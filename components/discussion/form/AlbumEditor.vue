@@ -7,6 +7,7 @@ import AlbumImageItem from './AlbumImageItem.vue';
 import AlbumDropZone from './AlbumDropZone.vue';
 import AlbumUrlInputForm from './AlbumUrlInputForm.vue';
 import AlbumExistingImagePicker from './AlbumExistingImagePicker.vue';
+import type { LibraryTabKey } from './reusableImageTypes';
 import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
 import { useImageMetadataAutoSave } from '@/composables/useImageMetadataAutoSave';
@@ -124,44 +125,53 @@ const selectedImageIds = computed(() =>
 const updateImageOrderAfterChange = (images: ImageInput[]) =>
   getImageIdOrder(images);
 
-// Helper to add a new image to the album
-const addNewImage = (input: Partial<ImageInput>) => {
-  if ((props.formValues.album?.images?.length ?? 0) >= MAX_IMAGES) {
+// Helper to add new images to the album in a single form update, so several
+// images can be added at once without each update overwriting the last.
+const addNewImages = (inputs: Partial<ImageInput>[]) => {
+  const currentImages = props.formValues.album?.images ?? [];
+  const remainingSlots = MAX_IMAGES - currentImages.length;
+
+  if (remainingSlots <= 0) {
     alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
     return;
   }
 
-  const { url, alt, caption, copyright, id, Uploader } = input;
+  const knownIds = new Set(selectedImageIds.value);
+  const newImages: ImageInput[] = [];
 
-  if (id && selectedImageIds.value.includes(id)) {
-    return;
+  for (const input of inputs) {
+    if (newImages.length >= remainingSlots) break;
+
+    const { url, alt, caption, copyright, id, Uploader } = input;
+    if (id && knownIds.has(id)) continue;
+    if (id) knownIds.add(id);
+
+    newImages.push({
+      id,
+      url: url || '',
+      alt: alt || '',
+      caption: caption || '',
+      copyright: copyright || '',
+      Uploader,
+    });
   }
 
-  const newImage: ImageInput = {
-    id,
-    url: url || '',
-    alt: alt || '',
-    caption: caption || '',
-    copyright: copyright || '',
-    Uploader,
-  };
-
-  const updatedImages = [...props.formValues.album.images, newImage];
-  const updatedImageOrder = [...props.formValues.album.imageOrder];
-
-  if (id) {
-    updatedImageOrder.push(id);
-  }
+  if (newImages.length === 0) return;
 
   emit('updateFormValues', {
     album: {
-      images: updatedImages,
-      imageOrder: updatedImageOrder,
+      images: [...currentImages, ...newImages],
+      imageOrder: [
+        ...props.formValues.album.imageOrder,
+        ...newImages.map((image) => image.id).filter((id): id is string => Boolean(id)),
+      ],
     },
   });
 
   debouncedAutoSave();
 };
+
+const addNewImage = (input: Partial<ImageInput>) => addNewImages([input]);
 
 const addExistingImage = (image: ExistingImageInput) => {
   addNewImage({
@@ -172,6 +182,20 @@ const addExistingImage = (image: ExistingImageInput) => {
     copyright: image.copyright || '',
     Uploader: image.Uploader,
   });
+};
+
+const addExistingImages = (images: ExistingImageInput[]) => {
+  addNewImages(
+    images.map((image) => ({
+      id: image.id,
+      url: image.url || '',
+      alt: image.alt || '',
+      caption: image.caption || '',
+      copyright: image.copyright || '',
+      Uploader: image.Uploader,
+    }))
+  );
+  showExistingImagePicker.value = false;
 };
 
 // Initialize image upload composable
@@ -217,6 +241,7 @@ const showUrlInput = ref(false);
 // Existing-image picker is hidden until the user asks to reuse an image, so we
 // don't fire its query on every form load.
 const showExistingImagePicker = ref(false);
+const libraryInitialTab = ref<LibraryTabKey>('uploads');
 const isCreatingImageFromUrl = ref(false);
 const urlInputFormRef = ref<InstanceType<typeof AlbumUrlInputForm> | null>(null);
 const pendingDeleteImageIndex = ref<number | null>(null);
@@ -389,7 +414,8 @@ const handleShowUrlInput = () => {
 };
 
 // Reveal the reusable-image picker (and the query it runs) on demand
-const handleShowExistingPicker = () => {
+const handleShowExistingPicker = (tab?: LibraryTabKey) => {
+  libraryInitialTab.value = tab ?? 'uploads';
   showExistingImagePicker.value = true;
 };
 
@@ -488,10 +514,11 @@ const handleUrlCancel = () => {
     />
 
     <AlbumExistingImagePicker
-      v-if="showExistingImagePicker"
+      :open="showExistingImagePicker"
       :selected-image-ids="selectedImageIds"
-      :is-limit-reached="isImageLimitReached"
-      @add-image="addExistingImage"
+      :max-images="MAX_IMAGES"
+      :initial-tab="libraryInitialTab"
+      @add-images="addExistingImages"
       @close="showExistingImagePicker = false"
     />
 
@@ -499,6 +526,8 @@ const handleUrlCancel = () => {
     <AlbumDropZone
       :is-limit-reached="isImageLimitReached"
       :max-images="MAX_IMAGES"
+      :compact="orderedImages.length > 0"
+      :selected-image-ids="selectedImageIds"
       :file-upload-available="fileUploadAvailable"
       :file-upload-unavailable-message="fileUploadUnavailableMessage"
       :setup-url="uploadSetupUrl"
@@ -506,6 +535,7 @@ const handleUrlCancel = () => {
       @drop="handleDropEvent"
       @show-url-input="handleShowUrlInput"
       @show-existing-picker="handleShowExistingPicker"
+      @add-existing-image="addExistingImage"
     />
 
     <!-- URL input form -->

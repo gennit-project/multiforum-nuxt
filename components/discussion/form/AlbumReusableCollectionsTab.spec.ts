@@ -64,8 +64,8 @@ vi.mock('@vue/apollo-composable', () => ({
 
 const GridStub = {
   name: 'AlbumReusableImageGrid',
-  props: ['images', 'selectedImageIds', 'isLimitReached', 'loading', 'error', 'emptyMessage'],
-  emits: ['add-image'],
+  props: ['images', 'selectedImageIds', 'pendingImageIds', 'isLimitReached', 'loading', 'error', 'emptyMessage'],
+  emits: ['toggle-image'],
   template: '<div class="grid-stub" />',
 };
 
@@ -74,6 +74,7 @@ const mountTab = (searchTerm = '') =>
     props: {
       searchTerm,
       selectedImageIds: [],
+      pendingImageIds: [],
       isLimitReached: false,
     },
     global: {
@@ -127,11 +128,11 @@ describe('AlbumReusableCollectionsTab', () => {
     expect(collectionButtons(wrapper).length).toBe(2);
   });
 
-  it('forwards addImage from the grid', async () => {
+  it('forwards toggleImage from the grid', async () => {
     const wrapper = mountTab();
     await collectionButtons(wrapper)[0].trigger('click');
-    wrapper.findComponent(GridStub).vm.$emit('add-image', { id: 'ci-1' });
-    expect(wrapper.emitted('addImage')?.[0]?.[0]).toMatchObject({ id: 'ci-1' });
+    wrapper.findComponent(GridStub).vm.$emit('toggle-image', { id: 'ci-1' });
+    expect(wrapper.emitted('toggleImage')?.[0]?.[0]).toMatchObject({ id: 'ci-1' });
   });
 
   it('requests the next page of collection images when Load more is clicked', async () => {

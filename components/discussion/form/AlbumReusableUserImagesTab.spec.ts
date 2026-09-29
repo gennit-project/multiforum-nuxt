@@ -40,8 +40,8 @@ vi.mock('@vue/apollo-composable', () => ({
 
 const GridStub = {
   name: 'AlbumReusableImageGrid',
-  props: ['images', 'selectedImageIds', 'isLimitReached', 'loading', 'error', 'emptyMessage'],
-  emits: ['add-image'],
+  props: ['images', 'selectedImageIds', 'pendingImageIds', 'isLimitReached', 'loading', 'error', 'emptyMessage'],
+  emits: ['toggle-image'],
   template: '<div class="grid-stub" />',
 };
 
@@ -51,6 +51,7 @@ const mountTab = (source: 'uploads' | 'favorites') =>
       source,
       searchTerm: '',
       selectedImageIds: [],
+      pendingImageIds: [],
       isLimitReached: false,
     },
     global: { stubs: { AlbumReusableImageGrid: GridStub } },

@@ -36,16 +36,16 @@ const mountGrid = (props: Record<string, unknown>) =>
     global: { stubs },
   });
 
-const addButtons = (wrapper: ReturnType<typeof mountGrid>) =>
-  wrapper.findAll('[data-testid="reuse-image-add-button"]');
+const toggles = (wrapper: ReturnType<typeof mountGrid>) =>
+  wrapper.findAll('[data-testid="reuse-image-toggle"]');
 
 describe('AlbumReusableImageGrid', () => {
   it('renders one card per image', () => {
     const wrapper = mountGrid({ images: [image('a'), image('b')] });
     expect(wrapper.findAll('img')[0]?.attributes()).toMatchObject({
       src: 'https://img.test/a.jpg',
-      width: '320',
-      height: '128',
+      width: '160',
+      height: '160',
       loading: 'lazy',
       decoding: 'async',
     });
@@ -76,31 +76,53 @@ describe('AlbumReusableImageGrid', () => {
     );
   });
 
-  it('emits addImage with the image when Add to album is clicked', async () => {
+  it('emits toggleImage with the image when its tile is clicked', async () => {
     const wrapper = mountGrid({ images: [image('a')] });
-    await addButtons(wrapper)[0].trigger('click');
-    expect(wrapper.emitted('addImage')?.[0]?.[0]).toMatchObject({ id: 'a' });
+    await toggles(wrapper)[0].trigger('click');
+    expect(wrapper.emitted('toggleImage')?.[0]?.[0]).toMatchObject({ id: 'a' });
   });
 
-  it('disables and relabels the button for an already-selected image', () => {
+  it('marks a picked image as pressed', () => {
+    const wrapper = mountGrid({
+      images: [image('a')],
+      pendingImageIds: ['a'],
+    });
+    expect(toggles(wrapper)[0].attributes('aria-pressed')).toBe('true');
+  });
+
+  it('leaves an unpicked image unpressed', () => {
+    const wrapper = mountGrid({ images: [image('a')] });
+    expect(toggles(wrapper)[0].attributes('aria-pressed')).toBe('false');
+  });
+
+  it('disables and labels an image that is already in the album', () => {
     const wrapper = mountGrid({
       images: [image('a')],
       selectedImageIds: ['a'],
     });
     expect({
-      disabled: addButtons(wrapper)[0].attributes('disabled'),
-      text: addButtons(wrapper)[0].text(),
+      disabled: toggles(wrapper)[0].attributes('disabled'),
+      text: toggles(wrapper)[0].text(),
     }).toEqual({ disabled: '', text: 'Already in album' });
   });
 
-  it('disables and relabels the button when the album limit is reached', () => {
+  it('disables unpicked images once the album limit is reached', () => {
     const wrapper = mountGrid({
       images: [image('a')],
       isLimitReached: true,
     });
     expect({
-      disabled: addButtons(wrapper)[0].attributes('disabled'),
-      text: addButtons(wrapper)[0].text(),
+      disabled: toggles(wrapper)[0].attributes('disabled'),
+      text: toggles(wrapper)[0].text(),
     }).toEqual({ disabled: '', text: 'Album limit reached' });
+  });
+
+  it('keeps picked images toggleable at the album limit so they can be unpicked', () => {
+    const wrapper = mountGrid({
+      images: [image('a')],
+      pendingImageIds: ['a'],
+      isLimitReached: true,
+    });
+    expect(toggles(wrapper)[0].attributes('disabled')).toBeUndefined();
   });
 });
