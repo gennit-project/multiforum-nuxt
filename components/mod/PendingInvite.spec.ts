@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import PendingInvite from '@/components/mod/PendingInvite.vue';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 
 const h = vi.hoisted(() => ({
   // useQuery is called twice: [0] owner invite, [1] mod invite.
@@ -16,13 +17,15 @@ const h = vi.hoisted(() => ({
   modError: null as unknown,
   modOnDone: undefined as undefined | (() => void),
   mutIndex: { n: 0 },
+  mutationOptions: [] as unknown[],
   username: null as unknown,
   route: null as unknown,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: () => ({ result: h.queryResults[h.queryIndex.n++] }),
-  useMutation: () => {
+  useMutation: (_document: unknown, options?: unknown) => {
+    h.mutationOptions.push(options);
     const i = h.mutIndex.n++;
     return i === 0
       ? {
@@ -44,10 +47,14 @@ vi.mock('@vue/apollo-composable', () => ({
   },
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
-vi.mock('@/composables/useAuthState', () => ({ useUsername: () => h.username }));
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => h.username,
+}));
 
-const ownerInvite = () => ref({ channels: [{ PendingOwnerInvites: [{ username: 'alice' }] }] });
-const modInvite = () => ref({ channels: [{ PendingModInvites: [{ username: 'alice' }] }] });
+const ownerInvite = () =>
+  ref({ channels: [{ PendingOwnerInvites: [{ username: 'alice' }] }] });
+const modInvite = () =>
+  ref({ channels: [{ PendingModInvites: [{ username: 'alice' }] }] });
 const noInvite = () => ref({ channels: [{}] });
 
 const mountInvite = () =>
@@ -60,7 +67,11 @@ const mountInvite = () =>
           emits: ['click'],
           template: '<button @click="$emit(\'click\')">{{ label }}</button>',
         },
-        ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
+        ErrorBanner: {
+          name: 'ErrorBanner',
+          props: ['text'],
+          template: '<div class="err">{{ text }}</div>',
+        },
       },
     },
   });
@@ -70,6 +81,7 @@ beforeEach(() => {
   h.queryIndex.n = 0;
   h.mutIndex.n = 0;
   h.queryResults = [noInvite(), noInvite()];
+  h.mutationOptions = [];
   h.ownerError = ref(null);
   h.modError = ref(null);
   h.ownerOnDone = undefined;
@@ -138,6 +150,15 @@ describe('PendingInvite accept owner', () => {
 });
 
 describe('PendingInvite accept mod', () => {
+  it('refreshes the active channel query when the mod invite is accepted', () => {
+    mountInvite();
+
+    expect(h.mutationOptions[1]).toEqual({
+      refetchQueries: [GET_CHANNEL],
+      awaitRefetchQueries: true,
+    });
+  });
+
   it('calls the mod mutation with the channel id', async () => {
     h.queryResults = [noInvite(), modInvite()];
     const wrapper = mountInvite();
