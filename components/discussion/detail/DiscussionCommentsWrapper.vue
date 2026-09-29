@@ -99,6 +99,14 @@ const props = defineProps({
     required: false,
     default: () => [],
   },
+  answersHasNextPage: {
+    type: Boolean,
+    default: false,
+  },
+  answersLoading: {
+    type: Boolean,
+    default: false,
+  },
   enableFeedback: {
     type: Boolean,
     required: false,
@@ -315,6 +323,7 @@ const updateCreateReplyCommentInput = (event: CreateEditCommentFormValues) => {
 
 defineEmits<{
   loadMore: [];
+  loadMoreAnswers: [];
 }>();
 
 const updateCommentSectionQueryResult = (
@@ -528,6 +537,8 @@ useAutoUnsubscribe({
     :archived="archived"
     :show-nuxt-page="effectiveShowNuxtPage"
     :answers="answers"
+    :answers-has-next-page="answersHasNextPage"
+    :answers-loading="answersLoading"
     :enable-feedback="enableFeedback"
     :enable-emoji="enableEmoji"
     :bot-suggestions="botSuggestions"
@@ -538,6 +549,7 @@ useAutoUnsubscribe({
     @update-comment-section-query-result="updateCommentSectionQueryResult"
     @update-create-reply-comment-input="updateCreateReplyCommentInput"
     @load-more="$emit('loadMore')"
+    @load-more-answers="$emit('loadMoreAnswers')"
   >
     <template #pre-header>
       <div v-if="isMounted && formDiscussionChannel && !archived && !locked">

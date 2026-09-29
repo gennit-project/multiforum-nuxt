@@ -92,7 +92,7 @@ const CommentStub = {
 
 const PinnedAnswersStub = {
   name: 'PinnedAnswers',
-  props: ['answers'],
+  props: ['answers', 'hasNextPage', 'loading'],
   emits: [
     'start-comment-save',
     'create-comment',
@@ -107,6 +107,7 @@ const PinnedAnswersStub = {
     'show-unmarked-as-best-answer-notification',
     'open-mod-profile',
     'scroll-to-top',
+    'load-more',
   ],
   template: '<div class="pinned-answers-stub" />',
 };
@@ -270,6 +271,23 @@ describe('CommentSection', () => {
   it('renders pinned answers when answers are present', () => {
     const wrapper = mountSection({ answers: [makeComment('a1')] });
     expect(wrapper.findComponent(PinnedAnswersStub).exists()).toBe(true);
+  });
+
+  it('forwards answer pagination state and events', async () => {
+    const wrapper = mountSection({
+      answers: [makeComment('a1')],
+      answersHasNextPage: true,
+      answersLoading: true,
+    });
+    const pinned = wrapper.findComponent(PinnedAnswersStub);
+
+    await pinned.vm.$emit('load-more');
+
+    expect({
+      hasNextPage: pinned.props('hasNextPage'),
+      loading: pinned.props('loading'),
+      emitted: wrapper.emitted('loadMoreAnswers'),
+    }).toEqual({ hasNextPage: true, loading: true, emitted: [[]] });
   });
 
   it('forwards load-more events', async () => {

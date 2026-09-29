@@ -104,4 +104,12 @@ describe('PinnedAnswers props and emits', () => {
       expect(wrapper.emitted(parentEvent)).toBeTruthy();
     }
   );
+
+  it('offers another page when more answers are available', async () => {
+    const wrapper = mountAnswers({ hasNextPage: true });
+
+    await wrapper.get('button').trigger('click');
+
+    expect(wrapper.emitted('loadMore')).toEqual([[]]);
+  });
 });

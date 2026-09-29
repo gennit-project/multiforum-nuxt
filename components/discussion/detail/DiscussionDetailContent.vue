@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { computed, ref, watch, defineAsyncComponent } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
+import { useApolloClient, useQuery } from '@vue/apollo-composable';
 import {
   GET_DISCUSSION_ACTIVITY,
   GET_DISCUSSION_DETAIL,
+  GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
+  GET_DISCUSSION_DETAIL_FILES_PAGE,
+  GET_DISCUSSION_DETAIL_IMAGES_PAGE,
   GET_DOWNLOAD_DETAIL,
 } from '@/graphQLData/discussion/queries';
 import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
@@ -20,6 +23,9 @@ import type {
   Discussion,
   DiscussionChannel,
   Comment,
+  DownloadableFile,
+  Image,
+  Album,
 } from '@/__generated__/graphql';
 import InfoBanner from '@/components/InfoBanner.vue';
 import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vue';
@@ -27,6 +33,7 @@ import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionCha
 import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 import AgeGatedDiscussionNotice from '@/components/auth/AgeGatedDiscussionNotice.vue';
+import LoadMore from '@/components/LoadMore.vue';
 import type { DiscussionChannelWithFlairs } from '@/types/Discussion';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
@@ -50,6 +57,36 @@ const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
 
 const COMMENT_LIMIT = 20;
+
+type DetailPageInfo = {
+  endCursor?: string | null;
+  hasNextPage: boolean;
+};
+
+type DetailAlbum = Album & {
+  detailImagesPageInfo?: DetailPageInfo;
+};
+
+type DetailDiscussion = Discussion & {
+  Album?: DetailAlbum | null;
+  detailFilesPageInfo?: DetailPageInfo;
+};
+
+type DetailDiscussionChannel = DiscussionChannel & {
+  detailAnswersPageInfo?: DetailPageInfo;
+};
+
+type DetailPageVariables = {
+  discussionId: string;
+  channelUniqueName: string;
+  after?: string | null;
+};
+
+const mergeById = <T extends { id: string }>(base: T[], additions: T[]) => {
+  const items = new Map(base.map((item) => [item.id, item]));
+  additions.forEach((item) => items.set(item.id, item));
+  return [...items.values()];
+};
 
 const props = defineProps({
   discussionId: {
@@ -88,6 +125,17 @@ const channelId = computed(() => {
 });
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 const lastValidDiscussion = ref<Discussion | null>(null);
+const additionalAnswers = ref<Comment[]>([]);
+const additionalFiles = ref<DownloadableFile[]>([]);
+const additionalImages = ref<Image[]>([]);
+const answerPageInfo = ref<DetailPageInfo | null>(null);
+const filePageInfo = ref<DetailPageInfo | null>(null);
+const imagePageInfo = ref<DetailPageInfo | null>(null);
+const answersLoading = ref(false);
+const mediaLoading = ref(false);
+const collectionError = ref('');
+const collectionGeneration = ref(0);
+const { resolveClient } = useApolloClient();
 const shouldLoadInlineComments = computed(
   () => !props.downloadMode && props.showComments
 );
@@ -172,7 +220,7 @@ const discussionBodyEditMode = ref(false);
 const albumEditMode = ref(false);
 const feedbackModalManager = ref();
 
-const discussion = computed<Discussion | null>(() => {
+const baseDiscussion = computed<DetailDiscussion | null>(() => {
   const currentDiscussion = getDiscussionResult.value?.discussions?.[0];
   const activity = getDiscussionActivityResult.value?.discussions?.[0];
   const currentWithActivity = currentDiscussion
@@ -186,7 +234,29 @@ const discussion = computed<Discussion | null>(() => {
     lastValidDiscussion.value?.id === props.discussionId
       ? lastValidDiscussion.value
       : null;
-  return currentWithActivity || lastValid;
+  return (currentWithActivity || lastValid) as DetailDiscussion | null;
+});
+
+const discussion = computed<Discussion | null>(() => {
+  const base = baseDiscussion.value;
+  if (!base) return null;
+
+  return {
+    ...base,
+    Album: base.Album
+      ? {
+          ...base.Album,
+          Images: mergeById(
+            (base.Album.Images || []) as Image[],
+            additionalImages.value
+          ),
+        }
+      : base.Album,
+    DownloadableFiles: mergeById(
+      (base.DownloadableFiles || []) as DownloadableFile[],
+      additionalFiles.value
+    ),
+  } as Discussion;
 });
 
 watch(commentSort, () =>
@@ -236,9 +306,19 @@ onGetDiscussionChannelResult((newResult) => {
 });
 
 watch(
-  () => props.discussionId,
+  [() => props.discussionId, channelId],
   () => {
+    collectionGeneration.value += 1;
     setLastValidCommentSection(null);
+    additionalAnswers.value = [];
+    additionalFiles.value = [];
+    additionalImages.value = [];
+    answerPageInfo.value = null;
+    filePageInfo.value = null;
+    imagePageInfo.value = null;
+    answersLoading.value = false;
+    mediaLoading.value = false;
+    collectionError.value = '';
   }
 );
 
@@ -261,10 +341,163 @@ const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
 });
 
 const answers = computed(() => {
-  return activeDiscussionChannel.value
-    ? activeDiscussionChannel.value.Answers
-    : [];
+  const initialAnswers = activeDiscussionChannel.value?.Answers || [];
+  return mergeById(initialAnswers as Comment[], additionalAnswers.value);
 });
+
+const currentAnswerPageInfo = computed(
+  () =>
+    answerPageInfo.value ||
+    (activeDiscussionChannel.value as DetailDiscussionChannel | null)
+      ?.detailAnswersPageInfo ||
+    null
+);
+
+const currentFilePageInfo = computed(
+  () =>
+    filePageInfo.value || baseDiscussion.value?.detailFilesPageInfo || null
+);
+
+const currentImagePageInfo = computed(
+  () =>
+    imagePageInfo.value ||
+    baseDiscussion.value?.Album?.detailImagesPageInfo ||
+    null
+);
+
+const hasMoreAnswers = computed(
+  () => currentAnswerPageInfo.value?.hasNextPage === true
+);
+
+const hasMoreMedia = computed(
+  () =>
+    currentFilePageInfo.value?.hasNextPage === true ||
+    currentImagePageInfo.value?.hasNextPage === true
+);
+
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : 'Unable to load more items.';
+
+const loadMoreAnswers = async () => {
+  const pageInfo = currentAnswerPageInfo.value;
+  if (!pageInfo?.hasNextPage || answersLoading.value) return;
+
+  answersLoading.value = true;
+  collectionError.value = '';
+  const requestGeneration = collectionGeneration.value;
+  try {
+    const client = resolveClient();
+    const { data } = await client.query<{
+      getDiscussionDetailAnswers: {
+        answers: Comment[];
+        pageInfo: DetailPageInfo;
+      };
+    }, DetailPageVariables>({
+      query: GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
+      variables: {
+        discussionId: props.discussionId,
+        channelUniqueName: channelId.value,
+        after: pageInfo.endCursor,
+      },
+      fetchPolicy: 'network-only',
+    });
+    if (requestGeneration === collectionGeneration.value) {
+      additionalAnswers.value = mergeById(
+        additionalAnswers.value,
+        data.getDiscussionDetailAnswers.answers
+      );
+      answerPageInfo.value = data.getDiscussionDetailAnswers.pageInfo;
+    }
+  } catch (error: unknown) {
+    if (requestGeneration === collectionGeneration.value) {
+      collectionError.value = getErrorMessage(error);
+    }
+  } finally {
+    if (requestGeneration === collectionGeneration.value) {
+      answersLoading.value = false;
+    }
+  }
+};
+
+const loadMoreMedia = async () => {
+  if (!hasMoreMedia.value || mediaLoading.value) return;
+
+  mediaLoading.value = true;
+  collectionError.value = '';
+  const requestGeneration = collectionGeneration.value;
+  try {
+    const client = resolveClient();
+    const requests: Promise<void>[] = [];
+
+    if (currentImagePageInfo.value?.hasNextPage) {
+      requests.push(
+        client
+          .query<{
+            getDiscussionDetailImages: {
+              images: Image[];
+              pageInfo: DetailPageInfo;
+            };
+          }, DetailPageVariables>({
+            query: GET_DISCUSSION_DETAIL_IMAGES_PAGE,
+            variables: {
+              discussionId: props.discussionId,
+              channelUniqueName: channelId.value,
+              after: currentImagePageInfo.value.endCursor,
+            },
+            fetchPolicy: 'network-only',
+          })
+          .then(({ data }) => {
+            if (requestGeneration === collectionGeneration.value) {
+              additionalImages.value = mergeById(
+                additionalImages.value,
+                data.getDiscussionDetailImages.images
+              );
+              imagePageInfo.value = data.getDiscussionDetailImages.pageInfo;
+            }
+          })
+      );
+    }
+
+    if (currentFilePageInfo.value?.hasNextPage) {
+      requests.push(
+        client
+          .query<{
+            getDiscussionDetailFiles: {
+              files: DownloadableFile[];
+              pageInfo: DetailPageInfo;
+            };
+          }, DetailPageVariables>({
+            query: GET_DISCUSSION_DETAIL_FILES_PAGE,
+            variables: {
+              discussionId: props.discussionId,
+              channelUniqueName: channelId.value,
+              after: currentFilePageInfo.value.endCursor,
+            },
+            fetchPolicy: 'network-only',
+          })
+          .then(({ data }) => {
+            if (requestGeneration === collectionGeneration.value) {
+              additionalFiles.value = mergeById(
+                additionalFiles.value,
+                data.getDiscussionDetailFiles.files
+              );
+              filePageInfo.value = data.getDiscussionDetailFiles.pageInfo;
+            }
+          })
+      );
+    }
+
+    await Promise.all(requests);
+  } catch (error: unknown) {
+    if (requestGeneration === collectionGeneration.value) {
+      collectionError.value = getErrorMessage(error);
+    }
+  } finally {
+    if (requestGeneration === collectionGeneration.value) {
+      mediaLoading.value = false;
+    }
+  }
+};
 
 const isArchived = computed(() => {
   // Check both sources for archived state - the comment section query and the discussion query
@@ -663,6 +896,18 @@ const handleEditAlbum = () => {
                   @handle-click-give-feedback="handleClickGiveFeedback"
                   @handle-click-undo-feedback="handleClickUndoFeedback"
                 />
+                <LoadMore
+                  v-if="hasMoreMedia || mediaLoading"
+                  class="mt-3 justify-self-center"
+                  :loading="mediaLoading"
+                  :reached-end-of-results="false"
+                  @load-more="loadMoreMedia"
+                />
+                <ErrorBanner
+                  v-if="collectionError"
+                  class="mt-3"
+                  :text="collectionError"
+                />
               </div>
             </div>
           </div>
@@ -692,7 +937,10 @@ const handleEditAlbum = () => {
                 :previous-offset="previousOffset"
                 :reached-end-of-results="reachedEndOfResults"
                 :answers="answers"
+                :answers-has-next-page="hasMoreAnswers"
+                :answers-loading="answersLoading"
                 @load-more="loadMore"
+                @load-more-answers="loadMoreAnswers"
               />
               <template #fallback>
                 <div

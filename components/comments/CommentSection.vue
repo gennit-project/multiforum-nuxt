@@ -122,6 +122,14 @@ const props = defineProps({
     type: Array as PropType<CommentType[]>,
     default: () => [],
   },
+  answersHasNextPage: {
+    type: Boolean,
+    default: false,
+  },
+  answersLoading: {
+    type: Boolean,
+    default: false,
+  },
   allowBotMentions: {
     type: Boolean,
     default: true,
@@ -148,6 +156,7 @@ const emit = defineEmits([
   'updateCreateReplyCommentInput',
   'updateCreateFormValues',
   'loadMore',
+  'loadMoreAnswers',
 ]);
 
 // Route and router
@@ -565,6 +574,8 @@ const commentPassThroughProps = computed(() => ({
       <PinnedAnswers
         v-if="answers?.length > 0"
         :answers="answers"
+        :has-next-page="answersHasNextPage"
+        :loading="answersLoading"
         :enable-feedback="enableFeedback"
         :locked="locked || archived"
         :archived="archived"
@@ -606,6 +617,7 @@ const commentPassThroughProps = computed(() => ({
         @scroll-to-top="scrollToTop"
         @update-edit-comment-input="updateEditInputValues"
         @update-create-reply-comment-input="updateCreateInputValuesForReply"
+        @load-more="$emit('loadMoreAnswers')"
       />
       <InfoBanner
         v-if="locked || archived"

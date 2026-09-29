@@ -25,7 +25,8 @@ vi.mock('@/composables/useAutoUnsubscribe', () => ({ useAutoUnsubscribe: vi.fn()
 
 const CommentSectionStub = {
   name: 'CommentSection',
-  props: ['comments'],
+  props: ['answersHasNextPage', 'answersLoading', 'comments'],
+  emits: ['load-more-answers'],
   // Render the slots so slotted content (e.g. the subscribe button) appears.
   template:
     '<div class="comment-section-stub"><slot name="subscription-button" /><slot name="pre-header" /><slot /></div>',
@@ -118,6 +119,22 @@ describe('DiscussionCommentsWrapper', () => {
     const wrapper = mountWrapper();
     const passed = wrapper.findComponent(CommentSectionStub).props('comments') as Comment[];
     expect(passed.map((c) => c.id)).toEqual(['a', 'b']);
+  });
+
+  it('forwards answer pagination state and events', async () => {
+    const wrapper = mountWrapper({
+      answersHasNextPage: true,
+      answersLoading: true,
+    });
+    const section = wrapper.findComponent(CommentSectionStub);
+
+    await section.vm.$emit('load-more-answers');
+
+    expect({
+      hasNextPage: section.props('answersHasNextPage'),
+      loading: section.props('answersLoading'),
+      emitted: wrapper.emitted('loadMoreAnswers'),
+    }).toEqual({ hasNextPage: true, loading: true, emitted: [[]] });
   });
 
   it('renders the subscribe button', () => {

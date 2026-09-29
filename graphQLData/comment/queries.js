@@ -218,6 +218,10 @@ export const GET_DISCUSSION_COMMENTS = gql`
             }
           }
         }
+        detailAnswersPageInfo {
+          endCursor
+          hasNextPage
+        }
       }
       Comments {
         id
