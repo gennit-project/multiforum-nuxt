@@ -3,11 +3,27 @@ import { mount } from '@vue/test-utils';
 
 import AlbumDropZone from '@/components/discussion/form/AlbumDropZone.vue';
 
+const { usernameRef } = vi.hoisted(() => ({
+  usernameRef: { value: 'alice' as string },
+}));
+
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => usernameRef,
+}));
+
+const StripStub = {
+  name: 'AlbumRecentUploadsStrip',
+  props: ['selectedImageIds'],
+  emits: ['add-image', 'browse'],
+  template: '<div class="strip-stub" />',
+};
+
 const mountZone = (props: Record<string, unknown> = {}) =>
   mount(AlbumDropZone, {
     props: { isLimitReached: false, maxImages: 5, ...props },
     global: {
       stubs: {
+        AlbumRecentUploadsStrip: StripStub,
         NuxtLink: {
           props: ['to'],
           template: '<a :href="to"><slot /></a>',
@@ -16,19 +32,26 @@ const mountZone = (props: Record<string, unknown> = {}) =>
     },
   });
 
-const buttonByText = (w: ReturnType<typeof mount>, text: string) =>
-  w.findAll('button').find((b) => b.text() === text);
+const source = (w: ReturnType<typeof mount>, key: string) =>
+  w.get(`[data-testid="album-source-${key}"]`);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  usernameRef.value = 'alice';
   vi.stubGlobal('alert', vi.fn());
 });
 
 describe('AlbumDropZone rendering', () => {
-  it('shows the upload controls when under the limit', () => {
+  it('shows the three sources with equal billing', () => {
     const wrapper = mountZone();
 
-    expect(buttonByText(wrapper, 'Choose Files')).toBeTruthy();
+    expect(
+      ['upload', 'library', 'link'].map((key) => source(wrapper, key).text())
+    ).toEqual([
+      'Upload filesChoose files or drag and drop',
+      'From your libraryUploads, favorites, and collections',
+      'Paste a linkUse an image from the web',
+    ]);
   });
 
   it('shows the limit message when the limit is reached', () => {
@@ -37,13 +60,15 @@ describe('AlbumDropZone rendering', () => {
     expect(wrapper.text()).toContain('Maximum limit of 5 images reached');
   });
 
-  it('hides the controls when the limit is reached', () => {
+  it('hides the sources when the limit is reached', () => {
     const wrapper = mountZone({ isLimitReached: true });
 
-    expect(buttonByText(wrapper, 'Choose Files')).toBeUndefined();
+    expect(wrapper.find('[data-testid="album-source-library"]').exists()).toBe(
+      false
+    );
   });
 
-  it('keeps link and reuse actions available when file storage is unavailable', () => {
+  it('keeps link and library actions available when file storage is unavailable', () => {
     const wrapper = mountZone({
       fileUploadAvailable: false,
       fileUploadUnavailableMessage: 'File storage is not configured.',
@@ -51,15 +76,10 @@ describe('AlbumDropZone rendering', () => {
     });
 
     expect(
-      wrapper.findAll('button').map((button) => ({
-        text: button.text(),
-        disabled: button.attributes('disabled') !== undefined,
-      }))
-    ).toEqual([
-      { text: 'Choose Files', disabled: true },
-      { text: 'Link to Image', disabled: false },
-      { text: 'Reuse an Image', disabled: false },
-    ]);
+      ['upload', 'library', 'link'].map(
+        (key) => source(wrapper, key).attributes('disabled') !== undefined
+      )
+    ).toEqual([true, false, false]);
   });
 
   it('links operators to upload setup when provided', () => {
@@ -73,15 +93,45 @@ describe('AlbumDropZone rendering', () => {
       '/admin/setup#file-uploads'
     );
   });
+
+  it('shows recent uploads and library shortcuts to signed-in users', () => {
+    const wrapper = mountZone();
+
+    expect({
+      strip: wrapper.findComponent(StripStub).exists(),
+      favorites: wrapper.find('[data-testid="album-browse-favorites"]').exists(),
+      collections: wrapper
+        .find('[data-testid="album-browse-collections"]')
+        .exists(),
+    }).toEqual({ strip: true, favorites: true, collections: true });
+  });
+
+  it('hides recent uploads and library shortcuts when signed out', () => {
+    usernameRef.value = '';
+    const wrapper = mountZone();
+
+    expect(wrapper.findComponent(StripStub).exists()).toBe(false);
+  });
+
+  it('collapses to a compact "Add more" row once the album has images', () => {
+    const wrapper = mountZone({ compact: true });
+
+    expect({
+      labels: ['upload', 'library', 'link'].map((key) =>
+        source(wrapper, key).text()
+      ),
+      strip: wrapper.findComponent(StripStub).exists(),
+    }).toEqual({ labels: ['Upload', 'Library', 'Link'], strip: false });
+  });
 });
 
 describe('AlbumDropZone actions', () => {
-  it('opens the file picker when Choose Files is clicked', async () => {
+  it('opens the file picker when Upload files is clicked', async () => {
     const wrapper = mountZone();
     const input = wrapper.find('input[type="file"]').element as HTMLInputElement;
     const clickSpy = vi.spyOn(input, 'click');
 
-    await buttonByText(wrapper, 'Choose Files')!.trigger('click');
+    await source(wrapper, 'upload').trigger('click');
 
     expect(clickSpy).toHaveBeenCalled();
   });
@@ -109,20 +159,48 @@ describe('AlbumDropZone actions', () => {
     expect(wrapper.emitted('files-selected')).toBeUndefined();
   });
 
-  it('emits show-url-input from Link to Image', async () => {
+  it('emits show-url-input from Paste a link', async () => {
     const wrapper = mountZone();
 
-    await buttonByText(wrapper, 'Link to Image')!.trigger('click');
+    await source(wrapper, 'link').trigger('click');
 
     expect(wrapper.emitted('show-url-input')).toBeTruthy();
   });
 
-  it('emits show-existing-picker from Reuse an Image', async () => {
+  it('emits show-existing-picker from From your library', async () => {
     const wrapper = mountZone();
 
-    await buttonByText(wrapper, 'Reuse an Image')!.trigger('click');
+    await source(wrapper, 'library').trigger('click');
 
-    expect(wrapper.emitted('show-existing-picker')).toBeTruthy();
+    expect(wrapper.emitted('show-existing-picker')).toEqual([[undefined]]);
+  });
+
+  it.each([
+    ['album-browse-favorites', 'favorites'],
+    ['album-browse-collections', 'collections'],
+  ])('opens the library on the right tab from %s', async (testid, tab) => {
+    const wrapper = mountZone();
+
+    await wrapper.get(`[data-testid="${testid}"]`).trigger('click');
+
+    expect(wrapper.emitted('show-existing-picker')).toEqual([[tab]]);
+  });
+
+  it('opens the library from the recent uploads Browse all link', async () => {
+    const wrapper = mountZone();
+
+    wrapper.findComponent(StripStub).vm.$emit('browse');
+
+    expect(wrapper.emitted('show-existing-picker')).toEqual([[undefined]]);
+  });
+
+  it('forwards a recent upload chosen in the strip', async () => {
+    const wrapper = mountZone();
+    const image = { id: 'img-1', url: 'https://img.test/1.jpg' };
+
+    wrapper.findComponent(StripStub).vm.$emit('add-image', image);
+
+    expect(wrapper.emitted('add-existing-image')).toEqual([[image]]);
   });
 
   it('emits drop when files are dropped', async () => {

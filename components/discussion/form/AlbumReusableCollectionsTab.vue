@@ -39,11 +39,12 @@ type CollectionImagesResult = {
 const props = defineProps<{
   searchTerm: string;
   selectedImageIds: string[];
+  pendingImageIds: string[];
   isLimitReached: boolean;
 }>();
 
 const emit = defineEmits<{
-  addImage: [image: ReusableImage];
+  toggleImage: [image: ReusableImage];
 }>();
 
 const usernameVar = useUsername();
@@ -243,11 +244,12 @@ const backToCollections = () => {
       <AlbumReusableImageGrid
         :images="collectionImages"
         :selected-image-ids="selectedImageIds"
+      :pending-image-ids="pendingImageIds"
         :is-limit-reached="isLimitReached"
         :loading="collectionImagesLoading"
         :error="collectionImagesErrorMessage"
         empty-message="This collection has no images."
-        @add-image="emit('addImage', $event)"
+        @toggle-image="emit('toggleImage', $event)"
       />
 
       <LoadMore

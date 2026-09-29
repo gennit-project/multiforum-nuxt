@@ -6,20 +6,33 @@ import AppImage from '@/components/image/AppImage.vue';
 import ImageCaption from '@/components/image/ImageCaption.vue';
 import type { ReusableImage } from './reusableImageTypes';
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   images: ReusableImage[];
   selectedImageIds: string[];
+  pendingImageIds?: string[];
   isLimitReached: boolean;
   loading: boolean;
   error?: string | null;
   emptyMessage?: string;
-}>();
+}>(), { pendingImageIds: () => [], error: null, emptyMessage: '' });
 
 const emit = defineEmits<{
-  addImage: [image: ReusableImage];
+  toggleImage: [image: ReusableImage];
 }>();
 
-const selectedImageIdsSet = computed(() => new Set(props.selectedImageIds));
+const inAlbumIds = computed(() => new Set(props.selectedImageIds));
+const pendingIds = computed(() => new Set(props.pendingImageIds));
+
+const isDisabled = (image: ReusableImage) =>
+  inAlbumIds.value.has(image.id) ||
+  (props.isLimitReached && !pendingIds.value.has(image.id));
+
+const statusLabel = (image: ReusableImage) => {
+  if (inAlbumIds.value.has(image.id)) return 'Already in album';
+  if (pendingIds.value.has(image.id)) return 'Selected';
+  if (props.isLimitReached) return 'Album limit reached';
+  return '';
+};
 
 const getImageAlt = (image: ReusableImage) =>
   image.alt || image.caption || 'Reusable album image';
@@ -56,53 +69,78 @@ const getUploaderLabel = (image: ReusableImage) => {
       {{ emptyMessage || 'No images found.' }}
     </p>
 
-    <div
+    <ul
       v-else
-      class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3"
+      class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4"
     >
-      <article
+      <li
         v-for="image in images"
         :key="image.id"
-        class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800"
       >
-        <AppImage
-          :src="image.url"
-          :alt="getImageAlt(image)"
-          class="h-32 w-full object-cover"
-          :width="320"
-          :height="128"
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          loading="lazy"
-          decoding="async"
-        />
-        <div class="space-y-2 p-3">
-          <ImageCaption
-            v-if="image.caption"
-            :text="image.caption"
-            class="line-clamp-2 text-sm font-medium text-gray-900 dark:text-white"
+        <button
+          type="button"
+          class="group relative block w-full overflow-hidden rounded-lg border-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 disabled:cursor-not-allowed"
+          :class="
+            pendingIds.has(image.id)
+              ? 'border-orange-500'
+              : 'border-transparent'
+          "
+          data-testid="reuse-image-toggle"
+          :aria-pressed="pendingIds.has(image.id)"
+          :aria-label="`${getImageAlt(image)}. Uploaded by ${getUploaderLabel(image)}`"
+          :disabled="isDisabled(image)"
+          @click="emit('toggleImage', image)"
+        >
+          <AppImage
+            :src="image.url"
+            :alt="''"
+            class="aspect-square w-full object-cover"
+            :class="inAlbumIds.has(image.id) ? 'opacity-40' : ''"
+            :width="160"
+            :height="160"
+            sizes="(min-width: 640px) 128px, 33vw"
+            loading="lazy"
+            decoding="async"
           />
-          <p
-            v-else
-            class="line-clamp-2 text-sm font-medium text-gray-900 dark:text-white"
+          <span
+            class="absolute top-1.5 left-1.5 flex h-6 w-6 items-center justify-center rounded-md border text-white"
+            :class="
+              pendingIds.has(image.id)
+                ? 'border-orange-600 bg-orange-600'
+                : 'border-gray-400 bg-white/90 dark:bg-gray-800/90'
+            "
+            aria-hidden="true"
           >
-            {{ image.alt || image.id }}
-          </p>
-          <p class="text-xs text-gray-600 dark:text-gray-300">
-            Uploaded by {{ getUploaderLabel(image) }}
-          </p>
-          <button
-            type="button"
-            class="w-full rounded-md bg-orange-600 px-3 py-2 text-sm font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600 dark:disabled:bg-gray-700 dark:disabled:text-gray-400"
-            data-testid="reuse-image-add-button"
-            :disabled="selectedImageIdsSet.has(image.id) || isLimitReached"
-            @click="emit('addImage', image)"
+            <svg
+              v-if="pendingIds.has(image.id)"
+              class="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="3"
+              stroke="currentColor"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+            </svg>
+          </span>
+          <span
+            v-if="statusLabel(image) && !pendingIds.has(image.id)"
+            class="absolute inset-x-0 bottom-0 bg-black/70 px-1.5 py-0.5 text-center text-[11px] text-white"
           >
-            <span v-if="selectedImageIdsSet.has(image.id)">Already in album</span>
-            <span v-else-if="isLimitReached">Album limit reached</span>
-            <span v-else>Add to album</span>
-          </button>
-        </div>
-      </article>
-    </div>
+            {{ statusLabel(image) }}
+          </span>
+        </button>
+        <ImageCaption
+          v-if="image.caption"
+          :text="image.caption"
+          class="mt-1 line-clamp-1 hidden text-xs text-gray-700 sm:block dark:text-gray-300"
+        />
+        <p
+          v-else
+          class="mt-1 line-clamp-1 hidden text-xs text-gray-700 sm:block dark:text-gray-300"
+        >
+          {{ image.alt || image.id }}
+        </p>
+      </li>
+    </ul>
   </div>
 </template>

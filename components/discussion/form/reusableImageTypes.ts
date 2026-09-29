@@ -16,6 +16,8 @@ export type ReusableImage = {
   } | null;
 };
 
+export type LibraryTabKey = 'uploads' | 'favorites' | 'collections';
+
 // Build the ImageWhere filter shared by every source tab: always exclude
 // archived / permanently-removed images, and, when a search term is present,
 // match it against the image's text fields.

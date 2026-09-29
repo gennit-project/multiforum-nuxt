@@ -103,8 +103,16 @@ const AlbumDropZoneStub = {
     'fileUploadAvailable',
     'fileUploadUnavailableMessage',
     'setupUrl',
+    'compact',
+    'selectedImageIds',
   ],
-  emits: ['files-selected', 'drop', 'show-url-input', 'show-existing-picker'],
+  emits: [
+    'files-selected',
+    'drop',
+    'show-url-input',
+    'show-existing-picker',
+    'add-existing-image',
+  ],
   template: '<div class="drop-zone-stub" />',
 };
 
@@ -120,17 +128,18 @@ const AlbumUrlInputFormStub = {
 
 const AlbumExistingImagePickerStub = {
   name: 'AlbumExistingImagePicker',
-  props: ['selectedImageIds', 'isLimitReached'],
-  emits: ['add-image', 'close'],
+  props: ['open', 'selectedImageIds', 'maxImages', 'initialTab'],
+  emits: ['add-images', 'close'],
   template: '<div class="existing-image-picker-stub" />',
 };
 
-// The reusable-image picker is hidden until the user asks to reuse an image, so
-// tests must first reveal it via the drop zone before it exists in the tree.
+// The reusable-image picker stays closed until the user asks to reuse an image,
+// so tests first request it via the drop zone.
 const revealExistingPicker = async (
-  wrapper: ReturnType<typeof mountEditor>
+  wrapper: ReturnType<typeof mountEditor>,
+  tab?: string
 ) => {
-  wrapper.getComponent(AlbumDropZoneStub).vm.$emit('show-existing-picker');
+  wrapper.getComponent(AlbumDropZoneStub).vm.$emit('show-existing-picker', tab);
   await wrapper.vm.$nextTick();
 };
 
@@ -347,15 +356,39 @@ describe('AlbumEditor', () => {
   it('adds an existing image from the picker', async () => {
     const wrapper = mountEditor();
     await revealExistingPicker(wrapper);
-    wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-image', makeImage('d'));
+    wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-images', [makeImage('d')]);
     await flushPromises();
     expect(lastEmit(wrapper).imageOrder).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('adds several existing images from the picker in one update', async () => {
+    const wrapper = mountEditor();
+    await revealExistingPicker(wrapper);
+    wrapper
+      .findComponent(AlbumExistingImagePickerStub)
+      .vm.$emit('add-images', [makeImage('d'), makeImage('e')]);
+    await flushPromises();
+    expect(lastEmit(wrapper).imageOrder).toEqual(['a', 'b', 'c', 'd', 'e']);
+  });
+
+  it('adds a recent upload chosen in the drop zone', async () => {
+    const wrapper = mountEditor();
+    wrapper
+      .getComponent(AlbumDropZoneStub)
+      .vm.$emit('add-existing-image', makeImage('d'));
+    await flushPromises();
+    expect(lastEmit(wrapper).imageOrder).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('switches the drop zone to its compact layout once the album has images', () => {
+    const wrapper = mountEditor();
+    expect(wrapper.getComponent(AlbumDropZoneStub).props('compact')).toBe(true);
   });
 
   it('does not add a duplicate existing image from the picker', async () => {
     const wrapper = mountEditor();
     await revealExistingPicker(wrapper);
-    wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-image', makeImage('a'));
+    wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-images', [makeImage('a')]);
     await flushPromises();
     expect(wrapper.emitted('updateFormValues')).toBeUndefined();
   });
@@ -436,29 +469,46 @@ describe('AlbumEditor', () => {
   });
 
   describe('existing-image picker flow', () => {
-    it('hides the reusable-image picker until the user requests it', () => {
+    const picker = (wrapper: ReturnType<typeof mountEditor>) =>
+      wrapper.getComponent(AlbumExistingImagePickerStub);
+
+    it('keeps the library picker closed until the user requests it', () => {
       const wrapper = mountEditor();
-      expect(wrapper.findComponent(AlbumExistingImagePickerStub).exists()).toBe(
-        false
-      );
+      expect(picker(wrapper).props('open')).toBe(false);
     });
 
-    it('reveals the reusable-image picker when the drop zone requests it', async () => {
+    it('opens the library picker when the drop zone requests it', async () => {
       const wrapper = mountEditor();
       await revealExistingPicker(wrapper);
-      expect(wrapper.findComponent(AlbumExistingImagePickerStub).exists()).toBe(
-        true
-      );
+      expect(picker(wrapper).props('open')).toBe(true);
     });
 
-    it('hides the reusable-image picker again on close', async () => {
+    it('opens the library picker on the tab the drop zone asked for', async () => {
+      const wrapper = mountEditor();
+      await revealExistingPicker(wrapper, 'collections');
+      expect(picker(wrapper).props('initialTab')).toBe('collections');
+    });
+
+    it('defaults to the uploads tab', async () => {
       const wrapper = mountEditor();
       await revealExistingPicker(wrapper);
-      wrapper.getComponent(AlbumExistingImagePickerStub).vm.$emit('close');
+      expect(picker(wrapper).props('initialTab')).toBe('uploads');
+    });
+
+    it('closes the library picker on close', async () => {
+      const wrapper = mountEditor();
+      await revealExistingPicker(wrapper);
+      picker(wrapper).vm.$emit('close');
       await wrapper.vm.$nextTick();
-      expect(wrapper.findComponent(AlbumExistingImagePickerStub).exists()).toBe(
-        false
-      );
+      expect(picker(wrapper).props('open')).toBe(false);
+    });
+
+    it('closes the library picker after images are added', async () => {
+      const wrapper = mountEditor();
+      await revealExistingPicker(wrapper);
+      picker(wrapper).vm.$emit('add-images', [makeImage('d')]);
+      await wrapper.vm.$nextTick();
+      expect(picker(wrapper).props('open')).toBe(false);
     });
   });
 });

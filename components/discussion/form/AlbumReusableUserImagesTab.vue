@@ -28,11 +28,12 @@ const props = defineProps<{
   source: 'uploads' | 'favorites';
   searchTerm: string;
   selectedImageIds: string[];
+  pendingImageIds: string[];
   isLimitReached: boolean;
 }>();
 
 const emit = defineEmits<{
-  addImage: [image: ReusableImage];
+  toggleImage: [image: ReusableImage];
 }>();
 
 const usernameVar = useUsername();
@@ -149,11 +150,12 @@ const loadMore = async () => {
     <AlbumReusableImageGrid
       :images="images"
       :selected-image-ids="selectedImageIds"
+      :pending-image-ids="pendingImageIds"
       :is-limit-reached="isLimitReached"
       :loading="loading"
       :error="errorMessage"
       :empty-message="emptyMessage"
-      @add-image="emit('addImage', $event)"
+      @toggle-image="emit('toggleImage', $event)"
     />
 
     <LoadMore
