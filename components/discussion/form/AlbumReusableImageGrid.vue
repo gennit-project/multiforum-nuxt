@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import AppImage from '@/components/image/AppImage.vue';
+import ImageCaption from '@/components/image/ImageCaption.vue';
 import type { ReusableImage } from './reusableImageTypes';
 
 const props = defineProps<{
@@ -75,8 +76,16 @@ const getUploaderLabel = (image: ReusableImage) => {
           decoding="async"
         />
         <div class="space-y-2 p-3">
-          <p class="line-clamp-2 text-sm font-medium text-gray-900 dark:text-white">
-            {{ image.caption || image.alt || image.id }}
+          <ImageCaption
+            v-if="image.caption"
+            :text="image.caption"
+            class="line-clamp-2 text-sm font-medium text-gray-900 dark:text-white"
+          />
+          <p
+            v-else
+            class="line-clamp-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
+            {{ image.alt || image.id }}
           </p>
           <p class="text-xs text-gray-600 dark:text-gray-300">
             Uploaded by {{ getUploaderLabel(image) }}

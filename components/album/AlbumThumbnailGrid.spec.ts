@@ -12,7 +12,16 @@ const img = (id: string, extra: Record<string, unknown> = {}) => ({
 const mountGrid = (props: Record<string, unknown>) =>
   mount(AlbumThumbnailGrid, {
     props,
-    global: { stubs: { NuxtLink: { template: '<a><slot /></a>' } } },
+    global: {
+      stubs: {
+        NuxtLink: { template: '<a><slot /></a>' },
+        ImageCaption: {
+          name: 'ImageCaption',
+          props: ['text'],
+          template: '<span class="image-caption">{{ text }}</span>',
+        },
+      },
+    },
   });
 
 describe('AlbumThumbnailGrid', () => {
@@ -36,16 +45,19 @@ describe('AlbumThumbnailGrid', () => {
 
   it('caps the number of tiles at maxImages', () => {
     expect(
-      mountGrid({ images: [img('a'), img('b'), img('c')], maxImages: 2 }).findAll(
-        'img'
-      )
+      mountGrid({
+        images: [img('a'), img('b'), img('c')],
+        maxImages: 2,
+      }).findAll('img')
     ).toHaveLength(2);
   });
 
   it('renders the caption when captions are enabled', () => {
     expect(
-      mountGrid({ images: [img('a', { caption: 'Sunset' })] }).text()
-    ).toContain('Sunset');
+      mountGrid({ images: [img('a', { caption: '**Sunset**' })] })
+        .getComponent({ name: 'ImageCaption' })
+        .props('text')
+    ).toBe('**Sunset**');
   });
 
   it('hides captions when showCaptions is false', () => {

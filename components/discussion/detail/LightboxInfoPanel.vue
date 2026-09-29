@@ -5,6 +5,7 @@ import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import CancelButton from '@/components/CancelButton.vue';
+import ImageCaption from '@/components/image/ImageCaption.vue';
 // Simplified image type for lightbox display
 interface LightboxImage {
   id: string;
@@ -101,9 +102,10 @@ const emit = defineEmits([
       class="text-md relative mb-4 border-white/20 pr-6 pb-2"
     >
       <div class="flex items-start justify-between">
-        <span class="flex-1">
-          {{ currentImage.caption || 'Image Details' }}</span
-        >
+        <ImageCaption
+          class="min-w-0 flex-1"
+          :text="currentImage.caption || 'Image Details'"
+        />
         <span
           v-if="isLoggedInAuthor"
           class="cursor-pointer rounded-full border-0 bg-transparent px-2 text-white transition-colors hover:bg-gray-800"

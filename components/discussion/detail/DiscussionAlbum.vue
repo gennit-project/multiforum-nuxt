@@ -15,6 +15,7 @@ import { useUsername } from '@/composables/useAuthState';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
 import AppImage from '@/components/image/AppImage.vue';
 import ModelPreviewTile from '@/components/image/ModelPreviewTile.vue';
+import ImageCaption from '@/components/image/ImageCaption.vue';
 import {
   hasGlbExtension,
   hasStlExtension,
@@ -372,8 +373,11 @@ onMounted(() => {
             </div>
           </div>
           <div v-else class="group relative text-center text-xs">
-            <span v-if="image?.caption">
-              <span>{{ image.caption }}</span>
+            <div
+              v-if="image?.caption"
+              class="flex items-start justify-center gap-1"
+            >
+              <ImageCaption class="min-w-0" :text="image.caption" @click.stop />
               <span
                 v-if="isLoggedInAuthor"
                 class="ml-2 inline-flex cursor-pointer rounded-full border-0 bg-transparent p-1 text-white transition-colors hover:bg-gray-800"
@@ -385,7 +389,7 @@ onMounted(() => {
               >
                 <PencilIcon class="re h-3 w-3" />
               </span>
-            </span>
+            </div>
             <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic"
               >No caption</span
             >
@@ -617,9 +621,7 @@ onMounted(() => {
           </div>
         </div>
         <div v-else-if="activeImage?.caption" class="group relative">
-          <span>
-            {{ activeImage.caption }}
-          </span>
+          <ImageCaption :text="activeImage.caption" />
         </div>
         <div v-else class="h-3" />
       </div>

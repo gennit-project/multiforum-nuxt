@@ -15,6 +15,7 @@ import { useCopyCurrentUrl } from '@/composables/useCopyCurrentUrl';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import ImageCaption from '@/components/image/ImageCaption.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import Notification from '@/components/NotificationComponent.vue';
@@ -555,7 +556,7 @@ onUnmounted(() => {
               </div>
             </div>
             <div v-else-if="image.caption">
-              <MarkdownPreview :text="image.caption" />
+              <ImageCaption :text="image.caption" />
             </div>
             <p v-else class="text-gray-500 italic dark:text-gray-400">
               No caption added yet.

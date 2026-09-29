@@ -24,9 +24,27 @@ const mountPanel = (props: Record<string, unknown> = {}) =>
       stubs: {
         XmarkIcon: true,
         PencilIcon: true,
-        TextEditor: { name: 'TextEditor', emits: ['update'], template: '<div class="editor" />' },
-        SaveButton: { name: 'SaveButton', emits: ['click'], template: '<button class="save" @click="$emit(\'click\', $event)" />' },
-        CancelButton: { name: 'CancelButton', emits: ['click'], template: '<button class="cancel" @click="$emit(\'click\', $event)" />' },
+        TextEditor: {
+          name: 'TextEditor',
+          emits: ['update'],
+          template: '<div class="editor" />',
+        },
+        SaveButton: {
+          name: 'SaveButton',
+          emits: ['click'],
+          template: '<button class="save" @click="$emit(\'click\', $event)" />',
+        },
+        CancelButton: {
+          name: 'CancelButton',
+          emits: ['click'],
+          template:
+            '<button class="cancel" @click="$emit(\'click\', $event)" />',
+        },
+        ImageCaption: {
+          name: 'ImageCaption',
+          props: ['text'],
+          template: '<div>{{ text }}</div>',
+        },
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
       },
@@ -37,7 +55,9 @@ describe('LightboxInfoPanel display', () => {
   it('shows the caption', () => {
     const wrapper = mountPanel();
 
-    expect(wrapper.text()).toContain('A nice cat');
+    expect(wrapper.getComponent({ name: 'ImageCaption' }).props('text')).toBe(
+      'A nice cat'
+    );
   });
 
   it('shows a More Details link when there is an uploader', () => {
@@ -82,7 +102,9 @@ describe('LightboxInfoPanel editing', () => {
   it('emits update-caption from the editor', async () => {
     const wrapper = mountPanel({ isEditing: true });
 
-    await wrapper.getComponent({ name: 'TextEditor' }).vm.$emit('update', 'new caption');
+    await wrapper
+      .getComponent({ name: 'TextEditor' })
+      .vm.$emit('update', 'new caption');
 
     expect(wrapper.emitted('update-caption')?.[0]).toEqual(['new caption']);
   });
