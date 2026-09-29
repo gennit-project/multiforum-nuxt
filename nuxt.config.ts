@@ -374,6 +374,10 @@ export default defineNuxtConfig({
     { src: '@/plugins/test-auth.client', mode: 'client' },
   ],
   runtimeConfig: {
+    // Optional multimodal model routed through Vercel AI Gateway. Keeping the
+    // model server-only prevents provider details and credentials from being
+    // exposed to the browser. Example: openai/gpt-5.4.
+    aiImageTextModel: '',
     // Server-only GraphQL URL. Docker deployments override it at runtime to
     // reach the backend over the private Compose network; browsers use the
     // same-origin /api/graphql proxy instead.
@@ -409,6 +413,10 @@ export default defineNuxtConfig({
       },
     },
     public: {
+      // The spike is opt-in so self-hosted instances do not display a control
+      // that cannot work until an AI provider has been configured.
+      aiImageTextSuggestionsEnabled:
+        process.env.NUXT_PUBLIC_AI_IMAGE_TEXT_SUGGESTIONS_ENABLED === 'true',
       // Deployment-specific values use matching NUXT_PUBLIC_* environment
       // variables at container startup. VITE_* remains the build-time fallback
       // for existing development and Vercel deployments.
