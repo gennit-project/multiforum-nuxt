@@ -36,8 +36,20 @@ const mountDetails = () =>
     props: { imageId: 'img1' },
     global: {
       stubs: {
-        LoadingSpinner: { name: 'LoadingSpinner', template: '<div class="spinner" />' },
-        ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
+        LoadingSpinner: {
+          name: 'LoadingSpinner',
+          template: '<div class="spinner" />',
+        },
+        ErrorBanner: {
+          name: 'ErrorBanner',
+          props: ['text'],
+          template: '<div class="err">{{ text }}</div>',
+        },
+        ImageCaption: {
+          name: 'ImageCaption',
+          props: ['text'],
+          template: '<div>{{ text }}</div>',
+        },
         NuxtImg: {
           props: [
             'src',
@@ -163,10 +175,12 @@ describe('ImageDetails content', () => {
   });
 
   it('shows the caption', () => {
-    h.result = ref({ images: [image({ caption: 'a caption' })] });
+    h.result = ref({ images: [image({ caption: '**a caption**' })] });
     const wrapper = mountDetails();
 
-    expect(wrapper.text()).toContain('a caption');
+    expect(wrapper.getComponent({ name: 'ImageCaption' }).props('text')).toBe(
+      '**a caption**'
+    );
   });
 
   it('links the album context discussion', () => {

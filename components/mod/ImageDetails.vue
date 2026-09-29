@@ -5,6 +5,7 @@ import { useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '../ErrorBanner.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import AppImage from '@/components/image/AppImage.vue';
+import ImageCaption from '@/components/image/ImageCaption.vue';
 import { stableRelativeTime } from '@/utils';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
 
@@ -162,7 +163,10 @@ onImageResult(({ data }) => {
             </div>
             <div v-if="image.caption" class="mt-2">
               <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Caption</p>
-              <p class="text-gray-900 dark:text-white">{{ image.caption }}</p>
+              <ImageCaption
+                :text="image.caption"
+                class="text-gray-900 dark:text-white"
+              />
             </div>
             <div v-if="image.alt" class="mt-1">
               <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Alt text</p>

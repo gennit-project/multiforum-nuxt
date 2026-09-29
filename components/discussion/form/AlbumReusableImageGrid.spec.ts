@@ -13,7 +13,15 @@ const image = (id: string, extra: Record<string, unknown> = {}) => ({
 
 const stubs = {
   LoadingSpinner: { template: '<div class="spinner" />' },
-  ErrorBanner: { props: ['text'], template: '<div class="error">{{ text }}</div>' },
+  ErrorBanner: {
+    props: ['text'],
+    template: '<div class="error">{{ text }}</div>',
+  },
+  ImageCaption: {
+    name: 'ImageCaption',
+    props: ['text'],
+    template: '<div>{{ text }}</div>',
+  },
 };
 
 const mountGrid = (props: Record<string, unknown>) =>
@@ -56,6 +64,16 @@ describe('AlbumReusableImageGrid', () => {
   it('renders the error banner when an error is passed', () => {
     const wrapper = mountGrid({ error: 'Boom' });
     expect(wrapper.find('.error').text()).toBe('Boom');
+  });
+
+  it('passes captions to the Markdown caption renderer', () => {
+    const wrapper = mountGrid({
+      images: [image('a', { caption: '[Example](https://example.com)' })],
+    });
+
+    expect(wrapper.getComponent({ name: 'ImageCaption' }).props('text')).toBe(
+      '[Example](https://example.com)'
+    );
   });
 
   it('emits addImage with the image when Add to album is clicked', async () => {

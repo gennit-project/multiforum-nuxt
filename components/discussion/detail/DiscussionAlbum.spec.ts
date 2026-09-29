@@ -29,6 +29,11 @@ const stubs = {
   LeftArrowIcon: { template: '<i />' },
   RightArrowIcon: { template: '<i />' },
   PencilIcon: { template: '<i />' },
+  ImageCaption: {
+    name: 'ImageCaption',
+    props: ['text'],
+    template: '<div class="image-caption">{{ text }}</div>',
+  },
 };
 
 const makeImage = (id: string) => ({
@@ -210,6 +215,19 @@ describe('DiscussionAlbum', () => {
       expect(wrapper.findComponent({ name: 'TextEditor' }).exists()).toBe(true);
     }
   );
+
+  it('passes grid captions to the Markdown caption renderer', () => {
+    const wrapper = mountAlbum({
+      album: {
+        ...makeAlbum(['a']),
+        Images: [{ ...makeImage('a'), caption: '**Existing caption**' }],
+      } as Album,
+    });
+
+    expect(wrapper.getComponent({ name: 'ImageCaption' }).props('text')).toBe(
+      '**Existing caption**'
+    );
+  });
 });
 
 describe('DiscussionAlbum — lightbox', () => {
