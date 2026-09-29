@@ -24,6 +24,16 @@ describe('TagComponent rendering', () => {
     expect(tagEl(wrapper).classes().join(' ')).toContain('bg-orange-400');
   });
 
+  it('keeps a single dark hover background with light text on default tags', () => {
+    const wrapper = mountTag();
+    const classes = tagEl(wrapper).classes();
+
+    expect({
+      hoverBgs: classes.filter((c) => c.startsWith('dark:hover:bg-')),
+      hoverText: classes.filter((c) => c.startsWith('dark:hover:text-')),
+    }).toEqual({ hoverBgs: ['dark:hover:bg-gray-600'], hoverText: ['dark:hover:text-white'] });
+  });
+
   it('uses channel styling in channel mode', () => {
     const wrapper = mountTag({ channelMode: true });
 
