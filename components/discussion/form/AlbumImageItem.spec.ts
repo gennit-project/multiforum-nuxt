@@ -1,8 +1,16 @@
-import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { flushPromises, mount } from '@vue/test-utils';
 import AlbumImageItem from './AlbumImageItem.vue';
 
-const image = { url: 'https://img.test/a.png', alt: 'A', caption: 'C', copyright: '' };
+const mockFetch = vi.fn();
+vi.stubGlobal('$fetch', mockFetch);
+
+const image = {
+  url: 'https://img.test/a.png',
+  alt: 'A',
+  caption: 'C',
+  copyright: '',
+};
 
 const mountItem = (props: Record<string, unknown> = {}) =>
   mount(AlbumImageItem, {
@@ -25,11 +33,16 @@ const mountItem = (props: Record<string, unknown> = {}) =>
         ClientOnly: { template: '<div><slot /></div>' },
         TextInput: {
           props: ['value'],
-          template: '<input class="ti" @input="$emit(\'update\', \'changed\')" >',
+          template:
+            '<input class="ti" @input="$emit(\'update\', \'changed\')" >',
         },
       },
     },
   });
+
+beforeEach(() => {
+  mockFetch.mockReset();
+});
 
 const buttonByName = (wrapper: ReturnType<typeof mountItem>, name: string) =>
   wrapper.get(`button[aria-label="${name}"]`);
@@ -48,16 +61,22 @@ describe('AlbumImageItem', () => {
       { canPermanentlyDelete: true },
       ['Move image 2 up', 'Move image 2 down', 'Delete image 2'],
     ],
-  ])('gives each icon control a descriptive accessible name (%o)', (props, names) => {
-    expect(
-      mountItem({ index: 1, ...props })
-        .findAll('button[aria-label]')
-        .map((button) => button.attributes('aria-label'))
-    ).toEqual(names);
-  });
+  ])(
+    'gives each icon control a descriptive accessible name (%o)',
+    (props, names) => {
+      expect(
+        mountItem({ index: 1, ...props })
+          .findAll('button[aria-label]')
+          .map((button) => button.attributes('aria-label'))
+      ).toEqual(names);
+    }
+  );
 
   it('disables the move-up button for the first image', () => {
-    const upButton = buttonByName(mountItem({ isFirst: true }), 'Move image 1 up');
+    const upButton = buttonByName(
+      mountItem({ isFirst: true }),
+      'Move image 1 up'
+    );
     expect((upButton.element as HTMLButtonElement).disabled).toBe(true);
   });
 
@@ -76,9 +95,12 @@ describe('AlbumImageItem', () => {
   it.each([
     { isFirst: true, expected: true },
     { isFirst: false, expected: false },
-  ])('shows the cover badge only on the first image (isFirst: $isFirst)', ({ isFirst, expected }) => {
-    expect(mountItem({ isFirst }).text().includes('Cover')).toBe(expected);
-  });
+  ])(
+    'shows the cover badge only on the first image (isFirst: $isFirst)',
+    ({ isFirst, expected }) => {
+      expect(mountItem({ isFirst }).text().includes('Cover')).toBe(expected);
+    }
+  );
 
   it.each([
     { alt: '', expected: 'Alt text missing' },
@@ -125,10 +147,93 @@ describe('AlbumImageItem', () => {
     [1, 'alt'],
     [2, 'copyright'],
     [3, 'url'],
-  ])('emits update-field for input %i with key %s', async (inputIndex, field) => {
-    const wrapper = mountItem();
-    await moreToggle(wrapper).trigger('click');
-    await wrapper.findAll('.ti')[inputIndex].trigger('input');
-    expect(wrapper.emitted('update-field')?.[0]).toEqual([field, 'changed']);
+  ])(
+    'emits update-field for input %i with key %s',
+    async (inputIndex, field) => {
+      const wrapper = mountItem();
+      await moreToggle(wrapper).trigger('click');
+      await wrapper.findAll('.ti')[inputIndex].trigger('input');
+      expect(wrapper.emitted('update-field')?.[0]).toEqual([field, 'changed']);
+    }
+  );
+  it('hides AI suggestions when the instance has not enabled the spike', () => {
+    expect(
+      mountItem().find('[data-testid="suggest-image-text-button"]').exists()
+    ).toBe(false);
+  });
+
+  it('sends the current image metadata when a suggestion is requested', async () => {
+    mockFetch.mockResolvedValue({
+      alt: 'A tabby cat sitting beside a window',
+      caption: 'Morning light by the window',
+    });
+    const wrapper = mountItem({ aiSuggestionsEnabled: true });
+
+    await wrapper
+      .get('[data-testid="suggest-image-text-button"]')
+      .trigger('click');
+    await flushPromises();
+
+    expect(mockFetch).toHaveBeenCalledWith('/api/ai/image-text-suggestion', {
+      method: 'POST',
+      body: {
+        imageUrl: image.url,
+        currentAlt: image.alt,
+        currentCaption: image.caption,
+      },
+    });
+  });
+
+  it('does not overwrite metadata when a suggestion is returned', async () => {
+    mockFetch.mockResolvedValue({
+      alt: 'A tabby cat sitting beside a window',
+      caption: 'Morning light by the window',
+    });
+    const wrapper = mountItem({ aiSuggestionsEnabled: true });
+
+    await wrapper
+      .get('[data-testid="suggest-image-text-button"]')
+      .trigger('click');
+    await flushPromises();
+
+    expect(wrapper.emitted('update-field')).toBeUndefined();
+  });
+
+  it('applies only the alt-text suggestion when asked', async () => {
+    mockFetch.mockResolvedValue({
+      alt: 'A tabby cat sitting beside a window',
+      caption: 'Morning light by the window',
+    });
+    const wrapper = mountItem({ aiSuggestionsEnabled: true });
+
+    await wrapper
+      .get('[data-testid="suggest-image-text-button"]')
+      .trigger('click');
+    await flushPromises();
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Use alt text')
+      ?.trigger('click');
+
+    expect(wrapper.emitted('update-field')?.[0]).toEqual([
+      'alt',
+      'A tabby cat sitting beside a window',
+    ]);
+  });
+
+  it('announces suggestion failures', async () => {
+    mockFetch.mockRejectedValue({
+      data: { statusMessage: 'The image could not be analyzed.' },
+    });
+    const wrapper = mountItem({ aiSuggestionsEnabled: true });
+
+    await wrapper
+      .get('[data-testid="suggest-image-text-button"]')
+      .trigger('click');
+    await flushPromises();
+
+    expect(wrapper.get('[role="alert"]').text()).toBe(
+      'The image could not be analyzed.'
+    );
   });
 });

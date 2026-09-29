@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
+import { useRuntimeConfig } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
@@ -23,6 +24,10 @@ import type { Album } from '@/__generated__/graphql';
 import { useInstanceCapability } from '@/composables/useInstanceSetupStatus';
 
 const usernameVar = useUsername();
+const runtimeConfig = useRuntimeConfig();
+const aiImageTextSuggestionsEnabled = computed(
+  () => runtimeConfig.public.aiImageTextSuggestionsEnabled === true
+);
 
 const MAX_IMAGES = 25;
 
@@ -38,7 +43,10 @@ type ImageInput = {
   } | null;
 };
 
-type ExistingImageInput = Omit<Partial<ImageInput>, 'alt' | 'caption' | 'copyright' | 'url'> & {
+type ExistingImageInput = Omit<
+  Partial<ImageInput>,
+  'alt' | 'caption' | 'copyright' | 'url'
+> & {
   url?: string | null;
   alt?: string | null;
   caption?: string | null;
@@ -218,12 +226,16 @@ const showUrlInput = ref(false);
 // don't fire its query on every form load.
 const showExistingImagePicker = ref(false);
 const isCreatingImageFromUrl = ref(false);
-const urlInputFormRef = ref<InstanceType<typeof AlbumUrlInputForm> | null>(null);
+const urlInputFormRef = ref<InstanceType<typeof AlbumUrlInputForm> | null>(
+  null
+);
 const pendingDeleteImageIndex = ref<number | null>(null);
 const permanentDeleteImageError = ref('');
 
-const { mutate: permanentlyDeleteImage, loading: permanentlyDeleteImageLoading } =
-  useMutation(PERMANENTLY_DELETE_IMAGE);
+const {
+  mutate: permanentlyDeleteImage,
+  loading: permanentlyDeleteImageLoading,
+} = useMutation(PERMANENTLY_DELETE_IMAGE);
 
 // Image field update handler
 const updateImageField = (
@@ -409,7 +421,9 @@ const handleUrlSubmit = async (url: string) => {
     showUrlInput.value = false;
     urlInputFormRef.value?.reset();
   } else {
-    urlInputFormRef.value?.setError('Failed to create image. Please try again.');
+    urlInputFormRef.value?.setError(
+      'Failed to create image. Please try again.'
+    );
   }
 
   isCreatingImageFromUrl.value = false;
@@ -441,7 +455,10 @@ const handleUrlCancel = () => {
       class="mb-2 flex items-center gap-2"
     >
       <LoadingSpinner v-if="isAutoSaving" class="h-4 w-4" />
-      <span v-if="isAutoSaving" class="text-sm text-blue-600 dark:text-blue-400">
+      <span
+        v-if="isAutoSaving"
+        class="text-sm text-blue-600 dark:text-blue-400"
+      >
         Saving album...
       </span>
       <span
@@ -481,6 +498,7 @@ const handleUrlCancel = () => {
       :is-last="index === orderedImages.length - 1"
       :is-loading="loadingStates[index] ?? false"
       :can-permanently-delete="canPermanentlyDeleteImage(image)"
+      :ai-suggestions-enabled="aiImageTextSuggestionsEnabled"
       @update-field="(field, value) => updateImageField(index, field, value)"
       @delete="requestDeleteImage(index)"
       @move-up="moveImageUp(index)"

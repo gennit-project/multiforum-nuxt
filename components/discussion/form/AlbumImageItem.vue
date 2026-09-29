@@ -7,6 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ExpandableImage from '@/components/ExpandableImage.vue';
 import ModelViewer from '@/components/ModelViewer.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+import { useImageTextSuggestion } from '@/composables/useImageTextSuggestion';
 
 // StlViewer statically imports three.js (~2MB decoded). Load it lazily so that
 // weight is only fetched when an STL image actually renders.
@@ -33,6 +34,7 @@ const props = defineProps<{
   isLast: boolean;
   isLoading: boolean;
   canPermanentlyDelete?: boolean;
+  aiSuggestionsEnabled?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -43,6 +45,14 @@ const emit = defineEmits<{
 // Attribution and the image URL are rarely edited, so they start collapsed.
 const showMore = ref(false);
 const moreId = useId();
+const suggestionStatusId = useId();
+const {
+  suggestion,
+  loading: suggestionLoading,
+  errorMessage: suggestionError,
+  requestSuggestion,
+  dismissSuggestion,
+} = useImageTextSuggestion();
 
 const imageNumber = computed(() => props.index + 1);
 // A file name ("07-21-25_5-25-45PM.png") describes nothing, so treat it like
@@ -54,6 +64,12 @@ const altHint = computed(() => {
   if (FILE_NAME_ALT.test(alt)) return 'Alt text is a file name';
   return '';
 });
+const handleRequestSuggestion = () =>
+  requestSuggestion({
+    imageUrl: props.image.url,
+    currentAlt: props.image.alt,
+    currentCaption: props.image.caption,
+  });
 
 const getUploaderLabel = (image: ImageData) => {
   const uploader = image.Uploader;
@@ -118,7 +134,7 @@ const getUploaderLabel = (image: ImageData) => {
       />
       <span
         v-if="isFirst"
-        class="absolute left-1 top-1 rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-600 dark:bg-blue-800 dark:text-blue-300"
+        class="absolute top-1 left-1 rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-600 dark:bg-blue-800 dark:text-blue-300"
       >
         Cover
       </span>
@@ -138,6 +154,95 @@ const getUploaderLabel = (image: ImageData) => {
     <!-- Fields -->
     <div class="w-full min-w-0 space-y-2 sm:w-auto sm:flex-1">
       <LoadingSpinner v-if="isLoading" />
+      <div
+        v-if="aiSuggestionsEnabled"
+        class="rounded-md border border-purple-200 bg-purple-50 p-3 dark:border-purple-800 dark:bg-purple-950/40"
+      >
+        <div class="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            class="rounded-md border border-purple-300 bg-white px-3 py-1.5 text-sm font-medium text-purple-700 hover:bg-purple-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-purple-700 dark:bg-gray-900 dark:text-purple-200 dark:hover:bg-purple-900"
+            :disabled="suggestionLoading || !image.url"
+            :aria-describedby="suggestionStatusId"
+            data-testid="suggest-image-text-button"
+            @click="handleRequestSuggestion"
+          >
+            {{
+              suggestionLoading ? 'Analyzing image…' : 'Suggest text with AI'
+            }}
+          </button>
+          <span
+            :id="suggestionStatusId"
+            class="text-xs text-gray-600 dark:text-gray-300"
+          >
+            Sends this image and its current text to the configured AI provider.
+            Review suggestions before using them. Accepted text updates this
+            reusable image everywhere it appears.
+          </span>
+        </div>
+
+        <p
+          v-if="suggestionError"
+          class="mt-2 text-sm text-red-700 dark:text-red-300"
+          role="alert"
+        >
+          {{ suggestionError }}
+        </p>
+
+        <div
+          v-if="suggestion"
+          class="mt-3 space-y-3 border-t border-purple-200 pt-3 dark:border-purple-800"
+          role="region"
+          :aria-label="`AI suggestions for image ${imageNumber}`"
+          aria-live="polite"
+        >
+          <div>
+            <p
+              class="text-xs font-semibold text-gray-600 uppercase dark:text-gray-300"
+            >
+              Suggested alt text
+            </p>
+            <p class="mt-1 text-sm text-gray-900 dark:text-white">
+              {{ suggestion.alt || 'No alt text suggested.' }}
+            </p>
+            <button
+              v-if="suggestion.alt"
+              type="button"
+              class="mt-1 text-sm font-medium text-purple-700 underline dark:text-purple-300"
+              @click="emit('update-field', 'alt', suggestion.alt)"
+            >
+              Use alt text
+            </button>
+          </div>
+
+          <div>
+            <p
+              class="text-xs font-semibold text-gray-600 uppercase dark:text-gray-300"
+            >
+              Suggested caption
+            </p>
+            <p class="mt-1 text-sm text-gray-900 dark:text-white">
+              {{ suggestion.caption || 'No caption suggested.' }}
+            </p>
+            <button
+              v-if="suggestion.caption"
+              type="button"
+              class="mt-1 text-sm font-medium text-purple-700 underline dark:text-purple-300"
+              @click="emit('update-field', 'caption', suggestion.caption)"
+            >
+              Use caption
+            </button>
+          </div>
+
+          <button
+            type="button"
+            class="text-sm text-gray-600 underline dark:text-gray-300"
+            @click="dismissSuggestion"
+          >
+            Dismiss suggestions
+          </button>
+        </div>
+      </div>
       <TextInput
         :value="image.caption"
         label="Caption"
