@@ -127,6 +127,26 @@ describe('ModerationWizard', () => {
       },
     });
 
+  it('does not ask for a mod action on a locked issue', () => {
+    const wrapper = mountWrapper({ isSuspendedMod: false, isLocked: true });
+
+    expect(wrapper.text()).not.toContain('Mod Action Needed');
+  });
+
+  it('explains that mod actions are disabled on a locked issue', () => {
+    const wrapper = mountWrapper({ isSuspendedMod: false, isLocked: true });
+
+    expect(wrapper.text()).toContain(
+      'Mod actions are disabled because the issue is locked.'
+    );
+  });
+
+  it('asks for a mod action on an open, unlocked issue', () => {
+    const wrapper = mountWrapper({ isSuspendedMod: false, isLocked: false });
+
+    expect(wrapper.text()).toContain('Mod Action Needed');
+  });
+
   it('shows the suspended-mod message', () => {
     const wrapper = mountWrapper();
 
