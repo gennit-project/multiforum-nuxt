@@ -68,7 +68,7 @@
     "codemirror": "^6.0.2",
     "crypto-js": "^4.2.0",
     "diff-match-patch": "^1.0.5",
-    "dotenv": "^17.4.2",
+    "dotenv": "^18.0.4",
     "graphql": "^16.14.2",
     "graphql-tag": "^2.12.7",
     "h3": "^1.15.11",
