@@ -65,7 +65,7 @@ const buildHandlers = ({ serverAdmins }: { serverAdmins: string[] }) => {
           setFeaturedWikiPages: {
             __typename: 'ServerConfig',
             serverName:
-              baseHandlers.getServerConfig().data.serverConfigs[0].serverName,
+              baseHandlers.getServerConfig().data.serverConfigs[0]?.serverName,
             featuredWikiPageIds,
           },
         },
