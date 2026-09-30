@@ -9,6 +9,12 @@ import {
 import { expectNoAxeViolations } from '../../helpers/axe';
 import type { GraphQLHandlers } from '../../helpers/mockGraphql';
 
+const thumbnail =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" fill="#526c55"/></svg>'
+  );
+
 const forums = [
   'prototaxites',
   'chatGPT',
@@ -59,6 +65,7 @@ const events = [
       startTime: '2025-02-20T18:00:00Z',
       endTime: '2025-02-20T19:00:00Z',
       virtualEventUrl: 'https://example.com/event',
+      coverImageURL: i === 1 ? thumbnail : '',
       location: null,
       locationName: '',
       address: '',
@@ -103,6 +110,7 @@ const handlers: GraphQLHandlers = {
           buildDiscussion({
             id: 'other',
             title: 'Why do tabby cats have stripes?',
+            body: `![Tabby cat](${thumbnail})`,
           }),
         ],
         aggregateDiscussionCount: 2,
@@ -226,6 +234,14 @@ for (const mobile of [false, true]) {
       .filter({ has: page.getByRole('link', { name: title, exact: true }) })
       .first();
     await expect(row).toBeVisible();
+    if (!mobile) {
+      const singleForumRow = page
+        .getByTestId('sitewide-discussion-list')
+        .locator(':scope > li')
+        .nth(1);
+      await expect(singleForumRow.getByRole('img').first()).toBeVisible();
+      expect((await singleForumRow.boundingBox())!.height).toBeLessThan(125);
+    }
     await expect(
       row.getByRole('link', { name: 'chatGPT: 1 comment', exact: true })
     ).toBeVisible();
@@ -297,6 +313,7 @@ for (const mobile of [false, true]) {
     await expect(
       row.getByText('3 comments · Shared across all forums')
     ).toBeVisible();
+    if (!mobile) expect((await row.boundingBox())!.height).toBeLessThan(200);
     await row.getByRole('button', { name: 'Show all 6 forums' }).click();
     await expect(
       row.getByRole('link', { name: 'View event in science' })

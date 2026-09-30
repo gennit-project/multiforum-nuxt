@@ -17,8 +17,9 @@ const props = withDefaults(
     kind: 'discussion' | 'event';
     selectedForum?: string;
     preview?: boolean;
+    compact?: boolean;
   }>(),
-  { selectedForum: '', preview: false }
+  { selectedForum: '', preview: false, compact: false }
 );
 const route = useRoute();
 const expanded = ref(false);
@@ -54,14 +55,29 @@ const label = (submission: Submission) =>
   <div
     v-if="submissions.length"
     class="min-w-0"
+    :class="
+      compact
+        ? 'grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2 gap-y-1'
+        : ''
+    "
     data-testid="forum-submissions"
   >
-    <p class="mb-2 text-xs font-medium text-gray-600 dark:text-gray-400">
+    <p
+      class="text-xs font-medium text-gray-600 dark:text-gray-400"
+      :class="compact ? 'pt-1.5' : 'mb-2'"
+    >
       {{ kind === 'discussion' ? 'Discuss in' : 'Shared in' }}
-      {{ submissions.length }}
-      {{ submissions.length === 1 ? 'forum' : 'forums' }}
+      <span :class="compact ? 'sr-only' : ''"
+        >{{ submissions.length }}
+        {{ submissions.length === 1 ? 'forum' : 'forums' }}</span
+      >
     </p>
-    <ul :id="listId" class="flex flex-wrap items-center gap-2" role="list">
+    <ul
+      :id="listId"
+      class="flex flex-wrap items-center"
+      :class="compact ? 'min-w-0 flex-1 gap-1' : 'gap-2'"
+      role="list"
+    >
       <li
         v-for="submission in visible"
         :key="submission.channelUniqueName"
@@ -81,8 +97,9 @@ const label = (submission: Submission) =>
           :aria-current="
             selectedForum === submission.channelUniqueName ? 'true' : undefined
           "
-          class="focus-visible:ring-brand-500 min-h-9 max-w-full items-center gap-2 rounded-lg border px-2.5 py-1.5 text-xs font-medium focus-visible:ring-2"
+          class="focus-visible:ring-brand-500 max-w-full items-center gap-2 rounded-lg border text-xs font-medium focus-visible:ring-2"
           :class="[
+            compact ? 'min-h-7 px-2 py-1' : 'min-h-9 px-2.5 py-1.5',
             mode === 'mobile'
               ? 'inline-flex lg:hidden'
               : mode === 'desktop'
@@ -106,7 +123,10 @@ const label = (submission: Submission) =>
       type="button"
       :aria-expanded="expanded"
       :aria-controls="listId"
-      class="focus-visible:ring-brand-500 mt-1 min-h-9 rounded px-1 text-xs font-semibold text-gray-700 underline underline-offset-4 focus-visible:ring-2 dark:text-gray-200"
+      class="focus-visible:ring-brand-500 rounded px-1 text-xs font-semibold text-gray-700 underline underline-offset-4 focus-visible:ring-2 dark:text-gray-200"
+      :class="
+        compact ? 'col-start-2 min-h-7 justify-self-start' : 'mt-1 min-h-9'
+      "
       @click="expanded = !expanded"
     >
       {{

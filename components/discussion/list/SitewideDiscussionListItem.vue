@@ -249,7 +249,7 @@ const revealSensitiveContent = () => {
 <template>
   <li class="list-none">
     <div
-      class="flex flex-col gap-2 rounded-xl border p-4 transition-colors"
+      class="flex flex-col gap-1 rounded-xl border px-3 py-2 transition-colors"
       :class="{
         'border-brand-600 bg-brand-50/50 dark:border-brand-400 dark:bg-gray-900':
           isSelected,
@@ -363,6 +363,22 @@ const revealSensitiveContent = () => {
               </button>
             </span>
           </div>
+          <ForumSubmissions
+            v-if="discussion"
+            class="mt-1.5"
+            :compact="true"
+            :submissions="discussion.DiscussionChannels"
+            :content-id="discussion.id"
+            kind="discussion"
+            :preview="true"
+            :selected-forum="
+              isSelected
+                ? typeof route.query.selectedForum === 'string'
+                  ? route.query.selectedForum
+                  : forumId
+                : ''
+            "
+          />
         </div>
         <nuxt-link
           v-if="thumbnailUrl && discussion && shouldShowContent"
@@ -372,10 +388,10 @@ const revealSensitiveContent = () => {
           <AppImage
             :src="thumbnailUrl"
             :alt="title"
-            class="h-16 w-16 rounded-lg object-cover sm:h-20 sm:w-20"
-            :width="80"
-            :height="80"
-            sizes="(max-width: 639px) 64px, 80px"
+            class="h-14 w-14 rounded-lg object-cover sm:h-16 sm:w-16"
+            :width="64"
+            :height="64"
+            sizes="(max-width: 639px) 56px, 64px"
           />
         </nuxt-link>
         <nuxt-link
@@ -386,10 +402,10 @@ const revealSensitiveContent = () => {
           <AppImage
             :src="thumbnailUrl"
             :alt="title"
-            class="h-16 w-16 rounded-lg object-cover sm:h-20 sm:w-20"
-            :width="80"
-            :height="80"
-            sizes="80px"
+            class="h-14 w-14 rounded-lg object-cover sm:h-16 sm:w-16"
+            :width="64"
+            :height="64"
+            sizes="64px"
           />
         </nuxt-link>
         <nuxt-link
@@ -401,22 +417,6 @@ const revealSensitiveContent = () => {
           <RightArrowIcon class="h-4 w-4" aria-hidden="true" />
         </nuxt-link>
       </div>
-
-      <ForumSubmissions
-        v-if="discussion"
-        class="mt-2 sm:ml-11"
-        :submissions="discussion.DiscussionChannels"
-        :content-id="discussion.id"
-        kind="discussion"
-        :preview="true"
-        :selected-forum="
-          isSelected
-            ? typeof route.query.selectedForum === 'string'
-              ? route.query.selectedForum
-              : forumId
-            : ''
-        "
-      />
 
       <div
         v-if="discussion && (discussion.body || discussion.Album) && isExpanded"

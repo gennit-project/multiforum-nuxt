@@ -156,9 +156,11 @@ const onMouseLeaveEventListItem = () => {
       role="list"
       :class="[
         'mb-4 ml-0 flex flex-col',
-        showMap || discoveryStyle
-          ? 'gap-3'
-          : 'gap-2 divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-black',
+        discoveryStyle
+          ? 'gap-2'
+          : showMap
+            ? 'gap-3'
+            : 'gap-2 divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-black',
         { 'pointer-events-none': sideNavIsOpenVar },
       ]"
       data-testid="event-list"
