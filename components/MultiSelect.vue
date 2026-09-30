@@ -470,16 +470,31 @@ const describedBy = computed(() => {
     <div v-click-outside="closeDropdown" class="relative">
       <div
         :class="[
-          'flex w-full rounded-lg border px-4 text-left dark:border-gray-700 dark:bg-gray-700',
+          'relative flex w-full rounded-lg border px-4 text-left dark:border-gray-700 dark:bg-gray-700',
           showChips
             ? 'min-h-10 flex-wrap items-center'
             : 'min-h-12 items-start py-2',
         ]"
       >
+        <!-- One native trigger covers the field; clear/remove stay separate buttons. -->
+        <button
+          ref="toggleButtonRef"
+          type="button"
+          :data-testid="testId"
+          :aria-label="toggleAriaLabel"
+          :aria-describedby="describedBy"
+          :aria-expanded="isDropdownOpen"
+          :aria-controls="popupId"
+          class="focus-visible:ring-brand-500 absolute inset-0 w-full cursor-pointer rounded-lg focus:outline-none focus-visible:ring-2"
+          @click="toggleDropdown"
+          @keydown.down.prevent="openDropdown('first')"
+          @keydown.up.prevent="openDropdown('last')"
+        ></button>
+
         <!-- Selected items as chips -->
         <div
           v-if="showChips && selectedOptions.length > 0"
-          class="flex flex-wrap gap-1"
+          class="pointer-events-none flex flex-wrap gap-1"
         >
           <div
             v-for="option in selectedOptions"
@@ -490,7 +505,7 @@ const describedBy = computed(() => {
             <button
               type="button"
               :aria-label="`Remove ${option.value}`"
-              class="focus-visible:ring-brand-500 ml-1 cursor-pointer rounded hover:text-red-500 focus:outline-none focus-visible:ring-2"
+              class="focus-visible:ring-brand-500 pointer-events-auto relative z-10 ml-1 cursor-pointer rounded hover:text-red-500 focus:outline-none focus-visible:ring-2"
               @click="removeSelection(option.value, $event)"
             >
               <span aria-hidden="true">&times;</span>
@@ -501,7 +516,7 @@ const describedBy = computed(() => {
         <!-- Single selection display or comma-separated values (when not showing chips) -->
         <div
           v-else-if="!showChips && selectedOptions.length > 0"
-          class="flex flex-1 items-start"
+          class="pointer-events-none flex flex-1 items-start"
         >
           <!-- Show avatar/icon only for single selection -->
           <AppImage
@@ -529,44 +544,33 @@ const describedBy = computed(() => {
         <!-- Placeholder -->
         <div
           v-if="selectedOptions.length === 0"
-          class="text-gray-500 dark:text-gray-400"
+          class="pointer-events-none text-gray-500 dark:text-gray-400"
         >
           <span>{{ placeholder }}</span>
         </div>
 
-        <!-- Clear button and dropdown arrow -->
-        <div class="ml-auto flex items-center text-gray-400">
+        <!-- Reserve space for the arrow and keep clear above the field trigger. -->
+        <div
+          class="pointer-events-none ml-auto flex items-center text-gray-400"
+        >
           <!-- Clear button -->
           <button
             v-if="selectedOptions.length > 0"
             type="button"
             aria-label="Clear selection"
-            class="mr-2 transition-colors hover:text-red-500"
+            class="pointer-events-auto relative z-10 mr-2 transition-colors hover:text-red-500"
             :title="'Clear selection'"
             @click.stop="clearSelection"
           >
             <XmarkIcon class="h-4 w-4" aria-hidden="true" />
           </button>
-
-          <button
-            ref="toggleButtonRef"
-            type="button"
-            :data-testid="testId"
-            :aria-label="toggleAriaLabel"
-            :aria-describedby="describedBy"
-            :aria-expanded="isDropdownOpen"
-            :aria-controls="popupId"
-            class="focus-visible:ring-brand-500 flex min-h-10 min-w-10 items-center justify-center rounded focus:outline-none focus-visible:ring-2"
-            @click="toggleDropdown"
-            @keydown.down.prevent="openDropdown('first')"
-            @keydown.up.prevent="openDropdown('last')"
-          >
+          <span class="flex min-h-10 min-w-10 items-center justify-center">
             <ChevronDownIcon
               class="h-4 w-4 transition-transform"
               :class="isDropdownOpen ? 'rotate-180' : ''"
               aria-hidden="true"
             />
-          </button>
+          </span>
         </div>
       </div>
 
