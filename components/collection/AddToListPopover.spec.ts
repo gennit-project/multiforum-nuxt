@@ -9,6 +9,7 @@ const h = vi.hoisted(() => {
   return {
     username: { value: 'alice' as string | null | undefined },
     collectionsResult: { value: undefined as unknown },
+    collectionsLoading: { value: false },
     itemInResult: { value: undefined as unknown },
     refetchCollections: undefined as unknown,
     refetchItem: undefined as unknown,
@@ -83,6 +84,7 @@ beforeEach(() => {
       },
     ],
   }) as never;
+  h.collectionsLoading = ref(false);
   h.itemInResult = ref({ users: [{ Collections: [] }] }) as never;
   h.refetchCollections = vi.fn();
   h.refetchItem = vi.fn();
@@ -96,6 +98,7 @@ beforeEach(() => {
     .fn()
     .mockReturnValueOnce({
       result: h.collectionsResult,
+      loading: h.collectionsLoading,
       refetch: h.refetchCollections,
     })
     .mockReturnValueOnce({ result: h.itemInResult, refetch: h.refetchItem });
@@ -128,6 +131,31 @@ describe('AddToListPopover list rendering', () => {
     expect(wrapper.text()).toContain('My List');
   });
 
+  it('shows collection skeletons instead of the empty state while loading', () => {
+    h.collectionsResult = ref(undefined) as never;
+    h.collectionsLoading = ref(true);
+    h.useQuery = vi
+      .fn()
+      .mockReturnValueOnce({
+        result: h.collectionsResult,
+        loading: h.collectionsLoading,
+        refetch: vi.fn(),
+      })
+      .mockReturnValueOnce({ result: h.itemInResult, refetch: vi.fn() });
+    const wrapper = mountPopover();
+
+    expect({
+      skeletonCount: wrapper.findAll('[aria-hidden="true"] .animate-pulse')
+        .length,
+      loadingLabel: wrapper.get('[role="status"]').attributes('aria-label'),
+      showsEmptyState: wrapper.text().includes('No collections yet'),
+    }).toEqual({
+      skeletonCount: 6,
+      loadingLabel: 'Loading collections',
+      showsEmptyState: false,
+    });
+  });
+
   it('renders collection choices as native toggle buttons', () => {
     const wrapper = mountPopover();
 
@@ -140,6 +168,71 @@ describe('AddToListPopover list rendering', () => {
       { element: 'BUTTON', pressed: 'false' },
       { element: 'BUTTON', pressed: 'false' },
     ]);
+  });
+
+  it('shows a row-level spinner immediately after a collection is clicked', async () => {
+    h.addMutation = vi.fn(() => new Promise(() => {}));
+    const wrapper = mountPopover();
+    const collectionRow = rows(wrapper)[1];
+
+    await collectionRow.trigger('click');
+    const pendingRow = rows(wrapper)[1];
+
+    expect({
+      mutationCalls: h.addMutation.mock.calls.length,
+      isBusy: pendingRow.attributes('aria-busy'),
+      isDisabled: pendingRow.attributes('disabled'),
+      showsRowSpinner: pendingRow.find('.animate-spin').exists(),
+      showsPopoverOverlay: wrapper
+        .find('.absolute.inset-0 .animate-spin')
+        .exists(),
+    }).toEqual({
+      mutationCalls: 1,
+      isBusy: 'true',
+      isDisabled: '',
+      showsRowSpinner: true,
+      showsPopoverOverlay: false,
+    });
+  });
+
+  it('keeps the row busy until refreshed membership is available', async () => {
+    let finishRefetch: (() => void) | undefined;
+    h.refetchItem = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finishRefetch = resolve;
+        })
+    );
+    h.useQuery = vi
+      .fn()
+      .mockReturnValueOnce({
+        result: h.collectionsResult,
+        loading: h.collectionsLoading,
+        refetch: h.refetchCollections,
+      })
+      .mockReturnValueOnce({
+        result: h.itemInResult,
+        refetch: h.refetchItem,
+      });
+    const wrapper = mountPopover();
+    const collectionRow = rows(wrapper)[1];
+
+    await collectionRow.trigger('click');
+    await flushPromises();
+    h.itemInResult.value = { users: [{ Collections: [{ id: 'c1' }] }] };
+    finishRefetch?.();
+    await flushPromises();
+    const refreshedRow = rows(wrapper)[1];
+
+    expect({
+      isBusy: refreshedRow.attributes('aria-busy'),
+      isChecked: refreshedRow.attributes('aria-pressed'),
+      showsRowSpinner: refreshedRow.find('.animate-spin').exists(),
+    }).toEqual({
+      isBusy: 'false',
+      isChecked: 'true',
+      showsRowSpinner: false,
+    });
   });
 
   it('shows the empty state when there are no collections', () => {
