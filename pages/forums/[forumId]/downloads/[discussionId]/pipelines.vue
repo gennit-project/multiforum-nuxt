@@ -58,6 +58,7 @@ const fileName = computed(
     <PublicDownloadPipelines
       v-if="fileId && discussionId && channelName"
       :file-id="fileId"
+      event-type="downloadableFile.created"
       :discussion-id="discussionId"
       :channel-name="channelName"
       :owner-username="discussion?.Author?.username || ''"

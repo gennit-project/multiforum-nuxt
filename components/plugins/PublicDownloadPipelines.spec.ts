@@ -91,7 +91,11 @@ vi.mock('@/composables/useDownloadPipelineOverview', async () => {
   };
 });
 
-const mountView = (ownerUsername = '', uploaderUsername = '') =>
+const mountView = (
+  ownerUsername = '',
+  uploaderUsername = '',
+  eventType?: string
+) =>
   mount(PublicDownloadPipelines, {
     props: {
       fileId: 'file-1',
@@ -99,6 +103,7 @@ const mountView = (ownerUsername = '', uploaderUsername = '') =>
       channelName: 'cats',
       ownerUsername,
       uploaderUsername,
+      eventType,
     },
   });
 
@@ -288,6 +293,77 @@ describe('PublicDownloadPipelines', () => {
         '/forums/cats/downloads/discussion-1/pipelines?attempt=pipeline-1#attempt-pipeline-1',
     });
   });
+
+  it('shows only creation scans and retries when scoped to the creation event', () => {
+    mockOverview.attempts = [
+      baseAttempt({
+        pipelineId: 'download',
+        eventType: 'downloadableFile.downloaded',
+      }),
+      baseAttempt({
+        pipelineId: 'update',
+        eventType: 'downloadableFile.updated',
+      }),
+      baseAttempt({
+        pipelineId: 'channel',
+        eventType: 'discussionChannel.created',
+        scope: 'CHANNEL',
+      }),
+      baseAttempt({
+        pipelineId: 'retry',
+        attemptNumber: 2,
+        trigger: 'OWNER_RETRY',
+      }),
+      baseAttempt({ pipelineId: 'initial', status: 'FAILED' }),
+    ];
+
+    const wrapper = mountView('', '', 'downloadableFile.created');
+
+    expect(wrapper.findAll('h4').map((heading) => heading.text())).toEqual([
+      'Server pipeline  · Attempt 2',
+      'Server pipeline  · Attempt 1',
+    ]);
+  });
+
+  it('shows an empty state when only unrelated checks exist', () => {
+    mockOverview.hasPipelineContent = true;
+    mockOverview.applicablePipelines = [
+      { eventType: 'discussionChannel.created' },
+    ];
+    mockOverview.attempts = [
+      baseAttempt({ eventType: 'downloadableFile.downloaded' }),
+    ];
+
+    expect(mountView('', '', 'downloadableFile.created').text()).toContain(
+      'No checks are configured and no pipeline attempts have run.'
+    );
+  });
+
+  it.each(['QUEUED', 'RUNNING'])(
+    'allows retrying a creation scan while an unrelated scan is %s',
+    (status) => {
+      mockUsername.value = 'alice';
+      mockOverview.hasActiveAttempt = true;
+      mockOverview.isPolling = true;
+      mockOverview.attempts = [
+        baseAttempt({
+          pipelineId: 'download',
+          eventType: 'downloadableFile.downloaded',
+          status,
+        }),
+        baseAttempt({ pipelineId: 'creation', status: 'FAILED' }),
+      ];
+
+      const wrapper = mountView('alice', '', 'downloadableFile.created');
+
+      expect({
+        updating: wrapper.text().includes('Updating'),
+        retry: wrapper
+          .findAll('button')
+          .some((button) => button.text() === 'Run checks again'),
+      }).toEqual({ updating: false, retry: true });
+    }
+  );
 
   it('announces polling while work is active', () => {
     mockOverview.hasPipelineContent = true;
