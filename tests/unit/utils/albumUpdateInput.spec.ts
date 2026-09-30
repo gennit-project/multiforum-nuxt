@@ -15,7 +15,10 @@ describe('buildAlbumUpdateInput', () => {
   describe('creating a new album', () => {
     it('connects valid images under Album.create', () => {
       const result = buildAlbumUpdateInput({
-        albumData: { images: [{ id: 'img1' }, { id: 'img2' }], imageOrder: ['img1', 'img2'] },
+        albumData: {
+          images: [{ id: 'img1' }, { id: 'img2' }],
+          imageOrder: ['img1', 'img2'],
+        },
         existingAlbumId: null,
       });
       expect(result).toEqual({
@@ -52,20 +55,38 @@ describe('buildAlbumUpdateInput', () => {
         existingAlbumId: 'album-1',
         existingImages: [{ id: 'old1' }],
       });
-      const ops = (result as { Album: { update: { node: { Images: unknown[] } } } }).Album.update.node.Images;
-      expect(ops).toContainEqual({ connect: [{ where: { node: { id: 'new1' } } }] });
+      const ops = (
+        result as { Album: { update: { node: { Images: unknown[] } } } }
+      ).Album.update.node.Images;
+      expect(ops).toContainEqual({
+        connect: [{ where: { node: { id: 'new1' } } }],
+      });
     });
 
     it('updates images that already exist', () => {
       const result = buildAlbumUpdateInput({
-        albumData: { images: [{ id: 'old1', alt: 'new alt', url: 'u', caption: 'c', copyright: 'r' }] },
+        albumData: {
+          images: [
+            {
+              id: 'old1',
+              alt: 'new alt',
+              url: 'u',
+              caption: 'c',
+              copyright: 'r',
+            },
+          ],
+        },
         existingAlbumId: 'album-1',
         existingImages: [{ id: 'old1' }],
       });
-      const ops = (result as { Album: { update: { node: { Images: unknown[] } } } }).Album.update.node.Images;
+      const ops = (
+        result as { Album: { update: { node: { Images: unknown[] } } } }
+      ).Album.update.node.Images;
       expect(ops).toContainEqual({
         where: { node: { id: 'old1' } },
-        update: { node: { url: 'u', alt: 'new alt', caption: 'c', copyright: 'r' } },
+        update: {
+          node: { url: 'u', alt: 'new alt', caption: 'c', copyright: 'r' },
+        },
       });
     });
 
@@ -75,18 +96,24 @@ describe('buildAlbumUpdateInput', () => {
         existingAlbumId: 'album-1',
         existingImages: [{ id: 'keep' }, { id: 'gone' }],
       });
-      const ops = (result as { Album: { update: { node: { Images: unknown[] } } } }).Album.update.node.Images;
-      expect(ops).toContainEqual({ disconnect: [{ where: { node: { id: 'gone' } } }] });
+      const ops = (
+        result as { Album: { update: { node: { Images: unknown[] } } } }
+      ).Album.update.node.Images;
+      expect(ops).toContainEqual({
+        disconnect: [{ where: { node: { id: 'gone' } } }],
+      });
     });
 
-    it('carries through the image order', () => {
+    it('drops order ids that are not connected images', () => {
       const result = buildAlbumUpdateInput({
         albumData: { images: [{ id: 'a' }], imageOrder: ['a', 'b'] },
         existingAlbumId: 'album-1',
         existingImages: [{ id: 'a' }],
       });
-      const order = (result as { Album: { update: { node: { imageOrder: string[] } } } }).Album.update.node.imageOrder;
-      expect(order).toEqual(['a', 'b']);
+      const order = (
+        result as { Album: { update: { node: { imageOrder: string[] } } } }
+      ).Album.update.node.imageOrder;
+      expect(order).toEqual(['a']);
     });
   });
 });

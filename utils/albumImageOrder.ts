@@ -13,18 +13,59 @@ export type OrderImagesParams<T> = {
 };
 
 /**
- * Return images sorted by `imageOrder`. Falls back to the original order when
- * no `imageOrder` is set; drops ids in the order that have no matching image.
+ * Return a complete, de-duplicated order for the supplied images. Valid stored
+ * order entries stay first, while connected images missing from a stale order
+ * are appended in their source order.
+ */
+export function normalizeImageOrder<T extends OrderableImage>(
+  params: OrderImagesParams<T>
+): string[] {
+  const { images, imageOrder } = params;
+  const imageIds = getImageIdOrder(images ?? []);
+  const validImageIds = new Set(imageIds);
+  const seen = new Set<string>();
+  const normalizedOrder: string[] = [];
+
+  for (const imageId of imageOrder ?? []) {
+    if (
+      typeof imageId === 'string' &&
+      validImageIds.has(imageId) &&
+      !seen.has(imageId)
+    ) {
+      seen.add(imageId);
+      normalizedOrder.push(imageId);
+    }
+  }
+
+  for (const imageId of imageIds) {
+    if (!seen.has(imageId)) {
+      seen.add(imageId);
+      normalizedOrder.push(imageId);
+    }
+  }
+
+  return normalizedOrder;
+}
+
+/**
+ * Return every connected image sorted by `imageOrder`. Images omitted from a
+ * stale order are appended so an incomplete scalar cannot hide relationships.
  */
 export function orderImagesByOrder<T extends OrderableImage>(
   params: OrderImagesParams<T>
 ): T[] {
-  const { images, imageOrder } = params;
+  const { images } = params;
   if (!images) return [];
-  if (!imageOrder || imageOrder.length === 0) return images;
+  if (!params.imageOrder || params.imageOrder.length === 0) return images;
 
-  return imageOrder
-    .map((imageId) => images.find((image) => image.id === imageId))
+  const imagesById = new Map(
+    images
+      .filter((image) => typeof image.id === 'string')
+      .map((image) => [image.id as string, image])
+  );
+
+  return normalizeImageOrder(params)
+    .map((imageId) => imagesById.get(imageId))
     .filter((image): image is T => image !== undefined);
 }
 

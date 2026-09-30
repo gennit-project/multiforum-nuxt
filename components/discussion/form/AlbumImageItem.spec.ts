@@ -42,18 +42,16 @@ describe('AlbumImageItem', () => {
     expect(mountItem({ index: 2 }).get('.sr-only').text()).toBe('Image 3');
   });
 
-  it.each([
-    [{}, ['Move image 2 up', 'Move image 2 down', 'Remove image 2']],
-    [
-      { canPermanentlyDelete: true },
-      ['Move image 2 up', 'Move image 2 down', 'Delete image 2'],
-    ],
-  ])('gives each icon control a descriptive accessible name (%o)', (props, names) => {
+  it('gives each icon control a descriptive accessible name', () => {
     expect(
-      mountItem({ index: 1, ...props })
+      mountItem({ index: 1 })
         .findAll('button[aria-label]')
         .map((button) => button.attributes('aria-label'))
-    ).toEqual(names);
+    ).toEqual([
+      'Move image 2 up',
+      'Move image 2 down',
+      'Remove image 2 from album',
+    ]);
   });
 
   it('disables the move-up button for the first image', () => {
@@ -63,7 +61,7 @@ describe('AlbumImageItem', () => {
 
   it('emits delete when the delete button is clicked', async () => {
     const wrapper = mountItem();
-    await buttonByName(wrapper, 'Remove image 1').trigger('click');
+    await buttonByName(wrapper, 'Remove image 1 from album').trigger('click');
     expect(wrapper.emitted('delete')).toBeTruthy();
   });
 

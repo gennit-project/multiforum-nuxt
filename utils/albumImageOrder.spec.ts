@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   orderImagesByOrder,
   getImageIdOrder,
+  normalizeImageOrder,
   moveImageOrderUp,
   moveImageOrderDown,
 } from './albumImageOrder';
@@ -11,22 +12,24 @@ describe('orderImagesByOrder', () => {
 
   it('returns images sorted by the id order', () => {
     expect(
-      orderImagesByOrder({ images, imageOrder: ['c', 'a', 'b'] }).map((i) => i.id)
+      orderImagesByOrder({ images, imageOrder: ['c', 'a', 'b'] }).map(
+        (i) => i.id
+      )
     ).toEqual(['c', 'a', 'b']);
   });
 
   it('keeps the original order when no imageOrder is set', () => {
-    expect(orderImagesByOrder({ images, imageOrder: [] }).map((i) => i.id)).toEqual(
-      ['a', 'b', 'c']
-    );
+    expect(
+      orderImagesByOrder({ images, imageOrder: [] }).map((i) => i.id)
+    ).toEqual(['a', 'b', 'c']);
   });
 
-  it('drops ids in the order with no matching image', () => {
+  it('drops unknown ids and appends connected images missing from the order', () => {
     expect(
       orderImagesByOrder({ images, imageOrder: ['c', 'missing', 'a'] }).map(
         (i) => i.id
       )
-    ).toEqual(['c', 'a']);
+    ).toEqual(['c', 'a', 'b']);
   });
 
   it('returns an empty array for null images', () => {
@@ -34,11 +37,23 @@ describe('orderImagesByOrder', () => {
   });
 });
 
+describe('normalizeImageOrder', () => {
+  it('preserves valid order and appends missing image ids once', () => {
+    expect(
+      normalizeImageOrder({
+        images: [{ id: 'a' }, { id: 'b' }, { id: 'c' }],
+        imageOrder: ['b', 'missing', 'b'],
+      })
+    ).toEqual(['b', 'a', 'c']);
+  });
+});
+
 describe('getImageIdOrder', () => {
   it('returns the list of non-null image ids', () => {
-    expect(
-      getImageIdOrder([{ id: 'a' }, { id: null }, { id: 'b' }])
-    ).toEqual(['a', 'b']);
+    expect(getImageIdOrder([{ id: 'a' }, { id: null }, { id: 'b' }])).toEqual([
+      'a',
+      'b',
+    ]);
   });
 });
 

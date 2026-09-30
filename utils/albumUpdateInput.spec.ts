@@ -32,6 +32,18 @@ describe('buildAlbumUpdateInput', () => {
     });
   });
 
+  it('persists a complete order when a connected image is missing from it', () => {
+    const result = buildAlbumUpdateInput({
+      albumData: {
+        images: [{ id: 'i1' }, { id: 'i2' }],
+        imageOrder: ['i1'],
+      },
+      existingAlbumId: 'a1',
+      existingImages: [{ id: 'i1' }],
+    });
+    expect(result.Album?.update?.node?.imageOrder).toEqual(['i1', 'i2']);
+  });
+
   it('disconnects images removed from an existing album', () => {
     const result = buildAlbumUpdateInput({
       albumData: { images: [], imageOrder: ['x'] },

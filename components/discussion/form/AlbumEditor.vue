@@ -11,9 +11,7 @@ import type { LibraryTabKey } from './reusableImageTypes';
 import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
 import { useImageMetadataAutoSave } from '@/composables/useImageMetadataAutoSave';
-import { useMutation } from '@vue/apollo-composable';
 import WarningModal from '@/components/WarningModal.vue';
-import { PERMANENTLY_DELETE_IMAGE } from '@/graphQLData/discussion/mutations';
 import {
   orderImagesByOrder,
   getImageIdOrder,
@@ -39,7 +37,10 @@ type ImageInput = {
   } | null;
 };
 
-type ExistingImageInput = Omit<Partial<ImageInput>, 'alt' | 'caption' | 'copyright' | 'url'> & {
+type ExistingImageInput = Omit<
+  Partial<ImageInput>,
+  'alt' | 'caption' | 'copyright' | 'url'
+> & {
   url?: string | null;
   alt?: string | null;
   caption?: string | null;
@@ -57,11 +58,13 @@ const props = withDefaults(
     allowImageUpload?: boolean;
     discussionId?: string;
     existingAlbum?: Album | null | undefined;
+    autoSave?: boolean;
   }>(),
   {
     allowImageUpload: true,
     discussionId: undefined,
     existingAlbum: undefined,
+    autoSave: true,
   }
 );
 
@@ -163,12 +166,14 @@ const addNewImages = (inputs: Partial<ImageInput>[]) => {
       images: [...currentImages, ...newImages],
       imageOrder: [
         ...props.formValues.album.imageOrder,
-        ...newImages.map((image) => image.id).filter((id): id is string => Boolean(id)),
+        ...newImages
+          .map((image) => image.id)
+          .filter((id): id is string => Boolean(id)),
       ],
     },
   });
 
-  debouncedAutoSave();
+  requestAutoSave();
 };
 
 const addNewImage = (input: Partial<ImageInput>) => addNewImages([input]);
@@ -227,6 +232,12 @@ const {
   getAlbumData: () => props.formValues.album,
 });
 
+const requestAutoSave = () => {
+  if (props.autoSave) {
+    debouncedAutoSave();
+  }
+};
+
 // Alt text, caption and attribution are saved on the Image itself; the album
 // save only handles which images are in the album, their order and URLs.
 const { saveImageMetadata, imageMetadataError } = useImageMetadataAutoSave();
@@ -243,12 +254,10 @@ const showUrlInput = ref(false);
 const showExistingImagePicker = ref(false);
 const libraryInitialTab = ref<LibraryTabKey>('uploads');
 const isCreatingImageFromUrl = ref(false);
-const urlInputFormRef = ref<InstanceType<typeof AlbumUrlInputForm> | null>(null);
-const pendingDeleteImageIndex = ref<number | null>(null);
-const permanentDeleteImageError = ref('');
-
-const { mutate: permanentlyDeleteImage, loading: permanentlyDeleteImageLoading } =
-  useMutation(PERMANENTLY_DELETE_IMAGE);
+const urlInputFormRef = ref<InstanceType<typeof AlbumUrlInputForm> | null>(
+  null
+);
+const pendingRemoveImageIndex = ref<number | null>(null);
 
 // Image field update handler
 const updateImageField = (
@@ -293,7 +302,7 @@ const updateImageField = (
     return;
   }
 
-  debouncedAutoSave();
+  requestAutoSave();
 };
 
 const removeImageFromAlbum = (index: number) => {
@@ -317,53 +326,22 @@ const removeImageFromAlbum = (index: number) => {
     },
   });
 
-  debouncedAutoSave();
+  requestAutoSave();
 };
 
-const canPermanentlyDeleteImage = (image: ImageInput | undefined) => {
-  const uploaderUsername = image?.Uploader?.username;
-  return !uploaderUsername || uploaderUsername === usernameVar.value;
+const requestRemoveImage = (index: number) => {
+  pendingRemoveImageIndex.value = index;
 };
 
-// Delete image handler
-const requestDeleteImage = (index: number) => {
-  const orderedImage = orderedImages.value[index];
-  if (!canPermanentlyDeleteImage(orderedImage)) {
-    removeImageFromAlbum(index);
-    return;
-  }
-
-  pendingDeleteImageIndex.value = index;
-  permanentDeleteImageError.value = '';
+const closeRemoveImageModal = () => {
+  pendingRemoveImageIndex.value = null;
 };
 
-const closeDeleteImageModal = () => {
-  if (permanentlyDeleteImageLoading.value) return;
-  pendingDeleteImageIndex.value = null;
-  permanentDeleteImageError.value = '';
-};
+const confirmRemoveImage = () => {
+  if (pendingRemoveImageIndex.value === null) return;
 
-const confirmDeleteImage = async () => {
-  if (pendingDeleteImageIndex.value === null) return;
-
-  const deleteIndex = pendingDeleteImageIndex.value;
-  const orderedImage = orderedImages.value[deleteIndex];
-  if (!orderedImage?.id) {
-    removeImageFromAlbum(deleteIndex);
-    closeDeleteImageModal();
-    return;
-  }
-
-  permanentDeleteImageError.value = '';
-
-  try {
-    await permanentlyDeleteImage({ imageId: orderedImage.id });
-    removeImageFromAlbum(deleteIndex);
-    pendingDeleteImageIndex.value = null;
-  } catch (error) {
-    permanentDeleteImageError.value =
-      error instanceof Error ? error.message : 'Failed to delete image.';
-  }
+  removeImageFromAlbum(pendingRemoveImageIndex.value);
+  pendingRemoveImageIndex.value = null;
 };
 
 // Move image up handler
@@ -377,7 +355,7 @@ const moveImageUp = (index: number) => {
     },
   });
 
-  debouncedAutoSave();
+  requestAutoSave();
 };
 
 // Move image down handler
@@ -392,7 +370,7 @@ const moveImageDown = (index: number) => {
     },
   });
 
-  debouncedAutoSave();
+  requestAutoSave();
 };
 
 // Handle files selected from drop zone
@@ -435,7 +413,9 @@ const handleUrlSubmit = async (url: string) => {
     showUrlInput.value = false;
     urlInputFormRef.value?.reset();
   } else {
-    urlInputFormRef.value?.setError('Failed to create image. Please try again.');
+    urlInputFormRef.value?.setError(
+      'Failed to create image. Please try again.'
+    );
   }
 
   isCreatingImageFromUrl.value = false;
@@ -467,7 +447,10 @@ const handleUrlCancel = () => {
       class="mb-2 flex items-center gap-2"
     >
       <LoadingSpinner v-if="isAutoSaving" class="h-4 w-4" />
-      <span v-if="isAutoSaving" class="text-sm text-blue-600 dark:text-blue-400">
+      <span
+        v-if="isAutoSaving"
+        class="text-sm text-blue-600 dark:text-blue-400"
+      >
         Saving album...
       </span>
       <span
@@ -506,9 +489,8 @@ const handleUrlCancel = () => {
       :is-first="index === 0"
       :is-last="index === orderedImages.length - 1"
       :is-loading="loadingStates[index] ?? false"
-      :can-permanently-delete="canPermanentlyDeleteImage(image)"
       @update-field="(field, value) => updateImageField(index, field, value)"
-      @delete="requestDeleteImage(index)"
+      @delete="requestRemoveImage(index)"
       @move-up="moveImageUp(index)"
       @move-down="moveImageDown(index)"
     />
@@ -548,17 +530,15 @@ const handleUrlCancel = () => {
     />
 
     <WarningModal
-      :open="pendingDeleteImageIndex !== null"
-      title="Delete this image?"
-      body="This permanently deletes the image and removes the stored file. This cannot be undone."
-      primary-button-text="Delete Image"
+      :open="pendingRemoveImageIndex !== null"
+      title="Remove this image from the album?"
+      body="The original image will remain in the library, collections, and other albums."
+      primary-button-text="Remove from album"
       secondary-button-text="Cancel"
       icon="trash"
-      data-testid="permanently-delete-album-image-modal"
-      :loading="permanentlyDeleteImageLoading"
-      :error="permanentDeleteImageError"
-      @primary-button-click="confirmDeleteImage"
-      @close="closeDeleteImageModal"
+      data-testid="remove-album-image-modal"
+      @primary-button-click="confirmRemoveImage"
+      @close="closeRemoveImageModal"
     />
   </div>
 </template>

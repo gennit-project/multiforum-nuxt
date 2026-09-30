@@ -10,50 +10,40 @@ import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
 const {
   usernameRef,
   createImageFromUrl,
-  permanentlyDeleteImage,
   uploadsAvailable,
   uploadsCapability,
   uploadsLoading,
   uploadsError,
   saveImageMetadata,
   debouncedAutoSave,
-} = vi.hoisted(
-  () => ({
-    saveImageMetadata: vi.fn(),
-    debouncedAutoSave: vi.fn(),
-    usernameRef: { value: 'alice' as string },
-    createImageFromUrl: vi.fn(),
-    permanentlyDeleteImage: vi.fn(),
-    uploadsAvailable: { value: true },
-    uploadsCapability: {
-      value: {
-        configured: true,
-        enabled: true,
-        requiredEnvVarsMissing: [],
-        setupUrl: '/admin/setup#file-uploads',
-        docsPath: '/self-hosting/uploads',
-      } as {
-        configured: boolean;
-        enabled: boolean;
-        requiredEnvVarsMissing: string[];
-        setupUrl: string;
-        docsPath: string;
-      } | null,
-    },
-    uploadsLoading: { value: false },
-    uploadsError: { value: null as Error | null },
-  })
-);
+} = vi.hoisted(() => ({
+  saveImageMetadata: vi.fn(),
+  debouncedAutoSave: vi.fn(),
+  usernameRef: { value: 'alice' as string },
+  createImageFromUrl: vi.fn(),
+  uploadsAvailable: { value: true },
+  uploadsCapability: {
+    value: {
+      configured: true,
+      enabled: true,
+      requiredEnvVarsMissing: [],
+      setupUrl: '/admin/setup#file-uploads',
+      docsPath: '/self-hosting/uploads',
+    } as {
+      configured: boolean;
+      enabled: boolean;
+      requiredEnvVarsMissing: string[];
+      setupUrl: string;
+      docsPath: string;
+    } | null,
+  },
+  uploadsLoading: { value: false },
+  uploadsError: { value: null as Error | null },
+}));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => usernameRef,
   setUsername: vi.fn(),
-}));
-vi.mock('@vue/apollo-composable', () => ({
-  useMutation: () => ({
-    mutate: permanentlyDeleteImage,
-    loading: { value: false },
-  }),
 }));
 vi.mock('@/composables/useAlbumImageUpload', () => ({
   useAlbumImageUpload: () => ({
@@ -92,7 +82,7 @@ vi.mock('@/composables/useInstanceSetupStatus', () => ({
 
 const AlbumImageItemStub = {
   name: 'AlbumImageItem',
-  props: ['image', 'index', 'isFirst', 'isLast', 'canPermanentlyDelete'],
+  props: ['image', 'index', 'isFirst', 'isLast'],
   emits: ['update-field', 'delete', 'move-up', 'move-down'],
   template: '<div class="image-item-stub" />',
 };
@@ -170,16 +160,21 @@ const makeImage = (id: string) => ({
 
 const mountEditor = (
   images = [makeImage('a'), makeImage('b'), makeImage('c')],
-  imageOrder = ['a', 'b', 'c']
+  imageOrder = ['a', 'b', 'c'],
+  props: Record<string, unknown> = {}
 ) =>
   mountWithDefaults(AlbumEditor, {
-    props: { formValues: { album: { images, imageOrder } } },
+    props: { formValues: { album: { images, imageOrder } }, ...props },
     global: { stubs },
   });
 
 const lastEmit = (wrapper: ReturnType<typeof mountEditor>) => {
   const calls = wrapper.emitted('updateFormValues');
-  return (calls?.[calls.length - 1]?.[0] as { album: { images: { id: string }[]; imageOrder: string[] } }).album;
+  return (
+    calls?.[calls.length - 1]?.[0] as {
+      album: { images: { id: string }[]; imageOrder: string[] };
+    }
+  ).album;
 };
 
 const warningModal = (wrapper: ReturnType<typeof mountEditor>) =>
@@ -189,10 +184,6 @@ describe('AlbumEditor', () => {
   beforeEach(() => {
     usernameRef.value = 'alice';
     createImageFromUrl.mockReset();
-    permanentlyDeleteImage.mockReset();
-    permanentlyDeleteImage.mockResolvedValue({
-      data: { permanentlyDeleteImage: { id: 'a' } },
-    });
     uploadsAvailable.value = true;
     uploadsCapability.value = {
       configured: true,
@@ -253,50 +244,37 @@ describe('AlbumEditor', () => {
     expect(lastEmit(wrapper).images.map((i) => i.id)).toEqual(['b', 'c']);
   });
 
-  it('opens a confirmation modal before deleting an image', async () => {
+  it('opens a confirmation modal before removing an image', async () => {
     const wrapper = mountEditor();
     wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('delete');
     await wrapper.vm.$nextTick();
     expect(warningModal(wrapper).props('open')).toBe(true);
   });
 
-  it('calls the permanent-delete mutation for the selected image', async () => {
+  it('explains that removing the pointer keeps the original image', async () => {
     const wrapper = mountEditor();
     wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('delete');
-    warningModal(wrapper).vm.$emit('primary-button-click');
-    await flushPromises();
-    expect(permanentlyDeleteImage).toHaveBeenCalledWith({ imageId: 'a' });
-  });
-
-  it('keeps the image in the album when permanent delete fails', async () => {
-    permanentlyDeleteImage.mockRejectedValue(
-      new Error('backend rejected delete')
-    );
-    const wrapper = mountEditor();
-    wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('delete');
-    warningModal(wrapper).vm.$emit('primary-button-click');
-    await flushPromises();
-    expect(wrapper.emitted('updateFormValues')).toBeUndefined();
-  });
-
-  it('removes a reused image by another uploader without permanent deletion', async () => {
-    const wrapper = mountEditor([
-      {
-        ...makeImage('a'),
-        Uploader: { username: 'bob', displayName: 'Bob' },
-      },
-    ], ['a']);
-    wrapper.findComponent(AlbumImageItemStub).vm.$emit('delete');
-    await flushPromises();
-    expect({
-      imageIds: lastEmit(wrapper).images.map((i) => i.id),
-      permanentDeleteCalls: permanentlyDeleteImage.mock.calls.length,
-      modalOpen: warningModal(wrapper).props('open'),
-    }).toEqual({
-      imageIds: [],
-      permanentDeleteCalls: 0,
-      modalOpen: false,
+    await wrapper.vm.$nextTick();
+    expect(warningModal(wrapper).props()).toMatchObject({
+      title: 'Remove this image from the album?',
+      body: 'The original image will remain in the library, collections, and other albums.',
     });
+  });
+
+  it('uses the same relationship-only removal flow for another uploader', async () => {
+    const wrapper = mountEditor(
+      [
+        {
+          ...makeImage('a'),
+          Uploader: { username: 'bob', displayName: 'Bob' },
+        },
+      ],
+      ['a']
+    );
+    wrapper.findComponent(AlbumImageItemStub).vm.$emit('delete');
+    warningModal(wrapper).vm.$emit('primary-button-click');
+    await flushPromises();
+    expect(lastEmit(wrapper).images).toEqual([]);
   });
 
   it('reorders imageOrder when an image moves up', () => {
@@ -313,8 +291,12 @@ describe('AlbumEditor', () => {
 
   it('updates a field on the targeted image', () => {
     const wrapper = mountEditor();
-    wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('update-field', 'alt', 'new alt');
-    const updated = lastEmit(wrapper).images.find((i) => i.id === 'a') as { alt: string };
+    wrapper
+      .findAllComponents(AlbumImageItemStub)[0]
+      .vm.$emit('update-field', 'alt', 'new alt');
+    const updated = lastEmit(wrapper).images.find((i) => i.id === 'a') as {
+      alt: string;
+    };
     expect(updated.alt).toBe('new alt');
   });
 
@@ -356,9 +338,21 @@ describe('AlbumEditor', () => {
   it('adds an existing image from the picker', async () => {
     const wrapper = mountEditor();
     await revealExistingPicker(wrapper);
-    wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-images', [makeImage('d')]);
+    wrapper
+      .findComponent(AlbumExistingImagePickerStub)
+      .vm.$emit('add-images', [makeImage('d')]);
     await flushPromises();
     expect(lastEmit(wrapper).imageOrder).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('does not auto-save picker changes when the enclosing form owns saving', async () => {
+    const wrapper = mountEditor(undefined, undefined, { autoSave: false });
+    await revealExistingPicker(wrapper);
+    wrapper
+      .findComponent(AlbumExistingImagePickerStub)
+      .vm.$emit('add-images', [makeImage('d')]);
+    await flushPromises();
+    expect(debouncedAutoSave).not.toHaveBeenCalled();
   });
 
   it('adds several existing images from the picker in one update', async () => {
@@ -388,7 +382,9 @@ describe('AlbumEditor', () => {
   it('does not add a duplicate existing image from the picker', async () => {
     const wrapper = mountEditor();
     await revealExistingPicker(wrapper);
-    wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-images', [makeImage('a')]);
+    wrapper
+      .findComponent(AlbumExistingImagePickerStub)
+      .vm.$emit('add-images', [makeImage('a')]);
     await flushPromises();
     expect(wrapper.emitted('updateFormValues')).toBeUndefined();
   });
@@ -438,7 +434,9 @@ describe('AlbumEditor', () => {
       });
       const wrapper = mountEditor();
       await showForm(wrapper);
-      wrapper.findComponent(AlbumUrlInputFormStub).vm.$emit('submit', 'https://example.com/d.jpg');
+      wrapper
+        .findComponent(AlbumUrlInputFormStub)
+        .vm.$emit('submit', 'https://example.com/d.jpg');
       await flushPromises();
 
       expect(lastEmit(wrapper).images.map((i) => i.id)).toContain('d');
@@ -449,7 +447,9 @@ describe('AlbumEditor', () => {
       usernameRef.value = '';
       const wrapper = mountEditor();
       await showForm(wrapper);
-      wrapper.findComponent(AlbumUrlInputFormStub).vm.$emit('submit', 'https://example.com/d.jpg');
+      wrapper
+        .findComponent(AlbumUrlInputFormStub)
+        .vm.$emit('submit', 'https://example.com/d.jpg');
       await flushPromises();
 
       expect(createImageFromUrl).not.toHaveBeenCalled();
@@ -460,7 +460,9 @@ describe('AlbumEditor', () => {
       createImageFromUrl.mockResolvedValue(null);
       const wrapper = mountEditor();
       await showForm(wrapper);
-      wrapper.findComponent(AlbumUrlInputFormStub).vm.$emit('submit', 'https://example.com/d.jpg');
+      wrapper
+        .findComponent(AlbumUrlInputFormStub)
+        .vm.$emit('submit', 'https://example.com/d.jpg');
       await flushPromises();
 
       expect(wrapper.emitted('updateFormValues')).toBeUndefined();
