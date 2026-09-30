@@ -318,7 +318,7 @@ const revealSensitiveContent = () => {
               </span>
               <span
                 v-if="hasSensitiveContent"
-                class="mt-1 shrink-0 rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
+                class="dark:border-brand-400 dark:text-brand-400 mt-1 shrink-0 rounded-full border border-amber-700 px-2 text-xs text-amber-700"
               >
                 Sensitive
               </span>
@@ -340,7 +340,7 @@ const revealSensitiveContent = () => {
               </span>
               <span
                 v-if="hasSensitiveContent"
-                class="mt-1 shrink-0 rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
+                class="dark:border-brand-400 dark:text-brand-400 mt-1 shrink-0 rounded-full border border-amber-700 px-2 text-xs text-amber-700"
               >
                 Sensitive
               </span>

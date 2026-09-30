@@ -52,7 +52,7 @@ const buttonClasses = computed(() => {
 
   if (properties.transparentBackground) {
     const transparentClasses = properties.active
-      ? 'border border-orange-300 bg-orange-100 text-orange-700 ring-1 ring-inset ring-orange-300 dark:border-orange-700/70 dark:bg-orange-950/70 dark:text-orange-200 dark:ring-orange-700/70'
+      ? 'border border-brand-300 bg-brand-100 text-brand-700 ring-1 ring-inset ring-brand-300 dark:border-brand-700/70 dark:bg-brand-950/70 dark:text-brand-200 dark:ring-brand-700/70'
       : 'border-transparent bg-black/5 text-black hover:border-transparent hover:bg-black/10 dark:text-white dark:bg-white/10 dark:hover:bg-white/15';
 
     const externalClass = properties.class || '';
@@ -73,13 +73,13 @@ const buttonClasses = computed(() => {
   }
 
   const defaultClasses = properties.active
-    ? 'border border-orange-300 bg-orange-100 text-orange-700 ring-1 ring-inset ring-orange-300 dark:border-orange-700/70 dark:bg-orange-950/70 dark:text-orange-200 dark:ring-orange-700/70'
-    : 'border-gray-200 text-black dark:text-white bg-gray-100 text-black hover:border-orange-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600';
+    ? 'border border-brand-300 bg-brand-100 text-brand-700 ring-1 ring-inset ring-brand-300 dark:border-brand-700/70 dark:bg-brand-950/70 dark:text-brand-200 dark:ring-brand-700/70'
+    : 'border-gray-200 text-black dark:text-white bg-gray-100 text-black hover:border-brand-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600';
 
   const permalinkClasses = properties.active
     ? ''
     : properties.isPermalinked
-      ? 'border-orange-500 hover:bg-orange-300 dark:border-orange-600 dark:hover:bg-orange-600'
+      ? 'border-brand-500 hover:bg-brand-300 dark:border-brand-600 dark:hover:bg-brand-600'
       : 'border-gray-200 dark:border-gray-600 hover:bg-gray-200';
 
   // Include external class passed from parent component

@@ -354,7 +354,7 @@ describe('ActivityFeedListItem', () => {
       commentEditIndex: 0,
     });
 
-    expect(wrapper.find('li').classes()).toContain('border-orange-500');
+    expect(wrapper.find('li').classes()).toContain('border-brand-500');
     expect(wrapper.find('[data-testid="revision-diff"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="markdown-preview"]').exists()).toBe(
       false

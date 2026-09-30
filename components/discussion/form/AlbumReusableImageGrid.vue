@@ -6,15 +6,18 @@ import AppImage from '@/components/image/AppImage.vue';
 import ImageCaption from '@/components/image/ImageCaption.vue';
 import type { ReusableImage } from './reusableImageTypes';
 
-const props = withDefaults(defineProps<{
-  images: ReusableImage[];
-  selectedImageIds: string[];
-  pendingImageIds?: string[];
-  isLimitReached: boolean;
-  loading: boolean;
-  error?: string | null;
-  emptyMessage?: string;
-}>(), { pendingImageIds: () => [], error: null, emptyMessage: '' });
+const props = withDefaults(
+  defineProps<{
+    images: ReusableImage[];
+    selectedImageIds: string[];
+    pendingImageIds?: string[];
+    isLimitReached: boolean;
+    loading: boolean;
+    error?: string | null;
+    emptyMessage?: string;
+  }>(),
+  { pendingImageIds: () => [], error: null, emptyMessage: '' }
+);
 
 const emit = defineEmits<{
   toggleImage: [image: ReusableImage];
@@ -48,11 +51,7 @@ const getUploaderLabel = (image: ReusableImage) => {
 
 <template>
   <div>
-    <ErrorBanner
-      v-if="error"
-      class="mt-3"
-      :text="error"
-    />
+    <ErrorBanner v-if="error" class="mt-3" :text="error" />
 
     <div
       v-if="loading && images.length === 0"
@@ -69,21 +68,13 @@ const getUploaderLabel = (image: ReusableImage) => {
       {{ emptyMessage || 'No images found.' }}
     </p>
 
-    <ul
-      v-else
-      class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4"
-    >
-      <li
-        v-for="image in images"
-        :key="image.id"
-      >
+    <ul v-else class="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4">
+      <li v-for="image in images" :key="image.id">
         <button
           type="button"
-          class="group relative block w-full overflow-hidden rounded-lg border-2 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 disabled:cursor-not-allowed"
+          class="group focus-visible:ring-brand-500 relative block w-full overflow-hidden rounded-lg border-2 text-left focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed"
           :class="
-            pendingIds.has(image.id)
-              ? 'border-orange-500'
-              : 'border-transparent'
+            pendingIds.has(image.id) ? 'border-brand-500' : 'border-transparent'
           "
           data-testid="reuse-image-toggle"
           :aria-pressed="pendingIds.has(image.id)"
@@ -106,7 +97,7 @@ const getUploaderLabel = (image: ReusableImage) => {
             class="absolute top-1.5 left-1.5 flex h-6 w-6 items-center justify-center rounded-md border text-white"
             :class="
               pendingIds.has(image.id)
-                ? 'border-orange-600 bg-orange-600'
+                ? 'border-brand-600 bg-brand-600'
                 : 'border-gray-400 bg-white/90 dark:bg-gray-800/90'
             "
             aria-hidden="true"
@@ -119,7 +110,11 @@ const getUploaderLabel = (image: ReusableImage) => {
               stroke-width="3"
               stroke="currentColor"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m4.5 12.75 6 6 9-13.5"
+              />
             </svg>
           </span>
           <span

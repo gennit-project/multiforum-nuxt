@@ -131,7 +131,7 @@ const contributorStats = computed(() =>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="bg-red-50 rounded-lg p-4 dark:bg-red-900/20">
+    <div v-else-if="error" class="rounded-lg bg-red-50 p-4 dark:bg-red-900/20">
       <p class="text-sm text-red-800 dark:text-red-200">
         Error loading contributors: {{ error.message }}
       </p>
@@ -149,7 +149,7 @@ const contributorStats = computed(() =>
       >
         <div class="mb-3 flex items-center gap-2">
           <div
-            class="font-semibold flex h-6 w-6 items-center justify-center rounded-full bg-orange-100 text-xs text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
+            class="bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300 flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold"
           >
             {{ index + 1 }}
           </div>
@@ -158,10 +158,10 @@ const contributorStats = computed(() =>
             :src="contributor.profilePicURL"
             :alt="contributor.displayName || contributor.username"
             class="h-8 w-8 rounded-full"
-          >
+          />
           <div class="min-w-0 flex-1">
             <h3
-              class="font-semibold truncate text-sm text-gray-900 dark:text-white"
+              class="truncate text-sm font-semibold text-gray-900 dark:text-white"
             >
               {{ contributor.displayName || contributor.username }}
             </h3>
@@ -186,7 +186,7 @@ const contributorStats = computed(() =>
     </div>
 
     <!-- Empty State -->
-    <div v-else class="bg-gray-50 rounded-lg p-12 text-center dark:bg-gray-800">
+    <div v-else class="rounded-lg bg-gray-50 p-12 text-center dark:bg-gray-800">
       <UserGroupIcon class="mx-auto mb-4 h-10 w-10 text-gray-400" />
       <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
         No results in the selected time period

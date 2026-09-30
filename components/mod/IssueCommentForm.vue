@@ -88,15 +88,14 @@ watch(
           />
         </svg>
         <span
-          >This issue is locked. Comments and status changes are
-          disabled.</span
+          >This issue is locked. Comments and status changes are disabled.</span
         >
       </div>
     </div>
     <template v-else>
       <div
         v-if="isSuspendedMod && !isOriginalUserAuthor"
-        class="my-4 rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-gray-700 dark:border-orange-500/40 dark:bg-orange-500/10 dark:text-gray-200"
+        class="border-brand-200 bg-brand-50 dark:border-brand-500/40 dark:bg-brand-500/10 my-4 rounded-lg border p-4 text-sm text-gray-700 dark:text-gray-200"
       >
         Your moderator account is suspended, so moderation actions on this issue
         are disabled. This does not suspend your user account.

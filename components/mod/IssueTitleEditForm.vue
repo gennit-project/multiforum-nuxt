@@ -16,7 +16,6 @@ import IssueBadge from '@/components/mod/IssueBadge.vue';
 
 const modProfileNameVar = useModProfileName();
 
-
 const route = useRoute();
 const titleEditMode = ref(false);
 
@@ -113,7 +112,7 @@ const hasReportedContent = computed(
 <template>
   <div class="w-full">
     <div
-      class="mb-3 mt-3 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
+      class="mt-3 mb-3 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >
       <div v-if="getIssueLoading" class="flex-1">
         <div class="flex flex-col gap-2 px-1">
@@ -125,7 +124,7 @@ const hasReportedContent = computed(
         <slot />
         <h2
           v-if="!titleEditMode"
-          class="text-wrap px-1 text-lg sm:tracking-tight md:text-2xl"
+          class="px-1 text-lg text-wrap sm:tracking-tight md:text-2xl"
         >
           {{ issue && issue.title ? issue.title : "Couldn't find the issue" }}
         </h2>
@@ -151,7 +150,7 @@ const hasReportedContent = computed(
           />
           <div
             v-if="issue"
-            class="ml-1 mt-1 text-sm text-gray-500 dark:text-gray-400"
+            class="mt-1 ml-1 text-sm text-gray-500 dark:text-gray-400"
           >
             <span v-if="hasReportedContent" class="mr-2">
               All reports for this content are collected in this issue.
@@ -174,7 +173,7 @@ const hasReportedContent = computed(
           <nuxt-link
             v-if="!titleEditMode"
             :to="`/forums/${channelId}/issues/create`"
-            class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            class="focus:ring-brand-500 ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             New Issue
           </nuxt-link>
@@ -198,7 +197,7 @@ const hasReportedContent = computed(
         <template #does-not-have-auth>
           <button
             type="button"
-            class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            class="focus:ring-brand-500 ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             New Issue
           </button>

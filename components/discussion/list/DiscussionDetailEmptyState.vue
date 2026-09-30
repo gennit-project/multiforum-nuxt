@@ -11,16 +11,16 @@ defineProps({
 
 <template>
   <div
-    class="flex h-full min-h-[20rem] flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-linear-to-br from-orange-50 via-white to-amber-50 px-6 py-10 text-center dark:border-gray-700 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800"
+    class="from-brand-50 flex h-full min-h-[20rem] flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-linear-to-br via-white to-amber-50 px-6 py-10 text-center dark:border-gray-700 dark:from-gray-900 dark:via-gray-900 dark:to-gray-800"
   >
     <div class="relative mb-6 h-36 w-full max-w-[18rem]" aria-hidden="true">
       <div
-        class="absolute top-6 left-4 h-24 w-32 rounded-2xl border border-orange-200/80 bg-white/90 shadow-sm dark:border-orange-500/20 dark:bg-gray-900/90"
+        class="border-brand-200/80 dark:border-brand-500/20 absolute top-6 left-4 h-24 w-32 rounded-2xl border bg-white/90 shadow-sm dark:bg-gray-900/90"
       >
         <div class="px-4 pt-4">
           <div class="mb-3 flex items-center gap-2">
             <div
-              class="h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-500/20"
+              class="bg-brand-100 dark:bg-brand-500/20 h-8 w-8 rounded-full"
             />
             <div class="space-y-2">
               <div class="h-2 w-14 rounded-full bg-gray-200 dark:bg-gray-700" />
@@ -35,10 +35,10 @@ defineProps({
       </div>
 
       <div
-        class="absolute top-0 right-5 flex h-24 w-28 items-center justify-center rounded-[1.25rem] border border-orange-300/80 bg-orange-100/80 shadow-sm dark:border-orange-500/30 dark:bg-orange-500/10"
+        class="border-brand-300/80 bg-brand-100/80 dark:border-brand-500/30 dark:bg-brand-500/10 absolute top-0 right-5 flex h-24 w-28 items-center justify-center rounded-[1.25rem] border shadow-sm"
       >
         <div class="relative">
-          <CommentIcon class="h-8 w-8 text-orange-500 dark:text-orange-300" />
+          <CommentIcon class="text-brand-500 dark:text-brand-300 h-8 w-8" />
           <div
             class="absolute -top-3 -right-5 h-5 w-5 rounded-full border-2 border-white bg-amber-300 dark:border-gray-900 dark:bg-amber-400"
           />
@@ -54,7 +54,7 @@ defineProps({
           />
           <div class="flex gap-2">
             <div
-              class="h-8 flex-1 rounded-xl bg-orange-100 dark:bg-orange-500/15"
+              class="bg-brand-100 dark:bg-brand-500/15 h-8 flex-1 rounded-xl"
             />
             <div class="h-8 w-8 rounded-xl bg-amber-100 dark:bg-amber-500/15" />
           </div>

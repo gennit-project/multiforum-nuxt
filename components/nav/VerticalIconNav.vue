@@ -213,7 +213,7 @@ watch(
 );
 
 const ACTIVE_NAV_ITEM =
-  'bg-orange-100 text-orange-700 ring-1 ring-inset ring-orange-300 dark:bg-orange-950/70 dark:text-orange-200 dark:ring-orange-700/70';
+  'bg-brand-100 text-brand-700 ring-1 ring-inset ring-brand-300 dark:bg-brand-950/70 dark:text-brand-200 dark:ring-brand-700/70';
 
 const getNavItemClasses = (isActive: boolean) => {
   const baseClasses =
@@ -223,12 +223,12 @@ const getNavItemClasses = (isActive: boolean) => {
 
 const getNavIconClasses = (isActive: boolean) =>
   isActive
-    ? 'h-6 w-6 text-orange-700 dark:text-orange-200'
+    ? 'h-6 w-6 text-brand-700 dark:text-brand-200'
     : 'h-6 w-6 text-gray-500 dark:text-gray-300';
 
 const getNavLabelClasses = (isActive: boolean) =>
   isActive
-    ? 'w-full text-center text-[10px] leading-[10px] font-medium text-orange-700 dark:text-orange-200'
+    ? 'w-full text-center text-[10px] leading-[10px] font-medium text-brand-700 dark:text-brand-200'
     : 'w-full text-center text-[10px] leading-[10px] text-gray-600 dark:text-gray-300';
 </script>
 

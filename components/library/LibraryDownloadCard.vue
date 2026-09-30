@@ -67,7 +67,7 @@ withDefaults(
       />
       <div
         v-else
-        class="flex h-full w-full items-center justify-center bg-linear-to-br from-orange-50 via-white to-gray-100 text-gray-400 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700"
+        class="from-brand-50 flex h-full w-full items-center justify-center bg-linear-to-br via-white to-gray-100 text-gray-400 dark:from-gray-900 dark:via-gray-800 dark:to-gray-700"
       >
         <svg
           class="h-12 w-12"
@@ -109,7 +109,7 @@ withDefaults(
       <div class="flex items-start gap-3">
         <NuxtLink
           :to="downloadLink"
-          class="min-w-0 flex-1 text-base leading-6 font-semibold text-gray-900 transition-colors hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
+          class="hover:text-brand-600 dark:hover:text-brand-400 min-w-0 flex-1 text-base leading-6 font-semibold text-gray-900 transition-colors dark:text-white"
         >
           {{ download.title }}
         </NuxtLink>

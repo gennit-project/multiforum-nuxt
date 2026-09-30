@@ -65,7 +65,7 @@ defineEmits(['click-remove-owner']);
 
         <button
           type="button"
-          class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
+          class="border-brand-500 text-brand-500 flex items-center gap-1 rounded border px-2 py-1"
           @click="$emit('click-remove-owner', admin.username)"
         >
           Remove Admin

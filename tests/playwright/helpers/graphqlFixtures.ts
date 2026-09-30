@@ -73,6 +73,10 @@ export type ServerConfigFixture = Pick<
   | '__typename'
   | 'serverName'
   | 'serverIconURL'
+  | 'brandingLogoDarkURL'
+  | 'brandingLogoAlt'
+  | 'brandingFaviconURL'
+  | 'brandingPrimaryColor'
   | 'serverDescription'
   | 'DefaultServerRole'
   | 'DefaultModRole'
@@ -288,6 +292,10 @@ export const buildServerConfig = (
   __typename: 'ServerConfig',
   serverName: 'Listical',
   serverIconURL: '',
+  brandingLogoDarkURL: null,
+  brandingLogoAlt: null,
+  brandingFaviconURL: null,
+  brandingPrimaryColor: null,
   serverDescription: '',
   Admins: [{ username: DEFAULT_USERNAME }],
   Moderators: [],

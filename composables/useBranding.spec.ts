@@ -10,6 +10,11 @@ describe('toBrandingLayer', () => {
   it('maps the API field names onto the resolver field names', () => {
     expect(
       toBrandingLayer({
+        serverIconURL: 'https://cdn.acme.test/logo.svg',
+        brandingLogoDarkURL: 'https://cdn.acme.test/logo-dark.svg',
+        brandingLogoAlt: 'Acme Forum',
+        brandingFaviconURL: '/favicon.svg',
+        brandingPrimaryColor: '#2563eb',
         brandingProductName: 'Acme Forum',
         brandingDocsURL: 'https://docs.acme.test',
         brandingSourceURL: 'https://github.com/acme/forum',
@@ -19,6 +24,11 @@ describe('toBrandingLayer', () => {
         brandingCustomFooterLinks: [{ label: 'Handbook', url: '/handbook' }],
       })
     ).toEqual({
+      logoUrl: 'https://cdn.acme.test/logo.svg',
+      logoDarkUrl: 'https://cdn.acme.test/logo-dark.svg',
+      logoAlt: 'Acme Forum',
+      faviconUrl: '/favicon.svg',
+      primaryColor: '#2563eb',
       productName: 'Acme Forum',
       docsUrl: 'https://docs.acme.test',
       sourceUrl: 'https://github.com/acme/forum',

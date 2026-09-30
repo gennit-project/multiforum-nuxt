@@ -181,7 +181,7 @@ const touched = ref(false);
 </script>
 
 <template>
-  <div class="mx-auto max-w-3xl px-2 pt-0 dark:text-white sm:px-6">
+  <div class="mx-auto max-w-3xl px-2 pt-0 sm:px-6 dark:text-white">
     <div v-if="eventLoading">Loading...</div>
     <div v-else-if="getEventError">
       <div v-for="(error, i) of getEventError?.graphQLErrors" :key="i">
@@ -265,7 +265,7 @@ const touched = ref(false);
                   :class="[
                     'cursor-pointer rounded-md px-4 py-2 transition-colors',
                     selectedEventType === option.value
-                      ? 'bg-orange-500 text-black'
+                      ? 'bg-brand-500 text-black'
                       : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
                   ]"
                   :data-testid="`event-type-option-${option.value}`"
@@ -277,7 +277,7 @@ const touched = ref(false);
                     :checked="selectedEventType === option.value"
                     class="sr-only"
                     @change="updateEventType(option.value)"
-                  >
+                  />
                   {{ option.label }}
                 </label>
               </div>
@@ -464,7 +464,7 @@ sl-input {
   border: 0 !important;
   padding: 0 !important;
   margin: 0, 0, 0, 0;
-  border-color: orange;
+  border-color: var(--color-brand-500);
   &::focus {
     border: 0 !important;
     outline: 0 !important;
@@ -478,7 +478,7 @@ sl-input {
   margin: 0, 0, 0, 0;
   font-family: 'Inter', sans-serif;
   color: #000000;
-  border-color: orange;
+  border-color: var(--color-brand-500);
   font-size: 0.875rem;
 }
 

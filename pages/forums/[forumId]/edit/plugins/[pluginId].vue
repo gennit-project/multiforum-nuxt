@@ -332,7 +332,7 @@ const hasFilteredChannelSettings = computed(() => {
       </div>
       <NuxtLink
         :to="`/forums/${channelUniqueName}/edit/plugins`"
-        class="mt-4 inline-flex items-center text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
+        class="text-brand-600 hover:text-brand-900 dark:text-brand-400 dark:hover:text-brand-300 mt-4 inline-flex items-center"
       >
         <i class="fa-solid fa-arrow-left mr-2" />
         Back to Plugins
@@ -482,7 +482,7 @@ const hasFilteredChannelSettings = computed(() => {
             >
               <button
                 type="button"
-                class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:ring-2 focus:ring-orange-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                class="bg-brand-700 hover:bg-brand-800 focus:ring-brand-500 rounded-md px-4 py-2 text-white focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="saving || !isDirty"
                 @click="handleSave"
               >
@@ -540,7 +540,7 @@ const hasFilteredChannelSettings = computed(() => {
             >
               <button
                 type="button"
-                class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:ring-2 focus:ring-orange-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                class="bg-brand-700 hover:bg-brand-800 focus:ring-brand-500 rounded-md px-4 py-2 text-white focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="saving || !isDirty"
                 @click="handleSave"
               >

@@ -66,8 +66,7 @@ const route = useRoute();
 const router = useRouter();
 const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
-const { forumAdminUsernames, forumModProfileNames } =
-  useForumRoleMembership();
+const { forumAdminUsernames, forumModProfileNames } = useForumRoleMembership();
 
 const editedAt = computed(() => {
   if (!props.discussion?.updatedAt) return '';
@@ -430,7 +429,7 @@ const warningModalBody = computed(() => {
             >
             <span
               v-if="authorBadges.isServerMod"
-              class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              class="border-brand-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
               >Server Mod</span
             >
             <span
@@ -440,7 +439,7 @@ const warningModalBody = computed(() => {
             >
             <span
               v-if="authorBadges.isForumMod"
-              class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              class="border-brand-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
               >Forum Mod</span
             >
           </div>

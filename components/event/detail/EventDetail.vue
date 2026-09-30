@@ -19,10 +19,7 @@ import type {
 } from '@/__generated__/graphql';
 import { stableRelativeTime } from '@/utils';
 import { isEventInThePast, hasEventStarted } from '@/utils/eventTiming';
-import {
-  formatEventDate,
-  buildEventHead,
-} from '@/utils/eventSeo';
+import { formatEventDate, buildEventHead } from '@/utils/eventSeo';
 import 'md-editor-v3/lib/style.css';
 import EventFooter from '@/components/event/detail/EventFooter.vue';
 import EventHeader from '@/components/event/detail/EventHeader.vue';
@@ -457,7 +454,7 @@ useHead(
                           eventId: event.id,
                         },
                       }"
-                      class="text-orange-500 dark:text-orange-400"
+                      class="text-brand-500 dark:text-brand-400"
                       rel="noopener noreferrer"
                     >
                       {{ event.title }}

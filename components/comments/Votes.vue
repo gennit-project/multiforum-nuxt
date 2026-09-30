@@ -87,7 +87,7 @@ const downvoteButtonClasses = computed(() => {
 
   const activeClasses = props.isMarkedAsAnswer
     ? 'border-green-500 bg-green-500 dark:border-green-600 dark:bg-green-600 dark:hover:bg-green-500'
-    : 'border border-orange-300 bg-orange-100 text-orange-700 ring-1 ring-inset ring-orange-300 dark:border-orange-700/70 dark:bg-orange-950/70 dark:text-orange-200 dark:ring-orange-700/70';
+    : 'border border-brand-300 bg-brand-100 text-brand-700 ring-1 ring-inset ring-brand-300 dark:border-brand-700/70 dark:bg-brand-950/70 dark:text-brand-200 dark:ring-brand-700/70';
 
   if (props.isPermalinked && !props.downvoteActive) {
     return [
@@ -98,12 +98,12 @@ const downvoteButtonClasses = computed(() => {
 
   const inactiveClasses = props.isMarkedAsAnswer
     ? 'border-green-200 bg-green-100 text-green-700 hover:border-green-400 hover:bg-green-200 dark:border-green-600 dark:bg-green-800 dark:text-green-300 dark:hover:bg-green-700'
-    : 'border-gray-200 text-black dark:text-white bg-gray-100 hover:border-orange-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600';
+    : 'border-gray-200 text-black dark:text-white bg-gray-100 hover:border-brand-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600';
 
   const permalinkClasses = props.downvoteActive
     ? ''
     : props.isPermalinked
-      ? 'border-orange-500 hover:bg-orange-300 dark:border-orange-600 dark:hover:bg-orange-600'
+      ? 'border-brand-500 hover:bg-brand-300 dark:border-brand-600 dark:hover:bg-brand-600'
       : 'border-gray-200 dark:border-gray-600 hover:bg-gray-200';
 
   return [
@@ -208,14 +208,18 @@ function viewFeedback() {
       :loading="superUpvoteLoading"
       :active="superUpvoteActive"
       :show-count="false"
-      :tooltip-text="superUpvoteActive ? 'Undo super upvote' : 'Super upvote with a thank-you note'"
+      :tooltip-text="
+        superUpvoteActive
+          ? 'Undo super upvote'
+          : 'Super upvote with a thank-you note'
+      "
       :is-permalinked="isPermalinked"
       :transparent-background="isPermalinked"
       :class="superUpvoteActive ? '' : 'super-upvote-button'"
       @vote="superUpvoteActive ? emit('undoSuperUpvote') : emit('superUpvote')"
     >
       <span
-        class="flex flex-nowrap items-center gap-1 whitespace-nowrap text-xs font-medium"
+        class="flex flex-nowrap items-center gap-1 text-xs font-medium whitespace-nowrap"
         :class="superUpvoteActive ? '' : 'rainbow-star'"
       >
         <StarIcon
@@ -240,11 +244,7 @@ function viewFeedback() {
     >
       <span :class="downvoteButtonClasses">
         <FlagIcon class="h-4 w-4" />
-        <span
-          v-if="showDownvoteCount"
-          class="ml-1 text-xs"
-          aria-hidden="true"
-        >
+        <span v-if="showDownvoteCount" class="ml-1 text-xs" aria-hidden="true">
           {{ downvoteCount }}
         </span>
       </span>
@@ -271,7 +271,9 @@ function viewFeedback() {
   border-radius: 9999px;
   padding: 1.5px;
   background: linear-gradient(to right, #ec4899, #8b5cf6, #6366f1);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
 }

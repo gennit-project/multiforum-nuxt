@@ -1,32 +1,83 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { computed, ref } from 'vue';
 
 import SiteLogo from '@/components/nav/SiteLogo.vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
+const mockServerBranding: { value: Record<string, unknown> | null } = {
+  value: null,
+};
+
+vi.mock('nuxt/app', () => ({
+  useRuntimeConfig: () => ({ public: {} }),
+}));
+
+vi.mock('@vue/apollo-composable', () => ({
+  useQuery: () => ({
+    result: computed(() =>
+      mockServerBranding.value
+        ? { serverConfigs: [mockServerBranding.value] }
+        : undefined
+    ),
+    loading: ref(false),
+    error: ref(null),
+  }),
+}));
+
 vi.mock('@/config', () => ({
-  config: { serverDisplayName: 'Test Forum' },
+  config: { serverName: 'test', serverDisplayName: 'Test Forum' },
 }));
 
 describe('SiteLogo', () => {
-  it('renders both mobile and desktop logo images', () => {
-    const wrapper = mountWithDefaults(SiteLogo);
-
-    expect(wrapper.findAll('img')).toHaveLength(2);
+  beforeEach(() => {
+    mockServerBranding.value = null;
   });
 
-  it('names both logos after the server for assistive tech', () => {
-    const wrapper = mountWithDefaults(SiteLogo);
+  it('shows the server display name when no logo is configured', () => {
+    expect(mountWithDefaults(SiteLogo).text()).toContain('Test Forum');
+  });
+
+  it('renders the configured light-mode logo', () => {
+    mockServerBranding.value = {
+      serverIconURL: 'https://cdn.example.test/logo.svg',
+      brandingLogoAlt: 'Acme Forum',
+    };
+
+    expect(mountWithDefaults(SiteLogo).get('img').attributes('src')).toBe(
+      'https://cdn.example.test/logo.svg'
+    );
+  });
+
+  it('uses the configured accessible name', () => {
+    mockServerBranding.value = {
+      serverIconURL: '/logo.svg',
+      brandingLogoAlt: 'Acme Forum',
+    };
+
+    expect(mountWithDefaults(SiteLogo).get('img').attributes('alt')).toBe(
+      'Acme Forum'
+    );
+  });
+
+  it('falls back to the server display name when an old logo lacks alt text', () => {
+    mockServerBranding.value = { serverIconURL: '/logo.svg' };
+
+    expect(mountWithDefaults(SiteLogo).get('img').attributes('alt')).toBe(
+      'Test Forum'
+    );
+  });
+
+  it('renders a separate dark-mode logo when configured', () => {
+    mockServerBranding.value = {
+      serverIconURL: '/logo.svg',
+      brandingLogoDarkURL: '/logo-dark.svg',
+      brandingLogoAlt: 'Acme Forum',
+    };
 
     expect(
-      wrapper.findAll('img').every((img) => img.attributes('alt') === 'Test Forum logo')
-    ).toBe(true);
-  });
-
-  it('applies the responsive visibility classes to the two logos', () => {
-    const wrapper = mountWithDefaults(SiteLogo);
-    const [mobileLogo, desktopLogo] = wrapper.findAll('img');
-
-    expect(mobileLogo.classes()).toContain('lg:hidden');
-    expect(desktopLogo.classes()).toContain('lg:block');
+      mountWithDefaults(SiteLogo)
+        .findAll('img')
+        .map((image) => image.attributes('src'))
+    ).toEqual(['/logo.svg', '/logo-dark.svg']);
   });
 });

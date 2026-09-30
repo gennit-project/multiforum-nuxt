@@ -101,8 +101,7 @@ const props = defineProps({
 const commentIdInParams = useRoute().params.commentId as string;
 const isPermalinked =
   commentIdInParams && commentIdInParams === props.activityItem.Comment?.id;
-const { forumAdminUsernames, forumModProfileNames } =
-  useForumRoleMembership();
+const { forumAdminUsernames, forumModProfileNames } = useForumRoleMembership();
 const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
 
@@ -556,7 +555,7 @@ const showCommentMenu = computed(() => {
     class="mt-4 list-none"
     :class="[
       isPermalinked
-        ? 'rounded-lg border border-orange-500 bg-orange-100 dark:bg-orange-950'
+        ? 'border-brand-500 bg-brand-100 dark:bg-brand-950 rounded-lg border'
         : '',
     ]"
   >
@@ -615,7 +614,7 @@ const showCommentMenu = computed(() => {
                   >
                   <span
                     v-if="actorBadges.isServerMod"
-                    class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    class="border-brand-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Server Mod</span
                   >
                   <span
@@ -625,7 +624,7 @@ const showCommentMenu = computed(() => {
                   >
                   <span
                     v-if="actorBadges.isForumMod"
-                    class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    class="border-brand-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Forum Mod</span
                   >
                   <span
@@ -661,7 +660,7 @@ const showCommentMenu = computed(() => {
                   >
                   <span
                     v-if="actorBadges.isServerMod"
-                    class="rounded-md border border-orange-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    class="border-brand-500 rounded-md border px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Server Mod</span
                   >
                   <span
@@ -671,7 +670,7 @@ const showCommentMenu = computed(() => {
                   >
                   <span
                     v-if="actorBadges.isForumMod"
-                    class="rounded-md border border-orange-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                    class="border-brand-500 rounded-md border px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Forum Mod</span
                   >
                   <span

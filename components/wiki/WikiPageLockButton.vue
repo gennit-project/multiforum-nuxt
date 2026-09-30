@@ -123,7 +123,7 @@ const handleUnlock = async () => {
       <textarea
         id="wiki-lock-reason"
         v-model="lockReason"
-        class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
+        class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:ring-1 focus:outline-none dark:border-gray-700 dark:bg-gray-950 dark:text-gray-100"
         rows="3"
         placeholder="Explain why this wiki page is locked"
       />
@@ -138,7 +138,7 @@ const handleUnlock = async () => {
         </button>
         <button
           type="submit"
-          class="rounded-md bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+          class="bg-brand-600 hover:bg-brand-700 rounded-md px-3 py-1.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="isSaving || !trimmedReason"
         >
           Lock page

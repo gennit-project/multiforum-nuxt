@@ -112,7 +112,7 @@ const markAllAsRead = () => {
 </script>
 
 <template>
-  <div class="dark:text-white flex justify-center">
+  <div class="flex justify-center dark:text-white">
     <div class="w-full max-w-5xl">
       <StatusMessage :busy="notificationLoading">
         <p v-if="notificationLoading">Loading...</p>
@@ -125,15 +125,12 @@ const markAllAsRead = () => {
           >
         </p>
       </StatusMessage>
-      <ErrorBanner
-        v-if="notificationError"
-        :text="notificationError.message"
-      />
+      <ErrorBanner v-if="notificationError" :text="notificationError.message" />
       <div
         v-if="notifications && notifications.length > 0"
         class="flex flex-col gap-2"
       >
-        <h1 class="mx-4 mb-2 mt-4 border-b border-gray-500 text-2xl">
+        <h1 class="mx-4 mt-4 mb-2 border-b border-gray-500 text-2xl">
           Notifications
         </h1>
         <p class="mx-4 text-sm text-gray-500 dark:text-gray-300">
@@ -153,7 +150,7 @@ const markAllAsRead = () => {
         />
         <ul
           role="list"
-          class="flex-1 flex-col divide-y divide-gray-200 bg-white shadow dark:divide-gray-700 dark:bg-gray-800 dark:text-white sm:rounded-lg"
+          class="flex-1 flex-col divide-y divide-gray-200 bg-white shadow sm:rounded-lg dark:divide-gray-700 dark:bg-gray-800 dark:text-white"
           data-testid="notification-list"
         >
           <li
@@ -173,7 +170,7 @@ const markAllAsRead = () => {
             <NuxtLink
               v-if="notification.link"
               :to="notification.link"
-              class="mt-2 inline-block text-sm text-orange-700 underline dark:text-orange-300"
+              class="text-brand-700 dark:text-brand-300 mt-2 inline-block text-sm underline"
             >
               View pipeline attempt
             </NuxtLink>

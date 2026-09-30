@@ -8,6 +8,7 @@ export const UPDATE_SERVER_CONFIG = gql`
     updateServerConfigs(where: { serverName: $serverName }, update: $input) {
       serverConfigs {
         serverName
+        serverIconURL
         serverDescription
         rules
         enableDownloads
@@ -18,6 +19,17 @@ export const UPDATE_SERVER_CONFIG = gql`
         minimumSensitiveContentAge
         allowedFileTypes
         pluginRegistries
+        brandingLogoDarkURL
+        brandingLogoAlt
+        brandingFaviconURL
+        brandingPrimaryColor
+        brandingProductName
+        brandingDocsURL
+        brandingSourceURL
+        brandingIssuesURL
+        brandingSupportEmail
+        brandingShowUpstreamLinks
+        brandingCustomFooterLinks
       }
     }
   }

@@ -19,7 +19,7 @@ defineProps({
     <div
       class="max-w-md rounded-lg border border-gray-200 bg-white p-6 text-center shadow-sm dark:border-gray-700 dark:bg-gray-800"
     >
-      <h2 class="font-semibold text-lg text-gray-900 dark:text-white">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
         {{
           statusUnavailable
             ? 'Map availability could not be checked'
@@ -36,7 +36,7 @@ defineProps({
       <div class="mt-4 flex flex-wrap justify-center gap-3 text-sm font-medium">
         <NuxtLink
           :to="setupUrl"
-          class="text-orange-700 hover:underline dark:text-orange-300"
+          class="text-brand-700 dark:text-brand-300 hover:underline"
         >
           Open instance setup
         </NuxtLink>

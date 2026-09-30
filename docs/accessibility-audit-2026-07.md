@@ -14,6 +14,7 @@ Severities use WCAG impact language: Critical (blocks a task for AT/keyboard use
 Serious, Moderate, Minor.
 
 Quantitative baseline (from grep):
+
 - **0** skip-to-content links
 - **0 / 150** pages with route-change focus management
 - **92 / 150** pages share one non-descriptive document title; **104 / 150** render no `<h1>`
@@ -100,6 +101,7 @@ These are the best return on effort: each fixes a primitive used in dozens of pl
 Specific controls that are completely unusable without a mouse, plus global shell gaps.
 
 ### Keyboard-inoperable custom widgets (Critical)
+
 - **`MultiSelect.vue`** — trigger is `<div @click>` (`:311`), dropdown `<div>` has no
   `role="listbox"` (`:400`), options are `<div @click>` with no `role="option"`/`aria-selected`/
   arrow-keys (`:627,698`); the standalone checkbox `@click.stop` blocks its own toggle
@@ -122,6 +124,7 @@ Specific controls that are completely unusable without a mouse, plus global shel
   navigate) left in place.
 
 ### App shell (global, one edit each)
+
 - **Skip-to-content link** — none exists. Add a visually-hidden-until-focused link as the first focusable element in `layouts/default.vue`, targeting the main content id. Serious.
 - **`<main>` landmark mis-scoped** — `layouts/default.vue:73` wraps header + both `<nav>`s + slot + footer inside a single `<main>`, so banner/nav/contentinfo nest inside main. Move `<main>` to wrap only the page slot. Serious.
 - **Mobile drawers have no dialog semantics** — `nav/SiteSidenav.vue:199-457` and `nav/RecentForumsDrawer.vue:68-98`: no focus trap, no focus move/restore, no `role="dialog"`/`aria-modal`, no Escape. Serious.
@@ -129,6 +132,7 @@ Specific controls that are completely unusable without a mouse, plus global shel
 - **Route-change focus management** — no `router.afterEach` focus handling anywhere; SPA nav leaves focus on the clicked link. Add a global handler moving focus to the new page's `<main>`/`<h1>` (`tabindex="-1"` + `.focus()`). Moderate.
 
 ### Global search unnamed (Serious)
+
 - **`SearchBar.vue:116,145`** — `<label for="search">` targets an id the `<input>` doesn't have (it only has `name="search"`); with the default empty placeholder the field has no accessible name. Used by the top-nav search and ForumFinder. Add `id="search"` (unique per instance).
 
 ---
@@ -192,6 +196,7 @@ Pervasive: async loading/error/validation states swap silently (near-zero `aria-
 ## P4 — Remaining widgets, media, forms & polish
 
 ### Custom-widget ARIA
+
 - `SortDropdown.vue` — ⚠️ **Dead component** (not imported anywhere; placeholder `<a href="#">`
   items). Flagged for deletion rather than ARIA-fixing; rebuild with `MenuButton.vue` if sort UI is
   needed later.
@@ -206,6 +211,7 @@ Pervasive: async loading/error/validation states swap silently (near-zero `aria-
 - `GenericButton.vue:33` (+ `GenericSmallButton:18`, `SaveButton:27`, `CancelButton:13`) — `@keydown.enter.prevent` cancels native Enter activation. Remove `.prevent`.
 
 ### Form labels & fields
+
 - `filter/FilterOptionManager.vue` (~6×) & `filter/FilterGroupManager.vue` — `<label>` with no `for`, inputs no `id`. Associate them.
 - `plugins/PipelineVisualEditor.vue:173,201` — unassociated `<select>` labels; remove-step (`:242`) title-only. Also provide keyboard reorder (drag-only today, `:147`).
 - `auth/CreateUsernameForm.vue:177,235` — username/birthday label/id mismatch.
@@ -221,6 +227,7 @@ Pervasive: async loading/error/validation states swap silently (near-zero `aria-
 - `mod/BrokenRulesModal.vue:704` — "Suspend user for" `<label>` not associated with its `<select>` (`:708` has no `id`). Moderate.
 
 ### Media / charts text alternatives
+
 - `charts/ContributionLineChart.vue:131` (+ `ChannelContributionChart.vue`) — `<canvas>` chart with no `role="img"`/`aria-label`/data-table alternative. Serious.
 - `ModelViewer.vue:29` — hardcoded `alt="3D Model Preview"`; accept + forward a real `alt` from `image/ImageListItem.vue:52`. Fullscreen/close buttons rely on `title` only (`:14,60`).
 - `LinkPreview.vue` — ✅ **DONE.** Image alt falls back to "Link preview image" when title is empty.
@@ -228,6 +235,7 @@ Pervasive: async loading/error/validation states swap silently (near-zero `aria-
   `<caption>`; the generic `Table.vue` gained an optional `caption` prop rendering an sr-only caption.
 
 ### Icon-only buttons relying on `title` (add `aria-label`)
+
 - `plugins/PluginLogsModal.vue:123` (close), `plugins/PipelineVisualEditor.vue:242` (remove),
   `plugins/ScopedPipelineView.vue:123` / `PluginPipeline.vue:81` (collapse chevron, also add `aria-expanded`),
   `plugins/fields/PluginSecretField.vue:153` (show/hide, add `aria-pressed`),
@@ -235,17 +243,20 @@ Pervasive: async loading/error/validation states swap silently (near-zero `aria-
   `filter/FilterOptionManager.vue:655` (↑/↓ reorder).
 
 ### Contrast (light-mode small text below 4.5:1)
+
 - `text-gray-400` hints: `plugins/fields/PluginNumberField.vue:114`, `PluginSecretField.vue:210`, `nav/SiteSidenav.vue:317`.
-- `text-orange-500` badge: `user/UserProfileSidebar.vue` — ✅ **DONE** (role badges bumped to `text-orange-700` in light mode, `dark:text-orange-500`).
+- `text-brand-500` badge: `user/UserProfileSidebar.vue` — ✅ **DONE** (role badges bumped to `text-brand-700` in light mode, `dark:text-brand-500`).
 - `text-gray-400 dark:text-gray-500` fails both modes: `admin/ImageReportsList.vue` — ✅ **DONE** (flipped to `text-gray-500 dark:text-gray-400`).
 - Typo `dak:text-white` → `dark:text-white` in `user/NotificationList.vue` — ✅ **DONE**.
 
 ### Tables / lists (mod & admin)
+
 - `admin/ChannelHealthTable.vue` — ✅ **DONE** (`scope="col"` added to header cells).
 - `admin/ServerSuspendedModList.vue:53` & `admin/ServerSuspendedUserList.vue` — `<div v-for>` lists losing semantics → `<ul role="list">`/`<li>`.
 - `admin/ServerTabs.vue:166` — decorative chevron `<i>` needs `aria-hidden="true"`.
 
 ### Minor polish
+
 - `nav/SiteLogo.vue:9` — placeholder `alt="Workflow"` (Tailwind template leftover) → real site name.
 - `nav/Breadcrumbs.vue:56` — add `aria-current="page"`.
 - `layout/SiteFooter.vue:47` — external link missing `rel="noopener noreferrer"` + new-window hint.
@@ -258,15 +269,16 @@ Pervasive: async loading/error/validation states swap silently (near-zero `aria-
 
 ## Suggested execution order
 
-| Phase | Theme | Rough effort | Why first |
-|------|-------|--------------|-----------|
-| P0 | 5 primitive fixes (focus ring, VoteButton, MenuButton, CommentButtons, icons) | ~1–2 days | One edit each → hundreds of call sites |
-| P1 | Keyboard blockers + app shell (skip link, main, drawers, MultiSelect) | ~2–3 days | Removes total mouse-only barriers |
-| P2 | Titles / headings / landmarks sweep | ~1–2 days | Orientation for every SR user; mechanical |
-| P3 | Live-region/status helper + rollout | ~1 day | Silent async states everywhere |
-| P4 | Widget ARIA, media alts, form labels, contrast, polish | ~2–3 days | Long tail |
+| Phase | Theme                                                                         | Rough effort | Why first                                 |
+| ----- | ----------------------------------------------------------------------------- | ------------ | ----------------------------------------- |
+| P0    | 5 primitive fixes (focus ring, VoteButton, MenuButton, CommentButtons, icons) | ~1–2 days    | One edit each → hundreds of call sites    |
+| P1    | Keyboard blockers + app shell (skip link, main, drawers, MultiSelect)         | ~2–3 days    | Removes total mouse-only barriers         |
+| P2    | Titles / headings / landmarks sweep                                           | ~1–2 days    | Orientation for every SR user; mechanical |
+| P3    | Live-region/status helper + rollout                                           | ~1 day       | Silent async states everywhere            |
+| P4    | Widget ARIA, media alts, form labels, contrast, polish                        | ~2–3 days    | Long tail                                 |
 
 ### Guardrails to add alongside
+
 - Add `eslint-plugin-vuejs-accessibility` (or `axe` in Playwright) to CI so regressions are caught. Recommend enabling it in `P0` so new code doesn't reintroduce these patterns.
 - Add an axe pass to a few existing Playwright mocked specs (home, discussion detail, a form page) as smoke coverage.
 
@@ -282,9 +294,9 @@ Not called out by the original audit's high-leverage list; pick up after P0–P4
   (2026-07):** added the focus-visible ring convention to the real focus targets —
   `IconButtonDropdown.vue` (both triggers), `TextButtonDropdown.vue` (both triggers),
   `nav/RecentForumsDrawer.vue` (Cancel button), `FileTypePicker.vue` (focus-within ring on the
-  combobox pill), and `channel/DownloadNowButton.vue` (was missing the ring *width* so no ring
+  combobox pill), and `channel/DownloadNowButton.vue` (was missing the ring _width_ so no ring
   painted — the P0 bug pattern). **Remaining (intentionally left):** non-focusable dropdown
-  *panels* (`SelectComponent`, `IconButtonDropdown`/`TextButtonDropdown` menu containers,
+  _panels_ (`SelectComponent`, `IconButtonDropdown`/`TextButtonDropdown` menu containers,
   `event/detail/EventNotificationsMenu`, `nav/CreateAnythingButton` menu) and programmatically-
   focused page containers (`pages/admin.vue`, `pages/forums/[forumId].vue`, `pages/server/issues.vue`,
   the discussion/download detail panels, `pages/settings.vue`, `pages/create-username.vue`) — these

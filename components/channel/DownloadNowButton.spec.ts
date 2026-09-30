@@ -14,7 +14,7 @@ describe('DownloadNowButton', () => {
     }).toEqual({
       disabled: undefined,
       text: 'Download Now',
-      classes: expect.arrayContaining(['bg-orange-400']),
+      classes: expect.arrayContaining(['bg-brand-400']),
     });
   });
 

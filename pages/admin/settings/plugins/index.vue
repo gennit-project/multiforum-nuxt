@@ -31,7 +31,9 @@ const upgradingPluginIds = ref<Set<string>>(new Set());
 
 // Search and filter state
 const searchQuery = ref('');
-const statusFilter = ref<'all' | 'available' | 'allowed' | 'installed' | 'enabled'>('all');
+const statusFilter = ref<
+  'all' | 'available' | 'allowed' | 'installed' | 'enabled'
+>('all');
 const sortBy = ref<'name' | 'status'>('name');
 const sortDirection = ref<'asc' | 'desc'>('asc');
 
@@ -160,9 +162,12 @@ const upgradePlugin = async (plugin: PluginState) => {
 };
 
 // Helper functions to check loading state for a specific plugin
-const isAllowingPlugin = (pluginId: string) => allowingPluginIds.value.has(pluginId);
-const isDisallowingPlugin = (pluginId: string) => disallowingPluginIds.value.has(pluginId);
-const isUpgradingPlugin = (pluginId: string) => upgradingPluginIds.value.has(pluginId);
+const isAllowingPlugin = (pluginId: string) =>
+  allowingPluginIds.value.has(pluginId);
+const isDisallowingPlugin = (pluginId: string) =>
+  disallowingPluginIds.value.has(pluginId);
+const isUpgradingPlugin = (pluginId: string) =>
+  upgradingPluginIds.value.has(pluginId);
 const canUpgradePlugin = (plugin: PluginState) =>
   getLatestVersionCompatibilityForPlugin(plugin).compatible;
 
@@ -220,9 +225,11 @@ const handlePluginsRefreshed = async () => {
                 v-model="searchQuery"
                 type="text"
                 placeholder="Search plugins..."
-                class="w-full rounded-md border border-gray-300 py-2 pl-9 pr-3 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              >
-              <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 py-2 pr-3 pl-9 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              />
+              <i
+                class="fa-solid fa-search absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+              />
             </div>
 
             <!-- Filter and Sort Controls -->
@@ -231,7 +238,7 @@ const handlePluginsRefreshed = async () => {
               <select
                 v-model="statusFilter"
                 aria-label="Filter plugins by status"
-                class="rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                class="focus:border-brand-500 focus:ring-brand-500 rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               >
                 <option value="all">All Status</option>
                 <option value="available">Available</option>
@@ -241,30 +248,48 @@ const handlePluginsRefreshed = async () => {
               </select>
 
               <!-- Sort Buttons -->
-              <div class="flex rounded-md border border-gray-300 dark:border-gray-600">
+              <div
+                class="flex rounded-md border border-gray-300 dark:border-gray-600"
+              >
                 <button
                   type="button"
                   class="px-3 py-2 text-sm"
-                  :class="sortBy === 'name' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'"
+                  :class="
+                    sortBy === 'name'
+                      ? 'bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300'
+                      : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                  "
                   @click="toggleSort('name')"
                 >
                   Name
                   <i
                     v-if="sortBy === 'name'"
-                    :class="sortDirection === 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'"
+                    :class="
+                      sortDirection === 'asc'
+                        ? 'fa-solid fa-arrow-up'
+                        : 'fa-solid fa-arrow-down'
+                    "
                     class="ml-1"
                   />
                 </button>
                 <button
                   type="button"
                   class="border-l border-gray-300 px-3 py-2 text-sm dark:border-gray-600"
-                  :class="sortBy === 'status' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'"
+                  :class="
+                    sortBy === 'status'
+                      ? 'bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300'
+                      : 'text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700'
+                  "
                   @click="toggleSort('status')"
                 >
                   Status
                   <i
                     v-if="sortBy === 'status'"
-                    :class="sortDirection === 'asc' ? 'fa-solid fa-arrow-up' : 'fa-solid fa-arrow-down'"
+                    :class="
+                      sortDirection === 'asc'
+                        ? 'fa-solid fa-arrow-up'
+                        : 'fa-solid fa-arrow-down'
+                    "
                     class="ml-1"
                   />
                 </button>
@@ -274,10 +299,13 @@ const handlePluginsRefreshed = async () => {
 
           <!-- Results count -->
           <div
-            v-if="pluginStates.length > 0 && (searchQuery || statusFilter !== 'all')"
+            v-if="
+              pluginStates.length > 0 && (searchQuery || statusFilter !== 'all')
+            "
             class="text-sm text-gray-500 dark:text-gray-400"
           >
-            Showing {{ filteredAndSortedPlugins.length }} of {{ pluginStates.length }} plugins
+            Showing {{ filteredAndSortedPlugins.length }} of
+            {{ pluginStates.length }} plugins
           </div>
 
           <!-- Loading State -->
@@ -298,7 +326,9 @@ const handlePluginsRefreshed = async () => {
 
           <!-- No Results After Filter -->
           <div
-            v-else-if="pluginStates.length > 0 && filteredAndSortedPlugins.length === 0"
+            v-else-if="
+              pluginStates.length > 0 && filteredAndSortedPlugins.length === 0
+            "
             class="py-8 text-center"
           >
             <div class="text-gray-500 dark:text-gray-400">
@@ -306,8 +336,11 @@ const handlePluginsRefreshed = async () => {
               <p>No plugins match your search criteria.</p>
               <button
                 type="button"
-                class="mt-2 text-sm text-orange-600 hover:underline dark:text-orange-400"
-                @click="searchQuery = ''; statusFilter = 'all'"
+                class="text-brand-600 dark:text-brand-400 mt-2 text-sm hover:underline"
+                @click="
+                  searchQuery = '';
+                  statusFilter = 'all';
+                "
               >
                 Clear filters
               </button>
@@ -315,7 +348,10 @@ const handlePluginsRefreshed = async () => {
           </div>
 
           <!-- Plugin Cards -->
-          <div v-else-if="filteredAndSortedPlugins.length > 0" class="space-y-4">
+          <div
+            v-else-if="filteredAndSortedPlugins.length > 0"
+            class="space-y-4"
+          >
             <div
               v-for="plugin in filteredAndSortedPlugins"
               :key="plugin.id"
@@ -330,7 +366,7 @@ const handlePluginsRefreshed = async () => {
                   >
                     <NuxtLink
                       :to="`/admin/plugins/${plugin.id}`"
-                      class="text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
+                      class="text-brand-600 hover:text-brand-900 dark:text-brand-400 dark:hover:text-brand-300"
                     >
                       {{ plugin.name }}
                     </NuxtLink>
@@ -350,7 +386,7 @@ const handlePluginsRefreshed = async () => {
                         >Status:</span
                       >
                       <span
-                        class="font-semibold inline-flex rounded-full px-2 text-xs leading-5"
+                        class="inline-flex rounded-full px-2 text-xs leading-5 font-semibold"
                         :class="{
                           'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200':
                             plugin.status === 'available',
@@ -358,7 +394,7 @@ const handlePluginsRefreshed = async () => {
                             plugin.status === 'allowed',
                           'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200':
                             plugin.status === 'installed_enabled',
-                          'bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-200':
+                          'bg-brand-100 text-brand-800 dark:bg-brand-800 dark:text-brand-200':
                             plugin.status === 'installed_disabled',
                         }"
                       >
@@ -371,9 +407,14 @@ const handlePluginsRefreshed = async () => {
                         }}
                       </span>
                     </div>
-                    <div v-if="plugin.installedVersion?.version" class="flex items-center gap-2">
+                    <div
+                      v-if="plugin.installedVersion?.version"
+                      class="flex items-center gap-2"
+                    >
                       <span>
-                        <span class="text-xs font-medium text-gray-400">Version:</span>
+                        <span class="text-xs font-medium text-gray-400"
+                          >Version:</span
+                        >
                         {{ plugin.installedVersion.version }}
                       </span>
                       <!-- Update Available Badge -->
@@ -401,7 +442,7 @@ const handlePluginsRefreshed = async () => {
                   <button
                     v-if="plugin.status === 'available'"
                     type="button"
-                    class="rounded-md bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50"
+                    class="bg-brand-600 hover:bg-brand-700 focus:ring-brand-500 rounded-md px-3 py-1.5 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
                     :disabled="isAllowingPlugin(plugin.id)"
                     @click="allowPlugin(plugin.id)"
                   >
@@ -416,13 +457,13 @@ const handlePluginsRefreshed = async () => {
                   <template v-else-if="plugin.status === 'allowed'">
                     <NuxtLink
                       :to="`/admin/plugins/${plugin.id}`"
-                      class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                      class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
                     >
                       Install
                     </NuxtLink>
                     <button
                       type="button"
-                      class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50"
+                      class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
                       :disabled="isDisallowingPlugin(plugin.id)"
                       @click="disallowPlugin(plugin.id)"
                     >
@@ -444,9 +485,14 @@ const handlePluginsRefreshed = async () => {
                     <button
                       v-if="plugin.hasUpdate"
                       type="button"
-                      class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50"
-                      :disabled="isUpgradingPlugin(plugin.id) || !canUpgradePlugin(plugin)"
-                      :title="getLatestVersionCompatibilityForPlugin(plugin).reason"
+                      class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
+                      :disabled="
+                        isUpgradingPlugin(plugin.id) ||
+                        !canUpgradePlugin(plugin)
+                      "
+                      :title="
+                        getLatestVersionCompatibilityForPlugin(plugin).reason
+                      "
                       @click="upgradePlugin(plugin)"
                     >
                       <i
@@ -458,7 +504,7 @@ const handlePluginsRefreshed = async () => {
                     </button>
                     <NuxtLink
                       :to="`/admin/plugins/${plugin.id}`"
-                      class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                      class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                     >
                       Manage
                     </NuxtLink>
@@ -471,14 +517,18 @@ const handlePluginsRefreshed = async () => {
           <!-- No Plugins State -->
           <div v-else class="py-8 text-center">
             <div class="text-gray-500 dark:text-gray-400">
-              <i class="fa-solid fa-puzzle-piece mb-3 text-4xl text-gray-300 dark:text-gray-600" />
+              <i
+                class="fa-solid fa-puzzle-piece mb-3 text-4xl text-gray-300 dark:text-gray-600"
+              />
               <p class="text-lg font-medium">No plugins available yet</p>
               <p class="mt-2 text-sm">
                 Add a plugin registry in the Registries tab and refresh plugins.
               </p>
               <div class="mt-4 text-xs">
                 <p class="font-medium">Getting started:</p>
-                <ol class="mt-2 list-inside list-decimal text-left inline-block">
+                <ol
+                  class="mt-2 inline-block list-inside list-decimal text-left"
+                >
                   <li>Add a plugin registry URL in the Registries tab</li>
                   <li>Refresh plugins to fetch available entries</li>
                   <li>Allow plugins you want to use on your server</li>

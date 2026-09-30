@@ -256,7 +256,7 @@ function handleBlockedReaction() {
         :class="[
           saveDisabled
             ? 'cursor-default rounded-lg bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
-            : 'cursor-pointer rounded-full bg-orange-600 text-white hover:text-black dark:text-gray-100 dark:hover:text-white',
+            : 'bg-brand-600 cursor-pointer rounded-full text-white hover:text-black dark:text-gray-100 dark:hover:text-white',
         ]"
         class="px-2 py-1"
         @click="
@@ -330,9 +330,7 @@ function handleBlockedReaction() {
     >
       <SuspensionNotice
         v-if="
-          createCommentError &&
-          suspensionIssueNumber &&
-          suspensionChannelId
+          createCommentError && suspensionIssueNumber && suspensionChannelId
         "
         class="mb-2"
         :issue-number="suspensionIssueNumber"

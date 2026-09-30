@@ -107,7 +107,8 @@ const describedBy = computed(() => {
       <span
         v-if="field.validation?.required || field.required"
         class="text-red-500"
-      >*</span>
+        >*</span
+      >
     </label>
     <p
       v-if="field.description"
@@ -124,9 +125,9 @@ const describedBy = computed(() => {
       v-bind="validationAttrs"
       :aria-describedby="describedBy"
       :aria-invalid="!!(error || validationError)"
-      class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+      class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
       :class="{ 'border-red-500': error || validationError }"
-    >
+    />
     <p
       v-if="rangeHint && !error && !validationError"
       :id="hintId"

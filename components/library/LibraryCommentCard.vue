@@ -72,7 +72,7 @@ withDefaults(
             />
             <span
               v-else-if="authorInfo?.isModerationProfile"
-              class="font-semibold text-orange-600 dark:text-orange-400"
+              class="text-brand-600 dark:text-brand-400 font-semibold"
             >
               {{ authorInfo.displayName }} (Moderator)
             </span>
@@ -105,7 +105,7 @@ withDefaults(
       <div class="min-w-0 text-sm text-gray-500 dark:text-gray-400">
         <NuxtLink
           :to="contextPermalink"
-          class="flex max-w-full flex-wrap items-center gap-x-1 gap-y-0.5 rounded-2xl bg-orange-50 px-3 py-1.5 font-medium text-orange-700 transition-colors hover:bg-orange-100 dark:bg-orange-500/10 dark:text-orange-300 dark:hover:bg-orange-500/20"
+          class="bg-brand-50 text-brand-700 hover:bg-brand-100 dark:bg-brand-500/10 dark:text-brand-300 dark:hover:bg-brand-500/20 flex max-w-full flex-wrap items-center gap-x-1 gap-y-0.5 rounded-2xl px-3 py-1.5 font-medium transition-colors"
         >
           <span class="opacity-75">Post from</span>
           <span class="min-w-0 wrap-break-word">{{ contextTitle }}</span>

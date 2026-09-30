@@ -43,7 +43,7 @@ const heading = computed(() => `Sign in to ${props.action}`);
     <p class="text-base font-medium">{{ heading }}</p>
     <a
       :href="loginUrl"
-      class="inline-flex rounded-md bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+      class="bg-brand-700 hover:bg-brand-800 focus:ring-brand-500 inline-flex rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:outline-none"
     >
       Sign in
     </a>

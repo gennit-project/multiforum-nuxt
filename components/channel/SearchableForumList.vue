@@ -126,11 +126,13 @@ const channelCollections = computed(() => {
 
   return collections
     .map((collection: RawCollectionData) => {
-      const channels = (collection.Channels || []).map((channel: RawChannelData) => ({
-        uniqueName: channel.uniqueName,
-        displayName: channel.displayName || channel.uniqueName,
-        icon: channel.channelIconURL || '',
-      }));
+      const channels = (collection.Channels || []).map(
+        (channel: RawChannelData) => ({
+          uniqueName: channel.uniqueName,
+          displayName: channel.displayName || channel.uniqueName,
+          icon: channel.channelIconURL || '',
+        })
+      );
 
       // Filter by search if there's a search query
       const filteredChannels = filterChannelsBySearch({
@@ -146,7 +148,8 @@ const channelCollections = computed(() => {
       };
     })
     .filter(
-      (collection: ProcessedCollection) => collection.channels.length > 0 || !searchInput.value
+      (collection: ProcessedCollection) =>
+        collection.channels.length > 0 || !searchInput.value
     );
 });
 
@@ -282,7 +285,7 @@ const areAllFavoritesSelected = computed(() =>
 
 <template>
   <div
-    class="touch-scroll-y absolute left-0 right-0 top-full z-50 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+    class="touch-scroll-y absolute top-full right-0 left-0 z-50 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
   >
     <SearchBar
       class="w-full align-middle"
@@ -294,10 +297,7 @@ const areAllFavoritesSelected = computed(() =>
       @keydown.enter.prevent
       @update-search-input="updateSearchResult"
     />
-    <StatusMessage
-      v-if="channelsLoading && regularChannels?.length === 0"
-      busy
-    >
+    <StatusMessage v-if="channelsLoading && regularChannels?.length === 0" busy>
       Loading...
     </StatusMessage>
     <StatusMessage v-else-if="channelsError" assertive>
@@ -312,7 +312,7 @@ const areAllFavoritesSelected = computed(() =>
         class="border-b dark:border-gray-600"
       >
         <p
-          class="px-3 pt-3 text-sm font-semibold uppercase text-gray-700 dark:text-gray-300"
+          class="px-3 pt-3 text-sm font-semibold text-gray-700 uppercase dark:text-gray-300"
         >
           Favorite Forums
         </p>
@@ -335,7 +335,7 @@ const areAllFavoritesSelected = computed(() =>
               :class="[
                 'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
                 areAllFavoritesSelected
-                  ? 'bg-orange-50 dark:bg-orange-900/20'
+                  ? 'bg-brand-50 dark:bg-brand-900/20'
                   : '',
               ]"
               @click="toggleSelectAllFavorites"
@@ -346,9 +346,9 @@ const areAllFavoritesSelected = computed(() =>
                   type="checkbox"
                   :checked="areAllFavoritesSelected"
                   aria-label="Select all favorite forums"
-                  class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
+                  class="text-brand-600 checked:border-brand-600 checked:bg-brand-600 focus:ring-brand-500 h-4 w-4 rounded border border-gray-400 checked:text-white dark:border-gray-500 dark:bg-gray-700"
                   @click.stop="toggleSelectAllFavorites"
-                >
+                />
               </div>
 
               <!-- Label -->
@@ -383,7 +383,7 @@ const areAllFavoritesSelected = computed(() =>
                     .join(', ')
                 }}
                 <button
-                  class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                  class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"
                   @click.stop="showAllFavorites = true"
                 >
                   (show all)
@@ -396,7 +396,7 @@ const areAllFavoritesSelected = computed(() =>
                     .join(', ')
                 }}
                 <button
-                  class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                  class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"
                   @click.stop="showAllFavorites = false"
                 >
                   (show less)
@@ -413,7 +413,7 @@ const areAllFavoritesSelected = computed(() =>
         class="border-b dark:border-gray-600"
       >
         <p
-          class="px-3 pt-3 text-sm font-semibold uppercase text-gray-700 dark:text-gray-300"
+          class="px-3 pt-3 text-sm font-semibold text-gray-700 uppercase dark:text-gray-300"
         >
           Forum Lists From Your Collections
         </p>
@@ -423,7 +423,7 @@ const areAllFavoritesSelected = computed(() =>
             :class="[
               'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
               isCollectionFullySelected(collection)
-                ? 'bg-orange-50 dark:bg-orange-900/20'
+                ? 'bg-brand-50 dark:bg-brand-900/20'
                 : '',
             ]"
             @click="toggleSelectAllCollection(collection)"
@@ -434,9 +434,9 @@ const areAllFavoritesSelected = computed(() =>
                 type="checkbox"
                 :checked="isCollectionFullySelected(collection)"
                 :aria-label="`Select all forums in ${collection.name}`"
-                class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
+                class="text-brand-600 checked:border-brand-600 checked:bg-brand-600 focus:ring-brand-500 h-4 w-4 rounded border border-gray-400 checked:text-white dark:border-gray-500 dark:bg-gray-700"
                 @click.stop="toggleSelectAllCollection(collection)"
-              >
+              />
             </div>
 
             <!-- Label and forum list inline -->
@@ -457,7 +457,7 @@ const areAllFavoritesSelected = computed(() =>
                       .map((ch: ChannelOption) => ch.uniqueName)
                       .join(', ')
                   }}<button
-                    class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                    class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"
                     @click.stop="toggleCollectionExpansion(collection.id)"
                   >
                     show more
@@ -468,7 +468,7 @@ const areAllFavoritesSelected = computed(() =>
                       .map((ch: ChannelOption) => ch.uniqueName)
                       .join(', ')
                   }}<button
-                    class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                    class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"
                     @click.stop="toggleCollectionExpansion(collection.id)"
                   >
                     show less
@@ -492,7 +492,7 @@ const areAllFavoritesSelected = computed(() =>
         class="border-b dark:border-gray-600"
       >
         <p
-          class="px-3 pt-3 text-sm font-semibold uppercase text-gray-700 dark:text-gray-300"
+          class="px-3 pt-3 text-sm font-semibold text-gray-700 uppercase dark:text-gray-300"
         >
           Featured Forums
         </p>
@@ -511,7 +511,9 @@ const areAllFavoritesSelected = computed(() =>
         </div>
       </div>
       <div class="pt-3">
-        <p class="px-3 text-sm font-semibold uppercase text-gray-700 dark:text-gray-300">
+        <p
+          class="px-3 text-sm font-semibold text-gray-700 uppercase dark:text-gray-300"
+        >
           All Forums
         </p>
         <div

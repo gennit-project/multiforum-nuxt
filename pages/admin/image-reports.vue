@@ -11,10 +11,10 @@ import ImageReportsList from '@/components/admin/ImageReportsList.vue';
         profile pictures, and channel icons/banners.
       </p>
       <ul
-        class="ml-4 mt-2 list-outside list-disc text-sm text-gray-600 dark:text-gray-400"
+        class="mt-2 ml-4 list-outside list-disc text-sm text-gray-600 dark:text-gray-400"
       >
         <li>
-          <span class="font-medium text-orange-700 dark:text-orange-300"
+          <span class="text-brand-700 dark:text-brand-300 font-medium"
             >Album Image</span
           >
           - Images in discussion albums (channel-scoped)

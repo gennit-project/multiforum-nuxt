@@ -43,7 +43,7 @@ const emitEvent = (eventName: string) => {
 // Computed class for green styling when comment is marked as best answer
 const buttonClasses = computed(() => {
   const baseClasses =
-    'shadow-none focus:ring-orange-500 inline-flex justify-start rounded-md px-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100';
+    'shadow-none focus:ring-brand-500 inline-flex justify-start rounded-md px-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100';
 
   if (props.isMarkedAsAnswer) {
     return `${baseClasses} text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300`;

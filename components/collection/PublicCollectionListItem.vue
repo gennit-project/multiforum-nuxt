@@ -27,13 +27,13 @@ const creatorLabel = computed(() => {
 
 <template>
   <div
-    class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:border-orange-400 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-orange-400"
+    class="hover:border-brand-400 dark:hover:border-brand-400 rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
   >
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
         <NuxtLink
           :to="`/collections/${collection.id}`"
-          class="font-semibold truncate text-sm text-gray-900 hover:text-orange-600 dark:text-white"
+          class="hover:text-brand-600 truncate text-sm font-semibold text-gray-900 dark:text-white"
         >
           {{ collection.name }}
         </NuxtLink>
@@ -46,7 +46,7 @@ const creatorLabel = computed(() => {
       </div>
       <NuxtLink
         :to="`/collections/${collection.id}`"
-        class="text-xs font-medium text-orange-700 hover:underline dark:text-orange-300"
+        class="text-brand-700 dark:text-brand-300 text-xs font-medium hover:underline"
       >
         View all
       </NuxtLink>

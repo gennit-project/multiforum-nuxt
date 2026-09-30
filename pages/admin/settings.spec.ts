@@ -241,6 +241,20 @@ describe('Admin server settings page', () => {
     );
   });
 
+  it('does not save a configured logo without alt text', async () => {
+    const wrapper = mountPage();
+    await fields(wrapper).vm.$emit('update-form-values', {
+      serverIconURL: 'https://example.com/logo.svg',
+      brandingLogoAlt: '',
+    });
+    await fields(wrapper).vm.$emit('submit');
+
+    expect([
+      harness.updateMutate.mock.calls.length,
+      harness.setFeaturedMutate.mock.calls.length,
+    ]).toEqual([0, 0]);
+  });
+
   it('shows the permission denied message when auth is missing', async () => {
     const Page = (await import('./settings.vue')).default;
     const wrapper = mountWithDefaults(Page, {

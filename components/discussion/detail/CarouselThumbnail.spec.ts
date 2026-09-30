@@ -51,7 +51,7 @@ describe('CarouselThumbnail', () => {
   it('applies the active border class when active', () => {
     expect(
       mountThumb({ image: { url: 'a.png' }, isActive: true }).classes()
-    ).toContain('border-orange-500');
+    ).toContain('border-brand-500');
   });
 
   it('sizes the thumbnail from the size prop', () => {

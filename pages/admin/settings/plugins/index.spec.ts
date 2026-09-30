@@ -236,7 +236,7 @@ describe('Plugins settings page', () => {
     setPluginData();
     const wrapper = mountPage();
 
-    await wrapper.get('button[class*="bg-orange-600"]').trigger('click');
+    await wrapper.get('button[class*="bg-brand-600"]').trigger('click');
     await flushPromises();
 
     expect(apolloState.mutations.ALLOW_PLUGIN).toHaveBeenCalledWith({

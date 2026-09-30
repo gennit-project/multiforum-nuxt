@@ -20,7 +20,7 @@ const { selectedIssueNumber, selectedIssueTitle, selectedIssueChannelId } =
 <template>
   <div class="relative w-full">
     <div
-      class="flex flex-col divide-x dark:divide-gray-500 md:flex-row"
+      class="flex flex-col divide-x md:flex-row dark:divide-gray-500"
       :class="showDetailPane ? 'lg:h-[calc(100vh-3.5rem)]' : ''"
     >
       <div
@@ -54,7 +54,7 @@ const { selectedIssueNumber, selectedIssueTitle, selectedIssueChannelId } =
               :href="`/forums/${selectedIssueChannelId}/issues/${selectedIssueNumber}`"
               target="_blank"
               rel="noopener noreferrer"
-              class="text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
+              class="text-brand-600 dark:text-brand-400 text-xs font-medium hover:underline"
             >
               Open in new tab
             </a>

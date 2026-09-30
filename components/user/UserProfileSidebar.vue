@@ -96,7 +96,7 @@ const handleReportSuccess = () => {
           <template #has-auth>
             <button
               type="button"
-              class="absolute bottom-2 right-2 rounded-full bg-white/80 p-2 text-gray-600 shadow-md transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:bg-red-900/50 dark:hover:text-red-400"
+              class="absolute right-2 bottom-2 rounded-full bg-white/80 p-2 text-gray-600 shadow-md transition-colors hover:bg-red-50 hover:text-red-600 dark:bg-gray-800/80 dark:text-gray-400 dark:hover:bg-red-900/50 dark:hover:text-red-400"
               title="Report profile picture"
               aria-label="Report profile picture"
               @click="showReportModal = true"
@@ -111,17 +111,17 @@ const handleReportSuccess = () => {
       </div>
       <h1
         v-if="username && !user?.displayName"
-        class="mb-3 mt-3 flex items-center gap-2 border-gray-700 text-xl font-bold leading-6 text-gray-500 dark:text-gray-200"
+        class="mt-3 mb-3 flex items-center gap-2 border-gray-700 text-xl leading-6 font-bold text-gray-500 dark:text-gray-200"
       >
         {{ username }}
         <span
           v-if="serverRoleBadge === 'serverAdmin'"
-          class="rounded-md border border-orange-700 px-2 py-1 text-xs text-orange-700 dark:border-orange-500 dark:text-orange-500"
+          class="border-brand-700 text-brand-700 dark:border-brand-500 dark:text-brand-500 rounded-md border px-2 py-1 text-xs"
           >Server Admin</span
         >
         <span
           v-else-if="serverRoleBadge === 'serverMod'"
-          class="rounded-md border border-orange-700 px-2 py-1 text-xs text-orange-700 dark:border-orange-500 dark:text-orange-500"
+          class="border-brand-700 text-brand-700 dark:border-brand-500 dark:text-brand-500 rounded-md border px-2 py-1 text-xs"
           >Server Mod</span
         >
       </h1>
@@ -132,12 +132,12 @@ const handleReportSuccess = () => {
         {{ user.displayName }}
         <span
           v-if="serverRoleBadge === 'serverAdmin'"
-          class="rounded-md border border-orange-700 px-2 py-1 text-sm text-orange-700 dark:border-orange-500 dark:text-orange-500"
+          class="border-brand-700 text-brand-700 dark:border-brand-500 dark:text-brand-500 rounded-md border px-2 py-1 text-sm"
           >Server Admin</span
         >
         <span
           v-else-if="serverRoleBadge === 'serverMod'"
-          class="rounded-md border border-orange-700 px-2 py-1 text-sm text-orange-700 dark:border-orange-500 dark:text-orange-500"
+          class="border-brand-700 text-brand-700 dark:border-brand-500 dark:text-brand-500 rounded-md border px-2 py-1 text-sm"
           >Server Mod</span
         >
       </h1>
@@ -157,7 +157,7 @@ const handleReportSuccess = () => {
         <slot />
         <div
           v-if="user && username"
-          class="mt-6 hidden min-w-0 flex-1 text-gray-600 dark:text-gray-400 sm:block 2xl:hidden"
+          class="mt-6 hidden min-w-0 flex-1 text-gray-600 sm:block 2xl:hidden dark:text-gray-400"
         >
           {{ `Joined ${stableRelativeTime(user.createdAt)}` }}
         </div>
@@ -199,7 +199,7 @@ const handleReportSuccess = () => {
 @media (prefers-color-scheme: light) {
   #md-editor-v3-preview,
   #md-editor-v3-preview-wrapper {
-    background-color: orange;
+    background-color: var(--color-brand-500);
   }
 }
 </style>

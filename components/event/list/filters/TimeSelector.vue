@@ -71,11 +71,11 @@ const hourRangesDataComputed = computed(() => hourRangesData);
             :id="'timeRange-' + range['12-hour-label']"
             type="checkbox"
             :data-testid="`timeRange-${range['12-hour-label']}`"
-            class="mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 text-orange-600 focus:ring-orange-500 dark:bg-gray-300"
+            class="text-brand-600 focus:ring-brand-500 mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 dark:bg-gray-300"
             :checked="workingCopyOfSelectedHourRanges[range['12-hour-label']]"
             @input="() => toggleSelectTimeRange(range)"
-          >
-          <span class="ml-2 whitespace-nowrap text-sm font-medium">{{
+          />
+          <span class="ml-2 text-sm font-medium whitespace-nowrap">{{
             range['12-hour-label']
           }}</span>
         </label>

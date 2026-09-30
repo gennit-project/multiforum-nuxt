@@ -8,7 +8,11 @@ import type {
   CommentCreateInput,
   CommentSectionFormat,
 } from '@/__generated__/graphql';
-import type { NormalizedCacheObject, ApolloCache, FetchResult  } from '@apollo/client/core';
+import type {
+  NormalizedCacheObject,
+  ApolloCache,
+  FetchResult,
+} from '@apollo/client/core';
 import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
 import { GET_USER } from '@/graphQLData/user/queries';
@@ -22,8 +26,16 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
-import { getBotMentionState, filterBotSuggestions, type BotSuggestion } from '@/utils/botMentions';
-import { getModMentionState, filterModSuggestions, type ModSuggestion } from '@/utils/modMentions';
+import {
+  getBotMentionState,
+  filterBotSuggestions,
+  type BotSuggestion,
+} from '@/utils/botMentions';
+import {
+  getModMentionState,
+  filterModSuggestions,
+  type ModSuggestion,
+} from '@/utils/modMentions';
 
 const usernameVar = useUsername();
 
@@ -444,13 +456,13 @@ const applyModSuggestion = (value: string) => {
     <RequireAuth :justify-left="true" :full-width="true">
       <template #has-auth>
         <form
-          class="relative flex w-full items-center gap-3 rounded-lg border border-orange-400 bg-white px-3 py-2 dark:bg-gray-900"
+          class="border-brand-400 relative flex w-full items-center gap-3 rounded-lg border bg-white px-3 py-2 dark:bg-gray-900"
           @submit.prevent="handleCreateComment"
         >
           <textarea
             ref="inlineTextarea"
             data-testid="discussion-inline-comment"
-            class="min-h-[44px] flex-1 resize-none rounded bg-white text-sm text-gray-900 placeholder-gray-500 outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-400"
+            class="focus-visible:ring-brand-500 min-h-[44px] flex-1 resize-none rounded bg-white text-sm text-gray-900 placeholder-gray-500 outline-none focus:outline-none focus-visible:ring-2 dark:bg-gray-900 dark:text-gray-100 dark:placeholder-gray-400"
             name="discussionInlineComment"
             aria-label="Add a comment"
             :rows="1"
@@ -466,13 +478,13 @@ const applyModSuggestion = (value: string) => {
           />
           <div
             v-if="showBotSuggestions"
-            class="absolute left-0 top-full z-20 mt-1 min-w-[220px] max-w-sm rounded-md border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
+            class="absolute top-full left-0 z-20 mt-1 max-w-sm min-w-[220px] rounded-md border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
           >
             <button
               v-for="suggestion in filteredBotSuggestions"
               :key="suggestion.value"
               type="button"
-              class="flex w-full cursor-pointer flex-col text-left px-3 py-2 transition hover:bg-gray-100 dark:hover:bg-gray-700"
+              class="flex w-full cursor-pointer flex-col px-3 py-2 text-left transition hover:bg-gray-100 dark:hover:bg-gray-700"
               @click.prevent="applyBotSuggestion(suggestion.value)"
             >
               <span class="text-sm font-semibold text-gray-900 dark:text-white">
@@ -488,13 +500,13 @@ const applyModSuggestion = (value: string) => {
           </div>
           <div
             v-if="showModSuggestions"
-            class="absolute left-0 top-full z-20 mt-1 min-w-[220px] max-w-sm rounded-md border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
+            class="absolute top-full left-0 z-20 mt-1 max-w-sm min-w-[220px] rounded-md border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-800"
           >
             <button
               v-for="suggestion in filteredModSuggestions"
               :key="suggestion.value"
               type="button"
-              class="flex w-full cursor-pointer flex-col text-left px-3 py-2 transition hover:bg-gray-100 dark:hover:bg-gray-700"
+              class="flex w-full cursor-pointer flex-col px-3 py-2 text-left transition hover:bg-gray-100 dark:hover:bg-gray-700"
               @click.prevent="applyModSuggestion(suggestion.value)"
             >
               <span class="text-sm font-semibold text-gray-900 dark:text-white">
@@ -504,7 +516,7 @@ const applyModSuggestion = (value: string) => {
           </div>
           <button
             type="submit"
-            class="font-semibold flex items-center justify-center rounded-md bg-orange-400 px-4 py-2 text-sm text-black hover:bg-orange-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-orange-200 dark:disabled:bg-orange-950 dark:disabled:text-orange-400"
+            class="bg-brand-400 hover:bg-brand-500 focus-visible:ring-brand-500 disabled:bg-brand-200 dark:disabled:bg-brand-950 dark:disabled:text-brand-400 flex items-center justify-center rounded-md px-4 py-2 text-sm font-semibold text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed"
             :disabled="
               createCommentLoading ||
               !createFormValues.text.length ||
@@ -526,7 +538,7 @@ const applyModSuggestion = (value: string) => {
         <button
           type="button"
           aria-label="Log in to add a comment"
-          class="flex w-full items-center gap-3 rounded-lg border border-orange-400 bg-white px-3 py-2 dark:bg-gray-900"
+          class="border-brand-400 flex w-full items-center gap-3 rounded-lg border bg-white px-3 py-2 dark:bg-gray-900"
         >
           <span
             class="flex min-h-[44px] flex-1 items-center bg-white text-left text-sm text-gray-500 dark:bg-gray-900 dark:text-gray-400"
@@ -535,7 +547,7 @@ const applyModSuggestion = (value: string) => {
           </span>
           <span
             aria-hidden="true"
-            class="font-semibold rounded-md bg-orange-200 px-4 py-2 text-sm text-black dark:bg-orange-950 dark:text-orange-400"
+            class="bg-brand-200 dark:bg-brand-950 dark:text-brand-400 rounded-md px-4 py-2 text-sm font-semibold text-black"
           >
             Post
           </span>

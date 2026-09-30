@@ -69,7 +69,7 @@ const channelIconSrc = computed(
 
         <div class="min-w-0 flex-1">
           <h3
-            class="truncate text-lg font-semibold text-gray-900 transition-colors hover:text-orange-500 dark:text-white dark:hover:text-orange-400"
+            class="hover:text-brand-500 dark:hover:text-brand-400 truncate text-lg font-semibold text-gray-900 transition-colors dark:text-white"
           >
             {{ channel.displayName || channel.uniqueName }}
           </h3>

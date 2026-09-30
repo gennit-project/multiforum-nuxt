@@ -136,12 +136,13 @@ const firstAlbumImage = computed(() => {
   return album.Images[0] || null;
 });
 
-const firstAlbumImageUrl = computed(() =>
-  getPreferredImageUrl({
-    source: firstAlbumImage.value,
-    preferred: ['list320', 'list160'],
-    originalUrl: firstAlbumImage.value?.url,
-  }) || ''
+const firstAlbumImageUrl = computed(
+  () =>
+    getPreferredImageUrl({
+      source: firstAlbumImage.value,
+      preferred: ['list320', 'list160'],
+      originalUrl: firstAlbumImage.value?.url,
+    }) || ''
 );
 
 const relativeCreated = computed(() => {
@@ -203,7 +204,7 @@ const handleOpenAlbum = () => {
           </nuxt-link>
           <span
             v-if="hasSensitiveContent"
-            class="ml-2 rounded-full border border-orange-400 px-2 text-[10px] text-orange-300"
+            class="border-brand-400 text-brand-300 ml-2 rounded-full border px-2 text-[10px]"
           >
             Sensitive
           </span>
@@ -228,7 +229,7 @@ const handleOpenAlbum = () => {
             in
             <nuxt-link
               :to="defaultLink"
-              class="text-orange-300 hover:underline"
+              class="text-brand-300 hover:underline"
               >{{ primaryChannel.channelUniqueName }}</nuxt-link
             >
           </template>

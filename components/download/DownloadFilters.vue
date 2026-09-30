@@ -164,7 +164,7 @@ const handleMultiSelectUpdate = (
       <button
         v-if="hasActiveFilters"
         type="button"
-        class="text-sm text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+        class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 text-sm"
         @click="clearAllFilters"
       >
         Clear all ({{ getActiveFilterCount }})
@@ -198,10 +198,7 @@ const handleMultiSelectUpdate = (
 
         <!-- Regular checkboxes for groups with <10 options -->
         <div v-else class="space-y-2">
-          <div
-            v-for="option in group.options"
-            :key="option.id"
-          >
+          <div v-for="option in group.options" :key="option.id">
             <CheckBox
               :checked="
                 selectedFilters[group.key]?.includes(option.value) || false

@@ -336,7 +336,7 @@ function getIdValidationError(id: string): string {
               type="text"
               :value="profile.id"
               placeholder="e.g., helper, reviewer, translator"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               :class="{
                 'border-red-500':
                   profile.id && getIdValidationError(profile.id),
@@ -373,7 +373,7 @@ function getIdValidationError(id: string): string {
               type="text"
               :value="profile.label"
               placeholder="e.g., Code Helper, PR Reviewer"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               @input="
                 updateProfile(
                   index,
@@ -400,7 +400,7 @@ function getIdValidationError(id: string): string {
               :value="profile.prompt"
               rows="4"
               placeholder="e.g., You are a helpful code reviewer..."
-              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               @input="
                 updateProfile(
                   index,
@@ -431,7 +431,7 @@ function getIdValidationError(id: string): string {
       <!-- Add Profile Button -->
       <button
         type="button"
-        class="flex items-center gap-2 rounded border border-orange-500 px-3 py-2 text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+        class="border-brand-500 text-brand-500 hover:bg-brand-50 dark:hover:bg-brand-900/20 flex items-center gap-2 rounded border px-3 py-2"
         @click="addProfile"
       >
         <i class="fa-solid fa-plus" />

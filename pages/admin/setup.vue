@@ -108,7 +108,7 @@ const stateClasses = (capability: InstanceCapabilityStatus) => {
 
           <div
             v-else-if="error && !status"
-            class="bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 p-5 dark:border-red-900"
+            class="rounded-lg border border-red-200 bg-red-50 p-5 dark:border-red-900 dark:bg-red-950/30"
             role="alert"
           >
             <h2 class="font-semibold text-red-800 dark:text-red-200">
@@ -120,7 +120,7 @@ const stateClasses = (capability: InstanceCapabilityStatus) => {
             </p>
             <button
               type="button"
-              class="mt-4 rounded-md bg-red-700 px-3 py-2 text-sm font-medium text-white hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+              class="mt-4 rounded-md bg-red-700 px-3 py-2 text-sm font-medium text-white hover:bg-red-800 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none dark:focus:ring-offset-gray-900"
               @click="refetch()"
             >
               Try again
@@ -144,7 +144,7 @@ const stateClasses = (capability: InstanceCapabilityStatus) => {
                   </p>
                 </div>
                 <span
-                  class="font-semibold shrink-0 rounded-full px-2.5 py-1 text-xs"
+                  class="shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold"
                   :class="stateClasses(capability)"
                   :data-testid="`setup-state-${capability.key}`"
                 >
@@ -157,7 +157,7 @@ const stateClasses = (capability: InstanceCapabilityStatus) => {
                 class="mt-4 rounded-md bg-amber-50 p-3 dark:bg-amber-950/30"
               >
                 <p
-                  class="font-semibold text-xs uppercase tracking-wide text-amber-800 dark:text-amber-200"
+                  class="text-xs font-semibold tracking-wide text-amber-800 uppercase dark:text-amber-200"
                 >
                   Missing environment variables
                 </p>
@@ -173,7 +173,7 @@ const stateClasses = (capability: InstanceCapabilityStatus) => {
 
               <a
                 :href="docsUrl(capability.docsPath)"
-                class="mt-4 inline-flex text-sm font-medium text-orange-700 hover:text-orange-800 hover:underline dark:text-orange-300 dark:hover:text-orange-200"
+                class="text-brand-700 hover:text-brand-800 dark:text-brand-300 dark:hover:text-brand-200 mt-4 inline-flex text-sm font-medium hover:underline"
                 target="_blank"
                 rel="noopener noreferrer"
               >

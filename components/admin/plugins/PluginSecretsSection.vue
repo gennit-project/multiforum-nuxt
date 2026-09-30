@@ -98,12 +98,17 @@ const getSecretControlId = (
     <template #content>
       <div class="space-y-4">
         <!-- Security warning banner -->
-        <div class="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-900/30">
-          <i class="fa-solid fa-lock mt-0.5 text-amber-600 dark:text-amber-400" />
+        <div
+          class="flex items-start gap-3 rounded-md border border-amber-200 bg-amber-50 p-3 dark:border-amber-700 dark:bg-amber-900/30"
+        >
+          <i
+            class="fa-solid fa-lock mt-0.5 text-amber-600 dark:text-amber-400"
+          />
           <div class="text-sm text-amber-800 dark:text-amber-200">
             <p class="font-medium">Secrets are write-only</p>
             <p class="mt-1">
-              Secrets are encrypted and cannot be retrieved after saving. Make sure to store your secrets securely before saving them here.
+              Secrets are encrypted and cannot be retrieved after saving. Make
+              sure to store your secrets securely before saving them here.
             </p>
           </div>
         </div>
@@ -123,13 +128,13 @@ const getSecretControlId = (
                 {{ secret.key }}
               </span>
               <span
-                class="font-semibold rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                class="rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300"
               >
                 Server
               </span>
               <span
                 :id="`${getSecretControlId(secret, index)}-status`"
-                class="font-semibold rounded-full px-2 py-1 text-xs"
+                class="rounded-full px-2 py-1 text-xs font-semibold"
                 :class="getSecretStatusColor(secret.status)"
               >
                 {{ getSecretStatusText(secret) }}
@@ -146,12 +151,19 @@ const getSecretControlId = (
               :aria-label="`Value for ${secret.key}`"
               :aria-describedby="`${getSecretControlId(secret, index)}-status`"
               :aria-invalid="secret.status === 'INVALID'"
-              class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-              @input="updateSecretValue(secret.key, ($event.target as HTMLInputElement).value)"
-            >
+              class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              @input="
+                updateSecretValue(
+                  secret.key,
+                  ($event.target as HTMLInputElement).value
+                )
+              "
+            />
 
             <!-- Warning text below input -->
-            <p class="flex items-center gap-1.5 text-xs italic text-amber-600 dark:text-amber-400">
+            <p
+              class="flex items-center gap-1.5 text-xs text-amber-600 italic dark:text-amber-400"
+            >
               <i class="fa-solid fa-triangle-exclamation" />
               This secret will not be visible after saving.
             </p>
@@ -162,12 +174,13 @@ const getSecretControlId = (
               class="rounded-md border border-amber-300 bg-amber-50 p-3 dark:border-amber-600 dark:bg-amber-900/30"
             >
               <p class="mb-2 text-sm text-amber-800 dark:text-amber-200">
-                Are you sure? This secret cannot be viewed or retrieved after saving.
+                Are you sure? This secret cannot be viewed or retrieved after
+                saving.
               </p>
               <div class="flex space-x-2">
                 <button
                   type="button"
-                  class="rounded bg-orange-600 px-3 py-1 text-sm text-white hover:bg-orange-700"
+                  class="bg-brand-600 hover:bg-brand-700 rounded px-3 py-1 text-sm text-white"
                   @click="confirmAndSave(secret.key)"
                 >
                   Save Secret
@@ -186,7 +199,7 @@ const getSecretControlId = (
             <div v-else class="flex space-x-2">
               <button
                 type="button"
-                class="rounded bg-orange-600 px-3 py-1 text-sm text-white hover:bg-orange-700"
+                class="bg-brand-600 hover:bg-brand-700 rounded px-3 py-1 text-sm text-white"
                 :disabled="!secretValues[secret.key]"
                 @click="requestConfirmation(secret.key)"
               >
@@ -207,14 +220,10 @@ const getSecretControlId = (
               :id="getSecretControlId(secret, index)"
               type="button"
               :aria-describedby="`${getSecretControlId(secret, index)}-status`"
-              class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              class="focus:ring-brand-500 rounded bg-gray-100 px-3 py-1 text-sm text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
               @click="updateShowSecretInput(secret.key, true)"
             >
-              {{
-                secret.status === 'NOT_SET'
-                  ? 'Set Secret'
-                  : 'Update Secret'
-              }}
+              {{ secret.status === 'NOT_SET' ? 'Set Secret' : 'Update Secret' }}
             </button>
           </div>
         </div>
@@ -231,20 +240,26 @@ const getSecretControlId = (
         <div
           class="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 dark:border-blue-700 dark:bg-blue-900/30 dark:text-blue-200"
         >
-          <p class="font-medium">These secrets are retained for rollback compatibility.</p>
+          <p class="font-medium">
+            These secrets are retained for rollback compatibility.
+          </p>
           <p class="mt-1">
-            The installed plugin version no longer declares them. They are not required
-            for enablement and will not be removed automatically.
+            The installed plugin version no longer declares them. They are not
+            required for enablement and will not be removed automatically.
           </p>
         </div>
 
-        <ul class="divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-700 dark:border-gray-700">
+        <ul
+          class="divide-y divide-gray-200 rounded-lg border border-gray-200 dark:divide-gray-700 dark:border-gray-700"
+        >
           <li
             v-for="secret in orphanedSecrets"
             :key="secret.key"
             class="flex items-center justify-between gap-4 p-4"
           >
-            <span class="font-mono text-sm font-medium text-gray-900 dark:text-white">
+            <span
+              class="font-mono text-sm font-medium text-gray-900 dark:text-white"
+            >
               {{ secret.key }}
             </span>
             <span

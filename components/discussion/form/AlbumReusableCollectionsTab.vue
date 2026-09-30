@@ -203,21 +203,17 @@ const backToCollections = () => {
         You have no image collections yet.
       </p>
 
-      <ul
-        v-else
-        class="mt-3 space-y-2"
-      >
-        <li
-          v-for="collection in collections"
-          :key="collection.id"
-        >
+      <ul v-else class="mt-3 space-y-2">
+        <li v-for="collection in collections" :key="collection.id">
           <button
             type="button"
-            class="flex w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-sm text-gray-900 shadow-sm hover:border-orange-400 hover:bg-orange-50 focus:outline-none focus:ring-2 focus:ring-orange-500/30 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:border-orange-500 dark:hover:bg-gray-700"
+            class="hover:border-brand-400 hover:bg-brand-50 focus:ring-brand-500/30 dark:hover:border-brand-500 flex w-full items-center justify-between rounded-md border border-gray-200 bg-white px-3 py-2 text-left text-sm text-gray-900 shadow-sm focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
             data-testid="reuse-image-collection-button"
             @click="openCollection(collection.id)"
           >
-            <span class="font-medium">{{ collection.name || 'Untitled collection' }}</span>
+            <span class="font-medium">{{
+              collection.name || 'Untitled collection'
+            }}</span>
             <span class="text-xs text-gray-500 dark:text-gray-400">
               {{ collection.itemCount ?? 0 }}
               {{ (collection.itemCount ?? 0) === 1 ? 'image' : 'images' }}
@@ -231,7 +227,7 @@ const backToCollections = () => {
     <div v-else>
       <button
         type="button"
-        class="mt-1 inline-flex items-center gap-1 text-sm font-medium text-orange-600 hover:text-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500/30 dark:text-orange-400 dark:hover:text-orange-300"
+        class="text-brand-600 hover:text-brand-700 focus:ring-brand-500/30 dark:text-brand-400 dark:hover:text-brand-300 mt-1 inline-flex items-center gap-1 text-sm font-medium focus:ring-2 focus:outline-none"
         @click="backToCollections"
       >
         <span aria-hidden="true">&larr;</span>
@@ -244,7 +240,7 @@ const backToCollections = () => {
       <AlbumReusableImageGrid
         :images="collectionImages"
         :selected-image-ids="selectedImageIds"
-      :pending-image-ids="pendingImageIds"
+        :pending-image-ids="pendingImageIds"
         :is-limit-reached="isLimitReached"
         :loading="collectionImagesLoading"
         :error="collectionImagesErrorMessage"

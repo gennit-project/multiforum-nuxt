@@ -1,6 +1,7 @@
 <template>
-  <svg aria-hidden="true"
-    class="h-8 w-8 text-orange-500 dark:text-orange-400"
+  <svg
+    aria-hidden="true"
+    class="text-brand-500 dark:text-brand-400 h-8 w-8"
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"

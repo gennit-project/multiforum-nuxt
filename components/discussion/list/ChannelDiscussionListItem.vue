@@ -106,8 +106,7 @@ const channelIdInParams = computed(() =>
 );
 const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
-const { forumAdminUsernames, forumModProfileNames } =
-  useForumRoleMembership();
+const { forumAdminUsernames, forumModProfileNames } = useForumRoleMembership();
 const defaultUniqueName = computed(
   () => channelIdInParams.value || props.discussionChannel.channelUniqueName
 );
@@ -172,8 +171,7 @@ const tags = computed(
   () => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []
 );
 const flairs = computed(
-  () =>
-    (props.discussionChannel as DiscussionChannelWithFlairs).Flairs || []
+  () => (props.discussionChannel as DiscussionChannelWithFlairs).Flairs || []
 );
 
 const filteredQuery = computed(() => {
@@ -215,11 +213,12 @@ const shouldShowContent = computed(() => {
 const revealSensitiveContent = () => {
   sensitiveContentRevealed.value = true;
 };
-
 </script>
 
 <template>
-  <li class="flex border-b border-gray-200 py-3 last:border-b-0 dark:border-gray-800">
+  <li
+    class="flex border-b border-gray-200 py-3 last:border-b-0 dark:border-gray-800"
+  >
     <div
       class="flex w-full min-w-0 flex-row justify-start gap-4 overflow-hidden"
     >
@@ -273,7 +272,7 @@ const revealSensitiveContent = () => {
                 </span>
                 <span
                   v-if="hasSensitiveContent"
-                  class="rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
+                  class="dark:border-brand-400 dark:text-brand-400 rounded-full border border-amber-700 px-2 text-xs text-amber-700"
                 >
                   Sensitive
                 </span>
@@ -317,7 +316,7 @@ const revealSensitiveContent = () => {
                 </span>
                 <span
                   v-if="hasSensitiveContent"
-                  class="rounded-full border border-amber-700 px-2 text-xs text-amber-700 dark:border-orange-400 dark:text-orange-400"
+                  class="dark:border-brand-400 dark:text-brand-400 rounded-full border border-amber-700 px-2 text-xs text-amber-700"
                 >
                   Sensitive
                 </span>
@@ -350,7 +349,12 @@ const revealSensitiveContent = () => {
                   :allow-add-to-list="true"
                   :discussion-id="discussion.id"
                   :discussion-title="discussion.title"
-                  :initial-is-favorited="(discussionChannel as DiscussionChannel & DiscussionChannelWithFavorited).isFavorited"
+                  :initial-is-favorited="
+                    (
+                      discussionChannel as DiscussionChannel &
+                        DiscussionChannelWithFavorited
+                    ).isFavorited
+                  "
                   size="small"
                 />
               </div>
@@ -360,7 +364,7 @@ const revealSensitiveContent = () => {
                 <button
                   v-if="discussion && (discussion.body || discussion.Album)"
                   type="button"
-                  class="inline-flex items-center gap-1 whitespace-nowrap text-xs text-gray-600 hover:underline dark:text-gray-300"
+                  class="inline-flex items-center gap-1 text-xs whitespace-nowrap text-gray-600 hover:underline dark:text-gray-300"
                   :aria-expanded="isExpanded"
                   @click="isExpanded = !isExpanded"
                 >
@@ -369,11 +373,7 @@ const revealSensitiveContent = () => {
                     class="h-3 w-3"
                     aria-hidden="true"
                   />
-                  <XmarkIcon
-                    v-else
-                    class="h-3 w-3"
-                    aria-hidden="true"
-                  />
+                  <XmarkIcon v-else class="h-3 w-3" aria-hidden="true" />
                   {{ isExpanded ? 'Collapse' : 'Expand' }}
                 </button>
               </div>
@@ -424,7 +424,7 @@ const revealSensitiveContent = () => {
               <template v-if="shouldShowContent">
                 <div
                   v-if="discussion.body"
-                  class="my-2 border-l border-gray-200 bg-gray-50 py-2 pl-4 pr-2 dark:border-gray-700 dark:bg-gray-900"
+                  class="my-2 border-l border-gray-200 bg-gray-50 py-2 pr-2 pl-4 dark:border-gray-700 dark:bg-gray-900"
                 >
                   <MarkdownPreview
                     :text="discussion.body"

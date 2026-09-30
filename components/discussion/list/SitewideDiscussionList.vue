@@ -368,7 +368,7 @@ const filterByChannel = (channel: string) => {
               <RequireAuth :full-width="false">
                 <template #has-auth>
                   <nuxt-link
-                    class="text-orange-500 underline"
+                    class="text-brand-500 underline"
                     :to="{ name: 'discussions-create' }"
                   >
                     Create one?
@@ -378,7 +378,7 @@ const filterByChannel = (channel: string) => {
                   <button
                     type="button"
                     aria-label="Log in to create a discussion"
-                    class="cursor-pointer text-orange-500 underline"
+                    class="text-brand-500 cursor-pointer underline"
                   >
                     Create one?
                   </button>
@@ -476,7 +476,7 @@ const filterByChannel = (channel: string) => {
                     </span>
                     <nuxt-link
                       :to="channelLink.link"
-                      class="text-orange-600 hover:underline dark:text-orange-400"
+                      class="text-brand-600 dark:text-brand-400 hover:underline"
                     >
                       {{ channelLink.commentCount }}
                       {{

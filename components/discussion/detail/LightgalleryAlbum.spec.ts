@@ -30,7 +30,8 @@ const mountAlbum = (props: Record<string, unknown> = {}) =>
     },
   });
 
-const thumbnails = (w: ReturnType<typeof mount>) => w.findAll('.grid-cols-4 > button');
+const thumbnails = (w: ReturnType<typeof mount>) =>
+  w.findAll('.grid-cols-4 > button');
 const rightArrow = (w: ReturnType<typeof mount>) =>
   w.find('button[aria-label="Scroll thumbnails right"]');
 const leftArrow = (w: ReturnType<typeof mount>) =>
@@ -59,7 +60,9 @@ describe('LightgalleryAlbum grid format', () => {
 
     await wrapper.findAll('button')[2].trigger('click');
 
-    expect(wrapper.getComponent({ name: 'VueEasyLightbox' }).props()).toMatchObject({
+    expect(
+      wrapper.getComponent({ name: 'VueEasyLightbox' }).props()
+    ).toMatchObject({
       visible: true,
       index: 2,
       imgs: Array.from({ length: 6 }, (_, i) => `https://x/${i}.png`),
@@ -92,7 +95,7 @@ describe('LightgalleryAlbum carousel thumbnails', () => {
   it('highlights the active thumbnail', () => {
     const wrapper = mountAlbum({ carouselFormat: true });
 
-    expect(thumbnails(wrapper)[0].classes()).toContain('border-orange-500');
+    expect(thumbnails(wrapper)[0].classes()).toContain('border-brand-500');
   });
 
   it('changes the active image on thumbnail click', async () => {
@@ -100,7 +103,7 @@ describe('LightgalleryAlbum carousel thumbnails', () => {
 
     await thumbnails(wrapper)[2].trigger('click');
 
-    expect(thumbnails(wrapper)[2].classes()).toContain('border-orange-500');
+    expect(thumbnails(wrapper)[2].classes()).toContain('border-brand-500');
   });
 
   it('eager loads the active carousel image', () => {

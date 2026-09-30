@@ -72,7 +72,11 @@ const labels: Record<PublicPipelineDisplayStatus, string> = {
         :class="hasActiveAttempt ? 'fa-spinner fa-spin' : 'fa-shield-halved'"
         aria-hidden="true"
       />
-      {{ loading && !hasPipelineContent ? 'Loading checks…' : labels[displayStatus] }}
+      {{
+        loading && !hasPipelineContent
+          ? 'Loading checks…'
+          : labels[displayStatus]
+      }}
     </span>
     <NuxtLink
       v-if="hasPipelineContent"
@@ -83,7 +87,7 @@ const labels: Record<PublicPipelineDisplayStatus, string> = {
           discussionId,
         },
       }"
-      class="font-medium text-orange-700 underline dark:text-orange-300"
+      class="text-brand-700 dark:text-brand-300 font-medium underline"
     >
       View checks
     </NuxtLink>

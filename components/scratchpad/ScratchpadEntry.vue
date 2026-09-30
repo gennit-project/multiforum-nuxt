@@ -182,7 +182,7 @@ const isLoading = computed(() => updateLoading.value || deleteLoading.value);
             <NuxtLink
               :to="sourceLink"
               data-testid="scratchpad-source-link"
-              class="text-orange-600 hover:underline dark:text-orange-400"
+              class="text-brand-600 dark:text-brand-400 hover:underline"
             >
               {{ sourceTypeLabel }}
             </NuxtLink>

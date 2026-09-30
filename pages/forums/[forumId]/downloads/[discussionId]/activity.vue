@@ -148,7 +148,7 @@ const hasAnyActivity = computed(() => {
           >
             <NuxtLink
               :to="pipelineAttemptUrl(attempt.pipelineId)"
-              class="font-medium text-orange-700 underline dark:text-orange-300"
+              class="text-brand-700 dark:text-brand-300 font-medium underline"
             >
               {{ attempt.scope === 'SERVER' ? 'Server' : 'Channel' }} checks
               {{

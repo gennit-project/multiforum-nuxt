@@ -61,7 +61,7 @@ const classes = computed(() => {
     } else {
       // Horizontal active tab: orange bottom border
       baseClasses.push(
-        'border-b-2 border-orange-500 text-gray-900 dark:text-gray-100'
+        'border-b-2 border-brand-500 text-gray-900 dark:text-gray-100'
       );
     }
   } else {

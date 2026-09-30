@@ -212,7 +212,7 @@ const getCurrentTabLabel = computed(() => {
                           typeof route.name === 'string' &&
                           route.name?.includes(`settings-${tab.key}`)
                       )?.fontAwesome,
-                      'mr-2 text-orange-500',
+                      'text-brand-500 mr-2',
                     ]"
                   />
                   <!-- For component icons -->
@@ -231,7 +231,7 @@ const getCurrentTabLabel = computed(() => {
                           route.name?.includes(`settings-${tab.key}`)
                       )?.icon
                     "
-                    class="mr-2 h-5 w-5 text-orange-500"
+                    class="text-brand-500 mr-2 h-5 w-5"
                   />
                   <span>{{ getCurrentTabLabel }}</span>
                 </div>
@@ -249,7 +249,7 @@ const getCurrentTabLabel = computed(() => {
                   <router-link
                     class="flex items-center py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                     :class="{
-                      'bg-gray-50 text-orange-500 dark:bg-gray-700':
+                      'text-brand-500 bg-gray-50 dark:bg-gray-700':
                         typeof route.name === 'string' &&
                         route.name?.includes(`settings-${tab.key}`),
                       'text-gray-700 dark:text-gray-300':
@@ -268,7 +268,7 @@ const getCurrentTabLabel = computed(() => {
                         tab.fontAwesome,
                         'mr-2',
                         {
-                          'text-orange-500':
+                          'text-brand-500':
                             typeof route.name === 'string' &&
                             route.name?.includes(`settings-${tab.key}`),
                           'text-gray-500 dark:text-gray-400':
@@ -283,7 +283,7 @@ const getCurrentTabLabel = computed(() => {
                       v-else-if="tab.icon"
                       class="mr-2 h-5 w-5"
                       :class="{
-                        'text-orange-500':
+                        'text-brand-500':
                           typeof route.name === 'string' &&
                           route.name?.includes(`settings-${tab.key}`),
                         'text-gray-400 dark:text-gray-400':
@@ -309,7 +309,7 @@ const getCurrentTabLabel = computed(() => {
                   <router-link
                     class="flex cursor-pointer items-center px-3 py-2"
                     :class="{
-                      'border-r-2 border-orange-500 bg-orange-50 font-medium text-gray-900 dark:bg-orange-900/20 dark:text-white':
+                      'border-brand-500 bg-brand-50 dark:bg-brand-900/20 border-r-2 font-medium text-gray-900 dark:text-white':
                         typeof route.name === 'string' &&
                         route.name?.includes(`settings-${tab.key}`),
                       'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300':
@@ -327,7 +327,7 @@ const getCurrentTabLabel = computed(() => {
                         tab.fontAwesome,
                         'mr-2',
                         {
-                          'text-orange-500':
+                          'text-brand-500':
                             typeof route.name === 'string' &&
                             route.name?.includes(`settings-${tab.key}`),
                           'text-gray-500 dark:text-gray-400':
@@ -342,7 +342,7 @@ const getCurrentTabLabel = computed(() => {
                       v-else-if="tab.icon"
                       class="mr-2 h-5 w-5"
                       :class="{
-                        'text-orange-500':
+                        'text-brand-500':
                           typeof route.name === 'string' &&
                           route.name?.includes(`settings-${tab.key}`),
                         'text-gray-400 dark:text-gray-400':

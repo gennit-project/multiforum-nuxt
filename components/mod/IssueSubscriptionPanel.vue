@@ -49,7 +49,7 @@ defineEmits(['toggle', 'dismiss-cta']);
 
     <div
       v-if="showCta && !isSubscribed"
-      class="rounded-lg border border-orange-200 bg-orange-50 p-3 text-sm dark:border-orange-500/40 dark:bg-orange-500/10"
+      class="border-brand-200 bg-brand-50 dark:border-brand-500/40 dark:bg-brand-500/10 rounded-lg border p-3 text-sm"
     >
       <p class="font-medium text-gray-900 dark:text-gray-100">
         Subscribe to updates on this issue?

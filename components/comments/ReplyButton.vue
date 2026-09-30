@@ -60,7 +60,7 @@ const buttonClasses = computed(() => {
     ...baseClasses,
     ...defaultClasses,
     props.isPermalinked
-      ? 'hover:bg-orange-300 dark:hover:bg-orange-700'
+      ? 'hover:bg-brand-300 dark:hover:bg-brand-700'
       : 'hover:bg-gray-200 dark:hover:bg-gray-600 dark:bg-gray-700',
   ];
 });

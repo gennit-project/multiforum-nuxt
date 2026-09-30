@@ -2,7 +2,11 @@
 import FormRow from '@/components/FormRow.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
-import type { PluginFormSection, PluginSecretStatus as PluginSecretStatusType, PluginSettings } from '@/types/pluginForms';
+import type {
+  PluginFormSection,
+  PluginSecretStatus as PluginSecretStatusType,
+  PluginSettings,
+} from '@/types/pluginForms';
 
 defineProps<{
   sections: PluginFormSection[];
@@ -22,7 +26,7 @@ const emit = defineEmits<{
   <FormRow v-if="sections.length > 0" section-title="">
     <template #content>
       <div class="space-y-6">
-        <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
+        <div class="border-b border-gray-200 pb-2 dark:border-gray-700">
           <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
             Server-Scoped Plugin Settings
           </h2>
@@ -39,10 +43,12 @@ const emit = defineEmits<{
           @update:model-value="emit('update:modelValue', $event)"
         />
 
-        <div class="flex justify-end border-t border-gray-200 pt-4 dark:border-gray-700">
+        <div
+          class="flex justify-end border-t border-gray-200 pt-4 dark:border-gray-700"
+        >
           <button
             type="button"
-            class="rounded-md bg-orange-700 px-4 py-2 text-white hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-600 disabled:cursor-not-allowed disabled:opacity-50"
+            class="bg-brand-700 hover:bg-brand-800 focus:ring-brand-600 rounded-md px-4 py-2 text-white focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="saving"
             @click="emit('save')"
           >

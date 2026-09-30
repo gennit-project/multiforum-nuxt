@@ -69,12 +69,13 @@ const botAccounts = computed(() => {
   return channel?.Bots ?? [];
 });
 
-const sidebarIconSrc = computed(() =>
-  getPreferredImageUrl({
-    source: props.channel,
-    preferred: ['avatar64', 'avatar96', 'avatar48'],
-    originalUrl: props.channel?.channelIconURL ?? '',
-  }) || ''
+const sidebarIconSrc = computed(
+  () =>
+    getPreferredImageUrl({
+      source: props.channel,
+      preferred: ['avatar64', 'avatar96', 'avatar48'],
+      originalUrl: props.channel?.channelIconURL ?? '',
+    }) || ''
 );
 
 // Check if a bot has active suspensions
@@ -384,7 +385,7 @@ const handleBecomeAdminSuccess = () => {
 @media (prefers-color-scheme: light) {
   #md-editor-v3-preview,
   #md-editor-v3-preview-wrapper {
-    background-color: orange;
+    background-color: var(--color-brand-500);
   }
 }
 </style>

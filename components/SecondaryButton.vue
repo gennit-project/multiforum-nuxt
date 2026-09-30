@@ -29,7 +29,7 @@ const sizeClasses = computed(() =>
         : 'text-gray-700 hover:bg-gray-400 dark:text-white dark:hover:bg-gray-600/60',
       sizeClasses,
     ]"
-    class="max-height-4 inline-flex items-center rounded-md font-medium whitespace-nowrap focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-100 focus:outline-none"
+    class="max-height-4 focus:ring-brand-500 inline-flex items-center rounded-md font-medium whitespace-nowrap focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:outline-none"
   >
     <slot />{{ label }}
   </button>

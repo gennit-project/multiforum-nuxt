@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import {
-  useApolloClient,
-  useMutation,
-  useQuery,
-} from '@vue/apollo-composable';
+import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
 import type { EventPipeline } from '@/utils/pipelineSchema';
 import {
   GET_PLUGIN_PIPELINE_CAMPAIGNS,
@@ -86,9 +82,7 @@ const activePolicyIds = computed(
     )
 );
 
-const { mutate: createCampaign } = useMutation(
-  CREATE_PLUGIN_PIPELINE_CAMPAIGN
-);
+const { mutate: createCampaign } = useMutation(CREATE_PLUGIN_PIPELINE_CAMPAIGN);
 const { mutate: pauseCampaign } = useMutation(PAUSE_PLUGIN_PIPELINE_CAMPAIGN);
 const { mutate: resumeCampaign } = useMutation(RESUME_PLUGIN_PIPELINE_CAMPAIGN);
 
@@ -154,8 +148,7 @@ const loadFailures = async (campaignId: string) => {
     variables: { campaignId },
     fetchPolicy: 'network-only',
   });
-  failures.value[campaignId] =
-    response.data.getPluginPipelineCampaignFailures;
+  failures.value[campaignId] = response.data.getPluginPipelineCampaignFailures;
 };
 
 const failureUrl = (failure: CampaignFailure) =>
@@ -208,34 +201,57 @@ const failureUrl = (failure: CampaignFailure) =>
           <dl class="mt-3 grid grid-cols-2 gap-3 md:grid-cols-4">
             <div>
               <dt class="text-gray-500">Affected</dt>
-              <dd class="font-semibold">{{ previews[policy.policyId!]?.affectedFileCount }}</dd>
+              <dd class="font-semibold">
+                {{ previews[policy.policyId!]?.affectedFileCount }}
+              </dd>
             </div>
             <div>
               <dt class="text-gray-500">Accessible</dt>
-              <dd class="font-semibold">{{ previews[policy.policyId!]?.accessibleFileCount }}</dd>
+              <dd class="font-semibold">
+                {{ previews[policy.policyId!]?.accessibleFileCount }}
+              </dd>
             </div>
             <div>
               <dt class="text-gray-500">Unavailable</dt>
-              <dd class="font-semibold">{{ previews[policy.policyId!]?.unavailableFileCount }}</dd>
+              <dd class="font-semibold">
+                {{ previews[policy.policyId!]?.unavailableFileCount }}
+              </dd>
             </div>
             <div>
               <dt class="text-gray-500">Provider runs</dt>
-              <dd class="font-semibold">{{ previews[policy.policyId!]?.estimatedProviderRuns }}</dd>
+              <dd class="font-semibold">
+                {{ previews[policy.policyId!]?.estimatedProviderRuns }}
+              </dd>
             </div>
           </dl>
           <div class="mt-4 flex flex-wrap items-end gap-3">
             <label class="text-xs">
               Concurrency
-              <input v-model.number="concurrency" type="number" min="1" max="20" class="mt-1 block w-24 rounded border px-2 py-1 dark:bg-gray-800">
+              <input
+                v-model.number="concurrency"
+                type="number"
+                min="1"
+                max="20"
+                class="mt-1 block w-24 rounded border px-2 py-1 dark:bg-gray-800"
+              />
             </label>
             <label class="text-xs">
               Runs/minute
-              <input v-model.number="rateLimitPerMinute" type="number" min="1" max="1000" class="mt-1 block w-28 rounded border px-2 py-1 dark:bg-gray-800">
+              <input
+                v-model.number="rateLimitPerMinute"
+                type="number"
+                min="1"
+                max="1000"
+                class="mt-1 block w-28 rounded border px-2 py-1 dark:bg-gray-800"
+              />
             </label>
             <button
               type="button"
-              class="rounded-md bg-orange-700 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-              :disabled="activePolicyIds.has(policy.policyId!) || busyPolicyId === policy.policyId"
+              class="bg-brand-700 rounded-md px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+              :disabled="
+                activePolicyIds.has(policy.policyId!) ||
+                busyPolicyId === policy.policyId
+              "
               @click="start(policy.policyId!)"
             >
               Start campaign
@@ -245,7 +261,8 @@ const failureUrl = (failure: CampaignFailure) =>
       </article>
     </div>
     <p v-else class="text-sm text-gray-500">
-      Save a gradual or immediate existing-file rollout policy to create a campaign.
+      Save a gradual or immediate existing-file rollout policy to create a
+      campaign.
     </p>
 
     <div v-if="campaigns.length" class="space-y-3">
@@ -273,22 +290,40 @@ const failureUrl = (failure: CampaignFailure) =>
           </button>
         </div>
         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
-          <div><dt class="text-gray-500">Completed</dt><dd>{{ campaign.completedCount }}</dd></div>
-          <div><dt class="text-gray-500">Running</dt><dd>{{ campaign.runningCount }}</dd></div>
-          <div><dt class="text-gray-500">Failed</dt><dd>{{ campaign.failedCount }}</dd></div>
-          <div><dt class="text-gray-500">Timed out</dt><dd>{{ campaign.timedOutCount }}</dd></div>
+          <div>
+            <dt class="text-gray-500">Completed</dt>
+            <dd>{{ campaign.completedCount }}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Running</dt>
+            <dd>{{ campaign.runningCount }}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Failed</dt>
+            <dd>{{ campaign.failedCount }}</dd>
+          </div>
+          <div>
+            <dt class="text-gray-500">Timed out</dt>
+            <dd>{{ campaign.timedOutCount }}</dd>
+          </div>
         </dl>
         <button
           v-if="campaign.failedCount + campaign.timedOutCount > 0"
           type="button"
-          class="mt-3 text-sm text-orange-700 underline dark:text-orange-300"
+          class="text-brand-700 dark:text-brand-300 mt-3 text-sm underline"
           @click="loadFailures(campaign.id)"
         >
           View failures
         </button>
         <ul v-if="failures[campaign.id]" class="mt-2 space-y-1 text-sm">
-          <li v-for="failure in failures[campaign.id]" :key="failure.pipelineId">
-            <a :href="failureUrl(failure)" class="text-orange-700 underline dark:text-orange-300">
+          <li
+            v-for="failure in failures[campaign.id]"
+            :key="failure.pipelineId"
+          >
+            <a
+              :href="failureUrl(failure)"
+              class="text-brand-700 dark:text-brand-300 underline"
+            >
               Attempt {{ failure.attemptNumber }} · {{ failure.status }}
             </a>
           </li>

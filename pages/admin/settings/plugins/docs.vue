@@ -316,7 +316,7 @@ step duration, public findings, remediation links, and correlation IDs.
         <li>
           <a
             href="#overview"
-            class="text-orange-600 hover:underline dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 hover:underline"
           >
             Overview
           </a>
@@ -324,7 +324,7 @@ step duration, public findings, remediation links, and correlation IDs.
         <li>
           <a
             href="#registry"
-            class="text-orange-600 hover:underline dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 hover:underline"
           >
             Setting Up a Plugin Registry
           </a>
@@ -332,7 +332,7 @@ step duration, public findings, remediation links, and correlation IDs.
         <li>
           <a
             href="#plugin-structure"
-            class="text-orange-600 hover:underline dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 hover:underline"
           >
             Creating a Plugin
           </a>
@@ -340,7 +340,7 @@ step duration, public findings, remediation links, and correlation IDs.
         <li>
           <a
             href="#pipelines"
-            class="text-orange-600 hover:underline dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 hover:underline"
           >
             Configuring Pipelines
           </a>
@@ -348,7 +348,7 @@ step duration, public findings, remediation links, and correlation IDs.
         <li>
           <a
             href="#troubleshooting"
-            class="text-orange-600 hover:underline dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 hover:underline"
           >
             Troubleshooting
           </a>

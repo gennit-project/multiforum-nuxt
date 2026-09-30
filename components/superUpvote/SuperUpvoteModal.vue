@@ -193,7 +193,7 @@ const handleSubmit = () => {
                       Write a thank-you note to
                       <NuxtLink
                         :to="`/u/${recipientUsername}`"
-                        class="font-medium text-orange-600 hover:text-orange-500 dark:text-orange-400"
+                        class="text-brand-600 hover:text-brand-500 dark:text-brand-400 font-medium"
                       >
                         @{{ recipientUsername }}
                       </NuxtLink>
@@ -213,7 +213,7 @@ const handleSubmit = () => {
                         :placeholder="placeholderText"
                         rows="4"
                         :maxlength="MAX_TEXT_LENGTH + 50"
-                        class="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
+                        class="focus:border-brand-500 focus:ring-brand-500 w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 placeholder-gray-400 focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
                         :class="{
                           'border-red-500 focus:border-red-500 focus:ring-red-500':
                             isOverLimit,
@@ -237,7 +237,7 @@ const handleSubmit = () => {
                 >
                   <button
                     type="button"
-                    class="inline-flex flex-1 justify-center rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                    class="focus:ring-brand-500 inline-flex flex-1 justify-center rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                     @click="emit('close')"
                   >
                     Cancel
@@ -246,7 +246,7 @@ const handleSubmit = () => {
                     type="button"
                     data-testid="super-upvote-submit"
                     :disabled="!isValid || loading"
-                    class="inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed"
+                    class="focus:ring-brand-500 inline-flex flex-1 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed"
                     :class="{
                       'bg-purple-500 bg-linear-to-r from-red-400 via-purple-500 to-blue-500 text-white hover:from-red-400 hover:via-purple-600 hover:to-blue-600':
                         isValid && !loading,

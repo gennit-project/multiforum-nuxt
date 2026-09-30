@@ -305,9 +305,7 @@ function handleUnarchive() {
       <span class="whitespace-nowrap">{{
         `gave feedback ${timeAgo(new Date(comment.createdAt))}`
       }}</span>
-      <span
-        v-if="isHighlighted"
-        class="rounded-lg bg-orange-500 px-2 text-black"
+      <span v-if="isHighlighted" class="bg-brand-500 rounded-lg px-2 text-black"
         >Permalinked</span
       >
       <MenuButton
@@ -359,7 +357,7 @@ function handleUnarchive() {
           class="mt-2 px-4"
           :text="editCommentError.message"
         />
-        <div class="ml-1 mt-3 flex justify-start">
+        <div class="mt-3 ml-1 flex justify-start">
           <CancelButton @click="editCommentMode = false" />
           <SaveButton
             data-testid="saveCommentButton"

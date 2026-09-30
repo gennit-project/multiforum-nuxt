@@ -515,7 +515,7 @@ const handleLockReasonUpdate = (value: string) => {
       <div
         v-else-if="shouldShowIssueDetailsSection"
         id="original-post-container"
-        class="bg-gray-50 rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-600 dark:bg-gray-800"
+        class="rounded-lg border border-gray-200 bg-gray-50 px-4 py-2 dark:border-gray-600 dark:bg-gray-800"
       >
         <IssueBodyEditor
           v-if="activeIssue?.body || isIssueAuthor"
@@ -585,7 +585,7 @@ const handleLockReasonUpdate = (value: string) => {
           <ErrorBanner v-if="deleteReasonError" :text="deleteReasonError" />
           <div
             v-if="isSuspendedMod"
-            class="bg-orange-50 mb-6 rounded-lg border border-orange-200 p-4 text-sm text-gray-700 dark:border-orange-500/40 dark:bg-orange-500/10 dark:text-gray-200"
+            class="bg-brand-50 border-brand-200 dark:border-brand-500/40 dark:bg-brand-500/10 mb-6 rounded-lg border p-4 text-sm text-gray-700 dark:text-gray-200"
           >
             Your moderator account is suspended. You can still use your user
             account where normal user permissions allow it, but moderation

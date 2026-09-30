@@ -49,6 +49,7 @@ const mountNav = () =>
             '<button class="forum-switcher">{{ currentForumId }}</button>',
         },
         TopNavSearch: true,
+        SiteLogo: { template: '<span>Test Server</span>' },
         LoginButton: true,
         ClientOnly: { template: '<div><slot /></div>' },
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },

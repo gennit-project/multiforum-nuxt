@@ -20,7 +20,6 @@ import type { DiscussionChannel } from '@/__generated__/graphql';
 
 const usernameVar = useUsername();
 
-
 const DISCUSSION_PAGE_LIMIT = 25;
 
 const emit = defineEmits(['filterByTag', 'filterByChannel']);
@@ -159,14 +158,11 @@ watch(
   }
 );
 
-watch(
-  channelId,
-  (newChannelId, oldChannelId) => {
-    if (newChannelId !== oldChannelId) {
-      uiStore.clearSelectedChannelDiscussion();
-    }
+watch(channelId, (newChannelId, oldChannelId) => {
+  if (newChannelId !== oldChannelId) {
+    uiStore.clearSelectedChannelDiscussion();
   }
-);
+});
 
 // Methods
 const filterByTag = (tag: string) => {
@@ -194,10 +190,11 @@ watch(
       return;
     }
 
-    const selectedDiscussionChannel = newDiscussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.find(
-      (discussionChannel: DiscussionChannel) =>
-        discussionChannel.discussionId === newSelectedDiscussionId
-    );
+    const selectedDiscussionChannel =
+      newDiscussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.find(
+        (discussionChannel: DiscussionChannel) =>
+          discussionChannel.discussionId === newSelectedDiscussionId
+      );
 
     if (!selectedDiscussionChannel?.Discussion?.title) {
       return;
@@ -252,7 +249,7 @@ watch(
                     forumId: channelId,
                   },
                 }"
-                class="text-orange-500 underline"
+                class="text-brand-500 underline"
               >
                 Create one?
               </nuxt-link>
@@ -261,7 +258,7 @@ watch(
               <button
                 type="button"
                 aria-label="Log in to create a discussion"
-                class="cursor-pointer text-orange-500 underline"
+                class="text-brand-500 cursor-pointer underline"
               >
                 Create one?
               </button>

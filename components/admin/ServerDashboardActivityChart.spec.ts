@@ -46,7 +46,7 @@ describe('ServerDashboardActivityChart', () => {
     ]);
 
     const blue = wrapper.findAll('.bg-blue-500');
-    const orange = wrapper.findAll('.bg-orange-500');
+    const orange = wrapper.findAll('.bg-brand-500');
     const green = wrapper.findAll('.bg-green-500');
 
     expect({
@@ -112,9 +112,12 @@ describe('ServerDashboardActivityChart', () => {
     expect({
       emptyTitle: wrapper.get('[title=": 0"]').exists(),
       blue: wrapper.find('.bg-blue-500').attributes('style'),
-      orange: wrapper.find('.bg-orange-500').attributes('style'),
+      orange: wrapper.find('.bg-brand-500').attributes('style'),
       green: wrapper.find('.bg-green-500').attributes('style'),
-      legend: wrapper.text().includes('Discussions') && wrapper.text().includes('Comments') && wrapper.text().includes('Events'),
+      legend:
+        wrapper.text().includes('Discussions') &&
+        wrapper.text().includes('Comments') &&
+        wrapper.text().includes('Events'),
     }).toEqual({
       emptyTitle: true,
       blue: 'height: 0%;',

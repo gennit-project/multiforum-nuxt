@@ -259,7 +259,7 @@ onAddFeedbackCommentToCommentDone(() => {
 <template>
   <div class="flex justify-center dark:text-white">
     <div
-      class="w-full max-w-4xl space-y-4 rounded-lg bg-white p-4 dark:bg-gray-800 sm:px-2 md:px-5"
+      class="w-full max-w-4xl space-y-4 rounded-lg bg-white p-4 sm:px-2 md:px-5 dark:bg-gray-800"
     >
       <div v-if="getCommentLoading && !getCommentResult">Loading...</div>
       <ErrorBanner v-if="getCommentError" :text="getCommentError.message" />
@@ -287,7 +287,7 @@ onAddFeedbackCommentToCommentDone(() => {
             />
           </div>
           <h1
-            class="text-wrap text-center text-2xl font-bold dark:text-gray-200"
+            class="text-center text-2xl font-bold text-wrap dark:text-gray-200"
           >
             Feedback
           </h1>
@@ -307,7 +307,7 @@ onAddFeedbackCommentToCommentDone(() => {
               :disable-gallery="true"
             />
           </div>
-          <nuxt-link :to="contextLink" class="text-orange-500 underline">
+          <nuxt-link :to="contextLink" class="text-brand-500 underline">
             View original context
           </nuxt-link>
         </div>

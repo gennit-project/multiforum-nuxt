@@ -66,13 +66,16 @@ const getOccurrenceLink = (occurrenceId: string): string => {
 </script>
 
 <template>
-  <div v-if="upcomingOccurrences.length > 0" class="flex flex-wrap items-center gap-1">
+  <div
+    v-if="upcomingOccurrences.length > 0"
+    class="flex flex-wrap items-center gap-1"
+  >
     <span class="mr-1 text-xs text-gray-500 dark:text-gray-400">Also on:</span>
     <nuxt-link
       v-for="occurrence in visibleOccurrences"
       :key="occurrence.id"
       :to="getOccurrenceLink(occurrence.id)"
-      class="inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-medium text-orange-700 hover:bg-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:hover:bg-orange-900/50"
+      class="bg-brand-100 text-brand-700 hover:bg-brand-200 dark:bg-brand-900/30 dark:text-brand-300 dark:hover:bg-brand-900/50 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
       @click.stop
     >
       {{ formatDate(occurrence.startTime) }}

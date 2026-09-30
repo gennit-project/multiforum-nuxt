@@ -56,34 +56,42 @@ vi.mock('@vue/apollo-composable', () => ({
 vi.mock('@/composables/useToast', () => ({
   useToast: () => ({ success: h.toastSuccess, error: h.toastError }),
 }));
-vi.mock('@/graphQLData/admin/queries', () => ({ GET_INSTALLED_PLUGINS: 'INSTALLED' }));
+vi.mock('@/graphQLData/admin/queries', () => ({
+  GET_INSTALLED_PLUGINS: 'INSTALLED',
+}));
 vi.mock('@/graphQLData/channel/queries', () => ({
   GET_CHANNEL: 'CHANNEL',
   GET_CHANNEL_PLUGIN_SETTINGS: 'CHANNEL_SETTINGS',
 }));
-vi.mock('@/graphQLData/channel/mutations', () => ({ UPDATE_CHANNEL_ENABLED_PLUGINS: 'UPDATE' }));
+vi.mock('@/graphQLData/channel/mutations', () => ({
+  UPDATE_CHANNEL_ENABLED_PLUGINS: 'UPDATE',
+}));
 
 const stubs = {
   FormRow: {
     name: 'FormRow',
     props: ['sectionTitle'],
-    template: '<section><h2>{{ sectionTitle }}</h2><slot name="content" /></section>',
+    template:
+      '<section><h2>{{ sectionTitle }}</h2><slot name="content" /></section>',
   },
   PluginSettingsForm: {
     name: 'PluginSettingsForm',
     props: ['modelValue'],
     emits: ['update:model-value'],
-    template: '<button class="settings-form" @click="$emit(\'update:model-value\', { strict: false })" />',
+    template:
+      '<button class="settings-form" @click="$emit(\'update:model-value\', { strict: false })" />',
   },
   BotProfilesEditor: {
     name: 'BotProfilesEditor',
     props: ['profiles'],
     emits: ['update:profiles'],
-    template: '<button class="bot-editor" @click="$emit(\'update:profiles\', [{ id: \'p1\', label: \'Bot\', prompt: \'Hi\' }])" />',
+    template:
+      "<button class=\"bot-editor\" @click=\"$emit('update:profiles', [{ id: 'p1', label: 'Bot', prompt: 'Hi' }])\" />",
   },
 };
 
-const mountPage = () => mountWithDefaults(ForumPluginDetailPage, { global: { stubs } });
+const mountPage = () =>
+  mountWithDefaults(ForumPluginDetailPage, { global: { stubs } });
 
 const setChannel = (edges: unknown[] = [], bots: unknown[] = []) => {
   h.channelResult.value = {
@@ -206,7 +214,9 @@ describe('Forum plugin detail page', () => {
                   {
                     id: 'general',
                     title: 'General',
-                    fields: [{ key: 'strict', type: 'boolean', label: 'Strict' }],
+                    fields: [
+                      { key: 'strict', type: 'boolean', label: 'Strict' },
+                    ],
                   },
                 ],
               },
@@ -220,8 +230,10 @@ describe('Forum plugin detail page', () => {
     };
 
     const wrapper = mountPage();
-    await wrapper.findComponent({ name: 'PluginSettingsForm' }).trigger('click');
-    await wrapper.get('button.bg-orange-700').trigger('click');
+    await wrapper
+      .findComponent({ name: 'PluginSettingsForm' })
+      .trigger('click');
+    await wrapper.get('button.bg-brand-700').trigger('click');
 
     expect(h.mutate.mock.calls[0]?.[0]).toEqual({
       channelUniqueName: 'cats',

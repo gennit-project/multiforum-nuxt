@@ -43,20 +43,22 @@ const uploaderUsername = computed(() => {
   return image.value?.Uploader?.username || null;
 });
 
-const detailImageUrl = computed(() =>
-  getPreferredImageUrl({
-    source: image.value,
-    preferred: ['detail640', 'detail960', 'detail1280'],
-    originalUrl: image.value?.url,
-  }) || ''
+const detailImageUrl = computed(
+  () =>
+    getPreferredImageUrl({
+      source: image.value,
+      preferred: ['detail640', 'detail960', 'detail1280'],
+      originalUrl: image.value?.url,
+    }) || ''
 );
 
-const uploaderImageUrl = computed(() =>
-  getPreferredImageUrl({
-    source: image.value?.Uploader,
-    preferred: ['avatar32', 'avatar48'],
-    originalUrl: image.value?.Uploader?.profilePicURL,
-  }) || ''
+const uploaderImageUrl = computed(
+  () =>
+    getPreferredImageUrl({
+      source: image.value?.Uploader,
+      preferred: ['avatar32', 'avatar48'],
+      originalUrl: image.value?.Uploader?.profilePicURL,
+    }) || ''
 );
 
 const formattedDate = computed(() => {
@@ -71,7 +73,8 @@ const albumContext = computed(() => {
   const discussion = album.Discussions?.[0];
   if (!discussion) return null;
 
-  const channelUniqueName = discussion.DiscussionChannels?.[0]?.channelUniqueName;
+  const channelUniqueName =
+    discussion.DiscussionChannels?.[0]?.channelUniqueName;
   if (!channelUniqueName) return null;
 
   return {
@@ -104,7 +107,9 @@ onImageResult(({ data }) => {
     <template v-else>
       <div class="flex flex-col gap-4">
         <div class="flex items-start gap-4">
-          <div class="relative max-w-md overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+          <div
+            class="relative max-w-md overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700"
+          >
             <AppImage
               :src="detailImageUrl"
               :alt="image.alt || 'Reported image'"
@@ -117,18 +122,20 @@ onImageResult(({ data }) => {
             />
             <div
               v-if="image.hasSensitiveContent"
-              class="absolute right-2 top-2 rounded bg-red-500 px-2 py-1 text-xs font-medium text-white"
+              class="absolute top-2 right-2 rounded bg-red-500 px-2 py-1 text-xs font-medium text-white"
             >
               Sensitive
             </div>
             <div
               v-if="image.hasSpoiler"
-              class="absolute left-2 top-2 rounded bg-yellow-500 px-2 py-1 text-xs font-medium text-black"
+              class="absolute top-2 left-2 rounded bg-yellow-500 px-2 py-1 text-xs font-medium text-black"
             >
               Spoiler
             </div>
           </div>
-          <div class="flex flex-col gap-2 text-sm text-gray-600 dark:text-gray-400">
+          <div
+            class="flex flex-col gap-2 text-sm text-gray-600 dark:text-gray-400"
+          >
             <div class="flex items-center gap-2">
               <AppImage
                 v-if="uploaderImageUrl"
@@ -151,7 +158,10 @@ onImageResult(({ data }) => {
                 <p class="font-medium text-gray-900 dark:text-white">
                   <nuxt-link
                     v-if="uploaderUsername"
-                    :to="{ name: 'u-username', params: { username: uploaderUsername } }"
+                    :to="{
+                      name: 'u-username',
+                      params: { username: uploaderUsername },
+                    }"
                     class="hover:underline"
                   >
                     {{ uploaderDisplayName }}
@@ -162,26 +172,36 @@ onImageResult(({ data }) => {
               </div>
             </div>
             <div v-if="image.caption" class="mt-2">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Caption</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Caption
+              </p>
               <ImageCaption
                 :text="image.caption"
                 class="text-gray-900 dark:text-white"
               />
             </div>
             <div v-if="image.alt" class="mt-1">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Alt text</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Alt text
+              </p>
               <p>{{ image.alt }}</p>
             </div>
             <div v-if="image.longDescription" class="mt-1">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Description</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Description
+              </p>
               <p>{{ image.longDescription }}</p>
             </div>
             <div v-if="image.copyright" class="mt-1">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Copyright</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Copyright
+              </p>
               <p>{{ image.copyright }}</p>
             </div>
             <div v-if="albumContext" class="mt-2">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Context</p>
+              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
+                Context
+              </p>
               <nuxt-link
                 :to="{
                   name: 'forums-forumId-discussions-discussionId',
@@ -190,7 +210,7 @@ onImageResult(({ data }) => {
                     discussionId: albumContext.discussionId,
                   },
                 }"
-                class="text-orange-500 hover:underline"
+                class="text-brand-500 hover:underline"
               >
                 {{ albumContext.discussionTitle }}
               </nuxt-link>

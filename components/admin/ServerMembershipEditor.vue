@@ -81,8 +81,12 @@ const {
 
 const admins = computed(() => props.serverConfig?.Admins || []);
 const moderators = computed(() => props.serverConfig?.Moderators || []);
-const pendingAdminInvites = computed(() => props.serverConfig?.PendingAdminInvites || []);
-const pendingModInvites = computed(() => props.serverConfig?.PendingModInvites || []);
+const pendingAdminInvites = computed(
+  () => props.serverConfig?.PendingAdminInvites || []
+);
+const pendingModInvites = computed(
+  () => props.serverConfig?.PendingModInvites || []
+);
 
 const loading = computed(
   () =>
@@ -164,20 +168,25 @@ const removeModerator = async (displayName: string) => {
 </script>
 
 <template>
-  <section class="space-y-6 rounded-lg border p-4 shadow-sm dark:border-gray-800 dark:bg-gray-800">
+  <section
+    class="space-y-6 rounded-lg border p-4 shadow-sm dark:border-gray-800 dark:bg-gray-800"
+  >
     <div class="space-y-1">
       <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
         Server Membership
       </h2>
       <p class="text-sm text-gray-600 dark:text-gray-300">
-        Invite users to become server admins or moderators. They will receive an invitation that they must accept.
+        Invite users to become server admins or moderators. They will receive an
+        invitation that they must accept.
       </p>
     </div>
 
     <div class="grid gap-6 lg:grid-cols-2">
       <!-- Server Admins Column -->
       <div class="space-y-3">
-        <h3 class="font-medium text-gray-900 dark:text-gray-100">Server Admins</h3>
+        <h3 class="font-medium text-gray-900 dark:text-gray-100">
+          Server Admins
+        </h3>
         <div class="flex gap-2">
           <input
             v-model="newAdminUsername"
@@ -186,10 +195,10 @@ const removeModerator = async (displayName: string) => {
             aria-label="Username to invite as server admin"
             class="w-full rounded border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
             @keyup.enter="sendAdminInvite"
-          >
+          />
           <button
             type="button"
-            class="rounded bg-orange-500 px-3 py-2 text-white disabled:opacity-60"
+            class="bg-brand-500 rounded px-3 py-2 text-white disabled:opacity-60"
             :disabled="loading || !newAdminUsername.trim()"
             @click="sendAdminInvite"
           >
@@ -202,7 +211,9 @@ const removeModerator = async (displayName: string) => {
 
         <!-- Pending Admin Invites -->
         <div v-if="pendingAdminInvites.length > 0" class="space-y-2">
-          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Pending Invites</h4>
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Pending Invites
+          </h4>
           <div
             v-for="invite in pendingAdminInvites"
             :key="invite.username || ''"
@@ -217,7 +228,9 @@ const removeModerator = async (displayName: string) => {
               <span class="text-sm text-gray-900 dark:text-gray-100">
                 {{ invite.username }}
               </span>
-              <span class="text-xs text-yellow-600 dark:text-yellow-400">(pending)</span>
+              <span class="text-xs text-yellow-600 dark:text-yellow-400"
+                >(pending)</span
+              >
             </div>
             <button
               type="button"
@@ -231,11 +244,16 @@ const removeModerator = async (displayName: string) => {
         </div>
 
         <!-- Current Admins -->
-        <div v-if="admins.length === 0 && pendingAdminInvites.length === 0" class="text-sm text-gray-600 dark:text-gray-300">
+        <div
+          v-if="admins.length === 0 && pendingAdminInvites.length === 0"
+          class="text-sm text-gray-600 dark:text-gray-300"
+        >
           No server admins configured.
         </div>
         <div v-if="admins.length > 0" class="space-y-2">
-          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Current Admins</h4>
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Current Admins
+          </h4>
           <div
             v-for="admin in admins"
             :key="admin.username || ''"
@@ -259,7 +277,7 @@ const removeModerator = async (displayName: string) => {
             </div>
             <button
               type="button"
-              class="rounded border border-orange-500 px-2 py-1 text-sm text-orange-500"
+              class="border-brand-500 text-brand-500 rounded border px-2 py-1 text-sm"
               :disabled="loading"
               @click="admin.username && removeAdmin(admin.username)"
             >
@@ -271,7 +289,9 @@ const removeModerator = async (displayName: string) => {
 
       <!-- Server Moderators Column -->
       <div class="space-y-3">
-        <h3 class="font-medium text-gray-900 dark:text-gray-100">Server Moderators</h3>
+        <h3 class="font-medium text-gray-900 dark:text-gray-100">
+          Server Moderators
+        </h3>
         <div class="flex gap-2">
           <input
             v-model="newModeratorUsername"
@@ -280,10 +300,10 @@ const removeModerator = async (displayName: string) => {
             aria-label="Username to invite as server moderator"
             class="w-full rounded border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
             @keyup.enter="sendModInvite"
-          >
+          />
           <button
             type="button"
-            class="rounded bg-orange-500 px-3 py-2 text-white disabled:opacity-60"
+            class="bg-brand-500 rounded px-3 py-2 text-white disabled:opacity-60"
             :disabled="loading || !newModeratorUsername.trim()"
             @click="sendModInvite"
           >
@@ -299,7 +319,9 @@ const removeModerator = async (displayName: string) => {
 
         <!-- Pending Mod Invites -->
         <div v-if="pendingModInvites.length > 0" class="space-y-2">
-          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Pending Invites</h4>
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Pending Invites
+          </h4>
           <div
             v-for="invite in pendingModInvites"
             :key="invite.username || ''"
@@ -314,7 +336,9 @@ const removeModerator = async (displayName: string) => {
               <span class="text-sm text-gray-900 dark:text-gray-100">
                 {{ invite.username }}
               </span>
-              <span class="text-xs text-yellow-600 dark:text-yellow-400">(pending)</span>
+              <span class="text-xs text-yellow-600 dark:text-yellow-400"
+                >(pending)</span
+              >
             </div>
             <button
               type="button"
@@ -328,11 +352,16 @@ const removeModerator = async (displayName: string) => {
         </div>
 
         <!-- Current Moderators -->
-        <div v-if="moderators.length === 0 && pendingModInvites.length === 0" class="text-sm text-gray-600 dark:text-gray-300">
+        <div
+          v-if="moderators.length === 0 && pendingModInvites.length === 0"
+          class="text-sm text-gray-600 dark:text-gray-300"
+        >
           No server moderators configured.
         </div>
         <div v-if="moderators.length > 0" class="space-y-2">
-          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">Current Moderators</h4>
+          <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Current Moderators
+          </h4>
           <div
             v-for="moderator in moderators"
             :key="moderator.displayName || ''"
@@ -343,9 +372,11 @@ const removeModerator = async (displayName: string) => {
             </span>
             <button
               type="button"
-              class="rounded border border-orange-500 px-2 py-1 text-sm text-orange-500"
+              class="border-brand-500 text-brand-500 rounded border px-2 py-1 text-sm"
               :disabled="loading"
-              @click="moderator.displayName && removeModerator(moderator.displayName)"
+              @click="
+                moderator.displayName && removeModerator(moderator.displayName)
+              "
             >
               Remove
             </button>

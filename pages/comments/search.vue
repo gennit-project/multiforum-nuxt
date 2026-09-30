@@ -300,7 +300,7 @@ const getContextForum = (comment: Comment) => {
               :tabindex="getCommentPermalink(comment) ? 0 : undefined"
               class="rounded-md border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800"
               :class="{
-                'cursor-pointer hover:border-orange-500 focus:ring-2 focus:ring-orange-500 focus:outline-none dark:hover:border-orange-400':
+                'hover:border-brand-500 focus:ring-brand-500 dark:hover:border-brand-400 cursor-pointer focus:ring-2 focus:outline-none':
                   getCommentPermalink(comment),
               }"
               @click="openCommentPermalink(comment)"
@@ -360,7 +360,7 @@ const getContextForum = (comment: Comment) => {
                   <span>in</span>
                   <router-link
                     :to="getContextLink(comment)!"
-                    class="text-orange-600 hover:underline dark:text-orange-400"
+                    class="text-brand-600 dark:text-brand-400 hover:underline"
                     @click.stop
                   >
                     {{ getContextText(comment) }}
@@ -372,7 +372,7 @@ const getContextForum = (comment: Comment) => {
                 <router-link
                   v-if="getCommentPermalink(comment)"
                   :to="getCommentPermalink(comment)!"
-                  class="font-medium text-orange-600 hover:underline dark:text-orange-400"
+                  class="text-brand-600 dark:text-brand-400 font-medium hover:underline"
                   @click.stop
                 >
                   View comment

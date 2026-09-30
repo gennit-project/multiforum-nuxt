@@ -48,6 +48,11 @@ const defaultHandlers: GraphQLHandlers = {
         {
           __typename: 'ServerConfig',
           serverName: 'Listical',
+          serverIconURL: null,
+          brandingLogoDarkURL: null,
+          brandingLogoAlt: null,
+          brandingFaviconURL: null,
+          brandingPrimaryColor: null,
           brandingProductName: null,
           brandingDocsURL: null,
           brandingSourceURL: null,

@@ -562,7 +562,7 @@ async function handleSave() {
               />
               <label
                 for="downloadable-file-input"
-                class="inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                class="focus:ring-brand-500 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                 :class="{
                   'cursor-not-allowed opacity-50':
                     uploadingFile || downloadsDisabled,
@@ -600,7 +600,7 @@ async function handleSave() {
                 <div class="mb-3 flex items-start justify-between gap-3">
                   <div class="min-w-0 flex-1">
                     <h4
-                      class="break-words font-medium text-gray-900 dark:text-gray-100"
+                      class="font-medium break-words text-gray-900 dark:text-gray-100"
                     >
                       {{ file.fileName }}
                     </h4>
@@ -647,7 +647,7 @@ async function handleSave() {
                         <input
                           :checked="customSupportFieldsEnabled[index]"
                           type="checkbox"
-                          class="mt-1 h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
+                          class="text-brand-600 focus:ring-brand-500 mt-1 h-4 w-4 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-700"
                           @change="
                             updateCustomSupportFieldsEnabled(
                               index,

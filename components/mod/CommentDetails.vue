@@ -30,8 +30,7 @@ const emit = defineEmits([
 ]);
 
 const route = useRoute();
-const { forumAdminUsernames, forumModProfileNames } =
-  useForumRoleMembership();
+const { forumAdminUsernames, forumModProfileNames } = useForumRoleMembership();
 const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
 const channelId = computed(() => {
@@ -157,7 +156,7 @@ const permalinkObject = computed(() => {
     <ErrorBanner v-else-if="commentError" :text="commentError.message" />
     <div
       v-else-if="!originalComment"
-      class="bg-gray-50 rounded-lg border border-gray-300 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+      class="rounded-lg border border-gray-300 bg-gray-50 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
     >
       <p>Can't find the content that was reported. It may have been deleted.</p>
     </div>
@@ -174,7 +173,7 @@ const permalinkObject = computed(() => {
           :is-forum-admin="authorBadges.isForumAdmin"
           :is-forum-mod="authorBadges.isForumMod"
         />
-        <nuxt-link :to="permalinkObject" class="text-orange-500 underline">
+        <nuxt-link :to="permalinkObject" class="text-brand-500 underline">
           Context
         </nuxt-link>
       </div>

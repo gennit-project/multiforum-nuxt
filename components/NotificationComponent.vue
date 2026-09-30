@@ -63,7 +63,7 @@ const emit = defineEmits(['closeNotification']);
               <div class="ml-4 flex shrink-0">
                 <button
                   type="button"
-                  class="inline-flex rounded-full text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:hover:text-gray-100"
+                  class="focus:ring-brand-500 inline-flex rounded-full text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:hover:text-gray-100"
                   @click="emit('closeNotification')"
                 >
                   <span class="sr-only">Close</span>

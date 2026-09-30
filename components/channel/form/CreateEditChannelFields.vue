@@ -404,7 +404,7 @@ const showCreateChannelError = computed(() => {
             <div class="mb-4 lg:hidden">
               <div class="relative">
                 <button
-                  class="bg-gray-50 flex w-full items-center justify-between rounded-md border border-gray-300 px-4 py-2 text-sm dark:text-white"
+                  class="flex w-full items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm dark:text-white"
                   type="button"
                   @click="isDropdownOpen = !isDropdownOpen"
                 >
@@ -424,7 +424,7 @@ const showCreateChannelError = computed(() => {
                             typeof route.name === 'string' &&
                             route.name?.includes(`edit-${tab.key}`)
                         )?.fontAwesome,
-                        'mr-2 text-orange-500',
+                        'text-brand-500 mr-2',
                       ]"
                     />
                     <!-- For component icons -->
@@ -443,7 +443,7 @@ const showCreateChannelError = computed(() => {
                             route.name?.includes(`edit-${tab.key}`)
                         )?.icon
                       "
-                      class="mr-2 h-5 w-5 text-orange-500"
+                      class="text-brand-500 mr-2 h-5 w-5"
                     />
                     <span>{{ getCurrentTabLabel }}</span>
                   </div>
@@ -461,7 +461,7 @@ const showCreateChannelError = computed(() => {
                     <router-link
                       class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                       :class="{
-                        'bg-gray-50 text-orange-500 dark:bg-gray-700':
+                        'text-brand-500 bg-gray-50 dark:bg-gray-700':
                           typeof route.name === 'string' &&
                           route.name?.includes(`edit-${tab.key}`),
                         'text-gray-700 dark:text-gray-300':
@@ -483,7 +483,7 @@ const showCreateChannelError = computed(() => {
                           tab.fontAwesome,
                           'mr-2',
                           {
-                            'text-orange-500':
+                            'text-brand-500':
                               typeof route.name === 'string' &&
                               route.name?.includes(`edit-${tab.key}`),
                             'text-gray-500 dark:text-gray-400':
@@ -498,7 +498,7 @@ const showCreateChannelError = computed(() => {
                         v-else-if="tab.icon"
                         class="mr-2 h-5 w-5"
                         :class="{
-                          'text-orange-500':
+                          'text-brand-500':
                             typeof route.name === 'string' &&
                             route.name?.includes(`edit-${tab.key}`),
                           'text-gray-500 dark:text-gray-400':
@@ -517,14 +517,14 @@ const showCreateChannelError = computed(() => {
             <div class="flex w-full">
               <!-- Left Sidebar (hidden on mobile) -->
               <div
-                class="bg-gray-50 mr-4 hidden w-1/4 border-r border-gray-300 dark:border-gray-300 lg:block"
+                class="mr-4 hidden w-1/4 border-r border-gray-300 bg-gray-50 lg:block dark:border-gray-300"
               >
                 <ul class="flex flex-col space-y-2">
                   <li v-for="tab in tabs" :key="tab.key">
                     <router-link
                       class="flex cursor-pointer items-center py-2 text-sm"
                       :class="{
-                        'border-r-2 border-orange-500 bg-orange-50 text-gray-900 font-medium dark:bg-orange-900/20 dark:text-white':
+                        'border-brand-500 bg-brand-50 dark:bg-brand-900/20 border-r-2 font-medium text-gray-900 dark:text-white':
                           typeof route.name === 'string' &&
                           route.name?.includes(`edit-${tab.key}`),
                         'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300':
@@ -545,7 +545,7 @@ const showCreateChannelError = computed(() => {
                           tab.fontAwesome,
                           'mr-2',
                           {
-                            'text-orange-500':
+                            'text-brand-500':
                               typeof route.name === 'string' &&
                               route.name?.includes(`edit-${tab.key}`),
                             'text-gray-500 dark:text-gray-400':
@@ -560,7 +560,7 @@ const showCreateChannelError = computed(() => {
                         v-else-if="tab.icon"
                         class="mr-2 h-4 w-4"
                         :class="{
-                          'text-orange-500':
+                          'text-brand-500':
                             typeof route.name === 'string' &&
                             route.name?.includes(`edit-${tab.key}`),
                           'text-gray-500 dark:text-gray-400':
@@ -585,10 +585,10 @@ const showCreateChannelError = computed(() => {
                 </div>
                 <div
                   v-else-if="!hasPermission"
-                  class="bg-yellow-50 m-4 rounded-lg p-6 dark:bg-yellow-900/20"
+                  class="m-4 rounded-lg bg-yellow-50 p-6 dark:bg-yellow-900/20"
                 >
                   <div class="flex items-start">
-                    <i class="fa-solid fa-lock mr-3 mt-0.5 text-yellow-500" />
+                    <i class="fa-solid fa-lock mt-0.5 mr-3 text-yellow-500" />
                     <div>
                       <h3
                         class="text-sm font-medium text-yellow-800 dark:text-yellow-200"
@@ -630,7 +630,7 @@ const showCreateChannelError = computed(() => {
             <div class="mb-6 h-10 rounded bg-gray-200 dark:bg-gray-700" />
             <div class="flex gap-4">
               <div
-                class="hidden h-64 w-1/4 rounded bg-gray-200 dark:bg-gray-700 lg:block"
+                class="hidden h-64 w-1/4 rounded bg-gray-200 lg:block dark:bg-gray-700"
               />
               <div class="h-64 flex-1 rounded bg-gray-200 dark:bg-gray-700" />
             </div>

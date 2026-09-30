@@ -88,7 +88,7 @@ const primaryButtonClasses = computed(() => {
     return 'border-transparent border bg-red-600 text-white hover:bg-red-500 focus:ring-red-500';
   }
 
-  return 'border-transparent border bg-orange-600 text-white hover:bg-orange-500 focus:ring-orange-500';
+  return 'border-transparent border bg-brand-600 text-white hover:bg-brand-500 focus:ring-brand-500';
 });
 
 const dangerButtonClasses = computed(() => {
@@ -210,7 +210,7 @@ const dangerButtonClasses = computed(() => {
                     v-if="showSecondaryButton"
                     ref="cancelButtonRef"
                     type="button"
-                    class="inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm dark:text-gray-200"
+                    class="focus:ring-brand-500 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm dark:text-gray-200"
                     @click="emit('close')"
                   >
                     {{ secondaryButtonText }}

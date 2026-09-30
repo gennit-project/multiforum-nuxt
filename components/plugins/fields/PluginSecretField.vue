@@ -95,10 +95,16 @@ const validationError = computed(() => {
   if (required && value.trim().length === 0 && !hasValue.value) {
     return `${props.field.label} is required`;
   }
-  if (validation?.minLength !== undefined && value.length < validation.minLength) {
+  if (
+    validation?.minLength !== undefined &&
+    value.length < validation.minLength
+  ) {
     return `${props.field.label} must be at least ${validation.minLength} characters`;
   }
-  if (validation?.maxLength !== undefined && value.length > validation.maxLength) {
+  if (
+    validation?.maxLength !== undefined &&
+    value.length > validation.maxLength
+  ) {
     return `${props.field.label} must be ${validation.maxLength} characters or fewer`;
   }
   // Skip pattern validation for secrets - they are validated by the backend when used
@@ -134,7 +140,8 @@ const describedBy = computed(() => {
         <span
           v-if="field.validation?.required || field.required"
           class="text-red-500"
-        >*</span>
+          >*</span
+        >
       </label>
       <span
         v-if="secretStatus"
@@ -165,16 +172,18 @@ const describedBy = computed(() => {
         :id="controlId"
         v-model="inputValue"
         :type="showValue ? 'text' : 'password'"
-        :placeholder="hasValue ? '[encrypted - cannot be viewed]' : field.placeholder"
+        :placeholder="
+          hasValue ? '[encrypted - cannot be viewed]' : field.placeholder
+        "
         v-bind="validationAttrs"
         :aria-describedby="describedBy"
         :aria-invalid="
           !!(secretStatus?.validationError || error || validationError)
         "
-        class="w-full rounded-md border border-gray-300 px-3 py-2 pr-20 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+        class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 pr-20 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
         :class="{ 'border-red-500': error }"
-      >
-      <div class="absolute inset-y-0 right-0 flex items-center pr-2 gap-1">
+      />
+      <div class="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
         <button
           type="button"
           class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
@@ -240,7 +249,8 @@ const describedBy = computed(() => {
       v-else-if="secretStatus?.lastValidatedAt"
       class="text-xs text-gray-500 dark:text-gray-400"
     >
-      Last validated: {{ new Date(secretStatus.lastValidatedAt).toLocaleString() }}
+      Last validated:
+      {{ new Date(secretStatus.lastValidatedAt).toLocaleString() }}
     </p>
   </div>
 </template>

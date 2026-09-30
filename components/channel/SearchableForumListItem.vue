@@ -29,9 +29,9 @@ const emit = defineEmits(['toggleSelection']);
       :value="channel.uniqueName"
       :checked="selected.includes(channel.uniqueName)"
       :aria-label="`Select ${channel.displayName || channel.uniqueName}`"
-      class="h-4 w-4 border border-gray-300 text-orange-600 dark:border-gray-600"
+      class="text-brand-600 h-4 w-4 border border-gray-300 dark:border-gray-600"
       @change="() => emit('toggleSelection', channel.uniqueName)"
-    >
+    />
     <div class="flex-1 text-sm">
       <span
         class="font-mono"

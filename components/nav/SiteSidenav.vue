@@ -231,7 +231,7 @@ const selectSearchType = (type: SearchType) => {
           <div class="flex h-7">
             <button
               type="button"
-              class="rounded-full text-gray-400 hover:text-gray-500 focus:ring-2 focus:ring-orange-500 focus:outline-none dark:text-gray-200"
+              class="focus:ring-brand-500 rounded-full text-gray-400 hover:text-gray-500 focus:ring-2 focus:outline-none dark:text-gray-200"
               @click="outside"
             >
               <span class="sr-only">Close panel</span>
@@ -254,7 +254,7 @@ const selectSearchType = (type: SearchType) => {
               v-model="searchInput"
               type="text"
               placeholder="Search..."
-              class="h-9 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-9 text-sm text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
+              class="focus:border-brand-500 focus:ring-brand-500 h-9 w-full rounded-lg border border-gray-200 bg-white pr-3 pl-9 text-sm text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
               @keydown.enter.prevent="executeSearch"
             />
           </div>
@@ -289,7 +289,7 @@ const selectSearchType = (type: SearchType) => {
                   class="flex w-full items-center justify-between px-3 py-2 text-left text-xs hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="[
                     selectedSearchType === option.value
-                      ? 'bg-orange-50 text-orange-900 dark:bg-orange-900/30 dark:text-orange-100'
+                      ? 'bg-brand-50 text-brand-900 dark:bg-brand-900/30 dark:text-brand-100'
                       : 'text-gray-700 dark:text-gray-200',
                   ]"
                   @click="selectSearchType(option.value)"
@@ -297,7 +297,7 @@ const selectSearchType = (type: SearchType) => {
                   <span>{{ option.label }}</span>
                   <CheckIcon
                     v-if="selectedSearchType === option.value"
-                    class="h-3 w-3 text-orange-500"
+                    class="text-brand-500 h-3 w-3"
                   />
                 </button>
               </div>

@@ -57,7 +57,7 @@ defineEmits<{
         </nuxt-link>
         <button
           type="button"
-          class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
+          class="border-brand-500 text-brand-500 flex items-center gap-1 rounded border px-2 py-1"
           :aria-label="`Remove ${mod.displayName} as a forum mod`"
           @click="$emit('click-remove-mod', mod.displayName)"
         >

@@ -60,10 +60,16 @@ const validationError = computed(() => {
   if (required && value.trim().length === 0) {
     return `${props.field.label} is required`;
   }
-  if (validation?.minLength !== undefined && value.length < validation.minLength) {
+  if (
+    validation?.minLength !== undefined &&
+    value.length < validation.minLength
+  ) {
     return `${props.field.label} must be at least ${validation.minLength} characters`;
   }
-  if (validation?.maxLength !== undefined && value.length > validation.maxLength) {
+  if (
+    validation?.maxLength !== undefined &&
+    value.length > validation.maxLength
+  ) {
     return `${props.field.label} must be ${validation.maxLength} characters or fewer`;
   }
   if (validation?.pattern) {
@@ -99,7 +105,8 @@ const describedBy = computed(() => {
       <span
         v-if="field.validation?.required || field.required"
         class="text-red-500"
-      >*</span>
+        >*</span
+      >
     </label>
     <p
       v-if="field.description"
@@ -117,7 +124,7 @@ const describedBy = computed(() => {
       :aria-describedby="describedBy"
       :aria-invalid="!!(error || validationError)"
       rows="3"
-      class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+      class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
       :class="{ 'border-red-500': error || validationError }"
     />
     <input
@@ -129,9 +136,9 @@ const describedBy = computed(() => {
       v-bind="validationAttrs"
       :aria-describedby="describedBy"
       :aria-invalid="!!(error || validationError)"
-      class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+      class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
       :class="{ 'border-red-500': error || validationError }"
-    >
+    />
     <p
       v-if="error || validationError"
       :id="errorId"

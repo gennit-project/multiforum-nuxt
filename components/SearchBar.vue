@@ -129,17 +129,17 @@ defineExpose({ focus, getValue });
           rightSideIsRounded ? 'rounded-r-md' : '',
           small ? 'h-9' : 'h-10',
         ]"
-        class="w-full border border-gray-200 pl-10 pr-12 text-sm leading-5 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+        class="focus:border-brand-500 focus:ring-brand-500 w-full border border-gray-200 pr-12 pl-10 text-sm leading-5 text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
         :placeholder="searchPlaceholder"
         type="text"
         @input="updateSearchInput"
         @keydown.enter.prevent="submit"
-      >
+      />
       <button
         v-if="initialValue"
         type="button"
         aria-label="Clear search"
-        class="bg-transparent absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center border-none"
+        class="absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center border-none bg-transparent"
         @click="clear"
       >
         <XmarkIcon

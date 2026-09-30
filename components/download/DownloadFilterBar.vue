@@ -130,7 +130,7 @@ const hasActiveDownloadFilters = computed(() => {
 </script>
 
 <template>
-  <div class="pb-2 pt-2">
+  <div class="pt-2 pb-2">
     <div>
       <div class="flex flex-wrap items-center justify-end space-x-2">
         <!-- Download Filters Button (mobile only) -->
@@ -140,9 +140,9 @@ const hasActiveDownloadFilters = computed(() => {
           :aria-label="showFilters ? 'Hide filters' : 'Show filters'"
           :title="showFilters ? 'Hide filters' : 'Show filters'"
           :class="[
-            'flex h-9 items-center gap-1 rounded-md border px-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden',
+            'flex h-9 items-center gap-1 rounded-md border px-1.5 hover:bg-gray-100 lg:hidden dark:hover:bg-gray-700',
             hasActiveDownloadFilters || showFilters
-              ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+              ? 'border-brand-500 text-brand-600 dark:text-brand-400'
               : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300',
           ]"
           @click="toggleShowFilters"
@@ -159,7 +159,7 @@ const hasActiveDownloadFilters = computed(() => {
           :title="showSearch ? 'Hide search' : 'Show search'"
           :class="
             showSearch
-              ? 'border-orange-500'
+              ? 'border-brand-500'
               : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
           class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-800 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
@@ -182,7 +182,7 @@ const hasActiveDownloadFilters = computed(() => {
         </RequireAuth>
       </div>
     </div>
-    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
+    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" />
 
     <!-- Search Panel -->
     <div
@@ -204,7 +204,7 @@ const hasActiveDownloadFilters = computed(() => {
     <!-- Mobile Filter Panel -->
     <div
       v-if="showFilters && filterGroups.length > 0"
-      class="flex flex-col gap-4 bg-gray-100 px-2 py-4 dark:bg-gray-800 dark:text-gray-300 lg:hidden"
+      class="flex flex-col gap-4 bg-gray-100 px-2 py-4 lg:hidden dark:bg-gray-800 dark:text-gray-300"
     >
       <DownloadFilters :filter-groups="filterGroups" />
 
@@ -217,7 +217,7 @@ const hasActiveDownloadFilters = computed(() => {
           :highlighted="tagLabel !== 'Tags'"
         >
           <template #icon>
-            <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+            <TagIcon class="mr-2 -ml-0.5 h-4 w-4" />
           </template>
           <template #content>
             <div class="relative w-96">
@@ -243,7 +243,7 @@ const hasActiveDownloadFilters = computed(() => {
     <!-- Desktop Filter Panel (for tags/archived only) -->
     <div
       v-if="showFilters && !filterGroups.length"
-      class="hidden justify-end gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300 lg:flex"
+      class="hidden justify-end gap-2 bg-gray-100 py-2 lg:flex dark:bg-gray-700 dark:text-gray-300"
     >
       <FilterChip
         class="align-middle"
@@ -252,7 +252,7 @@ const hasActiveDownloadFilters = computed(() => {
         :highlighted="tagLabel !== 'Tags'"
       >
         <template #icon>
-          <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+          <TagIcon class="mr-2 -ml-0.5 h-4 w-4" />
         </template>
         <template #content>
           <div class="relative w-96">

@@ -2,7 +2,10 @@
 import { ref, computed, watch } from 'vue';
 import * as yaml from 'js-yaml';
 import PipelineYamlEditor from './PipelineYamlEditor.vue';
-import type { PipelineConfig, PipelineConfigScope } from '@/utils/pipelineSchema';
+import type {
+  PipelineConfig,
+  PipelineConfigScope,
+} from '@/utils/pipelineSchema';
 import {
   getDefaultPipelineYaml,
   validatePipelineConfig,
@@ -32,7 +35,9 @@ const parseError = ref<string | null>(null);
 const validationErrors = ref<string[]>([]);
 const hasUnsavedChanges = ref(false);
 
-const availablePluginIds = computed(() => props.availablePlugins.map((p) => p.id));
+const availablePluginIds = computed(() =>
+  props.availablePlugins.map((p) => p.id)
+);
 const scopedEvents = computed(() => getEventsForScope(props.scope));
 
 type ParseOptions = {
@@ -45,11 +50,19 @@ function validateConfig() {
     return;
   }
 
-  const result = validatePipelineConfig(parsedConfig.value, availablePluginIds.value, props.scope);
+  const result = validatePipelineConfig(
+    parsedConfig.value,
+    availablePluginIds.value,
+    props.scope
+  );
   validationErrors.value = result.errors;
 }
 
-function handleParse(config: PipelineConfig | null, error: string | null, options: ParseOptions = {}) {
+function handleParse(
+  config: PipelineConfig | null,
+  error: string | null,
+  options: ParseOptions = {}
+) {
   parseError.value = error;
   parsedConfig.value = config;
 
@@ -90,7 +103,11 @@ watch(
 );
 
 function handleSave() {
-  if (!parsedConfig.value || parseError.value || validationErrors.value.length > 0) {
+  if (
+    !parsedConfig.value ||
+    parseError.value ||
+    validationErrors.value.length > 0
+  ) {
     return;
   }
 
@@ -116,25 +133,19 @@ const canSave = computed(() => {
           v-if="hasUnsavedChanges"
           class="text-sm text-yellow-600 dark:text-yellow-400"
         >
-          <i class="fa-solid fa-circle text-xs mr-1" />
+          <i class="fa-solid fa-circle mr-1 text-xs" />
           Unsaved changes
         </span>
       </div>
 
       <button
         type="button"
-        class="rounded-md bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+        class="bg-brand-700 hover:bg-brand-800 focus:ring-brand-500 rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
         :disabled="!canSave"
         @click="handleSave"
       >
-        <i
-          v-if="saving"
-          class="fa-solid fa-spinner animate-spin mr-2"
-        />
-        <i
-          v-else
-          class="fa-solid fa-save mr-2"
-        />
+        <i v-if="saving" class="fa-solid fa-spinner mr-2 animate-spin" />
+        <i v-else class="fa-solid fa-save mr-2" />
         Save Pipeline
       </button>
     </div>
@@ -146,31 +157,36 @@ const canSave = computed(() => {
         @parse="handleParse"
       />
 
-      <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
-        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+        <h3 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Available Plugins
         </h3>
         <div class="flex flex-wrap gap-2">
           <span
             v-for="plugin in availablePlugins"
             :key="plugin.id"
-            class="inline-flex items-center rounded-full bg-gray-200 dark:bg-gray-700 px-3 py-1 text-sm"
+            class="inline-flex items-center rounded-full bg-gray-200 px-3 py-1 text-sm dark:bg-gray-700"
           >
-            <code class="text-orange-600 dark:text-orange-400">{{ plugin.id }}</code>
+            <code class="text-brand-600 dark:text-brand-400">{{
+              plugin.id
+            }}</code>
             <span class="mx-1.5 text-gray-400">-</span>
-            <span class="text-gray-600 dark:text-gray-300">{{ plugin.name }}</span>
+            <span class="text-gray-600 dark:text-gray-300">{{
+              plugin.name
+            }}</span>
           </span>
           <span
             v-if="availablePlugins.length === 0"
             class="text-sm text-gray-500"
           >
-            No plugins installed. Install plugins first to add them to pipelines.
+            No plugins installed. Install plugins first to add them to
+            pipelines.
           </span>
         </div>
       </div>
 
-      <div class="rounded-lg bg-gray-50 dark:bg-gray-800 p-4">
-        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+      <div class="rounded-lg bg-gray-50 p-4 dark:bg-gray-800">
+        <h3 class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
           Available Events
         </h3>
         <div class="space-y-2">
@@ -179,8 +195,12 @@ const canSave = computed(() => {
             :key="event.value"
             class="flex items-start"
           >
-            <code class="text-orange-600 dark:text-orange-400 text-sm mr-2">{{ event.value }}</code>
-            <span class="text-sm text-gray-600 dark:text-gray-300">- {{ event.description }}</span>
+            <code class="text-brand-600 dark:text-brand-400 mr-2 text-sm">{{
+              event.value
+            }}</code>
+            <span class="text-sm text-gray-600 dark:text-gray-300"
+              >- {{ event.description }}</span
+            >
           </div>
         </div>
       </div>

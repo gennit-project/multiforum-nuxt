@@ -300,7 +300,7 @@ const handleCloseAlbum = () => {
               <RequireAuth :full-width="false">
                 <template #has-auth>
                   <nuxt-link
-                    class="text-orange-500 underline"
+                    class="text-brand-500 underline"
                     :to="{ name: 'discussions-create' }"
                   >
                     Create one?
@@ -310,7 +310,7 @@ const handleCloseAlbum = () => {
                   <button
                     type="button"
                     aria-label="Log in to create a download"
-                    class="cursor-pointer text-orange-500 underline"
+                    class="text-brand-500 cursor-pointer underline"
                   >
                     Create one?
                   </button>

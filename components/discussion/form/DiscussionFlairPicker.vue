@@ -57,11 +57,11 @@ const toggleFlair = (flairId: string) => {
         v-for="flair in flairs"
         :key="flair.id"
         type="button"
-        class="inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+        class="focus-visible:ring-brand-500 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors focus:outline-none focus-visible:ring-2"
         :class="
           modelValue.includes(flair.id)
-            ? 'border-orange-600 bg-orange-50 text-orange-800 dark:bg-orange-900/30 dark:text-orange-100'
-            : 'border-gray-300 bg-white text-gray-700 hover:border-orange-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
+            ? 'border-brand-600 bg-brand-50 text-brand-800 dark:bg-brand-900/30 dark:text-brand-100'
+            : 'hover:border-brand-400 border-gray-300 bg-white text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
         "
         :aria-pressed="modelValue.includes(flair.id)"
         :aria-label="`${modelValue.includes(flair.id) ? 'Remove' : 'Select'} ${flair.displayName} flair`"

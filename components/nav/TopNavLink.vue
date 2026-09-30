@@ -8,16 +8,16 @@ defineProps<{
 <template>
   <nuxt-link
     :to="to"
-    class="border-b-3 border-transparent group inline-flex items-center px-4 py-3 text-xs font-medium hover:border-orange-500 hover:text-orange-500 dark:text-white hover:dark:text-gray-200"
+    class="group hover:border-brand-500 hover:text-brand-500 inline-flex items-center border-b-3 border-transparent px-4 py-3 text-xs font-medium dark:text-white hover:dark:text-gray-200"
     active-class="
       inline-flex
       items-center
       border-b-2
-      border-orange-500
-      text-orange-500
-      dark:text-orange-400
-      dark:border-orange-400
-      hover:dark:text-orange-400
+      border-brand-500
+      text-brand-500
+      dark:text-brand-400
+      dark:border-brand-400
+      hover:dark:text-brand-400
       px-4
       py-3
       text-xs

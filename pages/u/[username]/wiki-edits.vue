@@ -29,7 +29,8 @@ type WikiEdit = TextVersion & {
 };
 
 const route = useRoute();
-const { selectedChannels, hasSelectedChannels } = useSelectedChannelsFromQuery();
+const { selectedChannels, hasSelectedChannels } =
+  useSelectedChannelsFromQuery();
 
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
@@ -118,9 +119,7 @@ const wikiEdits = computed<WikiEdit[]>(() => {
       return edits;
     })
     .sort((a, b) => {
-      return (
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     });
 });
 
@@ -148,7 +147,7 @@ const getWikiRevisionPath = (edit: WikiEdit) => {
           <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
             <NuxtLink
               :to="getWikiPagePath(edit)"
-              class="font-medium text-orange-600 hover:underline dark:text-orange-400"
+              class="text-brand-600 dark:text-brand-400 font-medium hover:underline"
             >
               {{ edit.wikiPage.title }}
             </NuxtLink>
@@ -167,7 +166,7 @@ const getWikiRevisionPath = (edit: WikiEdit) => {
           </div>
           <NuxtLink
             :to="getWikiRevisionPath(edit)"
-            class="text-sm text-orange-600 hover:underline dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 text-sm hover:underline"
           >
             View revision
           </NuxtLink>

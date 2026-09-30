@@ -45,7 +45,9 @@ const goToAdmin = () => {
 
 <template>
   <div class="mx-auto max-w-lg px-4 py-8">
-    <div class="rounded-lg border bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+    <div
+      class="rounded-lg border bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
+    >
       <template v-if="!usernameVar">
         <h1 class="mb-4 text-xl font-semibold text-gray-900 dark:text-gray-100">
           Sign In Required
@@ -56,15 +58,18 @@ const goToAdmin = () => {
       </template>
 
       <template v-else-if="accepted">
-        <h1 class="mb-4 text-xl font-semibold text-green-600 dark:text-green-400">
+        <h1
+          class="mb-4 text-xl font-semibold text-green-600 dark:text-green-400"
+        >
           Invitation Accepted
         </h1>
         <p class="mb-4 text-gray-600 dark:text-gray-300">
-          You are now a server admin. You can access the admin panel to manage server settings.
+          You are now a server admin. You can access the admin panel to manage
+          server settings.
         </p>
         <button
           type="button"
-          class="rounded bg-orange-500 px-4 py-2 text-white hover:bg-orange-600"
+          class="bg-brand-500 hover:bg-brand-600 rounded px-4 py-2 text-white"
           @click="goToAdmin"
         >
           Go to Admin Panel
@@ -76,20 +81,25 @@ const goToAdmin = () => {
           Server Admin Invitation
         </h1>
         <p class="mb-4 text-gray-600 dark:text-gray-300">
-          You have been invited to become a server admin. As a server admin, you will have full access to manage server settings, users, and moderation.
+          You have been invited to become a server admin. As a server admin, you
+          will have full access to manage server settings, users, and
+          moderation.
         </p>
         <p class="mb-6 text-sm text-gray-500 dark:text-gray-400">
           Logged in as: <span class="font-medium">{{ usernameVar }}</span>
         </p>
 
-        <div v-if="error || errorMessage" class="mb-4 rounded bg-red-50 p-3 text-red-600 dark:bg-red-900/20 dark:text-red-400">
+        <div
+          v-if="error || errorMessage"
+          class="mb-4 rounded bg-red-50 p-3 text-red-600 dark:bg-red-900/20 dark:text-red-400"
+        >
           {{ error?.message || errorMessage }}
         </div>
 
         <div class="flex gap-3">
           <button
             type="button"
-            class="rounded bg-orange-500 px-4 py-2 text-white hover:bg-orange-600 disabled:opacity-60"
+            class="bg-brand-500 hover:bg-brand-600 rounded px-4 py-2 text-white disabled:opacity-60"
             :disabled="loading"
             @click="handleAccept"
           >

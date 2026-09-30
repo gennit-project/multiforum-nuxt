@@ -171,7 +171,7 @@ test.describe('Event Date Modes', () => {
     await expect(recurringModeButton).toBeVisible();
 
     // Single mode should be selected by default
-    await expect(singleModeButton).toHaveClass(/border-orange-500/);
+    await expect(singleModeButton).toHaveClass(/border-brand-500/);
   });
 
   test('shows OccurrencesList when multiple dates mode is selected', async ({
@@ -198,7 +198,9 @@ test.describe('Event Date Modes', () => {
     await expect(addOccurrenceButton).toBeVisible();
 
     // There should be at least one occurrence row
-    const firstOccurrenceStartDate = page.getByTestId('occurrence-0-start-date');
+    const firstOccurrenceStartDate = page.getByTestId(
+      'occurrence-0-start-date'
+    );
     await expect(firstOccurrenceStartDate).toBeVisible();
   });
 
@@ -231,7 +233,7 @@ test.describe('Event Date Modes', () => {
     await expect(monthlyOption).toBeVisible();
 
     // Weekly should be selected by default
-    await expect(weeklyOption).toHaveClass(/border-orange-500/);
+    await expect(weeklyOption).toHaveClass(/border-brand-500/);
 
     // Interval count should be visible
     const intervalCount = page.getByTestId('interval-count');
@@ -263,7 +265,9 @@ test.describe('Event Date Modes', () => {
 
     // Change to Daily pattern
     await page.getByTestId('repeat-type-daily').click();
-    await expect(page.getByTestId('repeat-type-daily')).toHaveClass(/border-orange-500/);
+    await expect(page.getByTestId('repeat-type-daily')).toHaveClass(
+      /border-brand-500/
+    );
 
     // Day of week buttons should not be visible for daily pattern
     await expect(page.getByTestId('day-of-week-1')).not.toBeVisible();
@@ -276,8 +280,8 @@ test.describe('Event Date Modes', () => {
     await page.getByTestId('day-of-week-3').click(); // Wednesday
 
     // Both should now be selected (have orange background)
-    await expect(page.getByTestId('day-of-week-1')).toHaveClass(/bg-orange-500/);
-    await expect(page.getByTestId('day-of-week-3')).toHaveClass(/bg-orange-500/);
+    await expect(page.getByTestId('day-of-week-1')).toHaveClass(/bg-brand-500/);
+    await expect(page.getByTestId('day-of-week-3')).toHaveClass(/bg-brand-500/);
 
     // Change end type to AFTER_COUNT
     await page.getByTestId('end-type-after_count').click();

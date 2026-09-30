@@ -129,7 +129,7 @@ useHead(
         <!-- Breadcrumb navigation -->
         <nav class="mb-4" aria-label="Wiki breadcrumb">
           <span
-            class="cursor-pointer text-orange-600 hover:underline dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 cursor-pointer hover:underline"
             @click="goToWikiHome"
           >
             Wiki Home

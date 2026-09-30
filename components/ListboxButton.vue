@@ -9,7 +9,7 @@ defineProps<{
 
 <template>
   <ListboxButton
-    class="relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pl-3 pr-10 text-left shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:bg-gray-900 dark:text-gray-200 sm:text-sm"
+    class="focus:border-brand-500 focus:ring-brand-500 relative w-full cursor-default rounded-md border border-gray-300 bg-white py-2 pr-10 pl-3 text-left shadow-sm focus:ring-1 focus:outline-none sm:text-sm dark:bg-gray-900 dark:text-gray-200"
   >
     <span class="block truncate">{{ label }}</span>
     <span

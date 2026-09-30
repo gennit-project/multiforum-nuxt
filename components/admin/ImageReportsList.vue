@@ -59,7 +59,7 @@ const getImageTypeBadgeClass = (report: {
   if (report.relatedChannelIconName || report.relatedChannelBannerName) {
     return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
   }
-  return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200';
+  return 'bg-brand-100 text-brand-800 dark:bg-brand-900 dark:text-brand-200';
 };
 
 // Get the appropriate issue detail link based on scope
@@ -84,7 +84,7 @@ const getIssueLink = (report: {
             type="checkbox"
             class="mr-2 rounded"
             @change="toggleFilter"
-          >
+          />
           Show open reports only
         </label>
       </div>
@@ -158,7 +158,7 @@ const getIssueLink = (report: {
               </span>
               <span
                 v-else
-                class="text-sm italic text-gray-500 dark:text-gray-400"
+                class="text-sm text-gray-500 italic dark:text-gray-400"
               >
                 (server-scoped)
               </span>

@@ -82,7 +82,7 @@ const handleClose = () => {
     @danger-button-click="handleDelete"
   >
     <template #icon>
-      <PlusMinusIcon class="h-5 w-5 text-orange-600 dark:text-orange-400" />
+      <PlusMinusIcon class="text-brand-600 dark:text-brand-400 h-5 w-5" />
     </template>
     <template #content>
       <RevisionDiffContent

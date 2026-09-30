@@ -7,7 +7,8 @@ const authButtonStub = {
   name: 'AuthButton',
   props: ['testId', 'buttonClasses', 'props', 'loading', 'showCount', 'count'],
   emits: ['click'],
-  template: '<button :data-classes="buttonClasses" @click="$emit(\'click\')"><slot /></button>',
+  template:
+    '<button :data-classes="buttonClasses" @click="$emit(\'click\')"><slot /></button>',
 };
 
 const mountButton = (
@@ -22,22 +23,26 @@ const mountButton = (
       stubs: {
         AuthButton: authButtonStub,
         ClientOnly: { template: '<div><slot /></div>' },
-        Tooltip: { template: '<div><slot name="activator" :props="{}" /><slot /></div>' },
+        Tooltip: {
+          template: '<div><slot name="activator" :props="{}" /><slot /></div>',
+        },
         TooltipContent: true,
         ...customStubs,
       },
     },
   });
 
-const authButton = (w: ReturnType<typeof mount>) => w.getComponent(authButtonStub);
-const classes = (w: ReturnType<typeof mount>) => authButton(w).props('buttonClasses') as string;
+const authButton = (w: ReturnType<typeof mount>) =>
+  w.getComponent(authButtonStub);
+const classes = (w: ReturnType<typeof mount>) =>
+  authButton(w).props('buttonClasses') as string;
 
 describe('VoteButton classes', () => {
   it('uses outlined, shaded orange styling when active', () => {
     const wrapper = mountButton({ active: true });
 
     expect(classes(wrapper)).toEqual(
-      expect.stringContaining('border-orange-300 bg-orange-100')
+      expect.stringContaining('border-brand-300 bg-brand-100')
     );
   });
 
@@ -62,7 +67,7 @@ describe('VoteButton classes', () => {
   it('adds permalink styling when permalinked', () => {
     const wrapper = mountButton({ isPermalinked: true });
 
-    expect(classes(wrapper)).toContain('border-orange-500');
+    expect(classes(wrapper)).toContain('border-brand-500');
   });
 
   it('includes the external class', () => {
@@ -114,15 +119,11 @@ describe('VoteButton rendering', () => {
   });
 
   it('emits vote from the tooltip fallback button', async () => {
-    const wrapper = mountButton(
-      { tooltipText: 'Upvote this' },
-      'Upvote',
-      {
-        ClientOnly: {
-          template: '<div><slot name="fallback" /></div>',
-        },
-      }
-    );
+    const wrapper = mountButton({ tooltipText: 'Upvote this' }, 'Upvote', {
+      ClientOnly: {
+        template: '<div><slot name="fallback" /></div>',
+      },
+    });
 
     await authButton(wrapper).trigger('click');
 
