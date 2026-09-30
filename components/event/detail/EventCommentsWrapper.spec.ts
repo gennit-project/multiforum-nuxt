@@ -19,14 +19,9 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
 }));
 
+const mockRoute = vi.hoisted(() => ({ path: '/forums/forum-1/events/event-1', params: { eventId: 'event-1', forumId: 'forum-1' }, query: {} }));
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({
-    params: {
-      eventId: 'event-1',
-      forumId: 'forum-1',
-    },
-    query: {},
-  }),
+  useRoute: () => mockRoute,
   useRouter: () => ({
     replace: vi.fn(),
   }),
@@ -103,6 +98,7 @@ const NotificationStub = defineComponent({
 describe('EventCommentsWrapper', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRoute.path = '/forums/forum-1/events/event-1';
     onDoneCallbacks.length = 0;
     mutateSpies.forEach((spy) => spy.mockReset());
 
@@ -157,6 +153,11 @@ describe('EventCommentsWrapper', () => {
         },
       },
     });
+
+  it('does not mount the nested event search route inside a preview comment section', () => {
+    mockRoute.path = '/events/list/search/event-1';
+    expect(buildWrapper().get('[data-testid="comment-section"]').attributes('data-show-nuxt-page')).toBe('false');
+  });
 
   it('subscribes to event updates and shows the success notification', async () => {
     const wrapper = buildWrapper();

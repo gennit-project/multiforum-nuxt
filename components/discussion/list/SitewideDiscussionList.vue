@@ -17,9 +17,9 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { config } from '@/config';
-import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
+import type { Discussion } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
-import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
+import ForumSubmissions from '@/components/discovery/ForumSubmissions.vue';
 import { useFocusTrap } from '@/composables/useFocusTrap';
 
 const usernameVar = useUsername();
@@ -194,10 +194,14 @@ const selectedDiscussion = computed<Discussion | null>(() => {
 });
 
 const selectedChannelId = computed(() => {
-  const firstChannel = safeArrayFirst(
-    selectedDiscussion.value?.DiscussionChannels || []
+  const channels = selectedDiscussion.value?.DiscussionChannels || [];
+  const requested = route.query.selectedForum;
+  return (
+    channels.find((channel) => channel.channelUniqueName === requested)
+      ?.channelUniqueName ||
+    channels[0]?.channelUniqueName ||
+    ''
   );
-  return firstChannel?.channelUniqueName || '';
 });
 
 const selectedDiscussionTitle = computed(() => {
@@ -212,19 +216,6 @@ const selectedDiscussionLink = computed(() => {
 const selectedDiscussionChannels = computed(() => {
   if (!selectedDiscussion.value?.DiscussionChannels) return [];
   return selectedDiscussion.value.DiscussionChannels;
-});
-
-const selectedDiscussionChannelLinks = computed(() => {
-  return selectedDiscussionChannels.value.map(
-    (discussionChannel: DiscussionChannel) => {
-      const commentCount = discussionChannel.CommentsAggregate?.count || 0;
-      return {
-        channelUniqueName: discussionChannel.channelUniqueName,
-        commentCount,
-        link: `/forums/${discussionChannel.channelUniqueName}/discussions/${selectedDiscussionId.value}`,
-      };
-    }
-  );
 });
 
 const aggregateDiscussionCount = computed(() => {
@@ -317,28 +308,18 @@ const filterByChannel = (channel: string) => {
 <template>
   <div class="flex w-full min-w-0 justify-center overflow-x-hidden">
     <div
-      class="w-full max-w-[theme(screens.2xl)] min-w-0 flex-1 bg-white dark:bg-black dark:text-white"
+      class="flex w-full min-w-0 flex-1 flex-col bg-gray-50 lg:h-[calc(100vh-3.5rem)] dark:bg-gray-950 dark:text-white"
     >
-      <div class="relative w-full min-w-0">
-        <div
-          class="flex min-w-0 flex-col divide-x divide-gray-300 md:flex-row dark:divide-gray-500"
-        >
+      <div
+        class="border-b border-gray-200 px-4 pt-3 lg:px-6 dark:border-gray-800"
+      >
+        <slot :open-about="() => (isSitewideSidebarOpen = true)" />
+      </div>
+      <div class="relative min-h-0 w-full min-w-0 flex-1">
+        <div class="flex min-w-0 flex-col lg:h-full lg:flex-row">
           <div
-            class="min-w-0 flex-1 md:px-2 lg:h-[calc(100vh-3.5rem)] lg:basis-0 lg:overflow-y-auto"
+            class="min-w-0 flex-1 px-4 py-4 lg:h-full lg:basis-0 lg:overflow-y-auto lg:px-6"
           >
-            <slot :open-about="() => (isSitewideSidebarOpen = true)" />
-            <div class="mt-2 flex justify-end lg:pr-2">
-              <button
-                v-if="serverConfig"
-                type="button"
-                class="hidden items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 lg:inline-flex dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-                :aria-expanded="isSitewideSidebarOpen"
-                aria-controls="sitewide-sidebar-drawer"
-                @click="isSitewideSidebarOpen = true"
-              >
-                About
-              </button>
-            </div>
             <div
               v-if="shouldShowLoadingSkeleton"
               class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
@@ -387,7 +368,7 @@ const filterByChannel = (channel: string) => {
             </p>
             <div v-if="discussions && discussions.length > 0" class="p-0">
               <ul
-                class="m-0 flex flex-col p-0 lg:divide-y lg:divide-gray-200 lg:rounded-lg lg:bg-white lg:shadow lg:dark:divide-gray-700 lg:dark:bg-black"
+                class="m-0 flex flex-col gap-3 p-0"
                 data-testid="sitewide-discussion-list"
                 role="list"
               >
@@ -417,16 +398,8 @@ const filterByChannel = (channel: string) => {
             </div>
           </div>
           <aside
-            v-if="serverConfig"
-            class="min-w-0 shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto lg:hidden"
-          >
-            <SitewideDiscussionSidebar
-              :server-config="serverConfig"
-              class="px-4"
-            />
-          </aside>
-          <aside
-            class="hidden min-w-0 lg:flex lg:h-[calc(100vh-3.5rem)] lg:basis-[44%] lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto lg:px-4 lg:py-4 xl:basis-1/2 xl:px-6"
+            aria-label="Discussion preview"
+            class="hidden min-w-0 border-l border-gray-200 bg-white lg:flex lg:h-full lg:basis-[44%] lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto lg:px-4 lg:py-4 xl:basis-1/2 xl:px-6 dark:border-gray-800 dark:bg-black"
           >
             <div
               v-if="selectedDiscussionId"
@@ -447,48 +420,42 @@ const filterByChannel = (channel: string) => {
                   {{ selectedDiscussionTitle }}
                 </span>
               </h2>
+              <div
+                v-if="selectedDiscussionChannels.length"
+                class="mb-5 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900"
+              >
+                <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">
+                  Each forum has its own conversation.
+                </p>
+                <ForumSubmissions
+                  :key="selectedDiscussionId"
+                  :submissions="selectedDiscussionChannels"
+                  :content-id="selectedDiscussionId"
+                  kind="discussion"
+                  :preview="true"
+                  :selected-forum="selectedChannelId"
+                />
+              </div>
               <DiscussionDetailContent
+                v-if="selectedChannelId"
+                :key="`${selectedDiscussionId}:${selectedChannelId}`"
                 :discussion-id="selectedDiscussionId"
                 :channel-id="selectedChannelId"
                 :horizontal-album-thumbnails="true"
-                :show-comments="false"
+                :show-comments="true"
                 class="w-full max-w-full min-w-0"
-              />
-              <div
-                class="mt-6 w-full min-w-0 rounded-lg border border-gray-200 p-4 dark:border-gray-700"
               >
-                <p
-                  class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-200"
-                >
-                  Select a forum to view comments
-                </p>
-                <ul
-                  v-if="selectedDiscussionChannelLinks.length > 0"
-                  class="flex flex-col gap-2"
-                >
-                  <li
-                    v-for="channelLink in selectedDiscussionChannelLinks"
-                    :key="channelLink.channelUniqueName"
-                    class="flex items-center justify-between text-sm"
+                <template #before-comments>
+                  <h3
+                    class="mt-6 border-t border-gray-200 pt-5 text-base font-semibold dark:border-gray-800"
                   >
-                    <span class="text-gray-700 dark:text-gray-200">
-                      {{ channelLink.channelUniqueName }}
-                    </span>
-                    <nuxt-link
-                      :to="channelLink.link"
-                      class="text-brand-600 dark:text-brand-400 hover:underline"
-                    >
-                      {{ channelLink.commentCount }}
-                      {{
-                        channelLink.commentCount === 1 ? 'comment' : 'comments'
-                      }}
-                    </nuxt-link>
-                  </li>
-                </ul>
-                <p v-else class="text-sm text-gray-500 dark:text-gray-400">
-                  No forum comment sections are available for this discussion.
-                </p>
-              </div>
+                    Conversation in {{ selectedChannelId }}
+                  </h3>
+                  <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                    Replies here are visible in this forum’s conversation.
+                  </p>
+                </template>
+              </DiscussionDetailContent>
             </div>
             <div v-else class="h-full min-w-0 px-2 py-4 xl:px-6">
               <DiscussionDetailEmptyState />
@@ -497,7 +464,7 @@ const filterByChannel = (channel: string) => {
         </div>
         <div
           v-if="serverConfig && isSitewideSidebarOpen"
-          class="fixed inset-0 z-40 hidden lg:block"
+          class="fixed inset-0 z-40"
           aria-hidden="false"
         >
           <div

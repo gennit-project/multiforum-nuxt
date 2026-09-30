@@ -11,7 +11,6 @@ import type { SearchDiscussionValues } from '@/types/Discussion';
 import ExpandRowsIcon from '@/components/icons/ExpandRowsIcon.vue';
 import FilterIcon from '@/components/icons/FilterIcon.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
-import SecondaryButton from '@/components/SecondaryButton.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import { useUIStore } from '@/stores/uiStore';
@@ -50,18 +49,7 @@ const props = defineProps({
   },
 });
 
-// The sitewide discussion list uses a lower-emphasis (secondary) New Post
-// button; forum-scoped lists keep the primary button.
-const newPostButton = computed(() =>
-  props.isForumScoped ? PrimaryButton : SecondaryButton
-);
-
-// The sitewide (SecondaryButton) variant has no border of its own; add one so it
-// matches the bordered filter/search controls. PrimaryButton already has a border.
-const newPostButtonClass = computed(() =>
-  props.isForumScoped ? '' : 'border border-gray-300 dark:border-gray-600'
-);
-
+const newPostButton = PrimaryButton;
 // Shared styling for the icon toggle buttons (filter, search) so every control in
 // the bar has the same height, text size/weight, and border weight/color.
 const barButtonBase =
@@ -100,7 +88,7 @@ const shouldOpenSearch = () => {
 };
 
 const showFilters = ref(false);
-const showSearch = ref(shouldOpenSearch());
+const showSearch = ref(!props.isForumScoped || shouldOpenSearch());
 
 // Watch for route query changes to update search visibility
 watch(
@@ -159,23 +147,19 @@ const isExpanded = computed(() => {
 </script>
 
 <template>
-  <div class="pb-2 pt-2">
+  <div class="pt-2 pb-5">
     <div class="flex flex-wrap items-center justify-between gap-2">
       <h1
-        class="font-semibold h-9 px-4 text-xl leading-9 dark:text-white lg:px-0"
+        class="h-9 px-4 text-xl leading-9 font-semibold lg:px-0 dark:text-white"
       >
-        Discuss
+        {{ isForumScoped ? 'Discuss' : 'Discussions' }}
       </h1>
-      <div class="flex items-center gap-2">
-        <button
-          v-if="showAboutButton"
-          type="button"
-          class="hidden items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800 md:inline-flex lg:hidden"
-          @click="emit('openAbout')"
-        >
-          About
-        </button>
-      </div>
+      <p
+        v-if="!isForumScoped"
+        class="order-last w-full pb-1 text-sm text-gray-600 dark:text-gray-400"
+      >
+        One topic. Different conversations.
+      </p>
       <div class="flex flex-wrap items-center justify-end gap-1">
         <FilterChip
           v-if="!isForumScoped"
@@ -187,7 +171,7 @@ const isExpanded = computed(() => {
           "
         >
           <template #icon>
-            <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
+            <ChannelIcon class="mr-2 -ml-0.5 h-4 w-4" />
           </template>
           <template #content>
             <div class="relative w-96">
@@ -242,7 +226,10 @@ const isExpanded = computed(() => {
           data-testid="discussion-filter-button"
           :aria-label="showFilters ? 'Hide filters' : 'Show filters'"
           :title="showFilters ? 'Hide filters' : 'Show filters'"
-          :class="[barButtonBase, showFilters ? barButtonActive : barButtonInactive]"
+          :class="[
+            barButtonBase,
+            showFilters ? barButtonActive : barButtonInactive,
+          ]"
           @click="
             (event) => {
               event.preventDefault();
@@ -256,7 +243,10 @@ const isExpanded = computed(() => {
           data-testid="discussion-search-button"
           :aria-label="showSearch ? 'Hide search' : 'Show search'"
           :title="showSearch ? 'Hide search' : 'Show search'"
-          :class="[barButtonBase, showSearch ? barButtonActive : barButtonInactive]"
+          :class="[
+            barButtonBase,
+            showSearch ? barButtonActive : barButtonInactive,
+          ]"
           @click="
             (event) => {
               event.preventDefault();
@@ -267,13 +257,24 @@ const isExpanded = computed(() => {
           <SearchIcon />
         </button>
         <SortButtons />
+        <div class="flex items-center gap-2">
+          <button
+            v-if="showAboutButton"
+            type="button"
+            class="inline-flex items-center gap-2 rounded-md border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 hover:bg-gray-100 md:inline-flex dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+            @click="emit('openAbout')"
+          >
+            About
+          </button>
+        </div>
+
         <div v-if="!isDownloadPage">
           <RequireAuth :full-width="false">
             <template #has-auth>
               <component
                 :is="newPostButton"
                 size="sm"
-                :class="newPostButtonClass"
+                :background-color="isForumScoped ? 'orange' : 'brand'"
                 :label="isDownloadPage ? 'New Upload' : 'New Post'"
                 @click="
                   $router.push(
@@ -290,7 +291,7 @@ const isExpanded = computed(() => {
               <component
                 :is="newPostButton"
                 size="sm"
-                :class="newPostButtonClass"
+                :background-color="isForumScoped ? 'orange' : 'brand'"
                 :label="isDownloadPage ? 'New Upload' : 'New Post'"
               />
             </template>
@@ -298,7 +299,7 @@ const isExpanded = computed(() => {
         </div>
       </div>
     </div>
-    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
+    <hr class="mt-3 border-gray-200 dark:border-gray-800" />
     <div
       v-if="showSearch"
       class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-900 dark:text-gray-300"
@@ -306,11 +307,11 @@ const isExpanded = computed(() => {
       <SearchBar
         data-testid="discussion-filter-search-bar"
         :initial-value="filterValues.searchInput"
-        :search-placeholder="'Search'"
-        :auto-focus="true"
+        :search-placeholder="'Search discussions'"
+        :auto-focus="isForumScoped"
         :small="true"
-        :left-side-is-rounded="false"
-        :right-side-is-rounded="false"
+        :left-side-is-rounded="!isForumScoped"
+        :right-side-is-rounded="!isForumScoped"
         @update-search-input="updateSearchInput"
       />
     </div>
@@ -325,7 +326,7 @@ const isExpanded = computed(() => {
         :highlighted="tagLabel !== defaultFilterLabels.tags"
       >
         <template #icon>
-          <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+          <TagIcon class="mr-2 -ml-0.5 h-4 w-4" />
         </template>
         <template #content>
           <div class="relative w-96">

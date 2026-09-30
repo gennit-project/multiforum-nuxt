@@ -47,7 +47,9 @@ describe('DiscussionFilterBar', () => {
     expect(
       wrapper.find('[data-testid="discussion-filter-search-bar"]').exists()
     ).toBe(false);
-    await wrapper.get('[data-testid="discussion-search-button"]').trigger('click');
+    await wrapper
+      .get('[data-testid="discussion-search-button"]')
+      .trigger('click');
     expect(
       wrapper.find('[data-testid="discussion-filter-search-bar"]').exists()
     ).toBe(true);
@@ -58,7 +60,9 @@ describe('DiscussionFilterBar', () => {
     expect(
       wrapper.find('[data-testid="show-archived-discussions"]').exists()
     ).toBe(false);
-    await wrapper.get('[data-testid="discussion-filter-button"]').trigger('click');
+    await wrapper
+      .get('[data-testid="discussion-filter-button"]')
+      .trigger('click');
     expect(
       wrapper.find('[data-testid="show-archived-discussions"]').exists()
     ).toBe(true);
@@ -66,7 +70,9 @@ describe('DiscussionFilterBar', () => {
 
   it('emits openAbout when the inline about button is clicked', async () => {
     const wrapper = mountBar({ showAboutButton: true });
-    const aboutButton = wrapper.findAll('button').find((button) => button.text() === 'About');
+    const aboutButton = wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'About');
     expect(aboutButton).toBeTruthy();
     await aboutButton!.trigger('click');
     expect(wrapper.emitted('openAbout')).toBeTruthy();
@@ -78,15 +84,15 @@ describe('DiscussionFilterBar', () => {
     expect(wrapper.findComponent(PrimaryButton).exists()).toBe(true);
   });
 
-  it('uses the secondary New Post button on the sitewide list', () => {
+  it('uses the primary New Post button on the sitewide list', () => {
     const wrapper = mountBar({ isForumScoped: false });
 
-    expect(wrapper.findComponent(SecondaryButton).exists()).toBe(true);
+    expect(wrapper.findComponent(PrimaryButton).exists()).toBe(true);
   });
 
-  it('does not use the primary New Post button on the sitewide list', () => {
+  it('does not use the secondary New Post button on the sitewide list', () => {
     const wrapper = mountBar({ isForumScoped: false });
 
-    expect(wrapper.findComponent(PrimaryButton).exists()).toBe(false);
+    expect(wrapper.findComponent(SecondaryButton).exists()).toBe(false);
   });
 });

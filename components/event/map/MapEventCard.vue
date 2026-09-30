@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { DateTime } from 'luxon';
-import { MapPin, Clock, Repeat } from 'lucide-vue-next';
+import { MapPin, Clock, Repeat, MessageSquare, Video } from 'lucide-vue-next';
+import { useRouter } from 'nuxt/app';
+import ForumSubmissions from '@/components/discovery/ForumSubmissions.vue';
 import type { Event } from '@/__generated__/graphql';
 import { getDatePieces } from '@/utils';
 import SeriesOccurrenceButtons from '../list/SeriesOccurrenceButtons.vue';
@@ -14,16 +16,38 @@ const props = withDefaults(
     searchInput?: string;
     selectedTags?: string[];
     isHighlighted?: boolean;
+    onlineList?: boolean;
+    selectedEventId?: string;
   }>(),
-  { searchInput: '', selectedTags: () => [], isHighlighted: false }
+  {
+    searchInput: '',
+    selectedTags: () => [],
+    isHighlighted: false,
+    onlineList: false,
+    selectedEventId: '',
+  }
 );
 
 const emit = defineEmits<{
   openPreview: [];
+  select: [payload: { eventId: string; title: string }];
   filterByTag: [tag: string];
 }>();
 
-const start = computed(() => DateTime.fromISO(props.event.startTime));
+const router = useRouter();
+const openEvent = () => {
+  if (!props.onlineList) return emit('openPreview');
+  if (window.matchMedia('(min-width: 1024px)').matches) {
+    emit('select', { eventId: props.event.id, title: props.event.title });
+  } else {
+    router.push(
+      `/forums/${encodeURIComponent(props.event.EventChannels[0]?.channelUniqueName || '')}/events/${encodeURIComponent(props.event.id)}`
+    );
+  }
+};
+const start = computed(() =>
+  DateTime.fromISO(props.event.startTime).setZone('local')
+);
 const time = computed(
   () => getDatePieces(start.value, Boolean(props.event.isAllDay)).timeOfDay
 );
@@ -42,7 +66,7 @@ const multipleDays = computed(
   <li
     class="relative overflow-hidden rounded-xl border bg-white transition-colors dark:bg-gray-900"
     :class="
-      isHighlighted
+      isHighlighted || (onlineList && selectedEventId === event.id)
         ? 'border-brand-600 ring-brand-600 dark:border-brand-400 dark:ring-brand-400 ring-1'
         : 'border-gray-200 hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-500'
     "
@@ -52,7 +76,7 @@ const multipleDays = computed(
       type="button"
       :aria-label="`Preview ${event.title}`"
       class="focus-visible:ring-brand-500 flex w-full items-start gap-3 rounded-lg p-3 text-left focus-visible:ring-2 focus-visible:ring-inset"
-      @click="emit('openPreview')"
+      @click="openEvent"
     >
       <time
         :datetime="event.startTime"
@@ -83,7 +107,12 @@ const multipleDays = computed(
           />
         </span>
         <span
-          v-if="event.locationName"
+          v-if="onlineList"
+          class="mt-2 flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300"
+          ><Video class="h-4 w-4" aria-hidden="true" /> Online event</span
+        >
+        <span
+          v-if="event.locationName && !onlineList"
           class="mt-2 flex items-start gap-1.5 text-sm text-gray-600 dark:text-gray-300"
         >
           <MapPin class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
@@ -93,7 +122,8 @@ const multipleDays = computed(
           class="mt-1 flex items-start gap-1.5 text-sm text-gray-600 dark:text-gray-300"
         >
           <Clock class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-          {{ time }}<span v-if="multipleDays"> · Multiple days</span>
+          {{ time }}<span v-if="onlineList">{{ start.offsetNameShort }}</span
+          ><span v-if="multipleDays"> · Multiple days</span>
         </span>
         <span
           class="mt-2 flex flex-wrap items-center gap-2 text-xs font-medium"
@@ -143,6 +173,21 @@ const multipleDays = computed(
       >
         {{ tag.text }}
       </button>
+    </div>
+    <div v-if="onlineList" class="px-3 pb-3 sm:pl-[4.5rem]">
+      <ForumSubmissions
+        :submissions="event.EventChannels"
+        :content-id="event.id"
+        kind="event"
+      />
+      <p
+        class="mt-3 flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300"
+      >
+        <MessageSquare class="h-4 w-4" aria-hidden="true" />{{
+          event.CommentsAggregate?.count ?? 0
+        }}
+        comments · Shared across all forums
+      </p>
     </div>
     <SeriesOccurrenceButtons
       v-if="

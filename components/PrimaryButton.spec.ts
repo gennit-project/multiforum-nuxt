@@ -82,3 +82,7 @@ describe('PrimaryButton styling', () => {
     expect(/focus:ring-(red|green|blue|gray|orange)-\d/.test(classes(wrapper))).toBe(true);
   });
 });
+
+it('supports a brand-colored discovery action without changing other buttons', () => {
+  expect(classes(mountButton({ backgroundColor: 'brand' }))).toContain('bg-brand-500');
+});

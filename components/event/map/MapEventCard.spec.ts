@@ -1,8 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import type { Event } from '@/__generated__/graphql';
 import MapEventCard from './MapEventCard.vue';
 import SeriesOccurrenceButtons from '../list/SeriesOccurrenceButtons.vue';
+
+const { push } = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock('nuxt/app', () => ({
+  useRouter: () => ({ push }),
+  useRoute: () => ({ path: '/events/list/search', query: {} }),
+}));
 
 const event = {
   id: 'trivia',
@@ -22,6 +28,7 @@ const mountCard = (overrides: Partial<Event> = {}, props = {}) =>
     props: { event: { ...event, ...overrides }, ...props },
     global: {
       stubs: {
+        NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         SeriesOccurrenceButtons: true,
         AppImage: {
           props: ['src', 'alt'],
@@ -107,4 +114,50 @@ it('preserves links to other dates in a series', () => {
   expect(
     wrapper.getComponent(SeriesOccurrenceButtons).props('occurrences')
   ).toEqual(occurrences);
+});
+
+describe('online discovery cards', () => {
+  it('shows one event-wide count even when forum submissions have different counts', () => {
+    const wrapper = mountCard(
+      {
+        CommentsAggregate: { count: 9 },
+        EventChannels: [
+          { channelUniqueName: 'cats', CommentsAggregate: { count: 4 } },
+          { channelUniqueName: 'books', CommentsAggregate: { count: 5 } },
+        ],
+      } as Partial<Event>,
+      { onlineList: true }
+    );
+    expect(wrapper.text()).toContain('9 comments · Shared across all forums');
+  });
+  it('marks the selected online event', () => {
+    expect(
+      mountCard({}, { onlineList: true, selectedEventId: 'trivia' }).classes()
+    ).toContain('ring-1');
+  });
+  it('selects the event in the desktop reading pane', async () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: true }))
+    );
+    const wrapper = mountCard({}, { onlineList: true });
+    await wrapper.get('button[aria-label]').trigger('click');
+    expect(wrapper.emitted('select')).toEqual([
+      [{ eventId: 'trivia', title: event.title }],
+    ]);
+    vi.unstubAllGlobals();
+  });
+  it('opens the full event on mobile', async () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({ matches: false }))
+    );
+    const wrapper = mountCard(
+      { EventChannels: [{ channelUniqueName: 'books' }] } as Partial<Event>,
+      { onlineList: true }
+    );
+    await wrapper.get('button[aria-label]').trigger('click');
+    expect(push).toHaveBeenCalledWith('/forums/books/events/trivia');
+    vi.unstubAllGlobals();
+  });
 });
