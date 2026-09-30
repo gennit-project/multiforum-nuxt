@@ -256,7 +256,7 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
 <template>
   <div
     class="mt-1 flex-1 flex-col space-y-1 dark:text-white"
-    :class="[showMap ? 'w-full px-4' : 'mx-4']"
+    :class="[showMap ? 'map-filters w-full' : 'mx-4']"
   >
     <div
       v-if="
@@ -295,9 +295,16 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
       "
       class="mb-2 border border-t-gray-500 dark:border-t-gray-600"
     />
-    <div v-if="showMainFilters" class="flex flex-col gap-2 p-2">
+    <div
+      v-if="showMainFilters"
+      class="flex flex-col gap-2"
+      :class="showMap ? 'p-0' : 'p-2'"
+    >
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
-        <div class="flex items-center gap-2">
+        <div
+          class="flex items-center gap-2"
+          :class="{ 'flex-wrap sm:flex-nowrap': showMap }"
+        >
           <div
             class="align-items flex hidden justify-center space-x-2 md:block"
           >
@@ -332,8 +339,10 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
             class="flex-1"
             :full-width="true"
             :initial-value="filterValues.searchInput"
-            :right-side-is-rounded="!showLocationSearchBarAndDistanceButtons"
-            :search-placeholder="'Search'"
+            :right-side-is-rounded="
+              showMap || !showLocationSearchBarAndDistanceButtons
+            "
+            :search-placeholder="showMap ? 'Search events' : 'Search'"
             :small="true"
             :test-id="'event-search-bar'"
             @update-search-input="updateSearchInput"
@@ -406,6 +415,9 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
             class="flex-1"
             data-testid="event-drawer-location-search-bar"
             :left-side-is-rounded="false"
+            :right-side-is-rounded="!showMap"
+            :use-medium-rounded-corners="showMap"
+            :initial-value="filterValues.placeName || ''"
             :radius="radiusLabel"
             :reference-point-address-name="referencePointName"
             @update-location-input="updateLocationInput"
@@ -553,5 +565,14 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
   flex-wrap: wrap;
   padding: 10px;
   max-width: 600px;
+}
+</style>
+
+<style scoped>
+.map-filters :deep(input) {
+  min-height: 2.75rem;
+}
+.map-filters :deep([data-testid='event-drawer-location-search-bar']) {
+  min-width: 12rem;
 }
 </style>

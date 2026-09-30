@@ -82,8 +82,10 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="top-nav-shell relative z-20 h-14 border-y border-white/10 bg-gray-100 pr-4 text-white lg:ml-20 dark:bg-gray-900"
-    :class="[isOnMapPage ? 'fixed w-full lg:w-[calc(100%-5rem)]' : '']"
+    class="top-nav-shell z-20 h-14 border-y border-white/10 bg-gray-100 pr-4 text-white lg:ml-20 dark:bg-gray-900"
+    :class="[
+      isOnMapPage ? 'fixed top-0 w-full lg:w-[calc(100%-5rem)]' : 'relative',
+    ]"
     aria-label="Top navigation"
   >
     <div class="flex h-full items-center justify-between pr-3 pl-14 lg:px-5">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import MapEventCard from '../map/MapEventCard.vue';
 import EventListItem from './EventListItem.vue';
 import LoadMore from '../../LoadMore.vue';
 import { useRoute, useRouter } from 'nuxt/app';
@@ -153,12 +154,16 @@ const onMouseLeaveEventListItem = () => {
       v-if="events.length > 0"
       role="list"
       :class="[
-        'mb-4 ml-0 flex flex-col gap-2 divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-black',
+        'mb-4 ml-0 flex flex-col',
+        showMap
+          ? 'gap-3'
+          : 'gap-2 divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-black',
         { 'pointer-events-none': sideNavIsOpenVar },
       ]"
       data-testid="event-list"
     >
-      <EventListItem
+      <component
+        :is="showMap ? MapEventCard : EventListItem"
         v-for="event in events"
         :ref="`#${event.id}`"
         :key="event.id"
@@ -171,15 +176,23 @@ const onMouseLeaveEventListItem = () => {
         :is-selectable="isSelectable"
         :selected-event-id="selectedEventId"
         :class="[
-          event.id === highlightedEventId ||
-          (!highlightedEventId &&
-            highlightedEventLocationId === getEventLocationId(event))
+          !showMap &&
+          (event.id === highlightedEventId ||
+            (!highlightedEventId &&
+              highlightedEventLocationId === getEventLocationId(event)))
             ? 'bg-gray-200 dark:bg-gray-700'
             : '',
         ]"
         :show-map="showMap"
+        :is-highlighted="
+          event.id === highlightedEventId ||
+          (!highlightedEventId &&
+            highlightedEventLocationId === getEventLocationId(event))
+        "
         @select="$emit('select', $event)"
         @mouseover="onMouseOverEventListItem(event)"
+        @focusin="onMouseOverEventListItem(event)"
+        @focusout="onMouseLeaveEventListItem"
         @mouseleave="onMouseLeaveEventListItem"
         @clicked-event-list-item="handleClickEventListItem(event)"
         @filter-by-tag="filterByTag"
@@ -195,7 +208,7 @@ const onMouseLeaveEventListItem = () => {
               true
             );
             $nextTick(() => {
-              $emit('openPreview');
+              $emit('openPreview', event);
             });
           }
         "

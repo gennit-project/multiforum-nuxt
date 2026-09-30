@@ -9,6 +9,7 @@ import Tag from '@/components/TagComponent.vue';
 
 // Props
 const props = defineProps({
+  mapStyle: { type: Boolean, default: false },
   isListView: {
     type: Boolean,
     default: false,
@@ -30,8 +31,6 @@ const filterValues = ref<SearchEventValues>(
     showOnlineOnly: props.isListView && !channelId.value,
   })
 );
-
-const activeDateShortcut = ref(route.query.timeShortcut);
 
 // Watcher to update filters on query change
 watch(
@@ -61,15 +60,13 @@ const updateFilters = (params: Partial<SearchEventValues>) => {
 };
 
 const handleTimeFilterShortcutClick = (shortcut: string) => {
-  if (shortcut === activeDateShortcut.value) {
+  if (shortcut === filterValues.value.timeShortcut) {
     // If the filter is currently selected, clear it.
-    activeDateShortcut.value = timeShortcutValues.NONE;
     updateFilters({
       timeShortcut: timeShortcutValues.NONE,
     });
   } else {
     // If the filter is not already selected, select it.
-    activeDateShortcut.value = shortcut;
     updateFilters({
       timeShortcut: shortcut,
     });
@@ -78,7 +75,30 @@ const handleTimeFilterShortcutClick = (shortcut: string) => {
 </script>
 
 <template>
-  <div class="flex flex-wrap gap-1">
+  <div
+    v-if="mapStyle"
+    class="flex flex-wrap gap-2"
+    role="group"
+    aria-label="Event dates"
+  >
+    <button
+      v-for="shortcut in timeFilterShortcuts"
+      :key="shortcut.value"
+      type="button"
+      :data-testid="`time-shortcut-${shortcut.label}`"
+      :aria-pressed="shortcut.value === filterValues.timeShortcut"
+      class="focus-visible:ring-brand-500 min-h-11 rounded-lg border px-3 py-2 text-sm font-medium focus-visible:ring-2"
+      :class="
+        shortcut.value === filterValues.timeShortcut
+          ? 'border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-950 dark:text-brand-300'
+          : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'
+      "
+      @click="handleTimeFilterShortcutClick(shortcut.value)"
+    >
+      {{ shortcut.label }}
+    </button>
+  </div>
+  <div v-else class="flex flex-wrap gap-1">
     <Tag
       v-for="shortcut in timeFilterShortcuts"
       :key="shortcut.label"

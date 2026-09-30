@@ -25,13 +25,39 @@ const mountList = (props: Record<string, unknown> = {}) =>
     props: { events: [event()], resultCount: 1, ...props },
     global: {
       stubs: {
+        MapEventCard: {
+          name: 'MapEventCard',
+          props: ['event', 'isHighlighted'],
+          emits: [
+            'mouseover',
+            'mouseleave',
+            'focusin',
+            'focusout',
+            'open-preview',
+            'filter-by-tag',
+          ],
+          template: '<li />',
+        },
         EventListItem: {
           name: 'EventListItem',
           props: ['event'],
-          emits: ['select', 'mouseover', 'mouseleave', 'clicked-event-list-item', 'filter-by-tag', 'filter-by-channel', 'open-preview'],
+          emits: [
+            'select',
+            'mouseover',
+            'mouseleave',
+            'clicked-event-list-item',
+            'filter-by-tag',
+            'filter-by-channel',
+            'open-preview',
+          ],
           template: '<li />',
         },
-        LoadMore: { name: 'LoadMore', props: ['reachedEndOfResults'], emits: ['load-more'], template: '<div />' },
+        LoadMore: {
+          name: 'LoadMore',
+          props: ['reachedEndOfResults'],
+          emits: ['load-more'],
+          template: '<div />',
+        },
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
       },
@@ -39,7 +65,9 @@ const mountList = (props: Record<string, unknown> = {}) =>
   });
 
 const firstItem = (w: ReturnType<typeof mount>) =>
-  w.getComponent({ name: 'EventListItem' });
+  w.findComponent({ name: 'MapEventCard' }).exists()
+    ? w.getComponent({ name: 'MapEventCard' })
+    : w.getComponent({ name: 'EventListItem' });
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -66,7 +94,9 @@ describe('EventList rendering', () => {
       events: [event(), event({ id: 'e2' })],
     });
 
-    expect(wrapper.findAllComponents({ name: 'EventListItem' })).toHaveLength(2);
+    expect(wrapper.findAllComponents({ name: 'EventListItem' })).toHaveLength(
+      2
+    );
   });
 
   it('reports the end of results when all events are loaded', () => {
@@ -107,10 +137,12 @@ describe('EventList navigation', () => {
   it('opens a preview instead of navigating in map mode', async () => {
     const wrapper = mountList({ showMap: true });
 
-    await firstItem(wrapper).vm.$emit('clicked-event-list-item');
-
-    expect(wrapper.emitted('openPreview')?.[0]).toEqual(['e1']);
-    expect(h.push).not.toHaveBeenCalled();
+    await firstItem(wrapper).vm.$emit('open-preview');
+    await flushPromises();
+    expect({
+      event: wrapper.emitted('openPreview')?.[0],
+      navigated: h.push.mock.calls.length,
+    }).toEqual({ event: [event()], navigated: 0 });
   });
 });
 
@@ -165,5 +197,18 @@ describe('EventList re-emits', () => {
 
     expect(wrapper.emitted('highlightEvent')).toBeTruthy();
     expect(wrapper.emitted('openPreview')).toBeTruthy();
+  });
+});
+
+describe('map card keyboard interactions', () => {
+  it('highlights a card when keyboard focus enters it', async () => {
+    const wrapper = mountList({ showMap: true });
+    await firstItem(wrapper).vm.$emit('focusin');
+    expect(wrapper.emitted('highlightEvent')?.[0]?.[1]).toBe('e1');
+  });
+  it('clears the highlight when focus leaves', async () => {
+    const wrapper = mountList({ showMap: true });
+    await firstItem(wrapper).vm.$emit('focusout');
+    expect(wrapper.emitted('unhighlight')).toBeTruthy();
   });
 });
