@@ -100,6 +100,7 @@ const markdownImagesEnabled = computed(
               :carousel-format="true"
               :expanded-view="true"
               :download-mode="true"
+              :show-inline-favorites="false"
               :discussion-author="discussion.Author?.username || ''"
               :discussion-id="discussionId"
               :stl-files="stlFiles"
