@@ -300,3 +300,33 @@ it('falls back to an available forum for a stale forum selection', () => {
     wrapper.findComponent(stubs.DiscussionDetailContent).props('channelId')
   ).toBe('cats');
 });
+
+it.each([
+  { requested: undefined, expected: 'dogs' },
+  { requested: 'cats', expected: 'cats' },
+])(
+  'uses $expected for forum selection $requested',
+  ({ requested, expected }) => {
+    setupQueries(
+      createQueryMock(
+        listResult([
+          makeDiscussion('1', {
+            DiscussionChannels: [
+              { channelUniqueName: 'cats', CommentsAggregate: { count: 0 } },
+              { channelUniqueName: 'dogs', CommentsAggregate: { count: 1 } },
+            ],
+          }),
+        ])
+      )
+    );
+    const wrapper = mountList({
+      query: {
+        selectedDiscussionId: '1',
+        ...(requested ? { selectedForum: requested } : {}),
+      },
+    });
+    expect(
+      wrapper.findComponent(stubs.DiscussionDetailContent).props('channelId')
+    ).toBe(expected);
+  }
+);

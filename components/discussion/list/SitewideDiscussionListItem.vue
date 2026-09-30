@@ -8,7 +8,7 @@ import type {
   DiscussionWithFavorited,
 } from '@/types/Discussion';
 import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges.vue';
-import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
+import { selectDiscussionForum } from '@/utils/selectDiscussionForum';
 import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
@@ -88,11 +88,12 @@ const { result: getUserResult } = useQuery(
   })
 );
 
-const forumId = computed(() => {
-  if (!props.discussion) return '';
-  const firstChannel = safeArrayFirst(props.discussion.DiscussionChannels);
-  return firstChannel?.channelUniqueName || '';
-});
+const forumId = computed(() =>
+  selectDiscussionForum(
+    props.discussion?.DiscussionChannels || [],
+    isSelected.value ? route.query.selectedForum : undefined
+  )
+);
 
 // UI state is now handled via props
 
@@ -140,10 +141,7 @@ const getDesktopSelectionLink = () => {
     query: {
       ...route.query,
       selectedDiscussionId: props.discussion.id,
-      selectedForum:
-        isSelected.value && typeof route.query.selectedForum === 'string'
-          ? route.query.selectedForum
-          : forumId.value,
+      selectedForum: forumId.value,
     },
   };
 };
@@ -371,13 +369,7 @@ const revealSensitiveContent = () => {
             :content-id="discussion.id"
             kind="discussion"
             :preview="true"
-            :selected-forum="
-              isSelected
-                ? typeof route.query.selectedForum === 'string'
-                  ? route.query.selectedForum
-                  : forumId
-                : ''
-            "
+            :selected-forum="isSelected ? forumId : ''"
           />
         </div>
         <nuxt-link
