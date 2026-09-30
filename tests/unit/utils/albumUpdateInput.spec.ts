@@ -104,6 +104,29 @@ describe('buildAlbumUpdateInput', () => {
       });
     });
 
+    it('disconnects the final image when the album is emptied', () => {
+      const result = buildAlbumUpdateInput({
+        albumData: { images: [], imageOrder: [] },
+        existingAlbumId: 'album-1',
+        existingImages: [{ id: 'last-image' }],
+      });
+      const node = (
+        result as {
+          Album: {
+            update: { node: { imageOrder: string[]; Images: unknown[] } };
+          };
+        }
+      ).Album.update.node;
+      expect(node).toEqual({
+        imageOrder: [],
+        Images: [
+          {
+            disconnect: [{ where: { node: { id: 'last-image' } } }],
+          },
+        ],
+      });
+    });
+
     it('drops order ids that are not connected images', () => {
       const result = buildAlbumUpdateInput({
         albumData: { images: [{ id: 'a' }], imageOrder: ['a', 'b'] },

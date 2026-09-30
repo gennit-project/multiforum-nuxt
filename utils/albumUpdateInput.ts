@@ -42,10 +42,7 @@ export function buildAlbumUpdateInput(params: {
 }): AlbumUpdatePortion {
   const { albumData, existingAlbumId, existingImages = [] } = params;
 
-  if (
-    !albumData ||
-    (!albumData.images?.length && !albumData.imageOrder?.length)
-  ) {
+  if (!albumData) {
     return {}; // No album data to update
   }
 
