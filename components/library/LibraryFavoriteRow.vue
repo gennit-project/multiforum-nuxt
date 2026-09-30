@@ -24,13 +24,13 @@ const badgeClasses: Record<LibraryFavoriteKind, string> = {
   discussion:
     'border-amber-300/70 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950/35 dark:text-amber-300',
   download:
-    'border-emerald-300/70 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/35 dark:text-emerald-300',
+    'border-green-300/70 bg-green-50 text-green-800 dark:border-green-800 dark:bg-green-950/35 dark:text-green-300',
   image:
-    'border-orange-300/70 bg-orange-50 text-orange-800 dark:border-orange-800 dark:bg-orange-950/35 dark:text-orange-300',
+    'border-brand-300/70 bg-brand-50 text-brand-800 dark:border-brand-800 dark:bg-brand-950/35 dark:text-brand-300',
   comment:
-    'border-violet-300/70 bg-violet-50 text-violet-800 dark:border-violet-800 dark:bg-violet-950/35 dark:text-violet-300',
+    'border-purple-300/70 bg-purple-50 text-purple-800 dark:border-purple-800 dark:bg-purple-950/35 dark:text-purple-300',
   channel:
-    'border-sky-300/70 bg-sky-50 text-sky-800 dark:border-sky-800 dark:bg-sky-950/35 dark:text-sky-300',
+    'border-blue-300/70 bg-blue-50 text-blue-800 dark:border-blue-800 dark:bg-blue-950/35 dark:text-blue-300',
 };
 
 const kindLabel = computed(() => kindLabels[props.item.kind]);
