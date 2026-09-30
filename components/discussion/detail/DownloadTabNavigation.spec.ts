@@ -3,7 +3,6 @@ import { shallowMount } from '@vue/test-utils';
 import { createSSRApp, ref } from 'vue';
 import { renderToString } from 'vue/server-renderer';
 
-const mockHasPipelineContent = ref(true);
 const h = vi.hoisted(() => ({
   useQuery: vi.fn(),
   route: { name: 'forums-forumId-downloads-discussionId' },
@@ -26,12 +25,6 @@ h.useQuery.mockImplementation(() => ({
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ref(''),
-}));
-
-vi.mock('@/composables/useDownloadPipelineOverview', () => ({
-  useSharedDownloadPipelineOverview: () => ({
-    hasPipelineContent: mockHasPipelineContent,
-  }),
 }));
 
 const NuxtLinkStub = {
@@ -102,8 +95,7 @@ describe('DownloadTabNavigation', () => {
     expect(await renderToString(app)).toContain('Loading collections...');
   });
 
-  it('renders the Pipelines tab when checks are applicable or have history', async () => {
-    mockHasPipelineContent.value = true;
+  it('renders only the download detail tabs', async () => {
     const wrapper = await mountNav('forums-forumId-downloads-discussionId');
     const links = wrapper.findAllComponents(NuxtLinkStub);
 
@@ -125,10 +117,6 @@ describe('DownloadTabNavigation', () => {
         text: 'Activity',
         route: 'forums-forumId-downloads-discussionId-activity',
       },
-      {
-        text: 'Pipelines',
-        route: 'forums-forumId-downloads-discussionId-pipelines',
-      },
     ]);
   });
 
@@ -141,22 +129,6 @@ describe('DownloadTabNavigation', () => {
     expect(links[2].classes()).toContain('border-brand-500');
     // Description is inactive while on the activity route.
     expect(links[0].classes()).toContain('border-transparent');
-  });
-
-  it('hides the Pipelines tab without applicable checks or history', async () => {
-    mockHasPipelineContent.value = false;
-    const wrapper = await mountNav('forums-forumId-downloads-discussionId');
-
-    expect(wrapper.text()).not.toContain('Pipelines');
-  });
-
-  it('keeps the Pipelines tab visible on its route when loading fails', async () => {
-    mockHasPipelineContent.value = false;
-    const wrapper = await mountNav(
-      'forums-forumId-downloads-discussionId-pipelines'
-    );
-
-    expect(wrapper.text()).toContain('Pipelines');
   });
 
   it('renders metadata within the Description tab', async () => {

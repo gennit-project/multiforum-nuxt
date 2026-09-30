@@ -123,6 +123,12 @@ const channelId = computed(() => {
   }
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
+const isDownloadChecksRoute = computed(
+  () =>
+    props.downloadMode &&
+    typeof route.name === 'string' &&
+    route.name.includes('pipelines')
+);
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 const lastValidDiscussion = ref<Discussion | null>(null);
 const additionalAnswers = ref<Comment[]>([]);
@@ -843,6 +849,7 @@ const handleEditAlbum = () => {
           <div class="w-full px-2">
             <div class="w-full space-y-3 rounded-lg py-2 dark:border-gray-700">
               <DiscussionHeader
+                v-if="!isDownloadChecksRoute"
                 :channel-id="channelId"
                 :compact-mode="compactMode"
                 :discussion="discussion"
@@ -858,7 +865,7 @@ const handleEditAlbum = () => {
                 @handle-click-give-feedback="handleClickGiveFeedback"
               />
               <DiscussionFlairBadges
-                v-if="formDiscussionChannel"
+                v-if="formDiscussionChannel && !isDownloadChecksRoute"
                 :flairs="
                   (formDiscussionChannel as DiscussionChannelWithFlairs)
                     .Flairs || []
@@ -897,14 +904,16 @@ const handleEditAlbum = () => {
                   @handle-click-undo-feedback="handleClickUndoFeedback"
                 />
                 <LoadMore
-                  v-if="hasMoreMedia || mediaLoading"
+                  v-if="
+                    !isDownloadChecksRoute && (hasMoreMedia || mediaLoading)
+                  "
                   class="mt-3 justify-self-center"
                   :loading="mediaLoading"
                   :reached-end-of-results="false"
                   @load-more="loadMoreMedia"
                 />
                 <ErrorBanner
-                  v-if="collectionError"
+                  v-if="collectionError && !isDownloadChecksRoute"
                   class="mt-3"
                   :text="collectionError"
                 />

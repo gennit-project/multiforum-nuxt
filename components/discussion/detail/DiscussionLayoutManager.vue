@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, toRef } from 'vue';
+import { useRoute } from 'nuxt/app';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 import DownloadModeLayout from './DownloadModeLayout.vue';
 import RegularDiscussionLayout from './RegularDiscussionLayout.vue';
@@ -37,12 +38,20 @@ const props = defineProps({
   },
 });
 
+const route = useRoute();
+const isDownloadChecksRoute = computed(
+  () =>
+    props.downloadMode &&
+    typeof route.name === 'string' &&
+    route.name.includes('pipelines')
+);
+
 const downloadableFileId = computed(
   () =>
     (props.downloadMode && props.discussion.DownloadableFiles?.[0]?.id) || ''
 );
 
-// The navigation, sidebar, activity tab, and pipelines tab all consume this
+// The navigation, sidebar, activity tab, and checks page all consume this
 // overview. Providing it here keeps them on one query, cache, and polling loop.
 provideDownloadPipelineOverview(
   downloadableFileId,
@@ -62,47 +71,51 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div>
-    <!-- Download mode layout with sidebar -->
-    <DownloadModeLayout
-      v-if="downloadMode"
-      :discussion="discussion"
-      :discussion-id="discussionId"
-      :channel-id="channelId"
-      :active-discussion-channel="activeDiscussionChannel"
-      @discussion-refetch="emit('discussionRefetch')"
-      @discussion-channel-refetch="emit('discussionChannelRefetch')"
-      @handle-click-add-album="emit('handleClickAddAlbum')"
-      @edit-album="emit('editAlbum')"
-      @handle-click-edit-feedback="emit('handleClickEditFeedback')"
-      @handle-click-give-feedback="emit('handleClickGiveFeedback')"
-      @handle-click-undo-feedback="emit('handleClickUndoFeedback')"
-    />
+  <NuxtPage v-if="isDownloadChecksRoute" :discussion="discussion" />
 
-    <!-- Regular discussion mode layout -->
-    <RegularDiscussionLayout
-      v-else
-      :discussion="discussion"
-      :discussion-id="discussionId"
-      :channel-id="channelId"
-      :active-discussion-channel="activeDiscussionChannel"
-      :horizontal-album-thumbnails="horizontalAlbumThumbnails"
-      @discussion-refetch="emit('discussionRefetch')"
-      @discussion-channel-refetch="emit('discussionChannelRefetch')"
-      @edit-album="emit('editAlbum')"
-      @handle-click-edit-feedback="emit('handleClickEditFeedback')"
-      @handle-click-give-feedback="emit('handleClickGiveFeedback')"
-      @handle-click-undo-feedback="emit('handleClickUndoFeedback')"
-    />
+  <template v-else>
+    <div>
+      <!-- Download mode layout with sidebar -->
+      <DownloadModeLayout
+        v-if="downloadMode"
+        :discussion="discussion"
+        :discussion-id="discussionId"
+        :channel-id="channelId"
+        :active-discussion-channel="activeDiscussionChannel"
+        @discussion-refetch="emit('discussionRefetch')"
+        @discussion-channel-refetch="emit('discussionChannelRefetch')"
+        @handle-click-add-album="emit('handleClickAddAlbum')"
+        @edit-album="emit('editAlbum')"
+        @handle-click-edit-feedback="emit('handleClickEditFeedback')"
+        @handle-click-give-feedback="emit('handleClickGiveFeedback')"
+        @handle-click-undo-feedback="emit('handleClickUndoFeedback')"
+      />
 
-    <!-- Download mode tabs (only shown in download mode) -->
-    <DownloadTabNavigation
-      v-if="downloadMode"
-      :discussion="discussion"
-      :discussion-id="discussionId"
-      :channel-id="channelId"
-      :aggregate-comment-count="aggregateCommentCount"
-      :label-options="activeDiscussionChannel?.LabelOptions || []"
-    />
-  </div>
+      <!-- Regular discussion mode layout -->
+      <RegularDiscussionLayout
+        v-else
+        :discussion="discussion"
+        :discussion-id="discussionId"
+        :channel-id="channelId"
+        :active-discussion-channel="activeDiscussionChannel"
+        :horizontal-album-thumbnails="horizontalAlbumThumbnails"
+        @discussion-refetch="emit('discussionRefetch')"
+        @discussion-channel-refetch="emit('discussionChannelRefetch')"
+        @edit-album="emit('editAlbum')"
+        @handle-click-edit-feedback="emit('handleClickEditFeedback')"
+        @handle-click-give-feedback="emit('handleClickGiveFeedback')"
+        @handle-click-undo-feedback="emit('handleClickUndoFeedback')"
+      />
+
+      <!-- Download mode tabs (only shown in download mode) -->
+      <DownloadTabNavigation
+        v-if="downloadMode"
+        :discussion="discussion"
+        :discussion-id="discussionId"
+        :channel-id="channelId"
+        :aggregate-comment-count="aggregateCommentCount"
+        :label-options="activeDiscussionChannel?.LabelOptions || []"
+      />
+    </div>
+  </template>
 </template>

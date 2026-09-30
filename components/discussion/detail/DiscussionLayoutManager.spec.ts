@@ -1,10 +1,17 @@
-import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 
 import DiscussionLayoutManager from '@/components/discussion/detail/DiscussionLayoutManager.vue';
 import type { Discussion } from '@/__generated__/graphql';
 
 const mockProvideDownloadPipelineOverview = vi.hoisted(() => vi.fn());
+const mockRoute = vi.hoisted(() => ({
+  name: 'forums-forumId-downloads-discussionId',
+}));
+
+vi.mock('nuxt/app', () => ({
+  useRoute: () => mockRoute,
+}));
 
 vi.mock('@/composables/useDownloadPipelineOverview', () => ({
   provideDownloadPipelineOverview: mockProvideDownloadPipelineOverview,
@@ -48,12 +55,20 @@ const mountManager = (props: Record<string, unknown> = {}) =>
       stubs: {
         DownloadModeLayout: layoutStub('DownloadModeLayout'),
         RegularDiscussionLayout: layoutStub('RegularDiscussionLayout'),
-        DownloadTabNavigation: { name: 'DownloadTabNavigation', template: '<div class="tabs" />' },
+        DownloadTabNavigation: {
+          name: 'DownloadTabNavigation',
+          template: '<div class="tabs" />',
+        },
+        NuxtPage: { name: 'NuxtPage', template: '<div class="nested-page" />' },
       },
     },
   });
 
 describe('DiscussionLayoutManager', () => {
+  beforeEach(() => {
+    mockRoute.name = 'forums-forumId-downloads-discussionId';
+  });
+
   it('provides one pipeline overview for the download detail subtree', () => {
     mountManager({
       downloadMode: true,
@@ -90,6 +105,30 @@ describe('DiscussionLayoutManager', () => {
     expect(wrapper.find('.tabs').exists()).toBe(true);
   });
 
+  it('renders the nested checks page on the checks route', () => {
+    mockRoute.name = 'forums-forumId-downloads-discussionId-pipelines';
+
+    const wrapper = mountManager({ downloadMode: true });
+
+    expect(wrapper.find('.nested-page').exists()).toBe(true);
+  });
+
+  it('hides the download detail layout on the checks route', () => {
+    mockRoute.name = 'forums-forumId-downloads-discussionId-pipelines';
+
+    const wrapper = mountManager({ downloadMode: true });
+
+    expect(wrapper.find('.DownloadModeLayout').exists()).toBe(false);
+  });
+
+  it('hides the download tabs on the checks route', () => {
+    mockRoute.name = 'forums-forumId-downloads-discussionId-pipelines';
+
+    const wrapper = mountManager({ downloadMode: true });
+
+    expect(wrapper.find('.tabs').exists()).toBe(false);
+  });
+
   it('hides the download tabs in regular mode', () => {
     const wrapper = mountManager();
 
@@ -101,7 +140,9 @@ describe('DiscussionLayoutManager', () => {
     async (childEvent, parentEvent) => {
       const wrapper = mountManager();
 
-      await wrapper.getComponent({ name: 'RegularDiscussionLayout' }).vm.$emit(childEvent);
+      await wrapper
+        .getComponent({ name: 'RegularDiscussionLayout' })
+        .vm.$emit(childEvent);
 
       expect(wrapper.emitted(parentEvent)).toBeTruthy();
     }
@@ -112,7 +153,9 @@ describe('DiscussionLayoutManager', () => {
     async (childEvent, parentEvent) => {
       const wrapper = mountManager({ downloadMode: true });
 
-      await wrapper.getComponent({ name: 'DownloadModeLayout' }).vm.$emit(childEvent);
+      await wrapper
+        .getComponent({ name: 'DownloadModeLayout' })
+        .vm.$emit(childEvent);
 
       expect(wrapper.emitted(parentEvent)).toBeTruthy();
     }
