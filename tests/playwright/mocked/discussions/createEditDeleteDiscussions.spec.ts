@@ -1,4 +1,5 @@
 import { test, expect } from '../../helpers/testFixture';
+import { expectNoAxeViolations } from '../../helpers/axe';
 import {
   createDiscussionHandlers,
   createDiscussionState,
@@ -11,6 +12,90 @@ const UPDATED_BODY = 'Test description 2';
 const TAG_ONE = 'trivia';
 const TAG_TWO = 'music';
 const TAG_THREE = 'newYears';
+
+test('picker backgrounds open menus while remove and clear stay independent', async ({
+  page,
+  setupMockedPage,
+}) => {
+  await setupMockedPage({
+    handlers: {
+      ...createDiscussionHandlers(createDiscussionState(), {
+        channelId: TEST_CHANNEL,
+        username: 'cluse',
+      }),
+      getTags: () => ({
+        data: { tags: [{ __typename: 'Tag', text: TAG_ONE }] },
+      }),
+    },
+  });
+  await page.goto('/discussions/create');
+
+  for (const { testId, option, search } of [
+    {
+      testId: 'channel-input',
+      option: TEST_CHANNEL,
+      search: 'Type to search...',
+    },
+    {
+      testId: 'tag-picker',
+      option: TAG_ONE,
+      search: 'Type to search or add tags, separated by commas...',
+    },
+  ]) {
+    const trigger = page.getByTestId(testId);
+    const field = trigger.locator(
+      'xpath=ancestor::div[contains(@class, "rounded-lg")][1]'
+    );
+    await expect(trigger).toBeVisible();
+    const bounds = await field.boundingBox();
+    if (!bounds) throw new Error('Picker field has no bounds');
+
+    // Hit the middle of the background, far away from the right-hand caret.
+    await field.click({
+      position: { x: bounds.width / 2, y: bounds.height / 2 },
+    });
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      page.getByRole('textbox', { name: search, exact: true })
+    ).toBeFocused();
+    await page.getByRole('button', { name: option, exact: true }).click();
+    await page.keyboard.press('Escape');
+    await expect(trigger).toBeFocused();
+
+    // A populated field opens from its background and closes from the caret.
+    await field.click({
+      position: { x: bounds.width / 2, y: bounds.height / 2 },
+    });
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await trigger.click({
+      position: { x: bounds.width - 28, y: bounds.height / 2 },
+    });
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await field
+      .getByRole('button', { name: `Remove ${option}`, exact: true })
+      .click();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(
+      field.getByRole('button', { name: `Remove ${option}`, exact: true })
+    ).toHaveCount(0);
+
+    // Padding at the left edge is also part of the trigger.
+    await field.click({ position: { x: 5, y: 5 } });
+    await page.getByRole('button', { name: option, exact: true }).click();
+    await page.keyboard.press('Escape');
+    await field
+      .getByRole('button', { name: 'Clear selection', exact: true })
+      .click();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await expect(trigger).toHaveAttribute('aria-label', /No selection/);
+
+    await trigger.focus();
+    await page.keyboard.press('Enter');
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expectNoAxeViolations(page);
+    await page.keyboard.press('Escape');
+  }
+});
 
 test('creates, edits and deletes a discussion', async ({
   page,
