@@ -32,6 +32,11 @@ import {
 } from '@/graphQLData/discussion/queries';
 
 const mockApolloClientQuery = vi.hoisted(() => vi.fn());
+const mockRoute = vi.hoisted(() => ({
+  name: 'forums-forumId-discussions-discussionId',
+  params: {},
+  query: {},
+}));
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
   useApolloClient: () => ({
@@ -39,7 +44,7 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 vi.mock('nuxt/app', () => ({
-  useRoute: vi.fn(() => ({ params: {}, query: {} })),
+  useRoute: vi.fn(() => mockRoute),
 }));
 const auth = vi.hoisted(() => ({
   modProfileName: null as unknown as ReturnType<typeof ref<string>>,
@@ -282,6 +287,7 @@ describe('DiscussionDetailContent', () => {
     vi.clearAllMocks();
     asMock(useQuery).mockReset();
     mockApolloClientQuery.mockReset();
+    mockRoute.name = 'forums-forumId-discussions-discussionId';
     auth.modProfileName.value = '';
     auth.username.value = '';
   });
@@ -328,6 +334,14 @@ describe('DiscussionDetailContent', () => {
   it('renders the discussion header for a loaded discussion', () => {
     const { wrapper } = setup();
     expect(wrapper.find('.discussion-header-stub').exists()).toBe(true);
+  });
+
+  it('hides the download header on the dedicated checks route', () => {
+    mockRoute.name = 'forums-forumId-downloads-discussionId-pipelines';
+
+    const { wrapper } = setup({ componentProps: { downloadMode: true } });
+
+    expect(wrapper.find('.discussion-header-stub').exists()).toBe(false);
   });
 
   it('renders the flairs assigned in the active forum', () => {
