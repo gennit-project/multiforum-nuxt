@@ -54,12 +54,12 @@ type FavoriteImage = Pick<
   'id' | 'url' | 'alt' | 'caption' | 'createdAt'
 > & {
   Uploader?: UserSummary | null;
-  Album?: {
+  Albums?: Array<{
     id: string;
     Discussions?: Array<{
       DiscussionChannels?: DiscussionChannelSummary[] | null;
     }> | null;
-  } | null;
+  }> | null;
 };
 type FavoriteComment = Pick<Comment, 'id' | 'text' | 'createdAt'> & {
   CommentAuthor?:
@@ -182,7 +182,8 @@ const discussionItems = computed<LibraryFavoriteItem[]>(() =>
 
 const imageItems = computed<LibraryFavoriteItem[]>(() =>
   (result.value?.users?.[0]?.FavoriteImages || []).map((image) => {
-    const firstContext = image.Album?.Discussions?.[0]?.DiscussionChannels?.[0];
+    const firstContext =
+      image.Albums?.[0]?.Discussions?.[0]?.DiscussionChannels?.[0];
     return {
       id: image.id,
       kind: 'image',

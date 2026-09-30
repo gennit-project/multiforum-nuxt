@@ -75,7 +75,24 @@ const favorites = {
           caption: 'Poster',
           createdAt: '2026-09-27T12:00:00.000Z',
           Uploader: { username: 'zoe', displayName: 'Zoe' },
-          Album: null,
+          Albums: [
+            {
+              id: 'image-album-1',
+              Discussions: [
+                {
+                  DiscussionChannels: [
+                    {
+                      channelUniqueName: 'art',
+                      Channel: {
+                        uniqueName: 'art',
+                        displayName: 'Art Forum',
+                      },
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
         },
       ],
       FavoriteComments: [],
@@ -144,6 +161,14 @@ describe('library index page', () => {
     expect(wrapper.findComponent(LibraryFavoriteRow).props('item').id).toBe(
       'image-1'
     );
+  });
+
+  it('reads an image forum from its first album', async () => {
+    const wrapper = await mountPage();
+    const imageRow = wrapper
+      .findAllComponents(LibraryFavoriteRow)
+      .find((row) => row.props('item').id === 'image-1');
+    expect(imageRow?.props('item').source.forumUniqueName).toBe('art');
   });
 
   it('shows stable loading skeleton rows before favorites arrive', async () => {
