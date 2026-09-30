@@ -70,7 +70,7 @@ function handleTagClick(tag: string, active: boolean) {
 
 function getButtonStyles() {
   if (props.active) {
-    return 'bg-brand-400 dark:bg-brand-950 text-black dark:text-brand-400  hover:bg-brand-500';
+    return 'bg-brand-400 dark:bg-brand-950 text-black dark:text-brand-400 hover:bg-brand-500 dark:hover:bg-brand-900 dark:hover:text-brand-300';
   } else {
     if (props.channelMode) {
       return 'bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-50 dark:hover:bg-gray-600 dark:hover:text-white';
