@@ -472,7 +472,7 @@ const warningModalBody = computed(() => {
           <button
             v-if="!discussionBodyEditMode"
             type="button"
-            class="align-items flex gap-2 text-xs text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white"
+            class="align-items flex cursor-pointer gap-2 text-xs text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white"
             @click="$emit('handleClickEditBody')"
           >
             Edit
@@ -480,7 +480,7 @@ const warningModalBody = computed(() => {
           <button
             v-else-if="usernameVar"
             type="button"
-            class="text-xs text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white"
+            class="cursor-pointer text-xs text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white"
             @click="$emit('cancelEditDiscussionBody')"
           >
             Cancel

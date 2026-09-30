@@ -211,11 +211,11 @@ const handleMouseLeave = () => {
 const sizeClasses = computed(() => {
   switch (props.size) {
     case 'small':
-      return 'h-4 w-4';
-    case 'large':
-      return 'h-6 w-6';
-    default:
       return 'h-5 w-5';
+    case 'large':
+      return 'h-7 w-7';
+    default:
+      return 'h-6 w-6';
   }
 });
 
@@ -263,10 +263,10 @@ watch(
           type="button"
           :aria-label="buttonLabel"
           :disabled="isLoading"
-          class="add-to-favorites-button rounded-full transition-all duration-200"
+          class="add-to-favorites-button cursor-pointer rounded-full transition-all duration-200"
           :class="{
             'hover:text-brand-300 text-white': !isFavorited && overlayStyle,
-            'hover:text-brand-500 dark:hover:text-brand-400 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800':
+            'hover:text-brand-500 dark:hover:text-brand-400 text-gray-400':
               !isFavorited && !overlayStyle,
             'text-green-500 hover:text-green-400': isFavorited && overlayStyle,
             'text-green-500 hover:text-green-600': isFavorited && !overlayStyle,
@@ -346,11 +346,11 @@ watch(
           ref="buttonRef"
           type="button"
           :aria-label="`Add ${displayName || entityType} to favorites`"
-          class="add-to-favorites-button cursor-pointer rounded-full p-1 transition-all duration-200"
+          class="add-to-favorites-button cursor-pointer rounded-full transition-all duration-200"
           :class="
             overlayStyle
               ? 'hover:text-brand-300 text-white'
-              : 'hover:text-brand-500 dark:hover:text-brand-400 text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800'
+              : 'hover:text-brand-500 dark:hover:text-brand-400 text-gray-400'
           "
           @click="handleClick"
           @mouseenter="handleMouseEnter"

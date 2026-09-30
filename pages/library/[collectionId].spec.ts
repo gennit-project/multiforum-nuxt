@@ -132,7 +132,11 @@ const mountWith = async (collection: unknown) => {
         LibraryDiscussionCard: LibraryDiscussionCardStub,
         LibraryChannelCard: true,
         LibraryCommentCard: LibraryCommentCardStub,
-        ImageListItem: true,
+        ImageListItem: {
+          name: 'ImageListItem',
+          props: ['image', 'username'],
+          template: '<div class="image-list-item" />',
+        },
         ForumPicker: {
           name: 'ForumPicker',
           props: ['selectedChannels'],
@@ -529,6 +533,19 @@ describe('library collection detail page', () => {
     expect(
       wrapper.findComponent({ name: 'LibraryDownloadCard' }).props()
     ).toEqual(expect.objectContaining({ previewImageUrl: '/second.png' }));
+  });
+
+  it('uses the library owner in image links when uploader data is missing', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Images',
+      collectionType: 'IMAGES',
+      visibility: 'PRIVATE',
+      Images: [{ id: 'i1', alt: 'Legacy image', url: '/legacy.png' }],
+    });
+    expect(
+      wrapper.getComponent({ name: 'ImageListItem' }).props('username')
+    ).toBe('alice');
   });
 
   it('keeps the rename modal open when updating the name fails', async () => {

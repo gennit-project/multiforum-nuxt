@@ -104,14 +104,14 @@ describe('AlbumImageItem', () => {
     }
   );
 
-  it('shows only caption and alt text fields until More is opened', () => {
+  it('shows only caption and alt text fields until Attribution is opened', () => {
     expect(mountItem().findAll('.ti')).toHaveLength(2);
   });
 
-  it('reveals attribution and image URL fields when More is opened', async () => {
+  it('reveals only the attribution field when Attribution is opened', async () => {
     const wrapper = mountItem();
     await moreToggle(wrapper).trigger('click');
-    expect(wrapper.findAll('.ti')).toHaveLength(4);
+    expect(wrapper.findAll('.ti')).toHaveLength(3);
   });
 
   it('marks the More toggle as expanded when opened', async () => {
@@ -124,7 +124,6 @@ describe('AlbumImageItem', () => {
     [0, 'caption'],
     [1, 'alt'],
     [2, 'copyright'],
-    [3, 'url'],
   ])('emits update-field for input %i with key %s', async (inputIndex, field) => {
     const wrapper = mountItem();
     await moreToggle(wrapper).trigger('click');

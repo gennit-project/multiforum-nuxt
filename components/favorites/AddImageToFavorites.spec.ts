@@ -33,7 +33,7 @@ const mountFav = (props: Record<string, unknown> = {}) =>
       stubs: {
         AddToFavoritesButton: {
           name: 'AddToFavoritesButton',
-          props: ['isFavorited', 'isLoading', 'displayName', 'entityType', 'size', 'itemId'],
+          props: ['isFavorited', 'isLoading', 'displayName', 'entityType', 'size', 'itemId', 'overlayStyle'],
           emits: ['toggle'],
           template: '<button @click="$emit(\'toggle\')" />',
         },
@@ -77,6 +77,12 @@ describe('AddImageToFavorites state', () => {
     const wrapper = mountFav();
 
     expect(fav(wrapper).props('displayName')).toBe('image');
+  });
+
+  it('passes overlay styling to the shared favorite button', () => {
+    expect(fav(mountFav({ overlayStyle: true })).props('overlayStyle')).toBe(
+      true
+    );
   });
 });
 

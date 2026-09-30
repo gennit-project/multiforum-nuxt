@@ -127,7 +127,7 @@ const uploader = computed(() => {
 
 // Check if the current user matches the username in the route
 const isCorrectUserPage = computed(() => {
-  return uploader.value?.username === username.value;
+  return !uploader.value?.username || uploader.value.username === username.value;
 });
 
 // Check if logged-in user is the uploader
@@ -388,7 +388,11 @@ onUnmounted(() => {
         <!-- Copied link notification -->
         <Notification :show="showCopiedLinkNotification" title="Link copied!" />
         <h1 class="text-2xl font-bold dark:text-white">
-          Image uploaded by {{ uploader?.displayName || uploader?.username }}
+          {{
+            uploader?.displayName || uploader?.username
+              ? `Image uploaded by ${uploader.displayName || uploader.username}`
+              : 'Image details'
+          }}
           <span
             v-if="uploader?.displayName && uploader?.username"
             class="text-gray-500 dark:text-gray-400"
@@ -504,11 +508,15 @@ onUnmounted(() => {
           <div class="flex items-center gap-4">
             <div class="flex-1">
               <NuxtLink
+                v-if="uploader?.username"
                 :to="`/u/${uploader?.username}`"
                 class="text-lg font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 {{ uploader?.displayName || uploader?.username }}
               </NuxtLink>
+              <span v-else class="text-lg font-medium text-gray-600 dark:text-gray-300">
+                Uploader unavailable
+              </span>
               <div
                 v-if="image.createdAt"
                 class="mt-1 text-sm text-gray-600 dark:text-gray-400"

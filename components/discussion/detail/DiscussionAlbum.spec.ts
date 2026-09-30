@@ -29,6 +29,16 @@ const stubs = {
   LeftArrowIcon: { template: '<i />' },
   RightArrowIcon: { template: '<i />' },
   PencilIcon: { template: '<i />' },
+  AddImageToFavorites: {
+    name: 'AddImageToFavorites',
+    props: {
+      imageId: String,
+      imageTitle: String,
+      overlayStyle: Boolean,
+      size: String,
+    },
+    template: '<button class="image-favorite-stub" />',
+  },
   ImageCaption: {
     name: 'ImageCaption',
     props: ['text'],
@@ -280,6 +290,22 @@ describe('DiscussionAlbum — carousel navigation', () => {
     await wrapper.get('[aria-label="Next image"]').trigger('click');
 
     expect(wrapper.text()).toContain('2 of 3');
+  });
+
+  it('offers a favorite control beside the active image counter', () => {
+    expect(
+      mountAlbum({ carouselFormat: true })
+        .getComponent({ name: 'AddImageToFavorites' })
+        .props()
+    ).toMatchObject({ imageId: 'a', overlayStyle: true, size: 'small' });
+  });
+
+  it('updates the favorite control when the active image changes', async () => {
+    const wrapper = mountAlbum({ carouselFormat: true });
+    await wrapper.get('[aria-label="Next image"]').trigger('click');
+    expect(
+      wrapper.getComponent({ name: 'AddImageToFavorites' }).props('imageId')
+    ).toBe('b');
   });
 
   it('wraps to the last image when going left from the first', async () => {

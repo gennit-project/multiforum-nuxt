@@ -755,7 +755,7 @@ const handleDelete = async () => {
                   </div>
                   <ImageListItem
                     :image="image"
-                    :username="image.Uploader?.username || ''"
+                    :username="image.Uploader?.username || usernameVar"
                     :show-favorite-button="false"
                     :allow-add-to-list="true"
                   />
