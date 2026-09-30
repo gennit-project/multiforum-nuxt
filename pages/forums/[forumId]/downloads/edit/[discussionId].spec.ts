@@ -273,6 +273,7 @@ describe('download edit page', () => {
       where: { id: 'd1' },
       channelConnections: ['dogs'],
       channelDisconnections: ['cats'],
+      albumImageDisconnections: [],
       updateDiscussionInput: {
         title: 'Cool model',
         Tags: [
@@ -291,6 +292,27 @@ describe('download edit page', () => {
         ],
       },
     });
+  });
+
+  it('passes removed album image ids as explicit disconnections', async () => {
+    const discussion = populatedDiscussion();
+    discussion.Album = { ...discussion.Album, id: 'album-1' };
+    const wrapper = await loadPage(RequireAuthStub, discussion);
+
+    await wrapper
+      .findComponent(CreateEditDiscussionFields)
+      .vm.$emit('update-form-values', {
+        album: { images: [], imageOrder: [] },
+      });
+
+    const tracker = mutationTrackers.get(
+      UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS
+    ) as {
+      options: () => { variables: Record<string, unknown> };
+    };
+    expect(tracker.options().variables.albumImageDisconnections).toEqual([
+      'i1',
+    ]);
   });
 
   it('includes newly uploaded files in the final discussion update', async () => {

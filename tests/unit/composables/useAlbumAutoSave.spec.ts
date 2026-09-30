@@ -12,7 +12,9 @@ vi.mock('@vue/apollo-composable', () => ({
 }));
 
 vi.mock('@/graphQLData/discussion/mutations', () => ({
-  UPDATE_DISCUSSION: Symbol('UPDATE_DISCUSSION'),
+  UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS: Symbol(
+    'UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS'
+  ),
 }));
 
 describe('useAlbumAutoSave', () => {
@@ -51,6 +53,7 @@ describe('useAlbumAutoSave', () => {
 
       expect(mockMutate).toHaveBeenCalledWith({
         where: { id: 'disc-1' },
+        albumImageDisconnections: [],
         updateDiscussionInput: {
           Album: {
             create: {
@@ -120,6 +123,7 @@ describe('useAlbumAutoSave', () => {
 
       expect(mockMutate).toHaveBeenCalledWith({
         where: { id: 'disc-1' },
+        albumImageDisconnections: [],
         updateDiscussionInput: {
           Album: {
             update: {
@@ -164,6 +168,7 @@ describe('useAlbumAutoSave', () => {
 
       expect(mockMutate).toHaveBeenCalledWith({
         where: { id: 'disc-1' },
+        albumImageDisconnections: ['img-2'],
         updateDiscussionInput: {
           Album: {
             update: {
@@ -206,6 +211,7 @@ describe('useAlbumAutoSave', () => {
 
       expect(mockMutate).toHaveBeenCalledWith({
         where: { id: 'disc-1' },
+        albumImageDisconnections: ['img-1'],
         updateDiscussionInput: {
           Album: {
             update: {
@@ -249,6 +255,7 @@ describe('useAlbumAutoSave', () => {
 
       expect(mockMutate).toHaveBeenCalledWith({
         where: { id: 'disc-1' },
+        albumImageDisconnections: [],
         updateDiscussionInput: {
           Album: {
             update: {
@@ -301,6 +308,7 @@ describe('useAlbumAutoSave', () => {
       // Should still be called to update imageOrder, but Images array should be empty
       expect(mockMutate).toHaveBeenCalledWith({
         where: { id: 'disc-1' },
+        albumImageDisconnections: [],
         updateDiscussionInput: {
           Album: {
             update: {
