@@ -40,6 +40,7 @@ const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
 
 const props = defineProps({
+  discoveryMode: { type: Boolean, default: false },
   eventData: {
     type: Object as PropType<Event>,
     required: true,
@@ -64,8 +65,7 @@ const route = useRoute();
 const router = useRouter();
 const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
-const { forumAdminUsernames, forumModProfileNames } =
-  useForumRoleMembership();
+const { forumAdminUsernames, forumModProfileNames } = useForumRoleMembership();
 
 const showCopiedLinkNotification = ref(false);
 const showFeedbackFormModal = ref(false);
@@ -73,8 +73,12 @@ const showFeedbackSubmittedSuccessfully = ref(false);
 
 // Series-related state
 // Note: EventSeries is a new field that may not be in generated types yet
-const eventDataWithSeries = computed(() => props.eventData as Event & { EventSeries?: { id?: string } });
-const isPartOfSeries = computed(() => Boolean(eventDataWithSeries.value?.EventSeries?.id));
+const eventDataWithSeries = computed(
+  () => props.eventData as Event & { EventSeries?: { id?: string } }
+);
+const isPartOfSeries = computed(() =>
+  Boolean(eventDataWithSeries.value?.EventSeries?.id)
+);
 const {
   showReportModal: showReportEventModal,
   showArchiveModal,
@@ -189,7 +193,9 @@ const relatedIssueLink = computed(() => {
   };
 });
 
-const channelData = computed(() => getChannelResult.value?.channels?.[0] ?? null);
+const channelData = computed(
+  () => getChannelResult.value?.channels?.[0] ?? null
+);
 const serverConfig = computed(
   () => getServerResult.value?.serverConfigs?.[0] ?? null
 );
@@ -378,7 +384,7 @@ function openFeedbackFormModal() {
     />
 
     <div
-      class="mb-4 flex justify-between border-b pb-2 pt-2 text-sm text-gray-700 dark:border-gray-500 dark:text-gray-200"
+      class="mb-4 flex justify-between border-b pt-2 pb-2 text-sm text-gray-700 dark:border-gray-500 dark:text-gray-200"
     >
       <ul class="space-y-2">
         <li class="hanging-indent flex items-start">
@@ -392,6 +398,11 @@ function openFeedbackFormModal() {
                 : getDuration(eventData.startTime, eventData.endTime)
             }`
           }}</span>
+          <span
+            v-if="discoveryMode"
+            class="ml-2 text-xs text-gray-600 dark:text-gray-400"
+            >{{ DateTime.local().zoneName }}</span
+          >
         </li>
         <li
           v-if="eventData.virtualEventUrl"
@@ -406,7 +417,11 @@ function openFeedbackFormModal() {
             rel="noreferrer"
             :href="eventData.virtualEventUrl"
           >
-            {{ eventData.virtualEventUrl }}
+            {{
+              discoveryMode
+                ? 'Visit event website ↗'
+                : eventData.virtualEventUrl
+            }}
           </a>
         </li>
         <li v-if="eventData.address" class="hanging-indent flex items-start">
@@ -505,7 +520,7 @@ function openFeedbackFormModal() {
     </div>
 
     <InfoBanner
-      v-if="eventData.virtualEventUrl"
+      v-if="eventData.virtualEventUrl && !discoveryMode"
       :text="`The official event page is on an external website. Refer to the [official event page](${eventData.virtualEventUrl}) for the most complete, correct and up-to-date information.`"
     />
 

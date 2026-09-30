@@ -12,8 +12,7 @@ import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
-import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
-import CommentIcon from '@/components/icons/CommentIcon.vue';
+import ForumSubmissions from '@/components/discovery/ForumSubmissions.vue';
 import ExpandIcon from '@/components/icons/ExpandIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
@@ -101,36 +100,6 @@ const forumId = computed(() => {
 // Initial value is based on the defaultExpanded prop
 const isExpanded = ref(props.defaultExpanded);
 
-const commentCount = computed(() => {
-  let count = 0;
-  if (props.discussion) {
-    props.discussion.DiscussionChannels.forEach((dc: DiscussionChannel) => {
-      count += dc.CommentsAggregate?.count || 0;
-    });
-  }
-  return count;
-});
-
-const submittedToMultipleChannels = computed(
-  () => props.discussion?.DiscussionChannels?.length > 1
-);
-
-const channelCount = computed(
-  () => props.discussion?.DiscussionChannels.length || 0
-);
-
-const discussionDetailOptions = computed(() => {
-  if (!props.discussion) return [];
-  return props.discussion.DiscussionChannels.map((dc) => {
-    const commentCount = dc.CommentsAggregate?.count || 0;
-    const discussionDetailLink = `/forums/${dc.channelUniqueName}/discussions/${props.discussion?.id}`;
-    return {
-      label: `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
-      value: discussionDetailLink,
-    };
-  }).sort((a, b) => b.label.localeCompare(a.label));
-});
-
 const authorIsAdmin = computed(() => {
   return (
     getServerRoleBadge({
@@ -171,6 +140,10 @@ const getDesktopSelectionLink = () => {
     query: {
       ...route.query,
       selectedDiscussionId: props.discussion.id,
+      selectedForum:
+        isSelected.value && typeof route.query.selectedForum === 'string'
+          ? route.query.selectedForum
+          : forumId.value,
     },
   };
 };
@@ -274,13 +247,14 @@ const revealSensitiveContent = () => {
 </script>
 
 <template>
-  <li
-    class="list-none border-b border-gray-200 py-3 last:border-b-0 dark:border-gray-800"
-  >
+  <li class="list-none">
     <div
-      class="flex flex-col gap-2 px-2 lg:block lg:gap-0 lg:px-0"
+      class="flex flex-col gap-2 rounded-xl border p-4 transition-colors"
       :class="{
-        'bg-gray-50 dark:bg-gray-800/60': isSelected,
+        'border-brand-600 bg-brand-50/50 dark:border-brand-400 dark:bg-gray-900':
+          isSelected,
+        'border-gray-200 bg-white hover:border-gray-400 dark:border-gray-800 dark:bg-gray-950 dark:hover:border-gray-600':
+          !isSelected,
       }"
     >
       <!-- Discussion row -->
@@ -288,6 +262,8 @@ const revealSensitiveContent = () => {
         <div class="flex shrink-0 flex-col items-center gap-1">
           <ChannelIconStack
             :channels="channelIcons"
+            :max-visible="1"
+            :show-extra-count="false"
             tooltip-position-class="pointer-events-none absolute -top-8 left-0 z-30 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/chicon:opacity-100 dark:bg-gray-700"
           />
           <AddToDiscussionFavorites
@@ -349,24 +325,7 @@ const revealSensitiveContent = () => {
           <div
             class="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-gray-500 dark:text-gray-400"
           >
-            <nuxt-link
-              v-if="discussion"
-              :to="{
-                name: 'forums-forumId-discussions',
-                params: { forumId },
-              }"
-              class="rounded bg-gray-100 px-1.5 py-0.5 font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200"
-            >
-              {{ forumId }}
-            </nuxt-link>
-            <span
-              v-if="submittedToMultipleChannels"
-              class="text-gray-400 dark:text-gray-500"
-            >
-              +{{ channelCount - 1 }}
-            </span>
             <span class="inline-flex items-center gap-x-1.5 whitespace-nowrap">
-              <span aria-hidden="true">•</span>
               <span>{{ relative }}</span>
             </span>
             <span class="inline-flex items-center gap-x-1.5 whitespace-nowrap">
@@ -382,27 +341,6 @@ const revealSensitiveContent = () => {
                 :discussion-karma="discussion?.Author?.discussionKarma ?? 0"
                 :account-created="discussion?.Author?.createdAt"
               />
-            </span>
-            <span
-              v-if="discussion"
-              class="inline-flex items-center gap-x-1.5 whitespace-nowrap"
-            >
-              <span aria-hidden="true">•</span>
-              <nuxt-link
-                v-if="!submittedToMultipleChannels"
-                :to="getDetailLink()"
-                class="flex items-center gap-1 hover:underline"
-              >
-                <CommentIcon class="h-3.5 w-3.5" aria-hidden="true" />
-                {{ commentCount }}
-              </nuxt-link>
-              <MenuButton v-else :items="discussionDetailOptions">
-                <span class="flex cursor-pointer items-center gap-1">
-                  <CommentIcon class="h-3.5 w-3.5" aria-hidden="true" />
-                  {{ commentCount }} in {{ channelCount }}
-                  <ChevronDownIcon class="h-3 w-3" aria-hidden="true" />
-                </span>
-              </MenuButton>
             </span>
             <span
               v-if="discussion && (discussion.body || discussion.Album)"
@@ -427,7 +365,7 @@ const revealSensitiveContent = () => {
           </div>
         </div>
         <nuxt-link
-          v-if="thumbnailUrl && discussion"
+          v-if="thumbnailUrl && discussion && shouldShowContent"
           :to="getDetailLink()"
           class="shrink-0 lg:hidden"
         >
@@ -441,7 +379,7 @@ const revealSensitiveContent = () => {
           />
         </nuxt-link>
         <nuxt-link
-          v-if="thumbnailUrl && discussion"
+          v-if="thumbnailUrl && discussion && shouldShowContent"
           :to="getDesktopSelectionLink()"
           class="hidden shrink-0 lg:block"
         >
@@ -463,6 +401,22 @@ const revealSensitiveContent = () => {
           <RightArrowIcon class="h-4 w-4" aria-hidden="true" />
         </nuxt-link>
       </div>
+
+      <ForumSubmissions
+        v-if="discussion"
+        class="mt-2 sm:ml-11"
+        :submissions="discussion.DiscussionChannels"
+        :content-id="discussion.id"
+        kind="discussion"
+        :preview="true"
+        :selected-forum="
+          isSelected
+            ? typeof route.query.selectedForum === 'string'
+              ? route.query.selectedForum
+              : forumId
+            : ''
+        "
+      />
 
       <div
         v-if="discussion && (discussion.body || discussion.Album) && isExpanded"

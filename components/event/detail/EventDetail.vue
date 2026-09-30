@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue';
 import Tag from '@/components/TagComponent.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_EVENT } from '@/graphQLData/event/queries';
@@ -43,9 +43,16 @@ const usernameVar = useUsername();
 
 const formatDate = formatEventDate;
 
+// The forum shell imports EventDetail on discussion and download routes too.
+// Only discovery previews need this selector, so keep it out of their preload graph.
+const ForumSubmissions = defineAsyncComponent(
+  () => import('@/components/discovery/ForumSubmissions.vue')
+);
+
 const COMMENT_LIMIT = 50;
 
 const props = defineProps({
+  discoveryMode: { type: Boolean, default: false },
   compactMode: {
     type: Boolean,
     default: false,
@@ -428,10 +435,16 @@ useHead(
               :event-channel-id="activeEventChannel?.id || ''"
             />
             <ErrorBanner
-              v-if="eventIsInThePast && showEventInPastBanner"
+              v-if="eventIsInThePast && showEventInPastBanner && !discoveryMode"
               class="mt-2 mb-2"
               :text="'This event is in the past.'"
             />
+            <p
+              v-if="discoveryMode && eventIsInThePast"
+              class="self-start rounded-md bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+            >
+              Past event
+            </p>
             <ErrorBanner
               v-if="event.canceled"
               data-testid="canceled-event-banner"
@@ -496,6 +509,7 @@ useHead(
             <div>
               <EventHeader
                 :event-data="event"
+                :discovery-mode="discoveryMode"
                 :show-menu-buttons="showMenuButtons"
                 :event-is-archived="isArchived || false"
                 :event-channel-id="eventChannelId"
@@ -543,6 +557,21 @@ useHead(
               :show-poster="!usernameOnTop"
             />
 
+            <div
+              v-if="discoveryMode"
+              class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900"
+            >
+              <ForumSubmissions
+                :submissions="event.EventChannels"
+                :content-id="event.id"
+                kind="event"
+              />
+              <h3 class="mt-4 font-semibold">One shared conversation</h3>
+              <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                Comments and event updates are visible to everyone across all
+                these forums.
+              </p>
+            </div>
             <div v-if="showComments">
               <div class="my-6 mb-2 rounded-lg">
                 <EventCommentsWrapper
@@ -566,7 +595,7 @@ useHead(
               </div>
             </div>
             <EventChannelLinks
-              v-if="event && event.EventChannels"
+              v-if="!discoveryMode && event && event.EventChannels"
               class="my-4"
               :event-channels="event.EventChannels"
               :channel-id="channelId"

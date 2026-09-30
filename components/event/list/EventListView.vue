@@ -3,6 +3,8 @@ import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import EventList from './EventList.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
 import 'md-editor-v3/lib/style.css';
 import { GET_EVENTS } from '@/graphQLData/event/queries';
 import getEventWhere from '@/utils/getEventWhere';
@@ -158,12 +160,14 @@ const effectiveSelectedEventId = computed(() => {
 
 const updateFilters = (params: SearchEventValues) => {
   const existingQuery = route.query;
-  const cleanedParams: Record<string, string> = {};
+  const cleanedParams: Record<string, string | string[]> = {};
 
   Object.keys(params).forEach((key) => {
     const typedKey = key as keyof SearchEventValues;
     const value = params[typedKey];
-    if (value !== undefined && typeof value !== 'string') {
+    if (Array.isArray(value)) {
+      cleanedParams[key] = value;
+    } else if (value !== undefined && typeof value !== 'string') {
       cleanedParams[key] = String(value);
     } else if (value !== undefined) {
       cleanedParams[key] = value;
@@ -194,7 +198,7 @@ const filterByTag = (tag: string) => {
   } else {
     filterValues.value?.tags?.push(tag);
   }
-  updateFilters({ tags: [tag] });
+  updateFilters({ tags: filterValues.value.tags || [] });
 };
 
 const filterByChannel = (channel: string) => {
@@ -207,7 +211,7 @@ const filterByChannel = (channel: string) => {
   } else {
     filterValues.value.channels?.push(channel);
   }
-  updateFilters({ channels: [channel] });
+  updateFilters({ channels: filterValues.value.channels || [] });
 };
 
 // Filter visibility state for online events list (controlled externally)
@@ -236,7 +240,11 @@ watch(
   [eventResult, selectedSearchEventId],
   () => {
     if (!isSearchListRoute.value) return;
-    if (selectedSearchEventId.value && !selectedSearchEvent.value) {
+    if (
+      eventResult.value &&
+      selectedSearchEventId.value &&
+      !selectedSearchEvent.value
+    ) {
       selectedSearchEventId.value = '';
     }
   },
@@ -261,27 +269,32 @@ watch(isSearchListRoute, (isSearchRoute) => {
 
 <template>
   <div
-    class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-black lg:px-4"
-    :class="isSearchListRoute ? 'lg:flex-row lg:gap-6' : ''"
+    class="flex flex-col justify-center gap-2"
+    :class="
+      isSearchListRoute
+        ? 'online-event-explorer bg-gray-50 lg:grid lg:grid-cols-2 lg:gap-0 dark:bg-gray-950'
+        : 'bg-white dark:bg-black'
+    "
   >
     <div
-      class="flex flex-col gap-2 lg:min-w-0 lg:flex-1"
-      :class="
-        isSearchListRoute ? 'lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto' : ''
-      "
+      class="event-explorer-list flex flex-col gap-2 lg:min-w-0 lg:flex-1"
+      :class="isSearchListRoute ? 'lg:contents' : ''"
     >
       <div
         v-if="isSearchListRoute"
-        class="flex items-center justify-between px-4 py-2"
+        class="event-explorer-heading flex flex-wrap items-center justify-between gap-3 px-6 py-5"
       >
         <h1
-          class="font-semibold text-sm tracking-wide text-gray-900 dark:text-gray-100"
+          class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-100"
         >
           Online events
         </h1>
-        <div class="flex items-center gap-2">
+        <p class="order-last w-full text-sm text-gray-600 dark:text-gray-400">
+          Find your next conversation, class, or community gathering.
+        </p>
+        <div class="flex flex-wrap items-center gap-2">
           <button
-            class="inline-flex h-8 items-center gap-1.5 rounded-md border border-gray-300 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+            class="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-gray-300 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
             :class="[
               showMainFilters
                 ? 'border-gray-400 bg-gray-100 text-gray-900 dark:border-gray-500 dark:bg-gray-800 dark:text-white'
@@ -289,80 +302,106 @@ watch(isSearchListRoute, (isSearchRoute) => {
             ]"
             data-testid="toggle-main-filters-button"
             type="button"
+            :aria-expanded="showMainFilters"
             @click="toggleShowMainFilters"
           >
             <FilterIcon class="h-3.5 w-3.5" aria-hidden="true" />
             {{ showMainFilters ? 'Hide filters' : 'Show filters' }}
           </button>
           <button
-            class="inline-flex h-8 items-center gap-1.5 rounded-md border border-gray-300 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+            class="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-gray-300 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
             type="button"
             @click="goToInPersonMap"
           >
             <MapIcon class="h-3.5 w-3.5" aria-hidden="true" />
             In-person map
           </button>
+          <RequireAuth :full-width="false">
+            <template #has-auth
+              ><PrimaryButton
+                label="New event"
+                background-color="brand"
+                class="min-h-11"
+                @click="router.push('/events/create')"
+            /></template>
+            <template #does-not-have-auth
+              ><PrimaryButton
+                label="New event"
+                background-color="brand"
+                class="min-h-11"
+            /></template>
+          </RequireAuth>
         </div>
       </div>
       <hr
         v-if="isSearchListRoute"
         class="mx-4 -mt-2 border-t border-gray-200 dark:border-gray-700"
-      >
+      />
       <EventFilterBar
+        class="event-explorer-filters"
         :show-distance-filters="false"
         :allow-hiding-main-filters="true"
         :show-main-filters-by-default="!channelId"
         :toggle-show-archived-enabled="true"
         :hide-filters-button-externally="isSearchListRoute"
-        :show-new-event-next-to-search-bar="isSearchListRoute"
+        :show-new-event-next-to-search-bar="false"
         :external-show-main-filters="
           isSearchListRoute ? showMainFilters : undefined
         "
       >
-        <TimeShortcuts :is-list-view="true" />
+        <TimeShortcuts :is-list-view="true" :map-style="isSearchListRoute" />
         <OnlineInPersonShortcuts v-if="channelId" />
       </EventFilterBar>
 
-      <ErrorBanner
-        v-if="eventError"
-        class="mx-auto block"
-        :text="eventError.message"
-      />
+      <div class="event-explorer-results min-w-0">
+        <ErrorBanner
+          v-if="eventError"
+          class="mx-auto block"
+          :text="eventError.message"
+        />
 
-      <LoadingSpinner v-if="!eventResult && !eventError" class="mx-auto my-4" />
+        <LoadingSpinner
+          v-if="!eventResult && !eventError"
+          class="mx-auto my-4"
+        />
 
-      <EventList
-        v-if="eventResult?.events"
-        id="listView"
-        class="relative"
-        :result-count="eventResult.eventsAggregate?.count || 0"
-        :events="eventResult.events"
-        :channel-id="channelId"
-        :search-input="filterValues.searchInput"
-        :selected-tags="filterValues.tags"
-        :selected-channels="filterValues.channels"
-        :show-map="false"
-        :is-selectable="!!channelId || isSearchListRoute"
-        :selected-event-id="effectiveSelectedEventId"
-        @filter-by-tag="filterByTag"
-        @filter-by-channel="filterByChannel"
-        @load-more="loadMore"
-        @open-preview="openPreview"
-        @select="handleSelectEvent"
-      />
+        <EventList
+          v-if="eventResult?.events"
+          id="listView"
+          class="relative"
+          :result-count="eventResult.eventsAggregate?.count || 0"
+          :events="eventResult.events"
+          :channel-id="channelId"
+          :search-input="filterValues.searchInput"
+          :selected-tags="filterValues.tags"
+          :selected-channels="filterValues.channels"
+          :show-map="false"
+          :discovery-style="isSearchListRoute"
+          :is-selectable="!!channelId || isSearchListRoute"
+          :selected-event-id="effectiveSelectedEventId"
+          @filter-by-tag="filterByTag"
+          @filter-by-channel="filterByChannel"
+          @load-more="loadMore"
+          @open-preview="openPreview"
+          @select="handleSelectEvent"
+        />
+      </div>
     </div>
     <aside
       v-if="isSearchListRoute"
-      class="hidden lg:flex lg:h-[calc(100vh-3.5rem)] lg:w-1/2 lg:flex-col lg:overflow-y-auto lg:px-2 lg:py-4"
+      aria-label="Event preview"
+      class="event-explorer-preview hidden min-w-0 border-l border-gray-200 bg-white px-5 py-5 lg:flex lg:flex-col lg:overflow-y-auto dark:border-gray-800 dark:bg-black"
     >
       <div
         v-if="selectedSearchEventId"
-        class="flex w-full flex-col justify-center rounded-lg border border-gray-200 p-4 dark:border-gray-700"
+        class="flex w-full min-w-0 flex-col rounded-xl border border-gray-200 py-5 dark:border-gray-800"
       >
         <EventDetail
+          :key="selectedSearchEventId"
           :event-id="selectedSearchEventId"
           :channel-unique-name="selectedSearchEventChannelId"
-          :show-comments="false"
+          :show-comments="true"
+          :discovery-mode="true"
           :show-title="true"
           :link-title="true"
         />
@@ -376,3 +415,30 @@ watch(isSearchListRoute, (isSearchRoute) => {
     </aside>
   </div>
 </template>
+
+<style scoped>
+@reference '../../../assets/css/index.css';
+@media (min-width: 1024px) {
+  .online-event-explorer {
+    height: calc(100vh - 3.5rem);
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+  .online-event-explorer .event-explorer-heading,
+  .online-event-explorer .event-explorer-filters {
+    grid-column: 1 / -1;
+  }
+  .online-event-explorer .event-explorer-list > hr {
+    display: none;
+  }
+  .online-event-explorer .event-explorer-results {
+    grid-column: 1;
+    grid-row: 3;
+    overflow-y: auto;
+    padding-top: 1.25rem;
+  }
+  .online-event-explorer .event-explorer-preview {
+    grid-column: 2;
+    grid-row: 3;
+  }
+}
+</style>

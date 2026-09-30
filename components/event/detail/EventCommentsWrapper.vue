@@ -11,6 +11,7 @@ import CommentSection from '@/components/comments/CommentSection.vue';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 import { useUsername } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
+import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import type { ApolloCache } from '@apollo/client/core';
 import { GET_USER } from '@/graphQLData/user/queries';
@@ -74,7 +75,7 @@ const route = useRoute();
 
 const eventId = computed(() => props.event?.id);
 const hasEventIdInRoute = computed(
-  () => typeof route.params.eventId === 'string'
+  () => !isEventSearchRoute(route) && typeof route.params.eventId === 'string'
 );
 
 const aggregateCommentCount = computed(() => {

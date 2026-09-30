@@ -39,6 +39,8 @@ const colorClasses = computed(() => {
   }
 
   switch (props.backgroundColor) {
+    case 'brand':
+      return 'border border-brand-500 bg-brand-500 text-gray-950 hover:bg-brand-400 focus:ring-brand-500';
     case 'red':
       return 'bg-red-500 hover:bg-red-600 dark:border dark:border-red-500 dark:bg-red-500 dark:text-white dark:hover:bg-red-600 focus:ring-red-500';
     case 'green':
@@ -60,7 +62,7 @@ const colorClasses = computed(() => {
     :class="[
       colorClasses,
       sizeClasses,
-      'max-height-4 inline-flex items-center whitespace-nowrap rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100',
+      'max-height-4 inline-flex items-center rounded-md font-medium whitespace-nowrap focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:outline-none',
     ]"
   >
     <LoadingSpinner v-if="loading" class="mx-2" /><slot />{{ label }}

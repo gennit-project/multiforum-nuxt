@@ -17,6 +17,10 @@ const mockRoute = {
   query: {},
 };
 
+vi.mock('@/components/auth/RequireAuth.vue', () => ({
+  default: { template: '<div><slot name="has-auth" /></div>' },
+}));
+
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
@@ -52,7 +56,8 @@ const EventListStub = defineComponent({
     return () =>
       h('button', {
         'data-testid': 'event-list-select',
-        onClick: () => emit('select', { eventId: 'event-2', title: 'Event Two' }),
+        onClick: () =>
+          emit('select', { eventId: 'event-2', title: 'Event Two' }),
       });
   },
 });
@@ -60,7 +65,8 @@ const EventListStub = defineComponent({
 const EventDetailStub = defineComponent({
   props: ['eventId'],
   setup(props) {
-    return () => h('div', { 'data-testid': 'event-detail' }, props.eventId || '');
+    return () =>
+      h('div', { 'data-testid': 'event-detail' }, props.eventId || '');
   },
 });
 
@@ -152,7 +158,9 @@ describe('EventListView', () => {
     expect(eventQueryVariables?.options.sort).toEqual(
       expect.objectContaining({ startTime: expect.any(String) })
     );
-    expect('value' in ((eventQueryVariables?.where as object) ?? {})).toBe(false);
+    expect('value' in ((eventQueryVariables?.where as object) ?? {})).toBe(
+      false
+    );
   });
 });
 
@@ -162,9 +170,18 @@ describe('EventListView — filters and navigation', () => {
     setup(_, { emit }) {
       return () =>
         h('div', [
-          h('button', { 'data-testid': 'tag', onClick: () => emit('filter-by-tag', 'music') }),
-          h('button', { 'data-testid': 'chan', onClick: () => emit('filter-by-channel', 'cats') }),
-          h('button', { 'data-testid': 'more', onClick: () => emit('load-more') }),
+          h('button', {
+            'data-testid': 'tag',
+            onClick: () => emit('filter-by-tag', 'music'),
+          }),
+          h('button', {
+            'data-testid': 'chan',
+            onClick: () => emit('filter-by-channel', 'cats'),
+          }),
+          h('button', {
+            'data-testid': 'more',
+            onClick: () => emit('load-more'),
+          }),
         ]);
     },
   });
@@ -201,7 +218,9 @@ describe('EventListView — filters and navigation', () => {
 
   it('toggles the main filters visibility', async () => {
     const wrapper = mountView();
-    await wrapper.get('[data-testid="toggle-main-filters-button"]').trigger('click');
+    await wrapper
+      .get('[data-testid="toggle-main-filters-button"]')
+      .trigger('click');
 
     expect(wrapper.text()).toContain('Show filters');
   });

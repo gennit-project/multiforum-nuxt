@@ -24,25 +24,38 @@ vi.mock('@/composables/useTheme', () => ({
   useAppTheme: () => ({ theme: ref('light') }),
 }));
 
-const SERVER_CONFIG = { serverConfigs: [{ serverName: 'Test', __typename: 'ServerConfig' }] };
+const SERVER_CONFIG = {
+  serverConfigs: [{ serverName: 'Test', __typename: 'ServerConfig' }],
+};
 
-const makeDiscussion = (id: string, overrides: Record<string, unknown> = {}) => ({
+const makeDiscussion = (
+  id: string,
+  overrides: Record<string, unknown> = {}
+) => ({
   id,
   title: `Discussion ${id}`,
   score: 0,
   DiscussionChannels: [
-    { channelUniqueName: 'cats', CommentsAggregate: { count: 2 }, __typename: 'DiscussionChannel' },
+    {
+      channelUniqueName: 'cats',
+      CommentsAggregate: { count: 2 },
+      __typename: 'DiscussionChannel',
+    },
   ],
   __typename: 'Discussion',
   ...overrides,
 });
 
-const listResult = (discussions: ReturnType<typeof makeDiscussion>[], aggregate?: number) => ({
+const listResult = (
+  discussions: ReturnType<typeof makeDiscussion>[],
+  aggregate?: number
+) => ({
   getSiteWideDiscussionList: {
     discussions,
     aggregateDiscussionCount: aggregate ?? discussions.length,
     pageInfo: {
-      endCursor: discussions.length > 0 ? `cursor-${discussions.at(-1)?.id}` : null,
+      endCursor:
+        discussions.length > 0 ? `cursor-${discussions.at(-1)?.id}` : null,
       hasNextPage: (aggregate ?? discussions.length) > discussions.length,
       __typename: 'DiscussionListPageInfo',
     },
@@ -58,7 +71,10 @@ const stubs = {
     template: '<li class="item-stub" />',
   },
   SitewideDiscussionSidebar: { template: '<div />' },
-  DiscussionDetailContent: { template: '<div class="detail-stub" />' },
+  DiscussionDetailContent: {
+    props: ['channelId', 'showComments'],
+    template: '<div class="detail-stub"><slot name="before-comments" /></div>',
+  },
   DiscussionDetailEmptyState: { template: '<div class="empty-state-stub" />' },
   LoadMore: {
     name: 'LoadMore',
@@ -66,9 +82,16 @@ const stubs = {
     emits: ['loadMore'],
     template: '<button class="load-more-stub" @click="$emit(\'loadMore\')" />',
   },
-  ErrorBanner: { props: ['text'], template: '<div class="error-stub">{{ text }}</div>' },
-  'SkeletonLoader': { template: '<div class="skeleton-stub" />' },
-  NuxtLink: { name: 'NuxtLink', props: ['to'], template: '<a :href="to"><slot /></a>' },
+  ErrorBanner: {
+    props: ['text'],
+    template: '<div class="error-stub">{{ text }}</div>',
+  },
+  SkeletonLoader: { template: '<div class="skeleton-stub" />' },
+  NuxtLink: {
+    name: 'NuxtLink',
+    props: ['to'],
+    template: '<a :href="to"><slot /></a>',
+  },
 };
 
 const setupQueries = (discussionMock: ReturnType<typeof createQueryMock>) => {
@@ -85,7 +108,13 @@ const setupQueries = (discussionMock: ReturnType<typeof createQueryMock>) => {
 
 const mountList = (route: Record<string, unknown> = {}) => {
   asMock(useRoute).mockReturnValue({ params: {}, query: {}, ...route });
-  return mountWithDefaults(SitewideDiscussionList, { global: { stubs } });
+  return mountWithDefaults(SitewideDiscussionList, {
+    global: { stubs },
+    slots: {
+      default:
+        '<template #default="{ openAbout }"><button @click="openAbout">About</button></template>',
+    },
+  });
 };
 
 describe('SitewideDiscussionList', () => {
@@ -94,7 +123,9 @@ describe('SitewideDiscussionList', () => {
   });
 
   it('renders a list item per discussion', () => {
-    setupQueries(createQueryMock(listResult([makeDiscussion('1'), makeDiscussion('2')])));
+    setupQueries(
+      createQueryMock(listResult([makeDiscussion('1'), makeDiscussion('2')]))
+    );
     const wrapper = mountList();
     expect(wrapper.findAll('.item-stub')).toHaveLength(2);
   });
@@ -182,14 +213,16 @@ describe('SitewideDiscussionList', () => {
   it('re-emits filterByTag from a list item', () => {
     setupQueries(createQueryMock(listResult([makeDiscussion('1')])));
     const wrapper = mountList();
-    wrapper.findComponent(stubs.SitewideDiscussionListItem).vm.$emit('filterByTag', 'vue');
+    wrapper
+      .findComponent(stubs.SitewideDiscussionListItem)
+      .vm.$emit('filterByTag', 'vue');
     expect(wrapper.emitted('filterByTag')?.[0]).toEqual(['vue']);
   });
 
   it('builds comment-section links for the selected discussion', () => {
     setupQueries(createQueryMock(listResult([makeDiscussion('1')])));
     const wrapper = mountList({ query: { selectedDiscussionId: '1' } });
-    expect(wrapper.text()).toContain('2 comments');
+    expect(wrapper.find('[aria-label="cats: 2 comments"]').exists()).toBe(true);
   });
 
   it('navigates in place rather than opening a new tab from the comment-section link', () => {
@@ -197,7 +230,7 @@ describe('SitewideDiscussionList', () => {
     const wrapper = mountList({ query: { selectedDiscussionId: '1' } });
     const commentLink = wrapper
       .findAllComponents({ name: 'NuxtLink' })
-      .find((link) => link.text().includes('2 comments'));
+      .find((link) => link.attributes('aria-label') === 'cats: 2 comments');
     expect(commentLink?.props('to')).toBe('/forums/cats/discussions/1');
   });
 
@@ -235,4 +268,35 @@ describe('SitewideDiscussionList', () => {
 
     expect(wrapper.find('#sitewide-sidebar-drawer').exists()).toBe(false);
   });
+});
+
+it('loads the selected forum’s comments, not the first forum’s', () => {
+  setupQueries(
+    createQueryMock(
+      listResult([
+        makeDiscussion('1', {
+          DiscussionChannels: [
+            { channelUniqueName: 'cats', CommentsAggregate: { count: 2 } },
+            { channelUniqueName: 'dogs', CommentsAggregate: { count: 5 } },
+          ],
+        }),
+      ])
+    )
+  );
+  const wrapper = mountList({
+    query: { selectedDiscussionId: '1', selectedForum: 'dogs' },
+  });
+  expect(wrapper.findComponent(stubs.DiscussionDetailContent).props()).toEqual({
+    channelId: 'dogs',
+    showComments: true,
+  });
+});
+it('falls back to an available forum for a stale forum selection', () => {
+  setupQueries(createQueryMock(listResult([makeDiscussion('1')])));
+  const wrapper = mountList({
+    query: { selectedDiscussionId: '1', selectedForum: 'deleted' },
+  });
+  expect(
+    wrapper.findComponent(stubs.DiscussionDetailContent).props('channelId')
+  ).toBe('cats');
 });

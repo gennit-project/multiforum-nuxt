@@ -37,6 +37,7 @@ const props = defineProps({
     type: Array as PropType<string[]>,
     default: () => [],
   },
+  discoveryStyle: { type: Boolean, default: false },
   showMap: {
     type: Boolean,
     default: false,
@@ -155,7 +156,7 @@ const onMouseLeaveEventListItem = () => {
       role="list"
       :class="[
         'mb-4 ml-0 flex flex-col',
-        showMap
+        showMap || discoveryStyle
           ? 'gap-3'
           : 'gap-2 divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-black',
         { 'pointer-events-none': sideNavIsOpenVar },
@@ -163,10 +164,11 @@ const onMouseLeaveEventListItem = () => {
       data-testid="event-list"
     >
       <component
-        :is="showMap ? MapEventCard : EventListItem"
+        :is="showMap || discoveryStyle ? MapEventCard : EventListItem"
         v-for="event in events"
         :ref="`#${event.id}`"
         :key="event.id"
+        :online-list="discoveryStyle"
         :event="event"
         :selected-tags="selectedTags"
         :selected-channels="selectedChannels"

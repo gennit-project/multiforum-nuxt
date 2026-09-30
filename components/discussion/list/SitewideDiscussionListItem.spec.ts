@@ -57,12 +57,13 @@ const channel = (
   uniqueName: string,
   channelIconURL = '',
   flairs: Array<Record<string, unknown>> = []
-): Partial<DiscussionChannel> => ({
-  channelUniqueName: uniqueName,
-  Channel: { uniqueName, displayName: uniqueName, channelIconURL },
-  CommentsAggregate: { count: 0 },
-  Flairs: flairs,
-}) as Partial<DiscussionChannel>;
+): Partial<DiscussionChannel> =>
+  ({
+    channelUniqueName: uniqueName,
+    Channel: { uniqueName, displayName: uniqueName, channelIconURL },
+    CommentsAggregate: { count: 0 },
+    Flairs: flairs,
+  }) as Partial<DiscussionChannel>;
 
 const album = (
   images: { id: string; url: string }[],
@@ -88,7 +89,11 @@ describe('SitewideDiscussionListItem', () => {
   });
 
   it('identifies each assigned flair by its forum', () => {
-    const flair = (id: string, channelUniqueName: string, displayName: string) => ({
+    const flair = (
+      id: string,
+      channelUniqueName: string,
+      displayName: string
+    ) => ({
       id,
       channelUniqueName,
       displayName,
@@ -105,7 +110,9 @@ describe('SitewideDiscussionListItem', () => {
       })
     );
     expect(
-      wrapper.findAll('[data-testid="discussion-flair"]').map((item) => item.text())
+      wrapper
+        .findAll('[data-testid="discussion-flair"]')
+        .map((item) => item.text())
     ).toEqual(['cats: Question', 'dogs: Showcase']);
   });
 });
@@ -118,7 +125,7 @@ describe('SitewideDiscussionListItem channel icons', () => {
     expect(channelIcons(wrapper)).toHaveLength(1);
   });
 
-  it('caps the icon stack at three for a many-channel discussion', () => {
+  it('keeps the avatar gutter fixed for a many-forum discussion', () => {
     const wrapper = mountItem(
       discussion({
         DiscussionChannels: [
@@ -129,10 +136,10 @@ describe('SitewideDiscussionListItem channel icons', () => {
         ],
       })
     );
-    expect(channelIcons(wrapper)).toHaveLength(3);
+    expect(channelIcons(wrapper)).toHaveLength(1);
   });
 
-  it('shows an "and N more" label when posted to more than three channels', () => {
+  it('shows the explicit forum total beside the conversation links', () => {
     const wrapper = mountItem(
       discussion({
         DiscussionChannels: [
@@ -143,7 +150,7 @@ describe('SitewideDiscussionListItem channel icons', () => {
         ],
       })
     );
-    expect(wrapper.text()).toContain('and 1 more');
+    expect(wrapper.text()).toContain('Discuss in 4 forums');
   });
 
   it('omits the "and N more" label at three or fewer channels', () => {

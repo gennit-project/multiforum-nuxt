@@ -924,6 +924,7 @@ const handleEditAlbum = () => {
 
         <!-- Comments section (shown for non-download mode) -->
         <div v-if="!downloadMode && showComments">
+          <slot name="before-comments" />
           <div class="my-2 px-2 pt-2">
             <ClientOnly>
               <DiscussionCommentsWrapper

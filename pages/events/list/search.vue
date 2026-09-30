@@ -9,8 +9,6 @@ useHead({
 
 <template>
   <NuxtLayout>
-    <div class="px-2">
-      <EventListView />
-    </div>
+    <EventListView />
   </NuxtLayout>
 </template>
