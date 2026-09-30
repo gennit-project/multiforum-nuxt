@@ -3,6 +3,7 @@ import type {
   AlbumImagesConnectFieldInput,
   AlbumImagesUpdateFieldInput,
 } from '@/__generated__/graphql';
+import { normalizeImageOrder } from '@/utils/albumImageOrder';
 
 /**
  * Pure builder extracted from the download edit page
@@ -22,10 +23,13 @@ export type AlbumUpdateImageInput = {
   copyright?: string | null;
 };
 
-export type AlbumFormData = {
-  images?: AlbumUpdateImageInput[];
-  imageOrder?: string[];
-} | null | undefined;
+export type AlbumFormData =
+  | {
+      images?: AlbumUpdateImageInput[];
+      imageOrder?: string[];
+    }
+  | null
+  | undefined;
 
 export type ExistingAlbumImage = { id?: string | null };
 
@@ -59,12 +63,16 @@ export function buildAlbumUpdateInput(params: {
     const connect: AlbumImagesConnectFieldInput[] = validImages.map((img) => ({
       where: { node: { id: img.id } },
     }));
+    const normalizedImageOrder = normalizeImageOrder({
+      images: validImages,
+      imageOrder: albumData.imageOrder,
+    });
 
     return {
       Album: {
         create: {
           node: {
-            imageOrder: albumData.imageOrder || [],
+            imageOrder: normalizedImageOrder,
             Images: { connect },
           },
         },
@@ -75,6 +83,10 @@ export function buildAlbumUpdateInput(params: {
   // Existing album: build connect/update/disconnect operations.
   const oldImages = existingImages;
   const newImages = albumData.images || [];
+  const normalizedImageOrder = normalizeImageOrder({
+    images: newImages,
+    imageOrder: albumData.imageOrder,
+  });
 
   const connectImageArray: AlbumImagesUpdateFieldInput[] = newImages
     .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
@@ -108,7 +120,7 @@ export function buildAlbumUpdateInput(params: {
     Album: {
       update: {
         node: {
-          imageOrder: albumData.imageOrder || [],
+          imageOrder: normalizedImageOrder,
           Images: imagesOps,
         },
       },

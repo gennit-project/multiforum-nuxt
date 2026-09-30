@@ -17,33 +17,31 @@ const {
   uploadsError,
   saveImageMetadata,
   debouncedAutoSave,
-} = vi.hoisted(
-  () => ({
-    saveImageMetadata: vi.fn(),
-    debouncedAutoSave: vi.fn(),
-    usernameRef: { value: 'alice' as string },
-    createImageFromUrl: vi.fn(),
-    permanentlyDeleteImage: vi.fn(),
-    uploadsAvailable: { value: true },
-    uploadsCapability: {
-      value: {
-        configured: true,
-        enabled: true,
-        requiredEnvVarsMissing: [],
-        setupUrl: '/admin/setup#file-uploads',
-        docsPath: '/self-hosting/uploads',
-      } as {
-        configured: boolean;
-        enabled: boolean;
-        requiredEnvVarsMissing: string[];
-        setupUrl: string;
-        docsPath: string;
-      } | null,
-    },
-    uploadsLoading: { value: false },
-    uploadsError: { value: null as Error | null },
-  })
-);
+} = vi.hoisted(() => ({
+  saveImageMetadata: vi.fn(),
+  debouncedAutoSave: vi.fn(),
+  usernameRef: { value: 'alice' as string },
+  createImageFromUrl: vi.fn(),
+  permanentlyDeleteImage: vi.fn(),
+  uploadsAvailable: { value: true },
+  uploadsCapability: {
+    value: {
+      configured: true,
+      enabled: true,
+      requiredEnvVarsMissing: [],
+      setupUrl: '/admin/setup#file-uploads',
+      docsPath: '/self-hosting/uploads',
+    } as {
+      configured: boolean;
+      enabled: boolean;
+      requiredEnvVarsMissing: string[];
+      setupUrl: string;
+      docsPath: string;
+    } | null,
+  },
+  uploadsLoading: { value: false },
+  uploadsError: { value: null as Error | null },
+}));
 
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => usernameRef,
@@ -170,16 +168,21 @@ const makeImage = (id: string) => ({
 
 const mountEditor = (
   images = [makeImage('a'), makeImage('b'), makeImage('c')],
-  imageOrder = ['a', 'b', 'c']
+  imageOrder = ['a', 'b', 'c'],
+  props: Record<string, unknown> = {}
 ) =>
   mountWithDefaults(AlbumEditor, {
-    props: { formValues: { album: { images, imageOrder } } },
+    props: { formValues: { album: { images, imageOrder } }, ...props },
     global: { stubs },
   });
 
 const lastEmit = (wrapper: ReturnType<typeof mountEditor>) => {
   const calls = wrapper.emitted('updateFormValues');
-  return (calls?.[calls.length - 1]?.[0] as { album: { images: { id: string }[]; imageOrder: string[] } }).album;
+  return (
+    calls?.[calls.length - 1]?.[0] as {
+      album: { images: { id: string }[]; imageOrder: string[] };
+    }
+  ).album;
 };
 
 const warningModal = (wrapper: ReturnType<typeof mountEditor>) =>
@@ -280,12 +283,15 @@ describe('AlbumEditor', () => {
   });
 
   it('removes a reused image by another uploader without permanent deletion', async () => {
-    const wrapper = mountEditor([
-      {
-        ...makeImage('a'),
-        Uploader: { username: 'bob', displayName: 'Bob' },
-      },
-    ], ['a']);
+    const wrapper = mountEditor(
+      [
+        {
+          ...makeImage('a'),
+          Uploader: { username: 'bob', displayName: 'Bob' },
+        },
+      ],
+      ['a']
+    );
     wrapper.findComponent(AlbumImageItemStub).vm.$emit('delete');
     await flushPromises();
     expect({
@@ -313,8 +319,12 @@ describe('AlbumEditor', () => {
 
   it('updates a field on the targeted image', () => {
     const wrapper = mountEditor();
-    wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('update-field', 'alt', 'new alt');
-    const updated = lastEmit(wrapper).images.find((i) => i.id === 'a') as { alt: string };
+    wrapper
+      .findAllComponents(AlbumImageItemStub)[0]
+      .vm.$emit('update-field', 'alt', 'new alt');
+    const updated = lastEmit(wrapper).images.find((i) => i.id === 'a') as {
+      alt: string;
+    };
     expect(updated.alt).toBe('new alt');
   });
 
@@ -356,9 +366,21 @@ describe('AlbumEditor', () => {
   it('adds an existing image from the picker', async () => {
     const wrapper = mountEditor();
     await revealExistingPicker(wrapper);
-    wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-images', [makeImage('d')]);
+    wrapper
+      .findComponent(AlbumExistingImagePickerStub)
+      .vm.$emit('add-images', [makeImage('d')]);
     await flushPromises();
     expect(lastEmit(wrapper).imageOrder).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('does not auto-save picker changes when the enclosing form owns saving', async () => {
+    const wrapper = mountEditor(undefined, undefined, { autoSave: false });
+    await revealExistingPicker(wrapper);
+    wrapper
+      .findComponent(AlbumExistingImagePickerStub)
+      .vm.$emit('add-images', [makeImage('d')]);
+    await flushPromises();
+    expect(debouncedAutoSave).not.toHaveBeenCalled();
   });
 
   it('adds several existing images from the picker in one update', async () => {
@@ -388,7 +410,9 @@ describe('AlbumEditor', () => {
   it('does not add a duplicate existing image from the picker', async () => {
     const wrapper = mountEditor();
     await revealExistingPicker(wrapper);
-    wrapper.findComponent(AlbumExistingImagePickerStub).vm.$emit('add-images', [makeImage('a')]);
+    wrapper
+      .findComponent(AlbumExistingImagePickerStub)
+      .vm.$emit('add-images', [makeImage('a')]);
     await flushPromises();
     expect(wrapper.emitted('updateFormValues')).toBeUndefined();
   });
@@ -438,7 +462,9 @@ describe('AlbumEditor', () => {
       });
       const wrapper = mountEditor();
       await showForm(wrapper);
-      wrapper.findComponent(AlbumUrlInputFormStub).vm.$emit('submit', 'https://example.com/d.jpg');
+      wrapper
+        .findComponent(AlbumUrlInputFormStub)
+        .vm.$emit('submit', 'https://example.com/d.jpg');
       await flushPromises();
 
       expect(lastEmit(wrapper).images.map((i) => i.id)).toContain('d');
@@ -449,7 +475,9 @@ describe('AlbumEditor', () => {
       usernameRef.value = '';
       const wrapper = mountEditor();
       await showForm(wrapper);
-      wrapper.findComponent(AlbumUrlInputFormStub).vm.$emit('submit', 'https://example.com/d.jpg');
+      wrapper
+        .findComponent(AlbumUrlInputFormStub)
+        .vm.$emit('submit', 'https://example.com/d.jpg');
       await flushPromises();
 
       expect(createImageFromUrl).not.toHaveBeenCalled();
@@ -460,7 +488,9 @@ describe('AlbumEditor', () => {
       createImageFromUrl.mockResolvedValue(null);
       const wrapper = mountEditor();
       await showForm(wrapper);
-      wrapper.findComponent(AlbumUrlInputFormStub).vm.$emit('submit', 'https://example.com/d.jpg');
+      wrapper
+        .findComponent(AlbumUrlInputFormStub)
+        .vm.$emit('submit', 'https://example.com/d.jpg');
       await flushPromises();
 
       expect(wrapper.emitted('updateFormValues')).toBeUndefined();

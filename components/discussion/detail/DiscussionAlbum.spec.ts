@@ -109,6 +109,20 @@ describe('DiscussionAlbum', () => {
     expect(firstImg.attributes('src')).toContain('/c.jpg');
   });
 
+  it('appends connected images missing from a stale imageOrder', () => {
+    const wrapper = mountAlbum({
+      album: makeAlbum(['a', 'b', 'c'], ['c', 'a']),
+    });
+    const sources = cells(wrapper).map((cell) =>
+      cell.find('img').attributes('src')
+    );
+    expect(sources).toEqual([
+      'https://example.com/c.jpg',
+      'https://example.com/a.jpg',
+      'https://example.com/b.jpg',
+    ]);
+  });
+
   it('appends a synthetic cell for STL files', () => {
     const wrapper = mountAlbum({
       album: makeAlbum(['a']),

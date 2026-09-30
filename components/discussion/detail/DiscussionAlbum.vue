@@ -22,6 +22,7 @@ import {
   is3DModelFile,
 } from '@/utils/fileTypeUtils';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
+import { orderImagesByOrder } from '@/utils/albumImageOrder';
 
 const ModelViewer = defineAsyncComponent(
   () => import('@/components/ModelViewer.vue')
@@ -113,22 +114,10 @@ const expandedThumbnailDimensions = computed(() => {
 });
 
 const orderedImages = computed(() => {
-  let albumImages: Image[] = [];
-
-  if (props.album) {
-    if (!props.album.imageOrder || props.album.imageOrder.length === 0) {
-      albumImages = (props.album.Images || []) as Image[];
-    } else {
-      albumImages = props.album.imageOrder
-        .map((imageId) => {
-          const foundImage = props.album?.Images?.find(
-            (image) => image.id === imageId
-          );
-          return foundImage;
-        })
-        .filter((image): image is Image => image !== undefined);
-    }
-  }
+  const albumImages = orderImagesByOrder({
+    images: (props.album?.Images || []) as Image[],
+    imageOrder: props.album?.imageOrder,
+  });
 
   // Create synthetic "image" objects for STL files
   const stlAsImages = props.stlFiles.map((stlFile, index) => ({

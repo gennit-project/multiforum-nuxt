@@ -14,7 +14,10 @@ const h = vi.hoisted(() => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useMutation: (_doc: unknown, optionsFactory: () => Record<string, unknown>) => {
+  useMutation: (
+    _doc: unknown,
+    optionsFactory: () => Record<string, unknown>
+  ) => {
     h.mutationOptions = optionsFactory;
     return {
       mutate: h.updateDiscussion,
@@ -40,11 +43,19 @@ const mountForm = (props: Record<string, unknown> = {}) =>
     props,
     global: {
       stubs: {
-        AlbumEditor: stub('AlbumEditor', ['formValues'], ['update-form-values']),
+        AlbumEditor: stub(
+          'AlbumEditor',
+          ['formValues', 'autoSave'],
+          ['update-form-values']
+        ),
         PrimaryButton: stub('PrimaryButton', ['label', 'loading'], ['click']),
         GenericButton: stub('GenericButton', ['text'], ['click']),
         Notification: stub('Notification', ['show'], ['close-notification']),
-        ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err" />' },
+        ErrorBanner: {
+          name: 'ErrorBanner',
+          props: ['text'],
+          template: '<div class="err" />',
+        },
       },
     },
   });
@@ -52,8 +63,11 @@ const mountForm = (props: Record<string, unknown> = {}) =>
 const editor = (w: ReturnType<typeof mount>) =>
   w.getComponent({ name: 'AlbumEditor' });
 const updateInput = () =>
-  (h.mutationOptions?.().variables as { updateDiscussionInput: Record<string, unknown> })
-    .updateDiscussionInput;
+  (
+    h.mutationOptions?.().variables as {
+      updateDiscussionInput: Record<string, unknown>;
+    }
+  ).updateDiscussionInput;
 
 const editDiscussion = () =>
   ({
@@ -61,7 +75,9 @@ const editDiscussion = () =>
     Album: {
       id: 'alb1',
       imageOrder: ['img1'],
-      Images: [{ id: 'img1', url: 'u1', caption: 'c1', alt: 'a1', copyright: '' }],
+      Images: [
+        { id: 'img1', url: 'u1', caption: 'c1', alt: 'a1', copyright: '' },
+      ],
     },
   }) as unknown as Discussion;
 
@@ -77,19 +93,32 @@ describe('AlbumEditForm mode', () => {
   it('shows the Save Album button in create mode', () => {
     const wrapper = mountForm({ discussion: undefined });
 
-    expect(wrapper.findComponent({ name: 'PrimaryButton' }).exists()).toBe(true);
+    expect(wrapper.findComponent({ name: 'PrimaryButton' }).exists()).toBe(
+      true
+    );
   });
 
   it('has no Save button in edit mode', () => {
     const wrapper = mountForm({ discussion: editDiscussion() });
 
-    expect(wrapper.findComponent({ name: 'PrimaryButton' }).exists()).toBe(false);
+    expect(wrapper.findComponent({ name: 'PrimaryButton' }).exists()).toBe(
+      false
+    );
   });
 
   it('shows the auto-save / Close UI in edit mode', () => {
     const wrapper = mountForm({ discussion: editDiscussion() });
 
     expect(wrapper.text()).toContain('saved automatically');
+  });
+
+  it('disables album auto-save when the enclosing form owns saving', () => {
+    const wrapper = mountForm({
+      discussion: editDiscussion(),
+      showCloseButton: false,
+    });
+
+    expect(editor(wrapper).props('autoSave')).toBe(false);
   });
 });
 
@@ -121,7 +150,9 @@ describe('AlbumEditForm save', () => {
 
     await wrapper.getComponent({ name: 'PrimaryButton' }).vm.$emit('click');
 
-    expect(wrapper.getComponent({ name: 'Notification' }).props('show')).toBe(true);
+    expect(wrapper.getComponent({ name: 'Notification' }).props('show')).toBe(
+      true
+    );
   });
 
   it('runs the update mutation when saving a new (non-temp) album', async () => {
@@ -170,10 +201,11 @@ describe('AlbumEditForm update input', () => {
       album: { images: [], imageOrder: [] },
     });
 
-    const ops = (updateInput().Album as { update: { node: { Images: unknown[] } } })
-      .update.node.Images;
-    expect(ops.some((op) => Object.prototype.hasOwnProperty.call(op, 'disconnect'))).toBe(
-      true
-    );
+    const ops = (
+      updateInput().Album as { update: { node: { Images: unknown[] } } }
+    ).update.node.Images;
+    expect(
+      ops.some((op) => Object.prototype.hasOwnProperty.call(op, 'disconnect'))
+    ).toBe(true);
   });
 });

@@ -17,6 +17,7 @@ import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useRoute } from 'vue-router';
+import { normalizeImageOrder } from '@/utils/albumImageOrder';
 
 // Define a simplified type for images used in the form
 type AlbumFormImage = {
@@ -137,10 +138,14 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
   // 1) If the album doesn't exist yet, CREATE it and connect to existing images
   if (!albumId.value) {
     const newImages = formValues.value.album.images;
+    const normalizedImageOrder = normalizeImageOrder({
+      images: newImages,
+      imageOrder: formValues.value.album.imageOrder,
+    });
 
     // Build the album node with Owner if user is logged in
     const albumNode = {
-      imageOrder: formValues.value.album.imageOrder,
+      imageOrder: normalizedImageOrder,
       Images: {
         // Connect to existing images using their IDs
         connect: newImages
@@ -164,6 +169,10 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
   // 2) If the album already exists, we build the connect/update/delete arrays
   const oldImages = props.discussion?.Album?.Images ?? [];
   const newImages = formValues.value.album.images;
+  const normalizedImageOrder = normalizeImageOrder({
+    images: newImages,
+    imageOrder: formValues.value.album.imageOrder,
+  });
 
   // CONNECT array: any new image in `newImages` that has NO matching ID in `oldImages`
   // These are images that already exist in the database but need to be connected to this album
@@ -219,7 +228,7 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
     Album: {
       update: {
         node: {
-          imageOrder: formValues.value.album.imageOrder,
+          imageOrder: normalizedImageOrder,
           Images: imagesOps,
         },
       },
@@ -280,14 +289,15 @@ function handleUpdateAlbum(newVals: AlbumFormData) {
 
 <template>
   <div class="w-full">
-    <div class="mb-3 mt-3 flex w-full flex-col">
-      <h3 v-if="showHeading" class="font-semibold mb-4 text-lg dark:text-white">
+    <div class="mt-3 mb-3 flex w-full flex-col">
+      <h3 v-if="showHeading" class="mb-4 text-lg font-semibold dark:text-white">
         Edit Album (Optional)
       </h3>
 
       <AlbumEditor
         :form-values="formValues"
         :allow-image-upload="allowImageUpload"
+        :auto-save="showCloseButton"
         :discussion-id="discussionIdInParams"
         :existing-album="props.discussion?.Album || undefined"
         @update-form-values="handleUpdateAlbum"

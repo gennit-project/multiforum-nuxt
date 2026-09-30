@@ -2,6 +2,7 @@ import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import type { Album, Image } from '@/__generated__/graphql';
+import { normalizeImageOrder } from '@/utils/albumImageOrder';
 
 type AlbumFormData = {
   images: {
@@ -56,12 +57,17 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
     if (!albumId) {
       const newImages = albumData.images || [];
       const validImages = newImages.filter(
-        (img): img is (typeof img & { id: string }) => Boolean(img.id)
+        (img): img is typeof img & { id: string } => Boolean(img.id)
       );
 
       if (validImages.length === 0) {
         return {}; // No valid images to connect
       }
+
+      const normalizedImageOrder = normalizeImageOrder({
+        images: validImages,
+        imageOrder: albumData.imageOrder,
+      });
 
       const albumNode: {
         imageOrder: string[];
@@ -69,7 +75,7 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
           connect: { where: { node: { id: string } } }[];
         };
       } = {
-        imageOrder: albumData.imageOrder || [],
+        imageOrder: normalizedImageOrder,
         Images: {
           connect: validImages.map((img) => ({
             where: { node: { id: img.id } },
@@ -89,6 +95,10 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
     // If the album already exists, build the connect/update/disconnect arrays
     const oldImages: Image[] = (existingAlbum?.Images as Image[]) ?? [];
     const newImages = albumData.images || [];
+    const normalizedImageOrder = normalizeImageOrder({
+      images: newImages,
+      imageOrder: albumData.imageOrder,
+    });
 
     // CONNECT array: new images that need to be connected to this album
     const connectImageArray = newImages
@@ -150,7 +160,7 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
       Album: {
         update: {
           node: {
-            imageOrder: albumData.imageOrder || [],
+            imageOrder: normalizedImageOrder,
             Images: imagesOps,
           },
         },
