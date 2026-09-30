@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch } from 'vue';
-import ForumSubmissions from '@/components/discovery/ForumSubmissions.vue';
+import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue';
 import Tag from '@/components/TagComponent.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_EVENT } from '@/graphQLData/event/queries';
@@ -43,6 +42,12 @@ const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
 
 const formatDate = formatEventDate;
+
+// The forum shell imports EventDetail on discussion and download routes too.
+// Only discovery previews need this selector, so keep it out of their preload graph.
+const ForumSubmissions = defineAsyncComponent(
+  () => import('@/components/discovery/ForumSubmissions.vue')
+);
 
 const COMMENT_LIMIT = 50;
 
