@@ -14,28 +14,34 @@ import UserIcon from '@/components/icons/UserIcon.vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import WikiPagePinButton from '@/components/wiki/WikiPagePinButton.vue';
 import { updateFilters } from '@/utils/routerUtils';
 import { getChannelLabel, relativeTime } from '@/utils';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
-import { GET_SITE_WIDE_WIKI_LIST } from '@/graphQLData/wiki/queries';
+import {
+  GET_SITE_WIDE_WIKI_LIST,
+  GET_WIKI_PIN_CHANNELS,
+} from '@/graphQLData/wiki/queries';
 import { formatWikiExcerpt, formatWordCount } from '@/utils/wikiSearchDisplay';
 import { getPlainWikiTitle } from '@/utils/wikiTitle';
+import type { Channel, User, WikiPage } from '@/__generated__/graphql';
 
 const WIKI_PAGE_LIMIT = 25;
 
-type WikiSearchPage = {
-  id: string;
-  title?: string | null;
-  body?: string | null;
-  slug?: string | null;
-  channelUniqueName?: string | null;
-  createdAt?: string | null;
-  updatedAt?: string | null;
-  VersionAuthor?: {
-    username?: string | null;
-    displayName?: string | null;
-    profilePicURL?: string | null;
-  } | null;
+type WikiSearchPage = Pick<
+  WikiPage,
+  | 'id'
+  | 'title'
+  | 'body'
+  | 'slug'
+  | 'channelUniqueName'
+  | 'createdAt'
+  | 'updatedAt'
+> & {
+  VersionAuthor?: Pick<
+    User,
+    'username' | 'displayName' | 'profilePicURL'
+  > | null;
 };
 
 const route = useRoute();
@@ -130,6 +136,28 @@ const regularWikiPages = computed<WikiSearchPage[]>(() => {
   const featuredIds = new Set(featuredWikiPages.value.map((page) => page.id));
   return wikiPages.value.filter((page) => !featuredIds.has(page.id));
 });
+
+const wikiChannelUniqueNames = computed(() => [
+  ...new Set(
+    [...wikiPages.value, ...featuredWikiPages.value]
+      .map((page) => page.channelUniqueName)
+      .filter((uniqueName): uniqueName is string => Boolean(uniqueName))
+  ),
+]);
+
+const { result: wikiPinChannelsResult, refetch: refetchWikiPinChannels } =
+  useQuery(GET_WIKI_PIN_CHANNELS, {
+    uniqueNames: wikiChannelUniqueNames,
+  });
+
+const wikiPinChannelsByUniqueName = computed(() =>
+  Object.fromEntries(
+    (wikiPinChannelsResult.value?.channels || []).map((channel: Channel) => [
+      channel.uniqueName,
+      channel,
+    ])
+  )
+);
 
 const aggregateWikiPageCount = computed(() => {
   if (!wikiResult.value?.getSiteWideWikiList) {
@@ -285,10 +313,24 @@ watch(
                   />
                   Featured
                 </span>
-                <ArrowUpRightIcon
-                  class="group-hover:text-brand-600 dark:group-hover:text-brand-300 h-5 w-5 text-gray-400 transition"
-                  aria-hidden="true"
-                />
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                  <WikiPagePinButton
+                    v-if="
+                      wikiPage.channelUniqueName &&
+                      wikiPinChannelsByUniqueName[wikiPage.channelUniqueName]
+                    "
+                    :channel="
+                      wikiPinChannelsByUniqueName[wikiPage.channelUniqueName]
+                    "
+                    :wiki-page="wikiPage"
+                    :channel-unique-name="wikiPage.channelUniqueName"
+                    @pinned-changed="refetchWikiPinChannels"
+                  />
+                  <ArrowUpRightIcon
+                    class="group-hover:text-brand-600 dark:group-hover:text-brand-300 h-5 w-5 text-gray-400 transition"
+                    aria-hidden="true"
+                  />
+                </div>
               </div>
               <div class="mt-4">
                 <nuxt-link
@@ -351,10 +393,24 @@ watch(
                 >
                   <DocumentIcon class="h-5 w-5" aria-hidden="true" />
                 </div>
-                <ArrowUpRightIcon
-                  class="group-hover:text-brand-600 dark:group-hover:text-brand-300 h-5 w-5 text-gray-400 transition"
-                  aria-hidden="true"
-                />
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                  <WikiPagePinButton
+                    v-if="
+                      wikiPage.channelUniqueName &&
+                      wikiPinChannelsByUniqueName[wikiPage.channelUniqueName]
+                    "
+                    :channel="
+                      wikiPinChannelsByUniqueName[wikiPage.channelUniqueName]
+                    "
+                    :wiki-page="wikiPage"
+                    :channel-unique-name="wikiPage.channelUniqueName"
+                    @pinned-changed="refetchWikiPinChannels"
+                  />
+                  <ArrowUpRightIcon
+                    class="group-hover:text-brand-600 dark:group-hover:text-brand-300 h-5 w-5 text-gray-400 transition"
+                    aria-hidden="true"
+                  />
+                </div>
               </div>
               <div class="mt-4 flex-1">
                 <nuxt-link
