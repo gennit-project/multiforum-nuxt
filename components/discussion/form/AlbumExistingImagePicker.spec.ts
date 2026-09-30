@@ -95,6 +95,12 @@ describe('AlbumExistingImagePicker', () => {
     ]);
   });
 
+  it('keeps a stable viewport-capped height on desktop', () => {
+    expect(
+      mountPicker().get('[data-testid="album-library-panel"]').classes()
+    ).toContain('sm:h-[min(42rem,85vh)]');
+  });
+
   it('shows the uploads tab by default', () => {
     const wrapper = mountPicker();
     expect(wrapper.findComponent(UserImagesTabStub).props('source')).toBe(

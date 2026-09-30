@@ -12,7 +12,6 @@ const image = (id: string, extra: Record<string, unknown> = {}) => ({
 });
 
 const stubs = {
-  LoadingSpinner: { template: '<div class="spinner" />' },
   ErrorBanner: {
     props: ['text'],
     template: '<div class="error">{{ text }}</div>',
@@ -51,9 +50,21 @@ describe('AlbumReusableImageGrid', () => {
     });
   });
 
-  it('shows the loading spinner while loading with no images yet', () => {
+  it('shows image-card skeletons while loading with no images yet', () => {
     const wrapper = mountGrid({ images: [], loading: true });
-    expect(wrapper.find('.spinner').exists()).toBe(true);
+    expect(
+      wrapper
+        .get('[data-testid="reusable-image-skeleton-grid"]')
+        .findAll('li')
+    ).toHaveLength(8);
+  });
+
+  it('announces the image loading state', () => {
+    expect(
+      mountGrid({ images: [], loading: true })
+        .get('[role="status"]')
+        .attributes('aria-label')
+    ).toBe('Loading images');
   });
 
   it('shows the empty message when there are no images and not loading', () => {

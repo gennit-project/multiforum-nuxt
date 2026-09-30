@@ -6,7 +6,6 @@ import {
   GET_REUSABLE_IMAGE_COLLECTIONS,
   GET_REUSABLE_COLLECTION_IMAGES,
 } from '@/graphQLData/image/queries';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import AlbumReusableImageGrid from './AlbumReusableImageGrid.vue';
 import LoadMore from '@/components/LoadMore.vue';
@@ -190,10 +189,18 @@ const backToCollections = () => {
 
       <div
         v-if="collectionsLoading && collections.length === 0"
-        class="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
+        class="mt-3 space-y-2"
+        role="status"
+        aria-label="Loading collections"
+        data-testid="reusable-collection-skeletons"
       >
-        <LoadingSpinner class="h-4 w-4" />
-        <span>Loading collections...</span>
+        <span class="sr-only">Loading collections...</span>
+        <div
+          v-for="index in 6"
+          :key="index"
+          class="h-10 w-full animate-pulse rounded-md bg-gray-200 dark:bg-gray-700"
+          aria-hidden="true"
+        />
       </div>
 
       <p

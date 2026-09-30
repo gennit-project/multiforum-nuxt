@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import AppImage from '@/components/image/AppImage.vue';
 import ImageCaption from '@/components/image/ImageCaption.vue';
@@ -55,10 +54,25 @@ const getUploaderLabel = (image: ReusableImage) => {
 
     <div
       v-if="loading && images.length === 0"
-      class="mt-3 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
+      class="mt-3"
+      role="status"
+      aria-label="Loading images"
     >
-      <LoadingSpinner class="h-4 w-4" />
-      <span>Loading images...</span>
+      <span class="sr-only">Loading images...</span>
+      <ul
+        class="grid grid-cols-3 gap-2 sm:grid-cols-4"
+        aria-hidden="true"
+        data-testid="reusable-image-skeleton-grid"
+      >
+        <li v-for="index in 8" :key="index">
+          <div
+            class="aspect-square w-full animate-pulse rounded-lg bg-gray-200 dark:bg-gray-700"
+          />
+          <div
+            class="mt-1 hidden h-3 w-3/4 animate-pulse rounded bg-gray-200 sm:block dark:bg-gray-700"
+          />
+        </li>
+      </ul>
     </div>
 
     <p
