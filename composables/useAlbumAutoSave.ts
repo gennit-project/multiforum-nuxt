@@ -44,10 +44,7 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
   const getAlbumUpdateInput = () => {
     const albumData = getAlbumData();
 
-    if (
-      !albumData ||
-      (!albumData.images?.length && !albumData.imageOrder?.length)
-    ) {
+    if (!albumData) {
       return {}; // No album data to update
     }
 

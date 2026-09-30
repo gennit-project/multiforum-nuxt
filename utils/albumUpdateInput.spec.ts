@@ -46,7 +46,7 @@ describe('buildAlbumUpdateInput', () => {
 
   it('disconnects images removed from an existing album', () => {
     const result = buildAlbumUpdateInput({
-      albumData: { images: [], imageOrder: ['x'] },
+      albumData: { images: [], imageOrder: [] },
       existingAlbumId: 'a1',
       existingImages: [{ id: 'i1' }],
     });

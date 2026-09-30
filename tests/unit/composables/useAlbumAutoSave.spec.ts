@@ -181,6 +181,48 @@ describe('useAlbumAutoSave', () => {
       });
     });
 
+    it('disconnects the final image when the album is emptied', async () => {
+      const existingAlbum = makeAlbum({
+        id: 'album-1',
+        Images: [
+          {
+            id: 'img-1',
+            url: 'http://example.com/1.jpg',
+            alt: 'only image',
+            caption: '',
+            copyright: '',
+          },
+        ],
+        imageOrder: ['img-1'],
+      });
+
+      const { performAutoSave } = useAlbumAutoSave({
+        discussionId: 'disc-1',
+        existingAlbum,
+        getAlbumData: () => ({ images: [], imageOrder: [] }),
+      });
+
+      await performAutoSave();
+
+      expect(mockMutate).toHaveBeenCalledWith({
+        where: { id: 'disc-1' },
+        updateDiscussionInput: {
+          Album: {
+            update: {
+              node: {
+                imageOrder: [],
+                Images: [
+                  {
+                    disconnect: [{ where: { node: { id: 'img-1' } } }],
+                  },
+                ],
+              },
+            },
+          },
+        },
+      });
+    });
+
     it('builds update array when image properties change', async () => {
       const existingAlbum = makeAlbum({
         id: 'album-1',
