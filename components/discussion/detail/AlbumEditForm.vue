@@ -278,8 +278,9 @@ function handleUpdateAlbum(newVals: AlbumFormData) {
     imageOrder: newVals.album.imageOrder,
   };
 
-  // In create mode, automatically emit the updated album data to parent
-  if (isCreateMode.value) {
+  // Create forms and enclosing edit forms persist album data through their
+  // parent form. Standalone edit mode saves directly through AlbumEditor.
+  if (isCreateMode.value || !props.showCloseButton) {
     emit('updateFormValues', {
       album: formValues.value.album,
     });

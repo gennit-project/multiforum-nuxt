@@ -104,6 +104,7 @@ const mockComponents = {
     emits: ['updateFormValues'],
   },
   AlbumEditForm: {
+    name: 'AlbumEditForm',
     template: '<div data-testid="album-edit-form"></div>',
     props: ['discussion'],
     emits: ['closeEditor', 'updateFormValues'],
@@ -636,9 +637,9 @@ describe('CreateEditDiscussionFields Component', () => {
 
     it('forwards album updates from AlbumEditForm', async () => {
       const wrapper = mountComponent();
+      const albumEditForm = wrapper.findComponent({ name: 'AlbumEditForm' });
 
-      // Simulate the updateFormValues event directly since findComponent isn't working
-      wrapper.vm.$emit('updateFormValues', {
+      albumEditForm.vm.$emit('updateFormValues', {
         album: {
           images: [
             {
@@ -655,8 +656,24 @@ describe('CreateEditDiscussionFields Component', () => {
 
       await nextTick();
 
-      // Check that the component emitted the event with the expected payload
-      expect(wrapper.emitted()).toHaveProperty('updateFormValues');
+      expect(wrapper.emitted('updateFormValues')).toEqual([
+        [
+          {
+            album: {
+              images: [
+                {
+                  id: '1',
+                  url: 'test.jpg',
+                  alt: 'Test',
+                  caption: 'Caption',
+                  copyright: 'Copyright',
+                },
+              ],
+              imageOrder: ['1'],
+            },
+          },
+        ],
+      ]);
     });
   });
 

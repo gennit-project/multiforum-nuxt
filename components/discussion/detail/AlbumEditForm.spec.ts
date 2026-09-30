@@ -142,6 +142,21 @@ describe('AlbumEditForm album updates', () => {
 
     expect(wrapper.emitted('updateFormValues')).toBeUndefined();
   });
+
+  it('emits album changes when an enclosing edit form owns saving', async () => {
+    const wrapper = mountForm({
+      discussion: editDiscussion(),
+      showCloseButton: false,
+    });
+
+    await editor(wrapper).vm.$emit('update-form-values', {
+      album: { images: [], imageOrder: [] },
+    });
+
+    expect(wrapper.emitted('updateFormValues')).toEqual([
+      [{ album: { images: [], imageOrder: [] } }],
+    ]);
+  });
 });
 
 describe('AlbumEditForm save', () => {
