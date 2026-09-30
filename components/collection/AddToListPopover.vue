@@ -87,7 +87,11 @@ const {
 
 // Fetch user collections
 // Use cache-and-network to prevent cache collision with itemInCollections query
-const { result: collectionsResult, refetch: refetchCollections } = useQuery(
+const {
+  result: collectionsResult,
+  loading: collectionsLoading,
+  refetch: refetchCollections,
+} = useQuery(
   getCollectionQuery(),
   () => ({
     username: usernameVar.value,
@@ -547,6 +551,30 @@ const popoverStyles = computed(() => {
           </div>
 
           <!-- Custom Collections -->
+          <div
+            v-if="collectionsLoading && filteredCollections.length === 0"
+            role="status"
+            aria-label="Loading collections"
+            class="space-y-3 px-3 py-2"
+          >
+            <span class="sr-only">Loading collections…</span>
+            <div
+              v-for="width in ['w-2/3', 'w-1/2', 'w-3/4']"
+              :key="width"
+              aria-hidden="true"
+              class="flex items-center justify-between"
+            >
+              <div
+                :class="[
+                  width,
+                  'h-4 animate-pulse rounded bg-gray-200 dark:bg-gray-700',
+                ]"
+              />
+              <div
+                class="h-4 w-4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+              />
+            </div>
+          </div>
           <button
             v-for="collection in filteredCollections"
             :key="collection.id"
@@ -590,7 +618,11 @@ const popoverStyles = computed(() => {
 
           <!-- No Search Results -->
           <div
-            v-if="filteredCollections.length === 0 && searchTerm"
+            v-if="
+              !collectionsLoading &&
+              filteredCollections.length === 0 &&
+              searchTerm
+            "
             class="px-3 py-2 text-center text-sm text-gray-500 dark:text-gray-400"
           >
             No collections found for "{{ searchTerm }}"
@@ -598,7 +630,11 @@ const popoverStyles = computed(() => {
 
           <!-- Empty Collections State -->
           <div
-            v-if="filteredCollections.length === 0 && !searchTerm"
+            v-if="
+              !collectionsLoading &&
+              filteredCollections.length === 0 &&
+              !searchTerm
+            "
             class="px-3 py-2 text-center text-sm text-gray-500 dark:text-gray-400"
           >
             No collections yet. Create your first collection above!
@@ -766,6 +802,30 @@ const popoverStyles = computed(() => {
         </div>
 
         <!-- Custom Collections -->
+        <div
+          v-if="collectionsLoading && filteredCollections.length === 0"
+          role="status"
+          aria-label="Loading collections"
+          class="space-y-3 px-3 py-2"
+        >
+          <span class="sr-only">Loading collections…</span>
+          <div
+            v-for="width in ['w-2/3', 'w-1/2', 'w-3/4']"
+            :key="width"
+            aria-hidden="true"
+            class="flex items-center justify-between"
+          >
+            <div
+              :class="[
+                width,
+                'h-4 animate-pulse rounded bg-gray-200 dark:bg-gray-700',
+              ]"
+            />
+            <div
+              class="h-4 w-4 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+            />
+          </div>
+        </div>
         <button
           v-for="collection in filteredCollections"
           :key="collection.id"
@@ -809,7 +869,11 @@ const popoverStyles = computed(() => {
 
         <!-- No Search Results -->
         <div
-          v-if="filteredCollections.length === 0 && searchTerm"
+          v-if="
+            !collectionsLoading &&
+            filteredCollections.length === 0 &&
+            searchTerm
+          "
           class="px-3 py-2 text-center text-sm text-gray-500 dark:text-gray-400"
         >
           No collections found for "{{ searchTerm }}"
@@ -817,7 +881,11 @@ const popoverStyles = computed(() => {
 
         <!-- Empty Collections State -->
         <div
-          v-if="filteredCollections.length === 0 && !searchTerm"
+          v-if="
+            !collectionsLoading &&
+            filteredCollections.length === 0 &&
+            !searchTerm
+          "
           class="px-3 py-2 text-center text-sm text-gray-500 dark:text-gray-400"
         >
           No collections yet. Create your first collection above!

@@ -9,6 +9,7 @@ const h = vi.hoisted(() => {
   return {
     username: { value: 'alice' as string | null | undefined },
     collectionsResult: { value: undefined as unknown },
+    collectionsLoading: { value: false },
     itemInResult: { value: undefined as unknown },
     refetchCollections: undefined as unknown,
     refetchItem: undefined as unknown,
@@ -83,6 +84,7 @@ beforeEach(() => {
       },
     ],
   }) as never;
+  h.collectionsLoading = ref(false);
   h.itemInResult = ref({ users: [{ Collections: [] }] }) as never;
   h.refetchCollections = vi.fn();
   h.refetchItem = vi.fn();
@@ -96,6 +98,7 @@ beforeEach(() => {
     .fn()
     .mockReturnValueOnce({
       result: h.collectionsResult,
+      loading: h.collectionsLoading,
       refetch: h.refetchCollections,
     })
     .mockReturnValueOnce({ result: h.itemInResult, refetch: h.refetchItem });
@@ -126,6 +129,31 @@ describe('AddToListPopover list rendering', () => {
     const wrapper = mountPopover();
 
     expect(wrapper.text()).toContain('My List');
+  });
+
+  it('shows collection skeletons instead of the empty state while loading', () => {
+    h.collectionsResult = ref(undefined) as never;
+    h.collectionsLoading = ref(true);
+    h.useQuery = vi
+      .fn()
+      .mockReturnValueOnce({
+        result: h.collectionsResult,
+        loading: h.collectionsLoading,
+        refetch: vi.fn(),
+      })
+      .mockReturnValueOnce({ result: h.itemInResult, refetch: vi.fn() });
+    const wrapper = mountPopover();
+
+    expect({
+      skeletonCount: wrapper.findAll('[aria-hidden="true"] .animate-pulse')
+        .length,
+      loadingLabel: wrapper.get('[role="status"]').attributes('aria-label'),
+      showsEmptyState: wrapper.text().includes('No collections yet'),
+    }).toEqual({
+      skeletonCount: 6,
+      loadingLabel: 'Loading collections',
+      showsEmptyState: false,
+    });
   });
 
   it('renders collection choices as native toggle buttons', () => {
