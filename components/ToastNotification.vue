@@ -6,14 +6,17 @@ const toastStore = useToastStore();
 
 <template>
   <Teleport to="body">
-    <div class="fixed bottom-4 left-1/2 z-100 -translate-x-1/2 space-y-2">
+    <div
+      class="fixed top-4 left-1/2 z-100 w-[calc(100%-2rem)] max-w-[420px] -translate-x-1/2 space-y-2"
+      data-testid="toast-container"
+    >
       <TransitionGroup
         enter-active-class="transition ease-out duration-300"
-        enter-from-class="translate-y-2 opacity-0"
+        enter-from-class="-translate-y-2 opacity-0"
         enter-to-class="translate-y-0 opacity-100"
         leave-active-class="transition ease-in duration-200"
         leave-from-class="translate-y-0 opacity-100"
-        leave-to-class="translate-y-2 opacity-0"
+        leave-to-class="-translate-y-2 opacity-0"
       >
         <!--
           Each toast is its own live region so it announces on insertion:
@@ -26,7 +29,7 @@ const toastStore = useToastStore();
           :key="toast.id"
           :role="toast.type === 'error' ? 'alert' : 'status'"
           :aria-live="toast.type === 'error' ? 'assertive' : 'polite'"
-          class="flex max-w-[420px] min-w-[200px] items-center justify-between gap-3 rounded-lg bg-gray-900 px-4 py-3 text-white shadow-lg"
+          class="flex w-full min-w-0 items-center justify-between gap-3 rounded-lg bg-gray-900 px-4 py-3 text-white shadow-lg"
           :class="{
             'bg-gray-900': toast.type === 'info' || !toast.type,
             'bg-green-700': toast.type === 'success',
