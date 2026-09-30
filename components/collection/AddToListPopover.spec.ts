@@ -170,6 +170,71 @@ describe('AddToListPopover list rendering', () => {
     ]);
   });
 
+  it('shows a row-level spinner immediately after a collection is clicked', async () => {
+    h.addMutation = vi.fn(() => new Promise(() => {}));
+    const wrapper = mountPopover();
+    const collectionRow = rows(wrapper)[1];
+
+    await collectionRow.trigger('click');
+    const pendingRow = rows(wrapper)[1];
+
+    expect({
+      mutationCalls: h.addMutation.mock.calls.length,
+      isBusy: pendingRow.attributes('aria-busy'),
+      isDisabled: pendingRow.attributes('disabled'),
+      showsRowSpinner: pendingRow.find('.animate-spin').exists(),
+      showsPopoverOverlay: wrapper
+        .find('.absolute.inset-0 .animate-spin')
+        .exists(),
+    }).toEqual({
+      mutationCalls: 1,
+      isBusy: 'true',
+      isDisabled: '',
+      showsRowSpinner: true,
+      showsPopoverOverlay: false,
+    });
+  });
+
+  it('keeps the row busy until refreshed membership is available', async () => {
+    let finishRefetch: (() => void) | undefined;
+    h.refetchItem = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finishRefetch = resolve;
+        })
+    );
+    h.useQuery = vi
+      .fn()
+      .mockReturnValueOnce({
+        result: h.collectionsResult,
+        loading: h.collectionsLoading,
+        refetch: h.refetchCollections,
+      })
+      .mockReturnValueOnce({
+        result: h.itemInResult,
+        refetch: h.refetchItem,
+      });
+    const wrapper = mountPopover();
+    const collectionRow = rows(wrapper)[1];
+
+    await collectionRow.trigger('click');
+    await flushPromises();
+    h.itemInResult.value = { users: [{ Collections: [{ id: 'c1' }] }] };
+    finishRefetch?.();
+    await flushPromises();
+    const refreshedRow = rows(wrapper)[1];
+
+    expect({
+      isBusy: refreshedRow.attributes('aria-busy'),
+      isChecked: refreshedRow.attributes('aria-pressed'),
+      showsRowSpinner: refreshedRow.find('.animate-spin').exists(),
+    }).toEqual({
+      isBusy: 'false',
+      isChecked: 'true',
+      showsRowSpinner: false,
+    });
+  });
+
   it('shows the empty state when there are no collections', () => {
     h.collectionsResult = ref({
       users: [{ Collections: [], FavoriteDiscussions: [] }],

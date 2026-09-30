@@ -68,7 +68,11 @@ const newCollectionName = ref('');
 const newCollectionVisibility = ref<CollectionVisibility>(
   'PRIVATE' as CollectionVisibility
 );
-const isLoading = ref(false);
+const isCreatingCollection = ref(false);
+const pendingCollectionId = ref<string | null>(null);
+const isLoading = computed(
+  () => isCreatingCollection.value || pendingCollectionId.value !== null
+);
 const toastStore = useToastStore();
 const popoverIdBase = `add-to-list-popover-${props.itemType}-${props.itemId.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 const popoverTitleId = `${popoverIdBase}-title`;
@@ -225,7 +229,7 @@ const handleCreateNewCollection = async () => {
 
   if (!usernameVar.value) return;
 
-  isLoading.value = true;
+  isCreatingCollection.value = true;
   try {
     const now = new Date().toISOString();
     const result = await createCollection({
@@ -255,17 +259,20 @@ const handleCreateNewCollection = async () => {
     console.error('Error creating collection:', error);
     toastStore.showToast('Error creating collection', 'error');
   } finally {
-    isLoading.value = false;
+    isCreatingCollection.value = false;
   }
 };
 
 const handleToggleInCollection = async (collection: CollectionListItem) => {
+  if (isLoading.value) return;
+
+  pendingCollectionId.value = collection.id;
+
   // Check if this is the favorites list (has an id starting with 'favorites-')
   if (collection.id && collection.id.startsWith('favorites-')) {
     // Handle favorites list
     const isCurrentlyFavorited = isItemInFavorites.value;
 
-    isLoading.value = true;
     try {
       if (isCurrentlyFavorited) {
         // Remove from favorites
@@ -301,13 +308,13 @@ const handleToggleInCollection = async (collection: CollectionListItem) => {
         emit('favoriteChange', true);
       }
 
-      // Refresh the data
-      refetchCollections();
+      // Keep the row busy until the refreshed favorite state is available.
+      await Promise.allSettled([refetchCollections()]);
     } catch (error) {
       console.error('Error toggling favorites:', error);
       toastStore.showToast('Error updating favorites', 'error');
     } finally {
-      isLoading.value = false;
+      pendingCollectionId.value = null;
     }
   } else {
     // Handle regular collections
@@ -315,7 +322,6 @@ const handleToggleInCollection = async (collection: CollectionListItem) => {
       (c: CollectionListItem) => c.id === collection.id
     );
 
-    isLoading.value = true;
     try {
       if (isInCollection) {
         const removeMutation = getRemoveMutation();
@@ -333,14 +339,16 @@ const handleToggleInCollection = async (collection: CollectionListItem) => {
         toastStore.showToast(`Added to "${collection.name}"`);
       }
 
-      // Refresh the data
-      refetchCollections();
-      refetchItemInCollections();
+      // Keep the row busy until the refreshed membership state is available.
+      await Promise.allSettled([
+        refetchCollections(),
+        refetchItemInCollections(),
+      ]);
     } catch (error) {
       console.error('Error toggling collection:', error);
       toastStore.showToast('Error updating collection', 'error');
     } finally {
-      isLoading.value = false;
+      pendingCollectionId.value = null;
     }
   }
 };
@@ -512,7 +520,9 @@ const popoverStyles = computed(() => {
           <button
             type="button"
             :aria-pressed="isItemInFavorites"
-            class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
+            :aria-busy="pendingCollectionId === favoritesList.id"
+            :disabled="isLoading"
+            class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-wait disabled:opacity-70 dark:hover:bg-gray-700"
             @click.stop="handleToggleInCollection(favoritesList)"
           >
             <div class="flex items-center">
@@ -525,12 +535,19 @@ const popoverStyles = computed(() => {
               aria-hidden="true"
               :class="[
                 'flex h-4 w-4 items-center justify-center rounded border text-xs',
-                isItemInFavorites
-                  ? 'border-blue-600 bg-blue-600 text-white'
-                  : 'border-gray-400 dark:border-gray-500',
+                pendingCollectionId === favoritesList.id
+                  ? 'border-transparent'
+                  : isItemInFavorites
+                    ? 'border-blue-600 bg-blue-600 text-white'
+                    : 'border-gray-400 dark:border-gray-500',
               ]"
             >
-              {{ isItemInFavorites ? '✓' : '' }}
+              <span
+                v-if="pendingCollectionId === favoritesList.id"
+                aria-hidden="true"
+                class="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600 dark:border-gray-600 dark:border-t-blue-400"
+              />
+              <template v-else>{{ isItemInFavorites ? '✓' : '' }}</template>
             </span>
           </button>
 
@@ -584,7 +601,9 @@ const popoverStyles = computed(() => {
                 (c: CollectionListItem) => c.id === collection.id
               )
             "
-            class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
+            :aria-busy="pendingCollectionId === collection.id"
+            :disabled="isLoading"
+            class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-wait disabled:opacity-70 dark:hover:bg-gray-700"
             @click.stop="handleToggleInCollection(collection)"
           >
             <div class="flex items-center">
@@ -599,20 +618,29 @@ const popoverStyles = computed(() => {
               aria-hidden="true"
               :class="[
                 'flex h-4 w-4 items-center justify-center rounded border text-xs',
-                itemInCollections.some(
-                  (c: CollectionListItem) => c.id === collection.id
-                )
-                  ? 'border-blue-600 bg-blue-600 text-white'
-                  : 'border-gray-400 dark:border-gray-500',
+                pendingCollectionId === collection.id
+                  ? 'border-transparent'
+                  : itemInCollections.some(
+                        (c: CollectionListItem) => c.id === collection.id
+                      )
+                    ? 'border-blue-600 bg-blue-600 text-white'
+                    : 'border-gray-400 dark:border-gray-500',
               ]"
             >
-              {{
-                itemInCollections.some(
-                  (c: CollectionListItem) => c.id === collection.id
-                )
-                  ? '✓'
-                  : ''
-              }}
+              <span
+                v-if="pendingCollectionId === collection.id"
+                aria-hidden="true"
+                class="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600 dark:border-gray-600 dark:border-t-blue-400"
+              />
+              <template v-else>
+                {{
+                  itemInCollections.some(
+                    (c: CollectionListItem) => c.id === collection.id
+                  )
+                    ? '✓'
+                    : ''
+                }}
+              </template>
             </span>
           </button>
 
@@ -643,7 +671,7 @@ const popoverStyles = computed(() => {
 
         <!-- Loading Overlay -->
         <div
-          v-if="isLoading"
+          v-if="isCreatingCollection"
           class="absolute inset-0 flex items-center justify-center rounded-lg bg-white/50 dark:bg-gray-800/50"
         >
           <div
@@ -763,7 +791,9 @@ const popoverStyles = computed(() => {
         <button
           type="button"
           :aria-pressed="isItemInFavorites"
-          class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
+          :aria-busy="pendingCollectionId === favoritesList.id"
+          :disabled="isLoading"
+          class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-wait disabled:opacity-70 dark:hover:bg-gray-700"
           @click.stop="handleToggleInCollection(favoritesList)"
         >
           <div class="flex items-center">
@@ -776,12 +806,19 @@ const popoverStyles = computed(() => {
             aria-hidden="true"
             :class="[
               'flex h-4 w-4 items-center justify-center rounded border text-xs',
-              isItemInFavorites
-                ? 'border-blue-600 bg-blue-600 text-white'
-                : 'border-gray-400 dark:border-gray-500',
+              pendingCollectionId === favoritesList.id
+                ? 'border-transparent'
+                : isItemInFavorites
+                  ? 'border-blue-600 bg-blue-600 text-white'
+                  : 'border-gray-400 dark:border-gray-500',
             ]"
           >
-            {{ isItemInFavorites ? '✓' : '' }}
+            <span
+              v-if="pendingCollectionId === favoritesList.id"
+              aria-hidden="true"
+              class="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600 dark:border-gray-600 dark:border-t-blue-400"
+            />
+            <template v-else>{{ isItemInFavorites ? '✓' : '' }}</template>
           </span>
         </button>
 
@@ -835,7 +872,9 @@ const popoverStyles = computed(() => {
               (c: CollectionListItem) => c.id === collection.id
             )
           "
-          class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:hover:bg-gray-700"
+          :aria-busy="pendingCollectionId === collection.id"
+          :disabled="isLoading"
+          class="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left text-sm hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-wait disabled:opacity-70 dark:hover:bg-gray-700"
           @click.stop="handleToggleInCollection(collection)"
         >
           <div class="flex items-center">
@@ -850,20 +889,29 @@ const popoverStyles = computed(() => {
             aria-hidden="true"
             :class="[
               'flex h-4 w-4 items-center justify-center rounded border text-xs',
-              itemInCollections.some(
-                (c: CollectionListItem) => c.id === collection.id
-              )
-                ? 'border-blue-600 bg-blue-600 text-white'
-                : 'border-gray-400 dark:border-gray-500',
+              pendingCollectionId === collection.id
+                ? 'border-transparent'
+                : itemInCollections.some(
+                      (c: CollectionListItem) => c.id === collection.id
+                    )
+                  ? 'border-blue-600 bg-blue-600 text-white'
+                  : 'border-gray-400 dark:border-gray-500',
             ]"
           >
-            {{
-              itemInCollections.some(
-                (c: CollectionListItem) => c.id === collection.id
-              )
-                ? '✓'
-                : ''
-            }}
+            <span
+              v-if="pendingCollectionId === collection.id"
+              aria-hidden="true"
+              class="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600 dark:border-gray-600 dark:border-t-blue-400"
+            />
+            <template v-else>
+              {{
+                itemInCollections.some(
+                  (c: CollectionListItem) => c.id === collection.id
+                )
+                  ? '✓'
+                  : ''
+              }}
+            </template>
           </span>
         </button>
 
@@ -894,7 +942,7 @@ const popoverStyles = computed(() => {
 
       <!-- Loading Overlay -->
       <div
-        v-if="isLoading"
+        v-if="isCreatingCollection"
         class="absolute inset-0 flex items-center justify-center rounded-lg bg-white/50 dark:bg-gray-800/50"
       >
         <div
