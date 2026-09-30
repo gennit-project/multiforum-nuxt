@@ -11,9 +11,7 @@ import type { LibraryTabKey } from './reusableImageTypes';
 import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
 import { useImageMetadataAutoSave } from '@/composables/useImageMetadataAutoSave';
-import { useMutation } from '@vue/apollo-composable';
 import WarningModal from '@/components/WarningModal.vue';
-import { PERMANENTLY_DELETE_IMAGE } from '@/graphQLData/discussion/mutations';
 import {
   orderImagesByOrder,
   getImageIdOrder,
@@ -259,13 +257,7 @@ const isCreatingImageFromUrl = ref(false);
 const urlInputFormRef = ref<InstanceType<typeof AlbumUrlInputForm> | null>(
   null
 );
-const pendingDeleteImageIndex = ref<number | null>(null);
-const permanentDeleteImageError = ref('');
-
-const {
-  mutate: permanentlyDeleteImage,
-  loading: permanentlyDeleteImageLoading,
-} = useMutation(PERMANENTLY_DELETE_IMAGE);
+const pendingRemoveImageIndex = ref<number | null>(null);
 
 // Image field update handler
 const updateImageField = (
@@ -337,50 +329,19 @@ const removeImageFromAlbum = (index: number) => {
   requestAutoSave();
 };
 
-const canPermanentlyDeleteImage = (image: ImageInput | undefined) => {
-  const uploaderUsername = image?.Uploader?.username;
-  return !uploaderUsername || uploaderUsername === usernameVar.value;
+const requestRemoveImage = (index: number) => {
+  pendingRemoveImageIndex.value = index;
 };
 
-// Delete image handler
-const requestDeleteImage = (index: number) => {
-  const orderedImage = orderedImages.value[index];
-  if (!canPermanentlyDeleteImage(orderedImage)) {
-    removeImageFromAlbum(index);
-    return;
-  }
-
-  pendingDeleteImageIndex.value = index;
-  permanentDeleteImageError.value = '';
+const closeRemoveImageModal = () => {
+  pendingRemoveImageIndex.value = null;
 };
 
-const closeDeleteImageModal = () => {
-  if (permanentlyDeleteImageLoading.value) return;
-  pendingDeleteImageIndex.value = null;
-  permanentDeleteImageError.value = '';
-};
+const confirmRemoveImage = () => {
+  if (pendingRemoveImageIndex.value === null) return;
 
-const confirmDeleteImage = async () => {
-  if (pendingDeleteImageIndex.value === null) return;
-
-  const deleteIndex = pendingDeleteImageIndex.value;
-  const orderedImage = orderedImages.value[deleteIndex];
-  if (!orderedImage?.id) {
-    removeImageFromAlbum(deleteIndex);
-    closeDeleteImageModal();
-    return;
-  }
-
-  permanentDeleteImageError.value = '';
-
-  try {
-    await permanentlyDeleteImage({ imageId: orderedImage.id });
-    removeImageFromAlbum(deleteIndex);
-    pendingDeleteImageIndex.value = null;
-  } catch (error) {
-    permanentDeleteImageError.value =
-      error instanceof Error ? error.message : 'Failed to delete image.';
-  }
+  removeImageFromAlbum(pendingRemoveImageIndex.value);
+  pendingRemoveImageIndex.value = null;
 };
 
 // Move image up handler
@@ -528,9 +489,8 @@ const handleUrlCancel = () => {
       :is-first="index === 0"
       :is-last="index === orderedImages.length - 1"
       :is-loading="loadingStates[index] ?? false"
-      :can-permanently-delete="canPermanentlyDeleteImage(image)"
       @update-field="(field, value) => updateImageField(index, field, value)"
-      @delete="requestDeleteImage(index)"
+      @delete="requestRemoveImage(index)"
       @move-up="moveImageUp(index)"
       @move-down="moveImageDown(index)"
     />
@@ -570,17 +530,15 @@ const handleUrlCancel = () => {
     />
 
     <WarningModal
-      :open="pendingDeleteImageIndex !== null"
-      title="Delete this image?"
-      body="This permanently deletes the image and removes the stored file. This cannot be undone."
-      primary-button-text="Delete Image"
+      :open="pendingRemoveImageIndex !== null"
+      title="Remove this image from the album?"
+      body="The original image will remain in the library, collections, and other albums."
+      primary-button-text="Remove from album"
       secondary-button-text="Cancel"
       icon="trash"
-      data-testid="permanently-delete-album-image-modal"
-      :loading="permanentlyDeleteImageLoading"
-      :error="permanentDeleteImageError"
-      @primary-button-click="confirmDeleteImage"
-      @close="closeDeleteImageModal"
+      data-testid="remove-album-image-modal"
+      @primary-button-click="confirmRemoveImage"
+      @close="closeRemoveImageModal"
     />
   </div>
 </template>

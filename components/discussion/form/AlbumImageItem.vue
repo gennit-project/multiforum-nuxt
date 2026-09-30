@@ -32,7 +32,6 @@ const props = defineProps<{
   isFirst: boolean;
   isLast: boolean;
   isLoading: boolean;
-  canPermanentlyDelete?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -128,8 +127,8 @@ const getUploaderLabel = (image: ImageData) => {
     <button
       type="button"
       class="ml-auto rounded border border-gray-300 p-1.5 text-gray-600 hover:text-red-600 sm:order-last sm:ml-0 dark:border-gray-600 dark:text-gray-300 dark:hover:text-red-400"
-      :aria-label="`${canPermanentlyDelete ? 'Delete' : 'Remove'} image ${imageNumber}`"
-      :title="canPermanentlyDelete ? 'Delete image' : 'Remove image'"
+      :aria-label="`Remove image ${imageNumber} from album`"
+      title="Remove image from album"
       @click="emit('delete')"
     >
       <TrashIcon class="h-4 w-4" />

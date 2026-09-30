@@ -10,7 +10,6 @@ import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
 const {
   usernameRef,
   createImageFromUrl,
-  permanentlyDeleteImage,
   uploadsAvailable,
   uploadsCapability,
   uploadsLoading,
@@ -22,7 +21,6 @@ const {
   debouncedAutoSave: vi.fn(),
   usernameRef: { value: 'alice' as string },
   createImageFromUrl: vi.fn(),
-  permanentlyDeleteImage: vi.fn(),
   uploadsAvailable: { value: true },
   uploadsCapability: {
     value: {
@@ -46,12 +44,6 @@ const {
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => usernameRef,
   setUsername: vi.fn(),
-}));
-vi.mock('@vue/apollo-composable', () => ({
-  useMutation: () => ({
-    mutate: permanentlyDeleteImage,
-    loading: { value: false },
-  }),
 }));
 vi.mock('@/composables/useAlbumImageUpload', () => ({
   useAlbumImageUpload: () => ({
@@ -90,7 +82,7 @@ vi.mock('@/composables/useInstanceSetupStatus', () => ({
 
 const AlbumImageItemStub = {
   name: 'AlbumImageItem',
-  props: ['image', 'index', 'isFirst', 'isLast', 'canPermanentlyDelete'],
+  props: ['image', 'index', 'isFirst', 'isLast'],
   emits: ['update-field', 'delete', 'move-up', 'move-down'],
   template: '<div class="image-item-stub" />',
 };
@@ -192,10 +184,6 @@ describe('AlbumEditor', () => {
   beforeEach(() => {
     usernameRef.value = 'alice';
     createImageFromUrl.mockReset();
-    permanentlyDeleteImage.mockReset();
-    permanentlyDeleteImage.mockResolvedValue({
-      data: { permanentlyDeleteImage: { id: 'a' } },
-    });
     uploadsAvailable.value = true;
     uploadsCapability.value = {
       configured: true,
@@ -256,33 +244,24 @@ describe('AlbumEditor', () => {
     expect(lastEmit(wrapper).images.map((i) => i.id)).toEqual(['b', 'c']);
   });
 
-  it('opens a confirmation modal before deleting an image', async () => {
+  it('opens a confirmation modal before removing an image', async () => {
     const wrapper = mountEditor();
     wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('delete');
     await wrapper.vm.$nextTick();
     expect(warningModal(wrapper).props('open')).toBe(true);
   });
 
-  it('calls the permanent-delete mutation for the selected image', async () => {
+  it('explains that removing the pointer keeps the original image', async () => {
     const wrapper = mountEditor();
     wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('delete');
-    warningModal(wrapper).vm.$emit('primary-button-click');
-    await flushPromises();
-    expect(permanentlyDeleteImage).toHaveBeenCalledWith({ imageId: 'a' });
+    await wrapper.vm.$nextTick();
+    expect(warningModal(wrapper).props()).toMatchObject({
+      title: 'Remove this image from the album?',
+      body: 'The original image will remain in the library, collections, and other albums.',
+    });
   });
 
-  it('keeps the image in the album when permanent delete fails', async () => {
-    permanentlyDeleteImage.mockRejectedValue(
-      new Error('backend rejected delete')
-    );
-    const wrapper = mountEditor();
-    wrapper.findAllComponents(AlbumImageItemStub)[0].vm.$emit('delete');
-    warningModal(wrapper).vm.$emit('primary-button-click');
-    await flushPromises();
-    expect(wrapper.emitted('updateFormValues')).toBeUndefined();
-  });
-
-  it('removes a reused image by another uploader without permanent deletion', async () => {
+  it('uses the same relationship-only removal flow for another uploader', async () => {
     const wrapper = mountEditor(
       [
         {
@@ -293,16 +272,9 @@ describe('AlbumEditor', () => {
       ['a']
     );
     wrapper.findComponent(AlbumImageItemStub).vm.$emit('delete');
+    warningModal(wrapper).vm.$emit('primary-button-click');
     await flushPromises();
-    expect({
-      imageIds: lastEmit(wrapper).images.map((i) => i.id),
-      permanentDeleteCalls: permanentlyDeleteImage.mock.calls.length,
-      modalOpen: warningModal(wrapper).props('open'),
-    }).toEqual({
-      imageIds: [],
-      permanentDeleteCalls: 0,
-      modalOpen: false,
-    });
+    expect(lastEmit(wrapper).images).toEqual([]);
   });
 
   it('reorders imageOrder when an image moves up', () => {
