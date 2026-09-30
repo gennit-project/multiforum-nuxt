@@ -55,7 +55,9 @@ const {
 );
 
 // Computed property for the wiki page data
-const wikiPage = computed(() => wikiPageResult.value?.wikiPages?.[0] as WikiPage);
+const wikiPage = computed(
+  () => wikiPageResult.value?.wikiPages?.[0] as WikiPage
+);
 
 // Process all versions used by the revision-history screen.
 const historyEdits = computed(() => {
@@ -157,7 +159,7 @@ const handleRevisionSelect = (event: Event) => {
   }
 
   router.push(
-      `/forums/${forumId}/wiki/revisions/diff/${slug}/${selectedRevisionId}`
+    `/forums/${forumId}/wiki/revisions/diff/${slug}/${selectedRevisionId}`
   );
 };
 
@@ -171,11 +173,7 @@ const revisionTargetId = computed(() => {
       ? currentRevision.value.newVersionData?.id
       : currentRevision.value.oldVersionData?.id;
 
-  if (
-    !targetId ||
-    targetId === 'current' ||
-    targetId === INITIAL_REVISION_ID
-  ) {
+  if (!targetId || targetId === 'current' || targetId === INITIAL_REVISION_ID) {
     return '';
   }
 
@@ -280,14 +278,14 @@ useHead({
           aria-label="Wiki revision detail breadcrumb"
         >
           <button
-            class="text-orange-600 hover:underline dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 hover:underline"
             @click="goBackToWiki"
           >
             {{ wikiPage.title }}
           </button>
           <span class="text-gray-400">›</span>
           <button
-            class="text-orange-600 hover:underline dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 hover:underline"
             @click="goBackToRevisions"
           >
             Revision History
@@ -296,7 +294,9 @@ useHead({
           <span class="text-gray-700 dark:text-gray-300">Revision Detail</span>
         </nav>
 
-        <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <div
+          class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
+        >
           <div class="min-w-0">
             <h1 class="text-2xl font-bold dark:text-white">Revision Detail</h1>
             <div v-if="currentRevision.isCurrent" class="mt-2">
@@ -318,7 +318,7 @@ useHead({
               </label>
               <select
                 id="wiki-revision-select"
-                class="w-full min-w-0 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 sm:w-80"
+                class="focus:border-brand-500 focus:ring-brand-500 w-full min-w-0 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:ring-1 focus:outline-none sm:w-80 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                 :value="revisionId"
                 @change="handleRevisionSelect"
               >

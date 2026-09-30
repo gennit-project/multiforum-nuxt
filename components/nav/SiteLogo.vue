@@ -1,19 +1,35 @@
 <script lang="ts" setup>
-// SiteLogo component - displays the site logo
+import { computed } from 'vue';
 import { config } from '@/config';
+import { useBranding } from '@/composables/useBranding';
+
+const { branding } = useBranding();
+const logoAlt = computed(
+  () => branding.value.logoAlt || config.serverDisplayName
+);
 </script>
 
 <template>
-  <div class="shrink-0">
+  <span class="block shrink-0">
     <img
-      class="block h-8 w-auto lg:hidden"
-      src="https://tailwindui.com/img/logos/workflow-mark-orange-500.svg"
-      :alt="`${config.serverDisplayName} logo`"
+      v-if="branding.logoUrl"
+      class="h-8 max-w-48 object-contain object-left"
+      :class="{ 'dark:hidden': branding.logoDarkUrl }"
+      :src="branding.logoUrl"
+      :alt="logoAlt"
     />
     <img
-      class="hidden h-8 w-auto lg:block"
-      src="https://tailwindui.com/img/logos/workflow-logo-orange-500-mark-white-text.svg"
-      :alt="`${config.serverDisplayName} logo`"
+      v-if="branding.logoDarkUrl"
+      class="hidden h-8 max-w-48 object-contain object-left dark:block"
+      :src="branding.logoDarkUrl"
+      :alt="logoAlt"
     />
-  </div>
+    <span
+      v-if="!branding.logoUrl"
+      class="block truncate"
+      :class="{ 'dark:hidden': branding.logoDarkUrl }"
+    >
+      {{ config.serverDisplayName }}
+    </span>
+  </span>
 </template>

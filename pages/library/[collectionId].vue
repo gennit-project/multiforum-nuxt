@@ -323,7 +323,7 @@ const handleDelete = async () => {
             <!-- Loading state -->
             <div v-if="loading" class="py-8 text-center">
               <div
-                class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500"
+                class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
               />
               <p class="mt-2 text-gray-600 dark:text-gray-400">
                 Loading collection...
@@ -351,7 +351,7 @@ const handleDelete = async () => {
               <div class="mt-6">
                 <NuxtLink
                   to="/library"
-                  class="inline-flex items-center rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
+                  class="bg-brand-500 hover:bg-brand-600 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm"
                 >
                   Back to Library
                 </NuxtLink>
@@ -387,7 +387,7 @@ const handleDelete = async () => {
 
                 <div
                   v-if="isAutoSavedDownloads"
-                  class="mt-4 rounded-lg border border-orange-200 bg-orange-50 p-4 text-sm text-orange-900 dark:border-orange-800 dark:bg-orange-950/40 dark:text-orange-200"
+                  class="border-brand-200 bg-brand-50 text-brand-900 dark:border-brand-800 dark:bg-brand-950/40 dark:text-brand-200 mt-4 rounded-lg border p-4 text-sm"
                 >
                   Downloads are added to this private collection automatically
                   when you grab a file.
@@ -779,7 +779,7 @@ const handleDelete = async () => {
         >
           <template #icon>
             <svg
-              class="h-6 w-6 text-orange-600 dark:text-orange-400"
+              class="text-brand-600 dark:text-brand-400 h-6 w-6"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -805,7 +805,7 @@ const handleDelete = async () => {
                   id="collection-name"
                   v-model="newCollectionName"
                   type="text"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:ring-orange-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  class="focus:border-brand-500 focus:ring-brand-500 mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   placeholder="Enter collection name"
                 />
               </div>
@@ -820,7 +820,7 @@ const handleDelete = async () => {
                   id="collection-description"
                   v-model="newCollectionDescription"
                   rows="3"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:ring-orange-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  class="focus:border-brand-500 focus:ring-brand-500 mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   placeholder="Enter description"
                 />
               </div>
@@ -882,7 +882,7 @@ const handleDelete = async () => {
                   id="share-collection-title"
                   v-model="shareTitle"
                   type="text"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:ring-orange-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  class="focus:border-brand-500 focus:ring-brand-500 mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   placeholder="Enter discussion title"
                 />
               </div>
@@ -897,7 +897,7 @@ const handleDelete = async () => {
                   id="share-collection-message"
                   v-model="shareMessage"
                   rows="3"
-                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:ring-orange-500 focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  class="focus:border-brand-500 focus:ring-brand-500 mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:outline-none sm:text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   placeholder="Add context for readers"
                 />
               </div>

@@ -353,7 +353,7 @@ const getCollectionTypeInfo = (collectionType: string, isActive = false) => {
   if (isActive) {
     return {
       color:
-        'border border-orange-300/80 bg-orange-50/90 text-orange-950 dark:border-white/15 dark:bg-white/10 dark:text-white',
+        'border border-brand-300/80 bg-brand-50/90 text-brand-950 dark:border-white/15 dark:bg-white/10 dark:text-white',
     };
   }
 
@@ -376,7 +376,7 @@ const getCollectionTypeInfo = (collectionType: string, isActive = false) => {
     case 'DOWNLOADS':
       return {
         color:
-          'bg-orange-100 text-orange-700 border border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700',
+          'bg-brand-100 text-brand-700 border border-brand-300 dark:bg-brand-900/30 dark:text-brand-400 dark:border-brand-700',
       };
     case 'CHANNELS':
       return {
@@ -393,7 +393,7 @@ const getCollectionTypeInfo = (collectionType: string, isActive = false) => {
 
 const getSidebarItemClasses = (isActive: boolean) =>
   isActive
-    ? 'border-orange-300 bg-orange-100 text-gray-900 shadow-[0_18px_40px_-32px_rgba(249,115,22,0.45)] ring-1 ring-orange-200 dark:border-orange-800/80 dark:bg-orange-950/75 dark:text-white dark:ring-orange-800/70'
+    ? 'border-brand-300 bg-brand-100 text-gray-900 shadow-[0_18px_40px_-32px_rgba(249,115,22,0.45)] ring-1 ring-brand-200 dark:border-brand-800/80 dark:bg-brand-950/75 dark:text-white dark:ring-brand-800/70'
     : 'border-gray-200/90 bg-white/92 text-gray-700 hover:border-gray-300 hover:bg-white hover:text-gray-950 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:border-gray-600 dark:hover:bg-gray-700 dark:hover:text-white';
 
 const isMyDownloadsActive = computed(
@@ -458,7 +458,7 @@ const isUploadedFilesActive = computed(
                     type="search"
                     placeholder="Search collections"
                     aria-label="Search library collections"
-                    class="w-full rounded-2xl border border-gray-200 bg-gray-50/90 py-3 pr-4 pl-10 text-sm text-gray-900 transition outline-none focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-orange-400 dark:focus:bg-gray-800 dark:focus:ring-orange-500/20"
+                    class="focus:border-brand-400 focus:ring-brand-200 dark:focus:border-brand-400 dark:focus:ring-brand-500/20 w-full rounded-2xl border border-gray-200 bg-gray-50/90 py-3 pr-4 pl-10 text-sm text-gray-900 transition outline-none focus:bg-white focus:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:bg-gray-800"
                   />
                 </div>
 
@@ -707,7 +707,7 @@ const isUploadedFilesActive = computed(
                     type="search"
                     placeholder="Search collections"
                     aria-label="Search library collections"
-                    class="w-full rounded-2xl border border-gray-200 bg-gray-50/90 py-3 pr-4 pl-10 text-sm text-gray-900 transition outline-none focus:border-orange-400 focus:bg-white focus:ring-2 focus:ring-orange-200 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:border-orange-400 dark:focus:bg-gray-800 dark:focus:ring-orange-500/20"
+                    class="focus:border-brand-400 focus:ring-brand-200 dark:focus:border-brand-400 dark:focus:ring-brand-500/20 w-full rounded-2xl border border-gray-200 bg-gray-50/90 py-3 pr-4 pl-10 text-sm text-gray-900 transition outline-none focus:bg-white focus:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:placeholder:text-gray-500 dark:focus:bg-gray-800"
                   />
                 </div>
 

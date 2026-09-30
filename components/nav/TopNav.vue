@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { config } from '@/config';
 import { useDisplay } from '@/composables/useDisplay';
 import HamburgerMenuButton from '@/components/nav/HamburgerMenuButton.vue';
 import UserProfileDropdownMenu from '@/components/nav/UserProfileDropdownMenu.vue';
@@ -10,6 +9,7 @@ import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.
 import TopNavSearch from '@/components/nav/TopNavSearch.vue';
 import BellIcon from '@/components/icons/BellIcon.vue';
 import ForumQuickSwitcher from '@/components/nav/ForumQuickSwitcher.vue';
+import SiteLogo from '@/components/nav/SiteLogo.vue';
 // import LogoIcon from "@/components/icons/LogoIcon.vue"; // Unused for now
 import { useRoute } from 'nuxt/app';
 import LoginButton from './LoginButton.vue';
@@ -101,7 +101,7 @@ const isOnMapPage = computed(() => {
             <h1
               class="logo-font text-[1.2rem] leading-none font-semibold tracking-[-0.04em] text-gray-900 lg:text-[1.3rem] dark:text-white"
             >
-              {{ config.serverDisplayName }}
+              <SiteLogo />
             </h1>
           </nuxt-link>
 
@@ -184,7 +184,7 @@ const isOnMapPage = computed(() => {
                 ? `${notificationCountVar} new notifications`
                 : 'Notifications'
             "
-            class="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white"
+            class="focus-visible:ring-brand-500 relative inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-700 transition-colors hover:bg-gray-200 hover:text-gray-950 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-white"
           >
             <BellIcon class="h-6 w-6" aria-hidden="true" />
             <span

@@ -1,11 +1,5 @@
 <script setup lang="ts">
-import {
-  computed,
-  ref,
-  onMounted,
-  watch,
-  defineAsyncComponent,
-} from 'vue';
+import { computed, ref, onMounted, watch, defineAsyncComponent } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { useUIStore } from '@/stores/uiStore';
@@ -253,7 +247,7 @@ const reachedEndOfResults = computed(() => {
           <template #has-auth>
             <nuxt-link
               v-if="channelId"
-              class="text-orange-500 underline dark:text-white"
+              class="text-brand-500 underline dark:text-white"
               :to="{
                 name: 'forums-forumId-downloads-create',
                 params: {
@@ -266,7 +260,7 @@ const reachedEndOfResults = computed(() => {
           </template>
           <template #does-not-have-auth>
             <span
-              class="cursor-pointer text-orange-500 underline dark:text-white"
+              class="text-brand-500 cursor-pointer underline dark:text-white"
               >Create one?</span
             >
           </template>

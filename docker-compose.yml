@@ -105,6 +105,11 @@ services:
       # every deployment would silently lose its documentation and source
       # links. Unset variables are omitted entirely, leaving the application
       # defaults in place. See docs/frontend-runtime-configuration.md.
+      - NUXT_PUBLIC_BRANDING_LOGO_URL
+      - NUXT_PUBLIC_BRANDING_LOGO_DARK_URL
+      - NUXT_PUBLIC_BRANDING_LOGO_ALT
+      - NUXT_PUBLIC_BRANDING_FAVICON_URL
+      - NUXT_PUBLIC_BRANDING_PRIMARY_COLOR
       - NUXT_PUBLIC_BRANDING_PRODUCT_NAME
       - NUXT_PUBLIC_BRANDING_DOCS_URL
       - NUXT_PUBLIC_BRANDING_SOURCE_URL

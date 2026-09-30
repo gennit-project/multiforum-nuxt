@@ -64,12 +64,12 @@ const mod = computed(() => {
             {{ mod.displayName }}
             <span
               v-if="serverRoleBadge === 'serverAdmin'"
-              class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-500"
+              class="border-brand-500 text-brand-500 rounded-md border px-2 py-1 text-xs"
               >Server Admin</span
             >
             <span
               v-else-if="serverRoleBadge === 'serverMod'"
-              class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-500"
+              class="border-brand-500 text-brand-500 rounded-md border px-2 py-1 text-xs"
               >Server Mod</span
             >
             <span v-if="modProfileIsYourself" class="text-sm">(You)</span>

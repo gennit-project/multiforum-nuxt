@@ -21,7 +21,7 @@ const toggleTheme = () => {
   <client-only>
     <button
       type="button"
-      class="border-transparent relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2"
+      class="focus-visible:ring-brand-500 relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
       :class="isDarkMode ? 'bg-gray-700' : 'bg-gray-300'"
       aria-label="Toggle theme"
       role="switch"
@@ -47,7 +47,7 @@ const toggleTheme = () => {
           ]"
           aria-hidden="true"
         >
-          <SunIcon class="h-3.5 w-3.5 text-orange-500" />
+          <SunIcon class="text-brand-500 h-3.5 w-3.5" />
         </span>
 
         <!-- Moon icon in dark mode -->
@@ -69,7 +69,7 @@ const toggleTheme = () => {
     <template #fallback>
       <button
         type="button"
-        class="border-transparent relative mx-2 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 bg-gray-300 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:bg-gray-700"
+        class="focus-visible:ring-brand-500 relative mx-2 inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-gray-300 transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:bg-gray-700"
         aria-label="Toggle theme"
         role="switch"
         aria-checked="false"
@@ -85,7 +85,7 @@ const toggleTheme = () => {
             class="absolute inset-0 flex size-full items-center justify-center opacity-100 transition-opacity duration-200 ease-in dark:opacity-0 dark:duration-100 dark:ease-out"
             aria-hidden="true"
           >
-            <SunIcon class="h-3.5 w-3.5 text-orange-500" />
+            <SunIcon class="text-brand-500 h-3.5 w-3.5" />
           </span>
           <span
             class="absolute inset-0 flex size-full items-center justify-center opacity-0 transition-opacity duration-100 ease-out dark:opacity-100 dark:duration-200 dark:ease-in"

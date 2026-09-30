@@ -28,7 +28,8 @@ const suspendedUsers = computed(() => {
 
 const aggregateCount = computed(() => {
   return (
-    suspendedUsersResult.value?.channels?.[0]?.SuspendedUsersAggregate?.count ?? 0
+    suspendedUsersResult.value?.channels?.[0]?.SuspendedUsersAggregate?.count ??
+    0
   );
 });
 
@@ -100,7 +101,7 @@ const humanReadableDate = (dateISO: string): string => {
               </nuxt-link>
               <nuxt-link
                 v-if="user.RelatedIssue"
-                class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
+                class="border-brand-500 text-brand-500 flex items-center gap-1 rounded border px-2 py-1"
                 :to="{
                   name: 'forums-forumId-issues-issueNumber',
                   params: { issueNumber: user.RelatedIssue?.issueNumber },

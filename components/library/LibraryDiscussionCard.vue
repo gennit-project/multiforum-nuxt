@@ -79,7 +79,7 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
         <NuxtLink
           v-if="channelUniqueName"
           :to="channelLink"
-          class="inline-flex min-w-0 items-center gap-2 text-sm font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+          class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 inline-flex min-w-0 items-center gap-2 text-sm font-medium transition-colors"
         >
           <AvatarComponent
             :text="channelUniqueName"
@@ -94,7 +94,7 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
         >
           <span
             v-if="discussion.hasSensitiveContent"
-            class="rounded-full border border-orange-300 bg-orange-50 px-2 py-1 font-medium text-orange-700 dark:border-orange-500/40 dark:bg-orange-500/10 dark:text-orange-300"
+            class="border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-500/40 dark:bg-brand-500/10 dark:text-brand-300 rounded-full border px-2 py-1 font-medium"
           >
             Sensitive
           </span>
@@ -107,7 +107,7 @@ const albumForDisplay = computed(() => props.discussion.Album as Album | null);
       <div class="flex items-start gap-3">
         <NuxtLink
           :to="discussionLink"
-          class="min-w-0 flex-1 text-lg leading-7 font-semibold text-gray-900 transition-colors hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
+          class="hover:text-brand-600 dark:hover:text-brand-400 min-w-0 flex-1 text-lg leading-7 font-semibold text-gray-900 transition-colors dark:text-white"
         >
           {{ discussion.title }}
         </NuxtLink>

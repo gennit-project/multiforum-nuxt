@@ -37,12 +37,7 @@ useHead({
   title: 'Uploaded Files - Library',
 });
 
-const {
-  result,
-  loading,
-  error,
-  refetch,
-} = useQuery(
+const { result, loading, error, refetch } = useQuery(
   GET_UPLOADED_DOWNLOADABLE_FILES,
   () => ({
     username: usernameVar.value,
@@ -127,20 +122,27 @@ const deleteSelectedFile = async () => {
       <template #has-auth>
         <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
           <div class="mb-8">
-            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-orange-600 dark:text-orange-300">
+            <p
+              class="text-brand-600 dark:text-brand-300 text-xs font-semibold tracking-[0.24em] uppercase"
+            >
               Data control
             </p>
-            <h1 class="mt-2 text-3xl font-bold tracking-tight text-gray-950 dark:text-white">
+            <h1
+              class="mt-2 text-3xl font-bold tracking-tight text-gray-950 dark:text-white"
+            >
               Uploaded Files
             </h1>
             <p class="mt-2 max-w-2xl text-sm text-gray-600 dark:text-gray-300">
-              Files you uploaded to downloads, grouped by the discussion where they are attached.
-              Permanent delete removes the backing file from storage.
+              Files you uploaded to downloads, grouped by the discussion where
+              they are attached. Permanent delete removes the backing file from
+              storage.
             </p>
           </div>
 
           <div v-if="loading" class="py-10 text-center">
-            <div class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500" />
+            <div
+              class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
+            />
             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
               Loading uploaded files...
             </p>
@@ -156,11 +158,16 @@ const deleteSelectedFile = async () => {
             class="rounded-3xl border border-dashed border-gray-300 bg-gray-50 px-6 py-12 text-center dark:border-gray-700 dark:bg-gray-900"
           >
             <FolderOpenIcon class="mx-auto h-10 w-10 text-gray-400" />
-            <h2 class="mt-4 text-lg font-semibold text-gray-950 dark:text-white">
+            <h2
+              class="mt-4 text-lg font-semibold text-gray-950 dark:text-white"
+            >
               No uploaded files yet
             </h2>
-            <p class="mx-auto mt-2 max-w-md text-sm text-gray-600 dark:text-gray-300">
-              Files you upload to download posts will appear here so you can find and delete them later.
+            <p
+              class="mx-auto mt-2 max-w-md text-sm text-gray-600 dark:text-gray-300"
+            >
+              Files you upload to download posts will appear here so you can
+              find and delete them later.
             </p>
           </div>
 
@@ -170,15 +177,19 @@ const deleteSelectedFile = async () => {
               :key="group.discussion.id"
               class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900"
             >
-              <div class="border-b border-gray-100 bg-gray-50 px-5 py-4 dark:border-gray-800 dark:bg-gray-950/60">
+              <div
+                class="border-b border-gray-100 bg-gray-50 px-5 py-4 dark:border-gray-800 dark:bg-gray-950/60"
+              >
                 <NuxtLink
                   :to="getDiscussionPath(group)"
-                  class="text-lg font-semibold text-gray-950 hover:text-orange-600 dark:text-white dark:hover:text-orange-300"
+                  class="hover:text-brand-600 dark:hover:text-brand-300 text-lg font-semibold text-gray-950 dark:text-white"
                 >
                   {{ group.discussion.title }}
                 </NuxtLink>
                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                  {{ group.files.length }} uploaded file{{ group.files.length === 1 ? '' : 's' }}
+                  {{ group.files.length }} uploaded file{{
+                    group.files.length === 1 ? '' : 's'
+                  }}
                 </p>
               </div>
 
@@ -189,11 +200,14 @@ const deleteSelectedFile = async () => {
                   class="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div class="min-w-0">
-                    <p class="truncate font-medium text-gray-900 dark:text-gray-100">
+                    <p
+                      class="truncate font-medium text-gray-900 dark:text-gray-100"
+                    >
                       {{ file.fileName }}
                     </p>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                      {{ file.kind || 'File' }} · {{ formatFileSize(file.size) }}
+                      {{ file.kind || 'File' }} ·
+                      {{ formatFileSize(file.size) }}
                     </p>
                   </div>
                   <button

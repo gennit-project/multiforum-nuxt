@@ -25,15 +25,14 @@ const reviewNotes = ref<Record<string, string>>({});
 const clearingFileId = ref('');
 const retryingFileId = ref('');
 
-const {
-  result,
-  loading,
-  error,
-  refetch,
-} = useQuery(GET_DOWNLOAD_SCAN_REVIEW_QUEUE, { limit: 50 }, {
-  fetchPolicy: 'cache-and-network',
-  prefetch: false,
-});
+const { result, loading, error, refetch } = useQuery(
+  GET_DOWNLOAD_SCAN_REVIEW_QUEUE,
+  { limit: 50 },
+  {
+    fetchPolicy: 'cache-and-network',
+    prefetch: false,
+  }
+);
 
 const {
   mutate: clearDownloadableFileScan,
@@ -101,13 +100,17 @@ const pipelinePath = (item: ReviewItem) => {
           Download security review queue
         </h2>
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-          Quarantined files remain unavailable until a scan passes or a reviewer releases them with an audit reason.
+          Quarantined files remain unavailable until a scan passes or a reviewer
+          releases them with an audit reason.
         </p>
       </div>
-      <ShieldCheck class="h-5 w-5 text-orange-600 dark:text-orange-300" />
+      <ShieldCheck class="text-brand-600 dark:text-brand-300 h-5 w-5" />
     </div>
 
-    <p v-if="loading && !result" class="mt-4 text-sm text-gray-600 dark:text-gray-300">
+    <p
+      v-if="loading && !result"
+      class="mt-4 text-sm text-gray-600 dark:text-gray-300"
+    >
       Loading security reviews…
     </p>
     <p v-else-if="error" class="mt-4 text-sm text-red-700 dark:text-red-300">
@@ -133,29 +136,38 @@ const pipelinePath = (item: ReviewItem) => {
             </p>
             <p class="text-sm text-gray-600 dark:text-gray-300">
               {{ item.discussionTitle || item.discussionId }}
-              <span v-if="item.uploaderUsername"> · {{ item.uploaderUsername }}</span>
+              <span v-if="item.uploaderUsername">
+                · {{ item.uploaderUsername }}</span
+              >
             </p>
           </div>
           <span
             class="rounded-full px-2 py-1 text-xs font-medium"
-            :class="item.scanStatus === 'INFECTED'
-              ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
-            : item.scanStatus === 'FAILED'
-              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
-              : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200'"
+            :class="
+              item.scanStatus === 'INFECTED'
+                ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200'
+                : item.scanStatus === 'FAILED'
+                  ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200'
+                  : 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-200'
+            "
           >
             {{ item.scanStatus }}
           </span>
         </div>
 
-        <p v-if="item.scanReason" class="mt-2 text-sm text-gray-700 dark:text-gray-200">
+        <p
+          v-if="item.scanReason"
+          class="mt-2 text-sm text-gray-700 dark:text-gray-200"
+        >
           Scanner: {{ item.scanReason }}
         </p>
         <p
           v-if="item.reviewRequestedAt"
-          class="mt-2 text-sm font-medium text-orange-700 dark:text-orange-200"
+          class="text-brand-700 dark:text-brand-200 mt-2 text-sm font-medium"
         >
-          Creator requested human review<span v-if="item.reviewRequestReason">: {{ item.reviewRequestReason }}</span>
+          Creator requested human review<span v-if="item.reviewRequestReason"
+            >: {{ item.reviewRequestReason }}</span
+          >
         </p>
 
         <div class="mt-3 flex flex-col gap-2 md:flex-row md:items-end">
@@ -166,19 +178,19 @@ const pipelinePath = (item: ReviewItem) => {
               :aria-label="`Review note for ${item.fileName}`"
               class="mt-1 w-full rounded-md border-gray-300 text-sm dark:border-gray-700 dark:bg-gray-800"
               placeholder="Evidence supporting release"
-            >
+            />
           </label>
           <NuxtLink
             v-if="discussionPath(item)"
             :to="discussionPath(item) || ''"
-            class="text-sm font-medium text-orange-700 underline dark:text-orange-200"
+            class="text-brand-700 dark:text-brand-200 text-sm font-medium underline"
           >
             Open download page
           </NuxtLink>
           <NuxtLink
             v-if="pipelinePath(item)"
             :to="pipelinePath(item) || ''"
-            class="text-sm font-medium text-orange-700 underline dark:text-orange-200"
+            class="text-brand-700 dark:text-brand-200 text-sm font-medium underline"
           >
             Review pipeline
           </NuxtLink>
@@ -188,16 +200,26 @@ const pipelinePath = (item: ReviewItem) => {
             :disabled="retrying"
             @click="retryScan(item)"
           >
-            {{ retrying && retryingFileId === item.downloadableFileId ? 'Retrying…' : 'Retry scan' }}
+            {{
+              retrying && retryingFileId === item.downloadableFileId
+                ? 'Retrying…'
+                : 'Retry scan'
+            }}
           </button>
           <button
             type="button"
             data-testid="release-quarantine"
             class="rounded-md bg-green-700 px-3 py-2 text-sm font-medium text-white hover:bg-green-800 disabled:opacity-60"
-            :disabled="clearing || !reviewNotes[item.downloadableFileId]?.trim()"
+            :disabled="
+              clearing || !reviewNotes[item.downloadableFileId]?.trim()
+            "
             @click="clearReview(item)"
           >
-            {{ clearing && clearingFileId === item.downloadableFileId ? 'Releasing…' : 'Release quarantine' }}
+            {{
+              clearing && clearingFileId === item.downloadableFileId
+                ? 'Releasing…'
+                : 'Release quarantine'
+            }}
           </button>
         </div>
       </article>

@@ -44,13 +44,13 @@ const groupId = useId();
           :name="`radio-group-${groupId}`"
           type="radio"
           :checked="selectedOption.value === option.value"
-          class="h-4 w-4 border border-gray-300 text-orange-600 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700"
+          class="text-brand-600 focus:ring-brand-500 h-4 w-4 border border-gray-300 dark:border-gray-600 dark:bg-gray-700"
           @input="
             () => {
               emit('updateSelected', option);
             }
           "
-        >
+        />
         <label
           :for="`radio-${groupId}-${option.value}`"
           class="ml-3 block text-sm font-medium text-gray-700 dark:text-gray-300"

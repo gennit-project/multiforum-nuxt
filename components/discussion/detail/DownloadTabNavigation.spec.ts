@@ -138,7 +138,7 @@ describe('DownloadTabNavigation', () => {
     );
     const links = wrapper.findAllComponents(NuxtLinkStub);
 
-    expect(links[2].classes()).toContain('border-orange-500');
+    expect(links[2].classes()).toContain('border-brand-500');
     // Description is inactive while on the activity route.
     expect(links[0].classes()).toContain('border-transparent');
   });

@@ -62,14 +62,14 @@ if (route.name === 'admin-plugins' && route.path !== '/admin/plugins') {
         <div class="mb-4 lg:hidden">
           <div class="relative">
             <button
-              class="bg-gray-50 flex w-full items-center justify-between rounded-md border border-gray-300 px-4 py-2 text-sm dark:text-white"
+              class="flex w-full items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm dark:text-white"
               type="button"
               @click="isDropdownOpen = !isDropdownOpen"
             >
               <div class="flex items-center">
                 <component
                   :is="tabs.find((tab) => tab.key === activeTabKey)?.icon"
-                  class="mr-2 h-5 w-5 text-orange-500"
+                  class="text-brand-500 mr-2 h-5 w-5"
                 />
                 <span>{{ getCurrentTabLabel }}</span>
               </div>
@@ -87,8 +87,10 @@ if (route.name === 'admin-plugins' && route.path !== '/admin/plugins') {
                 <router-link
                   class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="{
-                    'bg-gray-50 text-orange-500 dark:bg-gray-700': activeTabKey === tab.key,
-                    'text-gray-700 dark:text-gray-300': activeTabKey !== tab.key,
+                    'text-brand-500 bg-gray-50 dark:bg-gray-700':
+                      activeTabKey === tab.key,
+                    'text-gray-700 dark:text-gray-300':
+                      activeTabKey !== tab.key,
                   }"
                   :to="tab.routePath"
                   @click="isDropdownOpen = false"
@@ -97,8 +99,9 @@ if (route.name === 'admin-plugins' && route.path !== '/admin/plugins') {
                     :is="tab.icon"
                     class="mr-2 h-5 w-5"
                     :class="{
-                      'text-orange-500': activeTabKey === tab.key,
-                      'text-gray-500 dark:text-gray-400': activeTabKey !== tab.key,
+                      'text-brand-500': activeTabKey === tab.key,
+                      'text-gray-500 dark:text-gray-400':
+                        activeTabKey !== tab.key,
                     }"
                   />
                   {{ tab.label }}
@@ -111,14 +114,14 @@ if (route.name === 'admin-plugins' && route.path !== '/admin/plugins') {
         <!-- Desktop Sidebar and Content -->
         <div class="flex w-full">
           <div
-            class="bg-gray-50 mr-4 hidden w-1/3 border-r border-gray-300 dark:border-gray-300 lg:block"
+            class="mr-4 hidden w-1/3 border-r border-gray-300 bg-gray-50 lg:block dark:border-gray-300"
           >
             <ul class="flex flex-col space-y-2">
               <li v-for="tab in tabs" :key="tab.key">
                 <router-link
                   class="flex cursor-pointer items-center px-3 py-2"
                   :class="{
-                    'border-r-2 border-orange-500 bg-orange-50 text-gray-900 font-medium dark:bg-orange-900/20 dark:text-white':
+                    'border-brand-500 bg-brand-50 dark:bg-brand-900/20 border-r-2 font-medium text-gray-900 dark:text-white':
                       activeTabKey === tab.key,
                     'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300':
                       activeTabKey !== tab.key,
@@ -129,8 +132,9 @@ if (route.name === 'admin-plugins' && route.path !== '/admin/plugins') {
                     :is="tab.icon"
                     class="mr-2 h-5 w-5"
                     :class="{
-                      'text-orange-500': activeTabKey === tab.key,
-                      'text-gray-500 dark:text-gray-400': activeTabKey !== tab.key,
+                      'text-brand-500': activeTabKey === tab.key,
+                      'text-gray-500 dark:text-gray-400':
+                        activeTabKey !== tab.key,
                     }"
                   />
                   {{ tab.label }}

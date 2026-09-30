@@ -20,7 +20,7 @@ const hideOverlay = () => {
       </div>
       <button
         type="button"
-        class="rounded-lg bg-orange-600 px-8 py-3 text-lg font-semibold text-white transition-colors hover:bg-orange-700"
+        class="bg-brand-600 hover:bg-brand-700 rounded-lg px-8 py-3 text-lg font-semibold text-white transition-colors"
         @click="hideOverlay"
       >
         Enter

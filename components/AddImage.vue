@@ -70,9 +70,9 @@ const onFileSelected = (event: Event) => {
   <div>
     <label
       :class="[
-        'my-1 inline-flex items-center rounded-md border border-orange-400 px-3 py-1 py-1.5 text-sm transition-colors dark:border-orange-800 dark:text-white',
+        'border-brand-400 dark:border-brand-800 my-1 inline-flex items-center rounded-md border px-3 py-1 py-1.5 text-sm transition-colors dark:text-white',
         !effectiveDisabled
-          ? 'cursor-pointer bg-orange-100 text-orange-700 hover:bg-orange-100 dark:bg-orange-900 dark:text-orange-200 dark:hover:bg-orange-800'
+          ? 'bg-brand-100 text-brand-700 hover:bg-brand-100 dark:bg-brand-900 dark:text-brand-200 dark:hover:bg-brand-800 cursor-pointer'
           : 'cursor-not-allowed bg-gray-100 text-gray-500 opacity-60 dark:bg-gray-700 dark:text-gray-400',
       ]"
       :for="`file-input-${props.fieldName}`"
@@ -88,7 +88,7 @@ const onFileSelected = (event: Event) => {
         :disabled="effectiveDisabled"
         @change="onFileSelected"
         @click="clearFileInput"
-      >
+      />
     </label>
     <p
       v-if="uploadsUnavailable"

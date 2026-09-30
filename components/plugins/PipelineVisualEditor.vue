@@ -128,7 +128,7 @@ const supportsRolloutPolicy = computed(() =>
             type="checkbox"
             :checked="pipeline.stopOnFirstFailure"
             aria-label="Stop on first failure"
-            class="form-checkbox h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+            class="form-checkbox text-brand-600 focus:ring-brand-500 h-4 w-4 rounded border-gray-300"
             @change="
               updateStopOnFirstFailure(
                 ($event.target as HTMLInputElement).checked
@@ -155,7 +155,7 @@ const supportsRolloutPolicy = computed(() =>
           :id="applicabilityInputId"
           data-testid="pipeline-applicability-select"
           :value="pipeline.applicability || 'NEW_FILES_ONLY'"
-          class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+          class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           @change="
             updateApplicability(
               ($event.target as HTMLSelectElement)
@@ -199,10 +199,10 @@ const supportsRolloutPolicy = computed(() =>
 
               <!-- Step Number -->
               <div
-                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-100 dark:bg-orange-900"
+                class="bg-brand-100 dark:bg-brand-900 flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
               >
                 <span
-                  class="text-sm font-medium text-orange-600 dark:text-orange-300"
+                  class="text-brand-600 dark:text-brand-300 text-sm font-medium"
                 >
                   {{ index + 1 }}
                 </span>
@@ -220,7 +220,7 @@ const supportsRolloutPolicy = computed(() =>
                   <select
                     :value="step.plugin"
                     data-testid="pipeline-step-plugin"
-                    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                     @change="
                       updateStep(index, {
                         plugin: ($event.target as HTMLSelectElement).value,
@@ -249,7 +249,7 @@ const supportsRolloutPolicy = computed(() =>
                     <select
                       :value="step.condition || 'ALWAYS'"
                       data-testid="pipeline-step-condition"
-                      class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                      class="focus:border-brand-500 focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                       @change="
                         updateStep(index, {
                           condition: ($event.target as HTMLSelectElement)
@@ -272,7 +272,7 @@ const supportsRolloutPolicy = computed(() =>
                       type="checkbox"
                       :checked="step.continueOnError"
                       aria-label="Continue on error"
-                      class="form-checkbox h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                      class="form-checkbox text-brand-600 focus:ring-brand-500 h-4 w-4 rounded border-gray-300"
                       @change="
                         updateStep(index, {
                           continueOnError: ($event.target as HTMLInputElement)
@@ -318,7 +318,7 @@ const supportsRolloutPolicy = computed(() =>
     <!-- Add Step Button -->
     <button
       type="button"
-      class="w-full rounded-lg border-2 border-dashed border-gray-300 p-4 text-gray-500 transition-colors hover:border-orange-500 hover:text-orange-500 dark:border-gray-600"
+      class="hover:border-brand-500 hover:text-brand-500 w-full rounded-lg border-2 border-dashed border-gray-300 p-4 text-gray-500 transition-colors dark:border-gray-600"
       @click="addStep"
     >
       <i class="fa-solid fa-plus mr-2" />

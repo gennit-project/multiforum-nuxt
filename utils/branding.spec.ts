@@ -2,12 +2,41 @@ import { describe, expect, it } from 'vitest';
 import {
   MAX_CUSTOM_FOOTER_LINKS,
   UPSTREAM_BRANDING,
+  createBrandPalette,
+  createBrandPaletteCss,
+  getContrastRatio,
   isSafeBrandingUrl,
+  isValidHexColor,
   parseBrandingFlag,
   parseBrandingLinks,
   readBrandingEnv,
   resolveBranding,
 } from './branding';
+
+describe('brand colour helpers', () => {
+  it.each([
+    ['#2563eb', true],
+    ['#ABCDEF', true],
+    ['#fff', false],
+    ['blue', false],
+  ])('validates %s as %s', (value, expected) => {
+    expect(isValidHexColor(value)).toBe(expected);
+  });
+
+  it('keeps the configured colour at the 500 palette stop', () => {
+    expect(createBrandPalette('#2563EB')?.[500]).toBe('#2563eb');
+  });
+
+  it('emits CSS custom properties for the derived palette', () => {
+    expect(createBrandPaletteCss('#2563eb')).toContain(
+      '--color-brand-500:#2563eb'
+    );
+  });
+
+  it('calculates the WCAG contrast ratio', () => {
+    expect(getContrastRatio('#000000', '#ffffff')).toBe(21);
+  });
+});
 
 describe('isSafeBrandingUrl', () => {
   it.each([
@@ -155,6 +184,41 @@ describe('resolveBranding', () => {
         .showUpstreamLinks
     ).toBe(false);
   });
+
+  it('applies visual branding fields', () => {
+    expect(
+      resolveBranding({
+        layers: [
+          {
+            logoUrl: '/logo.svg',
+            logoDarkUrl: '/logo-dark.svg',
+            logoAlt: 'Acme Forum',
+            faviconUrl: '/favicon.svg',
+            primaryColor: '#2563EB',
+          },
+        ],
+      })
+    ).toMatchObject({
+      logoUrl: '/logo.svg',
+      logoDarkUrl: '/logo-dark.svg',
+      logoAlt: 'Acme Forum',
+      faviconUrl: '/favicon.svg',
+      primaryColor: '#2563eb',
+    });
+  });
+
+  it('rejects an unsafe logo URL', () => {
+    expect(
+      resolveBranding({ layers: [{ logoUrl: 'javascript:alert(1)' }] }).logoUrl
+    ).toBe('');
+  });
+
+  it('rejects a malformed primary colour', () => {
+    expect(
+      resolveBranding({ layers: [{ primaryColor: 'expression(red)' }] })
+        .primaryColor
+    ).toBe('');
+  });
 });
 
 describe('readBrandingEnv', () => {
@@ -167,6 +231,24 @@ describe('readBrandingEnv', () => {
       readBrandingEnv({ VITE_BRANDING_SUPPORT_EMAIL: 'help@acme.test' })
         .supportEmail
     ).toBe('help@acme.test');
+  });
+
+  it('reads the visual branding fields from the environment', () => {
+    expect(
+      readBrandingEnv({
+        VITE_BRANDING_LOGO_URL: '/logo.svg',
+        VITE_BRANDING_LOGO_DARK_URL: '/logo-dark.svg',
+        VITE_BRANDING_LOGO_ALT: 'Acme Forum',
+        VITE_BRANDING_FAVICON_URL: '/favicon.svg',
+        VITE_BRANDING_PRIMARY_COLOR: '#2563eb',
+      })
+    ).toMatchObject({
+      logoUrl: '/logo.svg',
+      logoDarkUrl: '/logo-dark.svg',
+      logoAlt: 'Acme Forum',
+      faviconUrl: '/favicon.svg',
+      primaryColor: '#2563eb',
+    });
   });
 
   it('reads the upstream-links flag from the environment', () => {

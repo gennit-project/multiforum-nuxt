@@ -75,7 +75,7 @@ const user = computed(() => {
             <!-- Loading state -->
             <div v-if="loading" class="py-8 text-center">
               <div
-                class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500"
+                class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
               />
               <p class="mt-2 text-gray-600 dark:text-gray-400">
                 Loading your favorite images...
@@ -85,7 +85,7 @@ const user = computed(() => {
             <!-- Error state -->
             <div
               v-else-if="error"
-              class="bg-red-50 rounded-lg p-4 dark:bg-red-900/20"
+              class="rounded-lg bg-red-50 p-4 dark:bg-red-900/20"
             >
               <p class="text-red-800 dark:text-red-300">
                 Error loading favorite images: {{ error.message }}
@@ -121,7 +121,7 @@ const user = computed(() => {
               <div class="mt-6">
                 <NuxtLink
                   to="/"
-                  class="inline-flex items-center rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
+                  class="bg-brand-500 hover:bg-brand-600 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm"
                 >
                   Browse Content
                 </NuxtLink>

@@ -12,6 +12,11 @@ import {
 
 type ServerConfigBranding = Pick<
   ServerConfig,
+  | 'serverIconURL'
+  | 'brandingLogoDarkURL'
+  | 'brandingLogoAlt'
+  | 'brandingFaviconURL'
+  | 'brandingPrimaryColor'
   | 'brandingProductName'
   | 'brandingDocsURL'
   | 'brandingSourceURL'
@@ -39,6 +44,11 @@ export const toBrandingLayer = (
     }
   };
 
+  assign('logoUrl', serverConfig.serverIconURL);
+  assign('logoDarkUrl', serverConfig.brandingLogoDarkURL);
+  assign('logoAlt', serverConfig.brandingLogoAlt);
+  assign('faviconUrl', serverConfig.brandingFaviconURL);
+  assign('primaryColor', serverConfig.brandingPrimaryColor);
   assign('productName', serverConfig.brandingProductName);
   assign('docsUrl', serverConfig.brandingDocsURL);
   assign('sourceUrl', serverConfig.brandingSourceURL);

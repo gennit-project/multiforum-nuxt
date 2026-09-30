@@ -395,7 +395,7 @@ onMounted(() => {
             >
             <span
               v-else
-              class="flex w-full cursor-pointer items-center justify-center gap-1 text-orange-400 hover:text-orange-300"
+              class="text-brand-400 hover:text-brand-300 flex w-full cursor-pointer items-center justify-center gap-1"
               role="button"
               tabindex="0"
               @click.stop="startEditingCaption(idx)"

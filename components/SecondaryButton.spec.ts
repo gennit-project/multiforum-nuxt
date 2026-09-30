@@ -9,7 +9,8 @@ const mountButton = (props: Record<string, unknown> = {}, slot = '') =>
     slots: { default: slot },
   });
 
-const classes = (w: ReturnType<typeof mount>) => w.get('button').classes().join(' ');
+const classes = (w: ReturnType<typeof mount>) =>
+  w.get('button').classes().join(' ');
 
 describe('SecondaryButton content', () => {
   it('renders the label', () => {
@@ -49,6 +50,6 @@ describe('SecondaryButton styling', () => {
   it('pairs the focus ring width with a ring color', () => {
     const wrapper = mountButton();
 
-    expect(classes(wrapper)).toContain('focus:ring-orange-500');
+    expect(classes(wrapper)).toContain('focus:ring-brand-500');
   });
 });

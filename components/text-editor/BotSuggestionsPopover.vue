@@ -26,12 +26,12 @@ const emit = defineEmits<{
       type="button"
       :class="[
         'flex w-full cursor-pointer items-center justify-between px-3 py-2 text-left transition',
-        'font-semibold text-sm',
-        'border-transparent border-l-4',
+        'text-sm font-semibold',
+        'border-l-4 border-transparent',
         index === props.activeIndex
-          ? 'bg-orange-50 border-orange-400 dark:border-orange-500 dark:bg-gray-900/40'
+          ? 'bg-brand-50 border-brand-400 dark:border-brand-500 dark:bg-gray-900/40'
           : index === 0
-            ? 'bg-orange-50 dark:bg-gray-900/40'
+            ? 'bg-brand-50 dark:bg-gray-900/40'
             : 'bg-white dark:bg-black',
         'hover:bg-gray-100 dark:hover:bg-gray-700',
       ]"

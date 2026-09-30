@@ -87,7 +87,7 @@ const showAttributionRow = computed(
       <template v-if="showIssuesLink">
         If you have feedback or technical problems, please open an issue in the
         <a
-          class="ml-1 text-orange-400 underline"
+          class="text-brand-400 ml-1 underline"
           target="_blank"
           rel="noopener noreferrer"
           :href="branding.issuesUrl"
@@ -95,7 +95,7 @@ const showAttributionRow = computed(
         ><template v-if="showSupportEmail">
           , or email support at
           <a
-            class="ml-1 text-orange-400 underline"
+            class="text-brand-400 ml-1 underline"
             :href="`mailto:${branding.supportEmail}`"
             >{{ branding.supportEmail }}</a
           ></template
@@ -104,7 +104,7 @@ const showAttributionRow = computed(
       <template v-else-if="showSupportEmail">
         If you have feedback or technical problems, please email support at
         <a
-          class="ml-1 text-orange-400 underline"
+          class="text-brand-400 ml-1 underline"
           :href="`mailto:${branding.supportEmail}`"
           >{{ branding.supportEmail }}</a
         >.
@@ -117,7 +117,7 @@ const showAttributionRow = computed(
       <span>Powered by {{ branding.productName }}</span>
       <a
         v-if="branding.docsUrl"
-        class="text-orange-400 underline"
+        class="text-brand-400 underline"
         target="_blank"
         rel="noopener noreferrer"
         :href="branding.docsUrl"
@@ -125,7 +125,7 @@ const showAttributionRow = computed(
       >
       <a
         v-if="branding.sourceUrl"
-        class="text-orange-400 underline"
+        class="text-brand-400 underline"
         target="_blank"
         rel="noopener noreferrer"
         :href="branding.sourceUrl"

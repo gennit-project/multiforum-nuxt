@@ -103,7 +103,7 @@ const isDescriptionTab = computed(
             typeof $route.name === 'string' &&
             ($route.name.includes('description') ||
               $route.name === 'forums-forumId-downloads-discussionId')
-              ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+              ? 'border-brand-500 text-brand-600 dark:text-brand-400'
               : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
           "
         >
@@ -120,7 +120,7 @@ const isDescriptionTab = computed(
           class="border-b-2 px-1 py-2 text-sm font-medium"
           :class="
             typeof $route.name === 'string' && $route.name.includes('comments')
-              ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+              ? 'border-brand-500 text-brand-600 dark:text-brand-400'
               : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
           "
         >
@@ -137,7 +137,7 @@ const isDescriptionTab = computed(
           class="border-b-2 px-1 py-2 text-sm font-medium"
           :class="
             typeof $route.name === 'string' && $route.name.includes('activity')
-              ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+              ? 'border-brand-500 text-brand-600 dark:text-brand-400'
               : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
           "
         >
@@ -159,7 +159,7 @@ const isDescriptionTab = computed(
           class="border-b-2 px-1 py-2 text-sm font-medium"
           :class="
             typeof $route.name === 'string' && $route.name.includes('pipelines')
-              ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+              ? 'border-brand-500 text-brand-600 dark:text-brand-400'
               : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
           "
         >
@@ -195,7 +195,7 @@ const isDescriptionTab = computed(
           >
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+              class="focus:ring-brand-500 inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
               data-testid="edit-download-button-fallback"
               @click="
                 router.push(

@@ -53,7 +53,7 @@ defineProps<{
           :href="pluginAuthorUrl"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-orange-600 hover:underline dark:text-orange-400"
+          class="text-brand-600 dark:text-brand-400 hover:underline"
         >
           {{ pluginAuthorName }}
         </a>
@@ -83,7 +83,7 @@ defineProps<{
         :href="pluginHomepage"
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center text-orange-600 hover:underline dark:text-orange-400"
+        class="text-brand-600 dark:text-brand-400 flex items-center hover:underline"
       >
         <i class="fa-solid fa-home mr-1" />
         Homepage
@@ -93,7 +93,7 @@ defineProps<{
         :href="pluginRepoUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center text-orange-600 hover:underline dark:text-orange-400"
+        class="text-brand-600 dark:text-brand-400 flex items-center hover:underline"
       >
         <i class="fa-solid fa-code mr-1" />
         View Source
@@ -103,7 +103,7 @@ defineProps<{
         :href="pluginReleaseNotesUrl"
         target="_blank"
         rel="noopener noreferrer"
-        class="flex items-center text-orange-600 hover:underline dark:text-orange-400"
+        class="text-brand-600 dark:text-brand-400 flex items-center hover:underline"
       >
         <i class="fa-solid fa-scroll mr-1" />
         Release Notes
@@ -113,9 +113,9 @@ defineProps<{
     <div
       v-if="
         pluginRegistryUrl ||
-          pluginSourceCommit ||
-          pluginMinServerVersion ||
-          pluginApiVersion
+        pluginSourceCommit ||
+        pluginMinServerVersion ||
+        pluginApiVersion
       "
       class="mt-3 flex flex-wrap gap-2 text-xs text-gray-600 dark:text-gray-300"
     >

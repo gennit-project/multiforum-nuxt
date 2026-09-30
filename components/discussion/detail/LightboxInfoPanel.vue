@@ -134,7 +134,7 @@ const emit = defineEmits([
       <span v-if="!isLoggedInAuthor">No caption available for this image.</span>
       <span
         v-else
-        class="flex cursor-pointer items-center gap-1 text-orange-400 transition-colors hover:text-orange-300"
+        class="text-brand-400 hover:text-brand-300 flex cursor-pointer items-center gap-1 transition-colors"
         role="button"
         tabindex="0"
         @click="emit('start-editing')"

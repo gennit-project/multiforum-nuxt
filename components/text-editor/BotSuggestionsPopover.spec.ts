@@ -39,7 +39,9 @@ describe('BotSuggestionsPopover', () => {
   });
 
   it('omits the display name span when absent', () => {
-    const wrapper = mountPopover([suggestion({ mention: '@x', displayName: null })]);
+    const wrapper = mountPopover([
+      suggestion({ mention: '@x', displayName: null }),
+    ]);
     expect(wrapper.findAll('span')).toHaveLength(1);
   });
 
@@ -51,12 +53,14 @@ describe('BotSuggestionsPopover', () => {
 
   it('highlights the active suggestion', () => {
     const wrapper = mountPopover(three, 1);
-    expect(wrapper.findAll('button')[1]!.classes()).toContain('border-orange-400');
+    expect(wrapper.findAll('button')[1]!.classes()).toContain(
+      'border-brand-400'
+    );
   });
 
   it('highlights the first suggestion by default when another is active', () => {
     const wrapper = mountPopover(three, 1);
-    expect(wrapper.findAll('button')[0]!.classes()).toContain('bg-orange-50');
+    expect(wrapper.findAll('button')[0]!.classes()).toContain('bg-brand-50');
   });
 
   it('renders a non-active, non-first suggestion plainly', () => {

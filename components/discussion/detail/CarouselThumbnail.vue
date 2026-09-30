@@ -36,12 +36,13 @@ const sizeStyle = computed(() => ({
   width: `${thumbnailWidth.value}px`,
   height: `${thumbnailHeight.value}px`,
 }));
-const imageUrl = computed(() =>
-  getPreferredImageUrl({
-    source: props.image,
-    preferred: ['list160', 'list80'],
-    originalUrl: props.image?.url,
-  }) || ''
+const imageUrl = computed(
+  () =>
+    getPreferredImageUrl({
+      source: props.image,
+      preferred: ['list160', 'list80'],
+      originalUrl: props.image?.url,
+    }) || ''
 );
 </script>
 
@@ -49,7 +50,7 @@ const imageUrl = computed(() =>
   <div
     class="shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 transition-all lg:mb-2 lg:last:mb-0"
     :class="{
-      'border-orange-500': isActive,
+      'border-brand-500': isActive,
       'border-gray-300 hover:border-gray-400': !isActive,
     }"
     :style="sizeStyle"

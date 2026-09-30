@@ -104,14 +104,14 @@ const handleInput = (value: string) => {
         :id="inputId"
         ref="inputRef"
         v-model="text"
-        class="block min-w-0 flex-1 rounded-lg border border-gray-300 pb-2.5 pt-2.5 placeholder-gray-400 dark:border-none dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 sm:text-sm"
+        class="block min-w-0 flex-1 rounded-lg border border-gray-300 pt-2.5 pb-2.5 placeholder-gray-400 sm:text-sm dark:border-none dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400"
         :class="[
           disabled
             ? 'bg-gray-200 bg-clip-padding dark:bg-gray-500 dark:text-gray-300'
             : '',
           invalid
-            ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
-            : 'focus:border-orange-500 focus:ring-orange-500',
+            ? 'border-red-300 text-red-500 focus:border-red-500 focus:ring-red-500 focus:outline-none'
+            : 'focus:border-brand-500 focus:ring-brand-500',
         ]"
         :data-testid="testId"
         :disabled="disabled"
@@ -123,7 +123,7 @@ const handleInput = (value: string) => {
         :aria-describedby="errorMessage ? `${inputId}-error` : undefined"
         type="text"
         @input="handleInput(($event.target as HTMLInputElement).value)"
-      >
+      />
       <textarea
         v-else-if="rows && rows > 1"
         :id="inputId"
@@ -142,10 +142,10 @@ const handleInput = (value: string) => {
         :class="[
           disabled ? 'bg-gray-200 bg-clip-padding dark:bg-gray-800' : '',
           invalid
-            ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
-            : 'focus:border-orange-500 focus:ring-orange-500',
+            ? 'border-red-300 text-red-500 focus:border-red-500 focus:ring-red-500 focus:outline-none'
+            : 'focus:border-brand-500 focus:ring-brand-500',
         ]"
-        class="block min-w-0 flex-1 rounded-lg border-gray-200 pb-2.5 pt-2.5 placeholder-gray-400 dark:border-none dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-200 sm:text-sm"
+        class="block min-w-0 flex-1 rounded-lg border-gray-200 pt-2.5 pb-2.5 placeholder-gray-400 sm:text-sm dark:border-none dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-200"
         @input="handleInput(($event.target as HTMLTextAreaElement).value)"
       />
       <div

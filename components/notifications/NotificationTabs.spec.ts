@@ -90,11 +90,12 @@ vi.mock('@vue/apollo-composable', () => ({
     };
   }),
   useMutation: () => ({
-    mutate: [
-      mockMarkNotificationsAsRead,
-      mockMarkNotificationAsRead,
-      mockShowScratchpadEntry,
-    ][mockMutationIndex++] ?? vi.fn(),
+    mutate:
+      [
+        mockMarkNotificationsAsRead,
+        mockMarkNotificationAsRead,
+        mockShowScratchpadEntry,
+      ][mockMutationIndex++] ?? vi.fn(),
     loading: ref(false),
     error: ref(null),
     onDone: vi.fn(),
@@ -181,7 +182,7 @@ describe('NotificationTabs', () => {
 
     const generalButton = wrapper.find('button:first-of-type');
     expect(generalButton.text()).toContain('General');
-    expect(generalButton.classes()).toContain('border-orange-500');
+    expect(generalButton.classes()).toContain('border-brand-500');
   });
 
   it('switches to Feedback tab when clicked', async () => {
@@ -190,13 +191,13 @@ describe('NotificationTabs', () => {
     const feedbackButton = wrapper.findAll('button')[1];
     await feedbackButton.trigger('click');
 
-    expect(feedbackButton.classes()).toContain('border-orange-500');
+    expect(feedbackButton.classes()).toContain('border-brand-500');
   });
 
   it('displays unread count badges on tabs', () => {
     const wrapper = mountNotificationTabs();
 
-    const badges = wrapper.findAll('span.bg-orange-500');
+    const badges = wrapper.findAll('span.bg-brand-500');
     expect(badges.length).toBeGreaterThan(0);
   });
 
@@ -235,7 +236,9 @@ describe('NotificationTabs', () => {
   it('switches tabs with the ArrowRight key', async () => {
     const wrapper = mountNotificationTabs();
 
-    await wrapper.get('[role="tablist"]').trigger('keydown', { key: 'ArrowRight' });
+    await wrapper
+      .get('[role="tablist"]')
+      .trigger('keydown', { key: 'ArrowRight' });
 
     expect(
       wrapper.findAll('[role="tab"]')[1]!.attributes('aria-selected')
@@ -261,13 +264,15 @@ describe('NotificationTabs', () => {
       ],
     });
 
-    vi.mocked(vi.importActual('@vue/apollo-composable')).useQuery = vi.fn(() => ({
-      result: emptyResult,
-      error: ref(null),
-      loading: ref(false),
-      fetchMore: vi.fn(),
-      refetch: vi.fn(),
-    }));
+    vi.mocked(vi.importActual('@vue/apollo-composable')).useQuery = vi.fn(
+      () => ({
+        result: emptyResult,
+        error: ref(null),
+        loading: ref(false),
+        fetchMore: vi.fn(),
+        refetch: vi.fn(),
+      })
+    );
 
     const wrapper = mountNotificationTabs();
 
@@ -353,7 +358,9 @@ describe('NotificationTabs', () => {
     ];
     const wrapper = mountNotificationTabs();
 
-    await wrapper.get('[data-testid="notification-show-on-profile"]').trigger('click');
+    await wrapper
+      .get('[data-testid="notification-show-on-profile"]')
+      .trigger('click');
     await flushPromises();
 
     expect({
@@ -408,23 +415,27 @@ describe('NotificationTabs', () => {
 
     const wrapper = mountNotificationTabs();
 
-    expect(wrapper.get('[data-testid="notification-showing-on-profile"]').text()).toContain(
-      'Showing on your Kudos page'
-    );
+    expect(
+      wrapper.get('[data-testid="notification-showing-on-profile"]').text()
+    ).toContain('Showing on your Kudos page');
   });
 
   it('declares pagination options and total aggregates in the tab queries', () => {
     expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain(
       '$options: NotificationOptions'
     );
-    expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain('options: $options');
+    expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain(
+      'options: $options'
+    );
     expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain(
       'totalNotificationsAggregate'
     );
     expect(GET_FEEDBACK_NOTIFICATIONS.loc?.source.body).toContain(
       '$options: NotificationOptions'
     );
-    expect(GET_FEEDBACK_NOTIFICATIONS.loc?.source.body).toContain('options: $options');
+    expect(GET_FEEDBACK_NOTIFICATIONS.loc?.source.body).toContain(
+      'options: $options'
+    );
     expect(GET_FEEDBACK_NOTIFICATIONS.loc?.source.body).toContain(
       'totalNotificationsAggregate'
     );

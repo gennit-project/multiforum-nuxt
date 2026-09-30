@@ -205,7 +205,7 @@ const handleModalClose = () => {
       <button
         v-if="shouldShowMoreButton && !showFullText"
         type="button"
-        class="rounded-sm text-sm font-bold text-orange-600 hover:text-orange-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-orange-400 dark:hover:text-orange-300 dark:focus-visible:ring-offset-gray-900"
+        class="text-brand-600 hover:text-brand-700 focus-visible:ring-brand-500 dark:text-brand-400 dark:hover:text-brand-300 rounded-sm text-sm font-bold hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
         @click="toggleShowFullText"
       >
         Show More
@@ -214,7 +214,7 @@ const handleModalClose = () => {
     <button
       v-if="shouldShowMoreButton && showFullText"
       type="button"
-      class="rounded-sm text-sm font-bold text-orange-600 hover:text-orange-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2 dark:text-orange-400 dark:hover:text-orange-300 dark:focus-visible:ring-offset-gray-900"
+      class="text-brand-600 hover:text-brand-700 focus-visible:ring-brand-500 dark:text-brand-400 dark:hover:text-brand-300 rounded-sm text-sm font-bold hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900"
       @click="toggleShowFullText"
     >
       Show Less

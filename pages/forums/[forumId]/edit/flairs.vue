@@ -211,9 +211,7 @@ const submit = async () => {
     />
 
     <div v-else class="space-y-6">
-      <div
-        class="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
-      >
+      <div class="rounded-lg border border-gray-200 p-4 dark:border-gray-700">
         <CheckBox
           id="require-post-flair"
           label="Require at least one flair on new discussions"
@@ -233,7 +231,7 @@ const submit = async () => {
           </h3>
           <button
             type="button"
-            class="rounded-md bg-orange-600 px-3 py-2 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            class="bg-brand-600 hover:bg-brand-700 focus:ring-brand-500 rounded-md px-3 py-2 text-sm font-medium text-white focus:ring-2 focus:outline-none"
             @click="addFlair"
           >
             Add flair
@@ -266,7 +264,7 @@ const submit = async () => {
                 maxlength="40"
                 class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                 :aria-label="`Flair name ${index + 1}`"
-              >
+              />
             </label>
             <label
               class="block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -283,14 +281,14 @@ const submit = async () => {
                       $event.target as HTMLInputElement
                     ).value.toUpperCase()
                   "
-                >
+                />
                 <input
                   v-model="flair.color"
                   type="text"
                   placeholder="#F97316"
                   class="block w-full min-w-0 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                   :aria-label="`Hex color for ${flair.displayName || `flair ${index + 1}`}`"
-                >
+                />
               </span>
             </label>
             <div class="flex flex-wrap gap-2">
@@ -328,7 +326,9 @@ const submit = async () => {
         v-if="archivedFlairs.length"
         class="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
       >
-        <summary class="cursor-pointer font-medium text-gray-900 dark:text-white">
+        <summary
+          class="cursor-pointer font-medium text-gray-900 dark:text-white"
+        >
           Archived flairs ({{ archivedFlairs.length }})
         </summary>
         <ul class="mt-3 space-y-2">
@@ -367,7 +367,7 @@ const submit = async () => {
       <div class="flex justify-end">
         <button
           type="button"
-          class="rounded-md bg-orange-600 px-4 py-2 font-medium text-white hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+          class="bg-brand-600 hover:bg-brand-700 rounded-md px-4 py-2 font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="saving"
           @click="submit"
         >

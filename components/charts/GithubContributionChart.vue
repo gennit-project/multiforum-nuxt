@@ -79,14 +79,18 @@ const selectedDay = ref<null | DayInfo>(null);
 const selectedYearValue = ref(props.year);
 const gridData = ref<DayData[][]>([]);
 
-const getWikiPagePath = (edit: NonNullable<DayData['activities'][number]['WikiEdits']>[number]) => {
+const getWikiPagePath = (
+  edit: NonNullable<DayData['activities'][number]['WikiEdits']>[number]
+) => {
   if (!edit.WikiPage?.channelUniqueName || !edit.WikiPage?.slug) {
     return '';
   }
   return `/forums/${edit.WikiPage.channelUniqueName}/wiki/${edit.WikiPage.slug}`;
 };
 
-const getWikiRevisionPath = (edit: NonNullable<DayData['activities'][number]['WikiEdits']>[number]) => {
+const getWikiRevisionPath = (
+  edit: NonNullable<DayData['activities'][number]['WikiEdits']>[number]
+) => {
   if (!edit.WikiPage?.channelUniqueName || !edit.WikiPage?.slug) {
     return '';
   }
@@ -417,7 +421,7 @@ const cellCount = computed(() => {
   >
     <!-- Header with title -->
     <div class="flex items-center justify-between">
-      <h2 class="font-semibold text-xl">{{ formattedTitle }}</h2>
+      <h2 class="text-xl font-semibold">{{ formattedTitle }}</h2>
 
       <div class="flex items-center space-x-2">
         <label for="year-select" class="text-sm font-medium">{{
@@ -524,7 +528,7 @@ const cellCount = computed(() => {
                     selectedDay.week === weekIndex &&
                     selectedDay.day === dayIndex
                   "
-                  class="cursor-pointer transition-colors duration-200 focus:outline-none focus-visible:stroke-blue-600 focus-visible:stroke-2 hover:stroke-1"
+                  class="cursor-pointer transition-colors duration-200 hover:stroke-1 focus:outline-none focus-visible:stroke-blue-600 focus-visible:stroke-2"
                   :class="[
                     darkMode
                       ? 'hover:stroke-green-600'
@@ -532,7 +536,7 @@ const cellCount = computed(() => {
                     selectedDay &&
                     selectedDay.week === weekIndex &&
                     selectedDay.day === dayIndex
-                      ? 'stroke-orange-500 stroke-2'
+                      ? 'stroke-brand-500 stroke-2'
                       : '',
                   ]"
                   @click="selectDay(weekIndex, dayIndex)"
@@ -570,7 +574,7 @@ const cellCount = computed(() => {
     <div
       v-if="showDetails && selectedDay"
       class="mt-4 rounded-lg border p-4"
-      :class="darkMode ? 'border-green-500' : 'bg-gray-50 border-green-500'"
+      :class="darkMode ? 'border-green-500' : 'border-green-500 bg-gray-50'"
     >
       <div class="flex gap-3">
         <Calendar
@@ -628,16 +632,15 @@ const cellCount = computed(() => {
                   <template
                     v-if="
                       (activity.Comments && activity.Comments.length > 0) ||
-                      (activity.Discussions && activity.Discussions.length > 0) ||
+                      (activity.Discussions &&
+                        activity.Discussions.length > 0) ||
                       (activity.Events && activity.Events.length > 0)
                     "
                     >•</template
                   >
                   {{ activity.WikiEdits.length }}
                   {{
-                    activity.WikiEdits.length === 1
-                      ? 'wiki edit'
-                      : 'wiki edits'
+                    activity.WikiEdits.length === 1 ? 'wiki edit' : 'wiki edits'
                   }}
                 </template>
                 <template v-if="idx < selectedDay.activities.length - 1">
@@ -650,7 +653,7 @@ const cellCount = computed(() => {
 
           <div v-if="selectedDay.count > 0" class="mt-2">
             <div
-              class="mb-1 mt-3 text-xs font-medium uppercase tracking-wide"
+              class="mt-3 mb-1 text-xs font-medium tracking-wide uppercase"
               :class="darkMode ? 'text-gray-400' : 'text-gray-600'"
             >
               {{ texts.activityDetailsHeading }}
@@ -759,13 +762,11 @@ const cellCount = computed(() => {
                     class="mb-2 rounded-md border border-gray-200 p-3 dark:border-gray-700"
                   >
                     <div class="flex flex-col gap-1">
-                      <div
-                        class="flex flex-wrap items-center gap-x-2 gap-y-1"
-                      >
+                      <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
                         <NuxtLink
                           v-if="getWikiPagePath(edit)"
                           :to="getWikiPagePath(edit)"
-                          class="font-medium text-orange-600 hover:underline dark:text-orange-400"
+                          class="text-brand-600 dark:text-brand-400 font-medium hover:underline"
                         >
                           {{ edit.WikiPage?.title || 'Wiki page' }}
                         </NuxtLink>
@@ -791,7 +792,7 @@ const cellCount = computed(() => {
                       <NuxtLink
                         v-if="getWikiRevisionPath(edit)"
                         :to="getWikiRevisionPath(edit)"
-                        class="text-orange-600 hover:underline dark:text-orange-400"
+                        class="text-brand-600 dark:text-brand-400 hover:underline"
                       >
                         View revision
                       </NuxtLink>

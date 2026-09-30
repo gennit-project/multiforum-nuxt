@@ -54,74 +54,82 @@ const humanReadableDate = (dateISO?: string | null): string => {
         {{ `Active Suspensions (${aggregateCount})` }}
       </div>
       <ul role="list">
-      <li
-        v-for="suspension in suspendedUsers"
-        :key="suspension.id"
-        class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-      >
-        <div class="w-full flex-col">
-          <div class="flex w-full justify-between gap-2">
-            <nuxt-link
-              :to="{
-                name: 'u-username',
-                params: {
-                  username:
-                    suspension.SuspendedUser?.username ?? suspension.username,
-                },
-              }"
-              class="flex items-center font-bold dark:text-white"
-            >
-              <AvatarComponent
-                :text="
-                  suspension.SuspendedUser?.username ?? suspension.username ?? ''
-                "
-                :src="suspension.SuspendedUser?.profilePicURL ?? ''"
-                class="mr-2 h-6 w-6"
-              />
-              <UsernameWithTooltip
-                v-if="suspension.SuspendedUser?.username ?? suspension.username"
-                :username="
-                  suspension.SuspendedUser?.username ?? suspension.username ?? ''
-                "
-                :src="suspension.SuspendedUser?.profilePicURL ?? ''"
-                :display-name="suspension.SuspendedUser?.displayName ?? ''"
-                :comment-karma="suspension.SuspendedUser?.commentKarma ?? 0"
-                :discussion-karma="suspension.SuspendedUser?.discussionKarma ?? 0"
-                :account-created="suspension.SuspendedUser?.createdAt ?? ''"
-              />
-              <span
-                v-if="suspension.SuspendedUser?.isBot"
-                class="ml-2 rounded-full bg-blue-200 px-2 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/70 dark:text-blue-100"
+        <li
+          v-for="suspension in suspendedUsers"
+          :key="suspension.id"
+          class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <div class="w-full flex-col">
+            <div class="flex w-full justify-between gap-2">
+              <nuxt-link
+                :to="{
+                  name: 'u-username',
+                  params: {
+                    username:
+                      suspension.SuspendedUser?.username ?? suspension.username,
+                  },
+                }"
+                class="flex items-center font-bold dark:text-white"
               >
-                🤖 Bot
-              </span>
-            </nuxt-link>
-            <nuxt-link
-              v-if="suspension.RelatedIssue"
-              class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
-              :to="{
-                name: 'admin-issues-issueNumber',
-                params: { issueNumber: suspension.RelatedIssue.issueNumber },
-              }"
+                <AvatarComponent
+                  :text="
+                    suspension.SuspendedUser?.username ??
+                    suspension.username ??
+                    ''
+                  "
+                  :src="suspension.SuspendedUser?.profilePicURL ?? ''"
+                  class="mr-2 h-6 w-6"
+                />
+                <UsernameWithTooltip
+                  v-if="
+                    suspension.SuspendedUser?.username ?? suspension.username
+                  "
+                  :username="
+                    suspension.SuspendedUser?.username ??
+                    suspension.username ??
+                    ''
+                  "
+                  :src="suspension.SuspendedUser?.profilePicURL ?? ''"
+                  :display-name="suspension.SuspendedUser?.displayName ?? ''"
+                  :comment-karma="suspension.SuspendedUser?.commentKarma ?? 0"
+                  :discussion-karma="
+                    suspension.SuspendedUser?.discussionKarma ?? 0
+                  "
+                  :account-created="suspension.SuspendedUser?.createdAt ?? ''"
+                />
+                <span
+                  v-if="suspension.SuspendedUser?.isBot"
+                  class="ml-2 rounded-full bg-blue-200 px-2 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-900/70 dark:text-blue-100"
+                >
+                  🤖 Bot
+                </span>
+              </nuxt-link>
+              <nuxt-link
+                v-if="suspension.RelatedIssue"
+                class="border-brand-500 text-brand-500 flex items-center gap-1 rounded border px-2 py-1"
+                :to="{
+                  name: 'admin-issues-issueNumber',
+                  params: { issueNumber: suspension.RelatedIssue.issueNumber },
+                }"
+              >
+                Related Issue
+              </nuxt-link>
+            </div>
+            <div
+              v-if="!suspension.suspendedIndefinitely"
+              class="text-sm text-gray-500 dark:text-gray-300"
             >
-              Related Issue
-            </nuxt-link>
+              {{
+                `Suspended until ${humanReadableDate(suspension.suspendedUntil)}`
+              }}
+            </div>
+            <div v-else class="text-sm text-gray-500 dark:text-gray-300">
+              {{
+                `Suspended indefinitely as of ${humanReadableDate(suspension.createdAt)}`
+              }}
+            </div>
           </div>
-          <div
-            v-if="!suspension.suspendedIndefinitely"
-            class="text-sm text-gray-500 dark:text-gray-300"
-          >
-            {{
-              `Suspended until ${humanReadableDate(suspension.suspendedUntil)}`
-            }}
-          </div>
-          <div v-else class="text-sm text-gray-500 dark:text-gray-300">
-            {{
-              `Suspended indefinitely as of ${humanReadableDate(suspension.createdAt)}`
-            }}
-          </div>
-        </div>
-      </li>
+        </li>
       </ul>
     </div>
   </div>

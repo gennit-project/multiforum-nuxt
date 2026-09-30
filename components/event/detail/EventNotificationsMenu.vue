@@ -44,7 +44,9 @@ const baseButtonClasses =
           <MenuItems
             class="absolute right-0 z-50 mt-2 w-72 origin-top-right rounded-xl border border-gray-200 bg-white p-2 shadow-lg focus:outline-none dark:border-gray-700 dark:bg-gray-800"
           >
-            <div class="px-2 pb-2 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            <div
+              class="px-2 pt-1 pb-2 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
+            >
               Notify Me About
             </div>
 
@@ -52,29 +54,31 @@ const baseButtonClasses =
               <button
                 type="button"
                 class="flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left"
-                :class="active ? 'bg-orange-50 dark:bg-gray-700' : 'bg-transparent'"
+                :class="
+                  active ? 'bg-brand-50 dark:bg-gray-700' : 'bg-transparent'
+                "
                 @click="emit('toggleComments')"
               >
                 <div class="mt-0.5 flex h-4 w-4 items-center justify-center">
-                  <LoadingSpinner
-                    v-if="commentsLoading"
-                    class="h-4 w-4"
-                  />
+                  <LoadingSpinner v-if="commentsLoading" class="h-4 w-4" />
                   <input
                     v-else
                     type="checkbox"
-                    class="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                    class="text-brand-500 focus:ring-brand-500 h-4 w-4 rounded border-gray-300"
                     :checked="watchComments"
                     tabindex="-1"
                     aria-hidden="true"
-                  >
+                  />
                 </div>
                 <div>
-                  <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <div
+                    class="text-sm font-medium text-gray-900 dark:text-gray-100"
+                  >
                     Comments and replies
                   </div>
                   <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Get notified about new comments on this event and replies to watched comment threads.
+                    Get notified about new comments on this event and replies to
+                    watched comment threads.
                   </div>
                 </div>
               </button>
@@ -84,29 +88,31 @@ const baseButtonClasses =
               <button
                 type="button"
                 class="flex w-full items-start gap-3 rounded-lg px-3 py-3 text-left"
-                :class="active ? 'bg-orange-50 dark:bg-gray-700' : 'bg-transparent'"
+                :class="
+                  active ? 'bg-brand-50 dark:bg-gray-700' : 'bg-transparent'
+                "
                 @click="emit('toggleUpdates')"
               >
                 <div class="mt-0.5 flex h-4 w-4 items-center justify-center">
-                  <LoadingSpinner
-                    v-if="updatesLoading"
-                    class="h-4 w-4"
-                  />
+                  <LoadingSpinner v-if="updatesLoading" class="h-4 w-4" />
                   <input
                     v-else
                     type="checkbox"
-                    class="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                    class="text-brand-500 focus:ring-brand-500 h-4 w-4 rounded border-gray-300"
                     :checked="watchUpdates"
                     tabindex="-1"
                     aria-hidden="true"
-                  >
+                  />
                 </div>
                 <div>
-                  <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  <div
+                    class="text-sm font-medium text-gray-900 dark:text-gray-100"
+                  >
                     Event updates
                   </div>
                   <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                    Get notified if this event is canceled or its time, location, or title changes.
+                    Get notified if this event is canceled or its time,
+                    location, or title changes.
                   </div>
                 </div>
               </button>

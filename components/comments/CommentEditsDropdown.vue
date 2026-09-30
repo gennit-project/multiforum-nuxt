@@ -239,7 +239,7 @@ onUnmounted(() => {
             <button
               type="button"
               role="menuitem"
-              class="flex w-full flex-col px-3 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset dark:hover:bg-gray-700"
+              class="focus-visible:ring-brand-500 flex w-full flex-col px-3 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset dark:hover:bg-gray-700"
               @click="openRevisionDiff(edit)"
             >
               <div class="flex items-center text-sm">
@@ -257,7 +257,7 @@ onUnmounted(() => {
                 </span>
                 <span
                   v-else-if="edit === allEdits[0]"
-                  class="ml-1 text-orange-600 dark:text-orange-400"
+                  class="text-brand-600 dark:text-brand-400 ml-1"
                 >
                   Most recent
                 </span>

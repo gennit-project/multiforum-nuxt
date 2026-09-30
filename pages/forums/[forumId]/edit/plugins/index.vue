@@ -538,7 +538,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
               <div class="flex items-center gap-2">
                 <NuxtLink
                   :to="`/forums/${channelUniqueName}/edit/plugins/${consolidated.plugin.id}`"
-                  class="text-lg font-semibold text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
+                  class="text-brand-600 hover:text-brand-900 dark:text-brand-400 dark:hover:text-brand-300 text-lg font-semibold"
                 >
                   {{
                     consolidated.plugin.displayName || consolidated.plugin.name
@@ -575,7 +575,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
                 </label>
                 <select
                   :id="`version-${consolidated.plugin.id}`"
-                  class="rounded-md border border-gray-300 bg-white py-1 pr-8 pl-2 font-mono text-sm text-gray-700 focus:border-orange-500 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                  class="focus:border-brand-500 focus:ring-brand-500 rounded-md border border-gray-300 bg-white py-1 pr-8 pl-2 font-mono text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
                   :value="
                     getEnabledVersionForPlugin(consolidated) ||
                     consolidated.versions[0]?.version
@@ -610,7 +610,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
               <label class="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
-                  class="h-4 w-4 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                  class="text-brand-600 focus:ring-brand-500 h-4 w-4 rounded border-gray-300"
                   :checked="isAnyVersionEnabled(consolidated)"
                   :disabled="isConsolidatedToggling(consolidated)"
                   :aria-label="`Enable ${consolidated.plugin.displayName || consolidated.plugin.name}`"

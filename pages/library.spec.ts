@@ -249,7 +249,7 @@ describe('Library page', () => {
       .findAll('a')
       .find((link) => link.attributes('href') === '/library/favorite-channels');
 
-    expect(favoriteForumsLink?.classes().join(' ')).toContain('bg-orange-100');
+    expect(favoriteForumsLink?.classes().join(' ')).toContain('bg-brand-100');
   });
 
   it('renders the active library item label in the mobile dropdown', () => {

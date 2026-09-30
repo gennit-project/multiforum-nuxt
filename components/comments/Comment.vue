@@ -249,8 +249,7 @@ const forumId = computed(() => {
 
 // Use the permission composable
 const { userPermissions } = useCommentPermissions(forumId);
-const { forumAdminUsernames, forumModProfileNames } =
-  useForumRoleMembership();
+const { forumAdminUsernames, forumModProfileNames } = useForumRoleMembership();
 const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
 
@@ -484,7 +483,7 @@ const label = computed(() =>
         <div
           :class="[
             isHighlighted
-              ? 'rounded-md border border-orange-600 bg-orange-100 p-2 dark:bg-orange-950'
+              ? 'border-brand-600 bg-brand-100 dark:bg-brand-950 rounded-md border p-2'
               : isMarkedAsAnswer
                 ? 'rounded-md border border-green-600 bg-green-100 p-2 dark:bg-green-950'
                 : 'dark:bg-gray-950',

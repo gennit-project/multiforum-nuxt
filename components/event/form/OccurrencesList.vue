@@ -155,7 +155,7 @@ const getOccurrenceLabel = (index: number): string => {
     >
       <!-- Date number indicator -->
       <div
-        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-orange-100 text-sm font-medium text-orange-700 dark:bg-orange-900 dark:text-orange-200"
+        class="bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-200 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-medium"
       >
         {{ index + 1 }}
       </div>
@@ -223,7 +223,7 @@ const getOccurrenceLabel = (index: number): string => {
     <!-- Add occurrence button -->
     <button
       type="button"
-      class="flex items-center gap-2 rounded-md border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-600 hover:border-orange-400 hover:bg-orange-50 hover:text-orange-600 dark:border-gray-600 dark:text-gray-400 dark:hover:border-orange-500 dark:hover:bg-orange-900/20 dark:hover:text-orange-400"
+      class="hover:border-brand-400 hover:bg-brand-50 hover:text-brand-600 dark:hover:border-brand-500 dark:hover:bg-brand-900/20 dark:hover:text-brand-400 flex items-center gap-2 rounded-md border border-dashed border-gray-300 px-4 py-2 text-sm text-gray-600 dark:border-gray-600 dark:text-gray-400"
       data-testid="add-occurrence-button"
       @click="addOccurrence"
     >

@@ -127,7 +127,7 @@ const reachedEndOfResults = computed(() => {
       <router-link
         v-if="event"
         :to="`/forums/${channelId}/events/${event.id}`"
-        class="text-sm text-orange-500 hover:underline dark:text-orange-400"
+        class="text-brand-500 dark:text-brand-400 text-sm hover:underline"
         >View Event</router-link
       >
     </div>

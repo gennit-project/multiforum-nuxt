@@ -576,7 +576,7 @@ watch(
             <button
               v-if="canStartPipeline(pipeline)"
               type="button"
-              class="mt-4 inline-flex items-center gap-2 rounded-md bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-500"
+              class="bg-brand-700 hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-500 mt-4 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
               :disabled="startingPipeline"
               @click="startPipeline(pipeline)"
             >
@@ -679,21 +679,21 @@ watch(
                 </span>
                 <a
                   :href="attemptPermalink(attempt.pipelineId)"
-                  class="text-sm text-orange-700 underline dark:text-orange-300"
+                  class="text-brand-700 dark:text-brand-300 text-sm underline"
                   :aria-label="`Permalink to attempt ${attempt.attemptNumber}`"
                 >
                   Permalink
                 </a>
                 <button
                   type="button"
-                  class="text-sm text-orange-700 underline dark:text-orange-300"
+                  class="text-brand-700 dark:text-brand-300 text-sm underline"
                   @click="copyDiagnostics(attempt)"
                 >
                   Copy diagnostics
                 </button>
                 <button
                   type="button"
-                  class="text-sm text-orange-700 underline dark:text-orange-300"
+                  class="text-brand-700 dark:text-brand-300 text-sm underline"
                   @click="shareAttempt(attempt)"
                 >
                   Share this attempt
@@ -701,7 +701,7 @@ watch(
                 <button
                   v-if="canViewInternalLogs"
                   type="button"
-                  class="text-sm text-orange-700 underline dark:text-orange-300"
+                  class="text-brand-700 dark:text-brand-300 text-sm underline"
                   :aria-expanded="
                     isTechnicalDetailsExpanded(attempt.pipelineId)
                   "
@@ -717,7 +717,7 @@ watch(
                 <div v-if="canRerunAttempt(attempt)" class="text-right">
                   <button
                     type="button"
-                    class="inline-flex items-center gap-2 rounded-md bg-orange-700 px-3 py-2 text-sm font-medium text-white hover:bg-orange-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-orange-600 dark:hover:bg-orange-500"
+                    class="bg-brand-700 hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-500 inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
                     :disabled="rerunningPipeline"
                     @click="rerunAttempt(attempt)"
                   >
@@ -832,13 +832,13 @@ watch(
                       :href="diagnostic.helpUrl"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="mt-2 inline-block text-orange-700 underline dark:text-orange-300"
+                      class="text-brand-700 dark:text-brand-300 mt-2 inline-block underline"
                     >
                       Documentation
                     </a>
                     <NuxtLink
                       :to="supportDiscussionUrl(attempt, diagnostic.code)"
-                      class="mt-2 ml-3 inline-block text-orange-700 underline dark:text-orange-300"
+                      class="text-brand-700 dark:text-brand-300 mt-2 ml-3 inline-block underline"
                     >
                       Ask the community
                     </NuxtLink>
@@ -871,7 +871,7 @@ watch(
                 <button
                   v-if="technicalDetails[attempt.pipelineId]"
                   type="button"
-                  class="text-sm text-orange-700 underline dark:text-orange-300"
+                  class="text-brand-700 dark:text-brand-300 text-sm underline"
                   @click="
                     copyTechnicalDetails(
                       attempt.pipelineId,

@@ -23,11 +23,7 @@ const props = defineProps<{
   username: string;
 }>();
 
-const {
-  result,
-  loading,
-  error,
-} = useQuery(
+const { result, loading, error } = useQuery(
   GET_PUBLIC_SCRATCHPAD_ENTRIES,
   () => ({
     username: props.username,
@@ -98,13 +94,17 @@ const kudosPageLink = computed(() => `/u/${props.username}/kudos`);
             :to="`/u/${entry.Author?.username}`"
             class="truncate text-sm font-medium text-gray-900 hover:underline dark:text-white"
           >
-            {{ entry.Author?.displayName || entry.Author?.username || 'Unknown' }}
+            {{
+              entry.Author?.displayName || entry.Author?.username || 'Unknown'
+            }}
           </NuxtLink>
           <span class="shrink-0 text-xs text-gray-500 dark:text-gray-400">
             {{ relativeTime(entry.createdAt) }}
           </span>
         </div>
-        <p class="line-clamp-4 whitespace-pre-wrap text-sm text-gray-700 dark:text-gray-300">
+        <p
+          class="line-clamp-4 text-sm whitespace-pre-wrap text-gray-700 dark:text-gray-300"
+        >
           {{ entry.text }}
         </p>
       </article>
@@ -112,7 +112,7 @@ const kudosPageLink = computed(() => `/u/${props.username}/kudos`);
       <NuxtLink
         v-if="shouldShowSeeAllLink"
         :to="kudosPageLink"
-        class="inline-flex items-center gap-2 text-sm font-medium text-orange-600 hover:underline dark:text-orange-400"
+        class="text-brand-600 dark:text-brand-400 inline-flex items-center gap-2 text-sm font-medium hover:underline"
         data-testid="profile-kudos-see-all"
       >
         <span>See all kudos</span>

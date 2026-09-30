@@ -13,8 +13,14 @@ const mountTab = (props: Record<string, unknown> = {}, slot = '') =>
     slots: { default: slot },
     global: {
       stubs: {
-        NuxtLink: { props: ['to'], template: '<a v-bind="$attrs"><slot /></a>' },
-        'nuxt-link': { props: ['to'], template: '<a v-bind="$attrs"><slot /></a>' },
+        NuxtLink: {
+          props: ['to'],
+          template: '<a v-bind="$attrs"><slot /></a>',
+        },
+        'nuxt-link': {
+          props: ['to'],
+          template: '<a v-bind="$attrs"><slot /></a>',
+        },
       },
     },
   });
@@ -54,7 +60,7 @@ describe('TabButton active state', () => {
   it('is active when the isActive prop is true', () => {
     const wrapper = mountTab({ isActive: true });
 
-    expect(wrapper.find('a').classes()).toContain('border-orange-500');
+    expect(wrapper.find('a').classes()).toContain('border-brand-500');
   });
 
   it('does not apply a conflicting transparent border when active', () => {
@@ -73,7 +79,7 @@ describe('TabButton active state', () => {
     h.route = { path: '/forums/cats' };
     const wrapper = mountTab();
 
-    expect(wrapper.find('a').classes()).toContain('border-orange-500');
+    expect(wrapper.find('a').classes()).toContain('border-brand-500');
   });
 
   it('is inactive when the path does not match', () => {

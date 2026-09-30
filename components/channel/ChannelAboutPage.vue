@@ -171,7 +171,7 @@ const handleUnlocked = () => {
         <template #has-auth>
           <div class="flex w-full justify-between border-b border-gray-300">
             <span
-              class="my-2 mb-2 w-full text-sm font-bold leading-6 text-gray-600 dark:text-gray-100"
+              class="my-2 mb-2 w-full text-sm leading-6 font-bold text-gray-600 dark:text-gray-100"
             >
               Admin Actions
             </span>
@@ -193,7 +193,7 @@ const handleUnlocked = () => {
         <div v-if="canReportChannel || canLockChannel" class="mt-6">
           <div class="flex w-full justify-between border-b border-gray-300">
             <span
-              class="my-2 mb-2 w-full text-sm font-bold leading-6 text-gray-600 dark:text-gray-100"
+              class="my-2 mb-2 w-full text-sm leading-6 font-bold text-gray-600 dark:text-gray-100"
             >
               Server Moderation
             </span>
@@ -301,7 +301,7 @@ const handleUnlocked = () => {
 @media (prefers-color-scheme: light) {
   #md-editor-v3-preview,
   #md-editor-v3-preview-wrapper {
-    background-color: orange;
+    background-color: var(--color-brand-500);
   }
 }
 </style>

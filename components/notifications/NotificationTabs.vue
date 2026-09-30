@@ -308,7 +308,7 @@ const reachedEnd = computed(() => {
 <template>
   <div class="flex justify-center dark:text-white">
     <div class="w-full max-w-5xl">
-      <div class="mx-4 mb-4 mt-4">
+      <div class="mx-4 mt-4 mb-4">
         <h1 class="mb-4 border-b border-gray-500 text-2xl">Notifications</h1>
 
         <!-- Tab navigation -->
@@ -329,7 +329,7 @@ const reachedEnd = computed(() => {
             :class="[
               'px-4 py-2 text-sm font-medium',
               activeTab === 'general'
-                ? 'border-b-2 border-orange-500 text-gray-900 dark:text-white'
+                ? 'border-brand-500 border-b-2 text-gray-900 dark:text-white'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300',
             ]"
             @click="activeTab = 'general'"
@@ -337,7 +337,7 @@ const reachedEnd = computed(() => {
             General
             <span
               v-if="generalUnreadCount > 0"
-              class="ml-1 rounded-full bg-orange-500 px-2 py-0.5 text-xs text-white"
+              class="bg-brand-500 ml-1 rounded-full px-2 py-0.5 text-xs text-white"
             >
               {{ generalUnreadCount }}
             </span>
@@ -353,7 +353,7 @@ const reachedEnd = computed(() => {
             :class="[
               'px-4 py-2 text-sm font-medium',
               activeTab === 'feedback'
-                ? 'border-b-2 border-orange-500 text-gray-900 dark:text-white'
+                ? 'border-brand-500 border-b-2 text-gray-900 dark:text-white'
                 : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300',
             ]"
             @click="activeTab = 'feedback'"
@@ -361,7 +361,7 @@ const reachedEnd = computed(() => {
             Feedback
             <span
               v-if="feedbackUnreadCount > 0"
-              class="ml-1 rounded-full bg-orange-500 px-2 py-0.5 text-xs text-white"
+              class="bg-brand-500 ml-1 rounded-full px-2 py-0.5 text-xs text-white"
             >
               {{ feedbackUnreadCount }}
             </span>
@@ -412,7 +412,7 @@ const reachedEnd = computed(() => {
 
           <ul
             role="list"
-            class="flex-1 flex-col divide-y divide-gray-200 bg-white shadow dark:divide-gray-700 dark:bg-gray-800 dark:text-white sm:rounded-lg"
+            class="flex-1 flex-col divide-y divide-gray-200 bg-white shadow sm:rounded-lg dark:divide-gray-700 dark:bg-gray-800 dark:text-white"
             data-testid="notification-list"
           >
             <li
@@ -432,7 +432,7 @@ const reachedEnd = computed(() => {
               <NuxtLink
                 v-if="notification.link"
                 :to="notification.link"
-                class="mt-2 inline-block text-sm text-orange-700 underline dark:text-orange-300"
+                class="text-brand-700 dark:text-brand-300 mt-2 inline-block text-sm underline"
               >
                 View pipeline attempt
               </NuxtLink>
@@ -455,7 +455,7 @@ const reachedEnd = computed(() => {
                   type="button"
                   data-testid="notification-ignore"
                   :disabled="pendingNotificationId === notification.id"
-                  class="hover:bg-gray-50 inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                  class="inline-flex items-center gap-1 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                   @click="handleIgnore(notification)"
                 >
                   Ignore

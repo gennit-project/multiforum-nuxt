@@ -112,7 +112,7 @@ onUnmounted(() => {
       :tabindex="disabled ? -1 : 0"
       :aria-label="ariaLabel"
       :aria-expanded="isDropdownOpen"
-      class="flex h-10 w-full cursor-pointer items-center rounded border border-gray-200 px-3 pr-8 text-sm focus:border-orange-500 focus:ring-orange-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-32"
+      class="focus:border-brand-500 focus:ring-brand-500 flex h-10 w-full cursor-pointer items-center rounded border border-gray-200 px-3 pr-8 text-sm sm:w-32 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
       :class="{ 'cursor-not-allowed opacity-60': disabled }"
       @click="!disabled && toggleDropdown()"
       @keydown.enter="!disabled && toggleDropdown()"
@@ -121,7 +121,7 @@ onUnmounted(() => {
       {{ formattedTime }}
 
       <!-- Time dropdown toggle button -->
-      <div class="absolute right-3 top-1/2 -translate-y-1/2 transform">
+      <div class="absolute top-1/2 right-3 -translate-y-1/2 transform">
         <ClockIcon class="h-4 w-4 text-gray-500 dark:text-gray-400" />
       </div>
     </div>
@@ -129,7 +129,7 @@ onUnmounted(() => {
     <!-- Custom dropdown for time selection -->
     <div
       v-if="isDropdownOpen"
-      class="touch-scroll-y absolute left-0 top-full z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+      class="touch-scroll-y absolute top-full left-0 z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
       style="-webkit-overflow-scrolling: touch; scrollbar-width: thin"
     >
       <!-- Using generated time options -->
@@ -156,7 +156,7 @@ onUnmounted(() => {
             :class="[
               'cursor-pointer px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700',
               formattedTime === hourOption.display
-                ? 'bg-orange-50 dark:bg-orange-900'
+                ? 'bg-brand-50 dark:bg-brand-900'
                 : '',
             ]"
             @click="selectTime(hourOption.value)"

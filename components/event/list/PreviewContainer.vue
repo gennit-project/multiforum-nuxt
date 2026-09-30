@@ -60,7 +60,7 @@ defineEmits(['closePreview']);
                         <div class="ml-3 flex h-7 items-center">
                           <button
                             type="button"
-                            class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-gray-200"
+                            class="focus:ring-brand-500 rounded-full text-gray-400 hover:text-gray-500 focus:ring-2 focus:outline-none dark:text-gray-200"
                             @click="$emit('closePreview')"
                           >
                             <span class="sr-only">Close panel</span>

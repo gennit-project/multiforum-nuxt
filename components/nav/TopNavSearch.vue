@@ -39,8 +39,11 @@ const selectedType = ref<SearchType>('discussions');
 const selectedModified = ref<ModifiedRange>('all');
 const selectedForums = ref<string[]>([]);
 const showPopover = ref(false);
-const { recentSearches, load: loadRecentSearches, record: recordRecent } =
-  useRecentSearches();
+const {
+  recentSearches,
+  load: loadRecentSearches,
+  record: recordRecent,
+} = useRecentSearches();
 
 const typeOptions: Array<{ value: SearchType; label: string }> = [
   { value: 'discussions', label: 'Discussions' },
@@ -223,17 +226,12 @@ onBeforeUnmount(() => {
       type="button"
       data-testid="mobile-top-nav-search-button"
       aria-label="Open search"
-      class="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:text-gray-300 dark:hover:text-white"
+      class="focus-visible:ring-brand-500 inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 hover:text-gray-900 focus:outline-none focus-visible:ring-2 dark:text-gray-300 dark:hover:text-white"
       @click="togglePopoverAndFocus"
     >
       <SearchIcon class="h-5 w-5" />
     </button>
-    <div
-      v-else
-      class="w-full"
-      @click="openPopover"
-      @focusin="openPopover"
-    >
+    <div v-else class="w-full" @click="openPopover" @focusin="openPopover">
       <SearchBar
         ref="searchBarRef"
         :auto-focus="false"
@@ -251,11 +249,14 @@ onBeforeUnmount(() => {
       class="z-30 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900"
       :class="
         props.iconOnly
-          ? 'fixed left-2 right-2 top-[3.75rem]'
-          : 'absolute left-0 right-0 mt-2 min-w-[20rem] md:min-w-[28rem]'
+          ? 'fixed top-[3.75rem] right-2 left-2'
+          : 'absolute right-0 left-0 mt-2 min-w-[20rem] md:min-w-[28rem]'
       "
     >
-      <div v-if="props.iconOnly" class="border-b border-gray-200 p-3 dark:border-gray-700">
+      <div
+        v-if="props.iconOnly"
+        class="border-b border-gray-200 p-3 dark:border-gray-700"
+      >
         <SearchBar
           ref="searchBarRef"
           :auto-focus="false"
@@ -279,7 +280,7 @@ onBeforeUnmount(() => {
                 :class="[
                   'flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700',
                   selectedType === option.value
-                    ? 'bg-orange-50 text-orange-900 dark:bg-orange-900/30 dark:text-orange-100'
+                    ? 'bg-brand-50 text-brand-900 dark:bg-brand-900/30 dark:text-brand-100'
                     : 'text-gray-700 dark:text-gray-200',
                 ]"
                 @click="selectedType = option.value"
@@ -287,7 +288,7 @@ onBeforeUnmount(() => {
                 <span>{{ option.label }}</span>
                 <CheckIcon
                   v-if="selectedType === option.value"
-                  class="h-3 w-3 text-orange-500"
+                  class="text-brand-500 h-3 w-3"
                 />
               </button>
             </div>
@@ -303,7 +304,7 @@ onBeforeUnmount(() => {
                 :class="[
                   'flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700',
                   selectedModified === option.value
-                    ? 'bg-orange-50 text-orange-900 dark:bg-orange-900/30 dark:text-orange-100'
+                    ? 'bg-brand-50 text-brand-900 dark:bg-brand-900/30 dark:text-brand-100'
                     : 'text-gray-700 dark:text-gray-200',
                 ]"
                 @click="selectedModified = option.value"
@@ -311,7 +312,7 @@ onBeforeUnmount(() => {
                 <span>{{ option.label }}</span>
                 <CheckIcon
                   v-if="selectedModified === option.value"
-                  class="h-3 w-3 text-orange-500"
+                  class="text-brand-500 h-3 w-3"
                 />
               </button>
             </div>
@@ -319,7 +320,7 @@ onBeforeUnmount(() => {
         </FilterChip>
         <FilterChip :label="forumLabel">
           <template #icon>
-            <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
+            <ChannelIcon class="mr-2 -ml-0.5 h-4 w-4" />
           </template>
           <template #content>
             <div class="relative w-96">
@@ -332,7 +333,7 @@ onBeforeUnmount(() => {
         </FilterChip>
         <button
           type="button"
-          class="ml-auto rounded-md bg-orange-500 px-3 py-1.5 text-sm font-bold text-black hover:bg-orange-600"
+          class="bg-brand-500 hover:bg-brand-600 ml-auto rounded-md px-3 py-1.5 text-sm font-bold text-black"
           @click="executeSearch"
         >
           Search
@@ -340,7 +341,7 @@ onBeforeUnmount(() => {
       </div>
       <div class="border-t border-gray-200 dark:border-gray-700">
         <div
-          class="px-3 py-2 text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+          class="px-3 py-2 text-xs tracking-wide text-gray-500 uppercase dark:text-gray-400"
         >
           Recent searches
         </div>
@@ -363,7 +364,7 @@ onBeforeUnmount(() => {
           >
             <button
               type="button"
-              class="w-full text-left text-sm hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 dark:hover:bg-gray-800"
+              class="focus-visible:ring-brand-500 w-full text-left text-sm hover:bg-gray-100 focus:outline-none focus-visible:ring-2 dark:hover:bg-gray-800"
               @click="runRecentSearch(recent)"
             >
               <div class="font-medium text-gray-900 dark:text-gray-100">

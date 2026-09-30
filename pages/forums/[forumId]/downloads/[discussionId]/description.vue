@@ -91,7 +91,7 @@ const handleCancel = () => {
 
 <template>
   <div class="px-2">
-    <div class="flex flex-row space-x-4 lg:flex-col lg:space-x-0 lg:space-y-4">
+    <div class="flex flex-row space-x-4 lg:flex-col lg:space-y-4 lg:space-x-0">
       <!-- Description content and fallback -->
       <div v-if="!editMode" class="min-w-0 flex-1">
         <div v-if="props.discussion.body" class="rounded">
@@ -105,7 +105,7 @@ const handleCancel = () => {
       <button
         v-if="isOwnDiscussion && !editMode"
         type="button"
-        class="hover:bg-gray-50 inline-flex items-center gap-2 self-start rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 lg:self-end"
+        class="focus:ring-brand-500 inline-flex items-center gap-2 self-start rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none lg:self-end dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
         data-testid="edit-download-button"
         @click="handleEdit"
       >
@@ -115,7 +115,7 @@ const handleCancel = () => {
 
       <!-- Edit form -->
       <div v-else class="min-w-0 flex-1">
-        <div class="mb-3 mt-3 flex w-full flex-col">
+        <div class="mt-3 mb-3 flex w-full flex-col">
           <TextEditor
             class="mb-3"
             :test-id="'body-input'"

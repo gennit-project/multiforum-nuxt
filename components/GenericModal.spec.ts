@@ -20,13 +20,19 @@ const mountModal = (props: Record<string, unknown> = {}, slots = {}) =>
     global: {
       stubs: {
         ClientOnly: { template: '<div><slot /></div>' },
-        ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
+        ErrorBanner: {
+          name: 'ErrorBanner',
+          props: ['text'],
+          template: '<div class="err">{{ text }}</div>',
+        },
       },
     },
   });
 
-const primary = (w: ReturnType<typeof mount>) => w.find('[data-testid="m-primary-button"]');
-const danger = (w: ReturnType<typeof mount>) => w.find('[data-testid="m-danger-button"]');
+const primary = (w: ReturnType<typeof mount>) =>
+  w.find('[data-testid="m-primary-button"]');
+const danger = (w: ReturnType<typeof mount>) =>
+  w.find('[data-testid="m-danger-button"]');
 const secondaryBtn = (w: ReturnType<typeof mount>) =>
   w.findAll('button').find((b) => b.text() === 'Cancel');
 
@@ -78,7 +84,7 @@ describe('GenericModal primary button', () => {
   it('uses orange styling by default', () => {
     const wrapper = mountModal();
 
-    expect(primary(wrapper).attributes('class')).toContain('bg-orange-600');
+    expect(primary(wrapper).attributes('class')).toContain('bg-brand-600');
   });
 
   it('uses red styling with warningColor', () => {
@@ -118,7 +124,10 @@ describe('GenericModal danger button', () => {
   });
 
   it('shows a redacting label while loading', () => {
-    const wrapper = mountModal({ dangerButtonText: 'Redact', dangerButtonLoading: true });
+    const wrapper = mountModal({
+      dangerButtonText: 'Redact',
+      dangerButtonLoading: true,
+    });
 
     expect(danger(wrapper).text()).toBe('Redacting...');
   });

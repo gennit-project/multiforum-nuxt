@@ -44,7 +44,7 @@ const favoriteChannels = computed(() => {
 
             <div v-if="loading" class="py-8 text-center">
               <div
-                class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500"
+                class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
               />
               <p class="mt-2 text-gray-600 dark:text-gray-400">
                 Loading your favorite forums...
@@ -88,14 +88,17 @@ const favoriteChannels = computed(() => {
               <div class="mt-6">
                 <NuxtLink
                   to="/forums"
-                  class="inline-flex items-center rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
+                  class="bg-brand-500 hover:bg-brand-600 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm"
                 >
                   Browse Forums
                 </NuxtLink>
               </div>
             </div>
 
-            <div v-else class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <div
+              v-else
+              class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+            >
               <LibraryChannelCard
                 v-for="channel in favoriteChannels"
                 :key="channel.uniqueName"

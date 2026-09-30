@@ -260,7 +260,7 @@ const saveRole = async () => {
     class="space-y-4 rounded-lg border shadow-sm dark:border-gray-800 dark:bg-gray-800"
   >
     <div v-if="showTitle !== false" class="space-y-1">
-      <h2 class="font-semibold text-lg text-gray-900 dark:text-gray-100">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
         {{ title || 'Default Roles' }}
       </h2>
       <p class="text-sm text-gray-600 dark:text-gray-300">
@@ -283,7 +283,7 @@ const saveRole = async () => {
         class="flex flex-col gap-3 rounded-md border border-gray-200 bg-gray-100 p-4 dark:border-gray-900 dark:bg-black"
       >
         <div class="flex items-center justify-between gap-2">
-          <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
             {{ def.label }}
           </h3>
           <button
@@ -334,7 +334,7 @@ const saveRole = async () => {
       @primary-button-click="saveRole"
     >
       <template #icon>
-        <PencilIcon class="h-6 w-6 text-orange-500" />
+        <PencilIcon class="text-brand-500 h-6 w-6" />
       </template>
       <template #content>
         <div v-if="editingDefinition" class="space-y-4">
@@ -344,7 +344,7 @@ const saveRole = async () => {
           <div class="space-y-1">
             <label
               for="role-name-input"
-              class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
             >
               Role name
             </label>
@@ -354,12 +354,12 @@ const saveRole = async () => {
               type="text"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               :disabled="mutationLoading"
-            >
+            />
           </div>
           <div class="space-y-1">
             <label
               for="role-description-input"
-              class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+              class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
             >
               Role description
             </label>
@@ -386,7 +386,7 @@ const saveRole = async () => {
                 class="h-4 w-4 rounded border border-gray-300 accent-blue-600 dark:border-gray-600 dark:accent-blue-400"
                 :disabled="mutationLoading"
                 :aria-label="formatPermissionName(perm)"
-              >
+              />
             </label>
           </div>
         </div>

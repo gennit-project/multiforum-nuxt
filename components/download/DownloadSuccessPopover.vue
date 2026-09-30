@@ -203,7 +203,7 @@ const copyLink = async () => {
         <!-- File preview placeholder -->
         <div class="shrink-0">
           <div
-            class="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-orange-300 bg-linear-to-br from-orange-100 to-orange-200 dark:border-orange-600 dark:from-orange-800 dark:to-orange-900"
+            class="border-brand-300 from-brand-100 to-brand-200 dark:border-brand-600 dark:from-brand-800 dark:to-brand-900 flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed bg-linear-to-br"
           >
             <DownloadFileIcon />
           </div>
@@ -300,7 +300,7 @@ const copyLink = async () => {
                   :class="
                     attributionCopied
                       ? 'bg-green-500 text-white'
-                      : 'bg-orange-500 text-black hover:bg-orange-600'
+                      : 'bg-brand-500 hover:bg-brand-600 text-black'
                   "
                   @click="copyAttribution"
                 >

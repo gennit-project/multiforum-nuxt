@@ -102,7 +102,7 @@ const closeDropdown = () => {
         aria-haspopup="menu"
         :aria-expanded="isDropdownOpen"
         :class="[
-          'hover:bg-gray-50 flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700',
+          'flex w-full items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700',
         ]"
         @click="toggleDropdown"
       >
@@ -118,22 +118,22 @@ const closeDropdown = () => {
 
       <div
         v-if="isDropdownOpen"
-        class="absolute left-0 right-0 top-full z-10 mt-1 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
+        class="absolute top-full right-0 left-0 z-10 mt-1 rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
       >
         <nav class="max-h-64 overflow-y-auto p-2" aria-label="On this page">
           <button
             v-for="heading in filteredHeadings"
             :key="heading.id"
             :class="[
-              'hover:bg-orange-50 block w-full rounded px-2 py-1.5 text-left text-sm transition-colors dark:hover:bg-orange-900/20',
+              'hover:bg-brand-50 dark:hover:bg-brand-900/20 block w-full rounded px-2 py-1.5 text-left text-sm transition-colors',
               {
                 'pl-2': heading.level === 1,
                 'pl-4': heading.level === 2,
                 'pl-6': heading.level === 3,
                 'pl-8': heading.level === 4,
-                'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300':
+                'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300':
                   activeHeading === heading.anchor,
-                'text-gray-600 hover:text-orange-700 dark:text-gray-400 dark:hover:text-orange-300':
+                'hover:text-brand-700 dark:hover:text-brand-300 text-gray-600 dark:text-gray-400':
                   activeHeading !== heading.anchor,
                 'font-medium': heading.level === 1,
                 'font-normal': heading.level > 1,
@@ -150,7 +150,7 @@ const closeDropdown = () => {
     <!-- Desktop Sidebar -->
     <div v-else class="py-2">
       <h3
-        class="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
+        class="mb-3 text-xs font-medium tracking-wide text-gray-500 uppercase dark:text-gray-400"
       >
         On This Page
       </h3>
@@ -159,13 +159,13 @@ const closeDropdown = () => {
           v-for="heading in filteredHeadings"
           :key="heading.id"
           :class="[
-            'hover:bg-orange-50 block w-full rounded px-1 py-0.5 text-left text-xs transition-colors hover:text-orange-700 dark:hover:bg-orange-900/20 dark:hover:text-orange-300',
+            'hover:bg-brand-50 hover:text-brand-700 dark:hover:bg-brand-900/20 dark:hover:text-brand-300 block w-full rounded px-1 py-0.5 text-left text-xs transition-colors',
             {
               'pl-1': heading.level === 1,
               'pl-3': heading.level === 2,
               'pl-5': heading.level === 3,
               'pl-7': heading.level === 4,
-              'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300':
+              'bg-brand-100 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300':
                 activeHeading === heading.anchor,
               'text-gray-600 dark:text-gray-400':
                 activeHeading !== heading.anchor,

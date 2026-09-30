@@ -497,7 +497,7 @@ definePageMeta({
                       :href="`/forums/${channelId}/events/${selectedChannelEventId}`"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
+                      class="text-brand-600 dark:text-brand-400 text-xs font-medium hover:underline"
                     >
                       Open in new tab
                     </a>
@@ -538,7 +538,7 @@ definePageMeta({
                       :href="`/forums/${selectedIssueChannelId}/issues/${selectedIssueNumber}`"
                       target="_blank"
                       rel="noopener noreferrer"
-                      class="text-xs font-medium text-orange-600 hover:underline dark:text-orange-400"
+                      class="text-brand-600 dark:text-brand-400 text-xs font-medium hover:underline"
                     >
                       Open in new tab
                     </a>

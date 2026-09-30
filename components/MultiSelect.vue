@@ -193,11 +193,7 @@ const submitEntries = (params: { entries: string[]; remainder: string }) => {
 };
 
 const onSearchKeydown = (event: KeyboardEvent) => {
-  if (
-    event.key === 'Enter' &&
-    props.allowTextEntry &&
-    !event.isComposing
-  ) {
+  if (event.key === 'Enter' && props.allowTextEntry && !event.isComposing) {
     // Also keeps Enter from submitting a surrounding form.
     event.preventDefault();
     submitEntries({ entries: splitEntries(searchQuery.value), remainder: '' });
@@ -488,13 +484,13 @@ const describedBy = computed(() => {
           <div
             v-for="option in selectedOptions"
             :key="String(option.value)"
-            class="mt-1 mr-2 inline-flex items-center rounded-full bg-orange-100 px-2 py-1 text-sm text-orange-700 dark:bg-orange-700 dark:text-orange-100"
+            class="bg-brand-100 text-brand-700 dark:bg-brand-700 dark:text-brand-100 mt-1 mr-2 inline-flex items-center rounded-full px-2 py-1 text-sm"
           >
             <span class="font-mono">{{ option.value }}</span>
             <button
               type="button"
               :aria-label="`Remove ${option.value}`"
-              class="ml-1 cursor-pointer rounded hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+              class="focus-visible:ring-brand-500 ml-1 cursor-pointer rounded hover:text-red-500 focus:outline-none focus-visible:ring-2"
               @click="removeSelection(option.value, $event)"
             >
               <span aria-hidden="true">&times;</span>
@@ -560,7 +556,7 @@ const describedBy = computed(() => {
             :aria-describedby="describedBy"
             :aria-expanded="isDropdownOpen"
             :aria-controls="popupId"
-            class="flex min-h-10 min-w-10 items-center justify-center rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+            class="focus-visible:ring-brand-500 flex min-h-10 min-w-10 items-center justify-center rounded focus:outline-none focus-visible:ring-2"
             @click="toggleDropdown"
             @keydown.down.prevent="openDropdown('first')"
             @keydown.up.prevent="openDropdown('last')"
@@ -599,7 +595,7 @@ const describedBy = computed(() => {
             type="text"
             :placeholder="searchPlaceholder"
             :aria-label="searchPlaceholder"
-            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            class="focus:ring-brand-500 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             @input="updateSearch(searchQuery)"
             @keydown="onSearchKeydown"
             @keyup.stop
@@ -638,9 +634,9 @@ const describedBy = computed(() => {
                 data-selection-control
                 :aria-pressed="isSectionFullySelected(section.options)"
                 :class="[
-                  'flex w-full items-center border-b px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset dark:border-gray-600 dark:hover:bg-gray-700',
+                  'focus-visible:ring-brand-500 flex w-full items-center border-b px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset dark:border-gray-600 dark:hover:bg-gray-700',
                   isSectionFullySelected(section.options)
-                    ? 'bg-orange-50 dark:bg-orange-900/20'
+                    ? 'bg-brand-50 dark:bg-brand-900/20'
                     : '',
                 ]"
                 @click="toggleSelectAll(section.options)"
@@ -652,7 +648,7 @@ const describedBy = computed(() => {
                     :class="[
                       'flex h-4 w-4 items-center justify-center rounded border',
                       isSectionFullySelected(section.options)
-                        ? 'border-orange-600 bg-orange-600 text-white'
+                        ? 'border-brand-600 bg-brand-600 text-white'
                         : 'border-gray-400 dark:border-gray-500',
                     ]"
                   >
@@ -692,7 +688,7 @@ const describedBy = computed(() => {
                   }}
                   <button
                     type="button"
-                    class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                    class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"
                     @click.stop="toggleSectionExpansion(sectionIndex)"
                   >
                     (show all)
@@ -702,7 +698,7 @@ const describedBy = computed(() => {
                   {{ section.options.map((opt) => opt.value).join(', ') }}
                   <button
                     type="button"
-                    class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                    class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"
                     @click.stop="toggleSectionExpansion(sectionIndex)"
                   >
                     (show less)
@@ -728,9 +724,9 @@ const describedBy = computed(() => {
                   "
                   :aria-label="`Select all forums in ${collectionOption.label}`"
                   :class="[
-                    'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset dark:hover:bg-gray-700',
+                    'focus-visible:ring-brand-500 flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset dark:hover:bg-gray-700',
                     isCollectionFullySelected(collectionOption.channels || [])
-                      ? 'bg-orange-50 dark:bg-orange-900/20'
+                      ? 'bg-brand-50 dark:bg-brand-900/20'
                       : '',
                   ]"
                   @click="
@@ -745,7 +741,7 @@ const describedBy = computed(() => {
                         isCollectionFullySelected(
                           collectionOption.channels || []
                         )
-                          ? 'border-orange-600 bg-orange-600 text-white'
+                          ? 'border-brand-600 bg-brand-600 text-white'
                           : 'border-gray-400 dark:border-gray-500',
                       ]"
                     >
@@ -790,7 +786,7 @@ const describedBy = computed(() => {
                     }}
                     <button
                       type="button"
-                      class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                      class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"
                       @click.stop="
                         toggleCollectionExpansion(
                           String(collectionOption.value)
@@ -804,7 +800,7 @@ const describedBy = computed(() => {
                     {{ (collectionOption.channels || []).join(', ') }}
                     <button
                       type="button"
-                      class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                      class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"
                       @click.stop="
                         toggleCollectionExpansion(
                           String(collectionOption.value)
@@ -836,9 +832,9 @@ const describedBy = computed(() => {
                   :disabled="option.disabled"
                   :aria-label="optionAriaLabel(option)"
                   :class="[
-                    'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset dark:hover:bg-gray-700',
+                    'focus-visible:ring-brand-500 flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset dark:hover:bg-gray-700',
                     selected.includes(option.value)
-                      ? 'bg-orange-50 dark:bg-orange-900/20'
+                      ? 'bg-brand-50 dark:bg-brand-900/20'
                       : '',
                     option.disabled ? 'cursor-not-allowed opacity-50' : '',
                   ]"
@@ -850,7 +846,7 @@ const describedBy = computed(() => {
                       :class="[
                         'flex h-4 w-4 items-center justify-center rounded border',
                         selected.includes(option.value)
-                          ? 'border-orange-600 bg-orange-600 text-white'
+                          ? 'border-brand-600 bg-brand-600 text-white'
                           : 'border-gray-400 dark:border-gray-500',
                       ]"
                     >
@@ -883,7 +879,7 @@ const describedBy = computed(() => {
 
                   <CheckIcon
                     v-if="!multiple && selected.includes(option.value)"
-                    class="h-4 w-4 text-orange-600"
+                    class="text-brand-600 h-4 w-4"
                     aria-hidden="true"
                   />
                 </button>
@@ -914,9 +910,9 @@ const describedBy = computed(() => {
               :disabled="option.disabled"
               :aria-label="optionAriaLabel(option)"
               :class="[
-                'flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-inset dark:hover:bg-gray-700',
+                'focus-visible:ring-brand-500 flex w-full items-center px-4 py-2 text-left hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset dark:hover:bg-gray-700',
                 selected.includes(option.value)
-                  ? 'bg-orange-50 dark:bg-orange-900/20'
+                  ? 'bg-brand-50 dark:bg-brand-900/20'
                   : '',
                 option.disabled ? 'cursor-not-allowed opacity-50' : '',
               ]"
@@ -928,7 +924,7 @@ const describedBy = computed(() => {
                   :class="[
                     'flex h-4 w-4 items-center justify-center rounded border',
                     selected.includes(option.value)
-                      ? 'border-orange-600 bg-orange-600 text-white'
+                      ? 'border-brand-600 bg-brand-600 text-white'
                       : 'border-gray-400 dark:border-gray-500',
                   ]"
                 >
@@ -971,7 +967,7 @@ const describedBy = computed(() => {
 
               <CheckIcon
                 v-if="!multiple && selected.includes(option.value)"
-                class="h-4 w-4 text-orange-600"
+                class="text-brand-600 h-4 w-4"
                 aria-hidden="true"
               />
             </button>

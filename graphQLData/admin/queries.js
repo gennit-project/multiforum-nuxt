@@ -70,6 +70,11 @@ export const GET_SERVER_BRANDING = gql`
   query getServerBranding($serverName: String!) {
     serverConfigs(where: { serverName: $serverName }) {
       serverName
+      serverIconURL
+      brandingLogoDarkURL
+      brandingLogoAlt
+      brandingFaviconURL
+      brandingPrimaryColor
       brandingProductName
       brandingDocsURL
       brandingSourceURL
@@ -88,6 +93,10 @@ export const GET_SERVER_CONFIG = gql`
       serverIconURL
       serverDescription
       featuredWikiPageIds
+      brandingLogoDarkURL
+      brandingLogoAlt
+      brandingFaviconURL
+      brandingPrimaryColor
       brandingProductName
       brandingDocsURL
       brandingSourceURL

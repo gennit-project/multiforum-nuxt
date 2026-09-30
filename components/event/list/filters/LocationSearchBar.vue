@@ -147,7 +147,7 @@ const emit = defineEmits(['updateLocationInput', 'requestUserLocation']);
         :aria-describedby="
           geocodingUnavailable ? unavailableMessageId : undefined
         "
-        class="h-10 w-full border border-gray-300 bg-white py-3 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:disabled:bg-gray-900 dark:disabled:text-gray-400"
+        class="focus:border-brand-500 focus:ring-brand-500 h-10 w-full border border-gray-300 bg-white py-3 pr-3 pl-10 text-sm leading-5 placeholder-gray-400 focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:disabled:bg-gray-900 dark:disabled:text-gray-400"
         :class="[
           leftSideIsRounded ? 'rounded-l-full' : '',
           rightSideIsRounded ? 'rounded-r-full' : '',
@@ -155,7 +155,7 @@ const emit = defineEmits(['updateLocationInput', 'requestUserLocation']);
         ]"
         :placeholder="effectivePlaceholder"
         @input="searchLocations"
-      >
+      />
       <slot />
       <client-only>
         <ul

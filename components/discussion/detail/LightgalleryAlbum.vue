@@ -162,7 +162,7 @@ const getThumbnailImageUrl = (image: Album['Images'][number]) =>
             class="aspect-square h-20 w-20 cursor-pointer rounded border transition-all"
             :class="[
               activeIndex === thumbnailStartIndex + index
-                ? 'border-2 border-orange-500'
+                ? 'border-brand-500 border-2'
                 : 'border-gray-300 dark:border-gray-600',
               'bg-gray-100 dark:bg-gray-700',
             ]"

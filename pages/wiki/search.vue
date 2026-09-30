@@ -155,7 +155,7 @@ watch(
       class="mx-auto w-full max-w-6xl px-4 py-6 text-gray-900 sm:px-6 sm:py-8 lg:px-8 dark:text-gray-100"
     >
       <header
-        class="overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-white via-white to-orange-50/70 shadow-sm dark:border-gray-700 dark:from-gray-900 dark:via-gray-900 dark:to-orange-950/20"
+        class="to-brand-50/70 dark:to-brand-950/20 overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-br from-white via-white shadow-sm dark:border-gray-700 dark:from-gray-900 dark:via-gray-900"
       >
         <div class="p-5 sm:p-7">
           <div
@@ -163,13 +163,13 @@ watch(
           >
             <div class="flex items-start gap-4">
               <div
-                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300"
+                class="bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
               >
                 <BookIcon class="h-6 w-6" aria-hidden="true" />
               </div>
               <div>
                 <p
-                  class="text-xs font-semibold tracking-widest text-orange-700 uppercase dark:text-orange-300"
+                  class="text-brand-700 dark:text-brand-300 text-xs font-semibold tracking-widest uppercase"
                 >
                   Community knowledge
                 </p>
@@ -258,7 +258,7 @@ watch(
           <div class="mb-4 flex items-end justify-between gap-4">
             <div>
               <div
-                class="flex items-center gap-2 text-orange-700 dark:text-orange-300"
+                class="text-brand-700 dark:text-brand-300 flex items-center gap-2"
               >
                 <StarIcon class="h-5 w-5" :filled="true" aria-hidden="true" />
                 <h2 class="text-lg font-semibold">Featured</h2>
@@ -272,11 +272,11 @@ watch(
             <li
               v-for="wikiPage in featuredWikiPages"
               :key="wikiPage.id"
-              class="group relative overflow-hidden rounded-2xl border border-orange-200 bg-gradient-to-br from-orange-50 to-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-md dark:border-orange-900/70 dark:from-orange-950/40 dark:to-gray-900 dark:hover:border-orange-700"
+              class="group border-brand-200 from-brand-50 hover:border-brand-300 dark:border-brand-900/70 dark:from-brand-950/40 dark:hover:border-brand-700 relative overflow-hidden rounded-2xl border bg-gradient-to-br to-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:to-gray-900"
             >
               <div class="flex items-start justify-between gap-4">
                 <span
-                  class="inline-flex items-center gap-1.5 rounded-full bg-orange-100 px-2.5 py-1 text-xs font-semibold text-orange-800 dark:bg-orange-900/50 dark:text-orange-200"
+                  class="bg-brand-100 text-brand-800 dark:bg-brand-900/50 dark:text-brand-200 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
                 >
                   <StarIcon
                     class="h-3.5 w-3.5"
@@ -286,13 +286,13 @@ watch(
                   Featured
                 </span>
                 <ArrowUpRightIcon
-                  class="h-5 w-5 text-gray-400 transition group-hover:text-orange-600 dark:group-hover:text-orange-300"
+                  class="group-hover:text-brand-600 dark:group-hover:text-brand-300 h-5 w-5 text-gray-400 transition"
                   aria-hidden="true"
                 />
               </div>
               <div class="mt-4">
                 <nuxt-link
-                  class="text-lg leading-6 font-semibold text-gray-900 hover:text-orange-700 focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none dark:text-gray-100 dark:hover:text-orange-300"
+                  class="hover:text-brand-700 focus-visible:ring-brand-500 dark:hover:text-brand-300 text-lg leading-6 font-semibold text-gray-900 focus-visible:rounded-sm focus-visible:ring-2 focus-visible:outline-none dark:text-gray-100"
                   :to="`/forums/${wikiPage.channelUniqueName}/wiki/${wikiPage.slug}`"
                 >
                   <HighlightedSearchTerms
@@ -308,7 +308,7 @@ watch(
                 {{ formatWikiExcerpt(wikiPage.body) }}
               </p>
               <div
-                class="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-orange-200/70 pt-4 text-xs text-gray-600 dark:border-orange-900/60 dark:text-gray-300"
+                class="border-brand-200/70 dark:border-brand-900/60 mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 border-t pt-4 text-xs text-gray-600 dark:text-gray-300"
               >
                 <span class="inline-flex items-center gap-1.5 font-medium">
                   <ChannelIcon class="h-4 w-4" aria-hidden="true" />
@@ -343,22 +343,22 @@ watch(
               v-for="wikiPage in regularWikiPages"
               :key="wikiPage.id"
               data-testid="wiki-search-card"
-              class="group relative flex min-h-52 flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-md dark:border-gray-700 dark:bg-gray-900 dark:hover:border-orange-700"
+              class="group hover:border-brand-300 dark:hover:border-brand-700 relative flex min-h-52 flex-col rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-gray-700 dark:bg-gray-900"
             >
               <div class="flex items-start justify-between gap-4">
                 <div
-                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 transition group-hover:bg-orange-100 group-hover:text-orange-700 dark:bg-gray-800 dark:text-gray-400 dark:group-hover:bg-orange-900/40 dark:group-hover:text-orange-300"
+                  class="group-hover:bg-brand-100 group-hover:text-brand-700 dark:group-hover:bg-brand-900/40 dark:group-hover:text-brand-300 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 transition dark:bg-gray-800 dark:text-gray-400"
                 >
                   <DocumentIcon class="h-5 w-5" aria-hidden="true" />
                 </div>
                 <ArrowUpRightIcon
-                  class="h-5 w-5 text-gray-400 transition group-hover:text-orange-600 dark:group-hover:text-orange-300"
+                  class="group-hover:text-brand-600 dark:group-hover:text-brand-300 h-5 w-5 text-gray-400 transition"
                   aria-hidden="true"
                 />
               </div>
               <div class="mt-4 flex-1">
                 <nuxt-link
-                  class="text-base leading-6 font-semibold text-gray-900 hover:text-orange-700 focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:outline-none dark:text-gray-100 dark:hover:text-orange-300"
+                  class="hover:text-brand-700 focus-visible:ring-brand-500 dark:hover:text-brand-300 text-base leading-6 font-semibold text-gray-900 focus-visible:rounded-sm focus-visible:ring-2 focus-visible:outline-none dark:text-gray-100"
                   :to="`/forums/${wikiPage.channelUniqueName}/wiki/${wikiPage.slug}`"
                 >
                   <HighlightedSearchTerms

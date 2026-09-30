@@ -161,14 +161,14 @@ const dateSectionObj = computed(() => {
     class="flex flex-col"
   >
     <span
-      class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+      class="my-1 mb-1 flex items-center text-sm leading-6 font-bold text-gray-500 dark:text-gray-400"
     >
-      <TicketIcon class="mr-2 h-4 w-4 text-orange-500" />Happening Now
+      <TicketIcon class="text-brand-500 mr-2 h-4 w-4" />Happening Now
     </span>
     <div
       v-for="event in dateObj.happeningNow"
       :key="event?.id"
-      class="mb-1 flex flex-col gap-1 border-l-2 border-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+      class="border-brand-500 mb-1 flex flex-col gap-1 border-l-2 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -186,7 +186,7 @@ const dateSectionObj = computed(() => {
       </nuxt-link>
       <nuxt-link
         v-if="event?.virtualEventUrl"
-        class="w-fit rounded-sm bg-orange-600 px-4 py-1 text-black"
+        class="bg-brand-600 w-fit rounded-sm px-4 py-1 text-black"
         target="_blank"
         :to="event?.virtualEventUrl"
       >
@@ -201,14 +201,14 @@ const dateSectionObj = computed(() => {
     class="flex flex-col"
   >
     <span
-      class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+      class="my-1 mb-1 flex items-center text-sm leading-6 font-bold text-gray-500 dark:text-gray-400"
     >
       <CalendarIcon class="mr-2 h-4 w-4" />Today
     </span>
     <div
       v-for="event in dateObj.happeningToday"
       :key="event?.id"
-      class="mb-1 flex flex-col gap-1 border-l-2 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+      class="border-l-brand-500 mb-1 flex flex-col gap-1 border-l-2 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -232,14 +232,14 @@ const dateSectionObj = computed(() => {
     class="flex flex-col"
   >
     <span
-      class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+      class="my-1 mb-1 flex items-center text-sm leading-6 font-bold text-gray-500 dark:text-gray-400"
     >
       <CalendarIcon class="mr-2 h-4 w-4" />Tomorrow
     </span>
     <div
       v-for="event in dateObj.happeningTomorrow"
       :key="event?.id"
-      class="mb-1 flex flex-col gap-1 border-l-2 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+      class="border-l-brand-500 mb-1 flex flex-col gap-1 border-l-2 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -272,7 +272,7 @@ const dateSectionObj = computed(() => {
       <div
         v-for="event in events"
         :key="event?.id"
-        class="mb-1 flex flex-col gap-1 border-l-2 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+        class="border-l-brand-500 mb-1 flex flex-col gap-1 border-l-2 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
       >
         <nuxt-link
           class="flex items-center"

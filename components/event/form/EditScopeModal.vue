@@ -67,10 +67,7 @@ useFocusTrap(dialogRef, {
       data-testid="edit-scope-modal"
     >
       <!-- Backdrop -->
-      <div
-        class="absolute inset-0 bg-black/50"
-        @click="handleClose"
-      />
+      <div class="absolute inset-0 bg-black/50" @click="handleClose" />
 
       <!-- Modal -->
       <div
@@ -84,7 +81,8 @@ useFocusTrap(dialogRef, {
         </h2>
 
         <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-          This event is part of a series. How would you like to apply your changes?
+          This event is part of a series. How would you like to apply your
+          changes?
         </p>
 
         <!-- Scope options -->
@@ -95,7 +93,7 @@ useFocusTrap(dialogRef, {
             :class="[
               'flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors',
               selectedScope === option.value
-                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20'
+                ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/20'
                 : 'border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600',
             ]"
             :data-testid="`edit-scope-${option.value.toLowerCase().replace(/_/g, '-')}`"
@@ -105,8 +103,8 @@ useFocusTrap(dialogRef, {
               type="radio"
               name="edit-scope"
               :value="option.value"
-              class="mt-1 h-4 w-4 border-gray-300 text-orange-500 focus:ring-orange-500"
-            >
+              class="text-brand-500 focus:ring-brand-500 mt-1 h-4 w-4 border-gray-300"
+            />
             <div class="flex-1">
               <span class="block font-medium text-gray-900 dark:text-white">
                 {{ option.label }}
@@ -130,7 +128,7 @@ useFocusTrap(dialogRef, {
           </button>
           <button
             type="button"
-            class="rounded-lg bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-600"
+            class="bg-brand-500 hover:bg-brand-600 rounded-lg px-4 py-2 text-sm font-medium text-white"
             data-testid="edit-scope-confirm"
             @click="handleConfirm"
           >

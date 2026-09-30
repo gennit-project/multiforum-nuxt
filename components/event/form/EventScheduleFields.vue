@@ -149,7 +149,10 @@ const handleRepeatPatternUpdate = (pattern: RepeatPattern) => {
 
 // Computed: Generate preview of occurrences from repeat pattern
 const generatedOccurrencesPreview = computed(() => {
-  if (currentDateMode.value !== 'recurring' || !props.formValues.repeatPattern) {
+  if (
+    currentDateMode.value !== 'recurring' ||
+    !props.formValues.repeatPattern
+  ) {
     return [];
   }
 
@@ -309,14 +312,18 @@ const toggleMultiDayEvent = () => {
       <legend class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
         Event Schedule
       </legend>
-      <div class="flex flex-wrap gap-2" role="radiogroup" aria-label="Date mode">
+      <div
+        class="flex flex-wrap gap-2"
+        role="radiogroup"
+        aria-label="Date mode"
+      >
         <label
           v-for="option in dateModeOptions"
           :key="option.value"
           :class="[
             'cursor-pointer rounded-md border px-3 py-2 text-sm transition-colors',
             currentDateMode === option.value
-              ? 'border-orange-500 bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
+              ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
               : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600',
           ]"
           :data-testid="`date-mode-${option.value}`"
@@ -328,7 +335,7 @@ const toggleMultiDayEvent = () => {
             :checked="currentDateMode === option.value"
             class="sr-only"
             @change="updateDateMode(option.value)"
-          >
+          />
           <span class="font-medium">{{ option.label }}</span>
           <span class="ml-1 text-xs text-gray-500 dark:text-gray-400">
             ({{ option.description }})
@@ -402,7 +409,9 @@ const toggleMultiDayEvent = () => {
     <div v-else-if="currentDateMode === 'recurring'">
       <!-- Base date/time for pattern -->
       <div class="mb-4">
-        <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Starting from
         </label>
         <DateTimePickersRow
@@ -437,7 +446,7 @@ const toggleMultiDayEvent = () => {
             :key="index"
             class="flex items-center gap-2"
           >
-            <span class="text-orange-500">•</span>
+            <span class="text-brand-500">•</span>
             {{ formatOccurrenceDate(occurrence.startTime) }}
           </li>
         </ul>

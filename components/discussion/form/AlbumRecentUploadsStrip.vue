@@ -47,31 +47,24 @@ const label = (image: ReusableImage) =>
 </script>
 
 <template>
-  <div
-    v-if="images.length > 0"
-    data-testid="album-recent-uploads"
-  >
+  <div v-if="images.length > 0" data-testid="album-recent-uploads">
     <div class="mb-2 flex items-baseline justify-between">
       <h4 class="text-sm font-medium text-gray-800 dark:text-gray-100">
         Recent uploads
       </h4>
       <button
         type="button"
-        class="text-sm text-orange-700 hover:underline focus:ring-2 focus:ring-orange-500/40 focus:outline-none dark:text-orange-400"
+        class="text-brand-700 focus:ring-brand-500/40 dark:text-brand-400 text-sm hover:underline focus:ring-2 focus:outline-none"
         @click="emit('browse')"
       >
         Browse all
       </button>
     </div>
     <ul class="-mr-4 flex gap-2 overflow-x-auto pr-4 pb-1">
-      <li
-        v-for="image in images"
-        :key="image.id"
-        class="shrink-0"
-      >
+      <li v-for="image in images" :key="image.id" class="shrink-0">
         <button
           type="button"
-          class="block overflow-hidden rounded-lg border border-gray-300 hover:ring-2 hover:ring-orange-500 focus:ring-2 focus:ring-orange-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:ring-0 dark:border-gray-600"
+          class="hover:ring-brand-500 focus:ring-brand-500 block overflow-hidden rounded-lg border border-gray-300 hover:ring-2 focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:ring-0 dark:border-gray-600"
           data-testid="album-recent-upload"
           :aria-label="
             inAlbum.has(image.id)

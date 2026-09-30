@@ -143,7 +143,7 @@ const issueScopeLabel = computed(() =>
           type="checkbox"
           :checked="filter.checked"
           :data-testid="`issue-filter-${filter.key}`"
-          class="rounded border-gray-300 text-orange-600 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900"
+          class="text-brand-600 focus:ring-brand-500 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-900"
           @change="
             emit('update:involvementFilter', {
               key: filter.key,

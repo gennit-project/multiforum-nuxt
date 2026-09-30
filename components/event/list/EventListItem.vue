@@ -230,7 +230,7 @@ const seriesOccurrences = computed(() => {
     <div class="shrink-0 pt-2">
       <div class="flex w-16 flex-col items-center">
         <div
-          class="text-xs font-semibold text-gray-500 uppercase dark:text-orange-400"
+          class="dark:text-brand-400 text-xs font-semibold text-gray-500 uppercase"
         >
           {{
             new Date(event.startTime).toLocaleString('en-US', {
@@ -259,7 +259,7 @@ const seriesOccurrences = computed(() => {
         <!-- Series indicator -->
         <div
           v-if="isPartOfSeries"
-          class="mt-2 flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400"
+          class="text-brand-600 dark:text-brand-400 mt-2 flex items-center gap-1 text-xs"
           title="Part of a series"
         >
           <ArrowPath class="h-4 w-4" aria-hidden="true" />
@@ -284,7 +284,7 @@ const seriesOccurrences = computed(() => {
           <router-link
             :to="detailLink"
             :data-testid="'event-title'"
-            class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 lg:hidden dark:text-gray-200"
+            class="text-md hover:text-brand-700 mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 lg:hidden dark:text-gray-200"
             @click="handleSelect"
           >
             <HighlightedSearchTerms
@@ -299,7 +299,7 @@ const seriesOccurrences = computed(() => {
           </router-link>
           <button
             type="button"
-            class="text-md mt-2 hidden w-full cursor-pointer flex-wrap items-center gap-2 text-left text-gray-800 hover:text-orange-700 lg:flex dark:text-gray-200"
+            class="text-md hover:text-brand-700 mt-2 hidden w-full cursor-pointer flex-wrap items-center gap-2 text-left text-gray-800 lg:flex dark:text-gray-200"
             @click="handleSelect"
           >
             <span
@@ -401,7 +401,7 @@ const seriesOccurrences = computed(() => {
         <router-link
           :to="detailLink"
           :data-testid="'event-title'"
-          class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 dark:text-gray-200"
+          class="text-md hover:text-brand-700 mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 dark:text-gray-200"
           @click="handleSelect"
         >
           <HighlightedSearchTerms

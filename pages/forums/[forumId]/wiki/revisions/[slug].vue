@@ -36,7 +36,9 @@ const {
 );
 
 // Computed property for the wiki page data
-const wikiPage = computed(() => wikiPageResult.value?.wikiPages?.[0] as WikiPage);
+const wikiPage = computed(
+  () => wikiPageResult.value?.wikiPages?.[0] as WikiPage
+);
 
 // Total number of edits
 const totalEdits = computed(() => {
@@ -142,7 +144,7 @@ useHead({
       <div class="border-b border-gray-200 pb-4 dark:border-gray-700">
         <nav class="mb-4" aria-label="Wiki revisions breadcrumb">
           <button
-            class="text-orange-600 hover:underline dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 hover:underline"
             @click="goBackToWiki"
           >
             ← Back to {{ wikiPage.title }}
@@ -177,7 +179,7 @@ useHead({
         <div
           v-for="edit in allEdits"
           :key="edit.id"
-          class="hover:bg-gray-50 cursor-pointer rounded-md border border-gray-200 px-3 py-2 transition-colors dark:border-gray-700 dark:hover:bg-gray-800/50"
+          class="cursor-pointer rounded-md border border-gray-200 px-3 py-2 transition-colors hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800/50"
           @click="
             () => {
               viewRevisionDiff(edit);

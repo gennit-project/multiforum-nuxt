@@ -70,7 +70,7 @@ function handleTagClick(tag: string, active: boolean) {
 
 function getButtonStyles() {
   if (props.active) {
-    return 'bg-orange-400 dark:bg-orange-950 text-black dark:text-orange-400  hover:bg-orange-500';
+    return 'bg-brand-400 dark:bg-brand-950 text-black dark:text-brand-400  hover:bg-brand-500';
   } else {
     if (props.channelMode) {
       return 'bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-50 dark:hover:bg-gray-600 dark:hover:text-white';
@@ -92,7 +92,7 @@ function getButtonStyles() {
     <button
       type="button"
       :aria-pressed="props.active"
-      class="inline-flex items-center gap-1 p-0 text-inherit focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-1"
+      class="focus-visible:ring-brand-500 inline-flex items-center gap-1 p-0 text-inherit focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1"
       @click="handleTagClick(props.tag, props.active)"
     >
       <AvatarComponent
@@ -110,7 +110,7 @@ function getButtonStyles() {
       type="button"
       data-testid="tag-delete"
       :aria-label="`Remove ${props.tag}`"
-      class="inline-flex items-center p-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+      class="focus-visible:ring-brand-500 inline-flex items-center p-0 focus:outline-none focus-visible:ring-2"
       @click.stop="emits('delete', props.index)"
     >
       <XmarkIcon class="mr-1 h-4 w-4" aria-hidden="true" />

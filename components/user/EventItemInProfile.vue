@@ -57,7 +57,7 @@ const tags = (props.event.Tags ?? []).map((tag: TagData) => tag.text);
       <nuxt-link
         v-if="titleLink"
         :to="titleLink"
-        class="font-medium hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+        class="focus-visible:ring-brand-500 font-medium hover:underline focus:outline-none focus-visible:ring-2"
       >
         <HighlightedSearchTerms :text="title" :search-input="searchInput" />
       </nuxt-link>

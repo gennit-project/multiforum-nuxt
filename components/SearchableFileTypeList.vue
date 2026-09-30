@@ -67,7 +67,7 @@ function updateSearchResult(input: string) {
 
 <template>
   <div
-    class="touch-scroll-y absolute left-0 right-0 top-full z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+    class="touch-scroll-y absolute top-full right-0 left-0 z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
   >
     <SearchBar
       class="w-full align-middle"
@@ -107,9 +107,9 @@ function updateSearchResult(input: string) {
           :value="fileType"
           :checked="selected.includes(fileType)"
           :aria-label="`Select file type ${fileType}`"
-          class="border border-gray-300 text-orange-600 dark:border-gray-600"
+          class="text-brand-600 border border-gray-300 dark:border-gray-600"
           @change="() => emit('toggleSelection', fileType)"
-        >
+        />
         <div class="flex items-center space-x-2">
           <div class="flex-col">
             <span

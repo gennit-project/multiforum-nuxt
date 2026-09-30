@@ -376,7 +376,7 @@ watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
                   class="flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="[
                     isTabActive(tab)
-                      ? 'bg-orange-50 text-orange-700 dark:bg-orange-900/20 dark:text-orange-300'
+                      ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-300'
                       : 'text-gray-700 dark:text-gray-200',
                   ]"
                   @click="close"

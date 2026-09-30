@@ -76,7 +76,7 @@ const removeSelection = (fileType: string) => {
     </div>
     <div class="relative">
       <div
-        class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border px-4 text-left text-sm focus-within:ring-2 focus-within:ring-orange-500 focus-within:ring-offset-2 dark:border-gray-700 dark:bg-gray-700"
+        class="focus-within:ring-brand-500 flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border px-4 text-left text-sm focus-within:ring-2 focus-within:ring-offset-2 dark:border-gray-700 dark:bg-gray-700"
         :class="{
           'cursor-not-allowed opacity-50': disabled,
           'cursor-text': !disabled,
@@ -93,7 +93,7 @@ const removeSelection = (fileType: string) => {
         <div
           v-for="(fileType, index) in selected"
           :key="index"
-          class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 px-2 text-orange-700 dark:bg-orange-700 dark:text-orange-100"
+          class="bg-brand-100 text-brand-700 dark:bg-brand-700 dark:text-brand-100 mt-1 mr-2 inline-flex items-center rounded-full px-2"
           :class="{ 'opacity-50': disabled }"
         >
           <span>{{ fileType }}</span>
@@ -101,7 +101,7 @@ const removeSelection = (fileType: string) => {
             v-if="!disabled"
             type="button"
             :aria-label="`Remove ${fileType}`"
-            class="ml-1 cursor-pointer rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500"
+            class="focus-visible:ring-brand-500 ml-1 cursor-pointer rounded focus:outline-none focus-visible:ring-2"
             @click.stop="removeSelection(fileType)"
           >
             <span aria-hidden="true">&times;</span>
@@ -111,7 +111,7 @@ const removeSelection = (fileType: string) => {
           v-if="!disabled"
           ref="triggerRef"
           data-testid="file-type-picker"
-          class="bg-transparent flex-1 border-none text-sm focus:outline-none dark:text-white"
+          class="flex-1 border-none bg-transparent text-sm focus:outline-none dark:text-white"
           placeholder="Search file types..."
           aria-label="Selected file types"
           role="combobox"
@@ -123,7 +123,7 @@ const removeSelection = (fileType: string) => {
           @keydown.down.prevent="openDropdown"
           @keydown.enter.prevent="toggleDropdown"
           @keydown.escape="closeAndReturnFocus"
-        >
+        />
       </div>
       <SearchableFileTypeList
         v-if="isDropdownOpen && !disabled"

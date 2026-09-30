@@ -26,7 +26,12 @@ const usernameVar = useUsername();
 
 type FavoriteDiscussionChannel = Pick<
   DiscussionChannel,
-  'id' | 'channelUniqueName' | 'archived' | 'answered' | 'locked' | 'weightedVotesCount'
+  | 'id'
+  | 'channelUniqueName'
+  | 'archived'
+  | 'answered'
+  | 'locked'
+  | 'weightedVotesCount'
 > & {
   Channel?: Pick<Channel, 'uniqueName' | 'displayName'> | null;
   CommentsAggregate?: { count: number };
@@ -34,17 +39,30 @@ type FavoriteDiscussionChannel = Pick<
 
 type FavoriteDiscussion = Pick<
   Discussion,
-  'id' | 'title' | 'body' | 'createdAt' | 'updatedAt' | 'hasDownload' | 'hasSensitiveContent'
+  | 'id'
+  | 'title'
+  | 'body'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'hasDownload'
+  | 'hasSensitiveContent'
 > & {
   Author?: Pick<
     User,
-    'username' | 'displayName' | 'profilePicURL' | 'commentKarma' | 'discussionKarma' | 'createdAt'
+    | 'username'
+    | 'displayName'
+    | 'profilePicURL'
+    | 'commentKarma'
+    | 'discussionKarma'
+    | 'createdAt'
   > | null;
   DiscussionChannels?: FavoriteDiscussionChannel[];
   Tags?: Pick<Tag, 'text'>[];
-  Album?: Pick<Album, 'id'> & {
-    Images?: Pick<Image, 'id' | 'url' | 'caption'>[];
-  } | null;
+  Album?:
+    | (Pick<Album, 'id'> & {
+        Images?: Pick<Image, 'id' | 'url' | 'caption'>[];
+      })
+    | null;
 };
 
 useHead({
@@ -144,7 +162,7 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) =>
 
             <div v-if="loading" class="py-8 text-center">
               <div
-                class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500"
+                class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
               />
               <p class="mt-2 text-gray-600 dark:text-gray-400">
                 Loading your favorite discussions...
@@ -188,7 +206,7 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) =>
               <div class="mt-6">
                 <NuxtLink
                   to="/"
-                  class="inline-flex items-center rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
+                  class="bg-brand-500 hover:bg-brand-600 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm"
                 >
                   Browse Discussions
                 </NuxtLink>
@@ -202,14 +220,18 @@ const getAuthorInfo = (discussion: FavoriteDiscussion) =>
                 :discussion="discussion"
                 :discussion-link="getDiscussionLink(discussion)"
                 :channel-link="
-                  getChannelLink(discussion.DiscussionChannels?.[0]?.channelUniqueName)
+                  getChannelLink(
+                    discussion.DiscussionChannels?.[0]?.channelUniqueName
+                  )
                 "
                 :channel-unique-name="
                   discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
                 "
                 :author-info="getAuthorInfo(discussion)"
                 :comment-count="
-                  getFavoriteDiscussionCommentCount(discussion.DiscussionChannels)
+                  getFavoriteDiscussionCommentCount(
+                    discussion.DiscussionChannels
+                  )
                 "
                 :forum-count="discussion.DiscussionChannels?.length || 0"
                 :show-favorite-button="true"

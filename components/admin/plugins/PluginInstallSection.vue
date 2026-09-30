@@ -13,7 +13,10 @@ const props = defineProps<{
   canInstall: boolean;
   isSelectedVersionInstalled: boolean;
   hasNewerVersions: boolean;
-  compatibilityByVersion?: Record<string, { compatible: boolean; reason?: string }>;
+  compatibilityByVersion?: Record<
+    string,
+    { compatible: boolean; reason?: string }
+  >;
 }>();
 
 const emit = defineEmits<{
@@ -56,7 +59,7 @@ const canInstallSelectedVersion = computed(
             <select
               id="plugin-version-select"
               v-model="selectedVersion"
-              class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              class="focus:border-brand-500 focus:ring-brand-500 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             >
               <option
                 v-for="version in availableVersions"
@@ -64,17 +67,15 @@ const canInstallSelectedVersion = computed(
                 :value="version.version"
               >
                 v{{ version.version
-                }}{{
-                  version.version === installedVersion
-                    ? ' (Installed)'
-                    : ''
+                }}{{ version.version === installedVersion ? ' (Installed)' : ''
                 }}{{
                   version.version === latestVersion &&
                   version.version !== installedVersion
                     ? ' (Latest)'
                     : ''
                 }}{{
-                  compatibilityByVersion?.[version.version]?.compatible === false
+                  compatibilityByVersion?.[version.version]?.compatible ===
+                  false
                     ? ` (${compatibilityByVersion[version.version]?.reason})`
                     : ''
                 }}
@@ -84,8 +85,10 @@ const canInstallSelectedVersion = computed(
             <button
               v-if="!isInstalled"
               type="button"
-              class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="installing || !selectedVersion || !canInstallSelectedVersion"
+              class="bg-brand-600 hover:bg-brand-700 focus:ring-brand-500 rounded-md px-4 py-2 text-white focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="
+                installing || !selectedVersion || !canInstallSelectedVersion
+              "
               @click="emit('install')"
             >
               <LoadingSpinner v-if="installing" class="mr-2 inline-flex" />
@@ -95,8 +98,10 @@ const canInstallSelectedVersion = computed(
             <button
               v-else-if="canInstall"
               type="button"
-              class="rounded-md bg-orange-600 px-4 py-2 text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
-              :disabled="installing || !selectedVersion || !canInstallSelectedVersion"
+              class="bg-brand-600 hover:bg-brand-700 focus:ring-brand-500 rounded-md px-4 py-2 text-white focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+              :disabled="
+                installing || !selectedVersion || !canInstallSelectedVersion
+              "
               @click="emit('install')"
             >
               <LoadingSpinner v-if="installing" class="mr-2 inline-flex" />
@@ -111,7 +116,10 @@ const canInstallSelectedVersion = computed(
               This version is already installed
             </div>
 
-            <div v-else-if="!hasNewerVersions" class="text-sm text-gray-500 dark:text-gray-400">
+            <div
+              v-else-if="!hasNewerVersions"
+              class="text-sm text-gray-500 dark:text-gray-400"
+            >
               No other versions available
             </div>
           </div>
@@ -123,7 +131,10 @@ const canInstallSelectedVersion = computed(
             {{ selectedCompatibilityReason }}
           </p>
 
-          <div v-if="isInstalled" class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+          <div
+            v-if="isInstalled"
+            class="mt-2 text-xs text-gray-500 dark:text-gray-400"
+          >
             <p v-if="hasNewerVersions">
               Select a different version to install an update or downgrade.
             </p>

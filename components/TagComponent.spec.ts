@@ -6,7 +6,15 @@ import TagComponent from '@/components/TagComponent.vue';
 const mountTag = (props: Record<string, unknown> = {}) =>
   mount(TagComponent, {
     props: { tag: 'pets', ...props },
-    global: { stubs: { AvatarComponent: { name: 'AvatarComponent', template: '<div class="avatar" />' }, XmarkIcon: true } },
+    global: {
+      stubs: {
+        AvatarComponent: {
+          name: 'AvatarComponent',
+          template: '<div class="avatar" />',
+        },
+        XmarkIcon: true,
+      },
+    },
   });
 
 const tagEl = (w: ReturnType<typeof mount>) => w.find('span.tag');
@@ -21,7 +29,7 @@ describe('TagComponent rendering', () => {
   it('uses active styling when active', () => {
     const wrapper = mountTag({ active: true });
 
-    expect(tagEl(wrapper).classes().join(' ')).toContain('bg-orange-400');
+    expect(tagEl(wrapper).classes().join(' ')).toContain('bg-brand-400');
   });
 
   it('keeps a single dark hover background with light text on default tags', () => {
@@ -31,7 +39,10 @@ describe('TagComponent rendering', () => {
     expect({
       hoverBgs: classes.filter((c) => c.startsWith('dark:hover:bg-')),
       hoverText: classes.filter((c) => c.startsWith('dark:hover:text-')),
-    }).toEqual({ hoverBgs: ['dark:hover:bg-gray-600'], hoverText: ['dark:hover:text-white'] });
+    }).toEqual({
+      hoverBgs: ['dark:hover:bg-gray-600'],
+      hoverText: ['dark:hover:text-white'],
+    });
   });
 
   it('uses channel styling in channel mode', () => {
@@ -95,9 +106,9 @@ describe('TagComponent interaction', () => {
   it('gives the clear control an accessible name', () => {
     const wrapper = mountTag({ clearable: true });
 
-    expect(wrapper.get('[data-testid="tag-delete"]').attributes('aria-label')).toBe(
-      'Remove pets'
-    );
+    expect(
+      wrapper.get('[data-testid="tag-delete"]').attributes('aria-label')
+    ).toBe('Remove pets');
   });
 
   it('emits delete with the index from the clear icon', async () => {

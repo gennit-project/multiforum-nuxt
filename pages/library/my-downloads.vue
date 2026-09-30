@@ -112,7 +112,9 @@ const downloads = computed(() => {
 });
 
 const loadingState = computed(() => {
-  return collectionsLoading.value || collectionItemsLoading.value || loading.value;
+  return (
+    collectionsLoading.value || collectionItemsLoading.value || loading.value
+  );
 });
 
 const errorState = computed(() => {
@@ -172,14 +174,16 @@ const getFirstAlbumImage = (download: Download): string | undefined => {
                 class="mt-2 text-sm text-gray-500 dark:text-gray-400"
               >
                 Saved in your private
-                <span class="font-medium">{{ AUTO_SAVED_DOWNLOADS_COLLECTION_NAME }}</span>
+                <span class="font-medium">{{
+                  AUTO_SAVED_DOWNLOADS_COLLECTION_NAME
+                }}</span>
                 collection.
               </p>
             </div>
 
             <div v-if="loadingState" class="py-8 text-center">
               <div
-                class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500"
+                class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
               />
               <p class="mt-2 text-gray-600 dark:text-gray-400">
                 Loading your downloads...
@@ -195,10 +199,7 @@ const getFirstAlbumImage = (download: Download): string | undefined => {
               </p>
             </div>
 
-            <div
-              v-else-if="downloads.length === 0"
-              class="py-12 text-center"
-            >
+            <div v-else-if="downloads.length === 0" class="py-12 text-center">
               <svg
                 class="mx-auto h-12 w-12 text-gray-400"
                 fill="none"
@@ -223,7 +224,7 @@ const getFirstAlbumImage = (download: Download): string | undefined => {
               <div class="mt-6">
                 <NuxtLink
                   to="/downloads"
-                  class="inline-flex items-center rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
+                  class="bg-brand-500 hover:bg-brand-600 inline-flex items-center rounded-md px-4 py-2 text-sm font-medium text-white shadow-sm"
                 >
                   Browse Downloads
                 </NuxtLink>
@@ -237,7 +238,9 @@ const getFirstAlbumImage = (download: Download): string | undefined => {
                 :download="download"
                 :download-link="getDownloadLink(download)"
                 :channel-link="
-                  getChannelLink(download.DiscussionChannels?.[0]?.channelUniqueName)
+                  getChannelLink(
+                    download.DiscussionChannels?.[0]?.channelUniqueName
+                  )
                 "
                 :channel-unique-name="
                   download.DiscussionChannels?.[0]?.channelUniqueName || ''

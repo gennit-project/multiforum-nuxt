@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { computed, type PropType } from 'vue';
+import { computed, ref, type PropType } from 'vue';
 import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
 import FormRow from '@/components/FormRow.vue';
 import { useBrandingLock } from '@/composables/useBranding';
+import { useImageUpload } from '@/composables/useImageUpload';
 import {
+  BRAND_DARK_SURFACE,
+  BRAND_LIGHT_SURFACE,
   MAX_CUSTOM_FOOTER_LINKS,
   UPSTREAM_BRANDING,
+  getContrastRatio,
   isSafeBrandingUrl,
+  isValidHexColor,
   type BrandingLink,
 } from '@/utils/branding';
 
@@ -31,6 +36,34 @@ const emit = defineEmits<{
 }>();
 
 type UrlField = 'brandingDocsURL' | 'brandingSourceURL' | 'brandingIssuesURL';
+type ImageUrlField =
+  'serverIconURL' | 'brandingLogoDarkURL' | 'brandingFaviconURL';
+
+const imageFields: {
+  field: ImageUrlField;
+  label: string;
+  hint: string;
+  accept: string;
+}[] = [
+  {
+    field: 'serverIconURL',
+    label: 'Light-mode logo',
+    hint: 'Shown in the navigation in light mode.',
+    accept: 'image/png,image/jpeg,image/webp,image/svg+xml,image/gif',
+  },
+  {
+    field: 'brandingLogoDarkURL',
+    label: 'Dark-mode logo',
+    hint: 'Optional. The light-mode logo is used when this is blank.',
+    accept: 'image/png,image/jpeg,image/webp,image/svg+xml,image/gif',
+  },
+  {
+    field: 'brandingFaviconURL',
+    label: 'Favicon',
+    hint: 'Shown in browser tabs and bookmarks.',
+    accept: 'image/png,image/svg+xml,image/x-icon,image/vnd.microsoft.icon',
+  },
+];
 
 const urlFields: { field: UrlField; label: string; hint: string }[] = [
   {
@@ -55,6 +88,38 @@ const customLinks = computed<BrandingLink[]>(() => {
   return Array.isArray(value) ? (value as BrandingLink[]) : [];
 });
 
+const hasLogo = computed(() =>
+  Boolean(
+    props.formValues?.serverIconURL?.trim() ||
+    props.formValues?.brandingLogoDarkURL?.trim()
+  )
+);
+const logoAltIsMissing = computed(
+  () => hasLogo.value && !props.formValues?.brandingLogoAlt?.trim()
+);
+
+const primaryColor = computed(
+  () => props.formValues?.brandingPrimaryColor?.trim() || ''
+);
+const primaryColorIsInvalid = computed(
+  () => Boolean(primaryColor.value) && !isValidHexColor(primaryColor.value)
+);
+const lightContrast = computed(() =>
+  getContrastRatio(primaryColor.value, BRAND_LIGHT_SURFACE)
+);
+const darkContrast = computed(() =>
+  getContrastRatio(primaryColor.value, BRAND_DARK_SURFACE)
+);
+const hasLowContrast = computed(
+  () =>
+    (lightContrast.value !== null && lightContrast.value < 4.5) ||
+    (darkContrast.value !== null && darkContrast.value < 4.5)
+);
+
+const { uploadFile, validateFileSize, isUploading } = useImageUpload();
+const uploadingField = ref<ImageUrlField | null>(null);
+const uploadError = ref('');
+
 const canAddLink = computed(
   () => customLinks.value.length < MAX_CUSTOM_FOOTER_LINKS
 );
@@ -66,6 +131,11 @@ const emailIsInvalid = computed(() => {
 
 // An empty value is a deliberate opt-out, so only non-empty values are checked.
 const urlIsInvalid = (field: UrlField): boolean => {
+  const value = props.formValues?.[field]?.trim();
+  return Boolean(value) && !isSafeBrandingUrl(value ?? '');
+};
+
+const imageUrlIsInvalid = (field: ImageUrlField): boolean => {
   const value = props.formValues?.[field]?.trim();
   return Boolean(value) && !isSafeBrandingUrl(value ?? '');
 };
@@ -83,6 +153,39 @@ const updateShowUpstreamLinks = (event: Event) => {
   emit('updateFormValues', {
     brandingShowUpstreamLinks: (event.target as HTMLInputElement).checked,
   });
+};
+
+const uploadBrandingImage = async ({
+  field,
+  event,
+}: {
+  field: ImageUrlField;
+  event: Event;
+}) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+
+  uploadError.value = '';
+  const validation = validateFileSize(file);
+  if (!validation.valid) {
+    uploadError.value =
+      validation.message || 'The selected image is too large.';
+    input.value = '';
+    return;
+  }
+
+  uploadingField.value = field;
+  const result = await uploadFile(file);
+  uploadingField.value = null;
+  input.value = '';
+
+  if (!result.success || !result.embeddedLink) {
+    uploadError.value = result.error || 'The image could not be uploaded.';
+    return;
+  }
+
+  emit('updateFormValues', { [field]: result.embeddedLink });
 };
 
 const updateLinks = (links: BrandingLink[]) => {
@@ -126,6 +229,196 @@ const removeLink = (index: number) => {
       Branding for this instance is managed by your operator through deployment
       configuration, so it cannot be edited here.
     </p>
+
+    <FormRow section-title="Logo and favicon">
+      <template #content>
+        <div class="space-y-5">
+          <div v-for="imageField in imageFields" :key="imageField.field">
+            <label
+              :for="imageField.field"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
+              {{ imageField.label }} URL
+            </label>
+            <input
+              :id="imageField.field"
+              type="url"
+              :data-testid="`${imageField.field}-input`"
+              class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800"
+              :disabled="locked"
+              :value="formValues?.[imageField.field] || ''"
+              :aria-invalid="imageUrlIsInvalid(imageField.field)"
+              :aria-describedby="
+                imageUrlIsInvalid(imageField.field)
+                  ? `${imageField.field}-error`
+                  : `${imageField.field}-hint`
+              "
+              @input="updateText({ field: imageField.field, event: $event })"
+            />
+            <p
+              v-if="imageUrlIsInvalid(imageField.field)"
+              :id="`${imageField.field}-error`"
+              role="alert"
+              class="mt-1 text-xs text-red-700 dark:text-red-400"
+            >
+              Enter a full http:// or https:// address, or a path beginning with
+              a slash.
+            </p>
+            <p
+              v-else
+              :id="`${imageField.field}-hint`"
+              class="mt-1 text-xs text-gray-600 dark:text-gray-400"
+            >
+              {{ imageField.hint }} Enter a URL or upload an image below.
+            </p>
+            <input
+              :id="`${imageField.field}-upload`"
+              type="file"
+              :accept="imageField.accept"
+              :disabled="locked || isUploading"
+              :aria-label="`Upload ${imageField.label.toLowerCase()}`"
+              class="file:bg-brand-100 file:text-brand-900 hover:file:bg-brand-200 dark:file:bg-brand-900 dark:file:text-brand-100 mt-2 block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:px-3 file:py-2 file:text-sm file:font-medium disabled:opacity-50 dark:text-gray-300"
+              @change="
+                uploadBrandingImage({ field: imageField.field, event: $event })
+              "
+            />
+            <p
+              v-if="uploadingField === imageField.field"
+              class="mt-1 text-xs text-gray-600 dark:text-gray-400"
+              role="status"
+            >
+              Uploading…
+            </p>
+          </div>
+
+          <p
+            v-if="uploadError"
+            class="text-sm text-red-700 dark:text-red-400"
+            role="alert"
+          >
+            {{ uploadError }}
+          </p>
+
+          <div>
+            <label
+              for="branding-logo-alt"
+              class="block text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
+              Logo accessible name
+              <span v-if="hasLogo" aria-hidden="true" class="text-red-600"
+                >*</span
+              >
+            </label>
+            <input
+              id="branding-logo-alt"
+              type="text"
+              data-testid="branding-logo-alt-input"
+              class="mt-1 w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800"
+              :disabled="locked"
+              :required="hasLogo"
+              :value="formValues?.brandingLogoAlt || ''"
+              :aria-invalid="logoAltIsMissing"
+              :aria-describedby="
+                logoAltIsMissing
+                  ? 'branding-logo-alt-error'
+                  : 'branding-logo-alt-hint'
+              "
+              @input="updateText({ field: 'brandingLogoAlt', event: $event })"
+            />
+            <p
+              v-if="logoAltIsMissing"
+              id="branding-logo-alt-error"
+              class="mt-1 text-xs text-red-700 dark:text-red-400"
+              role="alert"
+            >
+              Enter a name for the logo’s home link.
+            </p>
+            <p
+              v-else
+              id="branding-logo-alt-hint"
+              class="mt-1 text-xs text-gray-600 dark:text-gray-400"
+            >
+              Describe the site, not the image—for example, “Acme Forum”.
+            </p>
+          </div>
+        </div>
+      </template>
+    </FormRow>
+
+    <FormRow section-title="Primary colour">
+      <template #content>
+        <label
+          for="branding-primary-color"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Brand colour
+        </label>
+        <div class="mt-1 flex items-center gap-3">
+          <input
+            id="branding-primary-color"
+            type="text"
+            inputmode="text"
+            pattern="#[0-9A-Fa-f]{6}"
+            placeholder="#f97316"
+            data-testid="branding-primary-color-input"
+            class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800"
+            :disabled="locked"
+            :value="formValues?.brandingPrimaryColor || ''"
+            :aria-invalid="primaryColorIsInvalid"
+            :aria-describedby="
+              primaryColorIsInvalid
+                ? 'branding-primary-color-error'
+                : 'branding-primary-color-hint'
+            "
+            @input="
+              updateText({ field: 'brandingPrimaryColor', event: $event })
+            "
+          />
+          <span
+            v-if="!primaryColorIsInvalid && primaryColor"
+            class="h-10 w-10 shrink-0 rounded-md border border-gray-400"
+            :style="{ backgroundColor: primaryColor }"
+            aria-hidden="true"
+          />
+        </div>
+        <p
+          v-if="primaryColorIsInvalid"
+          id="branding-primary-color-error"
+          class="mt-1 text-xs text-red-700 dark:text-red-400"
+          role="alert"
+        >
+          Enter a six-digit hex colour such as #2563eb.
+        </p>
+        <div
+          v-else-if="lightContrast !== null && darkContrast !== null"
+          id="branding-primary-color-hint"
+          class="mt-2 space-y-1 text-xs text-gray-700 dark:text-gray-300"
+        >
+          <p>Contrast on light surfaces: {{ lightContrast.toFixed(2) }}:1</p>
+          <p>Contrast on dark surfaces: {{ darkContrast.toFixed(2) }}:1</p>
+          <p
+            v-if="hasLowContrast"
+            class="font-medium text-red-700 dark:text-red-400"
+            role="alert"
+          >
+            This colour is below the WCAG AA 4.5:1 text contrast threshold on at
+            least one surface. Choose a different colour or avoid using it for
+            text.
+          </p>
+          <p v-else class="font-medium text-green-700 dark:text-green-400">
+            This colour meets the WCAG AA 4.5:1 text contrast threshold on both
+            surfaces.
+          </p>
+        </div>
+        <p
+          v-else
+          id="branding-primary-color-hint"
+          class="mt-1 text-xs text-gray-600 dark:text-gray-400"
+        >
+          Leave blank to use the default orange palette.
+        </p>
+      </template>
+    </FormRow>
 
     <FormRow section-title="Product name">
       <template #content>
@@ -249,7 +542,7 @@ const removeLink = (index: number) => {
             id="branding-show-upstream-links"
             type="checkbox"
             data-testid="branding-show-upstream-links-input"
-            class="mt-0.5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+            class="text-brand-600 focus:ring-brand-500 mt-0.5 rounded border-gray-300"
             :disabled="locked"
             :checked="formValues?.brandingShowUpstreamLinks !== false"
             @change="updateShowUpstreamLinks"

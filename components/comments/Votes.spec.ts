@@ -5,9 +5,19 @@ import Votes from '@/components/comments/Votes.vue';
 
 const voteButtonStub = {
   name: 'VoteButton',
-  props: ['active', 'count', 'testId', 'loading', 'tooltipText', 'showCount', 'isPermalinked', 'isMarkedAsAnswer'],
+  props: [
+    'active',
+    'count',
+    'testId',
+    'loading',
+    'tooltipText',
+    'showCount',
+    'isPermalinked',
+    'isMarkedAsAnswer',
+  ],
   emits: ['vote'],
-  template: '<button :data-testid="testId" @click="$emit(\'vote\')"><slot /></button>',
+  template:
+    '<button :data-testid="testId" @click="$emit(\'vote\')"><slot /></button>',
 };
 
 const menuButtonStub = {
@@ -20,7 +30,13 @@ const menuButtonStub = {
 const mountVotes = (props: Record<string, unknown> = {}) =>
   mount(Votes, {
     props,
-    global: { stubs: { VoteButton: voteButtonStub, MenuButton: menuButtonStub, FlagIcon: true } },
+    global: {
+      stubs: {
+        VoteButton: voteButtonStub,
+        MenuButton: menuButtonStub,
+        FlagIcon: true,
+      },
+    },
   });
 
 const button = (w: ReturnType<typeof mount>, testId: string) =>
@@ -39,9 +55,7 @@ describe('Votes upvote', () => {
 
     expect(
       button(wrapper, 'upvote-comment-button').get('button > span').classes()
-    ).toEqual(
-      expect.arrayContaining(['flex-nowrap', 'whitespace-nowrap'])
-    );
+    ).toEqual(expect.arrayContaining(['flex-nowrap', 'whitespace-nowrap']));
   });
 
   it('hides the upvote button when showUpvote is false', () => {
@@ -81,7 +95,10 @@ describe('Votes super upvote', () => {
   });
 
   it('emits superUpvote when inactive', async () => {
-    const wrapper = mountVotes({ upvoteActive: true, superUpvoteActive: false });
+    const wrapper = mountVotes({
+      upvoteActive: true,
+      superUpvoteActive: false,
+    });
 
     await button(wrapper, 'super-upvote-comment-button').trigger('click');
 
@@ -101,25 +118,34 @@ describe('Votes feedback menu', () => {
   it('offers Give Feedback when no feedback exists', () => {
     const wrapper = mountVotes({ downvoteActive: false });
 
-    const labels = menu(wrapper).props('items').map((i: { label: string }) => i.label);
+    const labels = menu(wrapper)
+      .props('items')
+      .map((i: { label: string }) => i.label);
     expect(labels).toContain('Give Feedback');
   });
 
   it('offers Undo and Edit Feedback when feedback exists', () => {
     const wrapper = mountVotes({ downvoteActive: true });
 
-    const labels = menu(wrapper).props('items').map((i: { label: string }) => i.label);
-    expect(labels).toEqual(expect.arrayContaining(['Undo Feedback', 'Edit Feedback']));
+    const labels = menu(wrapper)
+      .props('items')
+      .map((i: { label: string }) => i.label);
+    expect(labels).toEqual(
+      expect.arrayContaining(['Undo Feedback', 'Edit Feedback'])
+    );
   });
 
   it('uses outlined, shaded active styling when feedback is given', () => {
     const wrapper = mountVotes({ downvoteActive: true });
 
-    expect(wrapper.html()).toContain('border-orange-300 bg-orange-100');
+    expect(wrapper.html()).toContain('border-brand-300 bg-brand-100');
   });
 
   it('uses green styling for a best-answer downvote', () => {
-    const wrapper = mountVotes({ downvoteActive: true, isMarkedAsAnswer: true });
+    const wrapper = mountVotes({
+      downvoteActive: true,
+      isMarkedAsAnswer: true,
+    });
 
     expect(wrapper.html()).toContain('bg-green-500');
   });

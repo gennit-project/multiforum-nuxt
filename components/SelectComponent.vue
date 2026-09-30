@@ -35,7 +35,7 @@ function handleSelect(event: SelectOptionData) {
   <Listbox v-model="selected" as="div" @update:model-value="handleSelect">
     <div class="relative mt-1">
       <ListboxButton
-        class="relative w-full cursor-default rounded-md border border-gray-300 bg-white pr-10 pl-3 text-left shadow-sm focus:border-orange-500 focus:ring-1 focus:ring-orange-500 focus:outline-none dark:bg-gray-800 dark:text-gray-200"
+        class="focus:border-brand-500 focus:ring-brand-500 relative w-full cursor-default rounded-md border border-gray-300 bg-white pr-10 pl-3 text-left shadow-sm focus:ring-1 focus:outline-none dark:bg-gray-800 dark:text-gray-200"
         :label="props.label ?? selected?.label"
       >
         <span
@@ -55,7 +55,7 @@ function handleSelect(event: SelectOptionData) {
           <li
             :class="[
               active
-                ? 'bg-orange-600 text-white'
+                ? 'bg-brand-600 text-white'
                 : 'text-gray-900 dark:text-gray-200',
               'relative cursor-default py-1 pr-9 pl-3 select-none',
             ]"
@@ -72,7 +72,7 @@ function handleSelect(event: SelectOptionData) {
             <span
               v-if="isSelected"
               :class="[
-                active ? 'text-white' : 'text-orange-600',
+                active ? 'text-white' : 'text-brand-600',
                 'absolute inset-y-0 right-0 flex items-center pr-4',
               ]"
             >

@@ -105,7 +105,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
     <LoadingSpinner v-else-if="getDiscussionLoading" />
     <div
       v-else-if="!discussion"
-      class="bg-gray-50 rounded-lg border border-gray-300 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
+      class="rounded-lg border border-gray-300 bg-gray-50 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"
     >
       <p>Can't find the content that was reported. It may have been deleted.</p>
     </div>
@@ -157,7 +157,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
                 name: 'forums-forumId-discussions-discussionId',
                 params: { forumId: channelId, discussionId: discussion.id },
               }"
-              class="text-orange-500 dark:text-orange-400"
+              class="text-brand-500 dark:text-brand-400"
               rel="noopener noreferrer"
             >
               {{ discussion.title }}
@@ -174,11 +174,11 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
 
           <div
             v-if="downloadableFiles.length"
-            class="bg-orange-50 mt-4 space-y-3 rounded-md border border-orange-300 p-4 dark:border-orange-500/60 dark:bg-orange-900/30"
+            class="bg-brand-50 border-brand-300 dark:border-brand-500/60 dark:bg-brand-900/30 mt-4 space-y-3 rounded-md border p-4"
             data-testid="issue-downloads"
           >
             <div
-              class="font-semibold text-sm text-orange-800 dark:text-orange-200"
+              class="text-brand-800 dark:text-brand-200 text-sm font-semibold"
             >
               Attached download{{ downloadableFiles.length > 1 ? 's' : '' }}
             </div>
@@ -205,7 +205,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
                   </div>
                   <a
                     v-if="file.url"
-                    class="font-semibold shrink-0 rounded bg-orange-500 px-3 py-2 text-xs text-white shadow hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 dark:bg-orange-600 dark:hover:bg-orange-500"
+                    class="bg-brand-500 hover:bg-brand-600 focus:ring-brand-400 dark:bg-brand-600 dark:hover:bg-brand-500 shrink-0 rounded px-3 py-2 text-xs font-semibold text-white shadow focus:ring-2 focus:outline-none"
                     :href="file.url"
                     target="_blank"
                     rel="noopener noreferrer"

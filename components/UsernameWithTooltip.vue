@@ -65,9 +65,9 @@ const badgeClasses = computed(() => {
 
 const modBadgeClasses = computed(() => {
   if (props.lightText) {
-    return 'rounded-md border border-orange-400 px-1 py-0 text-xs text-orange-300';
+    return 'rounded-md border border-brand-400 px-1 py-0 text-xs text-brand-300';
   }
-  return 'rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300';
+  return 'rounded-md border border-brand-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300';
 });
 </script>
 <template>
@@ -89,40 +89,20 @@ const modBadgeClasses = computed(() => {
               class="flex flex-row items-center gap-1 hover:underline"
             >
               <span v-if="!displayName" class="font-bold">{{ username }}</span>
-              <span v-if="displayName" class="font-bold">{{ displayName }}</span>
-              <span
-                v-if="displayName"
-                :class="usernameClasses"
-                >{{ `(u/${username})` }}</span
-              >
+              <span v-if="displayName" class="font-bold">{{
+                displayName
+              }}</span>
+              <span v-if="displayName" :class="usernameClasses">{{
+                `(u/${username})`
+              }}</span>
             </nuxt-link>
-            <span
-              v-if="isServerAdmin"
-              :class="badgeClasses"
-              >Server Admin</span
-            >
-            <span
-              v-if="isServerMod"
-              :class="modBadgeClasses"
-            >
+            <span v-if="isServerAdmin" :class="badgeClasses">Server Admin</span>
+            <span v-if="isServerMod" :class="modBadgeClasses">
               Server Mod
             </span>
-            <span
-              v-if="isForumAdmin"
-              :class="badgeClasses"
-              >Forum Admin</span
-            >
-            <span
-              v-if="isForumMod"
-              :class="modBadgeClasses"
-            >
-              Forum Mod
-            </span>
-            <span
-              v-if="isOriginalPoster"
-              :class="badgeClasses"
-              >OP</span
-            >
+            <span v-if="isForumAdmin" :class="badgeClasses">Forum Admin</span>
+            <span v-if="isForumMod" :class="modBadgeClasses"> Forum Mod </span>
+            <span v-if="isOriginalPoster" :class="badgeClasses">OP</span>
           </div>
         </slot>
       </template>
@@ -134,9 +114,7 @@ const modBadgeClasses = computed(() => {
               :src="src"
               :variant-source="variantSource"
               :is-medium="true"
-            />{{
-              username
-            }}
+            />{{ username }}
           </div>
           <div v-if="displayName" class="text-md flex w-full flex-col">
             <AvatarComponent
@@ -178,32 +156,11 @@ const modBadgeClasses = computed(() => {
             `(u/${username})`
           }}</span>
         </nuxt-link>
-        <span
-          v-if="isServerAdmin"
-          :class="badgeClasses"
-          >Server Admin</span
-        >
-        <span
-          v-if="isServerMod"
-          :class="modBadgeClasses"
-          >Server Mod</span
-        >
-        <span
-          v-if="isForumAdmin"
-          :class="badgeClasses"
-          >Forum Admin</span
-        >
-        <span
-          v-if="isForumMod"
-          :class="modBadgeClasses"
-        >
-          Forum Mod
-        </span>
-        <span
-          v-if="isOriginalPoster"
-          :class="badgeClasses"
-          >OP</span
-        >
+        <span v-if="isServerAdmin" :class="badgeClasses">Server Admin</span>
+        <span v-if="isServerMod" :class="modBadgeClasses">Server Mod</span>
+        <span v-if="isForumAdmin" :class="badgeClasses">Forum Admin</span>
+        <span v-if="isForumMod" :class="modBadgeClasses"> Forum Mod </span>
+        <span v-if="isOriginalPoster" :class="badgeClasses">OP</span>
       </div>
     </template>
 
@@ -223,32 +180,11 @@ const modBadgeClasses = computed(() => {
             `(u/${username})`
           }}</span>
         </nuxt-link>
-        <span
-          v-if="isServerAdmin"
-          :class="badgeClasses"
-          >Server Admin</span
-        >
-        <span
-          v-if="isServerMod"
-          :class="modBadgeClasses"
-          >Server Mod</span
-        >
-        <span
-          v-if="isForumAdmin"
-          :class="badgeClasses"
-          >Forum Admin</span
-        >
-        <span
-          v-if="isForumMod"
-          :class="modBadgeClasses"
-        >
-          Forum Mod
-        </span>
-        <span
-          v-if="isOriginalPoster"
-          :class="badgeClasses"
-          >OP</span
-        >
+        <span v-if="isServerAdmin" :class="badgeClasses">Server Admin</span>
+        <span v-if="isServerMod" :class="modBadgeClasses">Server Mod</span>
+        <span v-if="isForumAdmin" :class="badgeClasses">Forum Admin</span>
+        <span v-if="isForumMod" :class="modBadgeClasses"> Forum Mod </span>
+        <span v-if="isOriginalPoster" :class="badgeClasses">OP</span>
       </div>
     </template>
   </client-only>

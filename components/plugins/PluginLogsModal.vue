@@ -213,7 +213,7 @@ const formatTimestamp = (isoString: string) => {
                       </h4>
                       <button
                         type="button"
-                        class="flex items-center space-x-1 text-xs text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                        class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 flex items-center space-x-1 text-xs"
                         @click="copyToClipboard"
                       >
                         <i

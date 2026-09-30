@@ -107,7 +107,7 @@ const hasDetails = computed(() => {
           hasDetails && run.status !== 'PENDING' && run.status !== 'RUNNING'
         "
         type="button"
-        class="mt-1 text-xs text-orange-600 hover:underline dark:text-orange-400"
+        class="text-brand-600 dark:text-brand-400 mt-1 text-xs hover:underline"
         @click="emit('viewLogs', run)"
       >
         View Details

@@ -98,15 +98,11 @@ const formattedDate = computed(() => {
     <div
       class="flex space-x-0 md:flex-row md:items-center md:justify-between md:space-x-2"
     >
-      <SkeletonLoader
-        v-if="getEventLoading"
-        class="flex-1"
-        type="text"
-      />
+      <SkeletonLoader v-if="getEventLoading" class="flex-1" type="text" />
       <div v-else ref="eventDetail" class="flex-1">
         <h1
           v-if="!titleEditMode"
-          class="text-md text-wrap px-1 sm:tracking-tight md:text-3xl"
+          class="text-md px-1 text-wrap sm:tracking-tight md:text-3xl"
         >
           {{ event?.title || '[Deleted]' }}
         </h1>
@@ -145,7 +141,7 @@ const formattedDate = computed(() => {
             <nuxt-link
               v-if="!titleEditMode"
               :to="`/forums/${channelId}/events/create`"
-              class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+              class="focus:ring-brand-500 ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               New Event
             </nuxt-link>
@@ -170,7 +166,7 @@ const formattedDate = computed(() => {
         <template #does-not-have-auth>
           <button
             type="button"
-            class="ml-2 inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+            class="focus:ring-brand-500 ml-2 inline-flex items-center gap-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium whitespace-nowrap text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
           >
             New Event
           </button>

@@ -159,7 +159,7 @@ describe('MarkdownPreview', () => {
         showShowMore: true,
       });
 
-      expect(wrapper.get('button').classes()).toContain('dark:text-orange-400');
+      expect(wrapper.get('button').classes()).toContain('dark:text-brand-400');
     });
 
     it('reveals the full text and flips the label when toggled', async () => {
@@ -222,9 +222,7 @@ describe('MarkdownPreview', () => {
     });
 
     it('opens the link in a new tab on confirm and then closes', async () => {
-      const openSpy = vi
-        .spyOn(window, 'open')
-        .mockReturnValue(null);
+      const openSpy = vi.spyOn(window, 'open').mockReturnValue(null);
       const wrapper = mountPreview({ text: 'words' });
       await clickLink(wrapper, 'https://external.example.com/path');
 
@@ -264,10 +262,14 @@ describe('MarkdownPreview', () => {
 
     it('ignores a direct image click when the gallery is disabled', () => {
       const wrapper = mountPreview({ text: 'words', disableGallery: true });
-      const event = { target: { tagName: 'IMG', src: 'x' } } as unknown as MouseEvent;
+      const event = {
+        target: { tagName: 'IMG', src: 'x' },
+      } as unknown as MouseEvent;
       (wrapper.vm as any).handleImageClick(event);
       // No embedded images and gallery disabled → lightbox stays hidden.
-      expect(wrapper.find('[data-testid="vue-easy-lightbox-stub"]').exists()).toBe(false);
+      expect(
+        wrapper.find('[data-testid="vue-easy-lightbox-stub"]').exists()
+      ).toBe(false);
     });
 
     it('does not open the lightbox for an image that is not in the gallery', () => {
@@ -276,7 +278,9 @@ describe('MarkdownPreview', () => {
         target: { tagName: 'IMG', src: 'https://example.com/missing.png' },
       } as unknown as MouseEvent;
       (wrapper.vm as any).handleImageClick(event);
-      expect(wrapper.find('[data-testid="vue-easy-lightbox-stub"]').exists()).toBe(false);
+      expect(
+        wrapper.find('[data-testid="vue-easy-lightbox-stub"]').exists()
+      ).toBe(false);
     });
 
     it('ignores a container image click that maps to no embedded image', async () => {

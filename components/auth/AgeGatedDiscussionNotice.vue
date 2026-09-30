@@ -117,7 +117,7 @@ const saveDisabled = computed(
       </p>
       <a
         :href="loginUrl"
-        class="mt-4 inline-flex rounded-md bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800 focus:ring-2 focus:ring-orange-500 focus:outline-none"
+        class="bg-brand-700 hover:bg-brand-800 focus:ring-brand-500 mt-4 inline-flex rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:outline-none"
         data-testid="age-gate-sign-in"
       >
         Sign in
@@ -163,7 +163,7 @@ const saveDisabled = computed(
         </p>
         <button
           type="submit"
-          class="mt-4 inline-flex rounded-md bg-orange-700 px-4 py-2 text-sm font-medium text-white hover:bg-orange-800 focus:ring-2 focus:ring-orange-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+          class="bg-brand-700 hover:bg-brand-800 focus:ring-brand-500 mt-4 inline-flex rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="saveDisabled"
           data-testid="age-gate-save-birthday"
         >

@@ -1,19 +1,36 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { shallowMount } from '@vue/test-utils';
+import { flushPromises, shallowMount } from '@vue/test-utils';
 import BrandingSettingsPage from './branding.vue';
 import type { BrandingLink } from '@/utils/branding';
 
 const mockPublicConfig: { brandingLocked?: boolean } = {};
+const mockUploadFile = vi.hoisted(() => vi.fn());
 
 vi.mock('nuxt/app', () => ({
   useRuntimeConfig: () => ({ public: mockPublicConfig }),
 }));
+
+vi.mock('@/composables/useImageUpload', async () => {
+  const { ref } = await import('vue');
+  return {
+    useImageUpload: () => ({
+      uploadFile: mockUploadFile,
+      validateFileSize: () => ({ valid: true, message: '' }),
+      isUploading: ref(false),
+    }),
+  };
+});
 
 const mountPage = (formValues: Record<string, unknown> = {}) =>
   shallowMount(BrandingSettingsPage, {
     props: {
       editMode: true,
       formValues: {
+        serverIconURL: '',
+        brandingLogoDarkURL: '',
+        brandingLogoAlt: '',
+        brandingFaviconURL: '',
+        brandingPrimaryColor: '',
         brandingProductName: '',
         brandingDocsURL: '',
         brandingSourceURL: '',
@@ -34,6 +51,68 @@ const mountPage = (formValues: Record<string, unknown> = {}) =>
 describe('admin branding settings page', () => {
   beforeEach(() => {
     delete mockPublicConfig.brandingLocked;
+    mockUploadFile.mockReset();
+    mockUploadFile.mockResolvedValue({
+      success: true,
+      embeddedLink: '/logo.svg',
+    });
+  });
+
+  it('emits the light-mode logo URL', async () => {
+    const wrapper = mountPage();
+
+    await wrapper.get('#serverIconURL').setValue('/logo.svg');
+
+    expect(wrapper.emitted('updateFormValues')?.[0]).toEqual([
+      { serverIconURL: '/logo.svg' },
+    ]);
+  });
+
+  it('requires an accessible name when a logo is configured', () => {
+    const wrapper = mountPage({ serverIconURL: '/logo.svg' });
+
+    expect(
+      wrapper.get('#branding-logo-alt').attributes('required')
+    ).toBeDefined();
+  });
+
+  it('marks a missing logo accessible name as invalid', () => {
+    const wrapper = mountPage({ serverIconURL: '/logo.svg' });
+
+    expect(wrapper.get('#branding-logo-alt').attributes('aria-invalid')).toBe(
+      'true'
+    );
+  });
+
+  it('uploads an image and emits its storage URL', async () => {
+    const wrapper = mountPage();
+    const input = wrapper.get('#serverIconURL-upload');
+    Object.defineProperty(input.element, 'files', {
+      value: [new File(['logo'], 'logo.svg', { type: 'image/svg+xml' })],
+    });
+
+    await input.trigger('change');
+    await flushPromises();
+
+    expect(wrapper.emitted('updateFormValues')?.[0]).toEqual([
+      { serverIconURL: '/logo.svg' },
+    ]);
+  });
+
+  it('warns when the primary colour is malformed', () => {
+    const wrapper = mountPage({ brandingPrimaryColor: 'blue' });
+
+    expect(
+      wrapper.get('#branding-primary-color-error').attributes('role')
+    ).toBe('alert');
+  });
+
+  it('reports the primary colour contrast against both surfaces', () => {
+    const wrapper = mountPage({ brandingPrimaryColor: '#777777' });
+
+    expect(wrapper.get('#branding-primary-color-hint').text()).toContain(
+      'Contrast on light surfaces:'
+    );
   });
 
   it('emits the product name', async () => {

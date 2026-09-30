@@ -50,7 +50,7 @@ const emit = defineEmits<{
     </span>
     <svg
       v-if="active"
-      class="h-4 w-4 shrink-0 text-orange-600 dark:text-orange-400"
+      class="text-brand-600 dark:text-brand-400 h-4 w-4 shrink-0"
       viewBox="0 0 20 20"
       fill="currentColor"
       aria-label="Current forum"

@@ -3,6 +3,7 @@ import {
   buildBasicUser,
   buildServerConfig,
   buildServerPermissionsConfig,
+  type ServerConfigFixture,
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
@@ -12,7 +13,7 @@ import { installGraphqlMocks } from '../../helpers/mockGraphql';
 // end-to-end coverage; here we verify each tab renders its form for an admin.
 const TEST_USER = 'alice';
 
-const getMocks = (overrides: { enableDownloads?: boolean } = {}) => ({
+const getMocks = (overrides: Partial<ServerConfigFixture> = {}) => ({
   getBasicUserInfo: () => ({
     data: {
       users: [buildBasicUser({ username: TEST_USER, displayName: TEST_USER })],
@@ -46,7 +47,18 @@ const getMocks = (overrides: { enableDownloads?: boolean } = {}) => ({
         buildServerConfig({
           serverName: 'Listical',
           enableEvents: true,
-          enableDownloads: overrides.enableDownloads ?? true,
+          enableDownloads: true,
+          ...overrides,
+        }),
+      ],
+    },
+  }),
+  getServerBranding: () => ({
+    data: {
+      serverConfigs: [
+        buildServerConfig({
+          serverName: 'Listical',
+          ...overrides,
         }),
       ],
     },
@@ -118,6 +130,55 @@ test.describe('Server settings (admin)', () => {
       }
     });
   }
+
+  test('branding tab previews visual branding and applies it to the document', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+    const diagnostics = await installGraphqlMocks(
+      page,
+      getMocks({
+        serverIconURL: '/logo.svg',
+        brandingLogoAlt: 'Listical Community',
+        brandingFaviconURL: '/favicon.svg',
+        brandingPrimaryColor: '#777777',
+      })
+    );
+
+    try {
+      await page.goto('/admin/settings/branding', {
+        waitUntil: 'domcontentloaded',
+      });
+      await expect(page.getByLabel('Light-mode logo URL')).toHaveValue(
+        '/logo.svg'
+      );
+      await expect(page.getByLabel('Logo accessible name')).toHaveValue(
+        'Listical Community'
+      );
+      await expect(page.getByText('Contrast on light surfaces:')).toBeVisible();
+      await expect(
+        page.locator('link[rel="icon"][href="/favicon.svg"]')
+      ).toHaveCount(1);
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            getComputedStyle(document.documentElement)
+              .getPropertyValue('--color-brand-500')
+              .trim()
+          )
+        )
+        .toBe('#777777');
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
 
   test('roles tab renders the server roles content', async ({
     context,

@@ -9,29 +9,34 @@ name, authentication provider, or optional integration.
 and Vercel workflows. Container deployments should prefer the runtime
 variables below.
 
-| Runtime variable | Purpose |
-| --- | --- |
-| `NUXT_PUBLIC_BASE_URL` | Public frontend origin used in links and metadata |
-| `NUXT_PUBLIC_ENVIRONMENT` | Deployment label such as `development`, `staging`, or `production` |
-| `NUXT_PUBLIC_SERVER_NAME` | Backend `ServerConfig` identifier |
-| `NUXT_PUBLIC_SERVER_DISPLAY_NAME` | Human-facing instance name |
-| `NUXT_PUBLIC_AUTH_PROVIDER` | `local-dev` or `auth0` |
-| `NUXT_BACKEND_GRAPHQL_URL` | Server-side GraphQL endpoint on the private container network |
-| `NUXT_PUBLIC_GOOGLE_MAPS_API_KEY` | Optional Google Maps browser key |
-| `NUXT_PUBLIC_GOOGLE_MAP_ID` | Optional Google Maps map ID |
-| `NUXT_PUBLIC_OPEN_CAGE_API_KEY` | Optional OpenCage geocoding key |
-| `NUXT_PUBLIC_GOOGLE_CLOUD_STORAGE_BUCKET` | Optional public storage bucket name |
-| `NUXT_PUBLIC_OPEN_GRAPH_API_KEY` | Optional link-preview API key |
-| `NUXT_PUBLIC_LOGOUT_URL` | Optional post-logout destination |
-| `NUXT_PUBLIC_ENABLE_LANGUAGE_PICKER` | Set to `true` to show language selection |
-| `NUXT_PUBLIC_BRANDING_PRODUCT_NAME` | Product name in the footer attribution (default `Multiforum`) |
-| `NUXT_PUBLIC_BRANDING_DOCS_URL` | Documentation link target |
-| `NUXT_PUBLIC_BRANDING_SOURCE_URL` | Source repository link target |
-| `NUXT_PUBLIC_BRANDING_ISSUES_URL` | Upstream bug tracker offered in the footer |
-| `NUXT_PUBLIC_BRANDING_SUPPORT_EMAIL` | Contact address for instance support (unset by default) |
-| `NUXT_PUBLIC_BRANDING_SHOW_UPSTREAM_LINKS` | Set to `false` to hide all upstream references |
-| `NUXT_PUBLIC_BRANDING_CUSTOM_FOOTER_LINKS` | JSON array of `{"label","url"}` footer links |
-| `NUXT_PUBLIC_BRANDING_LOCKED` | Set to `true` to pin branding to deployment config and make the admin form read-only |
+| Runtime variable                           | Purpose                                                                              |
+| ------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `NUXT_PUBLIC_BASE_URL`                     | Public frontend origin used in links and metadata                                    |
+| `NUXT_PUBLIC_ENVIRONMENT`                  | Deployment label such as `development`, `staging`, or `production`                   |
+| `NUXT_PUBLIC_SERVER_NAME`                  | Backend `ServerConfig` identifier                                                    |
+| `NUXT_PUBLIC_SERVER_DISPLAY_NAME`          | Human-facing instance name                                                           |
+| `NUXT_PUBLIC_AUTH_PROVIDER`                | `local-dev` or `auth0`                                                               |
+| `NUXT_BACKEND_GRAPHQL_URL`                 | Server-side GraphQL endpoint on the private container network                        |
+| `NUXT_PUBLIC_GOOGLE_MAPS_API_KEY`          | Optional Google Maps browser key                                                     |
+| `NUXT_PUBLIC_GOOGLE_MAP_ID`                | Optional Google Maps map ID                                                          |
+| `NUXT_PUBLIC_OPEN_CAGE_API_KEY`            | Optional OpenCage geocoding key                                                      |
+| `NUXT_PUBLIC_GOOGLE_CLOUD_STORAGE_BUCKET`  | Optional public storage bucket name                                                  |
+| `NUXT_PUBLIC_OPEN_GRAPH_API_KEY`           | Optional link-preview API key                                                        |
+| `NUXT_PUBLIC_LOGOUT_URL`                   | Optional post-logout destination                                                     |
+| `NUXT_PUBLIC_ENABLE_LANGUAGE_PICKER`       | Set to `true` to show language selection                                             |
+| `NUXT_PUBLIC_BRANDING_LOGO_URL`            | Light-mode navigation logo URL                                                       |
+| `NUXT_PUBLIC_BRANDING_LOGO_DARK_URL`       | Optional dark-mode logo URL; falls back to the light logo                            |
+| `NUXT_PUBLIC_BRANDING_LOGO_ALT`            | Accessible name for the logo's home link                                             |
+| `NUXT_PUBLIC_BRANDING_FAVICON_URL`         | Browser favicon URL                                                                  |
+| `NUXT_PUBLIC_BRANDING_PRIMARY_COLOR`       | Six-digit hex colour used to derive the brand palette                                |
+| `NUXT_PUBLIC_BRANDING_PRODUCT_NAME`        | Product name in the footer attribution (default `Multiforum`)                        |
+| `NUXT_PUBLIC_BRANDING_DOCS_URL`            | Documentation link target                                                            |
+| `NUXT_PUBLIC_BRANDING_SOURCE_URL`          | Source repository link target                                                        |
+| `NUXT_PUBLIC_BRANDING_ISSUES_URL`          | Upstream bug tracker offered in the footer                                           |
+| `NUXT_PUBLIC_BRANDING_SUPPORT_EMAIL`       | Contact address for instance support (unset by default)                              |
+| `NUXT_PUBLIC_BRANDING_SHOW_UPSTREAM_LINKS` | Set to `false` to hide all upstream references                                       |
+| `NUXT_PUBLIC_BRANDING_CUSTOM_FOOTER_LINKS` | JSON array of `{"label","url"}` footer links                                         |
+| `NUXT_PUBLIC_BRANDING_LOCKED`              | Set to `true` to pin branding to deployment config and make the admin form read-only |
 
 Nuxt exposes every `NUXT_PUBLIC_*` value to the browser. Do not put secrets in
 these variables. Auth0 client secrets and session secrets belong in the
@@ -53,13 +58,12 @@ The Node server proxies that route to `NUXT_BACKEND_GRAPHQL_URL`, so changing a
 backend hostname or container network does not require rebuilding browser
 assets and does not require exposing the backend directly to browsers.
 
-
 ## Instance branding
 
-The footer's documentation, source, issue-tracker and support links are
-configurable, so a deployment can point users at its own documentation and
-support address instead of the upstream project's. Values resolve through
-ordered layers, lowest precedence first:
+The navigation logo, favicon, brand colour, and footer links are configurable.
+A deployment can present its own visual identity and point users at its own
+documentation and support address. Values resolve through ordered layers,
+lowest precedence first:
 
 ```
 upstream defaults  ->  NUXT_PUBLIC_BRANDING_*  ->  admin ServerConfig
@@ -79,6 +83,14 @@ declaratively (GitOps, Helm values, a Vercel project) and must not drift.
 documentation, source and upstream issue-tracker links in one setting, for
 deployments that present the software under their own name. The support email
 is independent of that flag and still renders.
+
+The light logo replaces the text name in the navigation. The dark logo is
+optional and falls back to the light logo. Configure a meaningful logo alt name
+whenever either logo is set because the image is also the site's home link. The
+primary colour becomes the `brand-*` Tailwind palette; its configured value is
+the `500` stop and the remaining stops are derived for hover, background, and
+dark-mode states. The admin form reports contrast against representative light
+and dark surfaces and warns below the WCAG AA 4.5:1 text threshold.
 
 No support address is configured by default, so an instance that never sets one
 omits the address rather than directing its users to the upstream maintainers.

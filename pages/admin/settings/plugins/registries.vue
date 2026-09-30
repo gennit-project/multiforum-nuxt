@@ -35,7 +35,10 @@ const {
 } = useMutation(UPDATE_SERVER_CONFIG);
 
 const isDirty = computed(() => {
-  return JSON.stringify(pluginRegistries.value) !== JSON.stringify(originalRegistries.value);
+  return (
+    JSON.stringify(pluginRegistries.value) !==
+    JSON.stringify(originalRegistries.value)
+  );
 });
 
 watch(
@@ -89,7 +92,10 @@ const saveRegistries = async () => {
       </div>
     </div>
 
-    <div v-else-if="serverError" class="py-8 text-center text-red-600 dark:text-red-400">
+    <div
+      v-else-if="serverError"
+      class="py-8 text-center text-red-600 dark:text-red-400"
+    >
       Error loading registries: {{ serverError.message }}
     </div>
 
@@ -98,8 +104,8 @@ const saveRegistries = async () => {
         <template #content>
           <div class="my-3 space-y-4">
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              Configure plugin registries or GitHub plugin repos to allow plugins
-              to be installed on your server.
+              Configure plugin registries or GitHub plugin repos to allow
+              plugins to be installed on your server.
             </p>
 
             <div class="space-y-2">
@@ -138,12 +144,12 @@ const saveRegistries = async () => {
                   v-model="newRegistry"
                   type="url"
                   placeholder="https://github.com/org/plugin-repo"
-                  class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                  class="focus:border-brand-500 focus:ring-brand-500 flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:ring-1 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   @keyup.enter="addRegistry"
-                >
+                />
                 <button
                   type="button"
-                  class="rounded-md bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                  class="bg-brand-600 hover:bg-brand-700 focus:ring-brand-500 rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:ring-offset-2 focus:outline-none"
                   :disabled="!newRegistry.trim()"
                   @click="addRegistry"
                 >
@@ -155,7 +161,7 @@ const saveRegistries = async () => {
             <div class="flex justify-end">
               <button
                 type="button"
-                class="rounded-md bg-orange-600 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
+                class="bg-brand-600 hover:bg-brand-700 focus:ring-brand-500 rounded-md px-4 py-2 text-sm font-medium text-white focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 :disabled="!isDirty || savingRegistries"
                 @click="saveRegistries"
               >
@@ -167,7 +173,10 @@ const saveRegistries = async () => {
               </button>
             </div>
 
-            <div v-if="saveError" class="text-sm text-red-600 dark:text-red-400">
+            <div
+              v-if="saveError"
+              class="text-sm text-red-600 dark:text-red-400"
+            >
               Error saving registries: {{ saveError.message }}
             </div>
           </div>

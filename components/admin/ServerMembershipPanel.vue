@@ -55,13 +55,13 @@ const serverConfig = computed(() => {
             <div class="flex flex-wrap gap-3">
               <nuxt-link
                 :to="{ path: '/admin/suspensions/suspended-users' }"
-                class="rounded border border-orange-500 px-3 py-2 text-sm font-medium text-orange-500"
+                class="border-brand-500 text-brand-500 rounded border px-3 py-2 text-sm font-medium"
               >
                 View Suspended Users
               </nuxt-link>
               <nuxt-link
                 :to="{ path: '/admin/suspensions/suspended-mods' }"
-                class="rounded border border-orange-500 px-3 py-2 text-sm font-medium text-orange-500"
+                class="border-brand-500 text-brand-500 rounded border px-3 py-2 text-sm font-medium"
               >
                 View Suspended Mods
               </nuxt-link>

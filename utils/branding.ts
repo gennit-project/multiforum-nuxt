@@ -1,16 +1,10 @@
 /**
- * Instance branding (Phase 0: links and text only).
+ * Instance branding.
  *
  * Branding resolves through ordered layers, lowest precedence first, so the
  * same resolver serves every deployment shape:
  *
- *   upstream defaults  ->  NUXT_PUBLIC_BRANDING_* env  ->  (later) ServerConfig
- *
- * Phase 0 ships the first two layers. The admin-editable ServerConfig layer is
- * an additional entry in `layers`, so adding it later needs no rework here; an
- * operator who wants branding pinned by deployment config rather than editable
- * in the admin UI reverses the last two entries instead of gaining a new code
- * path.
+ *   upstream defaults  ->  NUXT_PUBLIC_BRANDING_* env  ->  ServerConfig
  *
  * Value semantics, applied per field:
  * - an explicit empty string DISABLES an optional field (matching the existing
@@ -25,6 +19,16 @@ export type BrandingLink = {
 };
 
 export type BrandingValues = {
+  /** Light-mode logo displayed in the home link. Empty keeps the text logo. */
+  logoUrl: string;
+  /** Dark-mode logo. Empty falls back to logoUrl. */
+  logoDarkUrl: string;
+  /** Accessible name for the logo image. */
+  logoAlt: string;
+  /** Browser favicon. Empty keeps the application default. */
+  faviconUrl: string;
+  /** Hex colour used to derive the brand palette. Empty keeps orange. */
+  primaryColor: string;
   /** Private-label name shown in footer attribution. Never empty. */
   productName: string;
   /** Documentation site. Empty hides the docs link. */
@@ -46,6 +50,11 @@ export type BrandingLayer = Partial<Record<keyof BrandingValues, unknown>>;
 
 /** Upstream defaults. These preserve the previously hardcoded footer values. */
 export const UPSTREAM_BRANDING: BrandingValues = {
+  logoUrl: '',
+  logoDarkUrl: '',
+  logoAlt: '',
+  faviconUrl: '',
+  primaryColor: '',
   productName: 'Multiforum',
   docsUrl: 'https://docs.multiforum.net/',
   sourceUrl: 'https://github.com/gennit-project/multiforum-nuxt',
@@ -63,6 +72,10 @@ export const UPSTREAM_BRANDING: BrandingValues = {
 export const MAX_CUSTOM_FOOTER_LINKS = 8;
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const HEX_COLOR_PATTERN = /^#[\da-f]{6}$/i;
+
+export const BRAND_LIGHT_SURFACE = '#ffffff';
+export const BRAND_DARK_SURFACE = '#0d1117';
 
 const asTrimmedString = (value: unknown): string | undefined =>
   typeof value === 'string' ? value.trim() : undefined;
@@ -84,6 +97,96 @@ export const isSafeBrandingUrl = (value: string): boolean => {
   } catch {
     return false;
   }
+};
+
+export const isValidHexColor = (value: string): boolean =>
+  HEX_COLOR_PATTERN.test(value);
+
+type RgbColor = { red: number; green: number; blue: number };
+
+const hexToRgb = (value: string): RgbColor | null => {
+  if (!isValidHexColor(value)) return null;
+  return {
+    red: Number.parseInt(value.slice(1, 3), 16),
+    green: Number.parseInt(value.slice(3, 5), 16),
+    blue: Number.parseInt(value.slice(5, 7), 16),
+  };
+};
+
+const rgbToHex = ({ red, green, blue }: RgbColor): string =>
+  `#${[red, green, blue]
+    .map((channel) => Math.round(channel).toString(16).padStart(2, '0'))
+    .join('')}`;
+
+const mixColors = (
+  foreground: RgbColor,
+  background: RgbColor,
+  amount: number
+) =>
+  rgbToHex({
+    red: foreground.red * amount + background.red * (1 - amount),
+    green: foreground.green * amount + background.green * (1 - amount),
+    blue: foreground.blue * amount + background.blue * (1 - amount),
+  });
+
+const WHITE: RgbColor = { red: 255, green: 255, blue: 255 };
+const BLACK: RgbColor = { red: 0, green: 0, blue: 0 };
+
+/** Derive a complete Tailwind scale while keeping the configured colour at 500. */
+export const createBrandPalette = (
+  primaryColor: string
+): Record<string, string> | null => {
+  const primary = hexToRgb(primaryColor);
+  if (!primary) return null;
+
+  return {
+    50: mixColors(primary, WHITE, 0.08),
+    100: mixColors(primary, WHITE, 0.16),
+    200: mixColors(primary, WHITE, 0.3),
+    300: mixColors(primary, WHITE, 0.5),
+    400: mixColors(primary, WHITE, 0.75),
+    500: primaryColor.toLowerCase(),
+    600: mixColors(primary, BLACK, 0.88),
+    700: mixColors(primary, BLACK, 0.74),
+    800: mixColors(primary, BLACK, 0.6),
+    900: mixColors(primary, BLACK, 0.46),
+    950: mixColors(primary, BLACK, 0.32),
+  };
+};
+
+export const createBrandPaletteCss = (primaryColor: string): string => {
+  const palette = createBrandPalette(primaryColor);
+  if (!palette) return '';
+  const declarations = Object.entries(palette)
+    .map(([stop, value]) => `--color-brand-${stop}:${value}`)
+    .join(';');
+  return `:root{${declarations}}`;
+};
+
+const relativeLuminance = ({ red, green, blue }: RgbColor): number => {
+  const linearize = (channel: number): number => {
+    const value = channel / 255;
+    return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+  };
+  return (
+    0.2126 * linearize(red) +
+    0.7152 * linearize(green) +
+    0.0722 * linearize(blue)
+  );
+};
+
+export const getContrastRatio = (
+  foreground: string,
+  background: string
+): number | null => {
+  const foregroundRgb = hexToRgb(foreground);
+  const backgroundRgb = hexToRgb(background);
+  if (!foregroundRgb || !backgroundRgb) return null;
+  const foregroundLuminance = relativeLuminance(foregroundRgb);
+  const backgroundLuminance = relativeLuminance(backgroundRgb);
+  const lighter = Math.max(foregroundLuminance, backgroundLuminance);
+  const darker = Math.min(foregroundLuminance, backgroundLuminance);
+  return (lighter + 0.05) / (darker + 0.05);
 };
 
 export const parseBrandingFlag = (value: unknown): boolean | undefined => {
@@ -159,6 +262,18 @@ const applyOptionalEmail = (current: string, value: unknown): string => {
   return EMAIL_PATTERN.test(text) ? text : current;
 };
 
+const applyOptionalColor = (current: string, value: unknown): string => {
+  const text = asTrimmedString(value);
+  if (text === undefined) return current;
+  if (text === '') return '';
+  return isValidHexColor(text) ? text.toLowerCase() : current;
+};
+
+const applyOptionalText = (current: string, value: unknown): string => {
+  const text = asTrimmedString(value);
+  return text === undefined ? current : text;
+};
+
 /**
  * Merge branding layers in ascending precedence order and return a fully
  * populated, sanitized value object.
@@ -179,6 +294,14 @@ export const resolveBranding = ({
     const links = parseBrandingLinks(layer.customFooterLinks);
 
     return {
+      logoUrl: applyOptionalUrl(resolved.logoUrl, layer.logoUrl),
+      logoDarkUrl: applyOptionalUrl(resolved.logoDarkUrl, layer.logoDarkUrl),
+      logoAlt: applyOptionalText(resolved.logoAlt, layer.logoAlt),
+      faviconUrl: applyOptionalUrl(resolved.faviconUrl, layer.faviconUrl),
+      primaryColor: applyOptionalColor(
+        resolved.primaryColor,
+        layer.primaryColor
+      ),
       productName: applyRequiredText(resolved.productName, layer.productName),
       docsUrl: applyOptionalUrl(resolved.docsUrl, layer.docsUrl),
       sourceUrl: applyOptionalUrl(resolved.sourceUrl, layer.sourceUrl),
@@ -207,6 +330,17 @@ export const readBrandingEnv = (
   };
 
   return {
+    logoUrl: text('VITE_BRANDING_LOGO_URL', UPSTREAM_BRANDING.logoUrl),
+    logoDarkUrl: text(
+      'VITE_BRANDING_LOGO_DARK_URL',
+      UPSTREAM_BRANDING.logoDarkUrl
+    ),
+    logoAlt: text('VITE_BRANDING_LOGO_ALT', UPSTREAM_BRANDING.logoAlt),
+    faviconUrl: text('VITE_BRANDING_FAVICON_URL', UPSTREAM_BRANDING.faviconUrl),
+    primaryColor: text(
+      'VITE_BRANDING_PRIMARY_COLOR',
+      UPSTREAM_BRANDING.primaryColor
+    ),
     productName: text(
       'VITE_BRANDING_PRODUCT_NAME',
       UPSTREAM_BRANDING.productName

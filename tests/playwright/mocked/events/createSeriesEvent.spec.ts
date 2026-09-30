@@ -280,12 +280,8 @@ test.describe('Create Series Event', () => {
     await page.getByTestId('day-of-week-3').click();
 
     // Verify days are selected (have orange background)
-    await expect(page.getByTestId('day-of-week-1')).toHaveClass(
-      /bg-orange-500/
-    );
-    await expect(page.getByTestId('day-of-week-3')).toHaveClass(
-      /bg-orange-500/
-    );
+    await expect(page.getByTestId('day-of-week-1')).toHaveClass(/bg-brand-500/);
+    await expect(page.getByTestId('day-of-week-3')).toHaveClass(/bg-brand-500/);
 
     // Set end count
     await page.getByTestId('end-type-after_count').click();

@@ -99,7 +99,7 @@ describe('OnThisPage navigation', () => {
 
     await wrapper.findAll('button')[0].trigger('click');
 
-    expect(wrapper.findAll('button')[0].classes()).toContain('bg-orange-100');
+    expect(wrapper.findAll('button')[0].classes()).toContain('bg-brand-100');
   });
 
   it('updates the URL hash on click', async () => {
@@ -120,15 +120,21 @@ describe('OnThisPage scroll spy', () => {
     sub.id = 'sub';
     Object.defineProperty(sub, 'offsetTop', { value: 500, configurable: true });
     document.body.append(intro, sub);
-    Object.defineProperty(window, 'scrollY', { value: 1000, configurable: true });
+    Object.defineProperty(window, 'scrollY', {
+      value: 1000,
+      configurable: true,
+    });
 
     const wrapper = mountToc();
     window.dispatchEvent(new Event('scroll'));
     await wrapper.vm.$nextTick();
 
     expect(
-      wrapper.findAll('button').find((b) => b.text() === 'Sub')?.classes()
-    ).toContain('bg-orange-100');
+      wrapper
+        .findAll('button')
+        .find((b) => b.text() === 'Sub')
+        ?.classes()
+    ).toContain('bg-brand-100');
     document.body.innerHTML = '';
   });
 });

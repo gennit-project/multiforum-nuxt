@@ -50,7 +50,7 @@ const updateMinimumAge = ({ field, event }: MinimumAgeUpdate) => {
             <input
               id="account-age-gate-enabled"
               type="checkbox"
-              class="mt-0.5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+              class="text-brand-600 focus:ring-brand-500 mt-0.5 rounded border-gray-300"
               :checked="formValues?.accountAgeGateEnabled || false"
               @change="
                 updateBoolean({ field: 'accountAgeGateEnabled', event: $event })
@@ -93,7 +93,7 @@ const updateMinimumAge = ({ field, event }: MinimumAgeUpdate) => {
             <input
               id="sensitive-content-age-gate-enabled"
               type="checkbox"
-              class="mt-0.5 rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+              class="text-brand-600 focus:ring-brand-500 mt-0.5 rounded border-gray-300"
               :checked="formValues?.sensitiveContentAgeGateEnabled || false"
               @change="
                 updateBoolean({

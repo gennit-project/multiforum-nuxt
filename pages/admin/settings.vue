@@ -69,6 +69,11 @@ const formValues = ref<ServerSettingsFormValues>({
   minimumSensitiveContentAge: 18,
   pluginRegistries: [],
   featuredWikiPageIds: [],
+  serverIconURL: '',
+  brandingLogoDarkURL: '',
+  brandingLogoAlt: '',
+  brandingFaviconURL: '',
+  brandingPrimaryColor: '',
   brandingProductName: '',
   brandingDocsURL: '',
   brandingSourceURL: '',
@@ -104,6 +109,11 @@ onGetServerResult((result) => {
     minimumSensitiveContentAge: serverConfig.minimumSensitiveContentAge ?? 18,
     pluginRegistries: serverConfig.pluginRegistries || [],
     featuredWikiPageIds: serverConfig.featuredWikiPageIds || [],
+    serverIconURL: serverConfig.serverIconURL || '',
+    brandingLogoDarkURL: serverConfig.brandingLogoDarkURL || '',
+    brandingLogoAlt: serverConfig.brandingLogoAlt || '',
+    brandingFaviconURL: serverConfig.brandingFaviconURL || '',
+    brandingPrimaryColor: serverConfig.brandingPrimaryColor || '',
     brandingProductName: serverConfig.brandingProductName || '',
     brandingDocsURL: serverConfig.brandingDocsURL || '',
     brandingSourceURL: serverConfig.brandingSourceURL || '',
@@ -140,6 +150,11 @@ const serverUpdateInput = computed(() => {
     minimumSensitiveContentAge:
       formValues.value.minimumSensitiveContentAge ?? 18,
     pluginRegistries: formValues.value.pluginRegistries || [],
+    serverIconURL: formValues.value.serverIconURL || '',
+    brandingLogoDarkURL: formValues.value.brandingLogoDarkURL || '',
+    brandingLogoAlt: formValues.value.brandingLogoAlt || '',
+    brandingFaviconURL: formValues.value.brandingFaviconURL || '',
+    brandingPrimaryColor: formValues.value.brandingPrimaryColor || '',
     brandingProductName: formValues.value.brandingProductName || '',
     brandingDocsURL: formValues.value.brandingDocsURL || '',
     brandingSourceURL: formValues.value.brandingSourceURL || '',
@@ -256,6 +271,12 @@ const combinedUpdateError = computed(
 );
 
 async function submit() {
+  const hasConfiguredLogo = Boolean(
+    formValues.value.serverIconURL?.trim() ||
+    formValues.value.brandingLogoDarkURL?.trim()
+  );
+  if (hasConfiguredLogo && !formValues.value.brandingLogoAlt?.trim()) return;
+
   await updateServer({
     input: serverUpdateInput.value,
     serverName: config.serverName,

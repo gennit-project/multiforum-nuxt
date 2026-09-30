@@ -45,7 +45,11 @@ describe('ListboxButton', () => {
   it('applies the listbox trigger styling classes', () => {
     const wrapper = mountButton();
 
-    expect(wrapper.get('.listbox-button-stub').classes()).toContain('border-gray-300');
-    expect(wrapper.get('.listbox-button-stub').classes()).toContain('focus:ring-orange-500');
+    expect(wrapper.get('.listbox-button-stub').classes()).toContain(
+      'border-gray-300'
+    );
+    expect(wrapper.get('.listbox-button-stub').classes()).toContain(
+      'focus:ring-brand-500'
+    );
   });
 });

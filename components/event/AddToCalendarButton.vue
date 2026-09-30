@@ -76,7 +76,7 @@ const calendarOptions = ref([
 ]);
 
 const addToCalendarButtonClasses =
-  'bg-orange-400 hover:bg-orange-400 dark:border dark:border-orange-500 dark:bg-orange-400 dark:text-black dark:hover:bg-orange-400 focus:ring-orange-500 px-4 py-2 justify-center items-center whitespace-nowrap font-medium';
+  'bg-brand-400 hover:bg-brand-400 dark:border dark:border-brand-500 dark:bg-brand-400 dark:text-black dark:hover:bg-brand-400 focus:ring-brand-500 px-4 py-2 justify-center items-center whitespace-nowrap font-medium';
 </script>
 <template>
   <MenuButton

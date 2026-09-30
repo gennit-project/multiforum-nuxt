@@ -154,10 +154,10 @@ const sources = computed(() => [
             v-for="source in sources"
             :key="source.key"
             type="button"
-            class="flex min-h-14 flex-col items-center justify-center gap-1 rounded-md border px-3 py-2 text-xs font-medium transition-colors focus:ring-2 focus:ring-orange-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 sm:flex-row sm:gap-2 sm:rounded-full sm:text-sm"
+            class="focus:ring-brand-500 flex min-h-14 flex-col items-center justify-center gap-1 rounded-md border px-3 py-2 text-xs font-medium transition-colors focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-0 sm:flex-row sm:gap-2 sm:rounded-full sm:text-sm"
             :class="
               source.highlight
-                ? 'border-orange-500 bg-orange-50 text-orange-800 hover:bg-orange-100 dark:bg-orange-950/40 dark:text-orange-300 dark:hover:bg-orange-950/70'
+                ? 'border-brand-500 bg-brand-50 text-brand-800 hover:bg-brand-100 dark:bg-brand-950/40 dark:text-brand-300 dark:hover:bg-brand-950/70'
                 : 'border-gray-300 bg-white text-gray-800 hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700'
             "
             :data-testid="`album-source-${source.key}`"
@@ -172,7 +172,11 @@ const sources = computed(() => [
               stroke="currentColor"
               aria-hidden="true"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" :d="source.icon" />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                :d="source.icon"
+              />
             </svg>
             {{ source.compactTitle }}
           </button>
@@ -193,11 +197,7 @@ const sources = computed(() => [
         class="mb-3 text-xs text-amber-800 dark:text-amber-200"
       >
         {{ fileUploadUnavailableMessage }}
-        <NuxtLink
-          v-if="setupUrl"
-          :to="setupUrl"
-          class="font-medium underline"
-        >
+        <NuxtLink v-if="setupUrl" :to="setupUrl" class="font-medium underline">
           Open instance setup
         </NuxtLink>
       </p>
@@ -207,28 +207,34 @@ const sources = computed(() => [
           v-for="source in sources"
           :key="source.key"
           type="button"
-          class="flex min-h-14 items-center gap-3 rounded-xl border bg-white p-3 text-left transition-colors focus:ring-2 focus:ring-orange-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:flex-col sm:items-start sm:gap-1.5 sm:p-4 dark:bg-gray-800"
+          class="focus:ring-brand-500 flex min-h-14 items-center gap-3 rounded-xl border bg-white p-3 text-left transition-colors focus:ring-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:flex-col sm:items-start sm:gap-1.5 sm:p-4 dark:bg-gray-800"
           :class="
             source.highlight
-              ? 'border-2 border-orange-500 hover:bg-orange-50 dark:hover:bg-orange-950/30'
-              : 'border-gray-300 hover:border-orange-400 hover:bg-orange-50 dark:border-gray-600 dark:hover:bg-gray-700'
+              ? 'border-brand-500 hover:bg-brand-50 dark:hover:bg-brand-950/30 border-2'
+              : 'hover:border-brand-400 hover:bg-brand-50 border-gray-300 dark:border-gray-600 dark:hover:bg-gray-700'
           "
           :data-testid="`album-source-${source.key}`"
           :disabled="source.disabled"
           @click="source.onClick"
         >
           <svg
-            class="h-6 w-6 shrink-0 text-orange-600 dark:text-orange-400"
+            class="text-brand-600 dark:text-brand-400 h-6 w-6 shrink-0"
             fill="none"
             viewBox="0 0 24 24"
             stroke-width="1.5"
             stroke="currentColor"
             aria-hidden="true"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" :d="source.icon" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              :d="source.icon"
+            />
           </svg>
           <span class="min-w-0 flex-1 sm:flex-none">
-            <span class="block text-[15px] font-medium text-gray-900 dark:text-white">
+            <span
+              class="block text-[15px] font-medium text-gray-900 dark:text-white"
+            >
               {{ source.title }}
             </span>
             <span class="block text-xs text-gray-600 dark:text-gray-300">
@@ -244,7 +250,11 @@ const sources = computed(() => [
             stroke="currentColor"
             aria-hidden="true"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="m8.25 4.5 7.5 7.5-7.5 7.5"
+            />
           </svg>
         </button>
       </div>
@@ -261,7 +271,7 @@ const sources = computed(() => [
         <div class="mt-3 flex flex-wrap gap-2">
           <button
             type="button"
-            class="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            class="focus:ring-brand-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
             data-testid="album-browse-favorites"
             @click="handleShowExistingPicker('favorites')"
           >
@@ -269,7 +279,7 @@ const sources = computed(() => [
           </button>
           <button
             type="button"
-            class="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 focus:ring-2 focus:ring-orange-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            class="focus:ring-brand-500 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 focus:ring-2 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
             data-testid="album-browse-collections"
             @click="handleShowExistingPicker('collections')"
           >
@@ -288,11 +298,11 @@ const sources = computed(() => [
       class="hidden"
       :disabled="!fileUploadAvailable"
       @change="handleFileInputChange"
-    >
+    />
   </div>
   <div
     v-else
-    class="bg-gray-50 my-3 rounded-md border-2 border-dotted border-gray-300 p-4 text-center opacity-70 dark:bg-gray-800"
+    class="my-3 rounded-md border-2 border-dotted border-gray-300 bg-gray-50 p-4 text-center opacity-70 dark:bg-gray-800"
   >
     <p class="text-sm text-gray-500 dark:text-gray-400">
       Maximum limit of {{ maxImages }} images reached

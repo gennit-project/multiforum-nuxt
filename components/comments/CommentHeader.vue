@@ -289,7 +289,7 @@ const isSticky = computed(
               >
               <span
                 v-if="isServerMod"
-                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                class="border-brand-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Server Mod</span
               >
               <span
@@ -299,7 +299,7 @@ const isSticky = computed(
               >
               <span
                 v-if="isForumMod"
-                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                class="border-brand-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Forum Mod</span
               >
               <span
@@ -326,7 +326,7 @@ const isSticky = computed(
               >
               <span
                 v-if="isServerMod"
-                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                class="border-brand-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Server Mod</span
               >
               <span
@@ -336,7 +336,7 @@ const isSticky = computed(
               >
               <span
                 v-if="isForumMod"
-                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                class="border-brand-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Forum Mod</span
               >
             </span>
@@ -366,13 +366,13 @@ const isSticky = computed(
           </span>
           <span
             v-if="isHighlighted"
-            class="rounded-lg bg-orange-500 px-2 py-1 text-black"
+            class="bg-brand-500 rounded-lg px-2 py-1 text-black"
           >
             Permalinked
           </span>
           <span
             v-if="label"
-            class="rounded-lg border border-orange-500 bg-orange-100 px-2 py-1 text-orange-600 dark:bg-orange-900 dark:text-orange-300"
+            class="border-brand-500 bg-brand-100 text-brand-600 dark:bg-brand-900 dark:text-brand-300 rounded-lg border px-2 py-1"
           >
             {{ label }}
           </span>

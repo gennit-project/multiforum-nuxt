@@ -90,7 +90,9 @@ const toggleDayOfWeek = (day: number) => {
       (a, b) => a - b
     );
   } else {
-    selectedDaysOfWeek.value = selectedDaysOfWeek.value.filter((d) => d !== day);
+    selectedDaysOfWeek.value = selectedDaysOfWeek.value.filter(
+      (d) => d !== day
+    );
   }
 };
 
@@ -127,7 +129,9 @@ if (!props.pattern) {
   <div class="space-y-4">
     <!-- Frequency Type -->
     <div>
-      <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label
+        class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+      >
         Repeat
       </label>
       <div
@@ -141,7 +145,7 @@ if (!props.pattern) {
           :class="[
             'cursor-pointer rounded-md border px-3 py-2 text-sm transition-colors',
             patternType === option.value
-              ? 'border-orange-500 bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300'
+              ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-900/30 dark:text-brand-300'
               : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:hover:border-gray-600',
           ]"
           :data-testid="`repeat-type-${option.value.toLowerCase()}`"
@@ -153,7 +157,7 @@ if (!props.pattern) {
             :checked="patternType === option.value"
             class="sr-only"
             @change="patternType = option.value"
-          >
+          />
           {{ option.label }}
         </label>
       </div>
@@ -175,7 +179,7 @@ if (!props.pattern) {
         max="99"
         class="w-16 rounded-md border border-gray-200 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
         data-testid="interval-count"
-      >
+      />
       <span class="text-sm text-gray-700 dark:text-gray-300">
         {{ intervalLabel }}
       </span>
@@ -183,7 +187,9 @@ if (!props.pattern) {
 
     <!-- Days of Week (for weekly patterns) -->
     <div v-if="patternType === 'WEEKLY'">
-      <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label
+        class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+      >
         On these days
       </label>
       <div class="flex gap-1" role="group" aria-label="Days of week">
@@ -194,7 +200,7 @@ if (!props.pattern) {
           :class="[
             'flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors',
             selectedDaysOfWeek.includes(day.value)
-              ? 'bg-orange-500 text-white'
+              ? 'bg-brand-500 text-white'
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
           ]"
           :aria-pressed="selectedDaysOfWeek.includes(day.value)"
@@ -215,7 +221,9 @@ if (!props.pattern) {
 
     <!-- End Condition -->
     <div>
-      <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label
+        class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+      >
         Ends
       </label>
       <div class="space-y-2">
@@ -228,7 +236,7 @@ if (!props.pattern) {
             :class="[
               'flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors',
               endType === option.value
-                ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/30'
+                ? 'border-brand-500 bg-brand-50 dark:bg-brand-900/30'
                 : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600',
             ]"
             :data-testid="`end-type-${option.value.toLowerCase()}`"
@@ -240,14 +248,16 @@ if (!props.pattern) {
               :checked="endType === option.value"
               class="sr-only"
               @change="endType = option.value"
-            >
+            />
             <span class="text-gray-700 dark:text-gray-300">
               {{ option.label }}
             </span>
           </label>
 
           <!-- After N occurrences -->
-          <template v-if="option.value === 'AFTER_COUNT' && endType === 'AFTER_COUNT'">
+          <template
+            v-if="option.value === 'AFTER_COUNT' && endType === 'AFTER_COUNT'"
+          >
             <input
               v-model.number="endCount"
               type="number"
@@ -255,7 +265,7 @@ if (!props.pattern) {
               max="100"
               class="w-16 rounded-md border border-gray-200 px-2 py-1 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               data-testid="end-count"
-            >
+            />
             <span class="text-sm text-gray-700 dark:text-gray-300">
               occurrences
             </span>
@@ -281,7 +291,9 @@ if (!props.pattern) {
       <p class="font-medium text-gray-700 dark:text-gray-300">Preview</p>
       <p class="mt-1">
         Repeats every {{ intervalCount }} {{ intervalLabel }}
-        <template v-if="patternType === 'WEEKLY' && selectedDaysOfWeek.length > 0">
+        <template
+          v-if="patternType === 'WEEKLY' && selectedDaysOfWeek.length > 0"
+        >
           on
           {{
             selectedDaysOfWeek
@@ -295,9 +307,7 @@ if (!props.pattern) {
         <template v-else-if="endType === 'ON_DATE' && endDate">
           until {{ new Date(endDate).toLocaleDateString() }}
         </template>
-        <template v-else-if="endType === 'NEVER'">
-          (ongoing)
-        </template>
+        <template v-else-if="endType === 'NEVER'"> (ongoing) </template>
       </p>
     </div>
   </div>

@@ -26,12 +26,12 @@ const toggleShowOnlyFree = () => {
             id="free-checkbox"
             type="checkbox"
             :data-testid="'free-checkbox'"
-            class="mr-1 h-4 w-4 rounded border border-gray-400 text-orange-600 focus:ring-orange-500"
+            class="text-brand-600 focus:ring-brand-500 mr-1 h-4 w-4 rounded border border-gray-400"
             :checked="copyOfShowOnlyFree"
             @input="() => toggleShowOnlyFree()"
-          >
+          />
           <span
-            class="ml-2 whitespace-nowrap text-sm font-medium dark:text-white"
+            class="ml-2 text-sm font-medium whitespace-nowrap dark:text-white"
             >Show only free events</span
           >
         </label>

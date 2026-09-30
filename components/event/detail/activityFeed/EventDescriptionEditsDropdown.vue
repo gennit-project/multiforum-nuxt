@@ -227,7 +227,7 @@ onUnmounted(() => {
                 {{ timeAgo(new Date(edit.createdAt)) }}
                 <span
                   v-if="edit === allEdits[0]"
-                  class="ml-1 text-orange-600 dark:text-orange-400"
+                  class="text-brand-600 dark:text-brand-400 ml-1"
                 >
                   Most recent
                 </span>
