@@ -129,7 +129,8 @@ const addSelected = () => {
             leave-to="translate-y-8 opacity-0 sm:translate-y-0 sm:scale-95"
           >
             <DialogPanel
-              class="flex h-[86vh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl sm:h-auto sm:max-h-[85vh] sm:max-w-3xl sm:rounded-xl dark:bg-gray-800"
+              class="flex h-[86vh] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl sm:h-[min(42rem,85vh)] sm:max-w-3xl sm:rounded-xl dark:bg-gray-800"
+              data-testid="album-library-panel"
             >
               <div
                 class="mx-auto mt-2 h-1 w-9 rounded-full bg-gray-300 sm:hidden dark:bg-gray-600"

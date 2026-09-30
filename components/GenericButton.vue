@@ -26,6 +26,7 @@ withDefaults(
         active && !disabled,
       'bg-white text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600':
         !active && !disabled,
+      'cursor-pointer': !disabled,
       'cursor-default bg-gray-200 text-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-500':
         disabled,
     }"

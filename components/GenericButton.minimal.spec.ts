@@ -66,6 +66,14 @@ describe('GenericButton Component - Minimal Tests', () => {
     expect(wrapper.html()).toContain('mock-spinner');
   });
 
+  it('should show the pointer cursor when enabled', async () => {
+    const GenericButton = await import('@/components/GenericButton.vue').then(
+      (m) => m.default
+    );
+    const wrapper = mount(GenericButton, { props: { text: 'Edit' } });
+    expect(wrapper.classes()).toContain('cursor-pointer');
+  });
+
   it('should support slot content', async () => {
     const GenericButton = await import('@/components/GenericButton.vue').then(
       (m) => m.default

@@ -39,7 +39,7 @@ const emit = defineEmits<{
   (e: 'delete' | 'move-up' | 'move-down'): void;
 }>();
 
-// Attribution and the image URL are rarely edited, so they start collapsed.
+// Attribution is rarely edited, so it starts collapsed.
 const showMore = ref(false);
 const moreId = useId();
 
@@ -163,7 +163,7 @@ const getUploaderLabel = (image: ImageData) => {
         </span>
         <button
           type="button"
-          class="inline-flex items-center gap-1 font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+          class="inline-flex cursor-pointer items-center gap-1 font-medium text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
           :aria-expanded="showMore"
           :aria-controls="moreId"
           @click="showMore = !showMore"
@@ -172,7 +172,7 @@ const getUploaderLabel = (image: ImageData) => {
             class="h-3 w-3 transition-transform"
             :class="showMore ? 'rotate-180' : ''"
           />
-          {{ showMore ? 'Less' : 'More: attribution, URL' }}
+          {{ showMore ? 'Hide attribution' : 'Attribution' }}
         </button>
         <span
           v-if="getUploaderLabel(image)"
@@ -193,14 +193,6 @@ const getUploaderLabel = (image: ImageData) => {
           placeholder="Who took this photo? (optional)"
           :full-width="true"
           @update="(val) => emit('update-field', 'copyright', val)"
-        />
-        <TextInput
-          :value="image.url"
-          label="Image URL"
-          :aria-label="`Image URL for image ${imageNumber}`"
-          placeholder="https://example.com/my-image.jpg"
-          :full-width="true"
-          @update="(val) => emit('update-field', 'url', val)"
         />
       </div>
     </div>

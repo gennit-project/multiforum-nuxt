@@ -16,6 +16,7 @@ import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.
 import AppImage from '@/components/image/AppImage.vue';
 import ModelPreviewTile from '@/components/image/ModelPreviewTile.vue';
 import ImageCaption from '@/components/image/ImageCaption.vue';
+import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
 import {
   hasGlbExtension,
   hasStlExtension,
@@ -136,6 +137,11 @@ const orderedImages = computed(() => {
 
 const activeImage = computed(() => {
   return orderedImages.value[activeIndex.value] || null;
+});
+
+const activeFavoriteImage = computed(() => {
+  const image = activeImage.value as (Image & { isStlFile?: boolean }) | null;
+  return image?.id && !image.isStlFile ? image : null;
 });
 
 const mainImageWidth = computed(() => (props.expandedView ? 600 : 384));
@@ -468,10 +474,26 @@ onMounted(() => {
               @touchstart="handleTouchStart"
               @touchend="handleTouchEnd"
             >
-              <div class="pointer-events-none absolute top-2 left-2 z-10">
-                <span class="rounded bg-black/60 px-2 py-1 text-xs text-white">
+              <div
+                class="absolute top-2 left-2 z-10 flex items-center gap-2"
+              >
+                <span
+                  class="pointer-events-none rounded bg-black/60 px-2 py-1 text-xs text-white"
+                >
                   {{ `${activeIndex + 1} of ${orderedImages.length}` }}
                 </span>
+                <div v-if="activeFavoriteImage" @click.stop>
+                  <AddImageToFavorites
+                    :image-id="activeFavoriteImage.id"
+                    :image-title="
+                      activeFavoriteImage.caption ||
+                      activeFavoriteImage.alt ||
+                      'Image'
+                    "
+                    overlay-style
+                    size="small"
+                  />
+                </div>
               </div>
               <div
                 v-if="orderedImages.length > 1"

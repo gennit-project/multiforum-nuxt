@@ -158,6 +158,24 @@ describe('user image detail page', () => {
     );
   });
 
+  it('renders a legacy image that has no uploader relationship', async () => {
+    const wrapper = await mountWith({
+      id: 'img1',
+      url: 'https://img.test/legacy.jpg',
+      Uploader: null,
+    });
+    expect(wrapper.get('h1').text()).toBe('Image details');
+  });
+
+  it('does not create a profile link for an image without an uploader', async () => {
+    const wrapper = await mountWith({
+      id: 'img1',
+      url: 'https://img.test/legacy.jpg',
+      Uploader: null,
+    });
+    expect(wrapper.text()).toContain('Uploader unavailable');
+  });
+
   it('does not show albums containing the image', async () => {
     const wrapper = await mountWith({
       ...baseImage,

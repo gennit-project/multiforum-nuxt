@@ -26,6 +26,10 @@ const props = defineProps({
     type: String,
     default: 'medium',
   },
+  overlayStyle: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const GET_USER_FAVORITE_IMAGE = gql`
@@ -93,6 +97,7 @@ const displayName = computed(() => {
     entity-type="image"
     :size="size"
     :item-id="imageId"
+    :overlay-style="overlayStyle"
     @toggle="handleToggleFavorite"
   />
 </template>

@@ -86,9 +86,9 @@ describe('AddToFavoritesButton', () => {
 
 describe('AddToFavoritesButton sizing', () => {
   it.each([
-    ['small', 'h-4 w-4'],
-    ['large', 'h-6 w-6'],
-    ['medium', 'h-5 w-5'],
+    ['small', 'h-5 w-5'],
+    ['large', 'h-7 w-7'],
+    ['medium', 'h-6 w-6'],
   ])('renders the %s icon size', (size, expected) => {
     const wrapper = mountButton({ size });
     expect(wrapper.get('svg').classes().join(' ')).toContain(expected);
@@ -96,7 +96,22 @@ describe('AddToFavoritesButton sizing', () => {
 
   it('defaults to the medium icon size', () => {
     const wrapper = mountButton();
-    expect(wrapper.get('svg').classes().join(' ')).toContain('h-5 w-5');
+    expect(wrapper.get('svg').classes().join(' ')).toContain('h-6 w-6');
+  });
+
+  it('uses the pointer cursor without a padded hover background', () => {
+    const classes = mountButton().get('[aria-label]').classes();
+    expect({
+      usesPointer: classes.includes('cursor-pointer'),
+      hasPadding: classes.some((name) => /^p-\d/.test(name)),
+      highlightsBackground: classes.some((name) =>
+        name.startsWith('hover:bg-')
+      ),
+    }).toEqual({
+      usesPointer: true,
+      hasPadding: false,
+      highlightsBackground: false,
+    });
   });
 });
 

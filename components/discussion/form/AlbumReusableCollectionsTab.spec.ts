@@ -94,6 +94,17 @@ const loadMoreButton = (wrapper: ReturnType<typeof mountTab>) =>
 
 beforeEach(() => {
   usernameRef.value = 'alice';
+  falseRef.value = false;
+  collectionsResult.value = {
+    users: [
+      {
+        Collections: [
+          { id: 'c1', name: 'Inspiration', itemCount: 3 },
+          { id: 'c2', name: 'Memes', itemCount: 1 },
+        ],
+      },
+    ],
+  };
   fetchMore.mockClear();
 });
 
@@ -111,6 +122,17 @@ describe('AlbumReusableCollectionsTab', () => {
     expect(collectionButtons(wrapper).map((b) => b.text())).toEqual([
       expect.stringContaining('Memes'),
     ]);
+  });
+
+  it('shows collection-row skeletons while the first page loads', () => {
+    falseRef.value = true;
+    collectionsResult.value = { users: [{ Collections: [] }] };
+
+    expect(
+      mountTab()
+        .get('[data-testid="reusable-collection-skeletons"]')
+        .findAll('[aria-hidden="true"]')
+    ).toHaveLength(6);
   });
 
   it('shows the selected collection images in the grid after choosing a collection', async () => {
