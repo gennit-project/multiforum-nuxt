@@ -1,8 +1,9 @@
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import type { Album, Image } from '@/__generated__/graphql';
 import { normalizeImageOrder } from '@/utils/albumImageOrder';
+import { getRemovedAlbumImageIds } from '@/utils/albumImageDisconnections';
 
 type AlbumFormData = {
   images: {
@@ -30,7 +31,7 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
 
   // GraphQL Mutation
   const { mutate: updateDiscussion, error: updateDiscussionError } =
-    useMutation(UPDATE_DISCUSSION);
+    useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS);
 
   // Auto-save state
   const isAutoSaving = ref(false);
@@ -178,6 +179,10 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
       autoSaveSuccess.value = false;
 
       const albumUpdateInput = getAlbumUpdateInput();
+      const albumImageDisconnections = getRemovedAlbumImageIds({
+        existingImages: existingAlbum?.Images,
+        currentImages: getAlbumData().images,
+      });
 
       if (Object.keys(albumUpdateInput).length === 0) {
         return;
@@ -186,6 +191,7 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
       await updateDiscussion({
         where: { id: discussionId },
         updateDiscussionInput: albumUpdateInput,
+        albumImageDisconnections,
       });
 
       autoSaveSuccess.value = true;

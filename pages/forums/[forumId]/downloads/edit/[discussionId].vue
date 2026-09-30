@@ -28,6 +28,7 @@ import type {
 import { useModProfileName } from '@/composables/useAuthState';
 import { resolveSelectedLabelOptionIds } from '@/utils/downloadLabelUtils';
 import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
+import { getRemovedAlbumImageIds } from '@/utils/albumImageDisconnections';
 import { buildDiscussionEditFormValues } from '@/utils/discussionEditForm';
 import {
   extractDownloadLabels,
@@ -323,6 +324,13 @@ const channelConnections = computed(() => {
   return formValues.value.selectedChannels;
 });
 
+const albumImageDisconnections = computed(() =>
+  getRemovedAlbumImageIds({
+    existingImages: discussion.value?.Album?.Images,
+    currentImages: formValues.value.album?.images,
+  })
+);
+
 const {
   mutate: updateDiscussion,
   error: updateDiscussionError,
@@ -340,6 +348,7 @@ const {
     }).map((dc) => {
       return dc.Channel?.uniqueName;
     }),
+    albumImageDisconnections: albumImageDisconnections.value,
   },
 }));
 
