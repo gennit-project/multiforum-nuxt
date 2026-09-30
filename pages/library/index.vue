@@ -317,19 +317,26 @@ const handleRemoved = (item: LibraryFavoriteItem) => {
           class="grid h-24 w-24 shrink-0 grid-cols-2 overflow-hidden rounded-xl border border-gray-200 bg-gray-100 shadow-sm dark:border-gray-700 dark:bg-gray-800"
           aria-hidden="true"
         >
-          <template v-if="coverImages.length">
-            <img
-              v-for="(url, index) in coverImages"
-              :key="`${url}-${index}`"
-              :src="url"
-              alt=""
-              class="h-full min-h-0 w-full object-cover"
+          <ClientOnly>
+            <template v-if="coverImages.length">
+              <img
+                v-for="(url, index) in coverImages"
+                :key="`${url}-${index}`"
+                :src="url"
+                alt=""
+                class="h-full min-h-0 w-full object-cover"
+              />
+            </template>
+            <BookmarkIcon
+              v-else
+              class="text-brand-500 col-span-2 m-auto h-10 w-10"
             />
-          </template>
-          <BookmarkIcon
-            v-else
-            class="text-brand-500 col-span-2 m-auto h-10 w-10"
-          />
+            <template #fallback>
+              <BookmarkIcon
+                class="text-brand-500 col-span-2 m-auto h-10 w-10"
+              />
+            </template>
+          </ClientOnly>
         </div>
         <div class="min-w-0">
           <p
@@ -391,70 +398,96 @@ const handleRemoved = (item: LibraryFavoriteItem) => {
       </button>
     </div>
 
-    <ErrorBanner v-if="error" class="mt-5" :text="error.message" />
+    <ClientOnly>
+      <ErrorBanner v-if="error" class="mt-5" :text="error.message" />
 
-    <div
-      v-if="loading && allItems.length === 0"
-      class="mt-5 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
-      role="status"
-      aria-label="Loading favorite items"
-    >
-      <span class="sr-only">Loading favorite items…</span>
       <div
-        v-for="index in 7"
-        :key="index"
-        class="flex animate-pulse items-center gap-3 border-b border-gray-200 px-4 py-3 last:border-b-0 dark:border-gray-800"
-        aria-hidden="true"
+        v-if="loading && allItems.length === 0"
+        class="mt-5 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+        role="status"
+        aria-label="Loading favorite items"
       >
-        <div class="h-14 w-14 rounded-lg bg-gray-200 dark:bg-gray-800" />
-        <div class="flex-1 space-y-2">
-          <div class="h-4 w-2/5 rounded bg-gray-200 dark:bg-gray-800" />
-          <div class="h-3 w-3/5 rounded bg-gray-100 dark:bg-gray-800/70" />
+        <span class="sr-only">Loading favorite items…</span>
+        <div
+          v-for="index in 7"
+          :key="index"
+          class="flex animate-pulse items-center gap-3 border-b border-gray-200 px-4 py-3 last:border-b-0 dark:border-gray-800"
+          aria-hidden="true"
+        >
+          <div class="h-14 w-14 rounded-lg bg-gray-200 dark:bg-gray-800" />
+          <div class="flex-1 space-y-2">
+            <div class="h-4 w-2/5 rounded bg-gray-200 dark:bg-gray-800" />
+            <div class="h-3 w-3/5 rounded bg-gray-100 dark:bg-gray-800/70" />
+          </div>
         </div>
       </div>
-    </div>
 
-    <div
-      v-else-if="filteredItems.length"
-      class="mt-5 overflow-visible rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950/40"
-    >
       <div
-        class="hidden grid-cols-[3.5rem_minmax(0,1.25fr)_8rem_13rem_5.5rem_2.75rem] gap-3 border-b border-gray-200 px-4 py-2 text-[11px] font-semibold tracking-[0.08em] text-gray-500 uppercase sm:grid dark:border-gray-800 dark:text-gray-400"
+        v-else-if="filteredItems.length"
+        class="mt-5 overflow-visible rounded-xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950/40"
       >
-        <span aria-hidden="true" />
-        <span>Title</span>
-        <span>Type</span>
-        <span>Source</span>
-        <span>Published</span>
-        <span class="sr-only">Actions</span>
+        <div
+          class="hidden grid-cols-[3.5rem_minmax(0,1.25fr)_8rem_13rem_5.5rem_2.75rem] gap-3 border-b border-gray-200 px-4 py-2 text-[11px] font-semibold tracking-[0.08em] text-gray-500 uppercase sm:grid dark:border-gray-800 dark:text-gray-400"
+        >
+          <span aria-hidden="true" />
+          <span>Title</span>
+          <span>Type</span>
+          <span>Source</span>
+          <span>Published</span>
+          <span class="sr-only">Actions</span>
+        </div>
+        <LibraryFavoriteRow
+          v-for="item in filteredItems"
+          :key="`${item.kind}-${item.id}`"
+          :item="item"
+          @removed="handleRemoved(item)"
+        />
       </div>
-      <LibraryFavoriteRow
-        v-for="item in filteredItems"
-        :key="`${item.kind}-${item.id}`"
-        :item="item"
-        @removed="handleRemoved(item)"
-      />
-    </div>
 
-    <div
-      v-else-if="!loading"
-      class="mt-5 rounded-xl border border-dashed border-gray-300 px-5 py-14 text-center dark:border-gray-700"
-    >
-      <BookmarkIcon class="mx-auto h-9 w-9 text-gray-400" />
-      <h2 class="mt-3 font-semibold text-gray-900 dark:text-white">
-        {{
-          allItems.length
-            ? 'No favorites match these filters'
-            : 'No favorites yet'
-        }}
-      </h2>
-      <p class="mx-auto mt-1 max-w-md text-sm text-gray-500 dark:text-gray-400">
-        {{
-          allItems.length
-            ? 'Try another content type or search term.'
-            : 'Save discussions, images, comments, downloads, or forums and they will appear together here.'
-        }}
-      </p>
-    </div>
+      <div
+        v-else-if="!loading"
+        class="mt-5 rounded-xl border border-dashed border-gray-300 px-5 py-14 text-center dark:border-gray-700"
+      >
+        <BookmarkIcon class="mx-auto h-9 w-9 text-gray-400" />
+        <h2 class="mt-3 font-semibold text-gray-900 dark:text-white">
+          {{
+            allItems.length
+              ? 'No favorites match these filters'
+              : 'No favorites yet'
+          }}
+        </h2>
+        <p
+          class="mx-auto mt-1 max-w-md text-sm text-gray-500 dark:text-gray-400"
+        >
+          {{
+            allItems.length
+              ? 'Try another content type or search term.'
+              : 'Save discussions, images, comments, downloads, or forums and they will appear together here.'
+          }}
+        </p>
+      </div>
+
+      <template #fallback>
+        <div
+          class="mt-5 overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800"
+          role="status"
+          aria-label="Loading favorite items"
+        >
+          <span class="sr-only">Loading favorite items…</span>
+          <div
+            v-for="index in 7"
+            :key="index"
+            class="flex animate-pulse items-center gap-3 border-b border-gray-200 px-4 py-3 last:border-b-0 dark:border-gray-800"
+            aria-hidden="true"
+          >
+            <div class="h-14 w-14 rounded-lg bg-gray-200 dark:bg-gray-800" />
+            <div class="flex-1 space-y-2">
+              <div class="h-4 w-2/5 rounded bg-gray-200 dark:bg-gray-800" />
+              <div class="h-3 w-3/5 rounded bg-gray-100 dark:bg-gray-800/70" />
+            </div>
+          </div>
+        </div>
+      </template>
+    </ClientOnly>
   </section>
 </template>

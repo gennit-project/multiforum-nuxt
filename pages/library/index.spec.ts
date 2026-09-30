@@ -107,6 +107,7 @@ const mountPage = async () => {
     global: {
       stubs: {
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
+        ClientOnly: { template: '<div><slot /></div>' },
         BookmarkIcon: true,
         ErrorBanner: true,
         LibraryFavoriteRow: true,

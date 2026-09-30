@@ -5,7 +5,6 @@ import LibraryPage from './library.vue';
 
 const h = vi.hoisted(() => ({
   counts: null as unknown as { value: unknown },
-  downloads: null as unknown as { value: unknown },
   owned: null as unknown as { value: unknown },
   uploaded: null as unknown as { value: unknown },
   collections: null as unknown as { value: unknown },
@@ -26,11 +25,10 @@ vi.mock('nuxt/app', async () => {
 vi.mock('@vue/apollo-composable', async () => {
   const { ref } = await import('vue');
   h.counts = ref(null);
-  h.downloads = ref(null);
   h.owned = ref(null);
   h.uploaded = ref(null);
   h.collections = ref(null);
-  const order = [h.counts, h.downloads, h.owned, h.uploaded, h.collections];
+  const order = [h.counts, h.owned, h.uploaded, h.collections];
   return {
     useQuery: (
       _document: unknown,
@@ -84,15 +82,15 @@ const setData = (
   h.counts.value = {
     users: [
       {
-        FavoriteChannelsAggregate: { count: params.channels || 0 },
-        FavoriteDiscussionsAggregate: { count: params.discussions || 0 },
-        FavoriteImagesAggregate: { count: params.images || 0 },
-        FavoriteCommentsAggregate: { count: params.comments || 0 },
+        FavoriteChannelsConnection: { totalCount: params.channels || 0 },
+        FavoriteDiscussionsConnection: {
+          totalCount: params.discussions || 0,
+        },
+        FavoriteImagesConnection: { totalCount: params.images || 0 },
+        FavoriteCommentsConnection: { totalCount: params.comments || 0 },
+        FavoriteDownloadsConnection: { totalCount: params.downloads || 0 },
       },
     ],
-  };
-  h.downloads.value = {
-    users: [{ FavoriteDiscussionsAggregate: { count: params.downloads || 0 } }],
   };
   h.owned.value = {
     users: [{ OwnedDownloadsAggregate: { count: params.ownedDownloads || 0 } }],
@@ -119,7 +117,6 @@ beforeEach(() => {
   h.route.path = '/library';
   h.route.params = {};
   h.counts.value = null;
-  h.downloads.value = null;
   h.owned.value = null;
   h.uploaded.value = null;
   h.collections.value = null;
@@ -283,7 +280,7 @@ describe('Library page', () => {
     setData();
     mountLibrary();
     expect(h.queryInputs).toEqual(
-      Array.from({ length: 5 }, () => [
+      Array.from({ length: 4 }, () => [
         { username: 'alice' },
         { enabled: true, fetchPolicy: 'cache-and-network' },
       ])
@@ -296,7 +293,7 @@ describe('Library page', () => {
     h.username.value = 'bob';
     await wrapper.vm.$nextTick();
     expect(h.refetches.map((refetch) => refetch.mock.calls.length)).toEqual([
-      1, 1, 1, 1, 1,
+      1, 1, 1, 1,
     ]);
   });
 });
