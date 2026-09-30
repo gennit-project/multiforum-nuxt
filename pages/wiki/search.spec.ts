@@ -3,6 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
+import WikiPagePinButton from '@/components/wiki/WikiPagePinButton.vue';
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ query: {}, params: {} }),
@@ -22,22 +23,30 @@ vi.mock('@/utils/getDiscussionFilterValuesFromParams', () => ({
 }));
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
+const refetchWikiPinChannels = vi.fn();
 
 const mountWith = async (
   wikiPages: unknown[],
-  featuredWikiPages: unknown[] = []
+  featuredWikiPages: unknown[] = [],
+  channels: unknown[] = []
 ) => {
-  mockedUseQuery.mockReturnValue({
-    result: ref({
-      getSiteWideWikiList: {
-        wikiPages,
-        featuredWikiPages,
-        aggregateWikiPageCount: wikiPages.length,
-      },
-    }),
-    loading: ref(false),
-    error: ref(null),
-  });
+  mockedUseQuery.mockReset();
+  mockedUseQuery
+    .mockReturnValueOnce({
+      result: ref({
+        getSiteWideWikiList: {
+          wikiPages,
+          featuredWikiPages,
+          aggregateWikiPageCount: wikiPages.length,
+        },
+      }),
+      loading: ref(false),
+      error: ref(null),
+    })
+    .mockReturnValueOnce({
+      result: ref({ channels }),
+      refetch: refetchWikiPinChannels,
+    });
   const Page = (await import('./search.vue')).default;
   return shallowMount(Page, {
     global: { stubs: { NuxtLayout: { template: '<div><slot /></div>' } } },
@@ -126,5 +135,47 @@ describe('wiki search page', () => {
     expect(wrapper.findComponent(HighlightedSearchTerms).props('text')).toBe(
       'Cat Care'
     );
+  });
+
+  it('offers the existing pin control for a result with forum data', async () => {
+    const wrapper = await mountWith(
+      [
+        {
+          id: 'w1',
+          title: 'Cats',
+          slug: 'cats',
+          channelUniqueName: 'cats',
+          body: 'hi',
+        },
+      ],
+      [],
+      [{ uniqueName: 'cats', PinnedWikiPages: [] }]
+    );
+
+    expect(wrapper.findComponent(WikiPagePinButton).props()).toMatchObject({
+      channelUniqueName: 'cats',
+      wikiPage: expect.objectContaining({ id: 'w1' }),
+    });
+  });
+
+  it('refreshes forum pin data after a pin changes', async () => {
+    refetchWikiPinChannels.mockClear();
+    const wrapper = await mountWith(
+      [
+        {
+          id: 'w1',
+          title: 'Cats',
+          slug: 'cats',
+          channelUniqueName: 'cats',
+          body: 'hi',
+        },
+      ],
+      [],
+      [{ uniqueName: 'cats', PinnedWikiPages: [] }]
+    );
+
+    wrapper.findComponent(WikiPagePinButton).vm.$emit('pinnedChanged');
+
+    expect(refetchWikiPinChannels).toHaveBeenCalledOnce();
   });
 });

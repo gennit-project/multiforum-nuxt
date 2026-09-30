@@ -44,6 +44,31 @@ export const GET_SITE_WIDE_WIKI_LIST = gql`
   }
 `;
 
+export const GET_WIKI_PIN_CHANNELS = gql`
+  query getWikiPinChannels($uniqueNames: [String!]!) {
+    channels(where: { uniqueName_IN: $uniqueNames }) {
+      uniqueName
+      Admins {
+        username
+      }
+      SuspendedUsers {
+        username
+      }
+      DefaultChannelRole {
+        canUpdateChannel
+      }
+      ElevatedChannelRole {
+        canUpdateChannel
+      }
+      PinnedWikiPages {
+        id
+        title
+        slug
+      }
+    }
+  }
+`;
+
 export const GET_WIKI_PAGES_BY_IDS = gql`
   query getWikiPagesByIds($ids: [ID!]!) {
     wikiPages(where: { id_IN: $ids }) {
