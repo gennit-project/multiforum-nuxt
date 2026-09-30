@@ -184,7 +184,7 @@ const getBaseMocks = (username: string) => ({
                 displayName: 'Zoe',
                 profilePicURL: '',
               },
-              Album: null,
+              Albums: [],
             },
           ],
           FavoriteComments: [],
