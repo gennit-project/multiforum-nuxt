@@ -64,13 +64,12 @@ const props = defineProps<{
   channelName: string;
   ownerUsername?: string;
   uploaderUsername?: string;
+  eventType?: string;
 }>();
 
 const {
-  applicablePipelines,
-  attempts,
-  hasPipelineContent,
-  hasActiveAttempt,
+  applicablePipelines: allApplicablePipelines,
+  attempts: allAttempts,
   isPolling,
   loading,
   error,
@@ -79,6 +78,26 @@ const {
   toRef(props, 'fileId'),
   toRef(props, 'discussionId'),
   toRef(props, 'channelName')
+);
+
+// Scope this view without changing the overview shared with download activity.
+const applicablePipelines = computed(() =>
+  allApplicablePipelines.value.filter(
+    (pipeline) => !props.eventType || pipeline.eventType === props.eventType
+  )
+);
+const attempts = computed(() =>
+  allAttempts.value.filter(
+    (attempt) => !props.eventType || attempt.eventType === props.eventType
+  )
+);
+const hasPipelineContent = computed(
+  () => applicablePipelines.value.length > 0 || attempts.value.length > 0
+);
+const hasActiveAttempt = computed(() =>
+  attempts.value.some((attempt) =>
+    ['QUEUED', 'RUNNING'].includes(attempt.status)
+  )
 );
 
 const username = useUsername();

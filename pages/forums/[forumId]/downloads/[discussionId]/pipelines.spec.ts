@@ -11,6 +11,7 @@ const PipelineViewStub = {
   name: 'PublicDownloadPipelines',
   props: [
     'fileId',
+    'eventType',
     'discussionId',
     'channelName',
     'ownerUsername',
@@ -49,6 +50,7 @@ describe('download checks page', () => {
 
     expect(wrapper.getComponent(PipelineViewStub).props()).toEqual({
       fileId: 'file-1',
+      eventType: 'downloadableFile.created',
       discussionId: 'discussion-1',
       channelName: 'cats',
       ownerUsername: 'alice',
