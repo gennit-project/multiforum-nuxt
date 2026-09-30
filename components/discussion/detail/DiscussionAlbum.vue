@@ -66,6 +66,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showInlineFavorites: {
+    type: Boolean,
+    default: true,
+  },
   expandedView: {
     type: Boolean,
     default: false,
@@ -482,7 +486,10 @@ onMounted(() => {
                 >
                   {{ `${activeIndex + 1} of ${orderedImages.length}` }}
                 </span>
-                <div v-if="activeFavoriteImage" @click.stop>
+                <div
+                  v-if="showInlineFavorites && activeFavoriteImage"
+                  @click.stop
+                >
                   <AddImageToFavorites
                     :image-id="activeFavoriteImage.id"
                     :image-title="
