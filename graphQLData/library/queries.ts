@@ -46,6 +46,7 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
         Albums(options: { limit: 1 }) {
           id
           Discussions(options: { limit: 1 }) {
+            id
             DiscussionChannels {
               channelUniqueName
               Channel {
@@ -80,6 +81,7 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
             channelIconURL
           }
           Discussion {
+            id
             title
             hasDownload
           }
