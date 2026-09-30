@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
+import { createSSRApp, nextTick } from 'vue';
+import { renderToString } from 'vue/server-renderer';
 import DownloadPipelineStatusSummary from './DownloadPipelineStatusSummary.vue';
 import type * as DownloadPipelineOverviewModule from '@/composables/useDownloadPipelineOverview';
 
@@ -12,9 +14,9 @@ const mockOverview = vi.hoisted(() => ({
 }));
 
 vi.mock('@/composables/useDownloadPipelineOverview', async () => {
-  const actual = await vi.importActual<
-    typeof DownloadPipelineOverviewModule
-  >('@/composables/useDownloadPipelineOverview');
+  const actual = await vi.importActual<typeof DownloadPipelineOverviewModule>(
+    '@/composables/useDownloadPipelineOverview'
+  );
   const { ref } = await import('vue');
   return {
     ...actual,
@@ -34,8 +36,8 @@ const NuxtLinkStub = {
   template: '<a><slot /></a>',
 };
 
-const mountSummary = () =>
-  mount(DownloadPipelineStatusSummary, {
+const mountSummary = async () => {
+  const wrapper = mount(DownloadPipelineStatusSummary, {
     props: {
       fileId: 'file-1',
       discussionId: 'discussion-1',
@@ -43,6 +45,9 @@ const mountSummary = () =>
     },
     global: { stubs: { NuxtLink: NuxtLinkStub } },
   });
+  await nextTick();
+  return wrapper;
+};
 
 describe('DownloadPipelineStatusSummary', () => {
   beforeEach(() => {
@@ -53,11 +58,11 @@ describe('DownloadPipelineStatusSummary', () => {
     mockOverview.loading = false;
   });
 
-  it('links compact pipeline status to the public tab', () => {
+  it('links compact pipeline status to the public tab', async () => {
     mockOverview.hasPipelineContent = true;
     mockOverview.attempts = [{ status: 'SUCCEEDED' }];
 
-    const wrapper = mountSummary();
+    const wrapper = await mountSummary();
     const link = wrapper.getComponent(NuxtLinkStub);
 
     expect({
@@ -75,16 +80,25 @@ describe('DownloadPipelineStatusSummary', () => {
     });
   });
 
-  it('renders nothing when no check is applicable and no history exists', () => {
-    expect(mountSummary().html()).toBe(
-      '<!--v-if-->'
-    );
+  it('renders a stable loading shell during SSR', async () => {
+    const app = createSSRApp(DownloadPipelineStatusSummary, {
+      fileId: 'file-1',
+      discussionId: 'discussion-1',
+      channelName: 'cats',
+    });
+    app.component('NuxtLink', NuxtLinkStub);
+
+    expect(await renderToString(app)).toContain('Loading checks…');
   });
 
-  it('summarizes active, skipped, failed, and not-executed checks', () => {
+  it('renders nothing when no check is applicable and no history exists', async () => {
+    expect((await mountSummary()).html()).toBe('<!--v-if-->');
+  });
+
+  it('summarizes active, skipped, failed, and not-executed checks', async () => {
     mockOverview.hasPipelineContent = true;
     mockOverview.hasActiveAttempt = true;
-    const running = mountSummary().text();
+    const running = (await mountSummary()).text();
 
     mockOverview.hasActiveAttempt = false;
     mockOverview.attempts = [
@@ -93,10 +107,10 @@ describe('DownloadPipelineStatusSummary', () => {
         jobs: [{ status: 'SKIPPED' }],
       },
     ];
-    const skipped = mountSummary().text();
+    const skipped = (await mountSummary()).text();
 
     mockOverview.attempts = [{ status: 'FAILED', jobs: [] }];
-    const failed = mountSummary().text();
+    const failed = (await mountSummary()).text();
 
     mockOverview.attempts = [];
     mockOverview.applicablePipelines = [
@@ -112,7 +126,7 @@ describe('DownloadPipelineStatusSummary', () => {
         expectedJobs: [],
       },
     ];
-    const missing = mountSummary().text();
+    const missing = (await mountSummary()).text();
 
     expect({ running, skipped, failed, missing }).toEqual({
       running: expect.stringContaining('Checks running'),
