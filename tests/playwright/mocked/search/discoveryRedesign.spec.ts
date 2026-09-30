@@ -35,7 +35,7 @@ const channels = forums.map((name, i) => {
     ...dc,
     Flairs: [],
     Channel: { ...dc.Channel, __typename: 'Channel' },
-    Discussion: { ...dc.Discussion, __typename: 'Discussion' },
+    Discussion: { ...dc.Discussion, title, __typename: 'Discussion' },
     detailAnswersPageInfo: { endCursor: null, hasNextPage: false },
   };
 });
@@ -131,15 +131,18 @@ const handlers: GraphQLHandlers = {
       data: {
         getCommentSection: {
           DiscussionChannel: dc,
-          Comments: [
-            buildComment({
-              comment: state,
-              comments: [state],
-              channelUniqueName: name,
-              discussionId: 'topic',
-              discussionChannelId: dc.id,
-            }),
-          ],
+          Comments:
+            name === 'chatGPT'
+              ? [
+                  buildComment({
+                    comment: state,
+                    comments: [state],
+                    channelUniqueName: name,
+                    discussionId: 'topic',
+                    discussionChannelId: dc.id,
+                  }),
+                ]
+              : [],
         },
       },
     };
@@ -254,9 +257,7 @@ for (const mobile of [false, true]) {
     ).toBeVisible();
     await row.getByRole('button', { name: 'Show fewer forums' }).click();
     if (!mobile) {
-      await row
-        .getByRole('link', { name: 'chatGPT: 1 comment', exact: true })
-        .click();
+      await row.getByRole('link', { name: title, exact: true }).click();
       const preview = page.getByRole('complementary', {
         name: 'Discussion preview',
       });
@@ -267,12 +268,27 @@ for (const mobile of [false, true]) {
         .getByRole('link', { name: 'fungi: 0 comments', exact: true })
         .click();
       await expect(
-        preview.getByText('A reply only in fungi', { exact: true })
+        preview.getByText('There are no comments yet.', { exact: true })
       ).toBeVisible();
       await expect(
         preview.getByText('A reply only in chatGPT', { exact: true })
       ).not.toBeVisible();
       await expect(page).toHaveURL(/selectedForum=fungi/);
+      await expect(
+        preview.getByRole('link', { name: 'fungi: 0 comments', exact: true })
+      ).toHaveAttribute('aria-current', 'true');
+      await expect(
+        row.getByRole('link', { name: 'fungi: 0 comments', exact: true })
+      ).toHaveAttribute('aria-current', 'true');
+      await expect(
+        preview.getByRole('heading', {
+          name: 'Conversation in fungi',
+          exact: true,
+        })
+      ).toBeVisible();
+      await expect(
+        preview.getByRole('heading', { name: 'Comments (0)', exact: true })
+      ).toBeVisible();
       await page.goBack();
       await expect(
         preview.getByText('A reply only in chatGPT', { exact: true })
@@ -298,6 +314,16 @@ for (const mobile of [false, true]) {
         .getByRole('link', { name: 'chatGPT: 1 comment', exact: true })
         .click();
       await expect(page).toHaveURL(/\/forums\/chatGPT\/discussions\/topic/);
+      await expect(
+        page.getByText('A reply only in chatGPT', { exact: true })
+      ).toBeVisible();
+      await page.goto('/forums/fungi/discussions/topic');
+      await expect(
+        page.getByText('There are no comments yet.', { exact: true })
+      ).toBeVisible();
+      await expect(
+        page.getByText('A reply only in chatGPT', { exact: true })
+      ).not.toBeVisible();
     }
   });
   test(`online event discovery ${mobile ? 'mobile' : 'desktop'}`, async ({

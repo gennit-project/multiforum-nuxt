@@ -21,6 +21,7 @@ import type { Discussion } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
 import ForumSubmissions from '@/components/discovery/ForumSubmissions.vue';
 import { useFocusTrap } from '@/composables/useFocusTrap';
+import { selectDiscussionForum } from '@/utils/selectDiscussionForum';
 
 const usernameVar = useUsername();
 const SitewideDiscussionSidebar = defineAsyncComponent(
@@ -193,16 +194,12 @@ const selectedDiscussion = computed<Discussion | null>(() => {
   );
 });
 
-const selectedChannelId = computed(() => {
-  const channels = selectedDiscussion.value?.DiscussionChannels || [];
-  const requested = route.query.selectedForum;
-  return (
-    channels.find((channel) => channel.channelUniqueName === requested)
-      ?.channelUniqueName ||
-    channels[0]?.channelUniqueName ||
-    ''
-  );
-});
+const selectedChannelId = computed(() =>
+  selectDiscussionForum(
+    selectedDiscussion.value?.DiscussionChannels || [],
+    route.query.selectedForum
+  )
+);
 
 const selectedDiscussionTitle = computed(() => {
   return selectedDiscussion.value?.title || '';

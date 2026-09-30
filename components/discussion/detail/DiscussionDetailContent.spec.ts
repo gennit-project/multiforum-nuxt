@@ -67,6 +67,7 @@ const DiscussionCommentsWrapperStub = {
   name: 'DiscussionCommentsWrapper',
   props: [
     'aggregateCommentCount',
+    'discussionChannel',
     'answers',
     'answersHasNextPage',
     'comments',
@@ -182,6 +183,7 @@ const commentSection = (comments: Comment[]) => ({
   getCommentSection: {
     DiscussionChannel: {
       id: 'dc1',
+      discussionId: 'd1',
       channelUniqueName: 'cats',
       Answers: [],
       archived: false,
@@ -646,6 +648,35 @@ describe('DiscussionDetailContent', () => {
     commentSectionQuery.loading.value = true;
     await wrapper.setProps({ discussionId: 'd2' });
 
+    expect(
+      wrapper.findComponent(DiscussionCommentsWrapperStub).props('comments')
+    ).toEqual([]);
+  });
+
+  it('discards a retained query result when switching to an empty forum', async () => {
+    const { wrapper } = setup({ comments: [makeComment('cats-only')] });
+    await wrapper.setProps({ channelId: 'dogs' });
+    expect(
+      wrapper.findComponent(DiscussionCommentsWrapperStub).props('comments')
+    ).toEqual([]);
+  });
+
+  it('does not use another forum’s channel metadata', async () => {
+    const { wrapper } = setup({ comments: [makeComment('cats-only')] });
+    await wrapper.setProps({ channelId: 'dogs' });
+    expect(
+      wrapper
+        .findComponent(DiscussionCommentsWrapperStub)
+        .props('discussionChannel')
+    ).toBeUndefined();
+  });
+
+  it('replaces populated comments with an empty response for the same forum', async () => {
+    const { wrapper, commentSectionQuery } = setup({
+      comments: [makeComment('removed')],
+    });
+    commentSectionQuery.result.value = commentSection([]);
+    await wrapper.vm.$nextTick();
     expect(
       wrapper.findComponent(DiscussionCommentsWrapperStub).props('comments')
     ).toEqual([]);

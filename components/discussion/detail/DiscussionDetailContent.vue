@@ -280,13 +280,35 @@ watch(
   }
 );
 
+// Apollo can retain the previous result while reactive query variables change.
+// Never use that result (or a saved fallback) for a different conversation.
+const matchesSelectedConversation = (
+  section: { DiscussionChannel: DiscussionChannel | null } | null | undefined
+) =>
+  section?.DiscussionChannel?.discussionId === props.discussionId &&
+  section.DiscussionChannel.channelUniqueName === channelId.value;
+
+const currentCommentSection = computed(() => {
+  const section = getDiscussionChannelResult.value?.getCommentSection;
+  return matchesSelectedConversation(section) ? section : null;
+});
+const selectedCommentSection = computed(
+  () =>
+    currentCommentSection.value ||
+    (matchesSelectedConversation(lastValidCommentSection.value)
+      ? lastValidCommentSection.value
+      : null)
+);
+
 const setLastValidCommentSection = (
   section: {
     DiscussionChannel: DiscussionChannel | null;
     Comments: Comment[];
   } | null
 ) => {
-  lastValidCommentSection.value = section;
+  lastValidCommentSection.value = matchesSelectedConversation(section)
+    ? section
+    : null;
 };
 
 if (getDiscussionChannelResult.value?.getCommentSection) {
@@ -340,8 +362,7 @@ const formDiscussionChannel = computed<DiscussionChannel | null>(() => {
 
 const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
   return (
-    getDiscussionChannelResult.value?.getCommentSection?.DiscussionChannel ||
-    lastValidCommentSection.value?.DiscussionChannel ||
+    selectedCommentSection.value?.DiscussionChannel ||
     formDiscussionChannel.value
   );
 });
@@ -536,11 +557,7 @@ const { locked: forumLocked } = useForumLock(
 const commentsDisabled = computed(() => locked.value || forumLocked.value);
 
 const comments = computed(() => {
-  return (
-    getDiscussionChannelResult.value?.getCommentSection?.Comments ||
-    lastValidCommentSection.value?.Comments ||
-    []
-  );
+  return selectedCommentSection.value?.Comments || [];
 });
 
 const loadedRootCommentCount = computed(() => {
