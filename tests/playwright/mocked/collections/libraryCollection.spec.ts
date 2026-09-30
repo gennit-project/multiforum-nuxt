@@ -57,7 +57,6 @@ const getBaseMocks = (username: string) => ({
     data: { users: [{ username, Collections: [] }] },
   }),
   getUserFavoriteCounts: () => ({ data: { users: [{ username }] } }),
-  getUserFavoriteDownloadsCount: () => ({ data: { users: [{ username }] } }),
   getUserOwnedDownloadsCount: () => ({ data: { users: [{ username }] } }),
   // the collection detail
   GetCollectionItems: () => ({

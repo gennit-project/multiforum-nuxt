@@ -659,30 +659,24 @@ export const GET_USER_FAVORITE_COUNTS = gql`
   query getUserFavoriteCounts($username: String!) {
     users(where: { username: $username }) {
       username
-      FavoriteChannelsAggregate {
-        count
+      FavoriteChannelsConnection {
+        totalCount
       }
-      FavoriteImagesAggregate {
-        count
+      FavoriteImagesConnection {
+        totalCount
       }
-      FavoriteCommentsAggregate {
-        count
+      FavoriteCommentsConnection {
+        totalCount
       }
-      FavoriteDiscussionsAggregate(
-        where: { OR: [{ hasDownload: false }, { hasDownload: null }] }
+      FavoriteDiscussionsConnection(
+        where: { node: { OR: [{ hasDownload: false }, { hasDownload: null }] } }
       ) {
-        count
+        totalCount
       }
-    }
-  }
-`;
-
-export const GET_USER_FAVORITE_DOWNLOADS_COUNT = gql`
-  query getUserFavoriteDownloadsCount($username: String!) {
-    users(where: { username: $username }) {
-      username
-      FavoriteDiscussionsAggregate(where: { hasDownload: true }) {
-        count
+      FavoriteDownloadsConnection: FavoriteDiscussionsConnection(
+        where: { node: { hasDownload: true } }
+      ) {
+        totalCount
       }
     }
   }

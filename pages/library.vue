@@ -8,7 +8,6 @@ import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import {
   GET_USER_FAVORITE_COUNTS,
-  GET_USER_FAVORITE_DOWNLOADS_COUNT,
   GET_USER_OWNED_DOWNLOADS_COUNT,
   GET_UPLOADED_DOWNLOADABLE_FILES,
 } from '@/graphQLData/user/queries';
@@ -60,11 +59,6 @@ const { result: favoriteCountsResult, refetch: refetchCounts } = useQuery(
   queryVariables,
   queryOptions
 );
-const { result: favoriteDownloadsResult, refetch: refetchDownloads } = useQuery(
-  GET_USER_FAVORITE_DOWNLOADS_COUNT,
-  queryVariables,
-  queryOptions
-);
 const { result: ownedDownloadsCountResult, refetch: refetchOwnedDownloads } =
   useQuery(GET_USER_OWNED_DOWNLOADS_COUNT, queryVariables, queryOptions);
 const { result: uploadedFilesResult, refetch: refetchUploadedFiles } = useQuery(
@@ -80,7 +74,6 @@ watch(
   ([nextUsername, nextIsAuthenticated]) => {
     if (!nextUsername || !nextIsAuthenticated) return;
     refetchCounts();
-    refetchDownloads();
     refetchOwnedDownloads();
     refetchUploadedFiles();
     refetchCustomCollections();
@@ -96,13 +89,12 @@ watch(
 
 const favoriteCounts = computed(() => {
   const user = favoriteCountsResult.value?.users?.[0];
-  const downloadUser = favoriteDownloadsResult.value?.users?.[0];
   return {
-    channels: user?.FavoriteChannelsAggregate?.count || 0,
-    discussions: user?.FavoriteDiscussionsAggregate?.count || 0,
-    images: user?.FavoriteImagesAggregate?.count || 0,
-    comments: user?.FavoriteCommentsAggregate?.count || 0,
-    downloads: downloadUser?.FavoriteDiscussionsAggregate?.count || 0,
+    channels: user?.FavoriteChannelsConnection?.totalCount || 0,
+    discussions: user?.FavoriteDiscussionsConnection?.totalCount || 0,
+    images: user?.FavoriteImagesConnection?.totalCount || 0,
+    comments: user?.FavoriteCommentsConnection?.totalCount || 0,
+    downloads: user?.FavoriteDownloadsConnection?.totalCount || 0,
   };
 });
 
@@ -229,7 +221,6 @@ const isLoading = computed(
     isAuthenticated.value &&
     Boolean(username.value) &&
     !favoriteCountsResult.value &&
-    !favoriteDownloadsResult.value &&
     !ownedDownloadsCountResult.value &&
     !uploadedFilesResult.value &&
     !customCollectionsResult.value
@@ -323,83 +314,114 @@ const itemIconLabel = (item: SidebarItem) => {
                   </button>
                 </div>
 
-                <nav
-                  id="mobile-library-list"
-                  class="mt-3 space-y-1 md:block"
-                  :class="isMobileNavOpen ? 'block' : 'hidden'"
-                  aria-label="Your library"
-                >
-                  <template v-if="isLoading">
-                    <div
-                      v-for="index in 6"
-                      :key="index"
-                      class="flex animate-pulse items-center gap-3 rounded-lg px-2 py-2"
-                      aria-hidden="true"
-                    >
+                <ClientOnly>
+                  <nav
+                    id="mobile-library-list"
+                    class="mt-3 space-y-1 md:block"
+                    :class="isMobileNavOpen ? 'block' : 'hidden'"
+                    aria-label="Your library"
+                  >
+                    <template v-if="isLoading">
                       <div
-                        class="h-11 w-11 rounded-lg bg-gray-200 dark:bg-gray-800"
-                      />
-                      <div class="flex-1 space-y-2">
+                        v-for="index in 6"
+                        :key="index"
+                        class="flex animate-pulse items-center gap-3 rounded-lg px-2 py-2"
+                        aria-hidden="true"
+                      >
                         <div
-                          class="h-3 w-2/3 rounded bg-gray-200 dark:bg-gray-800"
+                          class="h-11 w-11 rounded-lg bg-gray-200 dark:bg-gray-800"
                         />
+                        <div class="flex-1 space-y-2">
+                          <div
+                            class="h-3 w-2/3 rounded bg-gray-200 dark:bg-gray-800"
+                          />
+                          <div
+                            class="h-3 w-1/2 rounded bg-gray-100 dark:bg-gray-800/70"
+                          />
+                        </div>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <NuxtLink
+                        v-for="item in filteredSidebarItems"
+                        :key="item.id"
+                        :to="item.route"
+                        :data-testid="`library-item-${item.id}`"
+                        class="focus:ring-brand-500/30 flex items-center gap-3 rounded-xl border px-2 py-2 text-left transition focus:ring-2 focus:outline-none"
+                        :class="
+                          activeItemId === item.id
+                            ? 'border-brand-400 bg-brand-50 dark:border-brand-700 dark:bg-brand-950/35 text-gray-950 dark:text-white'
+                            : 'border-transparent text-gray-800 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-900'
+                        "
+                      >
+                        <span
+                          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-sm font-bold text-gray-500 dark:bg-gray-800 dark:text-gray-300"
+                          :class="
+                            item.id === 'all-favorites'
+                              ? 'text-brand-600 dark:text-brand-300'
+                              : ''
+                          "
+                          aria-hidden="true"
+                        >
+                          {{ itemIconLabel(item) }}
+                        </span>
+                        <span class="min-w-0 flex-1">
+                          <span class="block truncate text-sm font-semibold">
+                            {{ item.name }}
+                          </span>
+                          <span
+                            class="mt-0.5 block truncate text-xs text-gray-500 dark:text-gray-400"
+                            aria-live="polite"
+                          >
+                            {{ item.meta }}
+                          </span>
+                        </span>
+                      </NuxtLink>
+
+                      <p
+                        v-if="filteredSidebarItems.length === 0"
+                        class="rounded-xl border border-dashed border-gray-300 px-3 py-6 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
+                      >
+                        No library items match “{{ searchTerm }}”.
+                      </p>
+                    </template>
+                  </nav>
+
+                  <p
+                    v-if="activeItem"
+                    class="mt-3 truncate text-xs text-gray-500 md:hidden dark:text-gray-400"
+                  >
+                    Viewing {{ activeItem.name }}
+                  </p>
+
+                  <template #fallback>
+                    <div
+                      class="mt-3 space-y-1"
+                      role="status"
+                      aria-label="Loading library items"
+                    >
+                      <span class="sr-only">Loading library items…</span>
+                      <div
+                        v-for="index in 6"
+                        :key="index"
+                        class="flex animate-pulse items-center gap-3 rounded-lg px-2 py-2"
+                        aria-hidden="true"
+                      >
                         <div
-                          class="h-3 w-1/2 rounded bg-gray-100 dark:bg-gray-800/70"
+                          class="h-11 w-11 rounded-lg bg-gray-200 dark:bg-gray-800"
                         />
+                        <div class="flex-1 space-y-2">
+                          <div
+                            class="h-3 w-2/3 rounded bg-gray-200 dark:bg-gray-800"
+                          />
+                          <div
+                            class="h-3 w-1/2 rounded bg-gray-100 dark:bg-gray-800/70"
+                          />
+                        </div>
                       </div>
                     </div>
                   </template>
-                  <template v-else>
-                    <NuxtLink
-                      v-for="item in filteredSidebarItems"
-                      :key="item.id"
-                      :to="item.route"
-                      :data-testid="`library-item-${item.id}`"
-                      class="focus:ring-brand-500/30 flex items-center gap-3 rounded-xl border px-2 py-2 text-left transition focus:ring-2 focus:outline-none"
-                      :class="
-                        activeItemId === item.id
-                          ? 'border-brand-400 bg-brand-50 dark:border-brand-700 dark:bg-brand-950/35 text-gray-950 dark:text-white'
-                          : 'border-transparent text-gray-800 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-900'
-                      "
-                    >
-                      <span
-                        class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-sm font-bold text-gray-500 dark:bg-gray-800 dark:text-gray-300"
-                        :class="
-                          item.id === 'all-favorites'
-                            ? 'text-brand-600 dark:text-brand-300'
-                            : ''
-                        "
-                        aria-hidden="true"
-                      >
-                        {{ itemIconLabel(item) }}
-                      </span>
-                      <span class="min-w-0 flex-1">
-                        <span class="block truncate text-sm font-semibold">
-                          {{ item.name }}
-                        </span>
-                        <span
-                          class="mt-0.5 block truncate text-xs text-gray-500 dark:text-gray-400"
-                        >
-                          {{ item.meta }}
-                        </span>
-                      </span>
-                    </NuxtLink>
-
-                    <p
-                      v-if="filteredSidebarItems.length === 0"
-                      class="rounded-xl border border-dashed border-gray-300 px-3 py-6 text-center text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
-                    >
-                      No library items match “{{ searchTerm }}”.
-                    </p>
-                  </template>
-                </nav>
-
-                <p
-                  v-if="activeItem"
-                  class="mt-3 truncate text-xs text-gray-500 md:hidden dark:text-gray-400"
-                >
-                  Viewing {{ activeItem.name }}
-                </p>
+                </ClientOnly>
               </div>
             </aside>
 

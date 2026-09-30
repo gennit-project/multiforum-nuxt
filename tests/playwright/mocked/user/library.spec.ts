@@ -66,21 +66,11 @@ const getBaseMocks = (username: string) => ({
         {
           __typename: 'User',
           username,
-          FavoriteChannelsAggregate: { count: 3 },
-          FavoriteImagesAggregate: { count: 5 },
-          FavoriteCommentsAggregate: { count: 8 },
-          FavoriteDiscussionsAggregate: { count: 12 },
-        },
-      ],
-    },
-  }),
-  getUserFavoriteDownloadsCount: () => ({
-    data: {
-      users: [
-        {
-          __typename: 'User',
-          username,
-          FavoriteDiscussionsAggregate: { count: 2 },
+          FavoriteChannelsConnection: { totalCount: 3 },
+          FavoriteImagesConnection: { totalCount: 5 },
+          FavoriteCommentsConnection: { totalCount: 8 },
+          FavoriteDiscussionsConnection: { totalCount: 12 },
+          FavoriteDownloadsConnection: { totalCount: 2 },
         },
       ],
     },
@@ -201,7 +191,6 @@ const waitForLibraryData = async (
   const requiredOperations = [
     'GetUnifiedLibraryFavorites',
     'getUserFavoriteCounts',
-    'getUserFavoriteDownloadsCount',
     'getUserOwnedDownloadsCount',
     'getUploadedDownloadableFiles',
     'GetAllUserCollections',
@@ -241,6 +230,11 @@ test.describe('Library page', () => {
 
     // Page should load without JavaScript errors
     expect(diagnostics.pageErrors).toEqual([]);
+    expect(
+      diagnostics.consoleErrors.filter((message) =>
+        /hydration|server rendered/i.test(message)
+      )
+    ).toEqual([]);
   });
 
   test('displays filter buttons', async ({ page, setupMockedPage }) => {
