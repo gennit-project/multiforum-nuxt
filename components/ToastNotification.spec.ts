@@ -31,6 +31,14 @@ describe('ToastNotification', () => {
     expect(wrapper.text()).toContain('Saved');
   });
 
+  it('positions the toast stack at the top of the viewport', () => {
+    const wrapper = mountToasts();
+
+    expect(wrapper.get('[data-testid="toast-container"]').classes()).toContain(
+      'top-4'
+    );
+  });
+
   it('uses success styling', () => {
     h.toasts = [{ id: 't1', message: 'Done', type: 'success' }];
     const wrapper = mountToasts();
@@ -48,17 +56,23 @@ describe('ToastNotification', () => {
   it('dismisses a toast via the close button', async () => {
     const wrapper = mountToasts();
 
-    await wrapper.find('button[aria-label="Dismiss notification"]').trigger('click');
+    await wrapper
+      .find('button[aria-label="Dismiss notification"]')
+      .trigger('click');
 
     expect(h.dismiss).toHaveBeenCalledWith('t1');
   });
 
   it('runs the action and dismisses when the action button is clicked', async () => {
     const onClick = vi.fn();
-    h.toasts = [{ id: 't1', message: 'Undo?', action: { label: 'Undo', onClick } }];
+    h.toasts = [
+      { id: 't1', message: 'Undo?', action: { label: 'Undo', onClick } },
+    ];
     const wrapper = mountToasts();
 
-    const actionButton = wrapper.findAll('button').find((b) => b.text() === 'Undo');
+    const actionButton = wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Undo');
     await actionButton!.trigger('click');
 
     expect(onClick).toHaveBeenCalled();
