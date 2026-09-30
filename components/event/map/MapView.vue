@@ -25,7 +25,7 @@ import {
   cleanQueryParams,
   buildInfowindowContent,
 } from '@/utils/eventMap';
-import type { Event as EventData } from '@/__generated__/graphql';
+import type { Event as EventData, EventOptions } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 import type { Ref, PropType } from 'vue';
 import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
@@ -81,6 +81,15 @@ const showOnlineOnly = isEventSearchRoute(route);
 const showInPersonOnly =
   route.name === 'map-search-eventId' || route.name === 'map-search';
 const isMapRoute = computed(() => route.path.startsWith('/map/search'));
+const resultsHeading = computed(() => {
+  const period =
+    filterValues.value.timeShortcut === timeShortcutValues.PAST_EVENTS
+      ? 'Past events'
+      : 'In-person events';
+  return filterValues.value.placeName
+    ? `${period} near ${filterValues.value.placeName}`
+    : period;
+});
 
 const filterValues: Ref<SearchEventValues> = ref(
   getEventFilterValuesFromParams({
@@ -127,10 +136,8 @@ const {
 } = useQuery(
   GET_EVENTS,
   {
-    limit: 25,
-    offset: 0,
     where: eventWhere,
-    resultsOrder: resultsOrder,
+    options: computed<EventOptions>(() => ({ sort: [resultsOrder.value] })),
   },
   {
     fetchPolicy: 'cache-first',
@@ -196,12 +203,12 @@ const filterByChannel = (channel: string) => {
     filterValues.value.channels ?? [],
     channel
   );
-  updateFilters({ channels: [channel] });
+  updateFilters({ channels: filterValues.value.channels });
 };
 
 const filterByTag = (tag: string) => {
   filterValues.value.tags = toggleArrayItem(filterValues.value.tags ?? [], tag);
-  updateFilters({ tags: [tag] });
+  updateFilters({ tags: filterValues.value.tags });
 };
 
 type SetMarkerDataInput = {
@@ -432,50 +439,82 @@ const isClientSide = typeof window !== 'undefined';
 </script>
 
 <template>
-  <div class="flex flex-col">
+  <div class="map-explorer flex min-w-0 flex-col bg-gray-50 dark:bg-gray-950">
     <client-only>
-      <div
-        class="z-10 mt-12 flex h-34 w-full items-center justify-center bg-gray-800 text-white"
+      <header
+        class="shrink-0 border-b border-gray-200 bg-white px-4 py-4 sm:px-6 dark:border-gray-800 dark:bg-gray-900"
       >
         <div
-          class="z-10 flex w-full justify-center bg-gray-100 dark:bg-gray-900"
+          v-if="isMapRoute"
+          class="mb-4 flex flex-wrap items-center justify-between gap-3"
         >
-          <div class="mt-2 flex w-full max-w-7xl flex-col">
-            <div
-              v-if="isMapRoute"
-              class="flex items-center justify-between px-1 pt-1"
+          <div>
+            <h1
+              class="text-2xl font-bold tracking-tight text-gray-950 sm:text-3xl dark:text-white"
             >
-              <div
-                class="text-sm font-semibold tracking-wide text-gray-900 [font-variant-caps:all-small-caps] dark:text-gray-100"
-              >
-                In-person events
-              </div>
-              <button
-                class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
-                type="button"
-                @click="goToOnlineList"
-              >
-                Online list
-              </button>
-            </div>
-            <EventFilterBar
-              :show-map="true"
-              :allow-hiding-main-filters="false"
-              :show-main-filters-by-default="true"
-            >
-              <TimeShortcuts />
-            </EventFilterBar>
+              Explore events
+            </h1>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+              Find your people, around the corner.
+            </p>
           </div>
+          <button
+            class="focus-visible:ring-brand-500 inline-flex min-h-11 items-center rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-100 focus-visible:ring-2 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-800"
+            type="button"
+            @click="goToOnlineList"
+          >
+            Online events →
+          </button>
         </div>
-      </div>
+        <div
+          class="rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-950"
+        >
+          <EventFilterBar
+            :show-map="true"
+            :allow-hiding-main-filters="false"
+            :show-main-filters-by-default="true"
+          >
+            <TimeShortcuts :map-style="true" />
+          </EventFilterBar>
+        </div>
+      </header>
 
       <!-- Desktop View -->
       <div
         v-if="isClientSide && mdAndUp"
-        class="flex grow bg-white dark:bg-black"
+        class="grid min-h-0 flex-1 grid-cols-[minmax(20rem,42%)_minmax(0,1fr)]"
       >
-        <div class="w-1/2">
-          <div class="space-y-4">
+        <section
+          aria-labelledby="map-results-heading"
+          class="min-h-0 overflow-y-auto border-r border-gray-200 dark:border-gray-800"
+          tabindex="0"
+        >
+          <div
+            class="sticky top-0 z-10 border-b border-gray-200 bg-gray-50 px-4 py-4 dark:border-gray-800 dark:bg-gray-950"
+          >
+            <h2
+              id="map-results-heading"
+              class="text-lg font-semibold text-gray-900 dark:text-white"
+            >
+              {{ resultsHeading }}
+            </h2>
+            <p
+              class="mt-1 text-sm text-gray-600 dark:text-gray-300"
+              role="status"
+            >
+              {{
+                eventLoading
+                  ? 'Loading events…'
+                  : `${eventResult?.eventsAggregate?.count ?? 0} events`
+              }}
+              <span v-if="!eventLoading" class="float-right">{{
+                filterValues.timeShortcut === timeShortcutValues.PAST_EVENTS
+                  ? 'Newest first'
+                  : 'Soonest first'
+              }}</span>
+            </p>
+          </div>
+          <div class="py-3">
             <LoadingSpinner v-if="eventLoading" class="mx-auto my-4" />
             <ErrorBanner
               v-else-if="eventError"
@@ -484,7 +523,7 @@ const isClientSide = typeof window !== 'undefined';
             />
             <EventList
               v-else-if="eventResult && eventResult.events"
-              class="mt-4 pt-0"
+              class="pt-0"
               :events="eventResult.events"
               :channel-id="channelId"
               :highlighted-event-location-id="highlightedEventLocationId"
@@ -502,10 +541,12 @@ const isClientSide = typeof window !== 'undefined';
               @unhighlight="unhighlight"
             />
           </div>
-        </div>
+        </section>
 
-        <div
-          class="fixed top-0 right-0 h-screen w-1/2 bg-gray-300 lg:w-[calc(50%-2.5rem)] dark:bg-black"
+        <section
+          aria-label="Event map"
+          class="relative min-h-0 bg-gray-100 dark:bg-gray-900"
+          data-testid="event-map-panel"
         >
           <LoadingSpinner v-if="eventLoading" class="mx-auto my-4" />
           <ErrorBanner
@@ -542,7 +583,13 @@ const isClientSide = typeof window !== 'undefined';
             v-else-if="mapsCapabilityLoading"
             class="mx-auto my-4"
           />
-        </div>
+          <p
+            v-else
+            class="flex h-full items-center justify-center p-8 text-center text-sm text-gray-600 dark:text-gray-300"
+          >
+            Try another date, location, or search to find events on the map.
+          </p>
+        </section>
       </div>
 
       <!-- Mobile View - Only render if NOT on desktop -->
@@ -557,7 +604,11 @@ const isClientSide = typeof window !== 'undefined';
           v-else-if="eventResult && eventResult.events"
           id="mapViewMobileWidth"
         >
-          <div class="event-map-container w-full">
+          <section
+            aria-label="Event map"
+            class="event-map-container h-[40dvh] min-h-64 w-full"
+            data-testid="event-map-panel"
+          >
             <EventMap
               v-if="mapsAvailable && eventResult.events.length > 0"
               :events="eventResult.events"
@@ -582,11 +633,23 @@ const isClientSide = typeof window !== 'undefined';
               v-else-if="mapsCapabilityLoading"
               class="mx-auto my-4"
             />
-          </div>
-          <div class="h-1/3 w-full">
+          </section>
+          <section aria-labelledby="mobile-results-heading" class="w-full py-4">
+            <div class="mb-3 px-4">
+              <h2
+                id="mobile-results-heading"
+                class="text-lg font-semibold text-gray-900 dark:text-white"
+              >
+                {{ resultsHeading }}
+              </h2>
+              <p class="text-sm text-gray-600 dark:text-gray-300" role="status">
+                {{ eventResult.eventsAggregate?.count ?? 0 }} events
+              </p>
+            </div>
             <div class="mx-auto">
               <EventList
                 :events="eventResult.events"
+                :show-map="true"
                 :channel-id="channelId"
                 :highlighted-event-location-id="highlightedEventLocationId"
                 :highlighted-event-id="highlightedEventId"
@@ -602,7 +665,7 @@ const isClientSide = typeof window !== 'undefined';
                 @unhighlight="unhighlight"
               />
             </div>
-          </div>
+          </section>
         </div>
       </template>
 
@@ -642,29 +705,17 @@ const isClientSide = typeof window !== 'undefined';
   </div>
 </template>
 
-<style>
-.event-map-container {
-  position: relative;
-  width: 100%;
+<style scoped>
+/* TopNav is fixed on map routes. The grid uses the remaining viewport;
+   the map no longer guesses the height of the wrapping filter toolbar. */
+.map-explorer {
+  margin-top: 3.5rem;
+  min-height: calc(100dvh - 3.5rem);
 }
 
-.shortcut-buttons-wrapper {
-  position: absolute;
-  top: 0;
-  z-index: 1;
-  width: 100%;
-  max-width: calc(
-    100% - 1rem
-  ); /* Adjusts the width to fit within the viewport */
-  padding: 0 0.5rem; /* Adds padding on both sides */
-  box-sizing: border-box;
-}
-
-.shortcut-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-end;
-  border-radius: 4px;
+@media (min-width: 960px) {
+  .map-explorer {
+    height: calc(100dvh - 3.5rem);
+  }
 }
 </style>

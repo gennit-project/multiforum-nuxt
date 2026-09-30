@@ -22,7 +22,7 @@ const h = vi.hoisted(() => ({
   mdAndUp: null as unknown as { value: boolean },
   queryVariables: null as null | {
     where: { value: unknown };
-    resultsOrder: { value: unknown };
+    options: { value: unknown };
   },
   mapsCapability: null as unknown as { value: unknown },
   mapsAvailable: null as unknown as { value: boolean },
@@ -59,7 +59,7 @@ vi.mock('@vue/apollo-composable', () => ({
   ) => {
     h.queryVariables = variables;
     void variables.where.value;
-    void variables.resultsOrder.value;
+    void variables.options.value;
     return {
       result: h.result,
       loading: h.loading,
@@ -324,8 +324,8 @@ describe('MapView', () => {
   it('uses reverse chronological order for past events', () => {
     h.route.query = { timeShortcut: 'PAST_EVENTS' };
     mountView();
-    expect(h.queryVariables?.resultsOrder.value).toEqual({
-      startTime: 'DESC',
+    expect(h.queryVariables?.options.value).toEqual({
+      sort: [{ startTime: 'DESC' }],
     });
   });
 
@@ -465,5 +465,43 @@ describe('MapView', () => {
     const map = wrapper.findComponent(EventMap);
     await map.vm.$emit('lock-colors');
     expect(map.props('colorLocked')).toBe(true);
+  });
+});
+
+describe('map results header', () => {
+  it('labels past results with the searched place', () => {
+    h.route.query = {
+      timeShortcut: 'PAST_EVENTS',
+      placeName: 'Phoenix',
+      radius: '25',
+    };
+    expect(mountView().get('#map-results-heading').text()).toBe(
+      'Past events near Phoenix'
+    );
+  });
+
+  it('announces the actual result count', () => {
+    h.result.value = { events: [event('1')], eventsAggregate: { count: 42 } };
+    expect(mountView().get('[role="status"]').text()).toContain('42 events');
+  });
+
+  it('shows a helpful empty map state', () => {
+    expect(mountView().get('[data-testid="event-map-panel"]').text()).toContain(
+      'Try another date'
+    );
+  });
+
+  it('uses map cards on mobile too', () => {
+    h.mdAndUp.value = false;
+    expect(mountView().findComponent(EventList).attributes('show-map')).toBe(
+      'true'
+    );
+  });
+
+  it('removes an already selected tag', async () => {
+    h.route.query = { tags: ['music'] };
+    const wrapper = mountView();
+    await wrapper.findComponent(EventList).vm.$emit('filter-by-tag', 'music');
+    expect(h.replace).toHaveBeenCalledWith({ query: { tags: [] } });
   });
 });

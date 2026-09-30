@@ -15,7 +15,8 @@ import {
 } from '@/utils/mapMarkerLogic';
 
 // Type for Google Maps markers - can be legacy or advanced markers
-type GoogleMapMarker = google.maps.Marker | google.maps.marker.AdvancedMarkerElement;
+type GoogleMapMarker =
+  google.maps.Marker | google.maps.marker.AdvancedMarkerElement;
 
 export interface MarkerData {
   marker: GoogleMapMarker | null; // Can be legacy or advanced markers, null during initialization
@@ -135,7 +136,7 @@ const renderMap = async () => {
   const mapConfig = {
     center: { lat: 33.4255, lng: -111.94 },
     zoom: 7,
-    mapTypeId: 'terrain',
+    mapTypeId: 'roadmap',
     mapId: config.googleMapId,
     colorScheme:
       currentTheme.value === 'dark'
@@ -184,7 +185,10 @@ const renderMap = async () => {
     };
 
     // Create marker title based on number of events
-    const title = buildMarkerTitle(markerData.numberOfEvents, firstEvent?.title);
+    const title = buildMarkerTitle(
+      markerData.numberOfEvents,
+      firstEvent?.title
+    );
 
     // Use an AdvancedMarkerElement. On a vector (mapId-based) map these render
     // as real DOM elements, so we can attach native hover listeners to the
@@ -421,20 +425,20 @@ watch(
 
 <template>
   <client-only>
-    <div class="text-black">
+    <div class="h-full w-full text-black">
       <p v-if="events.length === 0" class="mx-3">
         Could not find any events with a location.
       </p>
       <div
         v-else-if="useMobileStyles"
         ref="mobileMapDiv"
-        class="mt-8 w-full"
-        style="width: 100vw; height: 60vw; touch-action: pan-x pan-y"
+        class="h-full w-full"
+        style="touch-action: pan-x pan-y"
       />
       <div
         v-else-if="!useMobileStyles"
         ref="desktopMapDiv"
-        style="position: fixed; top: 200px; left: 0; width: calc(100% - 14px); height: calc(100vh - 214px)"
+        class="h-full w-full"
       />
     </div>
   </client-only>

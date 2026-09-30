@@ -184,6 +184,9 @@ describe('TopNav actions', () => {
     h.route = { params: {}, name: 'map-search' };
     const wrapper = mountNav();
 
-    expect(wrapper.find('nav').classes()).toContain('fixed');
+    expect({
+      fixed: wrapper.find('nav').classes().includes('fixed'),
+      relative: wrapper.find('nav').classes().includes('relative'),
+    }).toEqual({ fixed: true, relative: false });
   });
 });
