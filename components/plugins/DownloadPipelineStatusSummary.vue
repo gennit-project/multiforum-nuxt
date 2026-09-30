@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, toRef } from 'vue';
+import { computed, onMounted, ref, toRef } from 'vue';
 import {
   getApplicablePipelineStatus,
   useSharedDownloadPipelineOverview,
@@ -11,6 +11,12 @@ const props = defineProps<{
   discussionId: string;
   channelName: string;
 }>();
+
+const hasMounted = ref(false);
+
+onMounted(() => {
+  hasMounted.value = true;
+});
 
 const {
   applicablePipelines,
@@ -62,7 +68,8 @@ const labels: Record<PublicPipelineDisplayStatus, string> = {
 
 <template>
   <div
-    v-if="hasPipelineContent || loading"
+    v-if="!hasMounted || hasPipelineContent || loading"
+    aria-live="polite"
     class="mt-3 flex items-center justify-between gap-3 rounded-md bg-gray-50 px-3 py-2 text-sm dark:bg-gray-700"
     data-testid="pipeline-status-summary"
   >
@@ -73,7 +80,7 @@ const labels: Record<PublicPipelineDisplayStatus, string> = {
         aria-hidden="true"
       />
       {{
-        loading && !hasPipelineContent
+        !hasMounted || (loading && !hasPipelineContent)
           ? 'Loading checks…'
           : labels[displayStatus]
       }}
