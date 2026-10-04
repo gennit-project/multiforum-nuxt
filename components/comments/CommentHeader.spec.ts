@@ -145,6 +145,28 @@ describe('CommentHeader badges', () => {
     ]).toEqual([true, true]);
   });
 
+  it('renders role labels as borderless text in the wrapping author line', () => {
+    const wrapper = mountHeader({
+      isServerAdmin: true,
+      isForumMod: true,
+    });
+    const authorLine = wrapper.find('a > span');
+    const roleLabels = authorLine
+      .findAll('span')
+      .filter((span) => ['Server Admin', 'Forum Mod'].includes(span.text()));
+
+    expect({
+      authorLineClasses: authorLine.classes(),
+      roleLabelClasses: roleLabels.map((span) => span.classes()),
+    }).toEqual({
+      authorLineClasses: ['leading-normal'],
+      roleLabelClasses: [
+        ['ml-1', 'text-xs', 'text-gray-500', 'dark:text-gray-300'],
+        ['ml-1', 'text-xs', 'text-gray-500', 'dark:text-gray-300'],
+      ],
+    });
+  });
+
   it('shows an OP badge for the original poster', () => {
     const wrapper = mountHeader({ originalPoster: 'alice' });
 
