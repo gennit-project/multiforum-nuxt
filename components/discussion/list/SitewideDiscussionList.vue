@@ -310,9 +310,7 @@ const filterByChannel = (channel: string) => {
     <div
       class="flex w-full min-w-0 flex-1 flex-col bg-gray-50 lg:h-[calc(100vh-3.5rem)] dark:bg-gray-950 dark:text-white"
     >
-      <div
-        class="border-b border-gray-200 px-4 pt-3 lg:px-6 dark:border-gray-800"
-      >
+      <div class="border-b border-gray-200 lg:px-6 dark:border-gray-800">
         <slot :open-about="() => (isSitewideSidebarOpen = true)" />
       </div>
       <div class="relative min-h-0 w-full min-w-0 flex-1">
@@ -399,7 +397,7 @@ const filterByChannel = (channel: string) => {
           </div>
           <aside
             aria-label="Discussion preview"
-            class="hidden min-w-0 border-l border-gray-200 bg-white lg:flex lg:h-full lg:basis-[44%] lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto lg:px-4 lg:py-4 xl:basis-1/2 xl:px-6 dark:border-gray-800 dark:bg-black"
+            class="hidden min-w-0 border-l border-gray-200 bg-white lg:flex lg:h-full lg:basis-[48%] lg:flex-col lg:overflow-x-hidden lg:overflow-y-auto lg:px-6 lg:py-6 xl:basis-1/2 xl:px-12 xl:py-8 dark:border-gray-800 dark:bg-black"
           >
             <div
               v-if="selectedDiscussionId"
@@ -457,7 +455,7 @@ const filterByChannel = (channel: string) => {
                 </template>
               </DiscussionDetailContent>
             </div>
-            <div v-else class="h-full min-w-0 px-2 py-4 xl:px-6">
+            <div v-else class="h-full min-w-0">
               <DiscussionDetailEmptyState />
             </div>
           </aside>
