@@ -147,20 +147,34 @@ const isExpanded = computed(() => {
 </script>
 
 <template>
-  <div class="pt-2 pb-5">
-    <div class="flex flex-wrap items-center justify-between gap-2">
-      <h1
-        class="h-9 px-4 text-xl leading-9 font-semibold lg:px-0 dark:text-white"
+  <div class="py-3">
+    <div
+      class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between"
+    >
+      <div class="min-w-fit px-4 lg:px-0">
+        <h1 class="text-xl leading-7 font-semibold dark:text-white">
+          {{ isForumScoped ? 'Discuss' : 'Discussions' }}
+        </h1>
+        <p
+          v-if="!isForumScoped"
+          class="text-sm text-gray-600 dark:text-gray-400"
+        >
+          One topic. Different conversations.
+        </p>
+      </div>
+      <div
+        class="flex w-full flex-wrap items-center gap-1 px-4 lg:w-auto lg:flex-1 lg:justify-end lg:px-0"
       >
-        {{ isForumScoped ? 'Discuss' : 'Discussions' }}
-      </h1>
-      <p
-        v-if="!isForumScoped"
-        class="order-last w-full pb-1 text-sm text-gray-600 dark:text-gray-400"
-      >
-        One topic. Different conversations.
-      </p>
-      <div class="flex flex-wrap items-center justify-end gap-1">
+        <SearchBar
+          v-if="!isForumScoped"
+          class="mb-1 min-w-56 basis-full sm:mr-1 sm:mb-0 sm:basis-72 lg:max-w-80 lg:flex-1"
+          data-testid="discussion-filter-search-bar"
+          :initial-value="filterValues.searchInput"
+          search-placeholder="Search discussions"
+          :auto-focus="false"
+          :small="true"
+          @update-search-input="updateSearchInput"
+        />
         <FilterChip
           v-if="!isForumScoped"
           class="align-middle"
@@ -240,6 +254,7 @@ const isExpanded = computed(() => {
           <FilterIcon />
         </button>
         <button
+          v-if="isForumScoped"
           data-testid="discussion-search-button"
           :aria-label="showSearch ? 'Hide search' : 'Show search'"
           :title="showSearch ? 'Hide search' : 'Show search'"
@@ -299,10 +314,9 @@ const isExpanded = computed(() => {
         </div>
       </div>
     </div>
-    <hr class="mt-3 border-gray-200 dark:border-gray-800" />
     <div
-      v-if="showSearch"
-      class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-900 dark:text-gray-300"
+      v-if="isForumScoped && showSearch"
+      class="mt-3 flex flex-col gap-2 border-t border-gray-200 bg-gray-100 pt-3 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300"
     >
       <SearchBar
         data-testid="discussion-filter-search-bar"

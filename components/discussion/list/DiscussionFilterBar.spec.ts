@@ -55,6 +55,22 @@ describe('DiscussionFilterBar', () => {
     ).toBe(true);
   });
 
+  it('shows the search field inline on the sitewide toolbar', () => {
+    const wrapper = mountBar({ isForumScoped: false });
+
+    expect(
+      wrapper.find('[data-testid="discussion-filter-search-bar"]').exists()
+    ).toBe(true);
+  });
+
+  it('does not show a redundant search toggle on the sitewide toolbar', () => {
+    const wrapper = mountBar({ isForumScoped: false });
+
+    expect(
+      wrapper.find('[data-testid="discussion-search-button"]').exists()
+    ).toBe(false);
+  });
+
   it('reveals the filters section when the filter toggle is clicked', async () => {
     const wrapper = mountBar();
     expect(
