@@ -379,6 +379,7 @@ export const buildServerPermissionsConfig = (
   overrides: Record<string, unknown> = {}
 ) => ({
   ...buildServerConfig(),
+  SuperAdmins: [] as unknown[],
   Moderators: [] as unknown[],
   PendingAdminInvites: [] as unknown[],
   PendingModInvites: [] as unknown[],
@@ -960,3 +961,118 @@ export const buildIssue = ({
   },
   ...overrides,
 });
+
+// ---------------------------------------------------------------------------
+// Server suspension workflows
+//
+// These fixtures deliberately keep the suspension, issue, and reported content
+// connected by the same IDs. A list-only suspension mock cannot catch the most
+// important regression in this workflow: following "Related Issue" to content
+// whose author can actually be unsuspended.
+// ---------------------------------------------------------------------------
+
+export const buildServerUserSuspensionScenario = () => {
+  const targetUser = buildUser({
+    username: 'baduser',
+    displayName: 'Bad User',
+  });
+  const reportedDiscussion = buildDiscussion({
+    id: 'reported-discussion',
+    discussionChannelId: 'reported-discussion-cats',
+    channelUniqueName: 'cats',
+    title: 'Reported discussion attached to a server issue',
+    body: 'This is the reported discussion body used by the suspension workflow.',
+    overrides: { Author: targetUser },
+  });
+  const issue = buildIssue({
+    issueNumber: 7,
+    channelUniqueName: '',
+    title: 'Server report for baduser',
+    body: 'A server administrator reported this discussion.',
+    overrides: {
+      relatedDiscussionId: reportedDiscussion.id,
+    },
+  });
+
+  return {
+    targetUser,
+    reportedDiscussion,
+    issue,
+    suspension: {
+      __typename: 'Suspension' as const,
+      id: 'server-user-suspension',
+      username: targetUser.username,
+      createdAt: MOCK_DATE,
+      suspendedUntil: null,
+      suspendedIndefinitely: true,
+      SuspendedUser: targetUser,
+      RelatedIssue: {
+        __typename: 'Issue' as const,
+        id: issue.id,
+        issueNumber: issue.issueNumber,
+      },
+    },
+  };
+};
+
+export const buildServerModSuspensionScenario = () => {
+  const modProfileName = 'BadMod';
+  const username = 'badmoduser';
+  const reportedComment = {
+    ...buildComment({
+      comment: {
+        id: 'reported-mod-comment',
+        text: 'This is the reported moderator comment used by the suspension workflow.',
+        parentCommentId: null,
+      },
+      comments: [],
+      channelUniqueName: 'cats',
+      discussionId: 'reported-mod-discussion',
+      discussionChannelId: 'reported-mod-discussion-cats',
+    }),
+    CommentAuthor: {
+      __typename: 'ModerationProfile' as const,
+      displayName: modProfileName,
+    },
+    deleted: false,
+    GivesFeedbackOnDiscussion: null,
+    GivesFeedbackOnEvent: null,
+    GivesFeedbackOnComment: null,
+    Issue: null,
+  };
+  const issue = buildIssue({
+    issueNumber: 8,
+    channelUniqueName: '',
+    title: 'Server report for BadMod',
+    body: 'A server administrator reported this moderator comment.',
+    overrides: {
+      relatedCommentId: reportedComment.id,
+      relatedModProfileName: modProfileName,
+    },
+  });
+
+  return {
+    modProfileName,
+    username,
+    reportedComment,
+    issue,
+    suspension: {
+      __typename: 'Suspension' as const,
+      id: 'server-mod-suspension',
+      modProfileName,
+      username,
+      createdAt: MOCK_DATE,
+      suspendedUntil: null,
+      suspendedIndefinitely: true,
+      SuspendedMod: {
+        __typename: 'ModerationProfile' as const,
+        displayName: modProfileName,
+      },
+      RelatedIssue: {
+        __typename: 'Issue' as const,
+        id: issue.id,
+        issueNumber: issue.issueNumber,
+      },
+    },
+  };
+};

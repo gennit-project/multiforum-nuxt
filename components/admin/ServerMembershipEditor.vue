@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { config } from '@/config';
+import WarningModal from '@/components/WarningModal.vue';
 import {
   REMOVE_SERVER_ADMIN,
   REMOVE_SERVER_MODERATOR,
@@ -32,15 +33,28 @@ type PendingInvite = {
   profilePicURL?: string | null;
 };
 
-const props = defineProps<{
-  serverConfig: {
-    Admins?: ServerUser[] | null;
-    Moderators?: ServerModerator[] | null;
-    PendingAdminInvites?: PendingInvite[] | null;
-    PendingModInvites?: PendingInvite[] | null;
-  } | null;
-  onUpdated?: () => void;
-}>();
+type PendingMembershipAction =
+  | { kind: 'cancel-admin-invite'; username: string }
+  | { kind: 'cancel-mod-invite'; username: string }
+  | { kind: 'remove-admin'; username: string }
+  | { kind: 'remove-moderator'; displayName: string };
+
+const props = withDefaults(
+  defineProps<{
+    serverConfig: {
+      Admins?: ServerUser[] | null;
+      Moderators?: ServerModerator[] | null;
+      PendingAdminInvites?: PendingInvite[] | null;
+      PendingModInvites?: PendingInvite[] | null;
+    } | null;
+    canManageAdmins?: boolean;
+    onUpdated?: () => void;
+  }>(),
+  {
+    canManageAdmins: true,
+    onUpdated: undefined,
+  }
+);
 
 const newAdminUsername = ref('');
 const newModeratorUsername = ref('');
@@ -112,6 +126,37 @@ const modError = computed(
     removeServerModeratorError.value
 );
 
+const pendingMembershipAction = ref<PendingMembershipAction | null>(null);
+
+const confirmationTitle = computed(() => {
+  if (pendingMembershipAction.value?.kind.startsWith('cancel-')) {
+    return 'Cancel invitation?';
+  }
+  return 'Remove server member?';
+});
+
+const confirmationBody = computed(() => {
+  const action = pendingMembershipAction.value;
+  if (!action) return '';
+
+  if (action.kind === 'cancel-admin-invite') {
+    return `Cancel the pending server admin invitation for u/${action.username}?`;
+  }
+  if (action.kind === 'cancel-mod-invite') {
+    return `Cancel the pending server moderator invitation for u/${action.username}?`;
+  }
+  if (action.kind === 'remove-admin') {
+    return `Remove u/${action.username} from the current server admins?`;
+  }
+  return `Remove ${action.displayName} from the current server moderators?`;
+});
+
+const confirmationButtonText = computed(() =>
+  pendingMembershipAction.value?.kind.startsWith('cancel-')
+    ? 'Cancel invitation'
+    : 'Remove member'
+);
+
 const sendAdminInvite = async () => {
   const username = newAdminUsername.value.trim();
   if (!username) return;
@@ -165,6 +210,22 @@ const removeModerator = async (displayName: string) => {
   });
   props.onUpdated?.();
 };
+
+const confirmMembershipAction = async () => {
+  const action = pendingMembershipAction.value;
+  pendingMembershipAction.value = null;
+  if (!action) return;
+
+  if (action.kind === 'cancel-admin-invite') {
+    await cancelAdminInvite(action.username);
+  } else if (action.kind === 'cancel-mod-invite') {
+    await cancelModInvite(action.username);
+  } else if (action.kind === 'remove-admin') {
+    await removeAdmin(action.username);
+  } else {
+    await removeModerator(action.displayName);
+  }
+};
 </script>
 
 <template>
@@ -187,19 +248,32 @@ const removeModerator = async (displayName: string) => {
         <h3 class="font-medium text-gray-900 dark:text-gray-100">
           Server Admins
         </h3>
+        <p
+          v-if="!canManageAdmins"
+          id="admin-management-permission-help"
+          class="text-sm text-gray-600 dark:text-gray-300"
+        >
+          Only a server super-admin can invite or remove server admins.
+        </p>
         <div class="flex gap-2">
           <input
             v-model="newAdminUsername"
             type="text"
             placeholder="Username to invite"
             aria-label="Username to invite as server admin"
+            :aria-describedby="
+              canManageAdmins ? undefined : 'admin-management-permission-help'
+            "
+            :disabled="!canManageAdmins"
             class="w-full rounded border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
             @keyup.enter="sendAdminInvite"
           />
           <button
             type="button"
             class="bg-brand-500 rounded px-3 py-2 text-white disabled:opacity-60"
-            :disabled="loading || !newAdminUsername.trim()"
+            :disabled="
+              !canManageAdmins || loading || !newAdminUsername.trim()
+            "
             @click="sendAdminInvite"
           >
             Invite
@@ -235,8 +309,14 @@ const removeModerator = async (displayName: string) => {
             <button
               type="button"
               class="rounded border border-gray-400 px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-              :disabled="loading"
-              @click="invite.username && cancelAdminInvite(invite.username)"
+              :disabled="!canManageAdmins || loading"
+              @click="
+                invite.username &&
+                (pendingMembershipAction = {
+                  kind: 'cancel-admin-invite',
+                  username: invite.username,
+                })
+              "
             >
               Cancel
             </button>
@@ -278,8 +358,14 @@ const removeModerator = async (displayName: string) => {
             <button
               type="button"
               class="border-brand-500 text-brand-500 rounded border px-2 py-1 text-sm"
-              :disabled="loading"
-              @click="admin.username && removeAdmin(admin.username)"
+              :disabled="!canManageAdmins || loading"
+              @click="
+                admin.username &&
+                (pendingMembershipAction = {
+                  kind: 'remove-admin',
+                  username: admin.username,
+                })
+              "
             >
               Remove
             </button>
@@ -344,7 +430,13 @@ const removeModerator = async (displayName: string) => {
               type="button"
               class="rounded border border-gray-400 px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
               :disabled="loading"
-              @click="invite.username && cancelModInvite(invite.username)"
+              @click="
+                invite.username &&
+                (pendingMembershipAction = {
+                  kind: 'cancel-mod-invite',
+                  username: invite.username,
+                })
+              "
             >
               Cancel
             </button>
@@ -375,7 +467,11 @@ const removeModerator = async (displayName: string) => {
               class="border-brand-500 text-brand-500 rounded border px-2 py-1 text-sm"
               :disabled="loading"
               @click="
-                moderator.displayName && removeModerator(moderator.displayName)
+                moderator.displayName &&
+                (pendingMembershipAction = {
+                  kind: 'remove-moderator',
+                  displayName: moderator.displayName,
+                })
               "
             >
               Remove
@@ -384,5 +480,16 @@ const removeModerator = async (displayName: string) => {
         </div>
       </div>
     </div>
+
+    <WarningModal
+      data-testid="server-membership-confirmation"
+      :title="confirmationTitle"
+      :body="confirmationBody"
+      :open="pendingMembershipAction !== null"
+      :loading="loading"
+      :primary-button-text="confirmationButtonText"
+      @close="pendingMembershipAction = null"
+      @primary-button-click="confirmMembershipAction"
+    />
   </section>
 </template>

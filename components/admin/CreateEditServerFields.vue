@@ -302,7 +302,7 @@ const getCurrentTabLabel = computed(() => {
           <div class="flex w-full">
             <!-- Left Sidebar (hidden on mobile) -->
             <div
-              class="mr-4 hidden w-1/3 border-r border-gray-300 bg-gray-50 lg:block dark:border-gray-300"
+              class="mr-4 hidden w-1/3 border-r border-gray-300 bg-gray-50 lg:block dark:border-gray-700 dark:bg-gray-900"
             >
               <ul class="flex flex-col space-y-2">
                 <li v-for="tab in tabs" :key="tab.key">

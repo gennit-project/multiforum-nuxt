@@ -256,7 +256,7 @@ describe('BrokenRulesModal Component', () => {
     expect((wrapper.vm as any).suspensionLength).toBe('two_weeks');
   });
 
-  it('generates correct formatted comment text', async () => {
+  it('labels forum and server rules correctly in formatted comment text', async () => {
     const wrapper = await mountComponent();
 
     const input = {
@@ -267,10 +267,18 @@ describe('BrokenRulesModal Component', () => {
 
     const result = (wrapper.vm as any).getFinalCommentText(input);
 
-    // Check that all rules are included in the result
-    expect(result).toContain('Forum Rule 1');
-    expect(result).toContain('Forum Rule 2');
-    expect(result).toContain('Server Rule 1');
-    expect(result).toContain('This is a test report');
+    expect({
+      forumHeadingBeforeForumRules:
+        result.indexOf('Forum rule violations:') <
+        result.indexOf('Forum Rule 1'),
+      serverHeadingBeforeServerRules:
+        result.indexOf('Server rule violations:') <
+        result.indexOf('Server Rule 1'),
+      includesNotes: result.includes('Notes:\n\nThis is a test report'),
+    }).toEqual({
+      forumHeadingBeforeForumRules: true,
+      serverHeadingBeforeServerRules: true,
+      includesNotes: true,
+    });
   });
 });

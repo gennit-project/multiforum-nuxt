@@ -1,10 +1,14 @@
 import { expect, test } from '../../helpers/testFixture';
 import {
   buildBasicUser,
+  buildServerModSuspensionScenario,
   buildServerConfig,
+  buildServerUserSuspensionScenario,
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
+import { getIssueDetailBaseMocks } from '../../helpers/issueDetailMocks';
+import { expectNoAxeViolations } from '../../helpers/axe';
 
 // Workflow: "Review Server Suspended Users / Mods Page". Drives the full
 // page -> query -> render chain for /admin/suspended-users and
@@ -178,6 +182,46 @@ test('shows the empty state when there are no server-suspended users', async ({
   ).toBeVisible({ timeout: 60_000 });
 });
 
+test('uses a dark background for the suspensions navigation in dark mode', async ({
+  context,
+  page,
+}) => {
+  await installMockAuth(context, page, {
+    username: TEST_USER,
+    email: 'alice@example.com',
+  });
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await installGraphqlMocks(page, {
+    ...getBaseMocks(TEST_USER),
+    getServerSuspendedUsers: () => ({
+      data: {
+        serverConfigs: [
+          {
+            __typename: 'ServerConfig',
+            serverName: 'Listical',
+            SuspendedUsersAggregate: { count: 0 },
+            SuspendedUsers: [],
+          },
+        ],
+      },
+    }),
+  });
+
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto('/admin/suspensions/suspended-users', {
+    waitUntil: 'domcontentloaded',
+  });
+
+  const sidebar = page.getByTestId('admin-suspensions-sidebar');
+  await expect(sidebar).toBeVisible({ timeout: 60_000 });
+  await expect
+    .poll(() =>
+      sidebar.evaluate((node) => getComputedStyle(node).backgroundColor)
+    )
+    .toBe('rgb(13, 17, 23)');
+  await expectNoAxeViolations(page);
+});
+
 test('renders server-suspended mods with the mod name and issue link', async ({
   context,
   page,
@@ -244,4 +288,141 @@ test('shows the empty state when there are no server-suspended mods', async ({
   await expect(
     page.getByText(/no active server-scoped mod suspensions/i)
   ).toBeVisible({ timeout: 60_000 });
+});
+
+test('follows a user suspension to its reported discussion and unsuspends the author', async ({
+  context,
+  page,
+}) => {
+  const scenario = buildServerUserSuspensionScenario();
+  let suspended = true;
+  let unsuspendVariables: Record<string, unknown> | null = null;
+
+  await installMockAuth(context, page, {
+    username: TEST_USER,
+    email: 'alice@example.com',
+  });
+  await installGraphqlMocks(page, {
+    ...getIssueDetailBaseMocks({ username: TEST_USER }),
+    getServerSuspendedUsers: () => ({
+      data: {
+        serverConfigs: [
+          {
+            __typename: 'ServerConfig',
+            serverName: 'Listical',
+            SuspendedUsersAggregate: { count: suspended ? 1 : 0 },
+            SuspendedUsers: suspended ? [scenario.suspension] : [],
+          },
+        ],
+      },
+    }),
+    getIssue: () => ({ data: { issues: [scenario.issue] } }),
+    getDiscussion: () => ({
+      data: { discussions: [scenario.reportedDiscussion] },
+    }),
+    getDiscussionChannelID: () => ({
+      data: {
+        discussionChannels: [
+          { id: 'reported-discussion-cats', archived: false },
+        ],
+      },
+    }),
+    getSuspension: () => ({
+      data: { isOriginalPosterSuspended: suspended },
+    }),
+    unsuspendUser: ({ body }) => {
+      suspended = false;
+      unsuspendVariables = body.variables ?? null;
+      return { data: { unsuspendUser: { id: scenario.suspension.id } } };
+    },
+  });
+
+  await page.goto('/admin/suspensions/suspended-users', {
+    waitUntil: 'domcontentloaded',
+  });
+  await page.getByRole('link', { name: 'Related Issue' }).click();
+
+  await expect(page.getByText(scenario.reportedDiscussion.title)).toBeVisible({
+    timeout: 60_000,
+  });
+  await expect(page.locator('#main-content')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Unsuspend Author' }).first().click();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Submit' })
+    .click();
+  await expect.poll(() => unsuspendVariables).not.toBeNull();
+  expect(unsuspendVariables).toMatchObject({ issueId: scenario.issue.id });
+
+  await page.goto('/admin/suspensions/suspended-users');
+  await expect(
+    page.getByText(/no active server-scoped user suspensions/i)
+  ).toBeVisible();
+  await expectNoAxeViolations(page);
+});
+
+test('follows a mod suspension to its reported comment and unsuspends the mod', async ({
+  context,
+  page,
+}) => {
+  const scenario = buildServerModSuspensionScenario();
+  let suspended = true;
+  let unsuspendVariables: Record<string, unknown> | null = null;
+
+  await installMockAuth(context, page, {
+    username: TEST_USER,
+    email: 'alice@example.com',
+  });
+  await installGraphqlMocks(page, {
+    ...getIssueDetailBaseMocks({ username: TEST_USER }),
+    getServerSuspendedMods: () => ({
+      data: {
+        serverConfigs: [
+          {
+            __typename: 'ServerConfig',
+            serverName: 'Listical',
+            SuspendedModsAggregate: { count: suspended ? 1 : 0 },
+            SuspendedMods: suspended ? [scenario.suspension] : [],
+          },
+        ],
+      },
+    }),
+    getIssue: () => ({ data: { issues: [scenario.issue] } }),
+    getComment: () => ({ data: { comments: [scenario.reportedComment] } }),
+    getSuspension: () => ({
+      data: { isOriginalPosterSuspended: suspended },
+    }),
+    unsuspendMod: ({ body }) => {
+      suspended = false;
+      unsuspendVariables = body.variables ?? null;
+      return { data: { unsuspendMod: { id: scenario.suspension.id } } };
+    },
+  });
+
+  await page.goto('/admin/suspensions/suspended-mods', {
+    waitUntil: 'domcontentloaded',
+  });
+  await expect(
+    page.getByText(`${scenario.modProfileName} (${scenario.username})`)
+  ).toBeVisible({ timeout: 60_000 });
+  await page.getByRole('link', { name: 'Related Issue' }).click();
+
+  await expect(
+    page.getByText(String(scenario.reportedComment.text))
+  ).toBeVisible({
+    timeout: 60_000,
+  });
+  await page.getByRole('button', { name: 'Unsuspend Mod' }).first().click();
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Submit' })
+    .click();
+  await expect(page.getByText('The mod was unsuspended.')).toBeVisible();
+  expect(unsuspendVariables).toMatchObject({ issueId: scenario.issue.id });
+
+  await page.goto('/admin/suspensions/suspended-mods');
+  await expect(
+    page.getByText(/no active server-scoped mod suspensions/i)
+  ).toBeVisible();
+  await expectNoAxeViolations(page);
 });

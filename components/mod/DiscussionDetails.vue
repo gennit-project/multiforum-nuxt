@@ -53,6 +53,16 @@ const discussion = computed(() => {
   return getDiscussionResult.value?.discussions?.[0] ?? null;
 });
 
+// Server-scoped issues intentionally have an empty channelUniqueName. Their
+// reported discussion is still attached to one or more channels, so use that
+// relationship when building the link back to the original discussion.
+const discussionChannelId = computed(
+  () =>
+    channelId.value ||
+    discussion.value?.DiscussionChannels?.[0]?.channelUniqueName ||
+    ''
+);
+
 const downloadableFiles = computed(
   () => discussion.value?.DownloadableFiles || []
 );
@@ -155,7 +165,10 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
             <nuxt-link
               :to="{
                 name: 'forums-forumId-discussions-discussionId',
-                params: { forumId: channelId, discussionId: discussion.id },
+                params: {
+                  forumId: discussionChannelId,
+                  discussionId: discussion.id,
+                },
               }"
               class="text-brand-500 dark:text-brand-400"
               rel="noopener noreferrer"

@@ -6,6 +6,9 @@ import { useQuery } from '@vue/apollo-composable';
 import { config } from '@/config';
 import ModChannelRolesEditor from '@/components/admin/ModChannelRolesEditor.vue';
 import ServerMembershipEditor from '@/components/admin/ServerMembershipEditor.vue';
+import { useUsername } from '@/composables/useAuthState';
+
+const username = useUsername();
 
 const {
   result: getServerResult,
@@ -28,6 +31,16 @@ const serverConfig = computed(() => {
   }
   return getServerResult.value?.serverConfigs?.[0] || null;
 });
+
+const canManageAdmins = computed(() =>
+  Boolean(
+    username.value &&
+      serverConfig.value?.SuperAdmins?.some(
+        (admin: { username?: string | null }) =>
+          admin.username === username.value
+      )
+  )
+);
 </script>
 
 <template>
@@ -44,6 +57,7 @@ const serverConfig = computed(() => {
           </div>
           <ServerMembershipEditor
             :server-config="serverConfig"
+            :can-manage-admins="canManageAdmins"
             :on-updated="refetchServerConfig"
           />
           <div class="rounded border border-gray-200 p-4 dark:border-gray-700">

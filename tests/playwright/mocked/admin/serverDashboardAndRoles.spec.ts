@@ -6,6 +6,7 @@ import {
 import { createBaseHandlers } from '../../helpers/baseHandlers';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
+import { expectNoAxeViolations } from '../../helpers/axe';
 
 // Admin server-health dashboard and the server-roles management page. Both are
 // admin-only, data-gated surfaces: their content only renders once the
@@ -20,7 +21,10 @@ test.describe('Admin dashboard + roles', () => {
     context,
     page,
   }, testInfo) => {
-    await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
     const diagnostics = await installGraphqlMocks(page, {
       ...createBaseHandlers({ username: TEST_USER }),
       getServerHealthDashboard: () => ({
@@ -45,7 +49,10 @@ test.describe('Admin dashboard + roles', () => {
     context,
     page,
   }, testInfo) => {
-    await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
     const diagnostics = await installGraphqlMocks(page, {
       ...createBaseHandlers({ username: TEST_USER }),
       // GET_SERVER_PERMISSIONS reuses the `getServerConfig` operation name but
@@ -59,7 +66,54 @@ test.describe('Admin dashboard + roles', () => {
 
     try {
       await page.goto('/admin/roles', { waitUntil: 'domcontentloaded' });
-      await expect(page.getByRole('heading', { name: 'Server Roles' })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: 'Server Roles' })
+      ).toBeVisible();
+    } finally {
+      await testInfo.attach('graphql-operations.json', {
+        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+        contentType: 'application/json',
+      });
+    }
+  });
+
+  test('server membership confirms before removing an admin', async ({
+    context,
+    page,
+  }, testInfo) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+    const diagnostics = await installGraphqlMocks(page, {
+      ...createBaseHandlers({ username: TEST_USER }),
+      getServerConfig: () => ({
+        data: {
+          serverConfigs: [
+            buildServerPermissionsConfig({
+              SuperAdmins: [{ username: TEST_USER }],
+              Admins: [{ username: TEST_USER, displayName: 'Alice' }],
+            }),
+          ],
+        },
+      }),
+      GetModChannelRoles: () => ({ data: { modChannelRoles: [] } }),
+    });
+
+    try {
+      await page.goto('/admin/suspensions/server-membership', {
+        waitUntil: 'domcontentloaded',
+      });
+      await page.getByRole('button', { name: 'Remove' }).click();
+
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toContainText(
+        'Remove u/alice from the current server admins?'
+      );
+      await expectNoAxeViolations(page);
+
+      await dialog.getByRole('button', { name: 'Cancel' }).click();
+      await expect(dialog).toBeHidden();
     } finally {
       await testInfo.attach('graphql-operations.json', {
         body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
