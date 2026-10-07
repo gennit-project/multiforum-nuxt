@@ -50,7 +50,7 @@ const getCurrentTabLabel = computed(() => {
       <div class="mb-4 lg:hidden">
         <div class="relative">
           <button
-            class="flex w-full items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm dark:text-white"
+            class="flex w-full items-center justify-between rounded-md border border-gray-300 bg-gray-50 px-4 py-2 text-sm dark:border-gray-700 dark:bg-gray-900 dark:text-white"
             type="button"
             @click="isDropdownOpen = !isDropdownOpen"
           >
@@ -102,7 +102,8 @@ const getCurrentTabLabel = computed(() => {
 
       <div class="flex w-full">
         <div
-          class="mr-4 hidden w-1/3 border-r border-gray-300 bg-gray-50 lg:block dark:border-gray-300"
+          class="mr-4 hidden w-1/3 border-r border-gray-300 bg-gray-50 lg:block dark:border-gray-700 dark:bg-gray-900"
+          data-testid="admin-suspensions-sidebar"
         >
           <ul class="flex flex-col space-y-2">
             <li v-for="tab in tabs" :key="tab.key">

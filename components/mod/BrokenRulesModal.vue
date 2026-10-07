@@ -433,7 +433,7 @@ const getFinalCommentText = (input: FinalCommentTextInput) => {
 ${
   selectedForumRules.length > 0
     ? `
-Server rule violations:
+Forum rule violations:
 
 ${selectedForumRules.map((rule) => `- ${rule}`).join('\n')}
 `
@@ -443,7 +443,7 @@ ${selectedForumRules.map((rule) => `- ${rule}`).join('\n')}
 ${
   selectedServerRules.length > 0
     ? `
-Forum rule violations:
+Server rule violations:
 
 ${selectedServerRules.map((rule) => `- ${rule}`).join('\n')}
 `

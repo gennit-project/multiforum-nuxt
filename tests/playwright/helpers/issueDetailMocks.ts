@@ -55,6 +55,7 @@ export const getIssueDetailBaseMocks = ({
         buildServerConfig({
           serverName: 'Listical',
           rules: DEFAULT_RULES_JSON,
+          Admins: [{ username }],
           DefaultModRole: DEFAULT_MOD_ROLE,
           DefaultElevatedModRole: DEFAULT_MOD_ROLE,
         }),
@@ -113,6 +114,10 @@ export const getIssueDetailBaseMocks = ({
   }),
   countOpenIssues: () => ({ data: { issuesAggregate: { count: 1 } } }),
   countClosedIssues: () => ({ data: { issuesAggregate: { count: 0 } } }),
+  countIssuesByServer: () => ({ data: { issuesAggregate: { count: 1 } } }),
+  countClosedIssuesByServer: () => ({
+    data: { issuesAggregate: { count: 0 } },
+  }),
   getEvents: () => ({ data: { events: [], eventsAggregate: { count: 0 } } }),
   // Rules shown in the broken-rules report modal.
   getServerRules: () => ({
@@ -126,6 +131,9 @@ export const getIssueDetailBaseMocks = ({
   // Related-content lookups default to empty so IssueRelatedContent stays inert
   // unless a test overrides them.
   getDiscussion: () => ({ data: { discussions: [] } }),
+  getDiscussionChannelID: () => ({ data: { discussionChannels: [] } }),
+  getEventChannelID: () => ({ data: { eventChannels: [] } }),
+  GetInstanceSetupStatus: () => ({ data: { getInstanceSetupStatus: null } }),
   // SuspendModButton's "is the target mod already suspended?" check.
   getSuspension: () => ({ data: { isOriginalPosterSuspended: false } }),
 });

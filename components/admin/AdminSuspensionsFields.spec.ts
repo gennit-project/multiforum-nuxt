@@ -67,4 +67,12 @@ describe('AdminSuspensionsFields', () => {
     expect(wrapper.text()).toContain('Suspended Users');
     expect(wrapper.text()).toContain('Suspended Mods');
   });
+
+  it('gives the desktop sidebar a dark-mode background', () => {
+    const wrapper = mountFields();
+
+    expect(
+      wrapper.get('[data-testid="admin-suspensions-sidebar"]').classes()
+    ).toContain('dark:bg-gray-900');
+  });
 });

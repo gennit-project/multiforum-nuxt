@@ -415,6 +415,9 @@ export const GET_SERVER_PERMISSIONS = gql`
   query getServerConfig($serverName: String!) {
     serverConfigs(where: { serverName: $serverName }) {
       serverName
+      SuperAdmins {
+        username
+      }
       Admins {
         username
         displayName

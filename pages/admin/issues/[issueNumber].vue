@@ -3,7 +3,5 @@ import IssueDetail from '@/components/mod/IssueDetail.vue';
 </script>
 
 <template>
-  <NuxtLayout>
-    <IssueDetail />
-  </NuxtLayout>
+  <IssueDetail />
 </template>

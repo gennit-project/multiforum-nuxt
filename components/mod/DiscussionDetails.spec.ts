@@ -22,8 +22,12 @@ vi.mock('@vue/apollo-composable', () => ({
     },
   }),
 }));
-vi.mock('nuxt/app', () => ({ useRoute: () => ({ params: { forumId: 'cats' } }) }));
-vi.mock('@/composables/useAuthState', () => ({ useModProfileName: () => ref('') }));
+vi.mock('nuxt/app', () => ({
+  useRoute: () => ({ params: { forumId: 'cats' } }),
+}));
+vi.mock('@/composables/useAuthState', () => ({
+  useModProfileName: () => ref(''),
+}));
 
 const issue = { relatedDiscussionId: 'd1' } as unknown as Issue;
 
@@ -33,23 +37,45 @@ const discussion = (overrides: Record<string, unknown> = {}) => ({
   body: 'discussion body',
   createdAt: '2024-01-01T00:00:00Z',
   Author: { username: 'alice', profilePicURL: '' },
+  DiscussionChannels: [{ channelUniqueName: 'cats' }],
   DownloadableFiles: [],
   ...overrides,
 });
 
-const mountDetails = () =>
+const mountDetails = (channelId = 'cats') =>
   mount(DiscussionDetails, {
-    props: { activeIssue: issue, channelId: 'cats' },
+    props: { activeIssue: issue, channelId },
     global: {
       stubs: {
         ClientOnly: { template: '<div><slot /></div>' },
-        ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
-        LoadingSpinner: { name: 'LoadingSpinner', template: '<div class="spinner" />' },
-        MarkdownPreview: { name: 'MarkdownPreview', props: ['text'], template: '<div class="md">{{ text }}</div>' },
+        ErrorBanner: {
+          name: 'ErrorBanner',
+          props: ['text'],
+          template: '<div class="err">{{ text }}</div>',
+        },
+        LoadingSpinner: {
+          name: 'LoadingSpinner',
+          template: '<div class="spinner" />',
+        },
+        MarkdownPreview: {
+          name: 'MarkdownPreview',
+          props: ['text'],
+          template: '<div class="md">{{ text }}</div>',
+        },
         AvatarComponent: true,
-        UsernameWithTooltip: { name: 'UsernameWithTooltip', props: ['username'], template: '<span>{{ username }}</span>' },
-        NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
-        'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
+        UsernameWithTooltip: {
+          name: 'UsernameWithTooltip',
+          props: ['username'],
+          template: '<span>{{ username }}</span>',
+        },
+        NuxtLink: {
+          props: ['to'],
+          template: '<a :data-forum-id="to?.params?.forumId"><slot /></a>',
+        },
+        'nuxt-link': {
+          props: ['to'],
+          template: '<a :data-forum-id="to?.params?.forumId"><slot /></a>',
+        },
       },
     },
   });
@@ -103,6 +129,12 @@ describe('DiscussionDetails content', () => {
 
     expect(wrapper.text()).toContain('alice');
   });
+
+  it('uses the reported discussion channel for a server-scoped issue link', () => {
+    const wrapper = mountDetails('');
+
+    expect(wrapper.get('h3 a').attributes('data-forum-id')).toBe('cats');
+  });
 });
 
 describe('DiscussionDetails downloads', () => {
@@ -111,7 +143,13 @@ describe('DiscussionDetails downloads', () => {
       discussions: [
         discussion({
           DownloadableFiles: [
-            { id: 'f1', fileName: 'model.glb', kind: '3D', size: 2048, url: 'https://x/model.glb' },
+            {
+              id: 'f1',
+              fileName: 'model.glb',
+              kind: '3D',
+              size: 2048,
+              url: 'https://x/model.glb',
+            },
           ],
         }),
       ],
@@ -127,7 +165,9 @@ describe('DiscussionDetails downloads', () => {
     h.result = ref({
       discussions: [
         discussion({
-          DownloadableFiles: [{ id: 'f1', fileName: 'broken', size: 0, url: '' }],
+          DownloadableFiles: [
+            { id: 'f1', fileName: 'broken', size: 0, url: '' },
+          ],
         }),
       ],
     });

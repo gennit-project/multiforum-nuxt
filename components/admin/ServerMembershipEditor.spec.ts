@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import ServerMembershipEditor from './ServerMembershipEditor.vue';
+import WarningModal from '@/components/WarningModal.vue';
 
 const inviteServerAdmin = vi.fn();
 const cancelInviteServerAdmin = vi.fn();
@@ -26,7 +27,8 @@ vi.mock('@vue/apollo-composable', () => ({
     const source = fn?.loc?.source?.body || '';
     let mutateFn = inviteServerAdmin;
     let errorRef = mockAdminError;
-    if (source.includes('CancelInviteServerAdmin')) mutateFn = cancelInviteServerAdmin;
+    if (source.includes('CancelInviteServerAdmin'))
+      mutateFn = cancelInviteServerAdmin;
     if (source.includes('RemoveServerAdmin')) mutateFn = removeServerAdmin;
     if (source.includes('InviteServerMod')) {
       mutateFn = inviteServerMod;
@@ -79,11 +81,17 @@ describe('ServerMembershipEditor', () => {
     ],
   };
 
+  const stubs = {
+    AvatarComponent: true,
+    UsernameWithTooltip: true,
+    WarningModal: true,
+  };
+
   it('renders current admins and moderators', () => {
     const wrapper = mount(ServerMembershipEditor, {
       props: { serverConfig },
       global: {
-        stubs: ['AvatarComponent', 'UsernameWithTooltip'],
+        stubs,
       },
     });
 
@@ -99,7 +107,7 @@ describe('ServerMembershipEditor', () => {
     const wrapper = mount(ServerMembershipEditor, {
       props: { serverConfig },
       global: {
-        stubs: ['AvatarComponent', 'UsernameWithTooltip'],
+        stubs,
       },
     });
 
@@ -110,7 +118,7 @@ describe('ServerMembershipEditor', () => {
     const wrapper = mount(ServerMembershipEditor, {
       props: { serverConfig, onUpdated },
       global: {
-        stubs: ['AvatarComponent', 'UsernameWithTooltip'],
+        stubs,
       },
     });
 
@@ -132,7 +140,7 @@ describe('ServerMembershipEditor', () => {
     const wrapper = mount(ServerMembershipEditor, {
       props: { serverConfig, onUpdated },
       global: {
-        stubs: ['AvatarComponent', 'UsernameWithTooltip'],
+        stubs,
       },
     });
 
@@ -149,8 +157,6 @@ describe('ServerMembershipEditor', () => {
     });
     expect(onUpdated).toHaveBeenCalled();
   });
-
-  const stubs = ['AvatarComponent', 'UsernameWithTooltip'];
 
   const mountEditor = (cfg: unknown) =>
     mount(ServerMembershipEditor, {
@@ -174,9 +180,37 @@ describe('ServerMembershipEditor', () => {
     );
   });
 
+  it('explains and disables admin management for restricted admins', () => {
+    const wrapper = mount(ServerMembershipEditor, {
+      props: { serverConfig, canManageAdmins: false },
+      global: { stubs },
+    });
+    const adminInput = wrapper.findAll('input')[0]!;
+    const adminButtons = wrapper
+      .findAll('button')
+      .filter((button) => ['Invite', 'Remove'].includes(button.text()))
+      .slice(0, 2);
+
+    expect({
+      help: wrapper.text().includes(
+        'Only a server super-admin can invite or remove server admins.'
+      ),
+      inputDisabled: adminInput.attributes('disabled') !== undefined,
+      describedBy: adminInput.attributes('aria-describedby'),
+      buttonsDisabled: adminButtons.map(
+        (button) => button.attributes('disabled') !== undefined
+      ),
+    }).toEqual({
+      help: true,
+      inputDisabled: true,
+      describedBy: 'admin-management-permission-help',
+      buttonsDisabled: [true, true],
+    });
+  });
+
   // --- Remove existing members ---
 
-  it('removes a server admin', async () => {
+  it('confirms before removing a server admin', async () => {
     const wrapper = mountEditor(serverConfig);
 
     const removeButtons = wrapper
@@ -184,15 +218,36 @@ describe('ServerMembershipEditor', () => {
       .filter((b) => b.text() === 'Remove');
     // First Remove belongs to the Server Admins column ("alice").
     await removeButtons[0].trigger('click');
+    const callsBeforeConfirmation = removeServerAdmin.mock.calls.length;
+    const modal = wrapper.findComponent(WarningModal);
+    const modalState = {
+      open: modal.props('open'),
+      title: modal.props('title'),
+      body: modal.props('body'),
+    };
+    modal.vm.$emit('primary-button-click');
+    await flushPromises();
 
-    expect(removeServerAdmin).toHaveBeenCalledWith({
-      serverName: 'TestServer',
-      username: 'alice',
+    expect({
+      callsBeforeConfirmation,
+      modalState,
+      callsAfterConfirmation: removeServerAdmin.mock.calls,
+      updateCount: onUpdated.mock.calls.length,
+    }).toEqual({
+      callsBeforeConfirmation: 0,
+      modalState: {
+        open: true,
+        title: 'Remove server member?',
+        body: 'Remove u/alice from the current server admins?',
+      },
+      callsAfterConfirmation: [
+        [{ serverName: 'TestServer', username: 'alice' }],
+      ],
+      updateCount: 1,
     });
-    expect(onUpdated).toHaveBeenCalled();
   });
 
-  it('removes a server moderator by mod profile name', async () => {
+  it('confirms before removing a server moderator by mod profile name', async () => {
     const wrapper = mountEditor(serverConfig);
 
     const removeButtons = wrapper
@@ -200,20 +255,35 @@ describe('ServerMembershipEditor', () => {
       .filter((b) => b.text() === 'Remove');
     // Second Remove belongs to the Server Moderators column ("Mod Alice").
     await removeButtons[1].trigger('click');
+    const callsBeforeConfirmation = removeServerModerator.mock.calls.length;
+    const modal = wrapper.findComponent(WarningModal);
+    const modalBody = modal.props('body');
+    modal.vm.$emit('primary-button-click');
+    await flushPromises();
 
-    expect(removeServerModerator).toHaveBeenCalledWith({
-      serverName: 'TestServer',
-      displayName: 'Mod Alice',
+    expect({
+      callsBeforeConfirmation,
+      modalBody,
+      callsAfterConfirmation: removeServerModerator.mock.calls,
+    }).toEqual({
+      callsBeforeConfirmation: 0,
+      modalBody: 'Remove Mod Alice from the current server moderators?',
+      callsAfterConfirmation: [
+        [{ serverName: 'TestServer', displayName: 'Mod Alice' }],
+      ],
     });
-    expect(onUpdated).toHaveBeenCalled();
   });
 
   // --- Pending invites: display + cancel ---
 
   const serverConfigWithPending = {
     ...serverConfig,
-    PendingAdminInvites: [{ username: 'bob', displayName: 'Bob', profilePicURL: '' }],
-    PendingModInvites: [{ username: 'carol', displayName: 'Carol', profilePicURL: '' }],
+    PendingAdminInvites: [
+      { username: 'bob', displayName: 'Bob', profilePicURL: '' },
+    ],
+    PendingModInvites: [
+      { username: 'carol', displayName: 'Carol', profilePicURL: '' },
+    ],
   };
 
   it('marks pending invites with a (pending) badge', () => {
@@ -222,31 +292,55 @@ describe('ServerMembershipEditor', () => {
     expect(wrapper.text()).toContain('(pending)');
   });
 
-  it('cancels a pending admin invite', async () => {
+  it('confirms before canceling a pending admin invite', async () => {
     const wrapper = mountEditor(serverConfigWithPending);
 
     const cancelButtons = wrapper
       .findAll('button')
       .filter((b) => b.text() === 'Cancel');
     await cancelButtons[0].trigger('click');
+    const callsBeforeConfirmation = cancelInviteServerAdmin.mock.calls.length;
+    const modal = wrapper.findComponent(WarningModal);
+    const modalBody = modal.props('body');
+    modal.vm.$emit('primary-button-click');
+    await flushPromises();
 
-    expect(cancelInviteServerAdmin).toHaveBeenCalledWith({
-      serverName: 'TestServer',
-      inviteeUsername: 'bob',
+    expect({
+      callsBeforeConfirmation,
+      modalBody,
+      callsAfterConfirmation: cancelInviteServerAdmin.mock.calls,
+    }).toEqual({
+      callsBeforeConfirmation: 0,
+      modalBody: 'Cancel the pending server admin invitation for u/bob?',
+      callsAfterConfirmation: [
+        [{ serverName: 'TestServer', inviteeUsername: 'bob' }],
+      ],
     });
   });
 
-  it('cancels a pending mod invite', async () => {
+  it('confirms before canceling a pending mod invite', async () => {
     const wrapper = mountEditor(serverConfigWithPending);
 
     const cancelButtons = wrapper
       .findAll('button')
       .filter((b) => b.text() === 'Cancel');
     await cancelButtons[1].trigger('click');
+    const callsBeforeConfirmation = cancelInviteServerMod.mock.calls.length;
+    const modal = wrapper.findComponent(WarningModal);
+    const modalBody = modal.props('body');
+    modal.vm.$emit('primary-button-click');
+    await flushPromises();
 
-    expect(cancelInviteServerMod).toHaveBeenCalledWith({
-      serverName: 'TestServer',
-      inviteeUsername: 'carol',
+    expect({
+      callsBeforeConfirmation,
+      modalBody,
+      callsAfterConfirmation: cancelInviteServerMod.mock.calls,
+    }).toEqual({
+      callsBeforeConfirmation: 0,
+      modalBody: 'Cancel the pending server moderator invitation for u/carol?',
+      callsAfterConfirmation: [
+        [{ serverName: 'TestServer', inviteeUsername: 'carol' }],
+      ],
     });
   });
 

@@ -8,6 +8,10 @@ vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
 
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => ref('alice'),
+}));
+
 const RequireAuthStub = {
   template: '<div><slot name="has-auth" /></div>',
 };
@@ -50,5 +54,29 @@ describe('ServerMembershipPanel', () => {
 
     expect(wrapper.text()).toContain('View Suspended Users');
     expect(wrapper.text()).toContain('View Suspended Mods');
+  });
+
+  it('allows super-admins to manage server admins', () => {
+    const wrapper = mountWith({
+      serverConfigs: [{ SuperAdmins: [{ username: 'alice' }] }],
+    });
+
+    expect(
+      wrapper.findComponent({ name: 'ServerMembershipEditor' }).props(
+        'canManageAdmins'
+      )
+    ).toBe(true);
+  });
+
+  it('restricts admin management for non-super-admins', () => {
+    const wrapper = mountWith({
+      serverConfigs: [{ SuperAdmins: [], Admins: [{ username: 'alice' }] }],
+    });
+
+    expect(
+      wrapper.findComponent({ name: 'ServerMembershipEditor' }).props(
+        'canManageAdmins'
+      )
+    ).toBe(false);
   });
 });
