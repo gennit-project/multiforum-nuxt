@@ -106,7 +106,7 @@
     "@nuxtjs/apollo": "^5.0.0-alpha.15",
     "@nuxtjs/google-fonts": "^3.2.0",
     "@pinia/testing": "^1.0.1",
-    "@playwright/test": "^1.61.1",
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@types/crypto-js": "^4.2.2",
     "@types/diff-match-patch": "^1.0.36",
