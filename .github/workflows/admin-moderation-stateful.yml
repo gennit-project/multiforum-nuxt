@@ -47,7 +47,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Install backend dependencies
-        run: pnpm --dir gennit-backend install --frozen-lockfile
+        # The backend is checked out beneath the frontend workspace. Without
+        # this flag pnpm discovers the parent's pnpm-workspace.yaml and
+        # reinstalls the frontend instead of creating backend/node_modules.
+        run: pnpm --dir gennit-backend install --ignore-workspace --frozen-lockfile
 
       - name: Start test Neo4j
         run: pnpm run playwright:neo4j:up
