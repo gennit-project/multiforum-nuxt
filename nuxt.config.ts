@@ -26,6 +26,7 @@ const runtimeGraphqlFetch: typeof globalThis.fetch = (input, init) => {
   return globalThis.fetch(target, init);
 };
 const ignoredDevWatchPatterns = [
+  '**/.stateful/**',
   '**/.claude/**',
   '**/.agents/**',
   '**/.vercel/**',
@@ -36,6 +37,8 @@ const ignoredDevWatchPatterns = [
   '**/test-results/**',
 ];
 const ignoredNuxtPaths = [
+  '.stateful',
+  '.stateful/**',
   '.claude',
   '.claude/**',
   '.agents',

@@ -1,3 +1,5 @@
+.stateful
+.stateful/**
 .claude
 .claude/**
 .agents

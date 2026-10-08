@@ -55,7 +55,7 @@ const webServers = [
           },
           url: `http://127.0.0.1:${backendPort}`,
           reuseExistingServer: true,
-          timeout: 120_000,
+          timeout: 240_000,
         },
       ]
     : []),
@@ -72,7 +72,7 @@ const webServers = [
     },
     url: baseURL,
     reuseExistingServer: true,
-    timeout: 120_000,
+    timeout: isStatefulRun ? 240_000 : 120_000,
   },
 ];
 
