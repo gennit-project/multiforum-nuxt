@@ -67,6 +67,10 @@ type AuthSessionContext = {
   profilePicURL: string;
 };
 
+type MockAuthCookie = Partial<AuthSessionContext> & {
+  accessToken?: string;
+};
+
 declare module 'h3' {
   interface H3EventContext {
     authSession?: AuthSessionContext;
@@ -152,15 +156,18 @@ const readMockSession = (event: Parameters<typeof getCookie>[0]) => {
   try {
     const decoded = JSON.parse(
       Buffer.from(raw, 'base64').toString('utf-8')
-    ) as Partial<AuthSessionContext>;
+    ) as MockAuthCookie;
     return {
-      isAuthenticated: true,
-      username: decoded.username || '',
-      email: decoded.email || '',
-      modProfileName: decoded.modProfileName || '',
-      notificationCount: decoded.notificationCount || 0,
-      profilePicURL: decoded.profilePicURL || '',
-    } satisfies AuthSessionContext;
+      authSession: {
+        isAuthenticated: true,
+        username: decoded.username || '',
+        email: decoded.email || '',
+        modProfileName: decoded.modProfileName || '',
+        notificationCount: decoded.notificationCount || 0,
+        profilePicURL: decoded.profilePicURL || '',
+      } satisfies AuthSessionContext,
+      accessToken: decoded.accessToken,
+    };
   } catch {
     return null;
   }
@@ -170,7 +177,8 @@ export default defineEventHandler(async (event) => {
   // Mocked-test bypass: seed straight from the cookie, no real Auth0 involved.
   const mockSession = readMockSession(event);
   if (mockSession) {
-    event.context.authSession = mockSession;
+    event.context.authSession = mockSession.authSession;
+    event.context.accessToken = mockSession.accessToken;
     return;
   }
 

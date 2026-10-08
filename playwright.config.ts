@@ -9,6 +9,7 @@ const baseURL = `http://127.0.0.1:${frontendPort}`;
 const graphqlURL = `http://127.0.0.1:${backendPort}/graphql`;
 const skipWebServer = process.env.PW_SKIP_WEBSERVER === 'true';
 const isStatefulRun = process.env.PLAYWRIGHT_STATEFUL === 'true';
+const useBuiltFrontend = process.env.PLAYWRIGHT_USE_BUILT_FRONTEND === 'true';
 const repoRoot = dirname(fileURLToPath(import.meta.url));
 const backendCandidates = [
   resolve(repoRoot, 'gennit-backend'),
@@ -61,11 +62,18 @@ const webServers = [
     : []),
   {
     name: 'frontend',
-    // Use dev server with increased memory for stateful tests
-    command: isStatefulRun
-      ? `NODE_OPTIONS='--max-old-space-size=4096' npx nuxt dev --host 127.0.0.1 --port ${frontendPort}`
-      : `npx nuxt dev --host 127.0.0.1 --port ${frontendPort}`,
+    // CI serves the prebuilt node artifact so cold Nuxt compilation cannot
+    // consume the web-server readiness window. Local runs retain fast HMR.
+    command: useBuiltFrontend
+      ? 'node .output/server/index.mjs'
+      : isStatefulRun
+        ? `NODE_OPTIONS='--max-old-space-size=4096' pnpm exec nuxt dev --host 127.0.0.1 --port ${frontendPort}`
+        : `pnpm exec nuxt dev --host 127.0.0.1 --port ${frontendPort}`,
     env: {
+      NITRO_HOST: '127.0.0.1',
+      NITRO_PORT: frontendPort,
+      NUXT_BACKEND_GRAPHQL_URL: graphqlURL,
+      NUXT_PUBLIC_AUTH_PROVIDER: 'local-dev',
       VITE_E2E_MOCK_MODE: 'true',
       VITE_GRAPHQL_URL: graphqlURL,
       VITE_SERVER_NAME: 'Playwright Test Server',

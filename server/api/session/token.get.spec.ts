@@ -41,4 +41,12 @@ describe('session token endpoint', () => {
       accessToken: 'auth0-token',
     });
   });
+
+  it('returns a token resolved by the request middleware', async () => {
+    h.cookie = undefined;
+
+    await expect(
+      handler({ context: { accessToken: 'mock-jwt' } } as never)
+    ).resolves.toEqual({ accessToken: 'mock-jwt' });
+  });
 });

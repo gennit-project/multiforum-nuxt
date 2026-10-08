@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: gennit-project/multiforum-backend
-          path: gennit-backend
+          path: .stateful/gennit-backend
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -41,26 +41,33 @@ jobs:
           cache: 'pnpm'
           cache-dependency-path: |
             pnpm-lock.yaml
-            gennit-backend/pnpm-lock.yaml
+            .stateful/gennit-backend/pnpm-lock.yaml
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Install backend dependencies
-        run: pnpm --dir gennit-backend install --frozen-lockfile
+        # The backend is checked out beneath the frontend workspace. Without
+        # this flag pnpm discovers the parent's pnpm-workspace.yaml and
+        # reinstalls the frontend instead of creating backend/node_modules.
+        run: pnpm --dir .stateful/gennit-backend install --ignore-workspace --frozen-lockfile
 
       - name: Start test Neo4j
         run: pnpm run playwright:neo4j:up
 
       - name: Build backend
-        run: pnpm --dir gennit-backend run build
+        run: pnpm --dir .stateful/gennit-backend run build
+
+      - name: Build frontend for Playwright
+        run: pnpm run build:playwright:mocked
 
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run real-stack admin moderation suite
         env:
-          PLAYWRIGHT_BACKEND_CWD: ${{ github.workspace }}/gennit-backend
+          PLAYWRIGHT_BACKEND_CWD: ${{ github.workspace }}/.stateful/gennit-backend
+          PLAYWRIGHT_USE_BUILT_FRONTEND: 'true'
         run: pnpm run test:playwright:stateful:admin
 
       - name: Upload Playwright diagnostics

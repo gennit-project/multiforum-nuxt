@@ -41,7 +41,7 @@ export async function installMockAuth(
   // (gated on VITE_E2E_MOCK_MODE). This drives the SAME SSR seeding path as
   // production, so SSR and client hydrate to the same authenticated state.
   const mockAuth = Buffer.from(
-    JSON.stringify({ username, email, modProfileName })
+    JSON.stringify({ username, email, modProfileName, accessToken: token })
   ).toString('base64');
 
   await context.addCookies([

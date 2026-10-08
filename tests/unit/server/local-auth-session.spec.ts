@@ -104,4 +104,31 @@ describe('local auth session middleware', () => {
       { path: '/' }
     );
   });
+
+  it('passes the guarded mock token through to the request context', async () => {
+    process.env.VITE_E2E_MOCK_MODE = 'true';
+    h.cookie = Buffer.from(
+      JSON.stringify({
+        username: 'admin',
+        email: 'admin@example.test',
+        modProfileName: 'bootstrap-admin',
+        accessToken: 'mock-jwt',
+      })
+    ).toString('base64');
+    const event = createEvent();
+
+    await handler(event as never);
+
+    expect(event.context).toEqual({
+      accessToken: 'mock-jwt',
+      authSession: {
+        isAuthenticated: true,
+        username: 'admin',
+        email: 'admin@example.test',
+        modProfileName: 'bootstrap-admin',
+        notificationCount: 0,
+        profilePicURL: '',
+      },
+    });
+  });
 });
