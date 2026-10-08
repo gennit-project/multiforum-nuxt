@@ -55,7 +55,7 @@ const webServers = [
           },
           url: `http://127.0.0.1:${backendPort}`,
           reuseExistingServer: true,
-          timeout: 240_000,
+          timeout: 120_000,
         },
       ]
     : []),
@@ -63,8 +63,8 @@ const webServers = [
     name: 'frontend',
     // Use dev server with increased memory for stateful tests
     command: isStatefulRun
-      ? `NODE_OPTIONS='--max-old-space-size=4096' npx nuxt dev --host 127.0.0.1 --port ${frontendPort}`
-      : `npx nuxt dev --host 127.0.0.1 --port ${frontendPort}`,
+      ? `NODE_OPTIONS='--max-old-space-size=4096' pnpm exec nuxt dev --host 127.0.0.1 --port ${frontendPort}`
+      : `pnpm exec nuxt dev --host 127.0.0.1 --port ${frontendPort}`,
     env: {
       VITE_E2E_MOCK_MODE: 'true',
       VITE_GRAPHQL_URL: graphqlURL,
@@ -72,7 +72,7 @@ const webServers = [
     },
     url: baseURL,
     reuseExistingServer: true,
-    timeout: isStatefulRun ? 240_000 : 120_000,
+    timeout: 120_000,
   },
 ];
 
