@@ -64,21 +64,25 @@ const {
   mutate: inviteServerAdmin,
   loading: inviteServerAdminLoading,
   error: inviteServerAdminError,
+  onError: onInviteServerAdminError,
 } = useMutation(INVITE_SERVER_ADMIN);
 const {
   mutate: cancelInviteServerAdmin,
   loading: cancelInviteServerAdminLoading,
   error: cancelInviteServerAdminError,
+  onError: onCancelInviteServerAdminError,
 } = useMutation(CANCEL_INVITE_SERVER_ADMIN);
 const {
   mutate: inviteServerMod,
   loading: inviteServerModLoading,
   error: inviteServerModError,
+  onError: onInviteServerModError,
 } = useMutation(INVITE_SERVER_MOD);
 const {
   mutate: cancelInviteServerMod,
   loading: cancelInviteServerModLoading,
   error: cancelInviteServerModError,
+  onError: onCancelInviteServerModError,
 } = useMutation(CANCEL_INVITE_SERVER_MOD);
 
 // Remove mutations (for existing members)
@@ -86,12 +90,23 @@ const {
   mutate: removeServerAdmin,
   loading: removeServerAdminLoading,
   error: removeServerAdminError,
+  onError: onRemoveServerAdminError,
 } = useMutation(REMOVE_SERVER_ADMIN);
 const {
   mutate: removeServerModerator,
   loading: removeServerModeratorLoading,
   error: removeServerModeratorError,
+  onError: onRemoveServerModeratorError,
 } = useMutation(REMOVE_SERVER_MODERATOR);
+
+// Register Apollo error handlers so mutation failures are exposed through the
+// hook's error refs without becoming unhandled event-handler rejections.
+onInviteServerAdminError(() => {});
+onCancelInviteServerAdminError(() => {});
+onInviteServerModError(() => {});
+onCancelInviteServerModError(() => {});
+onRemoveServerAdminError(() => {});
+onRemoveServerModeratorError(() => {});
 
 const admins = computed(() => props.serverConfig?.Admins || []);
 const moderators = computed(() => props.serverConfig?.Moderators || []);
@@ -124,6 +139,18 @@ const modError = computed(
     inviteServerModError.value ||
     cancelInviteServerModError.value ||
     removeServerModeratorError.value
+);
+
+const adminInviteDescribedBy = computed(() => {
+  const descriptions = [
+    props.canManageAdmins ? null : 'admin-management-permission-help',
+    adminError.value ? 'admin-invite-error' : null,
+  ].filter(Boolean);
+  return descriptions.length > 0 ? descriptions.join(' ') : undefined;
+});
+
+const modInviteDescribedBy = computed(() =>
+  modError.value ? 'mod-invite-error' : undefined
 );
 
 const pendingMembershipAction = ref<PendingMembershipAction | null>(null);
@@ -160,10 +187,11 @@ const confirmationButtonText = computed(() =>
 const sendAdminInvite = async () => {
   const username = newAdminUsername.value.trim();
   if (!username) return;
-  await inviteServerAdmin({
+  const result = await inviteServerAdmin({
     serverName: config.serverName,
     inviteeUsername: username,
   });
+  if (result?.data?.inviteServerAdmin !== true) return;
   newAdminUsername.value = '';
   props.onUpdated?.();
 };
@@ -187,10 +215,11 @@ const removeAdmin = async (username: string) => {
 const sendModInvite = async () => {
   const username = newModeratorUsername.value.trim();
   if (!username) return;
-  await inviteServerMod({
+  const result = await inviteServerMod({
     serverName: config.serverName,
     inviteeUsername: username,
   });
+  if (result?.data?.inviteServerMod !== true) return;
   newModeratorUsername.value = '';
   props.onUpdated?.();
 };
@@ -261,9 +290,8 @@ const confirmMembershipAction = async () => {
             type="text"
             placeholder="Username to invite"
             aria-label="Username to invite as server admin"
-            :aria-describedby="
-              canManageAdmins ? undefined : 'admin-management-permission-help'
-            "
+            :aria-describedby="adminInviteDescribedBy"
+            :aria-invalid="adminError ? 'true' : undefined"
             :disabled="!canManageAdmins"
             class="w-full rounded border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
             @keyup.enter="sendAdminInvite"
@@ -271,20 +299,27 @@ const confirmMembershipAction = async () => {
           <button
             type="button"
             class="bg-brand-500 rounded px-3 py-2 text-white disabled:opacity-60"
-            :disabled="
-              !canManageAdmins || loading || !newAdminUsername.trim()
-            "
+            :disabled="!canManageAdmins || loading || !newAdminUsername.trim()"
             @click="sendAdminInvite"
           >
             Invite
           </button>
         </div>
-        <p v-if="adminError" class="text-sm text-red-600 dark:text-red-400">
+        <p
+          v-if="adminError"
+          id="admin-invite-error"
+          role="alert"
+          class="text-sm text-red-600 dark:text-red-400"
+        >
           {{ adminError?.message }}
         </p>
 
         <!-- Pending Admin Invites -->
-        <div v-if="pendingAdminInvites.length > 0" class="space-y-2">
+        <div
+          v-if="pendingAdminInvites.length > 0"
+          data-testid="pending-admin-invite-list"
+          class="max-h-64 space-y-2 overflow-y-auto pr-1"
+        >
           <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Pending Invites
           </h4>
@@ -330,7 +365,11 @@ const confirmMembershipAction = async () => {
         >
           No server admins configured.
         </div>
-        <div v-if="admins.length > 0" class="space-y-2">
+        <div
+          v-if="admins.length > 0"
+          data-testid="current-admin-list"
+          class="max-h-64 space-y-2 overflow-y-auto pr-1"
+        >
           <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Current Admins
           </h4>
@@ -384,6 +423,8 @@ const confirmMembershipAction = async () => {
             type="text"
             placeholder="Username to invite"
             aria-label="Username to invite as server moderator"
+            :aria-describedby="modInviteDescribedBy"
+            :aria-invalid="modError ? 'true' : undefined"
             class="w-full rounded border px-3 py-2 dark:border-gray-700 dark:bg-gray-900"
             @keyup.enter="sendModInvite"
           />
@@ -399,12 +440,21 @@ const confirmMembershipAction = async () => {
         <p class="text-xs text-gray-500 dark:text-gray-400">
           The invited user must have a moderation profile to accept.
         </p>
-        <p v-if="modError" class="text-sm text-red-600 dark:text-red-400">
+        <p
+          v-if="modError"
+          id="mod-invite-error"
+          role="alert"
+          class="text-sm text-red-600 dark:text-red-400"
+        >
           {{ modError?.message }}
         </p>
 
         <!-- Pending Mod Invites -->
-        <div v-if="pendingModInvites.length > 0" class="space-y-2">
+        <div
+          v-if="pendingModInvites.length > 0"
+          data-testid="pending-mod-invite-list"
+          class="max-h-64 space-y-2 overflow-y-auto pr-1"
+        >
           <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Pending Invites
           </h4>
@@ -450,7 +500,11 @@ const confirmMembershipAction = async () => {
         >
           No server moderators configured.
         </div>
-        <div v-if="moderators.length > 0" class="space-y-2">
+        <div
+          v-if="moderators.length > 0"
+          data-testid="current-mod-list"
+          class="max-h-64 space-y-2 overflow-y-auto pr-1"
+        >
           <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300">
             Current Moderators
           </h4>

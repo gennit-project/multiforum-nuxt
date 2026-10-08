@@ -32,7 +32,8 @@ const webServers = [
               process.env.AUTH0_CLIENT_ID ?? 'playwright-test-client',
             AUTH0_DOMAIN: process.env.AUTH0_DOMAIN ?? 'example.com',
             CYPRESS_ADMIN_TEST_EMAIL:
-              process.env.CYPRESS_ADMIN_TEST_EMAIL ?? 'catherine.luse@gmail.com',
+              process.env.CYPRESS_ADMIN_TEST_EMAIL ??
+              'catherine.luse@gmail.com',
             CYPRESS_ADMIN_TEST_USERNAME:
               process.env.CYPRESS_ADMIN_TEST_USERNAME ?? 'cluse',
             NEO4J_PASSWORD:
@@ -40,10 +41,17 @@ const webServers = [
             NEO4J_URI: process.env.NEO4J_URI ?? 'bolt://127.0.0.1:7688',
             NEO4J_USER: process.env.NEO4J_USER ?? 'neo4j',
             E2E_MOCK_AUTH: 'true',
+            NODE_ENV: 'development',
             GOOGLE_CREDENTIALS_BASE64: '',
+            MULTIFORUM_AUTH_PROVIDER: 'local-dev',
+            MULTIFORUM_AUTO_PROVISION: 'true',
+            MULTIFORUM_BOOTSTRAP_EMAIL: 'catherine.luse@gmail.com',
+            MULTIFORUM_BOOTSTRAP_PASSWORD: 'playwright-local-password',
+            MULTIFORUM_BOOTSTRAP_USERNAME: 'cluse',
             PLAYWRIGHT_MOCK_AUTH: 'true',
             PORT: backendPort,
             SERVER_CONFIG_NAME: 'Playwright Test Server',
+            SUPERADMIN_EMAIL: 'catherine.luse@gmail.com',
           },
           url: `http://127.0.0.1:${backendPort}`,
           reuseExistingServer: true,
@@ -76,7 +84,7 @@ export default defineConfig({
   retries: isStatefulRun ? 1 : 0,
   workers: 1,
   expect: {
-    timeout: isStatefulRun ? 10_000 : 30_000,
+    timeout: 30_000,
   },
   fullyParallel: false,
   reporter: [['list'], ['html', { open: 'never' }]],

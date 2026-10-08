@@ -18,7 +18,13 @@
 ## Playwright Testing (E2E)
 
 - Use `installMockAuth()` to handle authentication for tests that need it
-- All Playwright tests use mocked GraphQL responses (no backend required)
+- Most Playwright tests use mocked GraphQL responses and require no backend.
+- Cross-repository workflows that need to prove browser, API, and persistence
+  behavior use the opt-in stateful suites under `tests/playwright/stateful`.
+  Run the admin moderation suite with a backend checkout available via
+  `PLAYWRIGHT_BACKEND_CWD`: start Neo4j with `pnpm run playwright:neo4j:up`,
+  run `pnpm run test:playwright:stateful:admin`, then stop it with
+  `pnpm run playwright:neo4j:down`.
 
 ### Playwright Test Optimizations
 
@@ -224,6 +230,7 @@ Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#fro
 ### Dynamic Test IDs in Modals
 
 Modals like `BrokenRulesModal.vue` use dynamic test IDs based on content type:
+
 - For comments: `report-comment-input`
 - For discussions: `report-discussion-input`
 - For events: `report-event-input`
