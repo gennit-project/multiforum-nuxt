@@ -1,0 +1,78 @@
+name: Stateful admin moderation
+
+# This suite exercises the complete browser -> GraphQL -> Neo4j path. Keep it
+# separate from the fast mocked PR suite, but run it regularly so cross-repo
+# moderation regressions cannot remain hidden.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 * * 2' # weekly, Tuesdays 07:00 UTC
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stateful-admin-moderation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  admin-moderation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout frontend
+        uses: actions/checkout@v4
+
+      - name: Checkout backend
+        uses: actions/checkout@v4
+        with:
+          repository: gennit-project/multiforum-backend
+          path: gennit-backend
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            gennit-backend/pnpm-lock.yaml
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install backend dependencies
+        run: pnpm --dir gennit-backend install --frozen-lockfile
+
+      - name: Start test Neo4j
+        run: pnpm run playwright:neo4j:up
+
+      - name: Build backend
+        run: pnpm --dir gennit-backend run build
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run real-stack admin moderation suite
+        env:
+          PLAYWRIGHT_BACKEND_CWD: ${{ github.workspace }}/gennit-backend
+        run: pnpm run test:playwright:stateful:admin
+
+      - name: Upload Playwright diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-moderation-playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+
+      - name: Stop test Neo4j
+        if: always()
+        run: pnpm run playwright:neo4j:down

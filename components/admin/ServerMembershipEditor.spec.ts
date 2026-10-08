@@ -46,16 +46,21 @@ vi.mock('@vue/apollo-composable', () => ({
       mutate: mutateFn,
       loading: ref(false),
       error: errorRef,
+      onError: vi.fn(),
     };
   },
 }));
 
 describe('ServerMembershipEditor', () => {
   beforeEach(() => {
-    inviteServerAdmin.mockReset().mockResolvedValue({});
+    inviteServerAdmin
+      .mockReset()
+      .mockResolvedValue({ data: { inviteServerAdmin: true } });
     cancelInviteServerAdmin.mockReset().mockResolvedValue({});
     removeServerAdmin.mockReset().mockResolvedValue({});
-    inviteServerMod.mockReset().mockResolvedValue({});
+    inviteServerMod
+      .mockReset()
+      .mockResolvedValue({ data: { inviteServerMod: true } });
     cancelInviteServerMod.mockReset().mockResolvedValue({});
     removeServerModerator.mockReset().mockResolvedValue({});
     onUpdated.mockReset();
@@ -192,9 +197,11 @@ describe('ServerMembershipEditor', () => {
       .slice(0, 2);
 
     expect({
-      help: wrapper.text().includes(
-        'Only a server super-admin can invite or remove server admins.'
-      ),
+      help: wrapper
+        .text()
+        .includes(
+          'Only a server super-admin can invite or remove server admins.'
+        ),
       inputDisabled: adminInput.attributes('disabled') !== undefined,
       describedBy: adminInput.attributes('aria-describedby'),
       buttonsDisabled: adminButtons.map(
@@ -350,14 +357,40 @@ describe('ServerMembershipEditor', () => {
     mockAdminError.value = { message: 'That user does not exist' };
     const wrapper = mountEditor(serverConfig);
 
-    expect(wrapper.text()).toContain('That user does not exist');
+    const error = wrapper.get('#admin-invite-error');
+    const input = wrapper.findAll('input')[0]!;
+
+    expect({
+      message: error.text(),
+      role: error.attributes('role'),
+      invalid: input.attributes('aria-invalid'),
+      describedBy: input.attributes('aria-describedby'),
+    }).toEqual({
+      message: 'That user does not exist',
+      role: 'alert',
+      invalid: 'true',
+      describedBy: 'admin-invite-error',
+    });
   });
 
   it('shows a mod error message when a mod mutation fails', () => {
     mockModError.value = { message: 'That mod does not exist' };
     const wrapper = mountEditor(serverConfig);
 
-    expect(wrapper.text()).toContain('That mod does not exist');
+    const error = wrapper.get('#mod-invite-error');
+    const input = wrapper.findAll('input')[1]!;
+
+    expect({
+      message: error.text(),
+      role: error.attributes('role'),
+      invalid: input.attributes('aria-invalid'),
+      describedBy: input.attributes('aria-describedby'),
+    }).toEqual({
+      message: 'That mod does not exist',
+      role: 'alert',
+      invalid: 'true',
+      describedBy: 'mod-invite-error',
+    });
   });
 
   // --- Empty states ---
