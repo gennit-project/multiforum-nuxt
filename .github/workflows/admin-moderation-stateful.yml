@@ -58,12 +58,16 @@ jobs:
       - name: Build backend
         run: pnpm --dir .stateful/gennit-backend run build
 
+      - name: Build frontend for Playwright
+        run: pnpm run build:playwright:mocked
+
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run real-stack admin moderation suite
         env:
           PLAYWRIGHT_BACKEND_CWD: ${{ github.workspace }}/.stateful/gennit-backend
+          PLAYWRIGHT_USE_BUILT_FRONTEND: 'true'
         run: pnpm run test:playwright:stateful:admin
 
       - name: Upload Playwright diagnostics
