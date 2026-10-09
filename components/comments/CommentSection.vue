@@ -445,11 +445,16 @@ function handleSubmitFeedback() {
 }
 
 function handleViewFeedback(commentId: string) {
+  const discussionId = props.commentSectionQueryVariables.discussionId;
+  if (!discussionId) {
+    console.error('discussionId is required to view comment feedback');
+    return;
+  }
   router.push({
     name: 'forums-forumId-discussions-commentFeedback-discussionId-commentId',
     params: {
       forumId: channelId.value,
-      discussionId: route.params.discussionId,
+      discussionId,
       commentId,
     },
   });
