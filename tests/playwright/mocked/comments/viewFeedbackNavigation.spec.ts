@@ -44,7 +44,6 @@ const discussionChannel = buildDiscussionChannel({
   title: discussion.title,
   commentsCount: 1,
   overrides: {
-    isFavorited: false,
     Flairs: [],
     Discussion: discussion,
   },
