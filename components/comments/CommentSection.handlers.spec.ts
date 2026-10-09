@@ -4,7 +4,13 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeComment } from '@/tests/utils/factories';
 import CommentSection from '@/components/comments/CommentSection.vue';
 
-const routerPush = vi.fn();
+const h = vi.hoisted(() => ({
+  route: {
+    params: { discussionId: 'd1', forumId: 'cats' } as Record<string, string>,
+    query: {} as Record<string, string>,
+  },
+  routerPush: vi.fn(),
+}));
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: () => ({
@@ -23,8 +29,8 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { discussionId: 'd1', forumId: 'cats' }, query: {} }),
-  useRouter: () => ({ push: routerPush, replace: vi.fn() }),
+  useRoute: () => h.route,
+  useRouter: () => ({ push: h.routerPush, replace: vi.fn() }),
 }));
 vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => ({ value: 'mod-alice' }),
@@ -87,7 +93,9 @@ const feedbackModal = (wrapper: ReturnType<typeof mountSection>) =>
   wrapper.findComponent('.feedback-modal-stub');
 
 beforeEach(() => {
-  routerPush.mockReset();
+  h.route.params = { discussionId: 'd1', forumId: 'cats' };
+  h.route.query = {};
+  h.routerPush.mockReset();
 });
 
 describe('CommentSection — view feedback', () => {
@@ -95,12 +103,49 @@ describe('CommentSection — view feedback', () => {
     const wrapper = mountSection();
     await pinned(wrapper).vm.$emit('handle-view-feedback', 'c1');
 
-    expect(routerPush).toHaveBeenCalledWith(
+    expect(h.routerPush).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'forums-forumId-discussions-commentFeedback-discussionId-commentId',
-        params: expect.objectContaining({ forumId: 'cats', commentId: 'c1' }),
+        params: {
+          forumId: 'cats',
+          discussionId: 'd1',
+          commentId: 'c1',
+        },
       })
     );
+  });
+
+  it('uses the query variables when the selected discussion is in query state', async () => {
+    h.route.params = { forumId: 'cats' };
+    h.route.query = { selectedDiscussionId: 'd1' };
+    const wrapper = mountSection();
+    await pinned(wrapper).vm.$emit('handle-view-feedback', 'c1');
+
+    expect(h.routerPush).toHaveBeenCalledWith(
+      expect.objectContaining({
+        params: {
+          forumId: 'cats',
+          discussionId: 'd1',
+          commentId: 'c1',
+        },
+      })
+    );
+  });
+
+  it('does not navigate without a discussion ID', async () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = mountSection({
+      commentSectionQueryVariables: {
+        channelUniqueName: 'cats',
+        limit: 50,
+        offset: 0,
+        sort: 'new',
+      },
+    });
+    await pinned(wrapper).vm.$emit('handle-view-feedback', 'c1');
+    errorSpy.mockRestore();
+
+    expect(h.routerPush).not.toHaveBeenCalled();
   });
 });
 
