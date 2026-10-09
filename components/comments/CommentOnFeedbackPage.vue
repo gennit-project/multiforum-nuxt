@@ -26,9 +26,11 @@ import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
+import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
+const { serverModProfileNames } = useServerRoleMembership();
 
 const props = defineProps({
   comment: {
@@ -57,6 +59,14 @@ const loggedInModName = computed(() => {
     console.error('Error fetching mod profile name');
   }
   return modName;
+});
+
+const authorIsServerMod = computed(() => {
+  const authorModProfileName = props.comment.CommentAuthor?.displayName;
+  return (
+    !!authorModProfileName &&
+    serverModProfileNames.value.includes(authorModProfileName)
+  );
 });
 
 const updateCommentInput = ref({
@@ -299,6 +309,11 @@ function handleUnarchive() {
         </nuxt-link>
         <span v-else>[Deleted User]</span>
       </span>
+      <span
+        v-if="authorIsServerMod"
+        class="ml-1 text-xs text-gray-500 dark:text-gray-300"
+        >Server Mod</span
+      >
       <span v-if="loggedInModName === comment?.CommentAuthor?.displayName">
         (You)
       </span>
