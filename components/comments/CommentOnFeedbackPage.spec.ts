@@ -13,6 +13,7 @@ const h = vi.hoisted(() => ({
   editDone: undefined as undefined | (() => void),
   deleteDone: undefined as undefined | (() => void),
   callIndex: { n: 0 },
+  serverModProfileNames: [] as string[],
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -45,6 +46,12 @@ vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => h.modName,
   useUsername: () => h.username,
 }));
+vi.mock('@/composables/useServerRoleMembership', () => ({
+  useServerRoleMembership: () => ({
+    serverAdminUsernames: ref([]),
+    serverModProfileNames: ref(h.serverModProfileNames),
+  }),
+}));
 
 const makeComment = (overrides: Partial<Comment> = {}) =>
   ({
@@ -71,12 +78,24 @@ const mountComment = (comment: Comment) =>
         MenuButton: stub(
           'MenuButton',
           ['items'],
-          ['copy-link', 'handle-edit', 'click-report', 'handle-delete', 'click-archive', 'click-unarchive', 'click-archive-and-suspend']
+          [
+            'copy-link',
+            'handle-edit',
+            'click-report',
+            'handle-delete',
+            'click-archive',
+            'click-unarchive',
+            'click-archive-and-suspend',
+          ]
         ),
         TextEditor: stub('TextEditor', ['initialValue'], ['update']),
         SaveButton: stub('SaveButton', ['disabled', 'loading'], ['click']),
         CancelButton: stub('CancelButton', [], ['click']),
-        WarningModal: stub('WarningModal', ['open'], ['close', 'primary-button-click']),
+        WarningModal: stub(
+          'WarningModal',
+          ['open'],
+          ['close', 'primary-button-click']
+        ),
         BrokenRulesModal: stub('BrokenRulesModal', ['open'], ['close']),
         UnarchiveModal: stub('UnarchiveModal', ['open'], ['close']),
         Notification: stub('Notification', ['show'], ['close-notification']),
@@ -102,6 +121,27 @@ beforeEach(() => {
   h.editDone = undefined;
   h.deleteDone = undefined;
   h.callIndex.n = 0;
+  h.serverModProfileNames = [];
+});
+
+describe('CommentOnFeedbackPage server role badge', () => {
+  it('shows Server Mod for feedback authored by a server moderator profile', () => {
+    h.serverModProfileNames = ['mod-bob'];
+
+    const wrapper = mountComment(
+      makeComment({ CommentAuthor: { displayName: 'mod-bob' } as never })
+    );
+
+    expect(wrapper.text()).toContain('Server Mod');
+  });
+
+  it('does not show Server Mod for a channel-only moderator profile', () => {
+    const wrapper = mountComment(
+      makeComment({ CommentAuthor: { displayName: 'mod-bob' } as never })
+    );
+
+    expect(wrapper.text()).not.toContain('Server Mod');
+  });
 });
 
 describe('CommentOnFeedbackPage menu items', () => {
@@ -163,7 +203,9 @@ describe('CommentOnFeedbackPage edit flow', () => {
     );
     await menu(wrapper).vm.$emit('handle-edit');
 
-    await wrapper.getComponent({ name: 'TextEditor' }).vm.$emit('update', 'edited');
+    await wrapper
+      .getComponent({ name: 'TextEditor' })
+      .vm.$emit('update', 'edited');
     // SaveButton uses @click.prevent, so the payload needs preventDefault().
     await wrapper
       .getComponent({ name: 'SaveButton' })
