@@ -38,7 +38,8 @@ const {
   () => ({
     channelUniqueName: channelId.value,
     issueNumber: issueNumber.value,
-    loggedInModName: modProfileNameVar.value || '',
+    activityFeedLimit: 10,
+    activityFeedOffset: 0,
   }),
   () => ({
     enabled: issueNumber.value !== null,

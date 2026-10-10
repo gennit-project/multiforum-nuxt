@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, defineAsyncComponent, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_ISSUE } from '@/graphQLData/issue/queries';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
@@ -16,7 +16,6 @@ import type {
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
 import PageNotFound from '@/components/PageNotFound.vue';
-import ModerationWizard from '@/components/mod/ModerationWizard.vue';
 import OriginalPosterActions from '@/components/mod/OriginalPosterActions.vue';
 import ActivityFeed from '@/components/mod/ActivityFeed.vue';
 import IssueLockedBanner from '@/components/mod/IssueLockedBanner.vue';
@@ -53,6 +52,11 @@ import { useResolvedModPermissions } from '@/composables/useResolvedModPermissio
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
+
+const ModerationWizard = defineAsyncComponent(
+  () => import('@/components/mod/ModerationWizard.vue')
+);
+const showResolutionOptions = ref(false);
 
 const props = defineProps({
   channelId: {
@@ -603,35 +607,71 @@ const handleLockReasonUpdate = (value: string) => {
             actions remain disabled until the suspension is reversed or expires.
           </div>
 
-          <ModerationWizard
+          <section
             v-if="issue && issueActionVisibility.showModActions"
-            :issue="issue"
-            :discussion-id="activeIssue?.relatedDiscussionId || ''"
-            :event-id="activeIssue?.relatedEventId || ''"
-            :comment-id="activeIssue?.relatedCommentId || ''"
-            :image-id="activeIssue?.relatedImageId || ''"
-            :channel-unique-name="channelId"
-            :close-issue-loading="closeIssueLoading"
-            :is-current-user-original-poster="
-              !issueActionVisibility.modActionsEnabled
-            "
-            :author-type="authorType"
-            :is-suspended-mod="isSuspendedMod"
-            :is-locked="isLocked"
-            :can-edit-comments="modPermissions.canEditComments"
-            :can-edit-discussions="modPermissions.canEditDiscussions"
-            :can-edit-events="modPermissions.canEditEvents"
-            :report-count="reportCount ?? undefined"
-            :is-author-bot="isAuthorBot"
-            @archived-successfully="resetActivityFeed"
-            @unarchived-successfully="resetActivityFeed"
-            @suspended-user-successfully="resetActivityFeed"
-            @suspended-mod-successfully="resetActivityFeed"
-            @unsuspended-user-successfully="resetActivityFeed"
-            @unsuspended-mod-successfully="resetActivityFeed"
-            @open-issue="toggleCloseOpenIssue"
-            @close-issue="toggleCloseOpenIssue"
-          />
+            class="mt-8 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/60"
+            aria-labelledby="issue-resolution-heading"
+          >
+            <div
+              class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+            >
+              <div>
+                <h2
+                  id="issue-resolution-heading"
+                  class="text-lg font-semibold text-gray-900 dark:text-white"
+                >
+                  Resolution
+                </h2>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                  Review the report before choosing a moderation action.
+                </p>
+              </div>
+              <button
+                type="button"
+                class="min-h-11 shrink-0 rounded-md border border-blue-600 bg-white px-4 py-2 text-sm font-semibold text-blue-700 transition hover:bg-blue-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none dark:border-blue-400 dark:bg-gray-900 dark:text-blue-300 dark:hover:bg-blue-950/40 dark:focus-visible:ring-offset-gray-900"
+                aria-controls="issue-resolution-options"
+                :aria-expanded="showResolutionOptions"
+                @click="showResolutionOptions = !showResolutionOptions"
+              >
+                {{
+                  showResolutionOptions
+                    ? 'Hide resolution options'
+                    : 'Review resolution options'
+                }}
+              </button>
+            </div>
+
+            <div v-if="showResolutionOptions" id="issue-resolution-options">
+              <ModerationWizard
+                :issue="issue"
+                :discussion-id="activeIssue?.relatedDiscussionId || ''"
+                :event-id="activeIssue?.relatedEventId || ''"
+                :comment-id="activeIssue?.relatedCommentId || ''"
+                :image-id="activeIssue?.relatedImageId || ''"
+                :channel-unique-name="channelId"
+                :close-issue-loading="closeIssueLoading"
+                :is-current-user-original-poster="
+                  !issueActionVisibility.modActionsEnabled
+                "
+                :author-type="authorType"
+                :is-suspended-mod="isSuspendedMod"
+                :is-locked="isLocked"
+                :can-edit-comments="modPermissions.canEditComments"
+                :can-edit-discussions="modPermissions.canEditDiscussions"
+                :can-edit-events="modPermissions.canEditEvents"
+                :report-count="reportCount ?? undefined"
+                :is-author-bot="isAuthorBot"
+                @archived-successfully="resetActivityFeed"
+                @unarchived-successfully="resetActivityFeed"
+                @suspended-user-successfully="resetActivityFeed"
+                @suspended-mod-successfully="resetActivityFeed"
+                @unsuspended-user-successfully="resetActivityFeed"
+                @unsuspended-mod-successfully="resetActivityFeed"
+                @open-issue="toggleCloseOpenIssue"
+                @close-issue="toggleCloseOpenIssue"
+              />
+            </div>
+          </section>
 
           <OriginalPosterActions
             v-if="issue && issueActionVisibility.showOpActions"
