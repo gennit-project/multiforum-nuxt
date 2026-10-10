@@ -105,6 +105,7 @@ const getBaseMocks = (username: string) => ({
   }),
   countOpenIssues: () => ({ data: { issuesAggregate: { count: 1 } } }),
   countClosedIssues: () => ({ data: { issuesAggregate: { count: 0 } } }),
+  GetInstanceSetupStatus: () => ({ data: { getInstanceSetupStatus: null } }),
   getEvents: () => ({
     data: { events: [], eventsAggregate: { count: 0 } },
   }),
@@ -201,6 +202,30 @@ test.describe('Moderation issue detail', () => {
       ).toBeLessThan(
         diagnostics.seenOperations.findIndex(
           ({ operationName }) => operationName === 'getIssueActivity'
+        )
+      );
+      const channelVariableShapes = new Set(
+        diagnostics.seenOperations
+          .filter(({ operationName }) => operationName === 'getChannel')
+          .map(({ variables }) => JSON.stringify(variables))
+      );
+      expect(channelVariableShapes.size).toBe(1);
+      expect(
+        diagnostics.seenOperations.filter(({ operationName }) =>
+          [
+            'countOpenIssues',
+            'countClosedIssues',
+            'getChannelDownloadCount',
+          ].includes(operationName)
+        )
+      ).toHaveLength(0);
+      expect(
+        diagnostics.seenOperations.findIndex(
+          ({ operationName }) => operationName === 'getIssue'
+        )
+      ).toBeLessThan(
+        diagnostics.seenOperations.findIndex(
+          ({ operationName }) => operationName === 'GetInstanceSetupStatus'
         )
       );
       // ActivityFeedListItem renders a distinct passive label per action type.

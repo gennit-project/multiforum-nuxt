@@ -36,6 +36,10 @@ export function useInstanceSetupStatus() {
   const { result, loading, error, refetch } =
     useQuery<InstanceSetupQueryResult>(GET_INSTANCE_SETUP_STATUS, undefined, {
       fetchPolicy: 'cache-and-network',
+      // Capability checks control interaction-only features such as uploads,
+      // maps, and geocoding. Fetch them after hydration instead of delaying
+      // every SSR page that happens to mount one of those controls.
+      prefetch: false,
     });
 
   const status = computed(() => result.value?.getInstanceSetupStatus ?? null);
