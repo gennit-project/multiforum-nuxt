@@ -16,7 +16,10 @@ const mountDialog = (props: Record<string, unknown> = {}) =>
           template:
             '<button :disabled="disabled" @click="$emit(\'click\')">{{ label }}</button>',
         },
-        ErrorBanner: { props: ['text'], template: '<div class="err">{{ text }}</div>' },
+        ErrorBanner: {
+          props: ['text'],
+          template: '<div class="err">{{ text }}</div>',
+        },
       },
     },
   });
@@ -52,5 +55,19 @@ describe('IssueLockDialog', () => {
       lockIssueError: { message: 'Boom' } as never,
     });
     expect(wrapper.find('.err').text()).toBe('Boom');
+  });
+
+  it('exposes modal dialog semantics', () => {
+    const wrapper = mountDialog();
+    const dialog = wrapper.get('[role="dialog"]');
+    expect({
+      modal: dialog.attributes('aria-modal'),
+      labelledBy: dialog.attributes('aria-labelledby'),
+    }).toEqual({ modal: 'true', labelledBy: 'issue-lock-dialog-title' });
+  });
+
+  it('associates the lock reason label with the textarea', () => {
+    const wrapper = mountDialog();
+    expect(wrapper.get('label').attributes('for')).toBe('issue-lock-reason');
   });
 });

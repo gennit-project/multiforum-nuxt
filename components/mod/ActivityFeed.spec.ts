@@ -116,4 +116,54 @@ describe('ActivityFeed', () => {
     expect(items).toHaveLength(1);
     expect(items[0].attributes()['data-has-paired']).toBe('true');
   });
+
+  it('filters the timeline to comments', async () => {
+    const wrapper = mount(ActivityFeed, {
+      props: {
+        feedItems: [
+          { id: 'comment', actionType: 'comment' },
+          { id: 'close', actionType: 'close' },
+        ],
+        originalUserAuthorUsername: '',
+        originalModAuthorName: '',
+      },
+      global: {
+        stubs: {
+          ActivityFeedListItem: ActivityFeedListItemStub,
+          NuxtPage: NuxtPageStub,
+        },
+      },
+    });
+
+    await wrapper
+      .get('button[aria-pressed="false"]:nth-of-type(2)')
+      .trigger('click');
+
+    expect(wrapper.findAll('.activity-item')).toHaveLength(1);
+  });
+
+  it('shows an empty state when the selected filter has no matches', async () => {
+    const wrapper = mount(ActivityFeed, {
+      props: {
+        feedItems: [
+          { id: 'close', actionType: 'close' },
+          { id: 'archive', actionType: 'archive' },
+        ],
+        originalUserAuthorUsername: '',
+        originalModAuthorName: '',
+      },
+      global: {
+        stubs: {
+          ActivityFeedListItem: ActivityFeedListItemStub,
+          NuxtPage: NuxtPageStub,
+        },
+      },
+    });
+
+    await wrapper.findAll('button')[1].trigger('click');
+
+    expect(wrapper.get('[role="status"]').text()).toBe(
+      'No activity matches this filter.'
+    );
+  });
 });
