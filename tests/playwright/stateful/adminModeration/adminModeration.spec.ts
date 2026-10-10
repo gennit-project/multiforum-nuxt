@@ -5,6 +5,10 @@ import { seedAdminModerationScenario } from '../../helpers/statefulAdminModerati
 
 const ADMIN_USERNAME = 'cluse';
 const ADMIN_EMAIL = 'catherine.luse@gmail.com';
+const CHANNEL_UNIQUE_NAME = 'e2e_admin_moderation';
+const TARGET_MOD_NAME = 'E2E Target Mod';
+const TARGET_MOD_ACTIVITY_COMMENT =
+  'Target moderator activity comment for suspension workflow.';
 
 const waitForGraphQLOperation = (page: Page, operationName: string) =>
   page.waitForResponse((response) => {
@@ -96,6 +100,56 @@ test.describe('real backend admin moderation workflows', () => {
     await page.goto('/admin/suspensions/suspended-mods');
     await expect(
       page.getByText(/no active server-scoped mod suspensions/i)
+    ).toBeVisible();
+    await expectNoAxeViolations(page);
+  });
+
+  test('suspends an issue target mod from their activity-feed comment menu', async ({
+    context,
+    page,
+  }) => {
+    await installMockAuth(context, page, {
+      username: ADMIN_USERNAME,
+      email: ADMIN_EMAIL,
+    });
+
+    await page.goto(`/forums/${CHANNEL_UNIQUE_NAME}/issues/9103`, {
+      waitUntil: 'domcontentloaded',
+    });
+    const activityItem = page
+      .getByRole('listitem')
+      .filter({ hasText: TARGET_MOD_ACTIVITY_COMMENT });
+    await expect(activityItem).toBeVisible();
+
+    await activityItem
+      .getByRole('button', { name: 'Comment actions' })
+      .click();
+    await page.getByRole('menuitem', { name: 'Suspend Mod' }).click();
+
+    await expect(
+      page.getByRole('heading', { name: 'Suspend Mod' }).last()
+    ).toBeVisible();
+    const submitSuspension = page
+      .getByRole('button', { name: 'Submit' })
+      .last();
+    await expect(submitSuspension).toBeVisible();
+
+    const suspendResponsePromise = waitForGraphQLOperation(page, 'suspendMod');
+    await submitSuspension.click();
+    const suspendResponse = await suspendResponsePromise;
+    expect(suspendResponse.ok()).toBe(true);
+    expect((await suspendResponse.json()).errors).toBeUndefined();
+
+    await page.goto(
+      `/forums/${CHANNEL_UNIQUE_NAME}/edit/suspended-mods`,
+      { waitUntil: 'domcontentloaded' }
+    );
+    await expect(
+      page.getByText(`${TARGET_MOD_NAME} (e2e_target_mod_user)`)
+    ).toBeVisible();
+    await page.getByRole('link', { name: 'Related Issue' }).click();
+    await expect(
+      page.getByText('Channel report against E2E Target Mod')
     ).toBeVisible();
     await expectNoAxeViolations(page);
   });
