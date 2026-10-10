@@ -133,6 +133,7 @@ test('reports a comment from a moderation profile comments page', async ({
 
   expect(reportVariables).toMatchObject({
     commentId: COMMENT_ID,
+    channelUniqueName: TEST_CHANNEL,
     selectedForumRules: [FORUM_RULE],
     reportText: 'This moderation comment violates the rules.',
   });

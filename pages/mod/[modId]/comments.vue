@@ -94,6 +94,14 @@ const {
 
 const commentToReport = ref<CommentType | null>(null);
 
+const reportChannelUniqueName = computed(() => {
+  return (
+    commentToReport.value?.Channel?.uniqueName ||
+    commentToReport.value?.DiscussionChannel?.channelUniqueName ||
+    ''
+  );
+});
+
 const handleClickReport = (comment: CommentType) => {
   commentToReport.value = comment;
   openReportModal();
@@ -135,6 +143,7 @@ const handleClickReport = (comment: CommentType) => {
       :open="showReportModal"
       :comment-id="commentToReport?.id"
       :comment="commentToReport"
+      :channel-unique-name-override="reportChannelUniqueName"
       @close="closeReportModal"
       @report-submitted-successfully="handleReportedSuccessfully"
     />
