@@ -281,6 +281,10 @@ describe('forum shell page', () => {
       false,
       false,
     ]);
+    expect(queryOptions.map((options) => options.enabled)).toEqual([
+      true,
+      false,
+    ]);
     expect({
       childPage: wrapper.findComponent(NuxtPageStub).exists(),
       notFound: wrapper.findComponent(PageNotFoundStub).exists(),
@@ -298,6 +302,21 @@ describe('forum shell page', () => {
     expect(queryOptions.map((options) => options.prefetch)).toEqual([
       true,
       true,
+    ]);
+  });
+
+  it('skips the hidden download count on issue detail routes', async () => {
+    mockState.route.name = 'forums-forumId-issues-issueNumber';
+    await mountWith([{ uniqueName: 'cats', displayName: 'Cats' }]);
+
+    const queryOptions = mockedUseQuery.mock.calls.slice(0, 2).map((call) => {
+      const options = call[2];
+      return typeof options === 'function' ? options() : options;
+    });
+
+    expect(queryOptions).toEqual([
+      expect.objectContaining({ enabled: true, prefetch: true }),
+      expect.objectContaining({ enabled: false, prefetch: false }),
     ]);
   });
 

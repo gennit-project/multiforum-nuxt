@@ -32,17 +32,31 @@ const {
   result: issuesResult,
   error: issuesError,
   loading: issuesLoading,
-} = useQuery(COUNT_OPEN_ISSUES, {
-  channelUniqueName: channelId.value,
-});
+} = useQuery(
+  COUNT_OPEN_ISSUES,
+  () => ({
+    channelUniqueName: channelId.value,
+  }),
+  () => ({
+    enabled: !issueNumber.value,
+    prefetch: !issueNumber.value,
+  })
+);
 
 const {
   result: closedIssuesResult,
   error: closedIssuesError,
   loading: closedIssuesLoading,
-} = useQuery(COUNT_CLOSED_ISSUES, {
-  channelUniqueName: channelId.value,
-});
+} = useQuery(
+  COUNT_CLOSED_ISSUES,
+  () => ({
+    channelUniqueName: channelId.value,
+  }),
+  () => ({
+    enabled: !issueNumber.value,
+    prefetch: !issueNumber.value,
+  })
+);
 
 const openCount = computed(() => {
   if (issuesLoading.value || issuesError.value) {
@@ -65,7 +79,7 @@ const closedCount = computed(() => {
   >
     <nav
       v-if="!issueNumber"
-      class="flex items-center justify-between gap-4 py-3 pl-4 pr-4 shadow-sm"
+      class="flex items-center justify-between gap-4 py-3 pr-4 pl-4 shadow-sm"
     >
       <div class="flex items-center gap-4">
         <nuxt-link
@@ -96,7 +110,8 @@ const closedCount = computed(() => {
               route.name !== 'forums-forumId-issues-closed',
           }"
         >
-          <CheckCircleIcon class="mr-1 inline h-4 w-4" /> {{ closedCount }} Closed
+          <CheckCircleIcon class="mr-1 inline h-4 w-4" />
+          {{ closedCount }} Closed
         </nuxt-link>
       </div>
       <RequireAuth :full-width="false">

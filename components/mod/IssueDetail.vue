@@ -72,6 +72,7 @@ const props = defineProps({
 });
 
 const ACTIVITY_FEED_PAGE_SIZE = 10;
+const currentHour = () => DateTime.utc().startOf('hour').toISO();
 
 // Setup
 const route = useRoute();
@@ -144,11 +145,18 @@ const { result: getChannelResult, refetch: refetchChannel } = useQuery(
   GET_CHANNEL,
   () => ({
     uniqueName: channelId.value,
-    now: DateTime.local().startOf('hour').toISO(),
+    loggedInUsername: usernameVar.value || null,
+    // Match the forum shell variables exactly so Apollo can coalesce the two
+    // consumers into one SSR request.
+    now: currentHour(),
   }),
   () => ({
     fetchPolicy: 'cache-first',
     enabled: !!channelId.value,
+    // The forum shell already prefetches this exact query for channel issue
+    // routes. Keep this consumer client-side there so SSR sends it only once;
+    // standalone and split-view issue surfaces still prefetch it.
+    prefetch: !hasForumIssueHeader.value,
   })
 );
 

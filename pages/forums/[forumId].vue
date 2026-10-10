@@ -137,8 +137,10 @@ const { result: downloadCountResult } = useQuery(
   () => ({
     fetchPolicy: 'cache-first',
     nextFetchPolicy: 'cache-first',
-    enabled: !!channelId.value,
-    prefetch: shouldPrefetchForumShell.value,
+    // The count is rendered only inside ChannelTabs. Detail routes hide those
+    // tabs, so avoid adding an unused database query to their SSR or hydration.
+    enabled: !!channelId.value && showChannelTabs.value,
+    prefetch: shouldPrefetchForumShell.value && showChannelTabs.value,
   })
 );
 

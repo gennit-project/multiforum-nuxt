@@ -19,6 +19,16 @@ const queryLoading = ref(false);
 const hasMoreActivityFeed = ref(false);
 const loadMoreActivityFeed = vi.fn();
 const deleteReasonError = ref('');
+const mockRoute = vi.hoisted(() => ({
+  name: undefined as string | undefined,
+  params: {
+    forumId: 'toDelete',
+    issueNumber: '6',
+  },
+  query: {
+    subscribeCta: '1',
+  },
+}));
 
 const buildIssueResult = () => ({
   issues: [
@@ -69,15 +79,7 @@ vi.mock('@vue/apollo-composable', () => ({
 }));
 
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({
-    params: {
-      forumId: 'toDelete',
-      issueNumber: '6',
-    },
-    query: {
-      subscribeCta: '1',
-    },
-  }),
+  useRoute: () => mockRoute,
   useRouter: () => ({
     replace: routerReplace,
   }),
@@ -238,6 +240,7 @@ const PassThroughStub = defineComponent({
 describe('IssueDetail', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockRoute.name = undefined;
     mockedPermissionFlags.isSuspendedMod = false;
     issueResult.value = buildIssueResult();
     refetchIssue.mockResolvedValue(undefined);
@@ -343,6 +346,26 @@ describe('IssueDetail', () => {
     expect(typeof options === 'function' ? options() : options).toMatchObject({
       prefetch: false,
     });
+  });
+
+  it('shares the forum shell channel query variables', () => {
+    mockRoute.name = 'forums-forumId-issues-issueNumber';
+    buildWrapper();
+    const channelCall = (
+      useQuery as unknown as ReturnType<typeof vi.fn>
+    ).mock.calls.find(([document]) => document === GET_CHANNEL);
+    const variables = channelCall?.[1];
+    const options = channelCall?.[2];
+    const resolvedVariables =
+      typeof variables === 'function' ? variables() : variables;
+    const resolvedOptions = typeof options === 'function' ? options() : options;
+
+    expect(resolvedVariables).toMatchObject({
+      uniqueName: 'toDelete',
+      loggedInUsername: 'alice',
+    });
+    expect(resolvedVariables.now).toMatch(/Z$/);
+    expect(resolvedOptions).toMatchObject({ enabled: true, prefetch: false });
   });
 
   it('subscribes from the issue CTA and clears the route query', async () => {

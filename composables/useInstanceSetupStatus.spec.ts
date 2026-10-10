@@ -41,7 +41,7 @@ describe('useInstanceSetupStatus', () => {
     expect(mockedUseQuery).toHaveBeenCalledWith(
       GET_INSTANCE_SETUP_STATUS,
       undefined,
-      { fetchPolicy: 'cache-and-network' }
+      { fetchPolicy: 'cache-and-network', prefetch: false }
     );
     expect(setup.status.value).toEqual(capabilityStatus);
     expect(setup.refetch).toBe(refetch);
