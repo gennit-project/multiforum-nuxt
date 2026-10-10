@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
+import { useQuery } from '@vue/apollo-composable';
 import EditContentModal from './EditContentModal.vue';
 import {
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
@@ -8,6 +9,7 @@ import {
 } from '@/graphQLData/issue/mutations';
 import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
 import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
 
 const mockMutate = vi.fn(() => Promise.resolve());
@@ -234,14 +236,31 @@ describe('EditContentModal', () => {
     );
   });
 
+  it('defers discussion content until the edit modal opens', () => {
+    mountModal({
+      open: false,
+      targetType: 'discussion',
+      discussionId: 'disc-1',
+      commentId: '',
+    });
+
+    const discussionQuery = vi
+      .mocked(useQuery)
+      .mock.calls.find(([document]) => document === GET_DISCUSSION);
+    const options = discussionQuery?.[2] as
+      (() => { enabled: boolean }) | undefined;
+
+    expect(options?.().enabled).toBe(false);
+  });
+
   it('selects a broken rule from the rule picker', async () => {
     const wrapper = mountModal();
     const picker = wrapper.findComponent({ name: 'SelectBrokenRules' });
     await picker.vm.$emit('toggle-forum-rule-selection', 'Spam');
 
-    expect(
-      (wrapper.vm as any).$?.exposed?.selectedForumRules.value
-    ).toContain('Spam');
+    expect((wrapper.vm as any).$?.exposed?.selectedForumRules.value).toContain(
+      'Spam'
+    );
   });
 
   it('selects a server broken rule from the rule picker', async () => {
@@ -249,9 +268,9 @@ describe('EditContentModal', () => {
     const picker = wrapper.findComponent({ name: 'SelectBrokenRules' });
     await picker.vm.$emit('toggle-server-rule-selection', 'Harassment');
 
-    expect(
-      (wrapper.vm as any).$?.exposed?.selectedServerRules.value
-    ).toContain('Harassment');
+    expect((wrapper.vm as any).$?.exposed?.selectedServerRules.value).toContain(
+      'Harassment'
+    );
   });
 
   it('deselects a broken rule that was already selected', async () => {

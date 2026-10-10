@@ -38,6 +38,49 @@
         "jsGzipBytes": 708000,
         "cssGzipBytes": 55000
       }
+    },
+    {
+      "name": "Channel issue detail",
+      "entries": [
+        "pages/forums/[forumId].vue",
+        "pages/forums/[forumId]/issues/[issueNumber].vue"
+      ],
+      "budgets": {
+        "preloadFiles": 202,
+        "rawBytes": 2453000,
+        "gzipBytes": 767000,
+        "jsGzipBytes": 710000,
+        "cssGzipBytes": 57000
+      }
+    },
+    {
+      "name": "Public server issue detail",
+      "entries": [
+        "pages/server/issues.vue",
+        "pages/server/issues/[issueNumber].vue"
+      ],
+      "budgets": {
+        "preloadFiles": 163,
+        "rawBytes": 2153000,
+        "gzipBytes": 674000,
+        "jsGzipBytes": 630000,
+        "cssGzipBytes": 45000
+      }
+    },
+    {
+      "name": "Admin issue detail",
+      "entries": [
+        "pages/admin.vue",
+        "pages/admin/issues.vue",
+        "pages/admin/issues/[issueNumber].vue"
+      ],
+      "budgets": {
+        "preloadFiles": 170,
+        "rawBytes": 2166000,
+        "gzipBytes": 681000,
+        "jsGzipBytes": 636000,
+        "cssGzipBytes": 45000
+      }
     }
   ]
 }

@@ -2,6 +2,7 @@ import { expect, test } from '../../helpers/testFixture';
 import {
   buildBasicUser,
   buildChannel,
+  buildDiscussion,
   buildServerConfig,
   buildUser,
   buildIssue,
@@ -193,6 +194,15 @@ test.describe('Moderation issue detail', () => {
           ({ operationName }) => operationName === 'getIssueActivity'
         )
       ).toHaveLength(1);
+      expect(
+        diagnostics.seenOperations.findIndex(
+          ({ operationName }) => operationName === 'getIssue'
+        )
+      ).toBeLessThan(
+        diagnostics.seenOperations.findIndex(
+          ({ operationName }) => operationName === 'getIssueActivity'
+        )
+      );
       // ActivityFeedListItem renders a distinct passive label per action type.
       await expect(page.getByText(/was reported by/i).first()).toBeVisible();
       await expect(page.getByText(/the issue was closed by/i)).toBeVisible();
@@ -271,13 +281,16 @@ test.describe('Moderation issue detail', () => {
       isOpen: true,
       overrides: { relatedDiscussionId: 'discussion-1' },
     });
+    const reportedDiscussion = buildDiscussion({
+      id: 'discussion-1',
+      channelUniqueName: TEST_CHANNEL,
+      title: 'Reported discussion needing review',
+    });
 
     const diagnostics = await installGraphqlMocks(page, {
       ...getBaseMocks(TEST_USER),
       getIssue: () => ({ data: { issues: [issue] } }),
-      // Related content lookup — empty list keeps IssueRelatedContent inert
-      // while the wizard renders from the issue's relatedDiscussionId.
-      getDiscussion: () => ({ data: { discussions: [] } }),
+      getDiscussion: () => ({ data: { discussions: [reportedDiscussion] } }),
       // Drives the wizard's "is archived" check (false → Archive action shown).
       getDiscussionChannelID: () => ({
         data: { discussionChannels: [{ archived: false }] },
@@ -298,6 +311,11 @@ test.describe('Moderation issue detail', () => {
         )
       ).toHaveLength(1);
       expect(
+        diagnostics.seenOperations.filter(
+          ({ operationName }) => operationName === 'getDiscussion'
+        )
+      ).toHaveLength(0);
+      expect(
         diagnostics.seenOperations.some(
           ({ operationName }) => operationName === 'getDiscussionChannelID'
         )
@@ -312,6 +330,11 @@ test.describe('Moderation issue detail', () => {
         .getByRole('button', { name: /Archive Discussion/i })
         .first();
       await expect(archiveButton).toBeVisible();
+      expect(
+        diagnostics.seenOperations.filter(
+          ({ operationName }) => operationName === 'getDiscussion'
+        )
+      ).toHaveLength(0);
 
       // Opening it surfaces the BrokenRulesModal.
       await archiveButton.click();

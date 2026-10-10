@@ -201,7 +201,7 @@ const run = async () => {
     if (process.env.GITHUB_STEP_SUMMARY) {
       fs.appendFileSync(
         process.env.GITHUB_STEP_SUMMARY,
-        `## Public route performance budgets\n\n${output}\n`
+        `## Route performance budgets\n\n${output}\n`
       );
     }
 
