@@ -33,7 +33,13 @@ describe('mod profile comments page', () => {
         result: ref({
           moderationProfiles: [
             {
-              AuthoredComments: [{ id: 'comment-1', text: 'hello' }],
+              AuthoredComments: [
+                {
+                  id: 'comment-1',
+                  text: 'hello',
+                  Channel: { uniqueName: 'cats' },
+                },
+              ],
             },
           ],
         }),
@@ -48,11 +54,17 @@ describe('mod profile comments page', () => {
           LoadMore: true,
           Notification: true,
           BrokenRulesModal: {
+            name: 'BrokenRulesModal',
             template: '<div data-testid="report-modal" />',
-            props: ['open', 'commentId', 'comment'],
+            props: [
+              'open',
+              'commentId',
+              'comment',
+              'channelUniqueNameOverride',
+            ],
           },
           Comment: {
-            template: '<button data-testid="report-comment" @click="$emit(\'click-report\', { id: \'comment-1\', text: \'hello\' })" />',
+            template: '<button data-testid="report-comment" @click="$emit(\'click-report\', { id: \'comment-1\', text: \'hello\', Channel: { uniqueName: \'cats\' } })" />',
           },
         },
       },
@@ -60,6 +72,12 @@ describe('mod profile comments page', () => {
 
     await wrapper.get('[data-testid="report-comment"]').trigger('click');
 
-    expect(wrapper.find('[data-testid="report-modal"]').exists()).toBe(true);
+    expect(wrapper.getComponent({ name: 'BrokenRulesModal' }).props()).toMatchObject(
+      {
+        open: true,
+        commentId: 'comment-1',
+        channelUniqueNameOverride: 'cats',
+      }
+    );
   });
 });
