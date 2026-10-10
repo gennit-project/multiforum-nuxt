@@ -97,18 +97,28 @@ describe('GET_ISSUE_RELATED_DISCUSSION', () => {
   });
 
   it('does not load unrelated discussion detail collections', () => {
-    for (const field of [
+    const expensiveFields = [
       'Album',
+      'Flairs',
+      'Tags',
       'Answers',
       'FeedbackComments',
       'CrosspostedDiscussion',
       'SharedCollection',
+      'LabelOptions',
       'LabelChangeHistory',
       'PastTitleVersions',
       'PastBodyVersions',
-    ]) {
-      expect(issueRelatedDiscussionSource).not.toContain(field);
-    }
+      'BodyLastEditedBy',
+      'detailAnswersPageInfo',
+      'detailFilesPageInfo',
+    ];
+
+    expect(
+      expensiveFields.filter((field) =>
+        issueRelatedDiscussionSource.includes(field)
+      )
+    ).toEqual([]);
   });
 });
 

@@ -57,7 +57,7 @@ const { result: commentResult } = useQuery(
   GET_COMMENT,
   () => ({ id: props.commentId }),
   () => ({
-    enabled: props.targetType === 'comment' && !!props.commentId,
+    enabled: props.open && props.targetType === 'comment' && !!props.commentId,
     fetchPolicy: 'cache-first',
   })
 );
@@ -71,6 +71,7 @@ const { result: discussionResult } = useQuery(
   }),
   () => ({
     enabled:
+      props.open &&
       (props.targetType === 'discussion' || props.targetType === 'download') &&
       !!props.discussionId,
     fetchPolicy: 'cache-first',
@@ -85,7 +86,7 @@ const { result: eventResult } = useQuery(
     loggedInModName: modProfileNameVar.value,
   }),
   () => ({
-    enabled: props.targetType === 'event' && !!props.eventId,
+    enabled: props.open && props.targetType === 'event' && !!props.eventId,
     fetchPolicy: 'cache-first',
   })
 );
@@ -313,7 +314,7 @@ defineExpose({
     <template #content>
       <div class="space-y-4">
         <div class="space-y-1">
-          <p class="font-semibold text-sm text-gray-800 dark:text-gray-100">
+          <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
             Select broken rules
           </p>
           <SelectBrokenRules
@@ -329,7 +330,7 @@ defineExpose({
         </div>
 
         <div class="space-y-2">
-          <p class="font-semibold text-sm text-gray-800 dark:text-gray-100">
+          <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
             Edit reason
           </p>
           <TextEditor
@@ -342,7 +343,7 @@ defineExpose({
         </div>
 
         <div v-if="targetType !== 'comment'" class="space-y-2">
-          <p class="font-semibold text-sm text-gray-800 dark:text-gray-100">
+          <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
             Title
           </p>
           <TextEditor
@@ -355,7 +356,7 @@ defineExpose({
         </div>
 
         <div class="space-y-2">
-          <p class="font-semibold text-sm text-gray-800 dark:text-gray-100">
+          <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
             {{ targetType === 'event' ? 'Description' : 'Body' }}
           </p>
           <TextEditor
@@ -384,7 +385,7 @@ defineExpose({
           </button>
           <button
             type="button"
-            class="font-semibold flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-gray-500"
+            class="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-gray-500"
             :disabled="isLoading"
             @click="saveEdits"
           >
