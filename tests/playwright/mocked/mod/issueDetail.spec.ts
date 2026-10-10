@@ -179,6 +179,20 @@ test.describe('Moderation issue detail', () => {
       await expect(
         page.getByText('This discussion violates the no-spam rule.')
       ).toBeVisible();
+      await waitForGraphqlOperation(
+        diagnostics.completedOperations,
+        'getIssue'
+      );
+      expect(
+        diagnostics.seenOperations.filter(
+          ({ operationName }) => operationName === 'getIssue'
+        )
+      ).toHaveLength(1);
+      expect(
+        diagnostics.seenOperations.filter(
+          ({ operationName }) => operationName === 'getIssueActivity'
+        )
+      ).toHaveLength(1);
       // ActivityFeedListItem renders a distinct passive label per action type.
       await expect(page.getByText(/was reported by/i).first()).toBeVisible();
       await expect(page.getByText(/the issue was closed by/i)).toBeVisible();
@@ -197,11 +211,6 @@ test.describe('Moderation issue detail', () => {
       await page.getByRole('button', { name: 'Cancel' }).click();
 
       await expectNoAxeViolations(page);
-
-      await waitForGraphqlOperation(
-        diagnostics.completedOperations,
-        'getIssue'
-      );
     } finally {
       await testInfo.attach('graphql-operations.json', {
         body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
@@ -279,6 +288,24 @@ test.describe('Moderation issue detail', () => {
 
     try {
       await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
+
+      await expect(
+        page.getByRole('button', { name: 'Review resolution options' })
+      ).toBeVisible();
+      expect(
+        diagnostics.seenOperations.filter(
+          ({ operationName }) => operationName === 'getIssueRelatedDiscussion'
+        )
+      ).toHaveLength(1);
+      expect(
+        diagnostics.seenOperations.some(
+          ({ operationName }) => operationName === 'getDiscussionChannelID'
+        )
+      ).toBe(false);
+
+      await page
+        .getByRole('button', { name: 'Review resolution options' })
+        .click();
 
       // ModerationWizard renders an Archive action for the related discussion.
       const archiveButton = page
@@ -366,11 +393,21 @@ test.describe('Moderation issue detail', () => {
 
     try {
       await page.goto(`/forums/${TEST_CHANNEL}/issues/${ISSUE_NUMBER}`);
+      await page
+        .getByRole('button', { name: 'Review resolution options' })
+        .click();
 
       const archiveButton = page
         .getByRole('button', { name: 'Archive Image' })
         .first();
       await expect(archiveButton).toBeVisible();
+      expect(
+        diagnostics.seenOperations.some(({ operationName }) =>
+          ['getDiscussionChannelID', 'getEventChannelID'].includes(
+            operationName
+          )
+        )
+      ).toBe(false);
       await archiveButton.click();
       await page.getByLabel('Select rule: Be kind').first().check();
       await page.getByTestId('report-image-modal-primary-button').click();

@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GET_ISSUE_RELATED_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { DateTime } from 'luxon';
 import { useRoute } from 'nuxt/app';
-import { useModProfileName } from '@/composables/useAuthState';
 import { stableRelativeTime } from '@/utils';
 import type { Issue } from '@/__generated__/graphql';
 
@@ -16,8 +15,6 @@ import MarkdownPreview from '../MarkdownPreview.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import { getOriginalPoster } from '@/utils/originalPoster';
-
-const modProfileNameVar = useModProfileName();
 
 const props = defineProps<{
   activeIssue: Issue;
@@ -42,10 +39,8 @@ const {
   error: getDiscussionError,
   loading: getDiscussionLoading,
   onResult: onGetDiscussionResult,
-} = useQuery(GET_DISCUSSION, () => ({
+} = useQuery(GET_ISSUE_RELATED_DISCUSSION, () => ({
   id: discussionId.value,
-  loggedInModName: modProfileNameVar.value,
-  channelUniqueName: channelId.value,
 }));
 
 const discussion = computed(() => {

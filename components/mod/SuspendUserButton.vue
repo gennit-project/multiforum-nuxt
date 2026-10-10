@@ -128,13 +128,22 @@ const { result: getDiscussionChannelResult } = useQuery(
   {
     discussionId: props.discussionId,
     channelUniqueName: props.channelUniqueName,
+  },
+  {
+    enabled: !!props.discussionId && !!props.channelUniqueName,
   }
 );
 
-const { result: getEventChannelResult } = useQuery(GET_EVENT_CHANNEL, {
-  eventId: props.eventId,
-  channelUniqueName: props.channelUniqueName,
-});
+const { result: getEventChannelResult } = useQuery(
+  GET_EVENT_CHANNEL,
+  {
+    eventId: props.eventId,
+    channelUniqueName: props.channelUniqueName,
+  },
+  {
+    enabled: !!props.eventId && !!props.channelUniqueName,
+  }
+);
 
 const discussionChannelId = computed(() => {
   return getDiscussionChannelResult.value?.discussionChannels?.[0]?.id ?? '';
@@ -143,14 +152,13 @@ const discussionChannelId = computed(() => {
 const eventChannelId = computed(() => {
   return getEventChannelResult.value?.eventChannels?.[0]?.id ?? '';
 });
-
 </script>
 
 <template>
   <div>
     <button
       v-if="userIsSuspendedFromChannel"
-      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
+      class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm font-semibold text-white transition"
       :class="{
         'cursor-pointer bg-green-600 hover:bg-green-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,
@@ -162,7 +170,7 @@ const eventChannelId = computed(() => {
     </button>
     <button
       v-else
-      class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
+      class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm font-semibold text-white transition"
       :class="{
         'cursor-pointer bg-red-600 hover:bg-red-500': !disabled,
         'cursor-not-allowed bg-gray-500': disabled,

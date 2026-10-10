@@ -73,6 +73,8 @@ const legacyOperationAliases: Record<string, string> = {
   getDiscussionDetail: 'getDiscussion',
   getDiscussionActivity: 'getDiscussion',
   getDownloadActivity: 'getDiscussion',
+  getIssueRelatedDiscussion: 'getDiscussion',
+  getIssueActivity: 'getIssue',
 };
 
 type CompletedOperation = {

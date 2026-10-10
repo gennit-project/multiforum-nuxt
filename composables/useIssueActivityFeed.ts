@@ -2,7 +2,7 @@ import { computed, ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import type { ComputedRef, Ref } from 'vue';
 import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
-import { GET_ISSUE } from '@/graphQLData/issue/queries';
+import { GET_ISSUE_ACTIVITY } from '@/graphQLData/issue/queries';
 import {
   ADD_ISSUE_ACTIVITY_FEED_ITEM,
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
@@ -15,7 +15,7 @@ const DEFAULT_ACTIVITY_FEED_PAGE_SIZE = 10;
 type IssueFeedData = { issues?: Issue[] | null };
 
 // Narrow views of the Apollo query handles the pagination needs. Typed loosely
-// enough that GET_ISSUE's inferred handles assign cleanly while still
+// enough that GET_ISSUE_ACTIVITY's inferred handles assign cleanly while still
 // describing the shape the merge logic relies on.
 export type FetchMoreIssue = (options: {
   variables: {
@@ -77,7 +77,11 @@ export function useIssueActivityFeed({
   );
 
   const loadMoreActivityFeed = async () => {
-    if (!fetchMoreIssue || getIssueLoading?.value || !hasMoreActivityFeed.value) {
+    if (
+      !fetchMoreIssue ||
+      getIssueLoading?.value ||
+      !hasMoreActivityFeed.value
+    ) {
       return;
     }
 
@@ -144,7 +148,7 @@ export function useIssueActivityFeed({
       }
 
       const existingIssueData = cache.readQuery<{ issues: Issue[] }>({
-        query: GET_ISSUE,
+        query: GET_ISSUE_ACTIVITY,
         variables,
       });
 
@@ -156,7 +160,7 @@ export function useIssueActivityFeed({
         );
 
         cache.writeQuery({
-          query: GET_ISSUE,
+          query: GET_ISSUE_ACTIVITY,
           variables,
           data: {
             issues: newIssues,

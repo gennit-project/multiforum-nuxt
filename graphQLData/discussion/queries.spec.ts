@@ -5,12 +5,14 @@ import {
   GET_DISCUSSION_DETAIL,
   GET_DOWNLOAD_ACTIVITY,
   GET_DOWNLOAD_DETAIL,
+  GET_ISSUE_RELATED_DISCUSSION,
 } from './queries';
 
 const source = print(GET_DOWNLOAD_DETAIL);
 const discussionSource = print(GET_DISCUSSION_DETAIL);
 const activitySource = print(GET_DISCUSSION_ACTIVITY);
 const downloadActivitySource = print(GET_DOWNLOAD_ACTIVITY);
+const issueRelatedDiscussionSource = print(GET_ISSUE_RELATED_DISCUSSION);
 const discussionValidationSchema = buildSchema(`
   type Query {
     discussions(where: DiscussionWhere): [Discussion!]!
@@ -80,6 +82,33 @@ describe('GET_DISCUSSION_ACTIVITY', () => {
     expect(activitySource).toContain('PastTitleVersions');
     expect(activitySource).toContain('PastBodyVersions');
     expect(activitySource).toContain('BodyLastEditedBy');
+  });
+});
+
+describe('GET_ISSUE_RELATED_DISCUSSION', () => {
+  it('keeps the reported content fields used by issue detail', () => {
+    expect(issueRelatedDiscussionSource).toContain(
+      'query getIssueRelatedDiscussion($id: ID!)'
+    );
+    expect(issueRelatedDiscussionSource).toContain('hasDownload');
+    expect(issueRelatedDiscussionSource).toContain('DiscussionChannels');
+    expect(issueRelatedDiscussionSource).toContain('DownloadableFiles');
+    expect(issueRelatedDiscussionSource).toContain('...AuthorFields');
+  });
+
+  it('does not load unrelated discussion detail collections', () => {
+    for (const field of [
+      'Album',
+      'Answers',
+      'FeedbackComments',
+      'CrosspostedDiscussion',
+      'SharedCollection',
+      'LabelChangeHistory',
+      'PastTitleVersions',
+      'PastBodyVersions',
+    ]) {
+      expect(issueRelatedDiscussionSource).not.toContain(field);
+    }
   });
 });
 

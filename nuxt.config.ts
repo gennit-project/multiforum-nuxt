@@ -16,14 +16,57 @@ const imageProvider = resolveImageProvider({
   nitroPreset: process.env.NITRO_PRESET,
   vercel: process.env.VERCEL,
 });
-const runtimeGraphqlFetch: typeof globalThis.fetch = (input, init) => {
+const runtimeGraphqlFetch: typeof globalThis.fetch = async (input, init) => {
   const runtimeBackendUrl =
     typeof window === 'undefined'
       ? process.env.NUXT_BACKEND_GRAPHQL_URL?.trim()
       : '';
   const target =
     typeof window === 'undefined' ? runtimeBackendUrl || input : input;
-  return globalThis.fetch(target, init);
+  const startedAt = performance.now();
+  const response = await globalThis.fetch(target, init);
+
+  if (typeof window === 'undefined') {
+    // Nuxt serializes this callback into the generated Apollo plugin, so it
+    // must remain self-contained rather than referring to imported helpers.
+    const configuredThreshold = Number(
+      process.env.NUXT_GRAPHQL_SLOW_REQUEST_MS
+    );
+    const thresholdMs =
+      Number.isFinite(configuredThreshold) && configuredThreshold >= 0
+        ? configuredThreshold
+        : 500;
+    const durationMs = performance.now() - startedAt;
+
+    if (durationMs >= thresholdMs) {
+      let operationName = 'unknown';
+      if (typeof init?.body === 'string') {
+        try {
+          const parsedBody = JSON.parse(init.body) as {
+            operationName?: unknown;
+          };
+          operationName =
+            typeof parsedBody.operationName === 'string' &&
+            parsedBody.operationName
+              ? parsedBody.operationName
+              : 'anonymous';
+        } catch {
+          // Keep the fallback name; never log raw request bodies or variables.
+        }
+      }
+
+      console.info(
+        `[graphql-timing] ${JSON.stringify({
+          operationName,
+          durationMs: Math.round(durationMs * 10) / 10,
+          status: response.status,
+          serverTiming: response.headers.get('server-timing'),
+        })}`
+      );
+    }
+  }
+
+  return response;
 };
 const ignoredDevWatchPatterns = [
   '**/.stateful/**',

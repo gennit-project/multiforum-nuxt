@@ -4,11 +4,21 @@ import { mount } from '@vue/test-utils';
 
 import SuspendUserButton from '@/components/mod/SuspendUserButton.vue';
 import type { Issue } from '@/__generated__/graphql';
+import {
+  GET_DISCUSSION_CHANNEL,
+  GET_EVENT_CHANNEL,
+} from '@/graphQLData/mod/queries';
 
-const h = vi.hoisted(() => ({ result: null as unknown }));
+const h = vi.hoisted(() => ({
+  result: null as unknown,
+  queryCalls: [] as unknown[][],
+}));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({ result: h.result, loading: ref(false), error: ref(null) }),
+  useQuery: (...args: unknown[]) => {
+    h.queryCalls.push(args);
+    return { result: h.result, loading: ref(false), error: ref(null) };
+  },
 }));
 
 const issue = {
@@ -30,7 +40,11 @@ const mountButton = (props: Record<string, unknown> = {}) =>
       stubs: {
         BrokenRulesModal: modalStub('BrokenRulesModal'),
         UnsuspendUserModal: modalStub('UnsuspendUserModal'),
-        Notification: { name: 'Notification', props: ['show', 'title'], template: '<div />' },
+        Notification: {
+          name: 'Notification',
+          props: ['show', 'title'],
+          template: '<div />',
+        },
         UserPlus: true,
         UserMinus: true,
       },
@@ -45,7 +59,26 @@ const suspensionResult = (suspended: boolean) => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
+  h.queryCalls = [];
   h.result = ref(suspensionResult(false));
+});
+
+describe('SuspendUserButton query scope', () => {
+  it('does not enable unrelated content channel queries', () => {
+    mountButton({
+      issue: { id: 'image-issue', relatedImageId: 'image-1' } as Issue,
+    });
+
+    const discussionCall = h.queryCalls.find(
+      ([document]) => document === GET_DISCUSSION_CHANNEL
+    );
+    const eventCall = h.queryCalls.find(
+      ([document]) => document === GET_EVENT_CHANNEL
+    );
+
+    expect(discussionCall?.[2]).toEqual({ enabled: false });
+    expect(eventCall?.[2]).toEqual({ enabled: false });
+  });
 });
 
 describe('SuspendUserButton label', () => {
@@ -88,9 +121,9 @@ describe('SuspendUserButton disabled state', () => {
 
     await wrapper.get('button').trigger('click');
 
-    expect(wrapper.getComponent({ name: 'BrokenRulesModal' }).props('open')).toBe(
-      false
-    );
+    expect(
+      wrapper.getComponent({ name: 'BrokenRulesModal' }).props('open')
+    ).toBe(false);
   });
 });
 
@@ -100,9 +133,9 @@ describe('SuspendUserButton modal flow', () => {
 
     await wrapper.get('button').trigger('click');
 
-    expect(wrapper.getComponent({ name: 'BrokenRulesModal' }).props('open')).toBe(
-      true
-    );
+    expect(
+      wrapper.getComponent({ name: 'BrokenRulesModal' }).props('open')
+    ).toBe(true);
   });
 
   it('opens the unsuspend modal on click when suspended', async () => {
