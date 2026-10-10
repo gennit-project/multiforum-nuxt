@@ -35,8 +35,12 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
-vi.mock('@/composables/useTheme', () => ({ useAppTheme: () => ({ theme: ref('light') }) }));
-vi.mock('@/composables/useAuthState', () => ({ useModProfileName: () => h.modName }));
+vi.mock('@/composables/useTheme', () => ({
+  useAppTheme: () => ({ theme: ref('light') }),
+}));
+vi.mock('@/composables/useAuthState', () => ({
+  useModProfileName: () => h.modName,
+}));
 
 const issue = (overrides: Record<string, unknown> = {}) => ({
   id: 'i1',
@@ -73,10 +77,18 @@ const mountForm = () =>
           emits: ['click'],
           template: '<button @click="$emit(\'click\')">{{ text }}</button>',
         },
-        ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err" />' },
-        IssueBadge: { name: 'IssueBadge', props: ['issue'], template: '<div class="badge" />' },
+        ErrorBanner: {
+          name: 'ErrorBanner',
+          props: ['text'],
+          template: '<div class="err" />',
+        },
+        IssueBadge: {
+          name: 'IssueBadge',
+          props: ['issue'],
+          template: '<div class="badge" />',
+        },
         CharCounter: { props: ['current', 'max'], template: '<div />' },
-        'SkeletonLoader': { template: '<div class="skeleton" />' },
+        SkeletonLoader: { template: '<div class="skeleton" />' },
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
       },
@@ -144,6 +156,15 @@ describe('IssueTitleEditForm display', () => {
     const wrapper = mountForm();
 
     expect(wrapper.text()).toContain('First reported on');
+  });
+
+  it('shows a user reporter by username', () => {
+    h.result = ref({
+      issues: [issue({ Author: { __typename: 'User', username: 'alice' } })],
+    });
+    const wrapper = mountForm();
+
+    expect(wrapper.text()).toContain('by alice');
   });
 });
 

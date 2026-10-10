@@ -6,6 +6,7 @@ import {
   buildUser,
   buildIssue,
   buildModerationAction,
+  buildModCommentActivityItem,
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
 import {
@@ -16,6 +17,7 @@ import {
   createRulesJSON,
   DEFAULT_RULES_JSON,
 } from '../../helpers/moderationFixtures';
+import { expectNoAxeViolations } from '../../helpers/axe';
 
 const TEST_CHANNEL = 'cats';
 const TEST_USER = 'alice';
@@ -136,6 +138,12 @@ test.describe('Moderation issue detail', () => {
       body: 'This discussion violates the no-spam rule.',
       isOpen: true,
       activityFeed: [
+        buildModCommentActivityItem({
+          id: 'action-comment',
+          text: 'Moderator follow-up comment',
+          channelUniqueName: TEST_CHANNEL,
+          issueId: 'issue-1',
+        }),
         buildModerationAction({
           id: 'action-report',
           actionType: 'report',
@@ -175,6 +183,20 @@ test.describe('Moderation issue detail', () => {
       await expect(page.getByText(/was reported by/i).first()).toBeVisible();
       await expect(page.getByText(/the issue was closed by/i)).toBeVisible();
       await expect(page.getByText(/the user was suspended by/i)).toBeVisible();
+
+      await page.getByRole('button', { name: 'Comments' }).click();
+      await expect(page.getByText('Moderator follow-up comment')).toBeVisible();
+      await expect(page.getByText(/the issue was closed by/i)).toBeHidden();
+
+      await page.getByRole('button', { name: 'All activity' }).click();
+
+      await page.getByRole('button', { name: 'Lock issue' }).click();
+      await expect(
+        page.getByRole('heading', { name: 'Lock Issue' })
+      ).toBeVisible();
+      await page.getByRole('button', { name: 'Cancel' }).click();
+
+      await expectNoAxeViolations(page);
 
       await waitForGraphqlOperation(
         diagnostics.completedOperations,

@@ -99,6 +99,16 @@ const formattedDate = computed(() => {
   });
 });
 
+const issueAuthorLabel = computed(() => {
+  const author = issue.value?.Author;
+  if (author?.__typename === 'User') return author.username;
+  if (author?.__typename === 'ModerationProfile') return author.displayName;
+  if (author && 'displayName' in author && author.displayName) {
+    return author.displayName;
+  }
+  return '[Deleted]';
+});
+
 const hasReportedContent = computed(
   () =>
     !!(
@@ -156,9 +166,7 @@ const hasReportedContent = computed(
               All reports for this content are collected in this issue.
             </span>
             <span>
-              {{
-                `First reported on ${formattedDate} by ${issue?.Author?.displayName || '[Deleted]'}`
-              }}
+              {{ `First reported on ${formattedDate} by ${issueAuthorLabel}` }}
             </span>
           </div>
         </div>

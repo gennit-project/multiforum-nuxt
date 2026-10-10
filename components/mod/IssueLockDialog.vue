@@ -1,8 +1,10 @@
 <script lang="ts" setup>
+import { ref } from 'vue';
 import type { ApolloError } from '@apollo/client/errors';
 import GenericButton from '@/components/GenericButton.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import { useFocusTrap } from '@/composables/useFocusTrap';
 
 const props = defineProps<{
   lockReasonInput: string;
@@ -15,6 +17,14 @@ const emit = defineEmits<{
   (e: 'close' | 'lock'): void;
 }>();
 
+const dialogRef = ref<HTMLElement | null>(null);
+const isOpen = ref(true);
+
+useFocusTrap(dialogRef, {
+  active: isOpen,
+  onEscape: () => emit('close'),
+});
+
 const handleReasonUpdate = (event: Event) => {
   const target = event.target as HTMLTextAreaElement;
   emit('update:lockReasonInput', target.value);
@@ -23,13 +33,22 @@ const handleReasonUpdate = (event: Event) => {
 
 <template>
   <div
+    ref="dialogRef"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="issue-lock-dialog-title"
     @click.self="emit('close')"
   >
     <div
       class="mx-4 w-full max-w-md rounded-lg bg-white p-6 shadow-xl dark:bg-gray-800"
     >
-      <h3 class="mb-4 text-lg font-bold dark:text-white">Lock Issue</h3>
+      <h3
+        id="issue-lock-dialog-title"
+        class="mb-4 text-lg font-bold dark:text-white"
+      >
+        Lock Issue
+      </h3>
       <ErrorBanner
         v-if="props.lockIssueError"
         class="mb-4"
@@ -39,10 +58,14 @@ const handleReasonUpdate = (event: Event) => {
         Locking an issue prevents further modifications including comments,
         status changes, and edits.
       </p>
-      <label class="mb-2 block text-sm font-medium dark:text-gray-300">
+      <label
+        for="issue-lock-reason"
+        class="mb-2 block text-sm font-medium dark:text-gray-300"
+      >
         Reason for locking (required)
       </label>
       <textarea
+        id="issue-lock-reason"
         :value="props.lockReasonInput"
         class="w-full rounded-lg border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
         rows="3"

@@ -20,6 +20,10 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  showSummary: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 defineEmits(['toggle', 'dismiss-cta']);
@@ -27,9 +31,11 @@ defineEmits(['toggle', 'dismiss-cta']);
 
 <template>
   <div
+    v-if="showSummary || (showCta && !isSubscribed)"
     class="mb-4 flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/60"
   >
     <div
+      v-if="showSummary"
       class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
     >
       <div>

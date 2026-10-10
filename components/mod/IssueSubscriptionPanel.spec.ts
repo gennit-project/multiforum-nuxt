@@ -9,7 +9,9 @@ const mountPanel = (props: Record<string, unknown> = {}) =>
 describe('IssueSubscriptionPanel', () => {
   it('labels the toggle "Subscribe" when not subscribed', () => {
     const wrapper = mountPanel({ isSubscribed: false });
-    expect(wrapper.findComponent(GenericButton).props('text')).toBe('Subscribe');
+    expect(wrapper.findComponent(GenericButton).props('text')).toBe(
+      'Subscribe'
+    );
   });
 
   it('labels the toggle "Unsubscribe" when subscribed', () => {
@@ -41,5 +43,14 @@ describe('IssueSubscriptionPanel', () => {
     const buttons = wrapper.findAllComponents(GenericButton);
     buttons[buttons.length - 1].vm.$emit('click');
     expect(wrapper.emitted('dismiss-cta')).toHaveLength(1);
+  });
+
+  it('can hide the summary while retaining the call-to-action', () => {
+    const wrapper = mountPanel({
+      isSubscribed: false,
+      showCta: true,
+      showSummary: false,
+    });
+    expect(wrapper.text()).not.toContain('Issue notifications');
   });
 });

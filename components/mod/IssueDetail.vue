@@ -47,9 +47,9 @@ import { useIssueModerationActions } from '@/composables/useIssueModerationActio
 import { useIssueSubscription } from '@/composables/useIssueSubscription';
 import NotificationComponent from '@/components/NotificationComponent.vue';
 import IssueSubscriptionPanel from '@/components/mod/IssueSubscriptionPanel.vue';
+import IssueDetailHeader from '@/components/mod/IssueDetailHeader.vue';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
-import TagComponent from '@/components/TagComponent.vue';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -71,6 +71,10 @@ const ACTIVITY_FEED_PAGE_SIZE = 10;
 
 // Setup
 const route = useRoute();
+
+const hasForumIssueHeader = computed(() =>
+  route.name?.toString().startsWith('forums-forumId-issues-issueNumber')
+);
 
 // Route and issueNumber computations
 const channelId = computed(() => {
@@ -439,6 +443,27 @@ const handleLockReasonUpdate = (value: string) => {
       :text="getIssueError.message"
     />
 
+    <IssueDetailHeader
+      v-if="activeIssue"
+      :issue="activeIssue"
+      :context-channels="issueContextChannels"
+      :show-summary="!hasForumIssueHeader"
+      :show-actions="!!usernameVar"
+      :is-subscribed="isIssueSubscribed"
+      :subscription-loading="
+        subscribeToIssueLoading || unsubscribeFromIssueLoading
+      "
+      :is-suspended-mod="isSuspendedMod"
+      :close-issue-loading="closeIssueLoading"
+      :reopen-issue-loading="reopenIssueLoading"
+      :lock-issue-loading="lockIssueLoading"
+      :unlock-issue-loading="unlockIssueLoading"
+      @toggle-subscription="toggleIssueSubscription"
+      @toggle-close-open="toggleCloseOpenIssue"
+      @open-lock-dialog="openLockDialog"
+      @unlock-issue="handleUnlockIssue"
+    />
+
     <!-- Lock Status Banner -->
     <IssueLockedBanner
       v-if="isLocked"
@@ -455,21 +480,6 @@ const handleLockReasonUpdate = (value: string) => {
     </div>
 
     <div v-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
-      <div
-        v-if="issueContextChannels.length"
-        class="flex flex-wrap gap-1"
-        data-testid="issue-detail-channel-tags"
-      >
-        <TagComponent
-          v-for="channelName in issueContextChannels"
-          :key="channelName"
-          class="dark:!text-white"
-          :tag="channelName"
-          :hide-icon="true"
-          :channel-mode="true"
-        />
-      </div>
-
       <!-- Related Content Section -->
       <IssueRelatedContent
         v-if="shouldShowIssueDetailsSection && hasRelatedContent"
@@ -546,6 +556,7 @@ const handleLockReasonUpdate = (value: string) => {
             :subscribe-loading="subscribeToIssueLoading"
             :unsubscribe-loading="unsubscribeFromIssueLoading"
             :show-cta="showSubscribeCta"
+            :show-summary="false"
             @toggle="toggleIssueSubscription"
             @dismiss-cta="dismissSubscribeCta"
           />
@@ -646,11 +657,13 @@ const handleLockReasonUpdate = (value: string) => {
 
           <IssueCommentForm
             v-if="activeIssue"
+            id="issue-comment-composer"
             :comment-text="createFormValues.text"
             :is-issue-open="activeIssue.isOpen ?? false"
             :is-locked="isLocked"
             :is-suspended-mod="isSuspendedMod"
             :is-original-user-author="isOriginalUserAuthor"
+            :show-management-actions="false"
             :close-issue-loading="closeIssueLoading"
             :reopen-issue-loading="reopenIssueLoading"
             :lock-issue-loading="lockIssueLoading"

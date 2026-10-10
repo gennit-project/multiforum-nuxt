@@ -1,7 +1,11 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'nuxt/app';
-import type { Discussion, Issue, ModerationAction } from '@/__generated__/graphql';
+import type {
+  Discussion,
+  Issue,
+  ModerationAction,
+} from '@/__generated__/graphql';
 import ActivityFeedListItem from './ActivityFeedListItem.vue';
 import { ActionType } from '@/types/Comment';
 
@@ -18,6 +22,15 @@ const route = useRoute();
 const hasIssueNumberInRoute = computed(
   () => typeof route.params.issueNumber === 'string'
 );
+
+type FeedFilter = 'all' | 'comments' | 'moderation';
+const activeFilter = ref<FeedFilter>('all');
+
+const feedFilters: Array<{ value: FeedFilter; label: string }> = [
+  { value: 'all', label: 'All activity' },
+  { value: 'comments', label: 'Comments' },
+  { value: 'moderation', label: 'Moderation' },
+];
 
 const reversedFeedItems = computed(() => {
   return props.feedItems.slice().reverse();
@@ -194,6 +207,18 @@ const displayFeedItems = computed(() => {
     });
   }
 
+  if (activeFilter.value === 'comments') {
+    return result.filter(
+      ({ activityItem }) =>
+        normalizeActionType(activityItem.actionType) === ActionType.Comment
+    );
+  }
+  if (activeFilter.value === 'moderation') {
+    return result.filter(
+      ({ activityItem }) =>
+        normalizeActionType(activityItem.actionType) !== ActionType.Comment
+    );
+  }
   return result;
 });
 </script>
@@ -201,7 +226,35 @@ const displayFeedItems = computed(() => {
 <template>
   <div class="flow-root">
     <NuxtPage v-if="hasIssueNumberInRoute" />
-    <ul role="list">
+    <div
+      v-if="feedItems.length > 1"
+      class="mb-4 flex flex-wrap gap-2 border-b border-gray-200 pb-3 dark:border-gray-700"
+      aria-label="Filter issue activity"
+    >
+      <button
+        v-for="filter in feedFilters"
+        :key="filter.value"
+        type="button"
+        :aria-pressed="activeFilter === filter.value"
+        class="focus-visible:ring-brand-500 min-h-10 rounded-full px-3 py-2 text-sm font-medium focus-visible:ring-2 focus-visible:outline-none"
+        :class="
+          activeFilter === filter.value
+            ? 'bg-gray-900 text-white dark:bg-gray-100 dark:text-gray-900'
+            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700'
+        "
+        @click="activeFilter = filter.value"
+      >
+        {{ filter.label }}
+      </button>
+    </div>
+    <p
+      v-if="displayFeedItems.length === 0"
+      class="rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-300"
+      role="status"
+    >
+      No activity matches this filter.
+    </p>
+    <ul v-else role="list">
       <ActivityFeedListItem
         v-for="displayItem in displayFeedItems"
         :key="displayItem.activityItem.id"

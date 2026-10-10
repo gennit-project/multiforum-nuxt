@@ -11,20 +11,28 @@ import ArrowPathIcon from '@/components/icons/ArrowPath.vue';
 // Track when the editor should reset (after clearing)
 const editorResetKey = ref(0);
 
-const props = defineProps<{
-  commentText: string;
-  isIssueOpen: boolean;
-  isLocked: boolean;
-  isSuspendedMod: boolean;
-  isOriginalUserAuthor: boolean;
-  closeIssueLoading: boolean;
-  reopenIssueLoading: boolean;
-  lockIssueLoading: boolean;
-  unlockIssueLoading: boolean;
-  commentLoading: boolean;
-  lockIssueError?: { message: string } | null;
-  unlockIssueError?: { message: string } | null;
-}>();
+const props = withDefaults(
+  defineProps<{
+    commentText: string;
+    isIssueOpen: boolean;
+    isLocked: boolean;
+    isSuspendedMod: boolean;
+    isOriginalUserAuthor: boolean;
+    closeIssueLoading: boolean;
+    reopenIssueLoading: boolean;
+    lockIssueLoading: boolean;
+    unlockIssueLoading: boolean;
+    commentLoading: boolean;
+    lockIssueError?: { message: string } | null;
+    unlockIssueError?: { message: string } | null;
+    showManagementActions?: boolean;
+  }>(),
+  {
+    lockIssueError: null,
+    unlockIssueError: null,
+    showManagementActions: true,
+  }
+);
 
 const emit = defineEmits<{
   (e: 'update:commentText', value: string): void;
@@ -129,7 +137,7 @@ watch(
     <div class="mt-3 flex justify-end gap-2">
       <!-- Lock/Unlock Button -->
       <GenericButton
-        v-if="!isLocked && !isSuspendedMod"
+        v-if="showManagementActions && !isLocked && !isSuspendedMod"
         :text="'Lock Issue'"
         :disabled="lockIssueLoading"
         :loading="lockIssueLoading"
@@ -149,7 +157,7 @@ watch(
         </svg>
       </GenericButton>
       <GenericButton
-        v-if="isLocked && !isSuspendedMod"
+        v-if="showManagementActions && isLocked && !isSuspendedMod"
         :text="'Unlock Issue'"
         :disabled="unlockIssueLoading"
         :loading="unlockIssueLoading"
@@ -168,7 +176,7 @@ watch(
       </GenericButton>
 
       <GenericButton
-        v-if="!isLocked"
+        v-if="showManagementActions && !isLocked"
         :test-id="'close-open-issue-button'"
         :text="closeOpenButtonText"
         :loading="closeIssueLoading || reopenIssueLoading"
