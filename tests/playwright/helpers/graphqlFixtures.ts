@@ -787,6 +787,29 @@ export const buildEvent = ({
 // without re-declaring the query shape inline.
 // ---------------------------------------------------------------------------
 
+export type IssueActivityCommentFixture = {
+  __typename: 'Comment';
+  id: string;
+  text: string;
+  emoji: string;
+  weightedVotesCount: number;
+  createdAt: string;
+  updatedAt: string;
+  Issue: { id: string };
+  CommentAuthor: {
+    __typename: 'ModerationProfile';
+    displayName: string;
+  };
+  Channel: { uniqueName: string };
+  ChildCommentsAggregate: CountAggregate;
+  ParentComment: null;
+  editReason: string;
+  PastVersions: [];
+  UpvotedByUsers: [];
+  UpvotedByUsersAggregate: CountAggregate;
+  SuperUpvotedByUsers: [];
+};
+
 export type ModerationActionFixture = {
   __typename: 'ModerationAction';
   id: string;
@@ -796,7 +819,7 @@ export type ModerationActionFixture = {
   ModerationProfile: { displayName: string } | null;
   User: { username: string } | null;
   Revision: null;
-  Comment: CommentFixture | null;
+  Comment: CommentFixture | IssueActivityCommentFixture | null;
 };
 
 export const buildModerationAction = ({
@@ -848,7 +871,7 @@ export const buildModCommentActivityItem = ({
   modDisplayName?: string;
   channelUniqueName?: string;
   issueId?: string;
-} = {}) => ({
+} = {}): ModerationActionFixture => ({
   __typename: 'ModerationAction',
   id,
   actionType: 'comment',
