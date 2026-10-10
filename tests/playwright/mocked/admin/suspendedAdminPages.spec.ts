@@ -346,6 +346,7 @@ test('follows a user suspension to its reported discussion and unsuspends the au
     timeout: 60_000,
   });
   await expect(page.locator('#main-content')).toHaveCount(1);
+  await page.getByRole('button', { name: 'Review resolution options' }).click();
   await page.getByRole('button', { name: 'Unsuspend Author' }).first().click();
   await page
     .getByRole('dialog')

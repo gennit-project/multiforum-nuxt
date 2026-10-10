@@ -491,6 +491,7 @@ export const GET_IMAGE_REPORTS = gql`
 
 export const GET_SERVER_ISSUE = gql`
   ${ISSUE_BASE_FIELDS}
+  ${COMMENT_VOTE_FIELDS}
   query getServerIssue(
     $issueNumber: Int!
     $activityFeedLimit: Int
