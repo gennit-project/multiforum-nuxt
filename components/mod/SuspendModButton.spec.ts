@@ -131,4 +131,24 @@ describe('SuspendModButton', () => {
     // When not disabled, button should have hover transition styling
     expect(button.classes()).toContain('transition');
   });
+
+  it('hides the manual trigger when the modal is opened by a menu action', () => {
+    const wrapper = mount(SuspendModButton, {
+      props: {
+        issue: mockIssue,
+        autoOpen: true,
+      },
+      global: {
+        stubs: {
+          SuspendModModal: { template: '<div />' },
+          UnsuspendModModal: { template: '<div />' },
+          Notification: { template: '<div />' },
+          UserPlus: { template: '<span>+</span>' },
+          UserMinus: { template: '<span>-</span>' },
+        },
+      },
+    });
+
+    expect(wrapper.find('button').exists()).toBe(false);
+  });
 });

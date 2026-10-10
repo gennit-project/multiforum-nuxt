@@ -111,7 +111,7 @@ onMounted(() => {
 <template>
   <div>
     <button
-      v-if="modIsSuspendedFromChannel"
+      v-if="!autoOpen && modIsSuspendedFromChannel"
       class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
       :class="{
         'cursor-pointer bg-green-600 hover:bg-green-500': !disabled,
@@ -123,7 +123,7 @@ onMounted(() => {
       Unsuspend Mod
     </button>
     <button
-      v-else
+      v-if="!autoOpen && !modIsSuspendedFromChannel"
       class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
       :class="{
         'cursor-pointer bg-red-600 hover:bg-red-500': !disabled,

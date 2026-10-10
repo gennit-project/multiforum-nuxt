@@ -767,7 +767,6 @@ const showCommentMenu = computed(() => {
               :issue="issue"
               :disabled="suspendModDisabled"
               :auto-open="true"
-              class="hidden"
               @modal-closed="showSuspendModFromMenu = false"
             />
             <!-- Discussion revision diffs -->
