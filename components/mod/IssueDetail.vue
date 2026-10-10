@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_ISSUE } from '@/graphQLData/issue/queries';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GET_ISSUE, GET_ISSUE_ACTIVITY } from '@/graphQLData/issue/queries';
+import { GET_ISSUE_RELATED_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { GET_EVENT } from '@/graphQLData/event/queries';
 import { GET_COMMENT } from '@/graphQLData/comment/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
@@ -104,10 +104,28 @@ const {
   error: getIssueError,
   loading: getIssueLoading,
   refetch: refetchIssue,
+} = useQuery(
+  GET_ISSUE,
+  () => ({
+    channelUniqueName: channelId.value,
+    issueNumber: issueNumber.value,
+  }),
+  () => ({
+    enabled: issueNumber.value !== null,
+  })
+);
+
+// The activity timeline is below the primary issue content. Fetch it after
+// hydration so database and network latency do not hold up the SSR response.
+const {
+  result: getIssueActivityResult,
+  loading: getIssueActivityLoading,
+  error: getIssueActivityError,
+  refetch: refetchIssueActivity,
   fetchMore: fetchMoreIssue,
   onResult: onIssueResult,
 } = useQuery(
-  GET_ISSUE,
+  GET_ISSUE_ACTIVITY,
   () => ({
     channelUniqueName: channelId.value,
     issueNumber: issueNumber.value,
@@ -116,6 +134,8 @@ const {
   }),
   () => ({
     enabled: issueNumber.value !== null,
+    fetchPolicy: 'cache-first',
+    prefetch: false,
   })
 );
 
@@ -138,7 +158,15 @@ const { result: getServerResult } = useQuery(GET_SERVER_CONFIG, {
 
 const activeIssue = computed<Issue | null>(() => {
   if (getIssueError.value || !getIssueResult.value) return null;
-  return getIssueResult.value.issues[0];
+  const issueSummary = getIssueResult.value.issues[0];
+  if (!issueSummary) return null;
+
+  const issueActivity = getIssueActivityResult.value?.issues?.[0];
+  return {
+    ...issueSummary,
+    ActivityFeed: issueActivity?.ActivityFeed ?? [],
+    ActivityFeedAggregate: issueActivity?.ActivityFeedAggregate,
+  } as Issue;
 });
 
 const activeIssueId = computed(() => activeIssue.value?.id || '');
@@ -173,11 +201,9 @@ const relatedChannelUniqueName = computed(
 );
 
 const { result: relatedDiscussionResult } = useQuery(
-  GET_DISCUSSION,
+  GET_ISSUE_RELATED_DISCUSSION,
   () => ({
     id: relatedDiscussionId.value,
-    loggedInModName: modProfileNameVar.value,
-    channelUniqueName: issueChannelUniqueName.value,
   }),
   () => ({
     fetchPolicy: 'cache-first',
@@ -282,13 +308,17 @@ const {
   activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE,
   issueNumber,
   activeIssue,
-  getIssueLoading,
+  getIssueLoading: getIssueActivityLoading,
   // Apollo's fetchMore is generic over its data/variables; narrow it to the
   // composable's concrete merge shape (variables + updateQuery are identical).
   fetchMoreIssue: fetchMoreIssue as unknown as FetchMoreIssue,
-  refetchIssue,
+  refetchIssue: refetchIssueActivity,
   onIssueResult,
 });
+
+const resetIssueDetail = async () => {
+  await Promise.all([refetchIssue(), resetActivityFeed()]);
+};
 
 const {
   lockReasonInput,
@@ -305,7 +335,7 @@ const {
   activeIssueId,
   activeIssue,
   isSuspendedMod,
-  refetchIssue: resetActivityFeed,
+  refetchIssue: resetIssueDetail,
 });
 
 const {
@@ -323,7 +353,7 @@ const {
   isIssueAuthor,
   isLocked,
   isSuspendedMod,
-  refetchIssue: resetActivityFeed,
+  refetchIssue: resetIssueDetail,
 });
 
 const issue = computed<Issue | null>(() => activeIssue.value || null);
@@ -426,7 +456,7 @@ const {
   addIssueActivityFeedItem,
   addIssueActivityFeedItemWithCommentAsMod,
   addIssueActivityFeedItemWithCommentAsUser,
-  resetActivityFeed,
+  resetActivityFeed: resetIssueDetail,
   refetchChannel,
 });
 
@@ -567,11 +597,17 @@ const handleLockReasonUpdate = (value: string) => {
 
           <h2 v-if="activeIssue" class="text-xl font-bold">Activity Feed</h2>
 
+          <ErrorBanner
+            v-if="getIssueActivityError"
+            class="mb-4"
+            :text="getIssueActivityError.message"
+          />
+
           <button
             v-if="activeIssue && hasMoreActivityFeed"
             type="button"
             class="mb-4 text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-            :disabled="getIssueLoading"
+            :disabled="getIssueActivityLoading"
             @click="loadMoreActivityFeed"
           >
             Load older posts
@@ -659,6 +695,9 @@ const handleLockReasonUpdate = (value: string) => {
                 :can-edit-comments="modPermissions.canEditComments"
                 :can-edit-discussions="modPermissions.canEditDiscussions"
                 :can-edit-events="modPermissions.canEditEvents"
+                :related-discussion-has-download="
+                  relatedDiscussion?.hasDownload ?? null
+                "
                 :report-count="reportCount ?? undefined"
                 :is-author-bot="isAuthorBot"
                 @archived-successfully="resetActivityFeed"

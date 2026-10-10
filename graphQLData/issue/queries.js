@@ -2,7 +2,6 @@ import { COMMENT_VOTE_FIELDS } from '../comment/queries';
 import { gql } from '@apollo/client/core';
 
 export const ISSUE_BASE_FIELDS = gql`
-  # ${COMMENT_VOTE_FIELDS}
   fragment IssueBaseFields on Issue {
     id
     issueNumber
@@ -44,6 +43,7 @@ export const ISSUE_BASE_FIELDS = gql`
 
 export const ISSUE_FIELDS = gql`
   ${ISSUE_BASE_FIELDS}
+  ${COMMENT_VOTE_FIELDS}
   fragment IssueFields on Issue {
     ...IssueBaseFields
     ActivityFeed(options: { sort: { createdAt: DESC } }) {
@@ -114,7 +114,21 @@ export const ISSUE_FIELDS = gql`
 
 export const GET_ISSUE = gql`
   ${ISSUE_BASE_FIELDS}
-  query getIssue(
+  query getIssue($channelUniqueName: String!, $issueNumber: Int!) {
+    issues(
+      where: {
+        channelUniqueName: $channelUniqueName
+        issueNumber: $issueNumber
+      }
+    ) {
+      ...IssueBaseFields
+    }
+  }
+`;
+
+export const GET_ISSUE_ACTIVITY = gql`
+  ${COMMENT_VOTE_FIELDS}
+  query getIssueActivity(
     $channelUniqueName: String!
     $issueNumber: Int!
     $activityFeedLimit: Int
@@ -126,7 +140,7 @@ export const GET_ISSUE = gql`
         issueNumber: $issueNumber
       }
     ) {
-      ...IssueBaseFields
+      id
       ActivityFeed(
         options: {
           sort: { createdAt: DESC }
@@ -482,12 +496,7 @@ export const GET_SERVER_ISSUE = gql`
     $activityFeedLimit: Int
     $activityFeedOffset: Int
   ) {
-    issues(
-      where: {
-        channelUniqueName: null
-        issueNumber: $issueNumber
-      }
-    ) {
+    issues(where: { channelUniqueName: null, issueNumber: $issueNumber }) {
       ...IssueBaseFields
       ActivityFeed(
         options: {

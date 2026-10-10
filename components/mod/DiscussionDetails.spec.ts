@@ -4,23 +4,30 @@ import { mount } from '@vue/test-utils';
 
 import DiscussionDetails from '@/components/mod/DiscussionDetails.vue';
 import type { Issue } from '@/__generated__/graphql';
+import { GET_ISSUE_RELATED_DISCUSSION } from '@/graphQLData/discussion/queries';
 
 const h = vi.hoisted(() => ({
   result: null as unknown,
   error: null as unknown,
   loading: null as unknown,
   onResult: undefined as undefined | ((r: unknown) => void),
+  queryDocument: null as unknown,
+  queryVariables: null as unknown,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: h.result,
-    error: h.error,
-    loading: h.loading,
-    onResult: (cb: (r: unknown) => void) => {
-      h.onResult = cb;
-    },
-  }),
+  useQuery: (document: unknown, variables: () => unknown) => {
+    h.queryDocument = document;
+    h.queryVariables = variables();
+    return {
+      result: h.result,
+      error: h.error,
+      loading: h.loading,
+      onResult: (cb: (r: unknown) => void) => {
+        h.onResult = cb;
+      },
+    };
+  },
 }));
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: { forumId: 'cats' } }),
@@ -86,6 +93,8 @@ beforeEach(() => {
   h.error = ref(null);
   h.loading = ref(false);
   h.onResult = undefined;
+  h.queryDocument = null;
+  h.queryVariables = null;
 });
 
 describe('DiscussionDetails states', () => {
@@ -112,6 +121,13 @@ describe('DiscussionDetails states', () => {
 });
 
 describe('DiscussionDetails content', () => {
+  it('uses the focused issue-related discussion query', () => {
+    mountDetails();
+
+    expect(h.queryDocument).toBe(GET_ISSUE_RELATED_DISCUSSION);
+    expect(h.queryVariables).toEqual({ id: 'd1' });
+  });
+
   it('renders the discussion title', () => {
     const wrapper = mountDetails();
 

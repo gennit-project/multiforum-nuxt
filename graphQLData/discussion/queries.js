@@ -716,6 +716,42 @@ export const GET_DISCUSSION_ACTIVITY = gql`
   }
 `;
 
+// Issue detail pages render only the reported discussion's core content and
+// attachments. Keep this query intentionally narrow: GET_DISCUSSION also
+// loads galleries, answers, feedback, crossposts, labels, and full edit
+// history, which made the moderation page wait on data it never displays.
+export const GET_ISSUE_RELATED_DISCUSSION = gql`
+  ${AUTHOR_FIELDS}
+  query getIssueRelatedDiscussion($id: ID!) {
+    discussions(where: { id: $id }) {
+      id
+      title
+      body
+      createdAt
+      updatedAt
+      editReason
+      hasDownload
+      Author {
+        ...AuthorFields
+      }
+      DiscussionChannels {
+        channelUniqueName
+      }
+      DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+        id
+        fileName
+        url
+        kind
+        size
+        license {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
 export const GET_DOWNLOAD_ACTIVITY = gql`
   query getDownloadActivity($id: ID!, $channelUniqueName: String!) {
     discussions(where: { id: $id }) {

@@ -3,10 +3,10 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, ref, nextTick } from 'vue';
 import IssueDetail from './IssueDetail.vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { GET_ISSUE } from '@/graphQLData/issue/queries';
+import { GET_ISSUE, GET_ISSUE_ACTIVITY } from '@/graphQLData/issue/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GET_ISSUE_RELATED_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { GET_EVENT } from '@/graphQLData/event/queries';
 import { GET_COMMENT } from '@/graphQLData/comment/queries';
 
@@ -248,9 +248,10 @@ describe('IssueDetail', () => {
 
     const queryResults = new Map<unknown, unknown>([
       [GET_ISSUE, issueResult],
+      [GET_ISSUE_ACTIVITY, issueResult],
       [GET_CHANNEL, channelResult],
       [GET_SERVER_CONFIG, serverResult],
-      [GET_DISCUSSION, relatedDiscussionResult],
+      [GET_ISSUE_RELATED_DISCUSSION, relatedDiscussionResult],
       [GET_EVENT, relatedEventResult],
       [GET_COMMENT, relatedCommentResult],
     ]);
@@ -331,6 +332,18 @@ describe('IssueDetail', () => {
         },
       },
     });
+
+  it('keeps issue activity out of SSR prefetch', () => {
+    buildWrapper();
+    const activityCall = (
+      useQuery as unknown as ReturnType<typeof vi.fn>
+    ).mock.calls.find(([document]) => document === GET_ISSUE_ACTIVITY);
+    const options = activityCall?.[2];
+
+    expect(typeof options === 'function' ? options() : options).toMatchObject({
+      prefetch: false,
+    });
+  });
 
   it('subscribes from the issue CTA and clears the route query', async () => {
     const wrapper = buildWrapper();

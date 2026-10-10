@@ -188,6 +188,11 @@ test.describe('Moderation issue detail', () => {
           ({ operationName }) => operationName === 'getIssue'
         )
       ).toHaveLength(1);
+      expect(
+        diagnostics.seenOperations.filter(
+          ({ operationName }) => operationName === 'getIssueActivity'
+        )
+      ).toHaveLength(1);
       // ActivityFeedListItem renders a distinct passive label per action type.
       await expect(page.getByText(/was reported by/i).first()).toBeVisible();
       await expect(page.getByText(/the issue was closed by/i)).toBeVisible();
@@ -287,6 +292,11 @@ test.describe('Moderation issue detail', () => {
       await expect(
         page.getByRole('button', { name: 'Review resolution options' })
       ).toBeVisible();
+      expect(
+        diagnostics.seenOperations.filter(
+          ({ operationName }) => operationName === 'getIssueRelatedDiscussion'
+        )
+      ).toHaveLength(1);
       expect(
         diagnostics.seenOperations.some(
           ({ operationName }) => operationName === 'getDiscussionChannelID'
