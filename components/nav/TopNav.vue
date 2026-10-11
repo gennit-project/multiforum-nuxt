@@ -197,6 +197,13 @@ const isOnMapPage = computed(() => {
               {{ notificationCountVar }}
             </span>
           </nuxt-link>
+          <span class="sr-only" aria-live="polite" aria-atomic="true">
+            {{
+              notificationCountVar > 0
+                ? `${notificationCountVar} new notifications`
+                : ''
+            }}
+          </span>
           <ThemeSwitcher />
           <div v-if="usernameVar && !smAndDown" class="hidden md:block">
             <div class="flex items-center">

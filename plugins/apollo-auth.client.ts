@@ -16,9 +16,10 @@
 // there are no cookieless requests. We keep that key in sync with the server
 // session here — a real browser fetch that carries the session cookie.
 import { defineNuxtPlugin } from 'nuxt/app';
+import { setNotificationCount } from '@/composables/useAuthState';
 import { clearPersistedAuth } from '@/utils/authUtils';
 
-export default defineNuxtPlugin(() => {
+export default defineNuxtPlugin((nuxtApp) => {
   // Client-only by file name, but guard anyway — never touch localStorage / make
   // a relative (cookieless) fetch on the server.
   if (typeof window === 'undefined') {
@@ -35,34 +36,46 @@ export default defineNuxtPlugin(() => {
   };
 
   const syncToken = async () => {
-    if (!canUseLocalStorage()) {
-      return;
-    }
-
     try {
       const res = await fetch('/api/session/token', {
         credentials: 'include',
         cache: 'no-store',
       });
       if (!res.ok) return;
-      const { accessToken } = (await res.json()) as {
+      const { accessToken, notificationCount } = (await res.json()) as {
         accessToken: string | null;
+        notificationCount?: number;
       };
       if (accessToken) {
-        localStorage.setItem(TOKEN_KEY, accessToken);
-        return;
+        if (canUseLocalStorage()) {
+          localStorage.setItem(TOKEN_KEY, accessToken);
+        }
+        return notificationCount;
       }
 
       // An explicit null token means the server session is gone. Clear both the
       // token and the persisted username so the UI cannot restore a ghost login.
-      clearPersistedAuth();
+      if (canUseLocalStorage()) {
+        clearPersistedAuth();
+      }
     } catch {
       // ignore — Apollo falls back to whatever is in localStorage
     }
+
+    return undefined;
   };
 
   // Sync once on load so the browser-local Apollo token matches the current
   // server session without introducing ongoing background polling for normal
-  // browser sessions.
-  syncToken();
+  // browser sessions. The same response carries the volatile unread count, but
+  // publish it only after Vue adopts the server-rendered tree so an early
+  // response cannot create a hydration mismatch in the navigation badge.
+  const tokenSync = syncToken();
+  nuxtApp.hook('app:mounted', () => {
+    void tokenSync.then((notificationCount) => {
+      if (typeof notificationCount === 'number') {
+        setNotificationCount(notificationCount);
+      }
+    });
+  });
 });

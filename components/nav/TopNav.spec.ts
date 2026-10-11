@@ -159,6 +159,15 @@ describe('TopNav actions', () => {
     );
   });
 
+  it('announces a hydrated notification count politely', () => {
+    h.notificationCount = ref(5);
+    const wrapper = mountNav();
+
+    expect(wrapper.get('[aria-live="polite"]').text()).toBe(
+      '5 new notifications'
+    );
+  });
+
   it('shows the profile menu when logged in', () => {
     h.username = ref('alice');
     const wrapper = mountNav();

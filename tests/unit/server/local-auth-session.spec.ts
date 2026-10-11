@@ -189,4 +189,29 @@ describe('auth session middleware', () => {
       })
     );
   });
+
+  it('does not block cached-profile SSR on the volatile notification count', async () => {
+    h.provider = 'auth0';
+    h.storageGet.mockResolvedValue({
+      username: 'admin',
+      modProfileName: 'bootstrap-admin',
+      profilePicURL: '',
+    });
+    h.useAuth0.mockReturnValue({
+      getSession: vi.fn().mockResolvedValue({
+        user: { email: 'admin@example.test' },
+      }),
+      getAccessToken: vi.fn().mockResolvedValue({ accessToken: 'auth0-token' }),
+    });
+    const event = createEvent('/forums/vue_devs/issues/2');
+
+    await handler(event as never);
+
+    expect({
+      backendRequests: h.fetch.mock.calls.length,
+      notificationCount: (
+        event.context as { authSession?: { notificationCount?: number } }
+      ).authSession?.notificationCount,
+    }).toEqual({ backendRequests: 0, notificationCount: 0 });
+  });
 });
