@@ -55,6 +55,15 @@ include only the operation name, frontend request duration, response status,
 and the backend's `Server-Timing` header. Request bodies, variables, and tokens
 are never logged.
 
+Authenticated SSR session work at or above `NUXT_AUTH_SLOW_REQUEST_MS` emits a
+similarly sanitized `[auth-session-timing]` record. Its default threshold is
+also 500 milliseconds. The record separates the Auth0 session read, access
+token resolution, and application-profile lookup, and reports whether the
+stable profile cache was hit. It includes the request path but never identity,
+session contents, profile data, or tokens. Browser `/api/graphql` requests are
+excluded from this work because the proxy forwards their existing
+Authorization header unchanged.
+
 Use several cold and warm requests rather than drawing conclusions from one
 sample:
 
@@ -64,6 +73,8 @@ sample:
   distance, serverless cold starts, and frontend/backend region placement.
 - If the same operation appears repeatedly for one navigation, investigate
   component fan-out, Apollo variables, caching, and request deduplication.
+- If `auth-session-timing` dominates, use its phase values to distinguish the
+  provider/session store from the application-profile backend lookup.
 - If GraphQL operations are individually fast but page readiness is slow,
   inspect SSR rendering, static assets, hydration, LCP, and client JavaScript.
 
