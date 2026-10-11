@@ -5,8 +5,10 @@ import plugin from '@/plugins/apollo-auth.client';
 
 const h = vi.hoisted(() => ({
   clearPersistedAuth: vi.fn(),
+  setNotificationCount: vi.fn(),
   fetch: vi.fn(),
   setItem: vi.fn(),
+  appMounted: undefined as undefined | (() => void),
   get localStorage() {
     return {
       getItem: vi.fn(),
@@ -23,17 +25,29 @@ vi.mock('nuxt/app', () => ({
 vi.mock('@/utils/authUtils', () => ({
   clearPersistedAuth: h.clearPersistedAuth,
 }));
+vi.mock('@/composables/useAuthState', () => ({
+  setNotificationCount: h.setNotificationCount,
+}));
 
 const run = async () => {
-  (plugin as () => void)();
+  (
+    plugin as (nuxtApp: {
+      hook: (name: string, callback: () => void) => void;
+    }) => void
+  )({
+    hook: (name, callback) => {
+      if (name === 'app:mounted') h.appMounted = callback;
+    },
+  });
   await flushPromises();
 };
 
 beforeEach(() => {
   vi.clearAllMocks();
+  h.appMounted = undefined;
   h.fetch.mockResolvedValue({
     ok: true,
-    json: async () => ({ accessToken: 'fresh-token' }),
+    json: async () => ({ accessToken: 'fresh-token', notificationCount: 4 }),
   });
   vi.stubGlobal('fetch', h.fetch);
   Object.defineProperty(window, 'localStorage', {
@@ -61,6 +75,31 @@ describe('apollo-auth client plugin', () => {
     expect(h.setItem).toHaveBeenCalledWith('token', 'fresh-token');
   });
 
+  it('does not publish the notification count before hydration completes', async () => {
+    await run();
+    expect(h.setNotificationCount).not.toHaveBeenCalled();
+  });
+
+  it('publishes the notification count after hydration completes', async () => {
+    await run();
+    h.appMounted?.();
+    await flushPromises();
+    expect(h.setNotificationCount).toHaveBeenCalledWith(4);
+  });
+
+  it('hydrates the count when localStorage is unavailable', async () => {
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      get: () => {
+        throw new Error('storage blocked');
+      },
+    });
+    await run();
+    h.appMounted?.();
+    await flushPromises();
+    expect(h.setNotificationCount).toHaveBeenCalledWith(4);
+  });
+
   it('clears persisted auth when the session endpoint returns no token', async () => {
     h.fetch.mockResolvedValue({
       ok: true,
@@ -84,6 +123,9 @@ describe('apollo-auth client plugin', () => {
   it('does not add a focus listener for token syncing', async () => {
     const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
     await run();
-    expect(addEventListenerSpy).not.toHaveBeenCalledWith('focus', expect.any(Function));
+    expect(addEventListenerSpy).not.toHaveBeenCalledWith(
+      'focus',
+      expect.any(Function)
+    );
   });
 });

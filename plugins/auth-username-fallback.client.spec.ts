@@ -13,7 +13,6 @@ const h = vi.hoisted(() => ({
   setEmail: vi.fn(),
   setModProfileName: vi.fn(),
   setProfilePicURL: vi.fn(),
-  setNotificationCount: vi.fn(),
   fetch: vi.fn(),
   appMounted: undefined as undefined | (() => void),
 }));
@@ -29,7 +28,6 @@ vi.mock('@/composables/useAuthState', () => ({
   setEmail: h.setEmail,
   setModProfileName: h.setModProfileName,
   setProfilePicURL: h.setProfilePicURL,
-  setNotificationCount: h.setNotificationCount,
 }));
 
 const start = (serverRendered = true) => {
@@ -112,11 +110,6 @@ describe('auth-username-fallback plugin: resolves when authenticated but usernam
     expect(h.setProfilePicURL).toHaveBeenCalledWith('https://pics/cluse.png');
   });
 
-  it('seeds the unread notification count', async () => {
-    await run();
-    expect(h.setNotificationCount).toHaveBeenCalledWith(4);
-  });
-
   it('looks the user up via the session-backed auth profile endpoint', async () => {
     await run();
     expect(h.fetch.mock.calls[0][0]).toBe('/api/session/profile');
@@ -149,7 +142,6 @@ describe('auth-username-fallback plugin: bootstraps client-rendered routes', () 
     expect(h.setUsername).toHaveBeenCalledWith('cluse');
     expect(h.setModProfileName).toHaveBeenCalledWith('mod-cluse');
     expect(h.setProfilePicURL).toHaveBeenCalledWith('https://pics/cluse.png');
-    expect(h.setNotificationCount).toHaveBeenCalledWith(4);
   });
 
   it('keeps the client anonymous when the server has no session', async () => {

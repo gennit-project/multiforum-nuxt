@@ -34,7 +34,6 @@ import {
   setEmail,
   setModProfileName,
   setProfilePicURL,
-  setNotificationCount,
 } from '@/composables/useAuthState';
 
 type AuthProfileResponse = {
@@ -43,7 +42,6 @@ type AuthProfileResponse = {
   email?: string | null;
   profilePicURL?: string | null;
   modProfileName?: string | null;
-  notificationCount?: number | null;
 };
 
 const resolveAuthProfile = async () => {
@@ -74,9 +72,6 @@ const resolveAuthProfile = async () => {
     }
     if (profile.profilePicURL) {
       setProfilePicURL(profile.profilePicURL);
-    }
-    if (typeof profile.notificationCount === 'number') {
-      setNotificationCount(profile.notificationCount);
     }
   } catch {
     // Ignore — username stays empty and will be retried on the next load.

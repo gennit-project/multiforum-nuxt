@@ -26,8 +26,9 @@
 //
 // Performance: the STABLE profile fields (username / mod name / avatar) are
 // cached per email in the 'authProfileCache' store with a TTL, so we don't
-// re-run the full backend join on every authenticated request. Only the
-// volatile unread-notification count is fetched fresh each request.
+// re-run the full backend join on every authenticated request. The volatile
+// unread-notification count is hydrated by the existing client-side session
+// token request after mount; it must not delay every SSR response.
 //
 // Numeric filename prefix controls middleware order (runs after
 // 1.cache-control.ts), matching the existing convention in this directory.
@@ -110,27 +111,9 @@ type OwnEmailResponse = {
   };
 };
 
-// Lightweight, count-only variant used on a profile-cache hit: the stable
-// fields come from the cache, so only the volatile unread-notification count
-// needs to be fetched fresh per request.
-const GET_NOTIFICATION_COUNT = /* GraphQL */ `
-  query getOwnEmailNotificationCount {
-    getOwnEmail {
-      unreadNotificationCount
-    }
-  }
-`;
-
-type NotificationCountResponse = {
-  data?: {
-    getOwnEmail?: {
-      unreadNotificationCount?: number | null;
-    } | null;
-  };
-};
-
 // The slice of the profile that is stable enough to cache between requests.
-// notificationCount is deliberately excluded — it is always fetched fresh.
+// notificationCount is deliberately excluded — the browser hydrates it after
+// mount through /api/session/token.
 type StableProfile = {
   username: string;
   modProfileName: string;
@@ -142,8 +125,7 @@ type StableProfile = {
 // (e.g. an avatar change) without re-querying on every authenticated request.
 const PROFILE_CACHE_TTL_SECONDS = 60 * 60;
 
-const roundDuration = (durationMs: number) =>
-  Math.round(durationMs * 10) / 10;
+const roundDuration = (durationMs: number) => Math.round(durationMs * 10) / 10;
 
 const getAuthTimingThresholdMs = () => {
   const configuredThreshold = Number(process.env.NUXT_AUTH_SLOW_REQUEST_MS);
@@ -267,8 +249,8 @@ export default defineEventHandler(async (event) => {
     // Resolve the app profile from the GraphQL backend by email, authenticated
     // with an API access token from the session (replaces the removed SPA
     // useAuthManager fetch). The STABLE fields (username/mod-name/avatar) are
-    // cached per email so we don't re-run the full join on every request; only
-    // the volatile unread-notification count is fetched fresh each time.
+    // cached per email so we don't re-run the full join on every request. The
+    // volatile unread count is not part of the critical SSR path.
     if (email) {
       try {
         const accessTokenStartedAt = performance.now();
@@ -306,15 +288,11 @@ export default defineEventHandler(async (event) => {
 
           if (cached) {
             profileCacheHit = true;
-            // Stable fields from cache; fetch only the fresh count.
+            // Stable fields are sufficient for SSR. The existing browser
+            // session-token request hydrates the volatile count after mount.
             username = cached.username;
             modProfileName = cached.modProfileName;
             profilePicURL = cached.profilePicURL;
-            const countRes = await queryBackend<NotificationCountResponse>(
-              GET_NOTIFICATION_COUNT
-            );
-            notificationCount =
-              countRes?.data?.getOwnEmail?.unreadNotificationCount || 0;
           } else {
             const res = await queryBackend<OwnEmailResponse>(GET_OWN_EMAIL);
             const u = res?.data?.getOwnEmail;
