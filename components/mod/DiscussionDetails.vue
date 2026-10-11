@@ -39,9 +39,18 @@ const {
   error: getDiscussionError,
   loading: getDiscussionLoading,
   onResult: onGetDiscussionResult,
-} = useQuery(GET_ISSUE_RELATED_DISCUSSION, () => ({
-  id: discussionId.value,
-}));
+} = useQuery(
+  GET_ISSUE_RELATED_DISCUSSION,
+  () => ({
+    id: discussionId.value,
+  }),
+  {
+    fetchPolicy: 'cache-first',
+    // IssueDetail owns the same query for moderation context. Both consumers
+    // stay out of SSR and share Apollo's client-side request after hydration.
+    prefetch: false,
+  }
+);
 
 const discussion = computed(() => {
   if (getDiscussionLoading.value || getDiscussionError.value) return null;
@@ -107,7 +116,10 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
 <template>
   <div>
     <ErrorBanner v-if="getDiscussionError" :text="getDiscussionError.message" />
-    <LoadingSpinner v-else-if="getDiscussionLoading" />
+    <LoadingSpinner
+      v-else-if="getDiscussionLoading"
+      label="Loading original discussion…"
+    />
     <div
       v-else-if="!discussion"
       class="rounded-lg border border-gray-300 bg-gray-50 p-4 text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300"

@@ -13,12 +13,14 @@ const h = vi.hoisted(() => ({
   onResult: undefined as undefined | ((r: unknown) => void),
   queryDocument: null as unknown,
   queryVariables: null as unknown,
+  queryOptions: null as unknown,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: (document: unknown, variables: () => unknown) => {
+  useQuery: (document: unknown, variables: () => unknown, options: unknown) => {
     h.queryDocument = document;
     h.queryVariables = variables();
+    h.queryOptions = options;
     return {
       result: h.result,
       error: h.error,
@@ -62,7 +64,8 @@ const mountDetails = (channelId = 'cats') =>
         },
         LoadingSpinner: {
           name: 'LoadingSpinner',
-          template: '<div class="spinner" />',
+          props: ['label'],
+          template: '<div class="spinner">{{ label }}</div>',
         },
         MarkdownPreview: {
           name: 'MarkdownPreview',
@@ -95,6 +98,7 @@ beforeEach(() => {
   h.onResult = undefined;
   h.queryDocument = null;
   h.queryVariables = null;
+  h.queryOptions = null;
 });
 
 describe('DiscussionDetails states', () => {
@@ -112,6 +116,15 @@ describe('DiscussionDetails states', () => {
     expect(wrapper.find('.spinner').exists()).toBe(true);
   });
 
+  it('labels the deferred loading status with its content', () => {
+    h.loading = ref(true);
+    const wrapper = mountDetails();
+
+    expect(wrapper.find('.spinner').text()).toBe(
+      'Loading original discussion…'
+    );
+  });
+
   it('shows a not-found message when there is no discussion', () => {
     h.result = ref({ discussions: [] });
     const wrapper = mountDetails();
@@ -126,6 +139,12 @@ describe('DiscussionDetails content', () => {
 
     expect(h.queryDocument).toBe(GET_ISSUE_RELATED_DISCUSSION);
     expect(h.queryVariables).toEqual({ id: 'd1' });
+  });
+
+  it('keeps the reported discussion out of SSR prefetch', () => {
+    mountDetails();
+
+    expect(h.queryOptions).toMatchObject({ prefetch: false });
   });
 
   it('renders the discussion title', () => {

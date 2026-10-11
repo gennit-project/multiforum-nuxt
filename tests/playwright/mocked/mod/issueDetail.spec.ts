@@ -177,7 +177,7 @@ test.describe('Moderation issue detail', () => {
 
       await expect(
         page.getByText('Reported discussion about spam')
-      ).toBeVisible();
+      ).toBeVisible({ timeout: 60_000 });
       await expect(
         page.getByText('This discussion violates the no-spam rule.')
       ).toBeVisible();
@@ -335,6 +335,15 @@ test.describe('Moderation issue detail', () => {
           ({ operationName }) => operationName === 'getIssueRelatedDiscussion'
         )
       ).toHaveLength(1);
+      expect(
+        diagnostics.seenOperations.findIndex(
+          ({ operationName }) => operationName === 'getIssue'
+        )
+      ).toBeLessThan(
+        diagnostics.seenOperations.findIndex(
+          ({ operationName }) => operationName === 'getIssueRelatedDiscussion'
+        )
+      );
       expect(
         diagnostics.seenOperations.filter(
           ({ operationName }) => operationName === 'getDiscussion'

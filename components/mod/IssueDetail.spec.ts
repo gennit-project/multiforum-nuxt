@@ -348,6 +348,20 @@ describe('IssueDetail', () => {
     });
   });
 
+  it('keeps related discussion content out of SSR prefetch', () => {
+    buildWrapper();
+    const discussionCall = (
+      useQuery as unknown as ReturnType<typeof vi.fn>
+    ).mock.calls.find(
+      ([document]) => document === GET_ISSUE_RELATED_DISCUSSION
+    );
+    const options = discussionCall?.[2];
+
+    expect(typeof options === 'function' ? options() : options).toMatchObject({
+      prefetch: false,
+    });
+  });
+
   it('shares the forum shell channel query variables', () => {
     mockRoute.name = 'forums-forumId-issues-issueNumber';
     buildWrapper();
