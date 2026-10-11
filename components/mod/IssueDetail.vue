@@ -216,6 +216,10 @@ const { result: relatedDiscussionResult } = useQuery(
   () => ({
     fetchPolicy: 'cache-first',
     enabled: !!relatedDiscussionId.value,
+    // The reported discussion depends on GET_ISSUE to supply its id. Keeping
+    // it out of SSR removes that serial backend round trip; the focused
+    // related-content panel loads it after hydration instead.
+    prefetch: false,
   })
 );
 
