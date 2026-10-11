@@ -66,11 +66,14 @@ const showDiscussionTitle = computed(
 const showDownloadTitle = computed(
   () => shellVisibility.value.showDownloadTitle
 );
-// Download detail routes render their own channel-aware content. Let the forum
-// shell hydrate after SSR so these non-critical queries do not block it.
-const shouldPrefetchForumShell = computed(() => !showDownloadTitle.value);
 const showEventTitle = computed(() => shellVisibility.value.showEventTitle);
 const showIssueTitle = computed(() => shellVisibility.value.showIssueTitle);
+// Download and issue detail routes render their own channel-aware content.
+// Let the full forum chrome hydrate after SSR so its sidebar aggregates and
+// role data do not block the primary detail content.
+const shouldPrefetchForumShell = computed(
+  () => !showDownloadTitle.value && !showIssueTitle.value
+);
 const showChannelTabs = computed(() => shellVisibility.value.showChannelTabs);
 const showChannelDiscussionPanel = computed(
   () => shellVisibility.value.showChannelDiscussionPanel

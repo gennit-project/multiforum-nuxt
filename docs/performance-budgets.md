@@ -41,8 +41,10 @@ These build budgets protect transfer and module-count regressions. The mocked
 issue-detail Playwright coverage separately protects the initial request shape:
 the summary precedes client-only activity, related discussion consumers share
 one focused request, and the legacy full-discussion query remains deferred
-until a moderator actually opens the edit modal. CI intentionally does not use
-a strict wall-clock page-load limit because shared-runner timing is noisy.
+until a moderator actually opens the edit modal. On channel issue-detail routes,
+the full forum-shell query is also excluded from SSR and hydrates the optional
+sidebar after the primary issue content. CI intentionally does not use a strict
+wall-clock page-load limit because shared-runner timing is noisy.
 
 ## Diagnosing issue-detail latency
 
