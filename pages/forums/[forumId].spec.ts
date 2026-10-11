@@ -315,9 +315,26 @@ describe('forum shell page', () => {
     });
 
     expect(queryOptions).toEqual([
-      expect.objectContaining({ enabled: true, prefetch: true }),
+      expect.objectContaining({ enabled: true, prefetch: false }),
       expect.objectContaining({ enabled: false, prefetch: false }),
     ]);
+  });
+
+  it('renders issue detail content while the forum shell hydrates', async () => {
+    mockState.route.name = 'forums-forumId-issues-issueNumber';
+    const wrapper = await mountWith([], { loading: true });
+
+    expect({
+      issueTitle: wrapper.findComponent(IssueTitleEditFormStub).exists(),
+      childPage: wrapper.findComponent(NuxtPageStub).exists(),
+      channelSidebar: wrapper.findComponent(ChannelSidebarStub).exists(),
+      notFound: wrapper.findComponent(PageNotFoundStub).exists(),
+    }).toEqual({
+      issueTitle: true,
+      childPage: true,
+      channelSidebar: false,
+      notFound: false,
+    });
   });
 
   it('renders the channel tabs on the plain forum route', async () => {
