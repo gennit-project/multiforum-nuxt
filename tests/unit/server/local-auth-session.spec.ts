@@ -176,7 +176,7 @@ describe('auth session middleware', () => {
     await handler(createEvent('/forums/vue_devs/issues/2') as never);
 
     const timing = JSON.parse(
-      String(info.mock.calls[0][0]).replace('[auth-session-timing] ', '')
+      String(info.mock.calls[0]?.[0]).replace('[auth-session-timing] ', '')
     );
     expect(timing).toEqual(
       expect.objectContaining({
