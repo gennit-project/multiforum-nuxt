@@ -142,6 +142,16 @@ type StableProfile = {
 // (e.g. an avatar change) without re-querying on every authenticated request.
 const PROFILE_CACHE_TTL_SECONDS = 60 * 60;
 
+const roundDuration = (durationMs: number) =>
+  Math.round(durationMs * 10) / 10;
+
+const getAuthTimingThresholdMs = () => {
+  const configuredThreshold = Number(process.env.NUXT_AUTH_SLOW_REQUEST_MS);
+  return Number.isFinite(configuredThreshold) && configuredThreshold >= 0
+    ? configuredThreshold
+    : 500;
+};
+
 // Test-only: in mocked Playwright runs there is no real Auth0 session, so the
 // test fixture (tests/playwright/helpers/mockAuth.ts) sets a `mock-auth` cookie
 // holding the seeded profile. We honor it ONLY when VITE_E2E_MOCK_MODE is set
@@ -174,6 +184,14 @@ const readMockSession = (event: Parameters<typeof getCookie>[0]) => {
 };
 
 export default defineEventHandler(async (event) => {
+  // Browser Apollo requests already carry their own Authorization header and
+  // the proxy forwards it unchanged. Resolving the Auth0 session and app
+  // profile here would add that work to every parallel GraphQL request without
+  // contributing anything to the proxy handler.
+  if (event.path === '/api/graphql') {
+    return;
+  }
+
   // Mocked-test bypass: seed straight from the cookie, no real Auth0 involved.
   const mockSession = readMockSession(event);
   if (mockSession) {
@@ -219,10 +237,18 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
+  const authStartedAt = performance.now();
+  let sessionMs = 0;
+  let accessTokenMs = 0;
+  let profileMs = 0;
+  let profileCacheHit = false;
+
   try {
     // useAuth0 is auto-imported by @auth0/auth0-nuxt in the Nitro context.
     const auth0 = useAuth0(event);
+    const sessionStartedAt = performance.now();
     const session = await auth0.getSession();
+    sessionMs = performance.now() - sessionStartedAt;
     const user = session?.user;
     if (!user) {
       // No session / not logged in — leave event.context.authSession unset.
@@ -245,7 +271,9 @@ export default defineEventHandler(async (event) => {
     // the volatile unread-notification count is fetched fresh each time.
     if (email) {
       try {
+        const accessTokenStartedAt = performance.now();
         const tokenSet = await auth0.getAccessToken();
+        accessTokenMs = performance.now() - accessTokenStartedAt;
         const accessToken = tokenSet?.accessToken;
         // Expose the API access token to the SSR Apollo client (read back in
         // plugins/apollo-ssr-auth.ts via the `apollo:auth` hook) so server-side
@@ -261,6 +289,7 @@ export default defineEventHandler(async (event) => {
         const graphqlUrl = getServerGraphqlUrl(runtimeConfig);
 
         if (accessToken && graphqlUrl) {
+          const profileStartedAt = performance.now();
           const queryBackend = <T>(query: string) =>
             $fetch<T>(graphqlUrl, {
               method: 'POST',
@@ -276,6 +305,7 @@ export default defineEventHandler(async (event) => {
           const cached = await cache.getItem(cacheKey);
 
           if (cached) {
+            profileCacheHit = true;
             // Stable fields from cache; fetch only the fresh count.
             username = cached.username;
             modProfileName = cached.modProfileName;
@@ -305,6 +335,7 @@ export default defineEventHandler(async (event) => {
               );
             }
           }
+          profileMs = performance.now() - profileStartedAt;
         }
       } catch {
         // Token/lookup unavailable — leave profile empty. The user is still
@@ -325,5 +356,24 @@ export default defineEventHandler(async (event) => {
     };
   } catch {
     // Never block a request on the auth read.
+  }
+
+  const totalMs = performance.now() - authStartedAt;
+  if (
+    event.context.authSession?.isAuthenticated &&
+    totalMs >= getAuthTimingThresholdMs()
+  ) {
+    // Do not log identity, tokens, or query variables. This record exists only
+    // to distinguish provider/session latency from profile/backend latency.
+    console.info(
+      `[auth-session-timing] ${JSON.stringify({
+        path: event.path,
+        totalMs: roundDuration(totalMs),
+        sessionMs: roundDuration(sessionMs),
+        accessTokenMs: roundDuration(accessTokenMs),
+        profileMs: roundDuration(profileMs),
+        profileCacheHit,
+      })}`
+    );
   }
 });
