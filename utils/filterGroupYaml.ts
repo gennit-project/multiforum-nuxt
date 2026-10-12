@@ -15,6 +15,7 @@ export type PlainFilterGroup = {
   key: string;
   displayName: string;
   mode: string;
+  uploadSelection?: string;
   order?: number;
   options?: PlainFilterOption[];
 };
@@ -38,6 +39,7 @@ export function serializeFilterGroupsToYaml(
     key: group.key,
     displayName: group.displayName,
     mode: group.mode,
+    uploadSelection: group.uploadSelection ?? 'MULTIPLE',
     order: group.order,
     options: (group.options || []).map((option) => ({
       value: option.value,
@@ -95,14 +97,23 @@ export function parseFilterGroupsYaml(
           `Group "${group.key}" has invalid mode. Must be INCLUDE or EXCLUDE`
         );
       }
+      const uploadSelection = group.uploadSelection ?? 'MULTIPLE';
+      if (!['SINGLE', 'MULTIPLE'].includes(uploadSelection)) {
+        throw new Error(
+          `Group "${group.key}" has invalid uploadSelection. Must be SINGLE or MULTIPLE`
+        );
+      }
       if (!Array.isArray(group.options) || group.options.length === 0) {
-        throw new Error(`Group "${group.key}" must include at least one option`);
+        throw new Error(
+          `Group "${group.key}" must include at least one option`
+        );
       }
       const seenOptionValues = new Set<string>();
       return {
         key: group.key,
         displayName: group.displayName,
         mode: group.mode,
+        uploadSelection,
         order: group.order ?? index,
         options: group.options.map((option, optionIndex) => {
           if (!option.value || !option.displayName) {

@@ -11,7 +11,7 @@ import type {
   FilterGroupOptionsConnection,
   FilterOptionGroupConnection,
 } from '@/__generated__/graphql';
-import { FilterMode } from '@/__generated__/graphql';
+import { FilterMode, FilterSelection } from '@/__generated__/graphql';
 import FilterOptionManager from './FilterOptionManager.vue';
 
 // Stub types for required GraphQL fields that aren't used in this form context
@@ -39,6 +39,7 @@ const newGroupForm = ref({
   key: '',
   displayName: '',
   mode: FilterMode.Include,
+  uploadSelection: FilterSelection.Multiple,
 });
 
 const showNewGroupForm = ref(false);
@@ -86,6 +87,7 @@ const preserveExistingIds = (
       key: group.key,
       displayName: group.displayName,
       mode: group.mode as FilterMode,
+      uploadSelection: group.uploadSelection as FilterSelection,
       order: group.order ?? index,
       options: (group.options || []).map((option, optionIndex) => {
         const existingOption = existingOptionsByValue.get(
@@ -140,6 +142,7 @@ const addNewGroup = () => {
     key: newGroupForm.value.key,
     displayName: newGroupForm.value.displayName,
     mode: newGroupForm.value.mode,
+    uploadSelection: newGroupForm.value.uploadSelection,
     order: props.filterGroups.length,
     options: [],
     // Required fields for GraphQL type but not used in this context
@@ -159,6 +162,7 @@ const addNewGroup = () => {
     key: '',
     displayName: '',
     mode: FilterMode.Include,
+    uploadSelection: FilterSelection.Multiple,
   };
   showNewGroupForm.value = false;
 };
@@ -361,6 +365,28 @@ watch(
 
             <div>
               <label
+                for="new-filter-group-upload-selection"
+                class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
+                When labeling a download
+              </label>
+              <select
+                id="new-filter-group-upload-selection"
+                v-model="newGroupForm.uploadSelection"
+                class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+              >
+                <option :value="FilterSelection.Single">Allow one option</option>
+                <option :value="FilterSelection.Multiple">
+                  Allow multiple options
+                </option>
+              </select>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                Download-list filtering always allows multiple options.
+              </p>
+            </div>
+
+            <div>
+              <label
                 class="block text-sm font-medium text-gray-700 dark:text-gray-300"
               >
                 Computer-Friendly Key
@@ -510,6 +536,7 @@ watch(
 - key: example_category
   displayName: Example Category
   mode: INCLUDE
+  uploadSelection: MULTIPLE
   order: 0
   options:
     - value: option1
@@ -539,6 +566,10 @@ watch(
             </li>
             <li><code>displayName</code>: Human-readable name</li>
             <li><code>mode</code>: Either "INCLUDE" or "EXCLUDE"</li>
+            <li>
+              <code>uploadSelection</code>: Either "SINGLE" or "MULTIPLE"
+              (defaults to "MULTIPLE")
+            </li>
             <li><code>order</code>: Display order (number)</li>
             <li>
               <code>options</code>: Array of filter options with

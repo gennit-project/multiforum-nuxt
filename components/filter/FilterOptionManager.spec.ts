@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
-import { FilterMode } from '@/__generated__/graphql';
+import { FilterMode, FilterSelection } from '@/__generated__/graphql';
 import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
 
 import FilterOptionManager from '@/components/filter/FilterOptionManager.vue';
@@ -21,6 +21,7 @@ const makeGroup = (overrides: Partial<FilterGroup> = {}): FilterGroup =>
     key: 'lot_size',
     displayName: 'Lot Size',
     mode: FilterMode.Include,
+    uploadSelection: FilterSelection.Multiple,
     order: 0,
     options: [],
     __typename: 'FilterGroup',
@@ -95,6 +96,19 @@ describe('FilterOptionManager', () => {
     await byText(wrapper, 'Save Changes').trigger('click');
     expect(wrapper.emitted('updateGroup')?.[0]?.[1]).toMatchObject({
       key: 'new_key',
+    });
+  });
+
+  it('emits an edited upload selection when saved', async () => {
+    const wrapper = mountOM();
+    await byText(wrapper, 'Edit Group Settings').trigger('click');
+    await wrapper
+      .get('#filter-group-g1-upload-selection')
+      .setValue(FilterSelection.Single);
+    await byText(wrapper, 'Save Changes').trigger('click');
+
+    expect(wrapper.emitted('updateGroup')?.[0]?.[1]).toMatchObject({
+      uploadSelection: FilterSelection.Single,
     });
   });
 

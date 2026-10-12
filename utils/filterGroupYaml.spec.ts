@@ -9,6 +9,7 @@ const group: PlainFilterGroup = {
   key: 'color',
   displayName: 'Color',
   mode: 'INCLUDE',
+  uploadSelection: 'MULTIPLE',
   order: 0,
   options: [{ value: 'red', displayName: 'Red', order: 0 }],
 };
@@ -30,25 +31,46 @@ describe('parseFilterGroupsYaml', () => {
   });
 
   it('fails when a group is missing required fields', () => {
-    expect(parseFilterGroupsYaml('- displayName: X\n  mode: INCLUDE').error).toContain(
-      'missing required fields'
-    );
+    expect(
+      parseFilterGroupsYaml('- displayName: X\n  mode: INCLUDE').error
+    ).toContain('missing required fields');
   });
 
   it('fails on an invalid mode', () => {
     expect(
-      parseFilterGroupsYaml('- key: k\n  displayName: D\n  mode: MAYBE\n  options:\n    - value: v\n      displayName: V').error
+      parseFilterGroupsYaml(
+        '- key: k\n  displayName: D\n  mode: MAYBE\n  options:\n    - value: v\n      displayName: V'
+      ).error
     ).toContain('invalid mode');
   });
 
   it('defaults order to the index when omitted', () => {
-    const result = parseFilterGroupsYaml('- key: k\n  displayName: D\n  mode: INCLUDE\n  options:\n    - value: v\n      displayName: V');
+    const result = parseFilterGroupsYaml(
+      '- key: k\n  displayName: D\n  mode: INCLUDE\n  options:\n    - value: v\n      displayName: V'
+    );
     expect(result.groups?.[0].order).toBe(0);
+  });
+
+  it('defaults uploadSelection to MULTIPLE when omitted', () => {
+    const result = parseFilterGroupsYaml(
+      '- key: k\n  displayName: D\n  mode: INCLUDE\n  options:\n    - value: v\n      displayName: V'
+    );
+    expect(result.groups?.[0].uploadSelection).toBe('MULTIPLE');
+  });
+
+  it('fails on an invalid uploadSelection', () => {
+    expect(
+      parseFilterGroupsYaml(
+        '- key: k\n  displayName: D\n  mode: INCLUDE\n  uploadSelection: SOMETIMES\n  options:\n    - value: v\n      displayName: V'
+      ).error
+    ).toContain('invalid uploadSelection');
   });
 
   it('fails when a group has no options', () => {
     expect(
-      parseFilterGroupsYaml('- key: k\n  displayName: D\n  mode: INCLUDE\n  options: []').error
+      parseFilterGroupsYaml(
+        '- key: k\n  displayName: D\n  mode: INCLUDE\n  options: []'
+      ).error
     ).toContain('must include at least one option');
   });
 

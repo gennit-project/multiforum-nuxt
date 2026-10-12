@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import DownloadLabelPicker from './DownloadLabelPicker.vue';
+import { FilterSelection } from '@/__generated__/graphql';
 import type { FilterGroup } from '@/__generated__/graphql';
 
 const mockFilterGroups: FilterGroup[] = [
@@ -8,6 +9,7 @@ const mockFilterGroups: FilterGroup[] = [
     id: 'group-1',
     key: 'category',
     displayName: 'Category',
+    uploadSelection: FilterSelection.Multiple,
     options: [
       {
         id: 'opt-1',
@@ -33,6 +35,7 @@ const mockFilterGroups: FilterGroup[] = [
     id: 'group-2',
     key: 'license',
     displayName: 'License Type',
+    uploadSelection: FilterSelection.Multiple,
     options: [
       {
         id: 'opt-4',
@@ -222,4 +225,92 @@ describe('DownloadLabelPicker', () => {
         .map((group) => group.displayName)
     );
   });
+
+  it('renders small single-choice groups as radios with a None option', () => {
+    const wrapper = mountWithSingleGroup();
+
+    expect(
+      wrapper
+        .findAll('input[type="radio"]')
+        .map((radio) => radio.attributes('value'))
+    ).toEqual(['', 'tools', 'models', 'textures']);
+  });
+
+  it('replaces a stale multi-value selection when a single-choice radio is selected', async () => {
+    const wrapper = mountWithSingleGroup({ category: ['tools', 'models'] });
+
+    await wrapper
+      .get('input[type="radio"][value="textures"]')
+      .trigger('change');
+
+    expect(wrapper.emitted('update:selectedLabels')?.at(-1)?.[0]).toEqual({
+      category: ['textures'],
+    });
+  });
+
+  it('normalizes existing multi-value data when a group becomes single-choice', () => {
+    const wrapper = mountWithSingleGroup({ category: ['tools', 'models'] });
+
+    expect(wrapper.emitted('update:selectedLabels')?.[0]?.[0]).toEqual({
+      category: ['tools'],
+    });
+  });
+
+  it('clears a single-choice group when None is selected', async () => {
+    const wrapper = mountWithSingleGroup({ category: ['tools'] });
+
+    await wrapper.get('input[type="radio"][value=""]').trigger('change');
+
+    expect(wrapper.emitted('update:selectedLabels')?.[0]?.[0]).toEqual({});
+  });
+
+  it('renders large single-choice groups as a native select with a clear option', () => {
+    const wrapper = mountWithSingleGroup({}, 10);
+
+    expect({
+      selectCount: wrapper.findAll('select').length,
+      firstOption: wrapper.get('select option').text(),
+      multiSelectCount: wrapper.findAll('.multi-select').length,
+    }).toEqual({ selectCount: 1, firstOption: 'None', multiSelectCount: 0 });
+  });
+
+  it('emits one value from a large single-choice select', async () => {
+    const wrapper = mountWithSingleGroup({}, 10);
+
+    await wrapper.get('select').setValue('option-7');
+
+    expect(wrapper.emitted('update:selectedLabels')?.[0]?.[0]).toEqual({
+      category: ['option-7'],
+    });
+  });
 });
+
+const mountWithSingleGroup = (
+  selectedLabels: Record<string, string[]> = {},
+  optionCount = 3
+) =>
+  mount(DownloadLabelPicker, {
+    props: {
+      filterGroups: [
+        {
+          ...mockFilterGroups[0],
+          uploadSelection: FilterSelection.Single,
+          options:
+            optionCount === 3
+              ? mockFilterGroups[0]!.options
+              : Array.from({ length: optionCount }, (_, index) => ({
+                  id: `option-${index}`,
+                  value: `option-${index}`,
+                  displayName: `Option ${index}`,
+                })),
+        } as FilterGroup,
+      ],
+      selectedLabels,
+    },
+    global: {
+      stubs: {
+        MultiSelect: { template: '<div class="multi-select" />' },
+        CheckBox: { template: '<div class="checkbox" />' },
+      },
+    },
+  });

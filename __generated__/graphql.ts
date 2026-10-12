@@ -36851,6 +36851,7 @@ export type FilterGroup = {
   optionsAggregate?: Maybe<FilterGroupFilterOptionOptionsAggregationSelection>;
   optionsConnection: FilterGroupOptionsConnection;
   order: Scalars['Int']['output'];
+  uploadSelection: FilterSelection;
 };
 
 
@@ -37183,6 +37184,7 @@ export type FilterGroupCreateInput = {
   mode: FilterMode;
   options?: InputMaybe<FilterGroupOptionsFieldInput>;
   order: Scalars['Int']['input'];
+  uploadSelection?: FilterSelection;
 };
 
 export type FilterGroupCreatedEvent = {
@@ -37222,6 +37224,7 @@ export type FilterGroupEventPayload = {
   key: Scalars['String']['output'];
   mode: FilterMode;
   order: Scalars['Int']['output'];
+  uploadSelection: FilterSelection;
 };
 
 export type FilterGroupFilterOptionOptionsAggregationSelection = {
@@ -37436,6 +37439,7 @@ export type FilterGroupSort = {
   key?: InputMaybe<SortDirection>;
   mode?: InputMaybe<SortDirection>;
   order?: InputMaybe<SortDirection>;
+  uploadSelection?: InputMaybe<SortDirection>;
 };
 
 export type FilterGroupSubscriptionWhere = {
@@ -37467,6 +37471,8 @@ export type FilterGroupSubscriptionWhere = {
   order_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
   order_LT?: InputMaybe<Scalars['Int']['input']>;
   order_LTE?: InputMaybe<Scalars['Int']['input']>;
+  uploadSelection?: InputMaybe<FilterSelection>;
+  uploadSelection_IN?: InputMaybe<Array<FilterSelection>>;
 };
 
 export type FilterGroupUpdateInput = {
@@ -37479,6 +37485,7 @@ export type FilterGroupUpdateInput = {
   order?: InputMaybe<Scalars['Int']['input']>;
   order_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   order_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  uploadSelection?: InputMaybe<FilterSelection>;
 };
 
 export type FilterGroupUpdatedEvent = {
@@ -37540,6 +37547,8 @@ export type FilterGroupWhere = {
   order_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
   order_LT?: InputMaybe<Scalars['Int']['input']>;
   order_LTE?: InputMaybe<Scalars['Int']['input']>;
+  uploadSelection?: InputMaybe<FilterSelection>;
+  uploadSelection_IN?: InputMaybe<Array<FilterSelection>>;
 };
 
 export type FilterGroupsConnection = {
@@ -37552,6 +37561,11 @@ export type FilterGroupsConnection = {
 export enum FilterMode {
   Exclude = 'EXCLUDE',
   Include = 'INCLUDE'
+}
+
+export enum FilterSelection {
+  Multiple = 'MULTIPLE',
+  Single = 'SINGLE'
 }
 
 /** A single checkbox inside a group, e.g. “10×20”. */

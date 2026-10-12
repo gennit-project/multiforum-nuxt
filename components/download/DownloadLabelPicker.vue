@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import type { PropType } from 'vue';
+import { FilterSelection } from '@/__generated__/graphql';
 import type { FilterGroup } from '@/__generated__/graphql';
 import MultiSelect from '@/components/MultiSelect.vue';
 import type { MultiSelectOption } from '@/components/MultiSelect.vue';
@@ -25,16 +26,53 @@ const visibleFilterGroups = computed(() =>
   props.filterGroups.filter((group) => group.key !== 'license')
 );
 
+const normalizedSelectedLabels = computed(() => {
+  const singleGroupKeys = new Set(
+    props.filterGroups
+      .filter((group) => group.uploadSelection === FilterSelection.Single)
+      .map((group) => group.key)
+  );
+
+  return Object.fromEntries(
+    Object.entries(props.selectedLabels).map(([groupKey, values]) => [
+      groupKey,
+      singleGroupKeys.has(groupKey) ? values.slice(0, 1) : values,
+    ])
+  );
+});
+
 const visibleSelectedLabels = computed<Array<[string, string[]]>>(() =>
-  Object.entries(props.selectedLabels).filter(
+  Object.entries(normalizedSelectedLabels.value).filter(
     ([groupKey]) => groupKey !== 'license'
   )
+);
+
+watch(
+  normalizedSelectedLabels,
+  (normalizedLabels) => {
+    const hasInvalidSingleSelection = props.filterGroups.some(
+      (group) =>
+        group.uploadSelection === FilterSelection.Single &&
+        (props.selectedLabels[group.key]?.length || 0) > 1
+    );
+
+    if (hasInvalidSingleSelection) {
+      emit('update:selectedLabels', normalizedLabels);
+    }
+  },
+  { immediate: true }
 );
 
 // Helper function to determine if a group should use dropdown
 const shouldUseDropdown = (group: FilterGroup) => {
   return (group.options?.length || 0) >= 10;
 };
+
+const isSingleSelection = (group: FilterGroup) =>
+  group.uploadSelection === FilterSelection.Single;
+
+const getSingleSelection = (groupKey: string) =>
+  normalizedSelectedLabels.value[groupKey]?.[0] || '';
 
 // Convert filter group options to MultiSelect options
 const getMultiSelectOptions = (group: FilterGroup): MultiSelectOption[] => {
@@ -46,7 +84,7 @@ const getMultiSelectOptions = (group: FilterGroup): MultiSelectOption[] => {
 
 // Handle checkbox toggle for small groups
 const toggleLabel = (groupKey: string, optionValue: string) => {
-  const currentSelection = props.selectedLabels[groupKey] || [];
+  const currentSelection = normalizedSelectedLabels.value[groupKey] || [];
   const index = currentSelection.indexOf(optionValue);
 
   let newSelection: string[];
@@ -57,7 +95,7 @@ const toggleLabel = (groupKey: string, optionValue: string) => {
   }
 
   const updatedLabels = {
-    ...props.selectedLabels,
+    ...normalizedSelectedLabels.value,
     [groupKey]: newSelection,
   };
 
@@ -76,7 +114,7 @@ const handleMultiSelectUpdate = (
   selectedValues: string[]
 ) => {
   const updatedLabels = {
-    ...props.selectedLabels,
+    ...normalizedSelectedLabels.value,
     [groupKey]: selectedValues,
   };
 
@@ -87,6 +125,40 @@ const handleMultiSelectUpdate = (
   }
 
   emit('update:selectedLabels', updatedLabels);
+};
+
+type SingleSelectionUpdate = {
+  groupKey: string;
+  optionValue: string;
+};
+
+const handleSingleSelectionUpdate = ({
+  groupKey,
+  optionValue,
+}: SingleSelectionUpdate) => {
+  const updatedLabels = { ...normalizedSelectedLabels.value };
+
+  if (optionValue) {
+    updatedLabels[groupKey] = [optionValue];
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+    delete updatedLabels[groupKey];
+  }
+
+  emit('update:selectedLabels', updatedLabels);
+};
+
+const handleSingleSelectChange = ({
+  groupKey,
+  event,
+}: {
+  groupKey: string;
+  event: Event;
+}) => {
+  handleSingleSelectionUpdate({
+    groupKey,
+    optionValue: (event.target as HTMLSelectElement).value,
+  });
 };
 
 // Check if any labels are selected
@@ -133,8 +205,63 @@ const selectedLabelCount = computed(() => {
           {{ group.displayName }}
         </legend>
 
-        <!-- MultiSelect for groups with 10+ options -->
-        <div v-if="shouldUseDropdown(group)">
+        <!-- Single-select dropdown for single-choice groups with 10+ options -->
+        <div v-if="isSingleSelection(group) && shouldUseDropdown(group)">
+          <select
+            :id="`download-label-${group.id}`"
+            :value="getSingleSelection(group.key)"
+            :aria-label="`Select one ${group.displayName} label`"
+            class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            @change="
+              handleSingleSelectChange({ groupKey: group.key, event: $event })
+            "
+          >
+            <option value="">None</option>
+            <option
+              v-for="option in group.options"
+              :key="option.id"
+              :value="option.value"
+            >
+              {{ option.displayName }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Radio buttons for single-choice groups with fewer than 10 options -->
+        <div v-else-if="isSingleSelection(group)" class="space-y-2">
+          <div
+            v-for="option in [
+              { id: 'none', value: '', displayName: 'None' },
+              ...(group.options || []),
+            ]"
+            :key="option.id"
+            class="flex min-h-6 items-center"
+          >
+            <input
+              :id="`download-label-${group.id}-${option.id}`"
+              :name="`download-label-${group.id}`"
+              type="radio"
+              :value="option.value"
+              :checked="getSingleSelection(group.key) === option.value"
+              class="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+              @change="
+                handleSingleSelectionUpdate({
+                  groupKey: group.key,
+                  optionValue: option.value,
+                })
+              "
+            >
+            <label
+              :for="`download-label-${group.id}-${option.id}`"
+              class="ml-3 text-sm text-gray-700 dark:text-gray-300"
+            >
+              {{ option.displayName }}
+            </label>
+          </div>
+        </div>
+
+        <!-- MultiSelect for multiple-choice groups with 10+ options -->
+        <div v-else-if="shouldUseDropdown(group)">
           <MultiSelect
             :model-value="selectedLabels[group.key] || []"
             :options="getMultiSelectOptions(group)"
@@ -146,7 +273,7 @@ const selectedLabelCount = computed(() => {
           />
         </div>
 
-        <!-- Regular checkboxes for groups with <10 options -->
+        <!-- Checkboxes for multiple-choice groups with fewer than 10 options -->
         <div v-else class="space-y-2">
           <div v-for="option in group.options" :key="option.id">
             <CheckBox
