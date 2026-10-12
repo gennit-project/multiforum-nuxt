@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
-import { FilterMode } from '@/__generated__/graphql';
+import { FilterMode, FilterSelection } from '@/__generated__/graphql';
 import type { FilterGroup } from '@/__generated__/graphql';
 import { serializeFilterGroupsToYaml } from '@/utils/filterGroupYaml';
 import { sims4BuildsFilterGroups } from '@/tests/playwright/helpers/sims4DownloadFixtures';
@@ -30,6 +30,7 @@ const makeGroup = (overrides: Partial<FilterGroup> = {}): FilterGroup =>
     key: 'lot_size',
     displayName: 'Lot Size',
     mode: FilterMode.Include,
+    uploadSelection: FilterSelection.Multiple,
     order: 0,
     options: [],
     __typename: 'FilterGroup',
@@ -132,6 +133,25 @@ describe('FilterGroupManager', () => {
       'updateFilterGroups'
     )?.[0]?.[0] as FilterGroup[];
     expect(emitted[0].mode).toBe(FilterMode.Exclude);
+  });
+
+  it('can create a single-choice upload group from the form editor', async () => {
+    const wrapper = mountManager([]);
+    await openNewGroupForm(wrapper);
+    await wrapper
+      .get('#new-filter-group-upload-selection')
+      .setValue(FilterSelection.Single);
+    await wrapper.get('input[placeholder="e.g. lot_size"]').setValue('price');
+    await wrapper.get('input[placeholder="e.g. Lot Size"]').setValue('Price');
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Add Group')!
+      .trigger('click');
+    const emitted = wrapper.emitted(
+      'updateFilterGroups'
+    )?.[0]?.[0] as FilterGroup[];
+
+    expect(emitted[0].uploadSelection).toBe(FilterSelection.Single);
   });
 
   it('emits the filtered list when a group is removed', () => {

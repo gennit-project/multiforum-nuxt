@@ -113,6 +113,9 @@ const buildGroupUpdateNode = (
     node.displayName = group.displayName;
   }
   if (group.mode !== existingGroup?.mode) node.mode = group.mode;
+  if (group.uploadSelection !== existingGroup?.uploadSelection) {
+    node.uploadSelection = group.uploadSelection;
+  }
   if (order !== existingGroup?.order) node.order = order;
 
   const optionUpdates = buildOptionUpdates(group, existingGroup);
@@ -152,6 +155,7 @@ export const buildFilterGroupsUpdate = ({
                 key: group.key,
                 displayName: group.displayName,
                 mode: group.mode,
+                uploadSelection: group.uploadSelection,
                 order,
                 options: group.options
                   ? { create: group.options.map(toOptionCreate) }

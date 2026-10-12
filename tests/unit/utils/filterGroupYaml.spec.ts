@@ -11,6 +11,7 @@ describe('serializeFilterGroupsToYaml', () => {
         key: 'color',
         displayName: 'Color',
         mode: 'INCLUDE',
+        uploadSelection: 'MULTIPLE',
         order: 0,
         options: [{ value: 'red', displayName: 'Red', order: 0 }],
       },
@@ -24,6 +25,7 @@ describe('serializeFilterGroupsToYaml', () => {
         key: 'color',
         displayName: 'Color',
         mode: 'INCLUDE',
+        uploadSelection: 'MULTIPLE',
         order: 0,
         options: [{ value: 'red', displayName: 'Red', order: 0 }],
       },
@@ -43,7 +45,9 @@ describe('parseFilterGroupsYaml', () => {
   });
 
   it('fails when a group is missing required fields', () => {
-    const result = parseFilterGroupsYaml('- displayName: No Key\n  mode: INCLUDE');
+    const result = parseFilterGroupsYaml(
+      '- displayName: No Key\n  mode: INCLUDE'
+    );
     expect(result.error).toContain('missing required fields');
   });
 

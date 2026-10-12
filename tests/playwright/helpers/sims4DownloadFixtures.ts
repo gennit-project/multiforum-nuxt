@@ -1,4 +1,9 @@
-import { FilterMode, type FilterGroup, type FilterOption } from '@/__generated__/graphql';
+import {
+  FilterMode,
+  FilterSelection,
+  type FilterGroup,
+  type FilterOption,
+} from '@/__generated__/graphql';
 import { buildChannel, type ChannelFixture } from './graphqlFixtures';
 
 export const SIMS4_BUILDS_CHANNEL_ID = 'sims4_builds';
@@ -10,7 +15,13 @@ type Sims4FilterOptionFixture = Pick<
 
 export type Sims4FilterGroupFixture = Pick<
   FilterGroup,
-  '__typename' | 'id' | 'key' | 'displayName' | 'mode' | 'order'
+  | '__typename'
+  | 'id'
+  | 'key'
+  | 'displayName'
+  | 'mode'
+  | 'uploadSelection'
+  | 'order'
 > & {
   options: Sims4FilterOptionFixture[];
 };
@@ -19,6 +30,7 @@ type FilterGroupInput = {
   key: string;
   displayName: string;
   mode?: FilterMode;
+  uploadSelection?: FilterSelection;
   order: number;
   options: Array<{
     value: string;
@@ -31,6 +43,7 @@ const sims4FilterGroupInputs: FilterGroupInput[] = [
   {
     key: 'size',
     displayName: 'Size',
+    uploadSelection: FilterSelection.Single,
     order: 0,
     options: [
       { value: '20x15', displayName: '20 x 15', order: 0 },
@@ -48,6 +61,7 @@ const sims4FilterGroupInputs: FilterGroupInput[] = [
   {
     key: 'price',
     displayName: 'Price',
+    uploadSelection: FilterSelection.Single,
     order: 1,
     options: [
       { value: '0-10k', displayName: '0 - 10,000', order: 0 },
@@ -61,6 +75,7 @@ const sims4FilterGroupInputs: FilterGroupInput[] = [
   {
     key: 'lot_type',
     displayName: 'Lot type',
+    uploadSelection: FilterSelection.Single,
     order: 2,
     options: [
       { value: 'residential', displayName: 'Residential', order: 0 },
@@ -238,6 +253,7 @@ export const sims4BuildsFilterGroups: Sims4FilterGroupFixture[] =
     key: group.key,
     displayName: group.displayName,
     mode: group.mode ?? FilterMode.Include,
+    uploadSelection: group.uploadSelection ?? FilterSelection.Multiple,
     order: group.order,
     options: group.options.map((option) => ({
       __typename: 'FilterOption',

@@ -257,6 +257,7 @@ export const GET_CHANNEL = gql`
         key
         displayName
         mode
+        uploadSelection
         order
         options(options: { sort: [{ order: ASC }] }) {
           id

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
-import { FilterMode } from '@/__generated__/graphql';
+import { FilterMode, FilterSelection } from '@/__generated__/graphql';
 import { buildFilterGroupsUpdate, isPersistedId } from './filterGroupUpdates';
 
 const option = (
@@ -8,8 +8,7 @@ const option = (
   value: string,
   order: number,
   displayName = value
-): FilterOption =>
-  ({ id, value, displayName, order }) as FilterOption;
+): FilterOption => ({ id, value, displayName, order }) as FilterOption;
 
 const group = (
   id: string,
@@ -23,6 +22,7 @@ const group = (
     key,
     displayName: key,
     mode: FilterMode.Include,
+    uploadSelection: FilterSelection.Multiple,
     order,
     options,
     ...extra,
@@ -63,7 +63,10 @@ describe('isPersistedId', () => {
 describe('buildFilterGroupsUpdate', () => {
   it('sends nothing when nothing changed', () => {
     expect(
-      buildFilterGroupsUpdate({ current: clone(existing()), existing: existing() })
+      buildFilterGroupsUpdate({
+        current: clone(existing()),
+        existing: existing(),
+      })
     ).toEqual([]);
   });
 
@@ -136,6 +139,7 @@ describe('buildFilterGroupsUpdate', () => {
               key: 'price',
               displayName: 'price',
               mode: FilterMode.Include,
+              uploadSelection: FilterSelection.Multiple,
               order: 3,
               options: {
                 create: [
@@ -160,7 +164,21 @@ describe('buildFilterGroupsUpdate', () => {
     const current = clone(existing()).slice(0, 2);
     expect(buildFilterGroupsUpdate({ current, existing: existing() })).toEqual([
       {
-        delete: [{ where: { node: { id: 'g-adv' } }, delete: { options: [{}] } }],
+        delete: [
+          { where: { node: { id: 'g-adv' } }, delete: { options: [{}] } },
+        ],
+      },
+    ]);
+  });
+
+  it('updates only uploadSelection when the labeling cardinality changes', () => {
+    const current = clone(existing());
+    current[0].uploadSelection = FilterSelection.Single;
+
+    expect(buildFilterGroupsUpdate({ current, existing: existing() })).toEqual([
+      {
+        where: { node: { id: 'g-size' } },
+        update: { node: { uploadSelection: FilterSelection.Single } },
       },
     ]);
   });
@@ -169,8 +187,8 @@ describe('buildFilterGroupsUpdate', () => {
     const current = clone(existing());
     current[2].options = [option('local-b', 'no_cc', 0, 'No custom content')];
     expect(
-      buildFilterGroupsUpdate({ current, existing: existing() })[0].update!.node!
-        .options
+      buildFilterGroupsUpdate({ current, existing: existing() })[0].update!
+        .node!.options
     ).toEqual([
       {
         create: [

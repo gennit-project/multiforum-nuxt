@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
-import { FilterMode } from '@/__generated__/graphql';
+import { FilterMode, FilterSelection } from '@/__generated__/graphql';
 
 const props = defineProps({
   filterGroup: {
@@ -40,6 +40,7 @@ const editForm = ref({
   key: props.filterGroup.key,
   displayName: props.filterGroup.displayName,
   mode: props.filterGroup.mode,
+  uploadSelection: props.filterGroup.uploadSelection,
 });
 
 const newOptionForm = ref({
@@ -66,6 +67,19 @@ const filterModeOptions = [
     value: FilterMode.Exclude,
     label: 'Must exclude selected labels',
     description: 'Downloads with selected options from this group are hidden.',
+  },
+];
+
+const uploadSelectionOptions = [
+  {
+    value: FilterSelection.Single,
+    label: 'Allow one option',
+    description: 'Uploaders can assign at most one option from this group.',
+  },
+  {
+    value: FilterSelection.Multiple,
+    label: 'Allow multiple options',
+    description: 'Uploaders can assign any number of options from this group.',
   },
 ];
 
@@ -119,6 +133,7 @@ const startEditing = () => {
     key: props.filterGroup.key,
     displayName: props.filterGroup.displayName,
     mode: props.filterGroup.mode,
+    uploadSelection: props.filterGroup.uploadSelection,
   };
   isEditing.value = true;
 };
@@ -130,6 +145,7 @@ const saveGroup = () => {
     key: editForm.value.key,
     displayName: editForm.value.displayName,
     mode: editForm.value.mode,
+    uploadSelection: editForm.value.uploadSelection,
   });
   isEditing.value = false;
 };
@@ -139,6 +155,7 @@ const cancelEditing = () => {
     key: props.filterGroup.key,
     displayName: props.filterGroup.displayName,
     mode: props.filterGroup.mode,
+    uploadSelection: props.filterGroup.uploadSelection,
   };
   isEditing.value = false;
 };
@@ -292,7 +309,7 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
     </div>
 
     <!-- Group Settings -->
-    <div v-if="!isEditing" class="grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div v-if="!isEditing" class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <div>
         <label
           class="block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -332,11 +349,30 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
           {{ filterGroup.displayName }}
         </p>
       </div>
+      <div>
+        <p class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          When labeling a download
+        </p>
+        <p class="mt-1 text-sm text-gray-900 dark:text-white">
+          {{
+            uploadSelectionOptions.find(
+              (option) => option.value === filterGroup.uploadSelection
+            )?.label
+          }}
+        </p>
+        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+          {{
+            uploadSelectionOptions.find(
+              (option) => option.value === filterGroup.uploadSelection
+            )?.description
+          }}
+        </p>
+      </div>
     </div>
 
     <!-- Edit Group Form -->
     <div v-else class="space-y-3">
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <label
             class="block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -409,6 +445,35 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
             type="text"
             class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           >
+        </div>
+        <div>
+          <label
+            :for="`filter-group-${filterGroup.id}-upload-selection`"
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            When labeling a download
+          </label>
+          <select
+            :id="`filter-group-${filterGroup.id}-upload-selection`"
+            v-model="editForm.uploadSelection"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+          >
+            <option
+              v-for="option in uploadSelectionOptions"
+              :key="option.value"
+              :value="option.value"
+            >
+              {{ option.label }}
+            </option>
+          </select>
+          <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            {{
+              uploadSelectionOptions.find(
+                (option) => option.value === editForm.uploadSelection
+              )?.description
+            }}
+            Download-list filtering always allows multiple options.
+          </p>
         </div>
       </div>
       <div class="flex space-x-3">
