@@ -185,16 +185,30 @@ describe('DiscussionAlbum', () => {
   });
 
   it.each([
+    ['GLB image', { album: glbAlbum }],
+    ['STL file', stlOnly],
+  ])(
+    'defers the viewer for the selected %s until the poster is activated',
+    (_label, props) => {
+      const wrapper = mountAlbum({ ...props, carouselFormat: true });
+
+      expect(
+        wrapper.find('.model-viewer-stub, .stl-viewer-stub').exists()
+      ).toBe(false);
+    }
+  );
+
+  it.each([
     ['GLB image', { album: glbAlbum }, '.model-viewer-stub'],
     ['STL file', stlOnly, '.stl-viewer-stub'],
   ])(
-    'mounts the interactive viewer for the selected %s in the carousel',
-    (_label, props, selector) => {
-      expect(
-        mountAlbum({ ...props, carouselFormat: true })
-          .find(selector)
-          .exists()
-      ).toBe(true);
+    'mounts the interactive viewer for the selected %s after the poster is clicked',
+    async (_label, props, selector) => {
+      const wrapper = mountAlbum({ ...props, carouselFormat: true });
+
+      await wrapper.find('[data-testid="load-3d-viewer"]').trigger('click');
+
+      expect(wrapper.find(selector).exists()).toBe(true);
     }
   );
 
