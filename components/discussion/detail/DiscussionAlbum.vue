@@ -479,9 +479,7 @@ onMounted(() => {
               @touchstart="handleTouchStart"
               @touchend="handleTouchEnd"
             >
-              <div
-                class="absolute top-2 left-2 z-10 flex items-center gap-2"
-              >
+              <div class="absolute top-2 left-2 z-10 flex items-center gap-2">
                 <span
                   class="pointer-events-none rounded bg-black/60 px-2 py-1 text-xs text-white"
                 >
@@ -572,6 +570,11 @@ onMounted(() => {
                   <ClientOnly v-else>
                     <StlViewer
                       :src="activeImage.url"
+                      :label="
+                        activeImage.alt ||
+                        activeImage.caption ||
+                        'Interactive 3D model'
+                      "
                       width="100%"
                       :height="expandedView ? 400 : 256"
                       :max-width="expandedView ? '600px' : '384px'"

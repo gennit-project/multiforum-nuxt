@@ -7,8 +7,10 @@ const stl = vi.hoisted(() => ({
   mode: 'success' as 'success' | 'error',
   controls: null as null | Record<string, unknown>,
   renderer: null as null | Record<string, unknown>,
+  camera: null as null | Record<string, unknown>,
   scene: null as null | { children: unknown[]; add: ReturnType<typeof vi.fn> },
   controlEvents: {} as Record<string, () => void>,
+  keyEventTarget: null as null | HTMLElement,
 }));
 
 vi.mock('three/examples/jsm/loaders/STLLoader', () => ({
@@ -43,9 +45,16 @@ vi.mock('three/examples/jsm/controls/OrbitControls', () => ({
       dampingFactor: 0,
       autoRotate: false,
       autoRotateSpeed: 0,
+      minDistance: 0,
+      maxDistance: Infinity,
+      target: {},
       addEventListener: vi.fn((name: string, callback: () => void) => {
         stl.controlEvents[name] = callback;
       }),
+      listenToKeyEvents: vi.fn((target: HTMLElement) => {
+        stl.keyEventTarget = target;
+      }),
+      stopListenToKeyEvents: vi.fn(),
       update: vi.fn(),
       dispose: vi.fn(),
     };
@@ -68,13 +77,21 @@ vi.mock('three', () => {
       return {};
     }),
     PerspectiveCamera: vi.fn(function () {
-      return {
-        position: { set: vi.fn() },
+      const position = {
+        set: vi.fn(),
+        distanceTo: vi.fn(() => 10),
+        sub: vi.fn().mockReturnThis(),
+        setLength: vi.fn().mockReturnThis(),
+        add: vi.fn().mockReturnThis(),
+      };
+      stl.camera = {
+        position,
         lookAt: vi.fn(),
         aspect: 1,
         fov: 45,
         updateProjectionMatrix: vi.fn(),
       };
+      return stl.camera;
     }),
     WebGLRenderer: vi.fn(function () {
       stl.renderer = {
@@ -121,13 +138,89 @@ beforeEach(() => {
   stl.mode = 'success';
   stl.controls = null;
   stl.renderer = null;
+  stl.camera = null;
   stl.scene = null;
   stl.controlEvents = {};
+  stl.keyEventTarget = null;
   vi.stubGlobal('requestAnimationFrame', vi.fn().mockReturnValue(1));
   vi.stubGlobal('cancelAnimationFrame', vi.fn());
 });
 
 describe('StlViewer', () => {
+  it('exposes a named keyboard-operable application region', async () => {
+    const wrapper = mountViewer({
+      src: 'http://x/model.stl',
+      label: 'Gear assembly preview',
+    });
+    await flushPromises();
+
+    expect({
+      role: wrapper.attributes('role'),
+      label: wrapper.attributes('aria-label'),
+      tabindex: wrapper.attributes('tabindex'),
+      canvasHidden: wrapper.get('canvas').attributes('aria-hidden'),
+      instructions: wrapper.get('.interaction-hint').text(),
+    }).toEqual({
+      role: 'application',
+      label: 'Gear assembly preview',
+      tabindex: '0',
+      canvasHidden: 'true',
+      instructions:
+        'Keyboard: Arrow keys pan, Shift plus arrow keys rotate, plus and minus zoom, and 0 resets the view.',
+    });
+  });
+
+  it('connects OrbitControls keyboard handling to the focusable viewer', async () => {
+    const wrapper = mountViewer({ src: 'http://x/model.stl' });
+    await flushPromises();
+
+    expect(stl.keyEventTarget).toBe(wrapper.element);
+  });
+
+  it.each([
+    ['+', 9],
+    ['-', 11],
+  ])('uses the %s key to zoom the camera', async (key, distance) => {
+    const wrapper = mountViewer({ src: 'http://x/model.stl' });
+    await flushPromises();
+
+    await wrapper.trigger('keydown', { key });
+
+    const setLength = stl.camera?.position.setLength as ReturnType<
+      typeof vi.fn
+    >;
+    expect(setLength).toHaveBeenCalledWith(distance);
+  });
+
+  it('uses the 0 key to reset the camera', async () => {
+    const wrapper = mountViewer({ src: 'http://x/model.stl' });
+    await flushPromises();
+    const setPosition = stl.camera?.position.set as ReturnType<typeof vi.fn>;
+    setPosition.mockClear();
+
+    await wrapper.trigger('keydown', { key: '0' });
+
+    expect(setPosition).toHaveBeenCalledOnce();
+  });
+
+  it('announces when the model has loaded', async () => {
+    const wrapper = mountViewer({ src: 'http://x/model.stl' });
+    await flushPromises();
+
+    expect(wrapper.get('[role="status"]').text()).toBe('3D model loaded.');
+  });
+
+  it('announces loading errors as alerts', async () => {
+    stl.mode = 'error';
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    const wrapper = mountViewer({ src: 'http://x/bad.stl' });
+    await flushPromises();
+
+    expect(wrapper.get('[role="alert"]').text()).toBe(
+      'Failed to load 3D model'
+    );
+  });
+
   it('stays in the loading state when no src is provided', () => {
     const wrapper = mountViewer();
     expect(wrapper.html()).toBeTruthy();
@@ -221,6 +314,8 @@ describe('StlViewer', () => {
       controls: (controls?.dispose as ReturnType<typeof vi.fn>).mock.calls
         .length,
       animation: vi.mocked(cancelAnimationFrame).mock.calls.length,
-    }).toEqual({ renderer: 1, controls: 1, animation: 1 });
+      keyboard: (controls?.stopListenToKeyEvents as ReturnType<typeof vi.fn>)
+        .mock.calls.length,
+    }).toEqual({ renderer: 1, controls: 1, animation: 1, keyboard: 1 });
   });
 });

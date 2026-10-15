@@ -139,7 +139,9 @@ const uploader = computed(() => {
 
 // Check if the current user matches the username in the route
 const isCorrectUserPage = computed(() => {
-  return !uploader.value?.username || uploader.value.username === username.value;
+  return (
+    !uploader.value?.username || uploader.value.username === username.value
+  );
 });
 
 // Check if logged-in user is the uploader
@@ -485,6 +487,7 @@ onUnmounted(() => {
           <ClientOnly v-else-if="image.url && hasStlExtension(image.url)">
             <StlViewer
               :src="image.url"
+              :label="image.alt || image.caption || 'Interactive 3D model'"
               :width="800"
               :height="600"
               class="h-auto max-w-full"
@@ -526,7 +529,10 @@ onUnmounted(() => {
               >
                 {{ uploader?.displayName || uploader?.username }}
               </NuxtLink>
-              <span v-else class="text-lg font-medium text-gray-600 dark:text-gray-300">
+              <span
+                v-else
+                class="text-lg font-medium text-gray-600 dark:text-gray-300"
+              >
                 Uploader unavailable
               </span>
               <div
@@ -883,6 +889,7 @@ onUnmounted(() => {
             <ClientOnly>
               <StlViewer
                 :src="image.url"
+                :label="image.alt || image.caption || 'Interactive 3D model'"
                 :width="800"
                 :height="600"
                 class="object-contain transition-all duration-300 ease-in-out"

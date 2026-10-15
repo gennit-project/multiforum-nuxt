@@ -100,7 +100,8 @@ const getUploaderLabel = (image: ImageData) => {
     <div class="relative w-28 shrink-0 overflow-hidden rounded-md">
       <Viewer3dGate
         v-if="
-          image.url && (hasGlbExtension(image.url) || hasStlExtension(image.url))
+          image.url &&
+          (hasGlbExtension(image.url) || hasStlExtension(image.url))
         "
         :label="image.alt || image.caption || 'Interactive 3D model'"
         height="112px"
@@ -114,7 +115,12 @@ const getUploaderLabel = (image: ImageData) => {
           width="112px"
         />
         <ClientOnly v-else>
-          <StlViewer :src="image.url" :width="112" :height="112" />
+          <StlViewer
+            :src="image.url"
+            :label="image.alt || image.caption || 'Interactive 3D model'"
+            :width="112"
+            :height="112"
+          />
         </ClientOnly>
       </Viewer3dGate>
       <ExpandableImage
@@ -129,7 +135,7 @@ const getUploaderLabel = (image: ImageData) => {
       />
       <span
         v-if="isFirst"
-        class="absolute left-1 top-1 rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-600 dark:bg-blue-800 dark:text-blue-300"
+        class="absolute top-1 left-1 rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-600 dark:bg-blue-800 dark:text-blue-300"
       >
         Cover
       </span>
