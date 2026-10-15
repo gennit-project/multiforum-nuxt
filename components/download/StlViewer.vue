@@ -4,11 +4,26 @@
     class="stl-container"
     :class="{ 'is-interactive': !loading && !error }"
     :style="containerStyle"
+    role="application"
+    :aria-label="label"
+    :aria-describedby="instructionsId"
+    :aria-disabled="loading || error ? 'true' : undefined"
+    tabindex="0"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
+    @keydown="handleKeydown"
   >
-    <div v-if="loading" class="loading-overlay">Loading 3D model...</div>
-    <div v-if="error" class="error-overlay">
+    <p class="sr-only" role="status" aria-live="polite" aria-atomic="true">
+      {{ loadStatus }}
+    </p>
+    <p :id="instructionsId" class="interaction-hint">
+      Keyboard: Arrow keys pan, Shift plus arrow keys rotate, plus and minus
+      zoom, and 0 resets the view.
+    </p>
+    <div v-if="loading" class="loading-overlay" aria-hidden="true">
+      Loading 3D model...
+    </div>
+    <div v-if="error" class="error-overlay" role="alert">
       {{ error }}
     </div>
   </div>
@@ -22,6 +37,7 @@ import {
   onBeforeUnmount,
   computed,
   nextTick,
+  useId,
 } from 'vue';
 // Named imports (not `import * as THREE`) so the bundler can tree-shake the
 // parts of three.js this viewer never uses.
@@ -61,6 +77,7 @@ interface Props {
   backgroundColor?: string;
   autoRotate?: boolean;
   showGrid?: boolean;
+  label?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -72,7 +89,10 @@ const props = withDefaults(defineProps<Props>(), {
   backgroundColor: '#f0f0f0',
   autoRotate: false,
   showGrid: false,
+  label: 'Interactive 3D model',
 });
+
+const instructionsId = `stl-viewer-instructions-${useId()}`;
 
 const containerStyle = computed((): CSSProperties =>
   buildContainerStyle(props.width, props.height, props.maxWidth)
@@ -90,13 +110,15 @@ const error = ref<string | null>(null);
 const isHovered = ref(false);
 const actualWidth = ref(400);
 const actualHeight = ref(400);
+const loadStatus = computed(() => {
+  if (loading.value) return 'Loading 3D model.';
+  if (error.value) return '';
+  return '3D model loaded.';
+});
 
 // THREE.js objects lack type declarations here, so these are intentionally `any`.
 /* eslint-disable @typescript-eslint/no-explicit-any */
-let scene: any,
-  camera: any,
-  renderer: any,
-  controls: any;
+let scene: any, camera: any, renderer: any, controls: any;
 /* eslint-enable @typescript-eslint/no-explicit-any */
 let animationId: number | undefined;
 
@@ -141,6 +163,7 @@ function initViewer(stlUrl: string) {
 
     renderer = new WebGLRenderer({ antialias: true });
     renderer.setSize(actualWidth.value, actualHeight.value);
+    renderer.domElement.setAttribute('aria-hidden', 'true');
     container.value!.appendChild(renderer.domElement);
 
     controls = new OrbitControls(camera, renderer.domElement);
@@ -148,6 +171,7 @@ function initViewer(stlUrl: string) {
     controls.dampingFactor = 0.05;
     controls.autoRotate = props.autoRotate;
     controls.autoRotateSpeed = 2;
+    controls.listenToKeyEvents(container.value!);
 
     // Add visual feedback for interaction
     renderer.domElement.style.cursor = 'grab';
@@ -252,6 +276,37 @@ function resetCamera() {
   }
 }
 
+function zoomCamera(scale: number) {
+  if (!camera || !controls) return;
+
+  const currentDistance = camera.position.distanceTo(controls.target);
+  const nextDistance = Math.min(
+    controls.maxDistance,
+    Math.max(controls.minDistance, currentDistance * scale)
+  );
+
+  camera.position
+    .sub(controls.target)
+    .setLength(nextDistance)
+    .add(controls.target);
+  controls.update();
+}
+
+function handleKeydown(event: KeyboardEvent) {
+  if (loading.value || error.value || !controls) return;
+
+  if (event.key === '+' || event.key === '=') {
+    event.preventDefault();
+    zoomCamera(0.9);
+  } else if (event.key === '-' || event.key === '_') {
+    event.preventDefault();
+    zoomCamera(1.1);
+  } else if (event.key === '0') {
+    event.preventDefault();
+    resetCamera();
+  }
+}
+
 function cleanup() {
   const containerElement = container.value;
   if (animationId) {
@@ -261,6 +316,7 @@ function cleanup() {
     renderer.dispose();
   }
   if (controls) {
+    controls.stopListenToKeyEvents();
     controls.dispose();
   }
   if (
@@ -322,6 +378,28 @@ defineExpose({
 .stl-container:focus {
   outline: 2px solid #3b82f6;
   outline-offset: 2px;
+}
+
+.interaction-hint {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  left: 8px;
+  z-index: 10;
+  margin: 0;
+  border-radius: 6px;
+  background: rgba(17, 24, 39, 0.92);
+  color: white;
+  padding: 8px 12px;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.stl-container:focus .interaction-hint {
+  opacity: 1;
 }
 
 .stl-container.is-interactive {

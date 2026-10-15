@@ -136,6 +136,9 @@ const handleClick = (event: MouseEvent) => {
       <ClientOnly>
         <StlViewer
           :src="currentImage.url"
+          :label="
+            currentImage.alt || currentImage.caption || 'Interactive 3D model'
+          "
           :width="800"
           :height="600"
           class="object-contain transition-all duration-300 ease-in-out"
