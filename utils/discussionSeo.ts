@@ -1,4 +1,5 @@
 import removeMarkdown from 'remove-markdown';
+import type { HeadObject } from '@/utils/seoHead';
 
 /**
  * Pure builders for the discussion detail page's SEO/social metadata and
@@ -46,14 +47,6 @@ export type BuildDiscussionHeadParams = {
   discussionId: string;
   serverDisplayName: string;
   baseUrl: string;
-};
-
-type HeadMeta = { name?: string; property?: string; content: string };
-type HeadObject = {
-  title: string;
-  description?: string;
-  meta?: HeadMeta[];
-  script?: { type: string; innerHTML: string }[];
 };
 
 const fallbackDescription = (serverDisplayName: string): string =>

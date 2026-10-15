@@ -6,13 +6,19 @@
  * head entries outside the component context (#578, #583).
  */
 
-export type HeadMeta = { name?: string; property?: string; content: string };
+export type HeadMeta = (
+  { name: string; property?: never } | { property: string; name?: never }
+) & { content: string };
 
-export type HeadScript = { type: string; innerHTML: string };
+export type HeadScript = {
+  type: 'application/ld+json';
+  innerHTML: string;
+};
 
 export type HeadObject = {
   title: string;
-  meta: HeadMeta[];
+  description?: string;
+  meta?: HeadMeta[];
   script?: HeadScript[];
 };
 

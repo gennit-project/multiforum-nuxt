@@ -7,6 +7,11 @@ import { gzipSync } from 'node:zlib';
 const BUILD_CANDIDATES = [
   {
     manifest:
+      '.vercel/output/functions/__fallback.func/chunks/virtual/precomputed.mjs',
+    assets: '.vercel/output/static/_nuxt',
+  },
+  {
+    manifest:
       '.vercel/output/functions/__fallback.func/chunks/build/client.precomputed.mjs',
     assets: '.vercel/output/static/_nuxt',
   },
@@ -158,7 +163,11 @@ export const checkRouteBudgets = async ({
 
   const { manifestPath, assetsDirectory } = findBuildArtifacts(repositoryRoot);
   const manifestUrl = `${pathToFileURL(manifestPath).href}?budget=${Date.now()}`;
-  const { default: manifest } = await import(manifestUrl);
+  const { default: importedManifest } = await import(manifestUrl);
+  const manifest =
+    typeof importedManifest === 'function'
+      ? await importedManifest()
+      : importedManifest;
 
   const results = config.routes.map((route) => {
     if (!Array.isArray(route.entries) || route.entries.length === 0) {

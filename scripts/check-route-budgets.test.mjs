@@ -180,6 +180,60 @@ test('checkRouteBudgets reads a node-server manifest and evaluates its route', a
   );
 });
 
+test('checkRouteBudgets reads the callable manifest emitted by Nuxt for Vercel', async () => {
+  const repositoryRoot = fs.mkdtempSync(
+    path.join(os.tmpdir(), 'route-budget-repository-')
+  );
+  const manifestDirectory = path.join(
+    repositoryRoot,
+    '.vercel/output/functions/__fallback.func/chunks/virtual'
+  );
+  const assetsDirectory = path.join(
+    repositoryRoot,
+    '.vercel/output/static/_nuxt'
+  );
+  fs.mkdirSync(manifestDirectory, { recursive: true });
+  fs.mkdirSync(assetsDirectory, { recursive: true });
+  fs.writeFileSync(path.join(assetsDirectory, 'route.js'), 'export default 1;');
+  fs.writeFileSync(
+    path.join(manifestDirectory, 'precomputed.mjs'),
+    `export default () => (${JSON.stringify({
+      dependencies: {
+        'pages/example.vue': {
+          preload: {
+            route: { file: 'route.js', resourceType: 'script' },
+          },
+        },
+      },
+    })});\n`
+  );
+  fs.writeFileSync(
+    path.join(repositoryRoot, 'performance-budgets.json'),
+    JSON.stringify({
+      routes: [
+        {
+          name: 'Example',
+          entries: ['pages/example.vue'],
+          budgets: { preloadFiles: 1 },
+        },
+      ],
+    })
+  );
+
+  const report = await checkRouteBudgets({ repositoryRoot });
+
+  assert.deepEqual(
+    {
+      manifestFound: report.manifestPath.endsWith(
+        'chunks/virtual/precomputed.mjs'
+      ),
+      preloadFiles: report.results[0]?.metrics.preloadFiles,
+      failures: report.results[0]?.failures,
+    },
+    { manifestFound: true, preloadFiles: 1, failures: [] }
+  );
+});
+
 test('renderReport includes route status and actionable failure details', () => {
   const output = renderReport([
     {
