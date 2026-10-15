@@ -79,6 +79,17 @@ const ignoredDevWatchPatterns = [
   '**/playwright-report/**',
   '**/test-results/**',
 ];
+const manualChunkGroups: Record<string, string[]> = {
+  'vue-libs': ['vue', 'vue-router', 'pinia'],
+  apollo: ['@apollo/client', '@vue/apollo-composable'],
+  'date-libs': ['luxon'],
+  'map-libs': ['@googlemaps/js-api-loader'],
+  // Keep three.js and model-viewer in separate chunks. Grouping them made
+  // every STL preview also download model-viewer. three stays one chunk shared
+  // by both viewers, so a page showing both formats still downloads it once.
+  three: ['three'],
+  'model-viewer': ['@google/model-viewer'],
+};
 const ignoredNuxtPaths = [
   '.stateful',
   '.stateful/**',
@@ -568,17 +579,18 @@ export default defineNuxtConfig({
       // },
       rollupOptions: {
         output: {
-          manualChunks: {
-            'vue-libs': ['vue', 'vue-router', 'pinia'],
-            apollo: ['@apollo/client', '@vue/apollo-composable'],
-            'date-libs': ['luxon'],
-            'map-libs': ['@googlemaps/js-api-loader'],
-            // Keep three.js and model-viewer in separate chunks. Grouping them
-            // made every STL preview also download model-viewer. three stays
-            // one chunk shared by both viewers, so a page showing both formats
-            // still downloads it once.
-            three: ['three'],
-            'model-viewer': ['@google/model-viewer'],
+          manualChunks(id) {
+            for (const [chunkName, packageNames] of Object.entries(
+              manualChunkGroups
+            )) {
+              if (
+                packageNames.some((packageName) =>
+                  id.includes(`/node_modules/${packageName}/`)
+                )
+              ) {
+                return chunkName;
+              }
+            }
           },
         },
       },

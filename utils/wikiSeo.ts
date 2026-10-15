@@ -1,4 +1,5 @@
 import { toMetaDescription } from '@/utils/discussionSeo';
+import type { HeadObject } from '@/utils/seoHead';
 
 /**
  * Pure builder for the wiki page's SEO/social metadata and schema.org Article
@@ -11,7 +12,10 @@ export type WikiSeoSource = {
   body?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
-  VersionAuthor?: { username?: string | null; displayName?: string | null } | null;
+  VersionAuthor?: {
+    username?: string | null;
+    displayName?: string | null;
+  } | null;
 };
 
 export type BuildWikiPageHeadParams = {
@@ -21,13 +25,6 @@ export type BuildWikiPageHeadParams = {
   slug: string;
   serverDisplayName: string;
   baseUrl: string;
-};
-
-type HeadMeta = { name?: string; property?: string; content: string };
-type HeadObject = {
-  title: string;
-  meta: HeadMeta[];
-  script?: { type: string; innerHTML: string }[];
 };
 
 /**

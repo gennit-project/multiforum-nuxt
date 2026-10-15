@@ -33,6 +33,7 @@ import { getForumShellVisibility } from '@/utils/forumShellVisibility';
 import type { ForumItem } from '@/types/forum';
 import { useUsername } from '@/composables/useAuthState';
 import { useDisplay } from '@/composables/useDisplay';
+import type { HeadObject } from '@/utils/seoHead';
 
 const route = useRoute();
 const router = useRouter();
@@ -215,7 +216,7 @@ onGetChannelResult((result) => {
 // Derive SEO meta tags reactively from the query result so useHead is
 // registered during setup (not inside the async onResult callback, which
 // runs outside the Nuxt instance context during SSR).
-const metaData = computed(() => {
+const metaData = computed<HeadObject>(() => {
   const serverName = config.serverDisplayName;
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const loadedChannel = channel.value;

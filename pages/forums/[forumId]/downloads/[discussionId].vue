@@ -8,6 +8,7 @@ import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DOWNLOAD_DETAIL } from '@/graphQLData/discussion/queries';
+import type { HeadObject } from '@/utils/seoHead';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -40,7 +41,7 @@ const { result: discussionResult } = useQuery(GET_DOWNLOAD_DETAIL, {
   channelUniqueName: channelId.value,
 });
 
-const metaData = computed(() => {
+const metaData = computed<HeadObject>(() => {
   try {
     const discussions = discussionResult.value?.discussions;
     if (!discussions) {

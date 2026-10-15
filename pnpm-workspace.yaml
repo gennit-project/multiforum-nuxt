@@ -3,14 +3,16 @@ packages: []
 minimumReleaseAge: 0
 
 allowBuilds:
-  "@parcel/watcher": true
-  "@sentry/cli": true
+  '@parcel/watcher': true
+  '@sentry/cli': true
   esbuild: true
   sharp: true
   unrs-resolver: true
   vue-demi: true
 
 overrides:
+  '@codemirror/state': 6.7.1
   html-encoding-sniffer: 4.0.0
   lodash: ^4.18.1
   esbuild: ^0.28.1
+  postcss-selector-parser: 7.1.6
