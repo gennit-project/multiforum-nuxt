@@ -84,11 +84,6 @@ const manualChunkGroups: Record<string, string[]> = {
   apollo: ['@apollo/client', '@vue/apollo-composable'],
   'date-libs': ['luxon'],
   'map-libs': ['@googlemaps/js-api-loader'],
-  // Keep three.js and model-viewer in separate chunks. Grouping them made
-  // every STL preview also download model-viewer. three stays one chunk shared
-  // by both viewers, so a page showing both formats still downloads it once.
-  three: ['three'],
-  'model-viewer': ['@google/model-viewer'],
 };
 const ignoredNuxtPaths = [
   '.stateful',

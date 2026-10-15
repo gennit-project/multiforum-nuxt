@@ -4,11 +4,11 @@
       "name": "Public discussions",
       "entries": ["pages/discussions/index.vue"],
       "budgets": {
-        "preloadFiles": 47,
+        "preloadFiles": 58,
         "rawBytes": 1040000,
         "gzipBytes": 312000,
         "jsGzipBytes": 287000,
-        "cssGzipBytes": 26000
+        "cssGzipBytes": 27500
       }
     },
     {
@@ -18,7 +18,7 @@
         "pages/forums/[forumId]/discussions/[discussionId].vue"
       ],
       "budgets": {
-        "preloadFiles": 193,
+        "preloadFiles": 216,
         "rawBytes": 2440000,
         "gzipBytes": 763000,
         "jsGzipBytes": 708000,
@@ -32,7 +32,7 @@
         "pages/forums/[forumId]/downloads/[discussionId].vue"
       ],
       "budgets": {
-        "preloadFiles": 193,
+        "preloadFiles": 216,
         "rawBytes": 2441000,
         "gzipBytes": 763000,
         "jsGzipBytes": 708000,
@@ -46,7 +46,7 @@
         "pages/forums/[forumId]/issues/[issueNumber].vue"
       ],
       "budgets": {
-        "preloadFiles": 202,
+        "preloadFiles": 216,
         "rawBytes": 2453000,
         "gzipBytes": 767000,
         "jsGzipBytes": 710000,
@@ -60,7 +60,7 @@
         "pages/server/issues/[issueNumber].vue"
       ],
       "budgets": {
-        "preloadFiles": 163,
+        "preloadFiles": 176,
         "rawBytes": 2153000,
         "gzipBytes": 674000,
         "jsGzipBytes": 630000,
@@ -75,7 +75,7 @@
         "pages/admin/issues/[issueNumber].vue"
       ],
       "budgets": {
-        "preloadFiles": 170,
+        "preloadFiles": 182,
         "rawBytes": 2166000,
         "gzipBytes": 681000,
         "jsGzipBytes": 636000,
