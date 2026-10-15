@@ -37,7 +37,7 @@
       camera-controls
       exposure="0.8"
       shadow-intensity="0.4"
-      environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
+      environment-image="neutral"
       tone-mapping="neutral"
       :style="{
         width: props.width || '100%',
@@ -95,7 +95,7 @@
           style="width: 100%; height: 95%; border-radius: 8px"
           exposure="0.8"
           shadow-intensity="0.4"
-          environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
+          environment-image="neutral"
           tone-mapping="neutral"
         />
       </div>

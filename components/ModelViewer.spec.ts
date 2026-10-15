@@ -10,7 +10,11 @@ vi.mock('@google/model-viewer', () => ({}));
 // to false and the button is hidden; enable it by default for these tests.
 const mountViewer = (props: Record<string, unknown> = {}) =>
   mount(ModelViewer, {
-    props: { modelUrl: 'https://x/model.glb', showFullscreenButton: true, ...props },
+    props: {
+      modelUrl: 'https://x/model.glb',
+      showFullscreenButton: true,
+      ...props,
+    },
   });
 
 const fullscreenButton = (w: ReturnType<typeof mount>) =>
@@ -27,6 +31,17 @@ describe('ModelViewer rendering', () => {
     const wrapper = mountViewer();
 
     expect(wrapper.find('model-viewer').exists()).toBe(true);
+  });
+
+  it('uses built-in neutral lighting without an external environment image', async () => {
+    const wrapper = mountViewer();
+    await fullscreenButton(wrapper).trigger('click');
+
+    expect(
+      wrapper
+        .findAll('model-viewer')
+        .map((viewer) => viewer.attributes('environment-image'))
+    ).toEqual(['neutral', 'neutral']);
   });
 
   it('omits the model when there is no url', () => {
