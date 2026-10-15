@@ -5,11 +5,14 @@ import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import TextInput from '@/components/TextInput.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ExpandableImage from '@/components/ExpandableImage.vue';
-import ModelViewer from '@/components/ModelViewer.vue';
+import Viewer3dGate from '@/components/viewer3d/Viewer3dGate.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
 
 // StlViewer statically imports three.js (~2MB decoded). Load it lazily so that
 // weight is only fetched when an STL image actually renders.
+const ModelViewer = defineAsyncComponent(
+  () => import('@/components/ModelViewer.vue')
+);
 const StlViewer = defineAsyncComponent(
   () => import('@/components/download/StlViewer.vue')
 );
@@ -95,16 +98,25 @@ const getUploaderLabel = (image: ImageData) => {
 
     <!-- Thumbnail -->
     <div class="relative w-28 shrink-0 overflow-hidden rounded-md">
-      <ModelViewer
-        v-if="image.url && hasGlbExtension(image.url)"
-        :model-url="image.url"
-        :model-alt="image.alt || image.caption || 'Interactive 3D model'"
+      <Viewer3dGate
+        v-if="
+          image.url && (hasGlbExtension(image.url) || hasStlExtension(image.url))
+        "
+        :label="image.alt || image.caption || 'Interactive 3D model'"
         height="112px"
-        width="112px"
-      />
-      <ClientOnly v-else-if="image.url && hasStlExtension(image.url)">
-        <StlViewer :src="image.url" :width="112" :height="112" />
-      </ClientOnly>
+        compact
+      >
+        <ModelViewer
+          v-if="hasGlbExtension(image.url)"
+          :model-url="image.url"
+          :model-alt="image.alt || image.caption || 'Interactive 3D model'"
+          height="112px"
+          width="112px"
+        />
+        <ClientOnly v-else>
+          <StlViewer :src="image.url" :width="112" :height="112" />
+        </ClientOnly>
+      </Viewer3dGate>
       <ExpandableImage
         v-else-if="image.url"
         class="w-28 object-cover"

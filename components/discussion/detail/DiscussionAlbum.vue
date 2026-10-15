@@ -24,6 +24,7 @@ import {
 } from '@/utils/fileTypeUtils';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
 import { orderImagesByOrder } from '@/utils/albumImageOrder';
+import Viewer3dGate from '@/components/viewer3d/Viewer3dGate.vue';
 
 const ModelViewer = defineAsyncComponent(
   () => import('@/components/ModelViewer.vue')
@@ -533,40 +534,32 @@ onMounted(() => {
                 class="h-full w-full cursor-pointer"
                 @click="openLightbox(activeIndex)"
               >
-                <ModelViewer
+                <Viewer3dGate
                   v-if="
                     activeImage &&
                     activeImage.url &&
-                    hasGlbExtension(activeImage.url)
+                    (hasGlbExtension(activeImage.url) ||
+                      hasStlExtension(activeImage.url))
                   "
-                  :model-url="activeImage.url"
-                  :model-alt="
+                  :key="activeImage.url"
+                  :label="
                     activeImage.alt ||
                     activeImage.caption ||
                     'Interactive 3D model'
                   "
                   :height="expandedView ? '400px' : '256px'"
-                  class="object-contain shadow-sm"
-                  :style="{
-                    aspectRatio: '3/2',
-                    width: '100%',
-                    maxWidth: expandedView ? '600px' : '384px',
-                    maxHeight: expandedView ? '400px' : '256px',
-                  }"
-                  :show-fullscreen-button="false"
-                />
-                <ClientOnly
-                  v-else-if="
-                    activeImage &&
-                    activeImage.url &&
-                    hasStlExtension(activeImage.url)
-                  "
+                  :max-width="expandedView ? '600px' : '384px'"
+                  aspect-ratio="3/2"
                 >
-                  <StlViewer
-                    :src="activeImage.url"
-                    width="100%"
-                    :height="expandedView ? 400 : 256"
-                    :max-width="expandedView ? '600px' : '384px'"
+                  <ModelViewer
+                    v-if="hasGlbExtension(activeImage.url)"
+                    :model-url="activeImage.url"
+                    :model-alt="
+                      activeImage.alt ||
+                      activeImage.caption ||
+                      'Interactive 3D model'
+                    "
+                    :height="expandedView ? '400px' : '256px'"
                     class="object-contain shadow-sm"
                     :style="{
                       aspectRatio: '3/2',
@@ -574,8 +567,24 @@ onMounted(() => {
                       maxWidth: expandedView ? '600px' : '384px',
                       maxHeight: expandedView ? '400px' : '256px',
                     }"
+                    :show-fullscreen-button="false"
                   />
-                </ClientOnly>
+                  <ClientOnly v-else>
+                    <StlViewer
+                      :src="activeImage.url"
+                      width="100%"
+                      :height="expandedView ? 400 : 256"
+                      :max-width="expandedView ? '600px' : '384px'"
+                      class="object-contain shadow-sm"
+                      :style="{
+                        aspectRatio: '3/2',
+                        width: '100%',
+                        maxWidth: expandedView ? '600px' : '384px',
+                        maxHeight: expandedView ? '400px' : '256px',
+                      }"
+                    />
+                  </ClientOnly>
+                </Viewer3dGate>
                 <AppImage
                   v-else
                   :src="activeImageUrl"

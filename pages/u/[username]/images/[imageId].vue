@@ -1,7 +1,13 @@
 <script lang="ts" setup>
 import { config } from '@/config';
 import { buildImageHead } from '@/utils/imageSeo';
-import { computed, ref, onMounted, onUnmounted } from 'vue';
+import {
+  computed,
+  defineAsyncComponent,
+  ref,
+  onMounted,
+  onUnmounted,
+} from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useRoute, useHead } from 'nuxt/app';
 import {
@@ -12,8 +18,6 @@ import { ADD_IMAGE_TO_ALBUM } from '@/graphQLData/image/mutations';
 import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
 import type { Image } from '@/__generated__/graphql';
 import { useCopyCurrentUrl } from '@/composables/useCopyCurrentUrl';
-import ModelViewer from '@/components/ModelViewer.vue';
-import StlViewer from '@/components/download/StlViewer.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ImageCaption from '@/components/image/ImageCaption.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
@@ -30,6 +34,14 @@ import { useImageZoomPan } from '@/composables/useImageZoomPan';
 import AddToListPopover from '@/components/collection/AddToListPopover.vue';
 import { useToastStore } from '@/stores/toastStore';
 import { useFocusTrap } from '@/composables/useFocusTrap';
+
+// The 3D runtimes are heavy; fetch them only when a 3D file is actually shown.
+const ModelViewer = defineAsyncComponent(
+  () => import('@/components/ModelViewer.vue')
+);
+const StlViewer = defineAsyncComponent(
+  () => import('@/components/download/StlViewer.vue')
+);
 
 const usernameVar = useUsername();
 const toastStore = useToastStore();

@@ -1,10 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { shallowMount } from '@vue/test-utils';
+import { flushPromises, shallowMount } from '@vue/test-utils';
 import { ref, unref } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { createPinia, setActivePinia } from 'pinia';
 
 vi.stubGlobal('definePageMeta', vi.fn());
+
+// The page loads the 3D viewers lazily; keep the heavy runtimes out of the test.
+vi.mock('@/components/ModelViewer.vue', () => ({
+  default: { name: 'ModelViewer', template: '<div />' },
+}));
+vi.mock('@/components/download/StlViewer.vue', () => ({
+  default: { name: 'StlViewer', template: '<div />' },
+}));
 
 const h = vi.hoisted(() => ({
   username: null as unknown as { value: string },
@@ -455,6 +463,7 @@ describe('user image detail page', () => {
     ['https://img.test/model.stl', 'StlViewer'],
   ])('renders %s with the specialized viewer', async (url, componentName) => {
     const wrapper = await mountWith({ ...baseImage, url });
+    await flushPromises();
 
     expect(wrapper.findComponent({ name: componentName }).exists()).toBe(true);
   });

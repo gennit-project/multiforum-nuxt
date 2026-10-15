@@ -1,11 +1,17 @@
 <script lang="ts" setup>
+import { defineAsyncComponent } from 'vue';
 import type { PropType } from 'vue';
 import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
-import ModelViewer from '@/components/ModelViewer.vue';
-import StlViewer from '@/components/download/StlViewer.vue';
 import AppImage from '@/components/image/AppImage.vue';
 import { hasGlbExtension, hasStlExtension } from '@/utils/fileTypeUtils';
+// The 3D runtimes are heavy; fetch them only when a 3D file is actually shown.
+const ModelViewer = defineAsyncComponent(
+  () => import('@/components/ModelViewer.vue')
+);
+const StlViewer = defineAsyncComponent(
+  () => import('@/components/download/StlViewer.vue')
+);
 // Simplified image type for lightbox display
 interface LightboxImage {
   id: string;
