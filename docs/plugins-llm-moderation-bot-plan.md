@@ -30,8 +30,9 @@ precedent) and is **rate limited**. It is acceptable for the bot to take some ti
 ## 2. Motivation, goals, non-goals
 
 ### Goals
-- Server-scope install → review **all** new discussions and comments against **server rules**, report violations.
-- Optional per-forum enable → additionally evaluate against **that forum's rules**.
+- Server-scope install → review new discussions and comments against **server rules** and report violations,
+  with an admin-chosen **mode**: all forums, an **allowlist** of forums (trial / phased rollout), or off (§4.1).
+- Optional per-forum enable → additionally evaluate against **that forum's rules** (independent of the mode).
 - A post in a forum where the bot is channel-enabled is evaluated in a **single consolidated LLM call**
   (server rules + that forum's rules together) producing a **single report** — not one call/report per scope.
 - The unit of evaluation is the per-forum submission (`DiscussionChannel`) or a comment (which lives in one
@@ -119,14 +120,29 @@ admin code**:
 This is the central behaviour and the part that needs the most care.
 
 ### 4.1 Desired behaviour
-- **Server install (enabled):** the bot reviews **every** new discussion and comment in **every** forum
-  against the **server rules** and reports server-rule violations.
-- **Per-forum enable (additive):** in a forum where the admin has also enabled the bot, each post is
-  **additionally** evaluated against **that forum's rules** (e.g. catching "good advice" posted in a
-  `bad_advice` forum, or an off-topic post in `cats`).
-- **Consolidation:** for a post in a forum where the bot is channel-enabled, there must be **one** LLM call
-  that receives **server rules + that forum's rules together**; the LLM selects which rules (from either set)
-  were violated and the bot opens **one** report. Not a server call + a channel call. Not two reports.
+- **Server-rule checking has a mode (Decision 4.E).** Because this is an experimental bot with a large blast
+  radius (cost + report volume), the admin chooses *how broadly* the server rules are applied:
+  - `all_forums` — review every discussion and comment in every forum against the server rules (full rollout).
+  - `allowlist` — review only forums on an admin-chosen allowlist. This is the **trial / phased-rollout**
+    path: pilot the bot on a few forums, build trust, then switch to `all_forums`. The allowlist also doubles
+    as a **cost gate**.
+  - `off` — no server-rule checking (the bot does only per-forum channel-rule checking where enabled).
+- **Per-forum channel-rule checking (additive, and independent of the mode above):** in a forum where the
+  admin enables the bot, each post is **additionally** evaluated against **that forum's own rules** (e.g.
+  catching "good advice" posted in a `bad_advice` forum, or an off-topic post in `cats`). This is a separate
+  switch from the server-rule mode — keeping them distinct avoids two confusingly-overlapping per-forum toggles.
+- **Consolidation (unchanged):** when both server-rule checking (per the mode) and channel-rule checking are
+  active for a post's forum, they are evaluated in **one** LLM call (server rules + that forum's rules
+  together) producing **one** report. If only one dimension is active, it's still one call with that rule set.
+  Never a server call + a separate channel call; never two reports for one piece of content in one forum.
+- **Per-forum matrix** — for a given post's forum:
+
+  | Server-rule checking active here? | Channel-rule checking enabled here? | Evaluated against |
+  |---|---|---|
+  | yes (mode `all_forums`, or forum in allowlist) | yes | server rules + forum rules (one call) |
+  | yes | no | server rules only |
+  | no (mode `off`, or not allowlisted) | yes | forum rules only |
+  | no | no | not evaluated (skipped — no call, no cost) |
 
 ### 4.2 Why this is feasible and is the right design
 - The report model already represents "violations from both scopes in one report": `createBotReport` takes
@@ -145,12 +161,13 @@ calls and potentially two reports. The current dispatcher resolves channel `plug
 the event (`commentTrigger.ts` ~238–315) — so double-dispatch is a real hazard.
 
 **Recommended model — channel enablement is an additive modifier on a single server-driven run:**
-- The plugin is triggered **once per post by the server-scope install** (one pipeline entry / one enabled
-  plugin). There is always exactly one run per post.
-- Within that single run, the plugin determines whether it is **channel-enabled for this post's forum** and,
-  if so, folds **that forum's rules** into the same prompt alongside the server rules.
+- The plugin runs **at most once per post**. A run fires when **server-rule checking covers this forum**
+  (mode `all_forums`, or the forum is on the allowlist) **or** the bot is **channel-enabled** for the forum;
+  if neither applies, the post is skipped (no run, no cost).
+- Within that single run, the plugin includes the **server rules** when server-rule checking covers the forum,
+  and **that forum's rules** when channel-enabled — per the §4.1 matrix — in one consolidated prompt.
 - The LLM returns violated rules tagged by scope; the bot calls `reportContentAsBot` **once** with
-  `selectedServerRules` and (when applicable) `selectedForumRules` populated.
+  `selectedServerRules` and/or `selectedForumRules` populated.
 
 This keeps the generic pipeline model intact (one server pipeline step) while making per-forum enablement a
 *configuration* the single run reads — not an independent execution.
@@ -291,7 +308,9 @@ Model on `auto-moderation-bot` + the security-scan plugin's external-call shape.
   - `secrets`: `OPENAI_API_KEY` (or provider key) `scope: "server"`, required; plus
     `MODERATION_SERVICE_API_KEY` `scope: "server"` (shared secret for the external service).
   - `settingsDefaults.server`: `{ serviceUrl, model, temperature, maxTokens, confidenceThreshold,
-    recommendationPolicy, serverProfileId/profilesJson }`.
+    recommendationPolicy, serverProfileId/profilesJson, serverRuleCheckMode ("all_forums" | "allowlist" |
+    "off"), serverRuleForumAllowlist (forum ids, used when mode = "allowlist"), shadowMode (bool, optional
+    dry-run) }`.
   - `settingsDefaults.channel`: `{ enabled toggle is handled by the ENABLED edge; optional per-forum
     confidenceThreshold / profile override }`.
   - `ui.forms.server` / `ui.forms.channel`, `metadata`, `documentation.readmePath: "README.md"`, `source`.
@@ -379,6 +398,11 @@ Admin install/enable/config/secrets/pipelines + per-forum enable all **reuse exi
    badge for the report actor; add one (copy the pattern from `components/comments/CommentHeader.vue`'s bot
    badge). The report itself already surfaces in every Issue queue for free because the Issue author is the
    bot's `ModerationProfile`/`User`.
+3. **Server-rule mode + forum allowlist control.** The server config form needs a mode selector
+   (`all_forums` / `allowlist` / `off`) and, for `allowlist`, a **forum picker**. A multi-select of forums
+   likely exceeds the current manifest `ui.forms` field types (text/select/toggle), so this may need a new
+   field type or a small custom admin control. UI copy must clearly distinguish **server-rule checking
+   (mode)** from the existing **per-forum channel-rule enable** so the two per-forum notions aren't confused.
 
 ---
 
@@ -477,6 +501,7 @@ cost further. Deferred; the service contract (`POST /moderate`) can later accept
 - **(4.B)** Backend resolves `channelEnabled` + forum rules into context vs. plugin infers from merged settings.
 - **(4.C)** Per-`DiscussionChannel` evaluation for v1 (recommended; discussion shared to N forums → N evaluations/reports) with the server-rule dedup optimization deferred.
 - **(4.D)** Discussion-**edit** re-checks run per `DiscussionChannel` (recommended) rather than one consolidated multi-forum call; cross-forum token optimization deferred (prefer the §4.5 server-rule dedup if it's ever needed).
+- **(4.E)** Server-rule checking is a mode: `all_forums` | `allowlist[forums]` (trial/phased rollout + cost gate) | `off`, kept independent of the per-forum channel-rule enable (§4.1). Sub-questions: default mode (recommend `allowlist` or `off` for an experimental bot so it never goes server-wide unintentionally); whether to also ship the optional `shadowMode` dry-run.
 - **(6.A)** LLM call in the external service (recommended) vs. in the plugin.
 - **(6.B)** Async model: generalize the campaign limiter (v1) vs. true callback/webhook (v2).
 - **(6.C)** `recommendedAction` on `ModerationAction` vs. `Issue`.
@@ -494,6 +519,8 @@ cost further. Deferred; the service contract (`POST /moderate`) can later accept
 
 ### Phase 1 — Consolidated server + per-forum evaluation (per `DiscussionChannel`)
 - [ ] Backend: supply server rules (+ `channelEnabled` + forum rules) to the bot context.
+- [ ] Server-rule **mode** (`all_forums` | `allowlist` | `off`) + forum allowlist (Decision 4.E); dispatch
+      gates on it (§4.3) so non-covered forums are skipped. Default to a conservative mode for the trial.
 - [ ] Single-run consolidation per `DiscussionChannel` (Decisions 4.A/4.C); one `reportContentAsBot` with
       both rule lists; discussion shared to N forums → N evaluations/reports.
 - [ ] Plugin: build the combined prompt; service returns scope-tagged violations.
