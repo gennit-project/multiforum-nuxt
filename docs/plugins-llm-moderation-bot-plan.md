@@ -92,13 +92,16 @@ pipeline step). Genuine async (fire-and-forget + callback) is **new work** — s
 - A report creates an **`Issue`** with an `ActivityFeed` of **`ModerationAction`** nodes; the originating
   report is a `ModerationAction` with `actionType: "report"`. Actor is a `ModerationProfile | User` union.
 - `services/botReportService.ts` `createBotReport(...)` ensures the bot user + `ModerationProfile`, finds or
-  creates the Issue for the target (dedupes by `relatedCommentId`/`relatedDiscussionId`/`relatedEventId`),
-  appends the report action, and reopens the Issue. It **requires at least one cited rule**
-  (`selectedForumRules` and/or `selectedServerRules`) — and it already accepts **both** lists, which is the
-  key enabler for the consolidated server+channel report (§4).
+  creates the Issue for the target — scoped by **`channelUniqueName`** plus
+  `relatedCommentId`/`relatedDiscussionId`/`relatedEventId` (`botReportService.ts:105,113,214`), so **Issues
+  are already per-forum** — appends the report action, and reopens the Issue. It **requires at least one cited
+  rule** (`selectedForumRules` and/or `selectedServerRules`) — and it already accepts **both** lists, which is
+  the key enabler for the consolidated server+channel report (§4).
 - Exposed to comment plugins as `context.reportContentAsBot({ contentType, contentId, reportText,
   selectedForumRules, selectedServerRules, botName, profileId, profileLabel })` (`commentTrigger.ts` ~578–610).
-  It is **suspension-gated** (a misbehaving bot can be suspended).
+  It is **suspension-gated** (a misbehaving bot can be suspended). Because dedup is channel-scoped, the
+  per-`DiscussionChannel` reporting path must carry/resolve its channel (`channelUniqueName` /
+  `discussionChannelId`) so each forum gets its own Issue — see §8.
 - The bot **cannot** take mod actions: `archiveComment`/`suspendUser`/`unarchiveComment` are not exposed to
   plugins. Report-only is guaranteed by construction.
 
@@ -302,11 +305,16 @@ Model on `auto-moderation-bot` + the security-scan plugin's external-call shape.
 
 - **Manifest (`plugin.json`):**
   - `id`, `name`, `version`, `description`, `entry: "dist/index.js"`.
-  - `events`: `["comment.created", "comment.edited", "discussion.created", "discussion.updated"]`
-    (the last three are **new backend events** — see §6.3 / §10 gap 1).
+  - `events`: `["comment.created", "comment.edited", "discussionChannel.created", "discussionChannel.updated"]`.
+    `comment.created` and `discussionChannel.created` **already exist**; only `comment.edited` and
+    `discussionChannel.updated` are **new backend events** (see §6.3 / §10 gap 1). Discussion submissions are
+    moderated **per forum** via `discussionChannel.*`, not a single `discussion.*` event.
   - `compatibility: { minServerVersion, apiVersion: "1" }`.
-  - `secrets`: `OPENAI_API_KEY` (or provider key) `scope: "server"`, required; plus
-    `MODERATION_SERVICE_API_KEY` `scope: "server"` (shared secret for the external service).
+  - `secrets`: `MODERATION_SERVICE_API_KEY` `scope: "server"`, required (shared secret for the external
+    service). The LLM **provider key lives on the external service** (Secret Manager) and is therefore **not**
+    declared in this manifest. A provider key (`OPENAI_API_KEY` or other) is required here **only if** the
+    in-process alternative is chosen (Decision 6.A = LLM call in the plugin) — the default design keeps it off
+    the backend entirely.
   - `settingsDefaults.server`: `{ serviceUrl, model, temperature, maxTokens, confidenceThreshold,
     recommendationPolicy, serverProfileId/profilesJson, serverRuleCheckMode ("all_forums" | "allowlist" |
     "off"), serverRuleForumAllowlist (forum ids, used when mode = "allowlist"), shadowMode (bool, optional
@@ -331,8 +339,13 @@ Mirror `security-scan-service`:
 - FastAPI (or a GCP cloud function), `/health` + authed `POST /moderate`.
 - Constant-time `X-API-Key` auth; pydantic settings (`MOD_`-prefixed env); provider key from Secret Manager.
 - `POST /moderate` request: `{ content: {type, id, title?, body}, rules: [{scope, id, text}], policy }`.
-  Response (structured): `{ violations: [{ scope: "server"|"channel", ruleId, ruleText }],
-  recommendation: "edit" | "remove" | "none", confidence: 0..1, rationale: string }`.
+  Response (structured): `{ violations: [{ scope: "server"|"channel", ruleId }], recommendation:
+  "edit" | "remove" | "none", confidence: 0..1, rationale: string }` — **rule IDs only; no model-authored
+  rule text**. The backend then validates every `(scope, ruleId)` against the exact rule set it submitted,
+  derives the stored scope + canonical rule text from backend data, and **rejects unknown, mis-scoped, or
+  duplicate citations** (if none survive validation, no report is filed). This prevents hallucinated IDs,
+  wrong-scope → wrong-queue reports, or altered rule text. `rationale` is explanatory free text only — never a
+  source of rule identity.
 - Owns the LLM call (OpenAI/other), the prompt construction (system = instructions + rules; user = content),
   structured-output enforcement, and provider-side retry/timeout. Echoes `X-Correlation-ID`, structured logs.
 - Deploy: Dockerfile on `$PORT`, Cloud Run v2 + Terraform + Secret Manager + Artifact Registry + WIF CI,
@@ -420,6 +433,9 @@ LLM calls. The user explicitly accepts delay ("it's OK for it to take some time�
   (`concurrency`, `rateLimitPerMinute`), `PluginPipelineRun`, `executionLease.ts`, `pipelineWatchdog.ts`.
   New posts enqueue a `PENDING` run; a ticking service drains at a bounded rate. The plugin call is still
   synchronous *within the worker*, but off the request path and throttled. **Least new infra; recommended v1.**
+  Caveat: the lease/watchdog model is **at-least-once** (a worker can persist a report, then die before
+  marking the run complete, and the job retries), so report creation must be **idempotent** and jobs must
+  carry revision context — see the idempotency + supersession bullet in §8.
 - **B — True fire-and-forget + callback.** Backend enqueues a job and returns; the external service processes
   and calls back an authenticated backend webhook that writes the report. Best for very long LLM work and
   future batching, but needs a callback endpoint, idempotency keys, and a durable job store. **v2.**
@@ -443,10 +459,22 @@ cost further. Deferred; the service contract (`POST /moderate`) can later accept
 - One `reportContentAsBot` call per post, populating `selectedServerRules` and/or `selectedForumRules` from
   the LLM's scope-tagged violations, plus `reportText` (human-readable rationale) and the structured
   `recommendedAction`.
-- **Dedup / re-evaluation on edit:** `createBotReport` finds-or-creates the Issue per target and reopens it,
-  so re-evaluating an edited post **updates the existing Issue** rather than spawning duplicates. Define
-  whether an edit appends a new report action or updates the latest (recommend: append, so the feed shows
-  history).
+- **Per-forum report identity (§4.5):** each per-`DiscussionChannel` run reports in **its own channel
+  context** — the callback carries/resolves the `DiscussionChannel`'s `channelUniqueName` (and
+  `discussionChannelId`). Since `createBotReport` already scopes the find-or-create by `channelUniqueName`
+  (`botReportService.ts:105,214`), dedup is effectively `(channelUniqueName, relatedDiscussionId)` and a
+  discussion shared to N forums yields **one Issue per forum** — no new dedup key is needed, but the channel
+  **must** be passed through the reporting contract (§3.3).
+- **Dedup / re-evaluation on edit:** within a forum, `createBotReport` finds-or-creates the per-forum Issue
+  and reopens it, so re-evaluating an edited post **updates the existing Issue** rather than spawning
+  duplicates. An edit **appends** a new report action (so the feed shows history).
+- **Idempotency + revision ordering (at-least-once queue, §7.2-A):** a retry can re-run a job after its report
+  was already persisted, which would append a **duplicate `ModerationAction`** (the Issue dedupes; the action
+  does not). So compute a stable **idempotency key** — `(discussionChannelId | commentId, contentRevisionHash,
+  ruleSetVersion)` — persist the revision/body hash + rule-set version on each job, and make report-action
+  creation **idempotent** (no-op if an action already exists for that key). Define **supersession**: a newer
+  revision's job cancels or ignores older still-pending jobs for the same target, so out-of-order execution
+  can never post a stale verdict.
 - **Report-only guarantee:** the bot uses only `reportContentAsBot` (and never `createCommentAsBot` unless we
   later want it to also explain itself in-thread). Action mutations are not exposed to plugins.
 - **Suspension:** `reportContentAsBot` is suspension-gated — a misbehaving bot can be stopped by suspending
@@ -485,6 +513,8 @@ cost further. Deferred; the service contract (`POST /moderate`) can later accept
 | 4 | Structured recommendation (edit/remove) | **Missing** (free-text only) | Schema + UI |
 | 5 | `reportContentAsBot` on the channel-trigger (`discussionChannel.*`) context | Comment path only | Add to channel path (needed to report discussion submissions) |
 | — | Server rules in bot invocation context | Forum rules only | Add server rules (§4.4) |
+| 9 | Idempotent report creation + per-job revision/rule-set context (at-least-once queue) | **Missing** | Build (§8); idempotency key + supersession |
+| 10 | Citation validation (resolve `(scope, ruleId)` against canonical rules; reject hallucinated/mis-scoped) | **Missing** | Build (§6.2 / §8) |
 | 6 | Per-channel secrets (per-forum LLM key) | **Missing** | Out of scope v1 |
 | 7 | Moderating feedback/event/issue comments | Skipped by `isDiscussionComment` | Out of scope v1 |
 | 8 | Dedicated per-channel enable resolver / audit | Rides generic `updateChannels` | Optional |
