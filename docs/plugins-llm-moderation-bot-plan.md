@@ -226,6 +226,25 @@ nice-to-have — without it the bot provides little real protection.
   doesn't materially change the moderated text (hash/length compare), but **always** re-evaluate on material
   change. This controls churn/cost without opening the evasion hole.
 
+**Per-forum, not cross-forum consolidated (Decision 4.D).** When a discussion shared to many forums is edited,
+re-evaluate **once per `DiscussionChannel`** (server rules + that forum's rules) — **not** a single call
+carrying all forums' rule sets. Collapsing N forums into one multi-forum call would save input tokens (the
+shared body + server rules are otherwise re-sent per forum) and one-call-vs-N eases rate limits, but it is
+**not recommended as the default**:
+- *Accuracy:* asking one call to attribute violations across (say) 10 rule sets to the correct forum is
+  markedly more error-prone than N focused single-forum calls. For moderation, mis-attribution means a report
+  in the wrong forum's queue citing the wrong rules — the worst failure mode.
+- *Complexity / asymmetry:* it adds a second, discussion-edit-only evaluation shape (multi-forum prompt +
+  response schema + result fan-out) that diverges from the uniform per-`DiscussionChannel` unit used
+  everywhere else (comments are always single-forum), and makes retry coarse (one failure fails all forums).
+- *Benefit is tail-only:* most discussions live in 1–3 forums, and the async queue + rate limiting (§7)
+  already absorbs the N-call burst ("it's OK to take time"), so the win mostly applies to the uncommon
+  widely-shared + frequently-edited + long-body case.
+
+If cost on widely-shared discussions ever bites, prefer the **server-rule dedup** from §4.5 (evaluate the
+shared body against server rules once; keep channel-rule evaluation per forum) over a giant multi-forum call
+— it removes the duplicated tokens without the attribution risk. Deferred either way.
+
 Because this is a correctness/anti-evasion property rather than a feature, the edit events (gap 1) and the
 per-forum re-evaluation should land in the **same milestone as creation coverage**, not a deferred phase.
 
@@ -457,6 +476,7 @@ cost further. Deferred; the service contract (`POST /moderate`) can later accept
 - **(4.A)** Single server-driven run + channel-enable modifier (recommended) vs. two pipeline entries + dispatcher coalescing.
 - **(4.B)** Backend resolves `channelEnabled` + forum rules into context vs. plugin infers from merged settings.
 - **(4.C)** Per-`DiscussionChannel` evaluation for v1 (recommended; discussion shared to N forums → N evaluations/reports) with the server-rule dedup optimization deferred.
+- **(4.D)** Discussion-**edit** re-checks run per `DiscussionChannel` (recommended) rather than one consolidated multi-forum call; cross-forum token optimization deferred (prefer the §4.5 server-rule dedup if it's ever needed).
 - **(6.A)** LLM call in the external service (recommended) vs. in the plugin.
 - **(6.B)** Async model: generalize the campaign limiter (v1) vs. true callback/webhook (v2).
 - **(6.C)** `recommendedAction` on `ModerationAction` vs. `Issue`.
