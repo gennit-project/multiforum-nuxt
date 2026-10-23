@@ -389,6 +389,13 @@ const actorBadges = computed(() => {
   });
 });
 
+const actorIsBot = computed(() => {
+  return (
+    props.activityItem.User?.isBot === true ||
+    props.activityItem.ModerationProfile?.User?.isBot === true
+  );
+});
+
 // Build the comment revision content for the diff
 const commentRevisionContent = computed(() => {
   if (props.commentEditIndex === null) return null;
@@ -608,6 +615,12 @@ const showCommentMenu = computed(() => {
                 <span class="flex flex-row items-center gap-1">
                   {{ activityItem.ModerationProfile?.displayName }}
                   <span
+                    v-if="actorIsBot"
+                    class="rounded-md border border-blue-500 bg-blue-100 px-1 py-0 text-xs text-blue-600 dark:border-blue-400 dark:bg-blue-900 dark:text-blue-300"
+                    title="This action was performed by a bot configured by forum admins."
+                    >Bot</span
+                  >
+                  <span
                     v-if="actorBadges.isServerAdmin"
                     class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >Server Admin</span
@@ -653,6 +666,12 @@ const showCommentMenu = computed(() => {
               >
                 <span class="flex items-center gap-1">
                   {{ activityItem.User.username }}
+                  <span
+                    v-if="actorIsBot"
+                    class="rounded-md border border-blue-500 bg-blue-100 px-1 py-0 text-xs text-blue-600 dark:border-blue-400 dark:bg-blue-900 dark:text-blue-300"
+                    title="This action was performed by a bot configured by forum admins."
+                    >Bot</span
+                  >
                   <span
                     v-if="actorBadges.isServerAdmin"
                     class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
