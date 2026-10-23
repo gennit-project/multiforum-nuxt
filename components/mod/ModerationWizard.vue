@@ -2,7 +2,10 @@
 import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import type { Issue } from '@/__generated__/graphql';
+import {
+  ModerationRecommendedAction,
+  type Issue,
+} from '@/__generated__/graphql';
 import ArchiveButton from './ArchiveButton.vue';
 import SuspendUserButton from './SuspendUserButton.vue';
 import SuspendModButton from './SuspendModButton.vue';
@@ -136,7 +139,7 @@ const actionsDisabled = computed(() => {
 // A locked issue can't be acted on, so it shouldn't call for a mod action
 const needsModAction = computed(
   () =>
-    props.issue.isOpen && !props.isCurrentUserOriginalPoster && !props.isLocked,
+    props.issue.isOpen && !props.isCurrentUserOriginalPoster && !props.isLocked
 );
 
 const shouldFetchDiscussion = computed(() => {
@@ -319,6 +322,44 @@ const editModalTargetType = computed(() => {
       return null;
   }
 });
+
+const latestRecommendation = computed(() => {
+  return props.issue.ActivityFeed?.find(
+    (item) =>
+      item.actionType?.toLowerCase() === 'report' &&
+      (item.recommendedAction === ModerationRecommendedAction.Edit ||
+        item.recommendedAction === ModerationRecommendedAction.Remove)
+  );
+});
+
+const isEditRecommended = computed(
+  () =>
+    latestRecommendation.value?.recommendedAction ===
+    ModerationRecommendedAction.Edit
+);
+
+const isRemoveRecommended = computed(
+  () =>
+    latestRecommendation.value?.recommendedAction ===
+    ModerationRecommendedAction.Remove
+);
+
+const recommendationLabel = computed(() =>
+  isEditRecommended.value ? 'Suggest edit' : 'Suggest remove/archive'
+);
+
+const recommendationConfidence = computed(() => {
+  const confidence = latestRecommendation.value?.recommendationConfidence;
+  if (typeof confidence !== 'number' || !Number.isFinite(confidence)) {
+    return null;
+  }
+
+  return `${Math.round(Math.min(1, Math.max(0, confidence)) * 100)}% confidence`;
+});
+
+const recommendationRationale = computed(() => {
+  return latestRecommendation.value?.recommendationRationale?.trim() || null;
+});
 </script>
 
 <template>
@@ -381,6 +422,51 @@ const editModalTargetType = computed(() => {
           <RequireAuth :full-width="true">
             <template #has-auth>
               <div class="mt-4 flex flex-col space-y-4">
+                <section
+                  v-if="latestRecommendation"
+                  class="space-y-2 rounded-lg border border-blue-300 bg-blue-50 p-4 text-blue-950 dark:border-blue-500/70 dark:bg-blue-950/40 dark:text-blue-100"
+                  aria-labelledby="automated-recommendation-heading"
+                  data-test="automated-recommendation"
+                >
+                  <div
+                    class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between"
+                  >
+                    <h2
+                      id="automated-recommendation-heading"
+                      class="text-base font-semibold"
+                    >
+                      Automated recommendation
+                    </h2>
+                    <span
+                      v-if="recommendationConfidence"
+                      class="text-sm font-medium text-blue-800 dark:text-blue-200"
+                      data-test="recommendation-confidence"
+                    >
+                      {{ recommendationConfidence }}
+                    </span>
+                  </div>
+                  <p
+                    class="text-lg font-semibold"
+                    data-test="recommendation-action"
+                  >
+                    {{ recommendationLabel }}
+                  </p>
+                  <p
+                    v-if="recommendationRationale"
+                    class="text-sm text-blue-900 dark:text-blue-100"
+                    data-test="recommendation-rationale"
+                  >
+                    {{ recommendationRationale }}
+                  </p>
+                  <p
+                    id="automated-recommendation-guidance"
+                    class="text-sm text-blue-800 dark:text-blue-200"
+                  >
+                    This suggestion is advisory. Review the content and rules
+                    before taking action.
+                  </p>
+                </section>
+
                 <div
                   v-if="needsModAction"
                   class="flex items-start gap-4 rounded-lg border border-blue-200 bg-blue-50 p-4 shadow-sm dark:border-blue-500/30 dark:bg-blue-500/10"
@@ -496,8 +582,20 @@ const editModalTargetType = computed(() => {
 
                     <div
                       v-if="shouldShowEditActions && editActions.length"
-                      class="flex flex-col gap-2"
+                      class="flex flex-col gap-2 rounded-md"
+                      :class="[
+                        isEditRecommended
+                          ? 'border-2 border-blue-500 bg-blue-50 p-3 dark:bg-blue-950/30'
+                          : '',
+                      ]"
                     >
+                      <p
+                        v-if="isEditRecommended"
+                        class="text-sm font-semibold text-blue-800 dark:text-blue-200"
+                        data-test="recommended-edit-action"
+                      >
+                        Recommended by automated review
+                      </p>
                       <p class="text-sm text-gray-700 dark:text-gray-300">
                         As an alternative to simply closing the issue, you can
                         address the violation by editing the original post or
@@ -521,6 +619,11 @@ const editModalTargetType = computed(() => {
                             : 'cursor-pointer bg-blue-500 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-700',
                         ]"
                         :disabled="editButtonDisabled"
+                        :aria-describedby="
+                          isEditRecommended
+                            ? 'automated-recommendation-guidance'
+                            : undefined
+                        "
                         :title="
                           !hasEditPermission
                             ? 'You do not have permission to edit this content.'
@@ -547,11 +650,25 @@ const editModalTargetType = computed(() => {
                       </p>
                       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <!-- Actions on Content -->
-                        <div class="space-y-2">
+                        <div
+                          class="space-y-2 rounded-md"
+                          :class="[
+                            isRemoveRecommended
+                              ? 'border-2 border-blue-500 bg-blue-50 p-3 dark:bg-blue-950/30'
+                              : '',
+                          ]"
+                        >
                           <p
                             class="text-xs font-medium tracking-wide text-gray-600 uppercase dark:text-gray-400"
                           >
                             Actions on Content
+                          </p>
+                          <p
+                            v-if="isRemoveRecommended"
+                            class="text-sm font-semibold text-blue-800 dark:text-blue-200"
+                            data-test="recommended-remove-action"
+                          >
+                            Recommended by automated review
                           </p>
                           <ArchiveButton
                             v-if="!isArchived"
@@ -563,6 +680,11 @@ const editModalTargetType = computed(() => {
                             :channel-unique-name="channelUniqueName"
                             :issue="issue"
                             :disabled="actionsDisabled"
+                            :aria-describedby="
+                              isRemoveRecommended
+                                ? 'automated-recommendation-guidance'
+                                : undefined
+                            "
                             @archived-successfully="
                               $emit('archived-successfully')
                             "
@@ -574,6 +696,11 @@ const editModalTargetType = computed(() => {
                             v-else
                             type="button"
                             disabled
+                            :aria-describedby="
+                              isRemoveRecommended
+                                ? 'automated-recommendation-guidance'
+                                : undefined
+                            "
                             class="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded bg-gray-400 px-4 py-2 text-sm font-semibold text-white dark:bg-gray-600"
                             title="Content is already archived. Use the Unarchive button above to restore it."
                           >

@@ -304,6 +304,17 @@ test.describe('Moderation issue detail', () => {
       channelUniqueName: TEST_CHANNEL,
       title: 'Reported discussion needing review',
       isOpen: true,
+      activityFeed: [
+        buildModerationAction({
+          id: 'automated-report',
+          actionType: 'report',
+          actionDescription: 'reported this discussion',
+          recommendedAction: 'REMOVE',
+          recommendationConfidence: 0.91,
+          recommendationRationale:
+            'The post directly promotes a prohibited solicitation.',
+        }),
+      ],
       overrides: { relatedDiscussionId: 'discussion-1' },
     });
     const reportedDiscussion = buildDiscussion({
@@ -359,16 +370,34 @@ test.describe('Moderation issue detail', () => {
         .getByRole('button', { name: 'Review resolution options' })
         .click();
 
+      await expect(
+        page.getByRole('heading', { name: 'Automated recommendation' })
+      ).toBeVisible();
+      await expect(page.getByText('Suggest remove/archive')).toBeVisible();
+      await expect(page.getByText('91% confidence')).toBeVisible();
+      await expect(
+        page.getByText('The post directly promotes a prohibited solicitation.')
+      ).toBeVisible();
+      await expect(
+        page.getByText('Recommended by automated review')
+      ).toBeVisible();
+
       // ModerationWizard renders an Archive action for the related discussion.
       const archiveButton = page
         .getByRole('button', { name: /Archive Discussion/i })
         .first();
       await expect(archiveButton).toBeVisible();
+      await expect(archiveButton).toHaveAttribute(
+        'aria-describedby',
+        'automated-recommendation-guidance'
+      );
       expect(
         diagnostics.seenOperations.filter(
           ({ operationName }) => operationName === 'getDiscussion'
         )
       ).toHaveLength(0);
+
+      await expectNoAxeViolations(page);
 
       // Opening it surfaces the BrokenRulesModal.
       await archiveButton.click();

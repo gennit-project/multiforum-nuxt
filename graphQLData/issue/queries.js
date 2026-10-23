@@ -52,6 +52,9 @@ export const ISSUE_FIELDS = gql`
         actionDescription
         actionType
         createdAt
+        recommendedAction
+        recommendationConfidence
+        recommendationRationale
         ModerationProfile {
           displayName
         }
@@ -153,6 +156,9 @@ export const GET_ISSUE_ACTIVITY = gql`
           actionDescription
           actionType
           createdAt
+          recommendedAction
+          recommendationConfidence
+          recommendationRationale
           ModerationProfile {
             displayName
           }

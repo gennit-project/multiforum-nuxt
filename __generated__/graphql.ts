@@ -45040,6 +45040,11 @@ export type ModServerRolesConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export enum ModerationRecommendedAction {
+  Edit = 'EDIT',
+  Remove = 'REMOVE'
+}
+
 export type ModerationAction = {
   __typename?: 'ModerationAction';
   Comment?: Maybe<Comment>;
@@ -45058,6 +45063,9 @@ export type ModerationAction = {
   actionType?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
+  recommendationConfidence?: Maybe<Scalars['Float']['output']>;
+  recommendationRationale?: Maybe<Scalars['String']['output']>;
+  recommendedAction?: Maybe<ModerationRecommendedAction>;
 };
 
 

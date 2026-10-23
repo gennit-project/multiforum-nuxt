@@ -99,8 +99,8 @@ describe('ModerationWizard', () => {
             name: 'ArchiveButton',
             emits: ['archived-successfully', 'unarchived-successfully'],
             template:
-              '<div data-testid="archive-button" :data-disabled="String(disabled)"></div>',
-            props: ['disabled'],
+              '<div data-testid="archive-button" :data-disabled="String(disabled)" :data-describedby="ariaDescribedby"></div>',
+            props: ['disabled', 'ariaDescribedby'],
           },
           SuspendUserButton: {
             name: 'SuspendUserButton',
@@ -202,6 +202,131 @@ describe('ModerationWizard', () => {
     isSuspendedMod: false,
     canEditDiscussions: true,
   };
+
+  const issueWithRecommendation = ({
+    action = 'EDIT',
+    confidence = 0.87,
+    rationale = 'The violation can be resolved without removing the post.',
+  }: {
+    action?: 'EDIT' | 'REMOVE';
+    confidence?: number | null;
+    rationale?: string | null;
+  } = {}) => ({
+    id: 'issue-1',
+    isOpen: true,
+    ActivityFeed: [
+      {
+        id: 'report-1',
+        actionType: 'report',
+        createdAt: '2026-10-23T20:00:00.000Z',
+        recommendedAction: action,
+        recommendationConfidence: confidence,
+        recommendationRationale: rationale,
+      },
+    ],
+  });
+
+  it('shows the structured edit recommendation', () => {
+    const wrapper = mountWrapper({
+      ...reportedComment,
+      issue: issueWithRecommendation(),
+    });
+
+    expect({
+      action: wrapper.get('[data-test="recommendation-action"]').text(),
+      confidence: wrapper.get('[data-test="recommendation-confidence"]').text(),
+      rationale: wrapper.get('[data-test="recommendation-rationale"]').text(),
+    }).toEqual({
+      action: 'Suggest edit',
+      confidence: '87% confidence',
+      rationale: 'The violation can be resolved without removing the post.',
+    });
+  });
+
+  it('associates an edit recommendation with the manual edit control', () => {
+    const wrapper = mountWrapper({
+      ...reportedComment,
+      issue: issueWithRecommendation(),
+    });
+
+    expect({
+      badge: wrapper.get('[data-test="recommended-edit-action"]').text(),
+      describedBy: wrapper
+        .get('[data-test="edit-comment"]')
+        .attributes('aria-describedby'),
+      modalOpen: wrapper
+        .get('[data-testid="edit-modal"]')
+        .attributes('data-open'),
+    }).toEqual({
+      badge: 'Recommended by automated review',
+      describedBy: 'automated-recommendation-guidance',
+      modalOpen: 'false',
+    });
+  });
+
+  it('associates a remove recommendation with the manual archive control', () => {
+    const wrapper = mountWrapper({
+      ...reportedComment,
+      issue: issueWithRecommendation({ action: 'REMOVE' }),
+    });
+
+    expect({
+      action: wrapper.get('[data-test="recommendation-action"]').text(),
+      badge: wrapper.get('[data-test="recommended-remove-action"]').text(),
+      describedBy: wrapper
+        .get('[data-testid="archive-button"]')
+        .attributes('data-describedby'),
+    }).toEqual({
+      action: 'Suggest remove/archive',
+      badge: 'Recommended by automated review',
+      describedBy: 'automated-recommendation-guidance',
+    });
+  });
+
+  it('uses the newest structured recommendation in feed order', () => {
+    const issue = issueWithRecommendation({ action: 'REMOVE' });
+    issue.ActivityFeed.push({
+      ...issue.ActivityFeed[0],
+      id: 'older-report',
+      recommendedAction: 'EDIT',
+    });
+    const wrapper = mountWrapper({ ...reportedComment, issue });
+
+    expect(wrapper.get('[data-test="recommendation-action"]').text()).toBe(
+      'Suggest remove/archive'
+    );
+  });
+
+  it('omits absent confidence and rationale', () => {
+    const wrapper = mountWrapper({
+      ...reportedComment,
+      issue: issueWithRecommendation({ confidence: null, rationale: null }),
+    });
+
+    expect({
+      confidence: wrapper
+        .find('[data-test="recommendation-confidence"]')
+        .exists(),
+      rationale: wrapper
+        .find('[data-test="recommendation-rationale"]')
+        .exists(),
+    }).toEqual({ confidence: false, rationale: false });
+  });
+
+  it('does not show a recommendation for legacy reports', () => {
+    const wrapper = mountWrapper({
+      ...reportedComment,
+      issue: {
+        id: 'issue-1',
+        isOpen: true,
+        ActivityFeed: [{ id: 'legacy-report', actionType: 'report' }],
+      },
+    });
+
+    expect(
+      wrapper.find('[data-test="automated-recommendation"]').exists()
+    ).toBe(false);
+  });
 
   it('offers the edit-comment action for a reported comment', () => {
     const wrapper = mountWrapper(reportedComment);

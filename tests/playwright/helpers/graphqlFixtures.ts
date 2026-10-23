@@ -816,6 +816,9 @@ export type ModerationActionFixture = {
   actionDescription: string;
   actionType: string;
   createdAt: string;
+  recommendedAction: 'EDIT' | 'REMOVE' | null;
+  recommendationConfidence: number | null;
+  recommendationRationale: string | null;
   ModerationProfile: { displayName: string } | null;
   User: { username: string } | null;
   Revision: null;
@@ -828,6 +831,9 @@ export const buildModerationAction = ({
   actionDescription = 'reported this issue',
   moderatorDisplayName = 'mod-alice',
   createdAt = MOCK_DATE,
+  recommendedAction = null,
+  recommendationConfidence = null,
+  recommendationRationale = null,
   comment = null,
   overrides = {},
 }: {
@@ -836,6 +842,9 @@ export const buildModerationAction = ({
   actionDescription?: string;
   moderatorDisplayName?: string | null;
   createdAt?: string;
+  recommendedAction?: 'EDIT' | 'REMOVE' | null;
+  recommendationConfidence?: number | null;
+  recommendationRationale?: string | null;
   comment?: CommentFixture | null;
   overrides?: Override<ModerationActionFixture>;
 } = {}): ModerationActionFixture => ({
@@ -844,6 +853,9 @@ export const buildModerationAction = ({
   actionDescription,
   actionType,
   createdAt,
+  recommendedAction,
+  recommendationConfidence,
+  recommendationRationale,
   ModerationProfile: moderatorDisplayName
     ? { displayName: moderatorDisplayName }
     : null,
@@ -877,6 +889,9 @@ export const buildModCommentActivityItem = ({
   actionType: 'comment',
   actionDescription: 'commented on the issue',
   createdAt: MOCK_DATE,
+  recommendedAction: null,
+  recommendationConfidence: null,
+  recommendationRationale: null,
   ModerationProfile: { displayName: modDisplayName },
   User: null,
   Revision: null,
