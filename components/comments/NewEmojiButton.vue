@@ -72,7 +72,9 @@ function handleClick() {
     <FloatingDropdown v-model="showMenu">
       <template #button="{ activatorProps }">
         <VoteButton
-          :class="props.interactionDisabled ? 'space-x-3 opacity-60' : 'space-x-3'"
+          :class="
+            props.interactionDisabled ? 'space-x-3 opacity-60' : 'space-x-3'
+          "
           :button-props="
             props.interactionDisabled
               ? { ...activatorProps, 'aria-disabled': 'true' }
@@ -96,14 +98,14 @@ function handleClick() {
           </span>
         </VoteButton>
       </template>
-      <template #content>
+      <template #content="{ onClose }">
         <client-only>
           <EmojiPicker
             :discussion-channel-id="discussionChannelId"
             :comment-id="commentId"
             :emoji-json="emojiJson"
-            @emoji-click="showMenu = false"
-            @close="showMenu = false"
+            @emoji-click="onClose"
+            @close="onClose"
           />
         </client-only>
       </template>

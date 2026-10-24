@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onBeforeUnmount, nextTick } from 'vue';
 import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/vue';
 
 // Controlled dropdown built on @floating-ui/vue (replaces Vuetify's v-menu).
@@ -14,7 +14,7 @@ defineSlots<{
     class?: unknown;
     onClose: () => void;
   }) => unknown;
-  content?: () => unknown;
+  content?: (props: { onClose: () => void }) => unknown;
 }>();
 
 const props = defineProps({
@@ -40,6 +40,12 @@ const { floatingStyles } = useFloating(triggerRef, floatingRef, {
 function close() {
   emit('update:modelValue', false);
 }
+function closeAndRestoreFocus() {
+  close();
+  void nextTick(() => {
+    triggerRef.value?.querySelector<HTMLElement>('button, a, input')?.focus();
+  });
+}
 function toggle() {
   emit('update:modelValue', !props.modelValue);
 }
@@ -63,7 +69,7 @@ function onDocumentPointerDown(event: PointerEvent) {
   close();
 }
 function onKeydown(event: KeyboardEvent) {
-  if (event.key === 'Escape') close();
+  if (event.key === 'Escape') closeAndRestoreFocus();
 }
 function onFocusOut(event: FocusEvent) {
   const relatedTarget = event.relatedTarget as Node | null;
@@ -114,7 +120,7 @@ onBeforeUnmount(() => {
         <div
           class="overflow-hidden rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700"
         >
-          <slot name="content" />
+          <slot name="content" :on-close="closeAndRestoreFocus" />
         </div>
       </div>
     </Teleport>

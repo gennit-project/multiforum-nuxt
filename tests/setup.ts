@@ -31,15 +31,6 @@ console.warn = function (msg, ...args) {
   originalConsoleWarn(msg, ...args);
 };
 
-// Mock components that might cause issues
-vi.mock('vuemoji-picker', () => ({
-  default: {
-    name: 'VuemojiPicker',
-    template: '<div data-testid="vuemoji-picker"></div>',
-    emits: ['emojiClick', 'close'],
-  },
-}));
-
 // Mock the Tab components from @headlessui/vue
 vi.mock('@headlessui/vue', () => ({
   Tab: {

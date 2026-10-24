@@ -1,58 +1,116 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
-import { mount } from '@vue/test-utils';
-
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { flushPromises, mount } from '@vue/test-utils';
 import EmojiPicker from '@/components/comments/EmojiPicker.vue';
 
 const h = vi.hoisted(() => ({
   addToComment: vi.fn(),
   addToDiscussion: vi.fn(),
-  index: { n: 0 },
-  username: null as unknown,
-  pickerStub: {
-    name: 'VuemojiPicker',
-    emits: ['emoji-click'],
-    template: '<div class="picker" />',
-  },
+  mutationIndex: 0,
+  username: 'alice',
+  load: vi.fn().mockResolvedValue(undefined),
+  search: vi.fn().mockResolvedValue(undefined),
+  setSkinTone: vi.fn().mockResolvedValue(undefined),
+  selectEmoji: vi.fn((emoji: { annotation: string; unicode: string }) => ({
+    annotation: emoji.annotation,
+    baseUnicode: emoji.unicode,
+    unicode: emoji.unicode,
+  })),
+  selectRecent: vi.fn((emoji: { annotation: string; unicode: string }) => ({
+    ...emoji,
+    baseUnicode: emoji.unicode,
+  })),
+  categories: [
+    {
+      id: 0,
+      icon: '😀',
+      label: 'Smileys and emotion',
+      emojis: [
+        {
+          annotation: 'grinning face',
+          group: 0,
+          name: 'grinning face',
+          order: 1,
+          unicode: '😀',
+          version: 1,
+        },
+        {
+          annotation: 'beaming face',
+          group: 0,
+          name: 'beaming face',
+          order: 2,
+          unicode: '😁',
+          version: 1,
+        },
+      ],
+    },
+  ],
+  recents: [{ annotation: 'red heart', unicode: '❤️' }],
+  searchResults: [] as Array<Record<string, unknown>>,
 }));
 
-vi.mock('vuemoji-picker', () => ({ VuemojiPicker: h.pickerStub }));
 vi.mock('@vue/apollo-composable', () => ({
-  // [0] addEmojiToComment, [1] addEmojiToDiscussionChannel
-  useMutation: () => ({ mutate: h.index.n++ === 0 ? h.addToComment : h.addToDiscussion }),
+  useMutation: () => ({
+    mutate: h.mutationIndex++ === 0 ? h.addToComment : h.addToDiscussion,
+  }),
 }));
-vi.mock('@/composables/useAuthState', () => ({ useUsername: () => h.username }));
-
-const emojiEvent = (overrides: Record<string, unknown> = {}) => ({
-  unicode: '😀',
-  emoji: { annotation: 'grinning face', char: '😀' },
-  ...overrides,
+vi.mock('@/composables/useAuthState', async () => {
+  const { ref } = await import('vue');
+  return { useUsername: () => ref(h.username) };
+});
+vi.mock('@/composables/useEmojiCatalog', async () => {
+  const { ref } = await import('vue');
+  return {
+    useEmojiCatalog: () => ({
+      categories: ref(h.categories),
+      error: ref(''),
+      load: h.load,
+      loading: ref(false),
+      recents: ref(h.recents),
+      search: h.search,
+      searching: ref(false),
+      searchResults: ref(h.searchResults),
+      selectEmoji: h.selectEmoji,
+      selectRecent: h.selectRecent,
+      setSkinTone: h.setSkinTone,
+      skinTone: ref(0),
+      unicodeFor: (emoji: { unicode: string }) => emoji.unicode,
+    }),
+  };
 });
 
-const mountPicker = (props: Record<string, unknown> = {}) =>
-  mount(EmojiPicker, {
-    props,
-    global: {
-      stubs: { ClientOnly: { template: '<div><slot /></div>' } },
-      directives: { clickOutside: {}, 'click-outside': {} },
-    },
-  });
-
-const picker = (w: ReturnType<typeof mount>) => w.getComponent(h.pickerStub);
+const mountedWrappers: Array<ReturnType<typeof mount>> = [];
+const mountPicker = async (props: Record<string, unknown> = {}) => {
+  const wrapper = mount(EmojiPicker, { props, attachTo: document.body });
+  mountedWrappers.push(wrapper);
+  await flushPromises();
+  return wrapper;
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
-  h.index.n = 0;
-  h.addToComment = vi.fn();
-  h.addToDiscussion = vi.fn();
-  h.username = ref('alice');
+  h.mutationIndex = 0;
+  h.username = 'alice';
+  h.searchResults = [];
 });
 
-describe('EmojiPicker comment', () => {
-  it('adds an emoji to a comment', async () => {
-    const wrapper = mountPicker({ commentId: 'c1' });
+afterEach(() => {
+  mountedWrappers.splice(0).forEach((wrapper) => wrapper.unmount());
+});
 
-    await picker(wrapper).vm.$emit('emoji-click', emojiEvent());
+describe('EmojiPicker', () => {
+  it('puts recent emoji before the standard categories', async () => {
+    const wrapper = await mountPicker();
+
+    expect(wrapper.findAll('h2').map((heading) => heading.text())).toEqual([
+      'Recently used',
+      'Smileys and emotion',
+    ]);
+  });
+
+  it('adds a selected emoji to a comment', async () => {
+    const wrapper = await mountPicker({ commentId: 'c1' });
+
+    await wrapper.get('button[aria-label="grinning face"]').trigger('click');
 
     expect(h.addToComment).toHaveBeenCalledWith({
       commentId: 'c1',
@@ -62,55 +120,82 @@ describe('EmojiPicker comment', () => {
     });
   });
 
-  it('emits emoji-click with the unicode and char', async () => {
-    const wrapper = mountPicker({ commentId: 'c1' });
+  it('adds a selected emoji to a discussion', async () => {
+    const wrapper = await mountPicker({ discussionChannelId: 'd1' });
 
-    await picker(wrapper).vm.$emit('emoji-click', emojiEvent());
-
-    expect(wrapper.emitted('emoji-click')?.[0]).toEqual([
-      { unicode: '😀', emoji: '😀' },
-    ]);
-  });
-});
-
-describe('EmojiPicker discussion channel', () => {
-  it('adds an emoji to a discussion channel', async () => {
-    const wrapper = mountPicker({ discussionChannelId: 'dc1' });
-
-    await picker(wrapper).vm.$emit('emoji-click', emojiEvent());
+    await wrapper.get('button[aria-label="grinning face"]').trigger('click');
 
     expect(h.addToDiscussion).toHaveBeenCalledWith({
-      discussionChannelId: 'dc1',
+      discussionChannelId: 'd1',
       emojiLabel: 'grinning face',
       unicode: '😀',
       username: 'alice',
     });
   });
-});
 
-describe('EmojiPicker guards', () => {
-  it('ignores an event with no unicode', async () => {
-    const wrapper = mountPicker({ commentId: 'c1' });
+  it('emits the existing emoji-click event shape', async () => {
+    const wrapper = await mountPicker({ commentId: 'c1' });
 
-    await picker(wrapper).vm.$emit('emoji-click', { emoji: { annotation: 'x' } });
+    await wrapper.get('button[aria-label="grinning face"]').trigger('click');
 
-    expect(h.addToComment).not.toHaveBeenCalled();
+    expect(wrapper.emitted('emoji-click')?.[0]).toEqual([
+      { emoji: '😀', unicode: '😀' },
+    ]);
   });
 
-  it('does nothing when there is no username', async () => {
-    h.username = ref('');
-    const wrapper = mountPicker({ commentId: 'c1' });
+  it('searches after the user types', async () => {
+    vi.useFakeTimers();
+    const wrapper = await mountPicker();
 
-    await picker(wrapper).vm.$emit('emoji-click', emojiEvent());
+    await wrapper.get('input[type="search"]').setValue('party');
+    await vi.advanceTimersByTimeAsync(150);
+    vi.useRealTimers();
 
-    expect(h.addToComment).not.toHaveBeenCalled();
+    expect(h.search).toHaveBeenCalledWith('party');
   });
 
-  it('does not mutate without a comment or discussion id', async () => {
-    const wrapper = mountPicker();
+  it('moves focus into the emoji grid with ArrowDown', async () => {
+    const wrapper = await mountPicker();
 
-    await picker(wrapper).vm.$emit('emoji-click', emojiEvent());
+    await wrapper.get('input[type="search"]').trigger('keydown', {
+      key: 'ArrowDown',
+    });
+    await flushPromises();
 
-    expect(h.addToComment).not.toHaveBeenCalled();
+    expect(document.activeElement?.getAttribute('aria-label')).toBe(
+      'red heart'
+    );
+  });
+
+  it('supports arrow-key movement inside a grid', async () => {
+    const wrapper = await mountPicker();
+    const firstCategoryEmoji = wrapper.get(
+      'section[id="emoji-category-0"] button[aria-label="grinning face"]'
+    );
+
+    firstCategoryEmoji.element.focus();
+    await firstCategoryEmoji.trigger('keydown', { key: 'ArrowRight' });
+
+    expect(document.activeElement?.getAttribute('aria-label')).toBe(
+      'beaming face'
+    );
+  });
+
+  it('closes on Escape when search is empty', async () => {
+    const wrapper = await mountPicker();
+
+    await wrapper.get('input[type="search"]').trigger('keydown', {
+      key: 'Escape',
+    });
+
+    expect(wrapper.emitted('close')).toHaveLength(1);
+  });
+
+  it('stores a changed skin tone preference', async () => {
+    const wrapper = await mountPicker();
+
+    await wrapper.get('select[aria-label="Skin tone"]').setValue('3');
+
+    expect(h.setSkinTone).toHaveBeenCalledWith(3);
   });
 });
