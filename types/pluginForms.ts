@@ -14,16 +14,32 @@ interface PluginFieldOption {
   label: string;
 }
 
+export type PluginScalarConfigValue = string | number | boolean;
+
+export interface PluginFieldVisibility {
+  key: string;
+  equals: PluginScalarConfigValue;
+}
+
 export interface PluginField {
   key: string;
-  type: 'text' | 'number' | 'boolean' | 'toggle' | 'select' | 'secret' | 'textarea';
+  type:
+    | 'text'
+    | 'number'
+    | 'boolean'
+    | 'toggle'
+    | 'select'
+    | 'secret'
+    | 'textarea'
+    | 'forum-multiselect';
   label: string;
   description?: string;
-  default?: string | number | boolean;
+  default?: PluginConfigValue;
   placeholder?: string;
   validation?: PluginFieldValidation;
   required?: boolean;
   options?: PluginFieldOption[]; // For select fields
+  visibleWhen?: PluginFieldVisibility;
 }
 
 export interface PluginFormSection {
@@ -33,7 +49,7 @@ export interface PluginFormSection {
 }
 
 // A single plugin configuration field value.
-export type PluginConfigValue = string | number | boolean;
+export type PluginConfigValue = PluginScalarConfigValue | string[];
 export type PluginConfigFieldKind = 'SETTING' | 'SECRET';
 
 /**

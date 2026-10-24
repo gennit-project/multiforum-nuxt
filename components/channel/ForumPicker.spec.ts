@@ -91,6 +91,20 @@ describe('ForumPicker', () => {
     expect(wrapper.findComponent({ name: 'MultiSelect' }).exists()).toBe(true);
   });
 
+  it('forwards a stable input id and error to the multi-select', () => {
+    const wrapper = createWrapper({
+      inputId: 'plugin-forums',
+      error: 'Choose at least one forum',
+    });
+
+    expect(
+      wrapper.findComponent({ name: 'MultiSelect' }).props()
+    ).toMatchObject({
+      inputId: 'plugin-forums',
+      error: 'Choose at least one forum',
+    });
+  });
+
   it('displays the selected channels as chips', () => {
     const wrapper = createWrapper({
       selectedChannels: ['forum1', 'forum2'],
@@ -115,8 +129,18 @@ describe('ForumPicker', () => {
   it('only shows eligible event forums by default', () => {
     h.channelResult = {
       channels: [
-        { uniqueName: 'cats', displayName: 'Cats', channelIconURL: '', eventsEnabled: true },
-        { uniqueName: 'dogs', displayName: 'Dogs', channelIconURL: '', eventsEnabled: false },
+        {
+          uniqueName: 'cats',
+          displayName: 'Cats',
+          channelIconURL: '',
+          eventsEnabled: true,
+        },
+        {
+          uniqueName: 'dogs',
+          displayName: 'Dogs',
+          channelIconURL: '',
+          eventsEnabled: false,
+        },
       ],
     };
 
@@ -134,8 +158,18 @@ describe('ForumPicker', () => {
   it('shows unavailable event forums as disabled search results with a reason', async () => {
     h.channelResult = {
       channels: [
-        { uniqueName: 'cats', displayName: 'Cats', channelIconURL: '', eventsEnabled: true },
-        { uniqueName: 'dogs', displayName: 'Dogs', channelIconURL: '', eventsEnabled: false },
+        {
+          uniqueName: 'cats',
+          displayName: 'Cats',
+          channelIconURL: '',
+          eventsEnabled: true,
+        },
+        {
+          uniqueName: 'dogs',
+          displayName: 'Dogs',
+          channelIconURL: '',
+          eventsEnabled: false,
+        },
       ],
     };
 
@@ -277,7 +311,9 @@ describe('ForumPicker', () => {
     });
 
     expect(wrapper.findComponent({ name: 'MultiSelect' }).exists()).toBe(false);
-    expect(wrapper.get('[data-testid="forum-picker"]').text()).toContain('cats');
+    expect(wrapper.get('[data-testid="forum-picker"]').text()).toContain(
+      'cats'
+    );
     expect(wrapper.text()).toContain(
       'This event will be posted to the current forum.'
     );

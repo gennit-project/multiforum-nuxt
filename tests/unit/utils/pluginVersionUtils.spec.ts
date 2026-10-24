@@ -30,12 +30,20 @@ describe('resolvePluginMetadata', () => {
   });
 
   it('falls back to the plugin id when nothing else is present', () => {
-    const meta = resolvePluginMetadata({ installed: null, registry: null, pluginId: 'p1' });
+    const meta = resolvePluginMetadata({
+      installed: null,
+      registry: null,
+      pluginId: 'p1',
+    });
     expect(meta.displayName).toBe('p1');
   });
 
   it('defaults tags to an empty array', () => {
-    const meta = resolvePluginMetadata({ installed: null, registry: null, pluginId: 'p1' });
+    const meta = resolvePluginMetadata({
+      installed: null,
+      registry: null,
+      pluginId: 'p1',
+    });
     expect(meta.tags).toEqual([]);
   });
 });
@@ -63,13 +71,18 @@ describe('resolvePluginReadme', () => {
     expect(
       resolvePluginReadme({
         selectedVersion: '9.9.9',
-        detailVersions: [{ version: '1.0.0' }, { version: '2.0.0', readmeMarkdown: 'two' }],
+        detailVersions: [
+          { version: '1.0.0' },
+          { version: '2.0.0', readmeMarkdown: 'two' },
+        ],
       })
     ).toBe('two');
   });
 
   it('returns null when no readme is available', () => {
-    expect(resolvePluginReadme({ detailVersions: [{ version: '1.0.0' }] })).toBeNull();
+    expect(
+      resolvePluginReadme({ detailVersions: [{ version: '1.0.0' }] })
+    ).toBeNull();
   });
 });
 
@@ -117,7 +130,9 @@ describe('hasNewerVersions', () => {
   });
 
   it('returns true when an available version differs from installed', () => {
-    expect(hasNewerVersions('1.0.0', [{ version: '1.0.0' }, { version: '2.0.0' }])).toBe(true);
+    expect(
+      hasNewerVersions('1.0.0', [{ version: '1.0.0' }, { version: '2.0.0' }])
+    ).toBe(true);
   });
 
   it('returns false when only the installed version is available', () => {
@@ -127,27 +142,39 @@ describe('hasNewerVersions', () => {
 
 describe('mapInstallErrorMessage', () => {
   it('maps a version-not-found error', () => {
-    expect(mapInstallErrorMessage('PLUGIN_VERSION_NOT_FOUND')).toContain('not found in registry');
+    expect(mapInstallErrorMessage('PLUGIN_VERSION_NOT_FOUND')).toContain(
+      'not found in registry'
+    );
   });
 
   it('maps an integrity mismatch error', () => {
-    expect(mapInstallErrorMessage('SHA-256 mismatch')).toContain('integrity check failed');
+    expect(mapInstallErrorMessage('SHA-256 mismatch')).toContain(
+      'integrity check failed'
+    );
   });
 
   it('maps a registry fetch failure', () => {
-    expect(mapInstallErrorMessage('Failed to fetch plugin registry')).toContain('connect to the plugin registry');
+    expect(mapInstallErrorMessage('Failed to fetch plugin registry')).toContain(
+      'connect to the plugin registry'
+    );
   });
 
   it('maps a tarball download failure', () => {
-    expect(mapInstallErrorMessage('Failed to download tarball')).toContain('download the plugin tarball');
+    expect(mapInstallErrorMessage('Failed to download tarball')).toContain(
+      'download the plugin tarball'
+    );
   });
 
   it('falls back to a generic message including the original text', () => {
-    expect(mapInstallErrorMessage('weird thing')).toBe('Installation failed: weird thing');
+    expect(mapInstallErrorMessage('weird thing')).toBe(
+      'Installation failed: weird thing'
+    );
   });
 
   it('handles an empty message', () => {
-    expect(mapInstallErrorMessage('')).toBe('Installation failed: Unknown error');
+    expect(mapInstallErrorMessage('')).toBe(
+      'Installation failed: Unknown error'
+    );
   });
 });
 
@@ -156,7 +183,12 @@ describe('validateRequiredSettings', () => {
     {
       title: 'S',
       fields: [
-        { key: 'apiKey', type: 'text', label: 'API Key', validation: { required: true } },
+        {
+          key: 'apiKey',
+          type: 'text',
+          label: 'API Key',
+          validation: { required: true },
+        },
         { key: 'optional', type: 'text', label: 'Optional' },
       ],
     },
@@ -173,6 +205,52 @@ describe('validateRequiredSettings', () => {
   });
 
   it('ignores optional empty fields', () => {
-    expect(validateRequiredSettings(sections, { apiKey: 'set', optional: '' })).toEqual({});
+    expect(
+      validateRequiredSettings(sections, { apiKey: 'set', optional: '' })
+    ).toEqual({});
+  });
+
+  it('flags an empty required forum multi-select', () => {
+    const forumSections: PluginFormSection[] = [
+      {
+        title: 'Rules',
+        fields: [
+          {
+            key: 'forums',
+            type: 'forum-multiselect',
+            label: 'Forums',
+            required: true,
+          },
+        ],
+      },
+    ];
+
+    expect(validateRequiredSettings(forumSections, { forums: [] })).toEqual({
+      forums: 'Forums is required',
+    });
+  });
+
+  it('does not validate a required field while its condition is hidden', () => {
+    const conditionalSections: PluginFormSection[] = [
+      {
+        title: 'Rules',
+        fields: [
+          {
+            key: 'forums',
+            type: 'forum-multiselect',
+            label: 'Forums',
+            required: true,
+            visibleWhen: { key: 'mode', equals: 'allowlist' },
+          },
+        ],
+      },
+    ];
+
+    expect(
+      validateRequiredSettings(conditionalSections, {
+        mode: 'off',
+        forums: [],
+      })
+    ).toEqual({});
   });
 });

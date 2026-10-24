@@ -13,6 +13,8 @@ import PluginNumberField from './fields/PluginNumberField.vue';
 import PluginBooleanField from './fields/PluginBooleanField.vue';
 import PluginSelectField from './fields/PluginSelectField.vue';
 import PluginSecretField from './fields/PluginSecretField.vue';
+import PluginForumMultiSelectField from './fields/PluginForumMultiSelectField.vue';
+import { isPluginFieldVisible } from '@/utils/pluginSettingsUtils';
 
 const props = defineProps<{
   sections: PluginFormSection[];
@@ -41,6 +43,12 @@ function getFieldValue(key: string): PluginConfigValue | undefined {
   ) {
     return value;
   }
+  if (
+    Array.isArray(value) &&
+    value.every((item): item is string => typeof item === 'string')
+  ) {
+    return value;
+  }
   return undefined;
 }
 
@@ -66,6 +74,8 @@ function getFieldComponent(field: PluginField) {
       return PluginSelectField;
     case 'secret':
       return PluginSecretField;
+    case 'forum-multiselect':
+      return PluginForumMultiSelectField;
     default:
       return PluginTextField;
   }
@@ -74,24 +84,28 @@ function getFieldComponent(field: PluginField) {
 const renderedSections = computed(() => {
   const occurrences = new Map<string, number>();
 
-  return props.sections.map((section) => ({
-    ...section,
-    fields: section.fields.map((field) => {
-      const kind = field.type === 'secret' ? 'SECRET' : 'SETTING';
-      const occurrenceKey = `${kind}:${field.key}`;
-      const occurrence = occurrences.get(occurrenceKey) || 0;
-      occurrences.set(occurrenceKey, occurrence + 1);
+  return props.sections
+    .map((section) => ({
+      ...section,
+      fields: section.fields
+        .filter((field) => isPluginFieldVisible(field, props.modelValue))
+        .map((field) => {
+          const kind = field.type === 'secret' ? 'SECRET' : 'SETTING';
+          const occurrenceKey = `${kind}:${field.key}`;
+          const occurrence = occurrences.get(occurrenceKey) || 0;
+          occurrences.set(occurrenceKey, occurrence + 1);
 
-      return {
-        field,
-        inputId: getPluginConfigFieldId({
-          kind,
-          key: field.key,
-          occurrence,
+          return {
+            field,
+            inputId: getPluginConfigFieldId({
+              kind,
+              key: field.key,
+              occurrence,
+            }),
+          };
         }),
-      };
-    }),
-  }));
+    }))
+    .filter((section) => section.fields.length > 0);
 });
 </script>
 
@@ -102,7 +116,7 @@ const renderedSections = computed(() => {
       :key="section.title"
       class="space-y-4"
     >
-      <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
+      <div class="border-b border-gray-200 pb-2 dark:border-gray-700">
         <h2 class="text-base font-semibold text-gray-900 dark:text-white">
           {{ section.title }}
         </h2>
@@ -115,17 +129,16 @@ const renderedSections = computed(() => {
       </div>
 
       <div class="space-y-4">
-        <template
-          v-for="{ field, inputId } in section.fields"
-          :key="inputId"
-        >
+        <template v-for="{ field, inputId } in section.fields" :key="inputId">
           <component
             :is="getFieldComponent(field)"
             :field="field"
             :input-id="inputId"
             :model-value="getFieldValue(field.key)"
             :error="getFieldError(field.key)"
-            :secret-status="field.type === 'secret' ? getSecretStatus(field.key) : undefined"
+            :secret-status="
+              field.type === 'secret' ? getSecretStatus(field.key) : undefined
+            "
             @update:model-value="updateFieldValue(field.key, $event)"
           />
         </template>
@@ -133,8 +146,8 @@ const renderedSections = computed(() => {
     </div>
 
     <div
-      v-if="sections.length === 0"
-      class="text-center py-8 text-gray-500 dark:text-gray-400"
+      v-if="renderedSections.length === 0"
+      class="py-8 text-center text-gray-500 dark:text-gray-400"
     >
       <p>No configuration options available for this plugin.</p>
     </div>
