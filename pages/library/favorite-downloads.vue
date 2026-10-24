@@ -5,6 +5,7 @@ import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import { gql } from '@apollo/client/core';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
@@ -185,14 +186,11 @@ const getFirstAlbumImage = (download: FavoriteDownload): string | undefined => {
               </p>
             </div>
 
-            <div v-if="loading" class="py-8 text-center">
-              <div
-                class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
-              />
-              <p class="mt-2 text-gray-600 dark:text-gray-400">
-                Loading your favorite downloads...
-              </p>
-            </div>
+            <LibraryListSkeleton
+              v-if="loading"
+              label="Loading your favorite downloads"
+              variant="cards"
+            />
 
             <div
               v-else-if="error"

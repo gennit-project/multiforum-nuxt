@@ -34,6 +34,11 @@ const channelId = computed(() =>
 );
 
 const shouldShowChannelId = computed(() => channelId.value);
+const isLibraryRoute = computed(
+  () =>
+    route.path === '/library' ||
+    (typeof route.path === 'string' && route.path.startsWith('/library/'))
+);
 
 // The text label shown after the site name when we're not inside a channel.
 // Merges the former `routeInfoLabel` computed and `getLabel` function into one
@@ -41,6 +46,10 @@ const shouldShowChannelId = computed(() => channelId.value);
 // template, so labels here are plain text (no baked-in "•").
 const secondaryLabel = computed(() => {
   const name = route.name;
+
+  if (isLibraryRoute.value) {
+    return 'library';
+  }
 
   if (typeof name === 'string' && name.includes('map-search')) {
     return 'in-person events';
@@ -164,6 +173,9 @@ const isOnMapPage = computed(() => {
           <LoginButton />
         </div>
         <div class="flex items-center gap-2 md:mr-2">
+          <div v-if="!usernameVar && isLibraryRoute" class="lg:hidden">
+            <LoginButton />
+          </div>
           <ClientOnly>
             <div v-if="smAndDown" class="md:hidden">
               <TopNavSearch icon-only />

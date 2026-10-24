@@ -161,6 +161,52 @@ describe('Library page', () => {
     ).toContain('discussions · 4 · private');
   });
 
+  it('uses content-type icons for fixed and custom library rows', () => {
+    setData({
+      collections: [
+        {
+          id: 'comments',
+          name: 'Saved comments',
+          collectionType: 'COMMENTS',
+          visibility: 'PRIVATE',
+          itemCount: 2,
+        },
+        {
+          id: 'images',
+          name: 'Saved images',
+          collectionType: 'IMAGES',
+          visibility: 'PRIVATE',
+          itemCount: 3,
+        },
+      ],
+    });
+    const wrapper = mountLibrary();
+
+    expect({
+      favorites: wrapper
+        .get('[data-testid="library-item-all-favorites"] [data-library-icon]')
+        .attributes('data-library-icon'),
+      downloads: wrapper
+        .get('[data-testid="library-item-my-downloads"] [data-library-icon]')
+        .attributes('data-library-icon'),
+      uploads: wrapper
+        .get('[data-testid="library-item-uploaded-files"] [data-library-icon]')
+        .attributes('data-library-icon'),
+      comments: wrapper
+        .get('[data-testid="library-item-comments"] [data-library-icon]')
+        .attributes('data-library-icon'),
+      images: wrapper
+        .get('[data-testid="library-item-images"] [data-library-icon]')
+        .attributes('data-library-icon'),
+    }).toEqual({
+      favorites: 'favorites',
+      downloads: 'downloads',
+      uploads: 'uploaded-files',
+      comments: 'comments',
+      images: 'images',
+    });
+  });
+
   it('uses the compact library search placeholder', () => {
     setData();
     expect(

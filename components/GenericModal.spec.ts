@@ -147,4 +147,16 @@ describe('GenericModal secondary button', () => {
 
     expect(secondaryBtn(wrapper)).toBeUndefined();
   });
+
+  it('keeps contrasting dark-mode colors on secondary-button hover', () => {
+    const wrapper = mountModal();
+
+    expect(secondaryBtn(wrapper)!.classes()).toEqual(
+      expect.arrayContaining([
+        'dark:bg-gray-800',
+        'dark:text-gray-100',
+        'dark:hover:bg-gray-700',
+      ])
+    );
+  });
 });
