@@ -230,7 +230,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer));
         :id="`${searchId}-skin-tone`"
         :value="skinTone"
         aria-label="Skin tone"
-        class="h-11 w-16 rounded-md border border-gray-400 bg-white px-2 text-xl focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-gray-500 dark:bg-gray-800 dark:text-white"
+        class="h-11 w-40 shrink-0 rounded-md border border-gray-400 bg-white px-2 text-base focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none dark:border-gray-500 dark:bg-gray-800 dark:text-white"
         @change="onSkinToneChange"
       >
         <option :value="0">&#x1F590;&#xFE0F; Default</option>
