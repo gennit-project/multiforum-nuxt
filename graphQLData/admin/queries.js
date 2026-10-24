@@ -345,6 +345,14 @@ export const GET_SERVER_HEALTH_DASHBOARD_OVERVIEW = gql`
         lockedContentCount
         suspensionCount
         failedDownloadScanCount
+        queuedPluginJobCount
+        runningPluginJobCount
+        pluginTimeoutCount24h
+        pluginTimeoutRate24h
+        repeatedPluginFailureCount24h
+        pluginRetryAttemptCount1h
+        pluginRetryStormCount1h
+        oldestQueuedPluginJobAgeSeconds
         medianOpenIssueAgeDays
       }
       timeSeries {

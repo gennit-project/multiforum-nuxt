@@ -148,8 +148,14 @@ const mountDashboard = async (
         ClientOnly: {
           template: '<slot /><slot name="fallback" />',
         },
-        DownloadScanReviewQueue: {
-          template: '<div data-testid="scan-review-queue" />',
+        ServerDashboardAttention: {
+          name: 'ServerDashboardAttention',
+          props: [
+            'openIssueCount',
+            'oldestOpenIssueAgeDays',
+            'oldestOpenIssueChannel',
+          ],
+          template: '<div data-testid="attention-stub" />',
         },
       },
     },
@@ -188,25 +194,133 @@ describe('admin dashboard page', () => {
   it('renders summary metrics from the health dashboard query', async () => {
     const { wrapper } = await mountDashboard();
 
-    expect(wrapper.text()).toContain('Server Dashboard');
-    expect(wrapper.text()).toContain('Active Channels');
-    expect(wrapper.text()).toContain('2');
-    expect(wrapper.text()).toContain('Admin Open Issues');
-    expect(wrapper.text()).toContain('4');
+    expect({
+      heading: wrapper.get('h1').text(),
+      activeChannels: wrapper
+        .get('[data-testid="metric-card-active-channels"]')
+        .text(),
+      openIssues: wrapper.get('[data-testid="metric-card-open-issues"]').text(),
+    }).toEqual({
+      heading: 'Server Dashboard',
+      activeChannels: expect.stringMatching(/^Active channels\s*2\s*44 votes cast$/),
+      openIssues: expect.stringMatching(/^Open admin issues\s*4\s*6 opened/),
+    });
   });
 
-  it('renders channel health issue pressure columns', async () => {
+  it('shows the plugin pipeline panel with reported values', async () => {
     const { wrapper } = await mountDashboard();
 
-    expect(wrapper.text()).toContain('General');
-    expect(wrapper.text()).toContain('Needs review');
-    expect(wrapper.text()).toContain('Open Issues');
-    expect(wrapper.text()).toContain('New Issues');
-    expect(wrapper.text()).toContain('Stale Open');
-    expect(wrapper.text()).toContain('Pressure');
-    expect(wrapper.text()).toContain('9d');
-    expect(wrapper.text()).toContain('26.6');
+    expect(
+      wrapper.get('[data-testid="pipeline-row-timeouts"]').text()
+    ).toMatch(/12\.5% rate · 2 repeated failures\s*3$/);
+  });
+
+  it('shows "No data" instead of NaN when the overview omits pipeline fields', async () => {
+    const pipelineKeys = new Set([
+      'queuedPluginJobCount',
+      'runningPluginJobCount',
+      'pluginTimeoutCount24h',
+      'pluginTimeoutRate24h',
+      'repeatedPluginFailureCount24h',
+      'pluginRetryAttemptCount1h',
+      'pluginRetryStormCount1h',
+      'oldestQueuedPluginJobAgeSeconds',
+    ]);
+    const withoutPipeline = {
+      getServerHealthDashboard: {
+        ...dashboardResult.getServerHealthDashboard,
+        summary: Object.fromEntries(
+          Object.entries(dashboardResult.getServerHealthDashboard.summary).filter(
+            ([key]) => !pipelineKeys.has(key)
+          )
+        ),
+      },
+    } as unknown as typeof dashboardResult;
+    const { wrapper } = await mountDashboard({ resultValue: withoutPipeline });
+
+    expect(wrapper.get('[data-testid="pipeline-health"]').text()).not.toMatch(
+      /NaN|undefined/
+    );
+  });
+
+  it('mounts the needs-attention panel with the open issue count and oldest channel', async () => {
+    const { wrapper } = await mountDashboard();
+
+    expect(
+      wrapper.findComponent({ name: 'ServerDashboardAttention' }).props()
+    ).toMatchObject({
+      openIssueCount: 4,
+      oldestOpenIssueAgeDays: 9,
+      oldestOpenIssueChannel: 'general',
+    });
+  });
+
+  it('renders the channel health table with per-type counts and status', async () => {
+    const { wrapper } = await mountDashboard();
+    const cells = wrapper
+      .get('tbody tr')
+      .findAll('td')
+      .map((cell) => cell.text());
+
+    expect(cells.slice(1, 8)).toEqual(['4', '10', '1', '30', '6', '3', '9d']);
+  });
+
+  it('links each channel row to its detail view', async () => {
+    const { wrapper } = await mountDashboard();
+
     expect(wrapper.html()).toContain('href="/admin/dashboard/general"');
+  });
+
+  it('drops the new issues and pressure columns', async () => {
+    const { wrapper } = await mountDashboard();
+
+    expect(wrapper.get('table').text()).not.toMatch(/New issues|Pressure/i);
+  });
+
+  it('marks the 30 day preset as selected when the range spans 30 days', async () => {
+    const { wrapper } = await mountDashboard();
+
+    expect(
+      wrapper.get('[data-testid="range-preset-30"]').attributes('aria-pressed')
+    ).toBe('true');
+  });
+
+  it('shows date inputs and selects Custom when the range matches no preset', async () => {
+    mockedUseRoute.mockReturnValue({
+      query: { startDate: '2026-06-01', endDate: '2026-06-26' },
+    });
+    const { wrapper } = await mountDashboard();
+
+    expect({
+      custom: wrapper
+        .get('[data-testid="range-preset-custom"]')
+        .attributes('aria-pressed'),
+      dateInputs: wrapper.findAll('input[type="date"]').length,
+    }).toEqual({ custom: 'true', dateInputs: 2 });
+  });
+
+  it('hides date inputs while a preset is selected', async () => {
+    const { wrapper } = await mountDashboard();
+
+    expect(wrapper.findAll('input[type="date"]')).toHaveLength(0);
+  });
+
+  it('updates the date range when a preset is chosen', async () => {
+    const replace = vi.fn();
+    mockedUseRouter.mockReturnValue({ replace });
+    const { wrapper } = await mountDashboard();
+    await wrapper.get('[data-testid="range-preset-7"]').trigger('click');
+
+    expect(replace).toHaveBeenCalledWith({
+      query: { startDate: '2026-06-19', endDate: '2026-06-26' },
+    });
+  });
+
+  it('reveals date inputs when Custom is pressed', async () => {
+    const { wrapper } = await mountDashboard();
+    await wrapper.get('[data-testid="range-preset-custom"]').trigger('click');
+
+    expect(wrapper.findAll('input[type="date"]')).toHaveLength(2);
   });
 
   it('updates query params when sorting the channel health table', async () => {
@@ -216,7 +330,7 @@ describe('admin dashboard page', () => {
 
     const staleHeader = wrapper
       .findAll('button')
-      .find((button) => button.text().includes('Stale Open'));
+      .find((button) => button.text().includes('Oldest open'));
     expect(staleHeader).toBeTruthy();
 
     await staleHeader?.trigger('click');
@@ -258,7 +372,7 @@ describe('admin dashboard page', () => {
     ).toEqual({
       startDate: '2026-05-27',
       endDate: '2026-06-26',
-      limit: 20,
+      limit: 100,
       sortBy: 'activityScore',
       sortDirection: 'desc',
     });
@@ -281,7 +395,7 @@ describe('admin dashboard page', () => {
     ).toEqual({
       startDate: '2026-05-27',
       endDate: '2026-06-26',
-      limit: 20,
+      limit: 100,
       sortBy: 'channelUniqueName',
       sortDirection: 'asc',
     });
@@ -322,7 +436,7 @@ describe('admin dashboard page', () => {
       channelLoading: true,
     });
 
-    expect(wrapper.text()).toContain('Active Channels');
+    expect(wrapper.text()).toContain('Active channels');
     expect(wrapper.text()).toContain('Activity');
     expect(wrapper.text()).toContain('Issue Aging');
     expect(

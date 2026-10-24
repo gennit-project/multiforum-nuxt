@@ -2,123 +2,100 @@ import { describe, it, expect } from 'vitest';
 import { mount } from '@vue/test-utils';
 import ServerDashboardMetricCards from '@/components/admin/ServerDashboardMetricCards.vue';
 
-const mountCards = (summary: Record<string, unknown> = {}) =>
+const baseSummary = {
+  activeChannelCount: 12,
+  discussionCount: 1000,
+  commentCount: 2500,
+  eventCount: 500,
+  voteCount: 4500,
+  openIssueCount: 3,
+  issueOpenedCount: 7,
+  issueClosedCount: 1,
+  moderationActionCount: 11,
+  medianOpenIssueAgeDays: 8.4,
+};
+
+const mountCards = (
+  summary: Record<string, unknown> = {},
+  channelCount?: number | null
+) =>
   mount(ServerDashboardMetricCards, {
     props: {
-      summary: {
-        activeChannelCount: 12,
-        discussionCount: 1000,
-        commentCount: 2500,
-        eventCount: 500,
-        voteCount: 4500,
-        openIssueCount: 3,
-        issueOpenedCount: 7,
-        issueClosedCount: 4,
-        moderationActionCount: 11,
-        archivedContentCount: 2,
-        lockedContentCount: 1,
-        failedDownloadScanCount: 2,
-        queuedPluginJobCount: 0,
-        runningPluginJobCount: 0,
-        pluginTimeoutCount24h: 0,
-        pluginTimeoutRate24h: 0,
-        repeatedPluginFailureCount24h: 0,
-        pluginRetryAttemptCount1h: 0,
-        pluginRetryStormCount1h: 0,
-        oldestQueuedPluginJobAgeSeconds: 0,
-        medianOpenIssueAgeDays: 8.4,
-        ...summary,
-      },
-    },
-    global: {
-      stubs: {
-        Users: { template: '<svg class="users" />' },
-        Flag: { template: '<svg class="flag" />' },
-        Clock3: { template: '<svg class="clock" />' },
-        ShieldAlert: { template: '<svg class="shield" />' },
-        ShieldX: { template: '<svg class="shield-x" />' },
-        Hourglass: { template: '<svg class="hourglass" />' },
-        RotateCcw: { template: '<svg class="retry" />' },
-        ThumbsUp: { template: '<svg class="thumbs" />' },
-        Archive: { template: '<svg class="archive" />' },
-      },
+      summary: { ...baseSummary, ...summary },
+      channelCount,
     },
   });
+
+const cardText = (wrapper: ReturnType<typeof mountCards>, key: string) =>
+  wrapper.get(`[data-testid="metric-card-${key}"]`).text();
 
 describe('ServerDashboardMetricCards', () => {
-  it('shows derived contribution totals and formatted large numbers', () => {
+  it('renders exactly four key number cards', () => {
     const wrapper = mountCards();
 
-    expect(wrapper.text()).toContain('4000 contributions');
-    expect(wrapper.text()).toContain('4,500');
-    expect(wrapper.text()).toContain('2500 comments');
+    expect(
+      wrapper.findAll('[data-testid^="metric-card-"]').map((card) =>
+        card.attributes('data-testid')
+      )
+    ).toEqual([
+      'metric-card-contributions',
+      'metric-card-active-channels',
+      'metric-card-open-issues',
+      'metric-card-moderation-actions',
+    ]);
   });
 
-  it('uses warning tones when open issues, old issue age, and archived content are present', () => {
-    const wrapper = mountCards();
-
-    expect({
-      yellowCount: wrapper.findAll('.text-yellow-600').length,
-      hasAgeLabel: wrapper.text().includes('8d'),
-      hasArchivedDetail: wrapper.text().includes('1 locked'),
-    }).toEqual({
-      yellowCount: 3,
-      hasAgeLabel: true,
-      hasArchivedDetail: true,
-    });
+  it('sums discussions, comments and events into the contributions card', () => {
+    expect(cardText(mountCards(), 'contributions')).toMatch(
+      /^Contributions\s*4,000\s*1,000 discussions · 2,500 comments · 500 events$/
+    );
   });
 
-  it('uses green and slate fallback tones when counts are clear or absent', () => {
+  it('uses singular nouns when a count is exactly one', () => {
     const wrapper = mountCards({
-      openIssueCount: 0,
-      archivedContentCount: 0,
-      medianOpenIssueAgeDays: null,
-      failedDownloadScanCount: 0,
+      discussionCount: 1,
+      commentCount: 1,
+      eventCount: 1,
     });
 
-    expect({
-      greenCount: wrapper.findAll('.text-green-600').length,
-      yellowCount: wrapper.findAll('.text-yellow-600').length,
-      zeroAge: wrapper.text().includes('0d'),
-    }).toEqual({
-      greenCount: 6,
-      yellowCount: 0,
-      zeroAge: true,
-    });
+    expect(cardText(wrapper, 'contributions')).toContain(
+      '1 discussion · 1 comment · 1 event'
+    );
   });
 
-  it('highlights failed security scans as an operational alert', () => {
-    const wrapper = mountCards({ failedDownloadScanCount: 2 });
-
-    expect({
-      hasLabel: wrapper.text().includes('Scan Failures'),
-      hasDetail: wrapper.text().includes('downloads blocked by scanner errors'),
-      redCount: wrapper.findAll('.text-red-600').length,
-    }).toEqual({ hasLabel: true, hasDetail: true, redCount: 1 });
+  it('shows the total channel count next to active channels when it is known', () => {
+    expect(cardText(mountCards({}, 23), 'active-channels')).toMatch(
+      /^Active channels\s*12 of 23\s*4,500 votes cast$/
+    );
   });
 
-  it('surfaces pipeline queue, timeout, repeated failure, and retry metrics', () => {
-    const wrapper = mountCards({
-      queuedPluginJobCount: 2,
-      runningPluginJobCount: 1,
-      pluginTimeoutCount24h: 3,
-      pluginTimeoutRate24h: 0.125,
-      repeatedPluginFailureCount24h: 2,
-      pluginRetryAttemptCount1h: 4,
-      pluginRetryStormCount1h: 1,
-      oldestQueuedPluginJobAgeSeconds: 45,
-    });
+  it('omits the total when no channel count is available', () => {
+    expect(cardText(mountCards({}, null), 'active-channels')).toMatch(
+      /^Active channels\s*12\s*4,500 votes cast$/
+    );
+  });
 
-    expect({
-      timeouts: wrapper.text().includes('Pipeline Timeouts'),
-      timeoutRate: wrapper.text().includes('12.5% rate · 2 repeated failures'),
-      queue: wrapper.text().includes('2 queued · 1 running · 45s oldest'),
-      retries: wrapper.text().includes('4 retries in the last hour'),
-    }).toEqual({
-      timeouts: true,
-      timeoutRate: true,
-      queue: true,
-      retries: true,
-    });
+  it('omits an impossible total smaller than the active channel count', () => {
+    expect(cardText(mountCards({}, 5), 'active-channels')).not.toContain('of 5');
+  });
+
+  it('reports opened issues and the rounded median age', () => {
+    expect(cardText(mountCards(), 'open-issues')).toMatch(
+      /^Open admin issues\s*3\s*7 opened this period · median age 8 days$/
+    );
+  });
+
+  it('drops the median age when no issues are open', () => {
+    const wrapper = mountCards({ openIssueCount: 0, medianOpenIssueAgeDays: null });
+
+    expect(cardText(wrapper, 'open-issues')).toMatch(
+      /^Open admin issues\s*0\s*7 opened this period$/
+    );
+  });
+
+  it('reports closed issues beside moderation actions', () => {
+    expect(cardText(mountCards(), 'moderation-actions')).toMatch(
+      /^Moderation actions\s*11\s*1 issue closed$/
+    );
   });
 });

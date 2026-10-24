@@ -78,6 +78,15 @@ vi.mock('@/components/plugins/DownloadPipelineStatusSummary.vue', () => ({
   }),
 }));
 
+vi.mock('@/components/download/DownloadScanReviewPanel.vue', () => ({
+  default: defineComponent({
+    props: {
+      downloadableFileId: { type: String, required: true },
+    },
+    template: '<div data-testid="scan-review-panel">{{ downloadableFileId }}</div>',
+  }),
+}));
+
 vi.mock('@/components/download/DownloadSuccessPopover.vue', () => ({
   default: defineComponent({
     props: {
@@ -446,5 +455,40 @@ describe('DownloadSidebar', () => {
     expect(trackDownloadMock).toHaveBeenCalledWith({
       downloadableFileId: 'file-1',
     });
+  });
+  it('offers the admin review panel for a file that is not clean', () => {
+    const wrapper = mount(DownloadSidebar, {
+      props: {
+        discussion: makeDiscussion({
+          ...discussionWithFile,
+          DownloadableFiles: [
+            {
+              ...discussionWithFile.DownloadableFiles[0],
+              scanStatus: 'FAILED',
+            },
+          ],
+        }),
+        discussionId: 'discussion-1',
+        channelUniqueName: 'test-forum',
+      },
+    });
+
+    expect(wrapper.get('[data-testid="scan-review-panel"]').text()).toBe(
+      'file-1'
+    );
+  });
+
+  it('does not render the admin review panel for a clean file', () => {
+    const wrapper = mount(DownloadSidebar, {
+      props: {
+        discussion: discussionWithFile,
+        discussionId: 'discussion-1',
+        channelUniqueName: 'test-forum',
+      },
+    });
+
+    expect(wrapper.find('[data-testid="scan-review-panel"]').exists()).toBe(
+      false
+    );
   });
 });
