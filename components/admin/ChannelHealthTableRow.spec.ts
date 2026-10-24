@@ -8,22 +8,21 @@ const baseRow = {
   channelUniqueName: 'support',
   displayName: 'Support Forum',
   channelIconURL: null,
+  discussionCount: 4,
+  commentCount: 18,
+  eventCount: 3,
   voteCount: 10,
   uniqueContributorCount: 4,
   openIssueCount: 0,
-  issueOpenedCount: 1,
   oldestOpenIssueAgeDays: null,
-  issuesPerHundredContributions: 0,
-  activityScore: 25,
   healthLabel: 'Active',
 };
 
-const mountRow = (row = {}) =>
+const mountRow = (row = {}, props: Record<string, unknown> = {}) =>
   mount(ChannelHealthTableRow, {
     props: {
       row: { ...baseRow, ...row },
-      maxActivity: 100,
-      maxIssuePressure: 40,
+      ...props,
     },
     global: {
       stubs: {
@@ -35,19 +34,34 @@ const mountRow = (row = {}) =>
     },
   });
 
+const cellTexts = (wrapper: ReturnType<typeof mountRow>) =>
+  wrapper.findAll('td').map((cell) => cell.text());
+
 describe('ChannelHealthTableRow', () => {
-  it('renders channel identity, link, and activity width', () => {
+  it('renders channel identity and links to the forum', () => {
     const wrapper = mountRow();
 
     expect({
       text: wrapper.text(),
       href: wrapper.get('a').attributes('href'),
-      activityWidth: wrapper.findAll('[style]')[0].attributes('style'),
     }).toEqual({
       text: expect.stringContaining('Support Forum'),
       href: '/forums/support',
-      activityWidth: 'width: 25%;',
     });
+  });
+
+  it('lists discussions, comments, events, votes and contributors as separate cells', () => {
+    expect(cellTexts(mountRow()).slice(1, 6)).toEqual([
+      '4',
+      '18',
+      '3',
+      '10',
+      '4',
+    ]);
+  });
+
+  it('does not render the removed new-issues or pressure columns', () => {
+    expect(mountRow().findAll('td')).toHaveLength(9);
   });
 
   it('uses initials when a channel has no icon URL', () => {
@@ -85,21 +99,18 @@ describe('ChannelHealthTableRow', () => {
     );
   });
 
-  it('formats issue pressure with minimum nonzero bar width and high-load color', () => {
-    const wrapper = mountRow({
-      issuesPerHundredContributions: 20,
-      healthLabel: 'High moderation load',
-    });
+  it('colours issues older than 30 days as urgent', () => {
+    const wrapper = mountRow({ openIssueCount: 1, oldestOpenIssueAgeDays: 286 });
 
-    expect({
-      pressureText: wrapper.get('td[title*="20.0 new"]').text(),
-      pressureWidth: wrapper.findAll('[style]')[1].attributes('style'),
-      highLoadBar: wrapper.find('.bg-yellow-500').exists(),
-    }).toEqual({
-      pressureText: '20.0',
-      pressureWidth: 'width: 50%;',
-      highLoadBar: true,
-    });
+    expect(wrapper.get('td[title*="286 days"] span').classes()).toContain(
+      'bg-red-100'
+    );
+  });
+
+  it('shows a dash with a screen-reader label when no issues are open', () => {
+    const wrapper = mountRow();
+
+    expect(wrapper.get('td[title^="No open"]').text()).toBe('—No open issues');
   });
 
   it('explains healthy and quiet status labels', () => {
@@ -113,5 +124,13 @@ describe('ChannelHealthTableRow', () => {
       healthy: 'Healthy activity',
       quiet: 'Quiet',
     });
+  });
+
+  it('links to the channel detail view when a detail route base is given', () => {
+    const wrapper = mountRow({}, { detailRouteBase: '/admin/dashboard' });
+
+    expect(
+      wrapper.findAll('a').map((link) => link.attributes('href'))
+    ).toEqual(['/forums/support', '/admin/dashboard/support']);
   });
 });

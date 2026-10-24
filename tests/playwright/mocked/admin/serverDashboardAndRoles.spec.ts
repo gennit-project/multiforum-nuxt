@@ -45,6 +45,106 @@ test.describe('Admin dashboard + roles', () => {
     }
   });
 
+  test('server dashboard surfaces what needs attention and filters channels', async ({
+    context,
+    page,
+  }) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+    const channelRow = (name: string, healthLabel: string, activityScore = 0) => ({
+      __typename: 'ChannelHealthRow',
+      id: name,
+      channelUniqueName: name,
+      displayName: name,
+      channelIconURL: null,
+      discussionCount: activityScore,
+      commentCount: 0,
+      eventCount: 0,
+      downloadCount: 0,
+      voteCount: 0,
+      uniqueContributorCount: activityScore ? 1 : 0,
+      openIssueCount: healthLabel === 'Needs review' ? 1 : 0,
+      issueOpenedCount: 0,
+      moderationActionCount: 0,
+      archivedContentCount: 0,
+      lockedContentCount: 0,
+      oldestOpenIssueAgeDays: healthLabel === 'Needs review' ? 286 : null,
+      issuesPerHundredContributions: 0,
+      activityScore,
+      healthLabel,
+    });
+    const dashboardData = () => ({
+      data: {
+        getServerHealthDashboard: buildServerHealthDashboard({
+          summary: {
+            ...buildServerHealthDashboard().summary,
+            openIssueCount: 1,
+            failedDownloadScanCount: 1,
+          },
+          channelHealth: [
+            channelRow('lively', 'Active', 5),
+            channelRow('overdue', 'Needs review', 2),
+            channelRow('sleepy', 'Quiet'),
+          ],
+        }),
+      },
+    });
+    await installGraphqlMocks(page, {
+      ...createBaseHandlers({ username: TEST_USER }),
+      getServerHealthDashboard: dashboardData,
+      getServerHealthDashboardOverview: dashboardData,
+      getServerHealthChannelHealth: dashboardData,
+      getDownloadScanReviewQueue: () => ({
+        data: {
+          getDownloadScanReviewQueue: [
+            {
+              __typename: 'DownloadScanReviewItem',
+              downloadableFileId: 'file-1',
+              fileName: 'Chateau_Frise.zip',
+              scanStatus: 'FAILED',
+              scanReason: 'Plugin not configured',
+              scanCheckedAt: null,
+              reviewRequestedAt: null,
+              reviewRequestReason: null,
+              uploaderUsername: 'alice',
+              discussionId: 'discussion-1',
+              discussionTitle: 'Chateau Frise',
+              channelUniqueName: 'lively',
+            },
+          ],
+        },
+      }),
+    });
+
+    await page.goto('/admin/dashboard', { waitUntil: 'domcontentloaded' });
+
+    const attention = page.getByRole('region', { name: 'Needs attention' });
+    await expect(attention).toContainText('Chateau_Frise.zip');
+    await expect(attention).toContainText('1 admin issue is still open');
+
+    // The release form stays collapsed until an admin chooses to review.
+    await expect(page.getByLabel('Required release reason')).toBeHidden();
+    await attention.getByRole('button', { name: /^Review Chateau_Frise\.zip/ }).click();
+    await expect(page.getByLabel('Required release reason')).toBeVisible();
+
+    // Missing pipeline metrics read "No data", never NaN/undefined.
+    const pipeline = page.getByRole('region', { name: 'Plugin pipeline' });
+    await expect(pipeline).toContainText('No data');
+    await expect(pipeline).not.toContainText(/NaN|undefined/);
+
+    // Quiet channels are collapsed until asked for; needs-review sorts first.
+    const channels = page.getByRole('region', { name: 'Channel health' });
+    await expect(channels.getByRole('row')).toHaveCount(3);
+    await expect(channels.getByRole('row').nth(1)).toContainText('overdue');
+    await expect(channels).not.toContainText('sleepy');
+    await channels.getByRole('button', { name: 'Show quiet channels' }).click();
+    await expect(channels).toContainText('sleepy');
+
+    await expectNoAxeViolations(page);
+  });
+
   test('server roles page renders the roles editor for an admin', async ({
     context,
     page,

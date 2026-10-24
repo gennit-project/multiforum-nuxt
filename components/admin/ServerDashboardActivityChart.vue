@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { CalendarDays } from 'lucide-vue-next';
+import type { ServerHealthTimeSeriesPoint as GeneratedTimeSeriesPoint } from '@/__generated__/graphql';
 
-type ServerHealthTimeSeriesPoint = {
-  date: string;
-  discussions: number;
-  comments: number;
-  events: number;
-};
+type ServerHealthTimeSeriesPoint = Pick<
+  GeneratedTimeSeriesPoint,
+  'date' | 'discussions' | 'comments' | 'events'
+>;
 
 const props = defineProps<{
   timeSeries: ServerHealthTimeSeriesPoint[];
@@ -17,6 +15,9 @@ const props = defineProps<{
 
 // Guard against a pathological range dragging in thousands of empty bars.
 const MAX_RANGE_DAYS = 366;
+// Number of date labels under the plot; bars never scroll, so labels are
+// sampled across the range instead of printed for every day.
+const AXIS_LABEL_COUNT = 5;
 
 const isDateInputValue = (value?: string): value is string =>
   !!value && /^\d{4}-\d{2}-\d{2}$/.test(value);
@@ -76,6 +77,17 @@ const maxActivity = computed(() => {
   return Math.max(...values, 1);
 });
 
+const totals = computed(() =>
+  chartPoints.value.reduce(
+    (sum, point) => ({
+      discussions: sum.discussions + point.discussions,
+      comments: sum.comments + point.comments,
+      events: sum.events + point.events,
+    }),
+    { discussions: 0, comments: 0, events: 0 }
+  )
+);
+
 const formatDateLabel = (date: string) => {
   if (!date) return '';
   return new Date(`${date}T00:00:00`).toLocaleDateString(undefined, {
@@ -84,73 +96,150 @@ const formatDateLabel = (date: string) => {
   });
 };
 
+const pluralize = (count: number, singular: string) =>
+  `${count} ${singular}${count === 1 ? '' : 's'}`;
+
+const describePoint = (point: ServerHealthTimeSeriesPoint) =>
+  `${formatDateLabel(point.date)}: ${pluralize(point.discussions, 'discussion')}, ${pluralize(point.comments, 'comment')}, ${pluralize(point.events, 'event')}`;
+
 const percent = (value: number, max: number) => {
   if (max <= 0) return 0;
   return Math.max(0, Math.min(100, (value / max) * 100));
 };
+
+const bars = computed(() =>
+  chartPoints.value.map((point) => ({
+    date: point.date,
+    title: describePoint(point),
+    discussionsHeight: `${percent(point.discussions, maxActivity.value)}%`,
+    commentsHeight: `${percent(point.comments, maxActivity.value)}%`,
+    eventsHeight: `${percent(point.events, maxActivity.value)}%`,
+  }))
+);
+
+const axisLabels = computed(() => {
+  const points = chartPoints.value;
+  if (points.length <= AXIS_LABEL_COUNT) {
+    return points.map((point) => formatDateLabel(point.date));
+  }
+  const indexes = new Set<number>();
+  for (let i = 0; i < AXIS_LABEL_COUNT; i += 1) {
+    indexes.add(Math.round((i * (points.length - 1)) / (AXIS_LABEL_COUNT - 1)));
+  }
+  return [...indexes].map((index) => formatDateLabel(points[index]?.date || ''));
+});
+
+const peakLabel = computed(() => {
+  const peak = chartPoints.value.reduce<ServerHealthTimeSeriesPoint | null>(
+    (best, point) => {
+      const total = point.discussions + point.comments + point.events;
+      const bestTotal = best
+        ? best.discussions + best.comments + best.events
+        : 0;
+      return total > bestTotal ? point : best;
+    },
+    null
+  );
+  return peak
+    ? ` Busiest day was ${formatDateLabel(peak.date)} with ${maxActivity.value}.`
+    : ' No activity in this range.';
+});
+
+const chartDescription = computed(() => {
+  const first = chartPoints.value[0];
+  const last = chartPoints.value[chartPoints.value.length - 1];
+  const range =
+    first && last
+      ? ` from ${formatDateLabel(first.date)} to ${formatDateLabel(last.date)}`
+      : '';
+  return `Bar chart of daily contributions${range}.${peakLabel.value}`;
+});
+
+const midLabel = computed(() => Math.round(maxActivity.value / 2));
 </script>
 
 <template>
-  <div
-    class="min-w-0 rounded-lg border border-gray-200 bg-white p-4 !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100"
+  <section
+    aria-labelledby="activity-heading"
+    class="min-w-0 rounded-xl border border-gray-200 bg-white p-5 !text-gray-900 shadow-sm dark:border-gray-800 dark:bg-gray-900 dark:!text-gray-100"
   >
-    <div class="mb-4 flex items-center justify-between gap-3">
+    <div class="flex flex-wrap items-start justify-between gap-3">
       <div>
-        <h2 class="text-base font-semibold !text-gray-900 dark:!text-gray-100">
+        <h2
+          id="activity-heading"
+          class="text-base font-semibold !text-gray-900 dark:!text-gray-100"
+        >
           Activity
         </h2>
-        <p class="text-sm text-gray-600 dark:text-gray-300">
-          Discussions, comments, and events by day.
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          Contributions per day. The whole range fits without scrolling.
         </p>
       </div>
-      <CalendarDays class="h-5 w-5 text-gray-400" />
+      <ul
+        class="m-0 flex list-none flex-wrap gap-4 p-0 text-sm text-gray-700 dark:text-gray-300"
+      >
+        <li class="inline-flex items-center gap-1.5">
+          <span class="h-2.5 w-2.5 rounded-sm bg-blue-500" />Discussions
+          <span data-testid="total-discussions">{{ totals.discussions }}</span>
+        </li>
+        <li class="inline-flex items-center gap-1.5">
+          <span class="h-2.5 w-2.5 rounded-sm bg-brand-500" />Comments
+          <span data-testid="total-comments">{{ totals.comments }}</span>
+        </li>
+        <li class="inline-flex items-center gap-1.5">
+          <span class="h-2.5 w-2.5 rounded-sm bg-green-500" />Events
+          <span data-testid="total-events">{{ totals.events }}</span>
+        </li>
+      </ul>
     </div>
 
     <div
-      class="flex h-64 items-end gap-2 overflow-x-auto overflow-y-visible pb-12"
+      role="img"
+      :aria-label="chartDescription"
+      class="mt-5 flex gap-2.5"
     >
       <div
-        v-for="point in chartPoints"
-        :key="point.date"
-        class="relative flex min-w-6 flex-1 flex-col items-center justify-end gap-1"
-        :title="`${formatDateLabel(point.date)}: ${point.discussions + point.comments + point.events}`"
+        aria-hidden="true"
+        class="flex h-40 w-6 shrink-0 flex-col justify-between text-right text-xs leading-none text-gray-600 dark:text-gray-400"
       >
+        <span>{{ maxActivity }}</span>
+        <span v-if="maxActivity >= 2">{{ midLabel }}</span>
+        <span>0</span>
+      </div>
+      <div class="min-w-0 flex-1">
         <div
-          class="flex h-44 w-full max-w-7 flex-col justify-end overflow-hidden rounded-t bg-gray-100 dark:bg-gray-800"
+          class="flex h-40 items-end gap-0.5 border-b border-gray-300 dark:border-gray-700"
         >
           <div
-            class="bg-blue-500"
-            :style="{ height: `${percent(point.discussions, maxActivity)}%` }"
-          />
-          <div
-            class="bg-brand-500"
-            :style="{ height: `${percent(point.comments, maxActivity)}%` }"
-          />
-          <div
-            class="bg-green-500"
-            :style="{ height: `${percent(point.events, maxActivity)}%` }"
-          />
+            v-for="bar in bars"
+            :key="bar.date"
+            data-testid="activity-bar"
+            class="flex h-full min-w-0 flex-1 flex-col justify-end overflow-hidden rounded-t-sm bg-gray-100 dark:bg-gray-800"
+            :title="bar.title"
+          >
+            <div
+              class="bg-green-500"
+              :style="{ height: bar.eventsHeight }"
+            />
+            <div
+              class="bg-brand-500"
+              :style="{ height: bar.commentsHeight }"
+            />
+            <div
+              class="bg-blue-500"
+              :style="{ height: bar.discussionsHeight }"
+            />
+          </div>
         </div>
-        <span
-          class="absolute -bottom-9 left-1/2 hidden w-14 origin-top-left -translate-x-1 -rotate-45 text-left text-[10px] leading-none whitespace-nowrap text-gray-500 sm:block"
+        <div
+          aria-hidden="true"
+          class="mt-2 flex justify-between text-xs text-gray-600 dark:text-gray-400"
         >
-          {{ formatDateLabel(point.date) }}
-        </span>
+          <span v-for="(label, index) in axisLabels" :key="`${label}-${index}`">
+            {{ label }}
+          </span>
+        </div>
       </div>
     </div>
-
-    <div
-      class="mt-3 flex flex-wrap gap-4 text-xs text-gray-600 dark:text-gray-300"
-    >
-      <span class="inline-flex items-center gap-1"
-        ><span class="h-2 w-2 rounded-full bg-blue-500" />Discussions</span
-      >
-      <span class="inline-flex items-center gap-1"
-        ><span class="bg-brand-500 h-2 w-2 rounded-full" />Comments</span
-      >
-      <span class="inline-flex items-center gap-1"
-        ><span class="h-2 w-2 rounded-full bg-green-500" />Events</span
-      >
-    </div>
-  </div>
+  </section>
 </template>

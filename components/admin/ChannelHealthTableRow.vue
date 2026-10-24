@@ -1,38 +1,28 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { ArrowRight } from 'lucide-vue-next';
+import type { ChannelHealthRow as GeneratedChannelHealthRow } from '@/__generated__/graphql';
 
-type ChannelHealthRow = {
-  id: string;
-  channelUniqueName: string;
-  displayName?: string | null;
-  channelIconURL?: string | null;
-  voteCount: number;
-  uniqueContributorCount: number;
-  openIssueCount: number;
-  issueOpenedCount: number;
-  oldestOpenIssueAgeDays?: number | null;
-  issuesPerHundredContributions: number;
-  activityScore: number;
-  healthLabel: string;
-};
+type ChannelHealthRow = Pick<
+  GeneratedChannelHealthRow,
+  | 'id'
+  | 'channelUniqueName'
+  | 'displayName'
+  | 'channelIconURL'
+  | 'discussionCount'
+  | 'commentCount'
+  | 'eventCount'
+  | 'voteCount'
+  | 'uniqueContributorCount'
+  | 'openIssueCount'
+  | 'oldestOpenIssueAgeDays'
+  | 'healthLabel'
+>;
 
 const props = defineProps<{
   row: ChannelHealthRow;
-  maxActivity: number;
-  maxIssuePressure: number;
   detailRouteBase?: string | null;
 }>();
-
-const percent = (value: number, max: number) => {
-  if (max <= 0) return 0;
-  return Math.max(0, Math.min(100, (value / max) * 100));
-};
-
-const barPercent = (value: number, max: number) => {
-  if (value <= 0) return 0;
-  return Math.max(4, percent(value, max));
-};
 
 const channelInitials = computed(() => {
   return props.row.channelUniqueName.slice(0, 2).toUpperCase();
@@ -47,14 +37,10 @@ const detailHref = computed(() => {
   return `${props.detailRouteBase}/${encodeURIComponent(props.row.channelUniqueName)}`;
 });
 
-const activityBarWidth = computed(() => {
-  return `${percent(props.row.activityScore, props.maxActivity)}%`;
-});
-
 const hasOpenIssues = computed(() => props.row.openIssueCount > 0);
 
 const staleOpenIssueLabel = computed(() => {
-  if (!hasOpenIssues.value) return 'None';
+  if (!hasOpenIssues.value) return '—';
   if (props.row.oldestOpenIssueAgeDays == null) return 'Open';
   return `${props.row.oldestOpenIssueAgeDays}d`;
 });
@@ -84,28 +70,6 @@ const staleOpenIssueClasses = computed(() => {
     return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-100';
   }
   return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-200';
-});
-
-const issuePressureLabel = computed(() => {
-  if (props.row.issuesPerHundredContributions === 0) return '0';
-  return props.row.issuesPerHundredContributions.toFixed(1);
-});
-
-const issuePressureDescription = computed(() => {
-  return `${issuePressureLabel.value} new admin/server-scoped issues per 100 contributions in this date range.`;
-});
-
-const issuePressureBarWidth = computed(() => {
-  return `${barPercent(
-    props.row.issuesPerHundredContributions,
-    props.maxIssuePressure
-  )}%`;
-});
-
-const issuePressureBarClasses = computed(() => {
-  return props.row.issuesPerHundredContributions >= 20
-    ? 'bg-yellow-500'
-    : 'bg-blue-500';
 });
 
 const healthLabelDescription = computed(() => {
@@ -143,7 +107,7 @@ const healthLabelClasses = computed(() => {
 
 <template>
   <tr>
-    <td class="px-4 py-3">
+    <td class="py-3 pr-4 pl-5">
       <div class="flex items-center gap-3">
         <img
           v-if="row.channelIconURL"
@@ -153,7 +117,7 @@ const healthLabelClasses = computed(() => {
         >
         <div
           v-else
-          class="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100 text-xs font-semibold text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+          class="flex h-8 w-8 items-center justify-center rounded-md bg-gray-100 text-xs font-semibold text-gray-700 dark:bg-gray-800 dark:text-gray-300"
         >
           {{ channelInitials }}
         </div>
@@ -164,69 +128,53 @@ const healthLabelClasses = computed(() => {
           >
             {{ row.displayName || row.channelUniqueName }}
           </NuxtLink>
-          <p class="text-xs text-gray-500 dark:text-gray-400">
+          <p class="text-xs text-gray-600 dark:text-gray-400">
             {{ row.channelUniqueName }}
           </p>
         </div>
       </div>
     </td>
-    <td class="px-4 py-3">
-      <div class="min-w-32">
-        <div class="mb-1 flex justify-between text-xs text-gray-500 dark:text-gray-400">
-          <span>{{ row.activityScore }}</span>
-          <span>{{ row.voteCount }} votes</span>
-        </div>
-        <div class="h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-          <div
-            class="h-full rounded-full bg-blue-500"
-            :style="{ width: activityBarWidth }"
-          />
-        </div>
-      </div>
+    <td class="px-4 py-3 text-gray-700 dark:text-gray-200">
+      {{ row.discussionCount }}
+    </td>
+    <td class="px-4 py-3 text-gray-700 dark:text-gray-200">
+      {{ row.commentCount }}
+    </td>
+    <td class="px-4 py-3 text-gray-700 dark:text-gray-200">
+      {{ row.eventCount }}
+    </td>
+    <td class="px-4 py-3 text-gray-700 dark:text-gray-200">
+      {{ row.voteCount }}
     </td>
     <td class="px-4 py-3 text-gray-700 dark:text-gray-200">
       {{ row.uniqueContributorCount }}
     </td>
-    <td class="px-4 py-3 text-gray-700 dark:text-gray-200">
+    <td class="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">
       {{ row.openIssueCount }}
-    </td>
-    <td class="px-4 py-3 text-gray-700 dark:text-gray-200">
-      {{ row.issueOpenedCount }}
     </td>
     <td
       class="px-4 py-3 text-gray-700 dark:text-gray-200"
       :title="staleOpenIssueDescription"
     >
       <span
+        v-if="hasOpenIssues"
         class="inline-flex rounded-full px-2 py-1 text-xs font-medium"
         :class="staleOpenIssueClasses"
       >
         {{ staleOpenIssueLabel }}
       </span>
-    </td>
-    <td
-      class="px-4 py-3 text-gray-700 dark:text-gray-200"
-      :title="issuePressureDescription"
-    >
-      <div class="min-w-28">
-        <div class="mb-1 text-xs font-medium text-gray-700 dark:text-gray-200">
-          {{ issuePressureLabel }}
-        </div>
-        <div class="h-2 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
-          <div
-            class="h-full rounded-full"
-            :class="issuePressureBarClasses"
-            :style="{ width: issuePressureBarWidth }"
-          />
-        </div>
-      </div>
+      <template v-else>
+        <span aria-hidden="true">{{ staleOpenIssueLabel }}</span>
+        <span class="sr-only">No open issues</span>
+      </template>
     </td>
     <td class="px-4 py-3">
       <span
-        class="inline-flex rounded-full px-2 py-1 text-xs font-medium"
+        class="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap"
         :class="healthLabelClasses"
         :title="healthLabelDescription"
       >
+        <span aria-hidden="true" class="h-1.5 w-1.5 rounded-full bg-current" />
         {{ row.healthLabel }}
       </span>
     </td>
@@ -236,7 +184,7 @@ const healthLabelClasses = computed(() => {
     >
       <NuxtLink
         :to="detailHref"
-        class="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800"
+        class="inline-flex min-h-8 items-center gap-1 rounded-md border border-gray-300 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-100 dark:hover:bg-gray-800"
       >
         Details
         <ArrowRight class="h-3.5 w-3.5" />
