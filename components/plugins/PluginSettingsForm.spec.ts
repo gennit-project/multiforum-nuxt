@@ -10,7 +10,10 @@ const fieldStub = (name: string) => ({
   template: `<div class="${name}" />`,
 });
 
-const section = (fields: { key: string; type: string }[], overrides = {}) => ({
+const section = (
+  fields: Array<{ key: string; type: string; [key: string]: unknown }>,
+  overrides = {}
+) => ({
   title: 'General',
   description: 'General settings',
   fields,
@@ -31,6 +34,7 @@ const mountForm = (props: Record<string, unknown> = {}) =>
         PluginBooleanField: fieldStub('PluginBooleanField'),
         PluginSelectField: fieldStub('PluginSelectField'),
         PluginSecretField: fieldStub('PluginSecretField'),
+        PluginForumMultiSelectField: fieldStub('PluginForumMultiSelectField'),
       },
     },
   });
@@ -64,6 +68,7 @@ describe('PluginSettingsForm field selection', () => {
     ['toggle', 'PluginBooleanField'],
     ['select', 'PluginSelectField'],
     ['secret', 'PluginSecretField'],
+    ['forum-multiselect', 'PluginForumMultiSelectField'],
     ['unknown', 'PluginTextField'],
   ])('renders %s fields with %s', (type, component) => {
     const wrapper = mountForm({ sections: [section([{ key: 'f', type }])] });
@@ -76,24 +81,93 @@ describe('PluginSettingsForm values', () => {
   it('passes the field value from the model', () => {
     const wrapper = mountForm({ modelValue: { name: 'hi' } });
 
-    expect(wrapper.getComponent({ name: 'PluginTextField' }).props('modelValue')).toBe('hi');
+    expect(
+      wrapper.getComponent({ name: 'PluginTextField' }).props('modelValue')
+    ).toBe('hi');
   });
 
   it('passes the field error', () => {
     const wrapper = mountForm({ errors: { name: 'Required' } });
 
-    expect(wrapper.getComponent({ name: 'PluginTextField' }).props('error')).toBe('Required');
+    expect(
+      wrapper.getComponent({ name: 'PluginTextField' }).props('error')
+    ).toBe('Required');
   });
 
   it('emits update:modelValue with the merged value', async () => {
     const wrapper = mountForm({ modelValue: { other: 1 } });
 
-    await wrapper.getComponent({ name: 'PluginTextField' }).vm.$emit('update:model-value', 'typed');
+    await wrapper
+      .getComponent({ name: 'PluginTextField' })
+      .vm.$emit('update:model-value', 'typed');
 
     expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toEqual({
       other: 1,
       name: 'typed',
     });
+  });
+
+  it('passes array values to forum multi-select fields', () => {
+    const wrapper = mountForm({
+      sections: [section([{ key: 'forums', type: 'forum-multiselect' }])],
+      modelValue: { forums: ['cats', 'dogs'] },
+    });
+
+    expect(
+      wrapper
+        .getComponent({ name: 'PluginForumMultiSelectField' })
+        .props('modelValue')
+    ).toEqual(['cats', 'dogs']);
+  });
+
+  it('emits merged array values from forum multi-select fields', async () => {
+    const wrapper = mountForm({
+      sections: [section([{ key: 'forums', type: 'forum-multiselect' }])],
+      modelValue: { mode: 'allowlist' },
+    });
+
+    await wrapper
+      .getComponent({ name: 'PluginForumMultiSelectField' })
+      .vm.$emit('update:model-value', ['cats']);
+
+    expect(wrapper.emitted('update:modelValue')?.[0]?.[0]).toEqual({
+      mode: 'allowlist',
+      forums: ['cats'],
+    });
+  });
+
+  it('shows fields whose visibility condition matches', () => {
+    const wrapper = mountForm({
+      sections: [
+        section([
+          {
+            key: 'forums',
+            type: 'forum-multiselect',
+            visibleWhen: { key: 'mode', equals: 'allowlist' },
+          },
+        ]),
+      ],
+      modelValue: { mode: 'allowlist' },
+    });
+
+    expect(wrapper.find('.PluginForumMultiSelectField').exists()).toBe(true);
+  });
+
+  it('hides fields whose visibility condition does not match', () => {
+    const wrapper = mountForm({
+      sections: [
+        section([
+          {
+            key: 'forums',
+            type: 'forum-multiselect',
+            visibleWhen: { key: 'mode', equals: 'allowlist' },
+          },
+        ]),
+      ],
+      modelValue: { mode: 'off' },
+    });
+
+    expect(wrapper.find('.PluginForumMultiSelectField').exists()).toBe(false);
   });
 
   it('passes the secret status to secret fields', () => {
