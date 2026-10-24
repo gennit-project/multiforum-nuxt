@@ -1,4 +1,19 @@
-import type { PluginFormSection } from '@/types/pluginForms';
+import type {
+  PluginField,
+  PluginFormSection,
+  PluginSettings,
+} from '@/types/pluginForms';
+
+export function isPluginFieldVisible(
+  field: PluginField,
+  settingsValues: PluginSettings
+): boolean {
+  if (!field.visibleWhen) return true;
+  return Object.is(
+    settingsValues[field.visibleWhen.key],
+    field.visibleWhen.equals
+  );
+}
 
 /**
  * Extracts the keys of all secret fields from plugin form sections.

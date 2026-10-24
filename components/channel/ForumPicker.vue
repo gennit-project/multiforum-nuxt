@@ -12,7 +12,11 @@ import type {
   MultiSelectOption,
   MultiSelectSection,
 } from '@/components/MultiSelect.vue';
-import type { Channel, ChannelWhere, Collection } from '@/__generated__/graphql';
+import type {
+  Channel,
+  ChannelWhere,
+  Collection,
+} from '@/__generated__/graphql';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 
@@ -42,6 +46,18 @@ const props = defineProps({
     default: '',
   },
   testId: {
+    type: String,
+    default: '',
+  },
+  inputId: {
+    type: String,
+    default: '',
+  },
+  placeholder: {
+    type: String,
+    default: 'Select forums...',
+  },
+  error: {
     type: String,
     default: '',
   },
@@ -133,7 +149,9 @@ const getDisabledReasons = (channel: ChannelOptionSource) => {
     .map((flag) => UNAVAILABLE_REASON_BY_FLAG[flag]);
 };
 
-const toSelectableOption = (channel: ChannelOptionSource): MultiSelectOption | null => {
+const toSelectableOption = (
+  channel: ChannelOptionSource
+): MultiSelectOption | null => {
   const reasons = getDisabledReasons(channel);
 
   if (reasons.length > 0 && !isSearchActive.value) {
@@ -198,16 +216,18 @@ const channelSections = computed<MultiSelectSection[]>(() => {
     title: 'Favorite Forums',
     options: favoriteOptions,
     emptyMessage: favoritesEmptyMessage,
-    selectAllLabel:
-      favoriteOptions.some((option: MultiSelectOption) => !option.disabled)
-        ? 'Select all favorite forums'
-        : undefined,
+    selectAllLabel: favoriteOptions.some(
+      (option: MultiSelectOption) => !option.disabled
+    )
+      ? 'Select all favorite forums'
+      : undefined,
   });
 
   // Channel collections - consolidated under single heading
   const collections = collectionsResult.value?.users?.[0]?.Collections || [];
   const collectionsWithChannels = collections.filter(
-    (collection: Pick<Collection, 'Channels'>) => collection.Channels && collection.Channels.length > 0
+    (collection: Pick<Collection, 'Channels'>) =>
+      collection.Channels && collection.Channels.length > 0
   );
 
   if (collectionsWithChannels.length > 0) {
@@ -290,9 +310,11 @@ const handleSearch = (query: string) => {
     :model-value="props.selectedChannels"
     :sections="channelSections"
     :description="props.description"
+    :error="props.error"
     :loading="channelsLoading"
     :test-id="props.testId"
-    placeholder="Select forums..."
+    :input-id="props.inputId"
+    :placeholder="props.placeholder"
     search-placeholder="Type to search..."
     searchable
     :show-chips="true"

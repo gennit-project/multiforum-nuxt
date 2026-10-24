@@ -24,19 +24,50 @@ const asRecord = (value: unknown): Record<string, unknown> =>
 
 const isCompatibleValue = (field: PluginField, value: unknown): boolean => {
   if (value === undefined || value === null) return true;
-  if (field.type === 'number' && (typeof value !== 'number' || !Number.isFinite(value))) return false;
-  if ((field.type === 'boolean' || field.type === 'toggle') && typeof value !== 'boolean') return false;
-  if ((field.type === 'text' || field.type === 'textarea') && typeof value !== 'string') return false;
-  if (field.type === 'select' && !field.options?.some((option) => Object.is(option.value, value))) return false;
+  if (
+    field.type === 'number' &&
+    (typeof value !== 'number' || !Number.isFinite(value))
+  )
+    return false;
+  if (
+    (field.type === 'boolean' || field.type === 'toggle') &&
+    typeof value !== 'boolean'
+  )
+    return false;
+  if (
+    (field.type === 'text' || field.type === 'textarea') &&
+    typeof value !== 'string'
+  )
+    return false;
+  if (
+    field.type === 'select' &&
+    !field.options?.some((option) => Object.is(option.value, value))
+  )
+    return false;
+  if (
+    field.type === 'forum-multiselect' &&
+    (!Array.isArray(value) || value.some((item) => typeof item !== 'string'))
+  )
+    return false;
 
   const validation = field.validation || {};
   if (typeof value === 'number') {
-    if (typeof validation.min === 'number' && value < validation.min) return false;
-    if (typeof validation.max === 'number' && value > validation.max) return false;
+    if (typeof validation.min === 'number' && value < validation.min)
+      return false;
+    if (typeof validation.max === 'number' && value > validation.max)
+      return false;
   }
   if (typeof value === 'string') {
-    if (typeof validation.minLength === 'number' && value.length < validation.minLength) return false;
-    if (typeof validation.maxLength === 'number' && value.length > validation.maxLength) return false;
+    if (
+      typeof validation.minLength === 'number' &&
+      value.length < validation.minLength
+    )
+      return false;
+    if (
+      typeof validation.maxLength === 'number' &&
+      value.length > validation.maxLength
+    )
+      return false;
     if (validation.pattern) {
       try {
         if (!new RegExp(validation.pattern).test(value)) return false;

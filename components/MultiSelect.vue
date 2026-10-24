@@ -58,6 +58,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  inputId: {
+    type: String,
+    default: '',
+  },
   // Whether to show a search bar
   searchable: {
     type: Boolean,
@@ -479,6 +483,7 @@ const describedBy = computed(() => {
         <!-- One native trigger covers the field; clear/remove stay separate buttons. -->
         <button
           ref="toggleButtonRef"
+          :id="inputId || undefined"
           type="button"
           :data-testid="testId"
           :aria-label="toggleAriaLabel"

@@ -1,5 +1,6 @@
 import { compareVersionStrings } from '@/utils/versionUtils';
 import type { PluginFormSection } from '@/types/pluginForms';
+import { isPluginFieldVisible } from '@/utils/pluginSettingsUtils';
 
 /**
  * Pure helpers for the server-scoped plugin detail page
@@ -152,7 +153,10 @@ export function mapInstallErrorMessage(errorMessage: string): string {
   }
   if (errorMessage.includes('PLUGIN_API_VERSION_UNSUPPORTED')) {
     const match = errorMessage.match(/Requires plugin API [^;]+/);
-    return match?.[0] || 'This plugin version requires an unsupported plugin API version.';
+    return (
+      match?.[0] ||
+      'This plugin version requires an unsupported plugin API version.'
+    );
   }
   return `Installation failed: ${errorMessage || 'Unknown error'}`;
 }
@@ -168,9 +172,16 @@ export function validateRequiredSettings(
   const errors: Record<string, string> = {};
   for (const section of sections) {
     for (const field of section.fields) {
-      if (field.validation?.required) {
+      if (!isPluginFieldVisible(field, values)) continue;
+
+      if (field.required || field.validation?.required) {
         const value = values[field.key];
-        if (value === undefined || value === null || value === '') {
+        if (
+          value === undefined ||
+          value === null ||
+          value === '' ||
+          (Array.isArray(value) && value.length === 0)
+        ) {
           errors[field.key] = `${field.label} is required`;
         }
       }
