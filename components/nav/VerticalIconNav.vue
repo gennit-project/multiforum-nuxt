@@ -80,20 +80,11 @@ const navigation: NavigationItem[] = [
 const recentForums = ref<ForumItem[]>([]);
 
 const loadRecentForums = () => {
-  if (!import.meta.client) {
-    recentForums.value = [];
-    return;
-  }
   const forums = getLocalStorageItem<ForumItem[]>('recentForums', []);
   recentForums.value = forums
     .sort((a, b) => b.timestamp - a.timestamp)
     .slice(0, DEFAULT_LIMIT);
 };
-
-// Load initial forums only on client
-if (import.meta.client) {
-  loadRecentForums();
-}
 
 const route = useRoute();
 const { height } = useDisplay();
@@ -122,14 +113,21 @@ const canSeeAdminDashboard = computed(() => {
   );
 });
 
+const hasUserActions = computed(() => canSeeAdminDashboard.value);
+
 // Keep SSR and client hydration aligned, then apply viewport-height layout after mount.
 onMounted(() => {
   hasMounted.value = true;
+  loadRecentForums();
 });
 const isVerticallyShort = computed(() => {
   if (!hasMounted.value) return false;
   return height.value < 700;
 });
+
+const hasVisibleRecentForums = computed(
+  () => recentForums.value.length > 0 && !isVerticallyShort.value
+);
 
 // Drawer state
 const isDrawerOpen = ref(false);
@@ -281,15 +279,15 @@ const getNavLabelClasses = (isActive: boolean) =>
 
     <!-- Divider -->
     <div
-      v-if="!isVerticallyShort"
-      class="h-px w-8 bg-gray-200 dark:bg-gray-600"
+      v-if="hasVisibleRecentForums || hasUserActions"
+      class="nav-section-divider h-px w-8 bg-gray-200 dark:bg-gray-600"
       :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
     />
 
     <!-- Recent Forums (hidden when vertically short) -->
     <ClientOnly>
       <div
-        v-if="recentForums.length > 0 && !isVerticallyShort"
+        v-if="hasVisibleRecentForums"
         class="recent-forums-rail flex w-full flex-col items-center space-y-1"
       >
         <!-- Limited Recent Forums -->
@@ -351,7 +349,8 @@ const getNavLabelClasses = (isActive: boolean) =>
 
     <!-- Divider -->
     <div
-      class="h-px w-8 bg-gray-200 dark:bg-gray-600"
+      v-if="hasVisibleRecentForums && hasUserActions"
+      class="nav-section-divider h-px w-8 bg-gray-200 dark:bg-gray-600"
       :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
     />
 
