@@ -60,7 +60,7 @@ const mountNav = () =>
 
 beforeEach(() => {
   vi.clearAllMocks();
-  h.route = { params: {}, name: 'home' };
+  h.route = { params: {}, name: 'home', path: '/' };
   h.username = ref('');
   h.notificationCount = ref(0);
   h.smAndDown = ref(false);
@@ -117,6 +117,17 @@ describe('TopNav route label', () => {
     const wrapper = mountNav();
 
     expect(wrapper.text()).toContain('discussions');
+  });
+
+  it('labels nested library routes', () => {
+    h.route = {
+      params: { collectionId: 'reading-list' },
+      name: 'library-collectionId',
+      path: '/library/reading-list',
+    };
+    const wrapper = mountNav();
+
+    expect(wrapper.text()).toContain('library');
   });
 
   it('labels admin routes', () => {
@@ -187,6 +198,13 @@ describe('TopNav actions', () => {
     const wrapper = mountNav();
 
     expect(wrapper.find('.profile').exists()).toBe(false);
+  });
+
+  it('keeps a login control in the library top nav when logged out', () => {
+    h.route = { params: {}, name: 'library', path: '/library' };
+    const wrapper = mountNav();
+
+    expect(wrapper.findAllComponents({ name: 'LoginButton' })).toHaveLength(2);
   });
 
   it('applies fixed positioning on map pages', () => {

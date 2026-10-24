@@ -5,6 +5,7 @@ import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import { GET_USER_FAVORITE_CHANNELS } from '@/graphQLData/user/queries';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 
 const usernameVar = useUsername();
 
@@ -42,14 +43,11 @@ const favoriteChannels = computed(() => {
               </p>
             </div>
 
-            <div v-if="loading" class="py-8 text-center">
-              <div
-                class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
-              />
-              <p class="mt-2 text-gray-600 dark:text-gray-400">
-                Loading your favorite forums...
-              </p>
-            </div>
+            <LibraryListSkeleton
+              v-if="loading"
+              label="Loading your favorite forums"
+              variant="cards"
+            />
 
             <div
               v-else-if="error"

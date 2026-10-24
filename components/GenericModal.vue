@@ -210,7 +210,7 @@ const dangerButtonClasses = computed(() => {
                     v-if="showSecondaryButton"
                     ref="cancelButtonRef"
                     type="button"
-                    class="focus:ring-brand-500 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm dark:text-gray-200"
+                    class="focus:ring-brand-500 inline-flex w-full justify-center rounded-full border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none sm:mt-0 sm:w-auto sm:text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
                     @click="emit('close')"
                   >
                     {{ secondaryButtonText }}

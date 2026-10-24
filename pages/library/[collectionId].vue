@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import { computed, ref, defineAsyncComponent } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { useHead } from 'nuxt/app';
 import { useRoute, useRouter } from 'vue-router';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import Breadcrumbs from '@/components/nav/Breadcrumbs.vue';
+import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
+import LibraryReorderControls from '@/components/library/LibraryReorderControls.vue';
+import LibraryItemIcon from '@/components/library/LibraryItemIcon.vue';
+import Tooltip from '@/components/Tooltip.vue';
+import ArrowUpRightIcon from '@/components/icons/ArrowUpRightIcon.vue';
+import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
+import LockClosedIcon from '@/components/icons/LockClosedIcon.vue';
+import LockOpenIcon from '@/components/icons/LockOpenIcon.vue';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
 import {
   GET_COLLECTION_ITEMS,
   GET_ALL_USER_COLLECTIONS,
@@ -138,6 +149,7 @@ const newCollectionDescription = ref('');
 // Delete modal state
 const showDeleteModal = ref(false);
 const showShareModal = ref(false);
+const isReorderMode = ref(false);
 const selectedShareForums = ref<string[]>([]);
 const shareTitle = ref('');
 const shareMessage = ref('');
@@ -172,8 +184,29 @@ const shareSubmitError = ref<string | null>(null);
 const collectionIsPublic = computed(
   () => collection.value?.visibility === 'PUBLIC'
 );
+const collectionItemCountLabel = computed(() => {
+  const count = collection.value?.itemCount ?? items.value.length;
+  return `${count} ${count === 1 ? 'item' : 'items'}`;
+});
+const shareTooltipText = computed(() =>
+  collectionIsPublic.value
+    ? 'Share this public collection to a forum discussion.'
+    : "This collection can't be shared because it is private."
+);
 
 const getItemId = (item: unknown) => getCollectionItemStableId(item);
+
+const getReorderLabel = (item: {
+  title?: string | null;
+  displayName?: string | null;
+  uniqueName?: string | null;
+  alt?: string | null;
+}) =>
+  item.title ||
+  item.displayName ||
+  item.uniqueName ||
+  item.alt ||
+  (collection.value?.collectionType === 'COMMENTS' ? 'comment' : 'item');
 
 const moveCollectionItem = async (item: unknown, newPosition: number) => {
   const itemId = getItemId(item);
@@ -321,14 +354,13 @@ const handleDelete = async () => {
             <Breadcrumbs :links="breadcrumbLinks" />
 
             <!-- Loading state -->
-            <div v-if="loading" class="py-8 text-center">
-              <div
-                class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
-              />
-              <p class="mt-2 text-gray-600 dark:text-gray-400">
-                Loading collection...
-              </p>
-            </div>
+            <LibraryListSkeleton
+              v-if="loading"
+              class="py-8"
+              label="Loading collection"
+              variant="rows"
+              :count="4"
+            />
 
             <!-- Error state -->
             <div
@@ -362,7 +394,7 @@ const handleDelete = async () => {
             <template v-else>
               <!-- Header -->
               <div
-                class="mb-8 rounded-[1.75rem] border border-gray-200/80 bg-white/82 p-6 shadow-[0_24px_70px_-42px_rgba(38,38,38,0.26)] backdrop-blur dark:border-gray-700 dark:bg-gray-900 dark:shadow-[0_24px_70px_-48px_rgba(0,0,0,0.82)]"
+                class="border-t-brand-500/60 dark:border-t-brand-500/60 mb-8 rounded-[1.75rem] border border-gray-200/80 bg-white/90 p-5 shadow-[0_24px_70px_-42px_rgba(38,38,38,0.26)] backdrop-blur lg:p-6 dark:border-gray-700 dark:bg-gray-900 dark:shadow-[0_24px_70px_-48px_rgba(0,0,0,0.82)]"
               >
                 <!-- Back button for mobile -->
                 <NuxtLink
@@ -386,152 +418,190 @@ const handleDelete = async () => {
                 </NuxtLink>
 
                 <div
-                  v-if="isAutoSavedDownloads"
-                  class="border-brand-200 bg-brand-50 text-brand-900 dark:border-brand-800 dark:bg-brand-950/40 dark:text-brand-200 mt-4 rounded-lg border p-4 text-sm"
+                  class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between"
                 >
-                  Downloads are added to this private collection automatically
-                  when you grab a file.
-                </div>
+                  <div class="flex min-w-0 flex-1 items-start gap-4">
+                    <div
+                      class="border-brand-300 bg-brand-50 text-brand-700 dark:border-brand-700 dark:bg-brand-950/60 dark:text-brand-300 flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border"
+                      aria-hidden="true"
+                    >
+                      <LibraryItemIcon
+                        class="h-9 w-9"
+                        :collection-type="collection.collectionType"
+                      />
+                    </div>
 
-                <!-- Title and actions -->
-                <div
-                  class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between"
-                >
-                  <div class="flex-1">
-                    <h1
-                      class="text-3xl font-semibold tracking-[-0.04em] text-gray-950 md:text-4xl dark:text-white"
-                    >
-                      {{ collection.name }}
-                      <span
-                        class="font-semibold text-gray-500 dark:text-gray-300"
-                        >({{ collection.itemCount }})</span
+                    <div class="min-w-0 flex-1">
+                      <p
+                        class="text-brand-700 dark:text-brand-300 text-[11px] font-bold tracking-[0.16em] uppercase"
                       >
-                    </h1>
-                    <p
-                      v-if="collection.description"
-                      class="mt-3 max-w-3xl text-base leading-7 text-gray-600 dark:text-gray-300"
-                    >
-                      {{ collection.description }}
-                    </p>
-                    <div class="mt-4 flex flex-wrap items-center gap-2 text-sm">
-                      <span
-                        class="rounded-full border border-green-300 bg-green-50 px-3 py-1 font-medium text-green-700 dark:border-green-500/35 dark:bg-green-500/12 dark:text-green-300"
+                        Custom collection
+                      </p>
+                      <div class="mt-1 flex flex-wrap items-center gap-3">
+                        <h1
+                          class="min-w-0 text-3xl font-semibold tracking-[-0.04em] text-gray-950 md:text-4xl dark:text-white"
+                        >
+                          {{ collection.name }}
+                        </h1>
+                        <span
+                          class="rounded-full border border-gray-200 bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                        >
+                          {{ collectionItemCountLabel }}
+                        </span>
+                      </div>
+                      <p
+                        v-if="collection.description"
+                        class="mt-2 max-w-3xl text-sm leading-6 text-gray-600 dark:text-gray-300"
                       >
-                        {{ collectionTypeLabel.toLowerCase() }}
+                        {{ collection.description }}
+                      </p>
+
+                      <div
+                        class="mt-3 flex flex-wrap items-center gap-2 text-sm"
+                      >
+                        <span
+                          class="inline-flex items-center gap-1.5 rounded-full border border-green-300 bg-green-50 px-3 py-1 font-medium text-green-700 dark:border-green-500/35 dark:bg-green-500/12 dark:text-green-300"
+                        >
+                          <LibraryItemIcon
+                            class="h-4 w-4"
+                            :collection-type="collection.collectionType"
+                          />
+                          {{ collectionTypeLabel }}
+                        </span>
+                        <span
+                          class="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-gray-100 px-3 py-1 font-medium text-gray-700 capitalize dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                        >
+                          <LockOpenIcon
+                            v-if="collectionIsPublic"
+                            class="h-4 w-4"
+                          />
+                          <LockClosedIcon v-else class="h-4 w-4" />
+                          {{ collection.visibility.toLowerCase() }}
+                        </span>
+                      </div>
+
+                      <span
+                        v-if="visibilityError"
+                        class="mt-2 block text-sm text-red-600 dark:text-red-400"
+                      >
+                        {{ visibilityError }}
                       </span>
                       <span
-                        class="rounded-full border border-gray-300 bg-gray-100 px-3 py-1 font-medium text-gray-700 capitalize dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                        v-if="reorderError"
+                        class="mt-2 block text-sm text-red-600 dark:text-red-400"
                       >
-                        {{ collection.visibility.toLowerCase() }}
+                        Could not update collection order:
+                        {{ reorderError.message }}
                       </span>
                     </div>
-                    <p
-                      v-if="visibilityError"
-                      class="mt-1 text-sm text-red-600 dark:text-red-400"
-                    >
-                      {{ visibilityError }}
-                    </p>
-                    <p
-                      v-if="reorderError"
-                      class="mt-1 text-sm text-red-600 dark:text-red-400"
-                    >
-                      Could not update collection order:
-                      {{ reorderError.message }}
-                    </p>
-                    <p
-                      v-if="!collectionIsPublic"
-                      class="mt-3 text-sm text-gray-500 dark:text-gray-300"
-                    >
-                      Make this collection public before sharing it to a forum
-                      discussion.
-                    </p>
                   </div>
 
-                  <!-- Action buttons -->
                   <div
-                    class="flex w-full flex-wrap items-center gap-2 lg:ml-4 lg:w-auto lg:shrink-0 lg:flex-nowrap"
+                    class="flex w-full flex-wrap items-center gap-2 lg:ml-4 lg:w-auto lg:shrink-0 lg:flex-nowrap lg:justify-end"
                   >
+                    <Tooltip location="top" :aria-label="shareTooltipText">
+                      <template #activator="{ props: tooltipProps }">
+                        <button
+                          v-bind="tooltipProps"
+                          type="button"
+                          data-testid="share-collection-button"
+                          class="inline-flex min-h-11 items-center gap-2 rounded-full border border-green-300 bg-green-50 px-4 py-2 text-sm font-semibold text-green-800 shadow-sm transition hover:bg-green-100 focus:ring-2 focus:ring-green-500/30 focus:outline-none aria-disabled:cursor-not-allowed aria-disabled:opacity-55 dark:border-green-500/35 dark:bg-green-500/12 dark:text-green-200 dark:hover:bg-green-500/20"
+                          :aria-disabled="!collectionIsPublic"
+                          @click="openShareModal"
+                        >
+                          <ArrowUpRightIcon
+                            class="h-4 w-4"
+                            aria-hidden="true"
+                          />
+                          Share to forum
+                        </button>
+                      </template>
+                      {{ shareTooltipText }}
+                    </Tooltip>
                     <button
                       type="button"
-                      class="inline-flex items-center rounded-full border border-green-300 bg-green-50 px-3 py-1.5 text-xs font-medium text-green-800 shadow-sm transition hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-70 lg:px-3 lg:py-2 lg:text-sm dark:border-green-500/35 dark:bg-green-500/12 dark:text-green-200 dark:hover:bg-green-500/20"
-                      :disabled="!collectionIsPublic"
-                      :title="
-                        collectionIsPublic
-                          ? 'Share this public collection to a forum discussion'
-                          : 'Make this collection public before sharing it to a forum'
-                      "
-                      @click="openShareModal"
-                    >
-                      Share to forum
-                    </button>
-                    <button
-                      type="button"
-                      class="inline-flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-1.5 text-xs font-medium text-gray-800 shadow-sm transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-70 lg:px-3 lg:py-2 lg:text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                      class="inline-flex min-h-11 items-center gap-2 rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-200 focus:ring-2 focus:ring-gray-500/30 focus:outline-none disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
                       :disabled="visibilityUpdating || updateLoading"
                       @click="handleToggleVisibility"
                     >
-                      <svg
-                        class="mr-1.5 h-3.5 w-3.5 lg:h-4 lg:w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M12 4v16m8-8H4"
-                        />
-                      </svg>
+                      <LockClosedIcon
+                        v-if="collectionIsPublic"
+                        class="h-4 w-4"
+                      />
+                      <LockOpenIcon v-else class="h-4 w-4" />
                       {{
                         collection.visibility === 'PUBLIC'
                           ? 'Make Private'
                           : 'Make Public'
                       }}
                     </button>
-                    <button
-                      type="button"
-                      aria-label="Edit collection"
-                      title="Edit collection"
-                      class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-800 shadow-sm transition hover:bg-gray-100 lg:h-11 lg:w-11 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                      @click="openRenameModal"
-                    >
-                      <svg
-                        class="h-3.5 w-3.5 lg:h-4 lg:w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                    <Menu as="div" class="relative">
+                      <MenuButton
+                        class="focus:ring-brand-500/30 inline-flex h-11 w-11 items-center justify-center rounded-full border border-gray-300 bg-white text-gray-700 shadow-sm transition hover:bg-gray-100 focus:ring-2 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+                        aria-label="Collection actions"
                       >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        <EllipsisHorizontal
+                          class="h-5 w-5"
+                          aria-hidden="true"
                         />
-                      </svg>
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="Delete collection"
-                      title="Delete collection"
-                      class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-red-300 bg-white text-red-600 shadow-sm transition hover:bg-red-50 lg:h-11 lg:w-11 dark:border-red-500/40 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-red-500/12"
-                      @click="showDeleteModal = true"
-                    >
-                      <svg
-                        class="h-3.5 w-3.5 lg:h-4 lg:w-4"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                      </MenuButton>
+                      <transition
+                        enter-active-class="transition duration-100 ease-out"
+                        enter-from-class="scale-95 opacity-0"
+                        enter-to-class="scale-100 opacity-100"
+                        leave-active-class="transition duration-75 ease-in"
+                        leave-from-class="scale-100 opacity-100"
+                        leave-to-class="scale-95 opacity-0"
                       >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                        />
-                      </svg>
-                    </button>
+                        <MenuItems
+                          class="absolute right-0 z-30 mt-2 w-52 origin-top-right rounded-xl border border-gray-200 bg-white p-1.5 shadow-2xl focus:outline-none dark:border-gray-700 dark:bg-gray-900"
+                        >
+                          <MenuItem v-slot="{ active, close }">
+                            <button
+                              type="button"
+                              title="Edit collection"
+                              class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-gray-800 dark:text-gray-100"
+                              :class="
+                                active ? 'bg-gray-100 dark:bg-gray-800' : ''
+                              "
+                              @click="
+                                openRenameModal();
+                                close();
+                              "
+                            >
+                              <PencilIcon class="h-4 w-4" />
+                              Edit collection
+                            </button>
+                          </MenuItem>
+                          <MenuItem v-slot="{ active, close }">
+                            <button
+                              type="button"
+                              title="Delete collection"
+                              class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-red-600 dark:text-red-400"
+                              :class="
+                                active ? 'bg-red-50 dark:bg-red-950/30' : ''
+                              "
+                              @click="
+                                showDeleteModal = true;
+                                close();
+                              "
+                            >
+                              <TrashIcon class="h-4 w-4" />
+                              Delete collection
+                            </button>
+                          </MenuItem>
+                        </MenuItems>
+                      </transition>
+                    </Menu>
                   </div>
+                </div>
+
+                <div
+                  v-if="isAutoSavedDownloads"
+                  class="border-brand-200 bg-brand-50 text-brand-900 dark:border-brand-800 dark:bg-brand-950/40 dark:text-brand-200 mt-4 rounded-xl border px-4 py-3 text-sm"
+                >
+                  Downloads are added to this private collection automatically
+                  when you grab a file.
                 </div>
               </div>
 
@@ -561,206 +631,210 @@ const handleDelete = async () => {
                 </p>
               </div>
 
-              <div
-                v-else-if="
-                  collection.collectionType === 'DISCUSSIONS' ||
-                  collection.collectionType === 'DOWNLOADS'
-                "
-                class="space-y-4"
-              >
-                <template
-                  v-for="(discussion, index) in items"
-                  :key="getItemId(discussion)"
+              <template v-else>
+                <div
+                  v-if="items.length > 1"
+                  class="mb-4 flex items-center justify-between gap-4 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 dark:border-gray-800 dark:bg-gray-900/60"
+                >
+                  <p
+                    class="text-sm text-gray-600 dark:text-gray-300"
+                    aria-live="polite"
+                  >
+                    {{
+                      isReorderMode
+                        ? 'Use the controls beside each item to change its position.'
+                        : `${items.length} items in this collection.`
+                    }}
+                  </p>
+                  <button
+                    type="button"
+                    class="focus-visible:ring-brand-500 inline-flex min-h-11 shrink-0 items-center rounded-full border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-100 focus:outline-none focus-visible:ring-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+                    :aria-pressed="isReorderMode"
+                    @click="isReorderMode = !isReorderMode"
+                  >
+                    {{ isReorderMode ? 'Done reordering' : 'Reorder' }}
+                  </button>
+                </div>
+
+                <div
+                  v-if="
+                    collection.collectionType === 'DISCUSSIONS' ||
+                    collection.collectionType === 'DOWNLOADS'
+                  "
+                  :class="
+                    collection.collectionType === 'DOWNLOADS'
+                      ? 'grid max-w-6xl gap-4 xl:grid-cols-2'
+                      : 'max-w-5xl space-y-4'
+                  "
+                >
+                  <template
+                    v-for="(discussion, index) in items"
+                    :key="getItemId(discussion)"
+                  >
+                    <div
+                      class="grid items-start gap-3"
+                      :class="
+                        isReorderMode
+                          ? 'grid-cols-[3.25rem_minmax(0,1fr)]'
+                          : 'grid-cols-1'
+                      "
+                    >
+                      <LibraryReorderControls
+                        v-if="isReorderMode"
+                        :item-label="getReorderLabel(discussion)"
+                        :index="index"
+                        :total="items.length"
+                        :loading="reorderLoading"
+                        @move="moveCollectionItem(discussion, $event)"
+                      />
+                      <LibraryDownloadCard
+                        v-if="collection.collectionType === 'DOWNLOADS'"
+                        :download="discussion"
+                        :download-link="getDiscussionLink(discussion)"
+                        :channel-link="
+                          discussion.DiscussionChannels?.[0]?.channelUniqueName
+                            ? `/forums/${discussion.DiscussionChannels[0].channelUniqueName}`
+                            : '/'
+                        "
+                        :channel-unique-name="
+                          discussion.DiscussionChannels?.[0]
+                            ?.channelUniqueName || ''
+                        "
+                        :author-info="getAuthorInfo(discussion)"
+                        :preview-image-url="getPreviewImage(discussion)"
+                        :show-favorite-button="true"
+                        :allow-add-to-list="true"
+                        :is-favorited="Boolean(discussion.isFavorited)"
+                      />
+                      <LibraryDiscussionCard
+                        v-else
+                        :discussion="discussion"
+                        :discussion-link="getDiscussionLink(discussion)"
+                        :channel-link="
+                          discussion.DiscussionChannels?.[0]?.channelUniqueName
+                            ? `/forums/${discussion.DiscussionChannels[0].channelUniqueName}`
+                            : '/'
+                        "
+                        :channel-unique-name="
+                          discussion.DiscussionChannels?.[0]
+                            ?.channelUniqueName || ''
+                        "
+                        :author-info="getAuthorInfo(discussion)"
+                        :comment-count="
+                          discussion.DiscussionChannels?.reduce(
+                            (
+                              total: number,
+                              item: CollectionDiscussionChannel
+                            ) => total + (item.CommentsAggregate?.count || 0),
+                            0
+                          ) || 0
+                        "
+                        :show-favorite-button="true"
+                        :allow-add-to-list="true"
+                        :is-favorited="Boolean(discussion.isFavorited)"
+                      />
+                    </div>
+                  </template>
+                </div>
+
+                <div
+                  v-else-if="collection.collectionType === 'CHANNELS'"
+                  class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
                 >
                   <div
-                    class="grid gap-3 md:grid-cols-[auto,minmax(0,1fr)] md:items-start"
+                    v-for="(channel, index) in items"
+                    :key="getItemId(channel)"
+                    class="grid items-start gap-3"
+                    :class="
+                      isReorderMode
+                        ? 'grid-cols-[3.25rem_minmax(0,1fr)]'
+                        : 'grid-cols-1'
+                    "
                   >
-                    <div class="flex gap-2 md:flex-col">
-                      <button
-                        type="button"
-                        class="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                        :disabled="index === 0 || reorderLoading"
-                        :aria-label="`Move ${discussion.title || 'item'} up`"
-                        @click="moveCollectionItem(discussion, index - 1)"
-                      >
-                        Up
-                      </button>
-                      <button
-                        type="button"
-                        class="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                        :disabled="index === items.length - 1 || reorderLoading"
-                        :aria-label="`Move ${discussion.title || 'item'} down`"
-                        @click="moveCollectionItem(discussion, index + 1)"
-                      >
-                        Down
-                      </button>
-                    </div>
-                    <LibraryDownloadCard
-                      v-if="collection.collectionType === 'DOWNLOADS'"
-                      :download="discussion"
-                      :download-link="getDiscussionLink(discussion)"
-                      :channel-link="
-                        discussion.DiscussionChannels?.[0]?.channelUniqueName
-                          ? `/forums/${discussion.DiscussionChannels[0].channelUniqueName}`
-                          : '/'
-                      "
-                      :channel-unique-name="
-                        discussion.DiscussionChannels?.[0]?.channelUniqueName ||
-                        ''
-                      "
-                      :author-info="getAuthorInfo(discussion)"
-                      :preview-image-url="getPreviewImage(discussion)"
+                    <LibraryReorderControls
+                      v-if="isReorderMode"
+                      :item-label="getReorderLabel(channel)"
+                      :index="index"
+                      :total="items.length"
+                      :loading="reorderLoading"
+                      @move="moveCollectionItem(channel, $event)"
+                    />
+                    <LibraryChannelCard
+                      :channel="channel"
                       :show-favorite-button="true"
                       :allow-add-to-list="true"
-                      :is-favorited="Boolean(discussion.isFavorited)"
+                      :is-favorited="Boolean(channel.isFavorited)"
                     />
-                    <LibraryDiscussionCard
-                      v-else
-                      :discussion="discussion"
-                      :discussion-link="getDiscussionLink(discussion)"
-                      :channel-link="
-                        discussion.DiscussionChannels?.[0]?.channelUniqueName
-                          ? `/forums/${discussion.DiscussionChannels[0].channelUniqueName}`
-                          : '/'
-                      "
-                      :channel-unique-name="
-                        discussion.DiscussionChannels?.[0]?.channelUniqueName ||
-                        ''
-                      "
-                      :author-info="getAuthorInfo(discussion)"
-                      :comment-count="
-                        discussion.DiscussionChannels?.reduce(
-                          (total: number, item: CollectionDiscussionChannel) =>
-                            total + (item.CommentsAggregate?.count || 0),
-                          0
-                        ) || 0
-                      "
+                  </div>
+                </div>
+
+                <div
+                  v-else-if="collection.collectionType === 'COMMENTS'"
+                  class="space-y-4"
+                >
+                  <div
+                    v-for="(comment, index) in items"
+                    :key="getItemId(comment)"
+                    class="grid items-start gap-3"
+                    :class="
+                      isReorderMode
+                        ? 'grid-cols-[3.25rem_minmax(0,1fr)]'
+                        : 'grid-cols-1'
+                    "
+                  >
+                    <LibraryReorderControls
+                      v-if="isReorderMode"
+                      :item-label="getReorderLabel(comment)"
+                      :index="index"
+                      :total="items.length"
+                      :loading="reorderLoading"
+                      @move="moveCollectionItem(comment, $event)"
+                    />
+                    <LibraryCommentCard
+                      :comment="comment"
+                      :author-info="getAuthorInfo(comment)"
+                      :context-type="getCommentContextType(comment)"
+                      :context-title="getCommentContextTitle(comment)"
+                      :context-permalink="getCommentContextPermalink(comment)"
+                      :permalink="getCommentPermalink(comment)"
                       :show-favorite-button="true"
                       :allow-add-to-list="true"
-                      :is-favorited="Boolean(discussion.isFavorited)"
+                      :is-favorited="Boolean(comment.isFavorited)"
                     />
                   </div>
-                </template>
-              </div>
-
-              <div
-                v-else-if="collection.collectionType === 'CHANNELS'"
-                class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
-              >
-                <div
-                  v-for="(channel, index) in items"
-                  :key="getItemId(channel)"
-                  class="space-y-2"
-                >
-                  <div class="flex gap-2">
-                    <button
-                      type="button"
-                      class="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                      :disabled="index === 0 || reorderLoading"
-                      :aria-label="`Move ${channel.displayName || channel.uniqueName || 'forum'} up`"
-                      @click="moveCollectionItem(channel, index - 1)"
-                    >
-                      Up
-                    </button>
-                    <button
-                      type="button"
-                      class="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                      :disabled="index === items.length - 1 || reorderLoading"
-                      :aria-label="`Move ${channel.displayName || channel.uniqueName || 'forum'} down`"
-                      @click="moveCollectionItem(channel, index + 1)"
-                    >
-                      Down
-                    </button>
-                  </div>
-                  <LibraryChannelCard
-                    :channel="channel"
-                    :show-favorite-button="true"
-                    :allow-add-to-list="true"
-                    :is-favorited="Boolean(channel.isFavorited)"
-                  />
                 </div>
-              </div>
 
-              <div
-                v-else-if="collection.collectionType === 'COMMENTS'"
-                class="space-y-4"
-              >
                 <div
-                  v-for="(comment, index) in items"
-                  :key="getItemId(comment)"
-                  class="grid gap-3 md:grid-cols-[auto,minmax(0,1fr)] md:items-start"
+                  v-else-if="collection.collectionType === 'IMAGES'"
+                  class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 >
-                  <div class="flex gap-2 md:flex-col">
-                    <button
-                      type="button"
-                      class="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                      :disabled="index === 0 || reorderLoading"
-                      aria-label="Move comment up"
-                      @click="moveCollectionItem(comment, index - 1)"
-                    >
-                      Up
-                    </button>
-                    <button
-                      type="button"
-                      class="inline-flex items-center justify-center rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                      :disabled="index === items.length - 1 || reorderLoading"
-                      aria-label="Move comment down"
-                      @click="moveCollectionItem(comment, index + 1)"
-                    >
-                      Down
-                    </button>
+                  <div
+                    v-for="(image, index) in items"
+                    :key="getItemId(image)"
+                    class="grid items-start gap-3"
+                    :class="
+                      isReorderMode
+                        ? 'grid-cols-[3.25rem_minmax(0,1fr)]'
+                        : 'grid-cols-1'
+                    "
+                  >
+                    <LibraryReorderControls
+                      v-if="isReorderMode"
+                      :item-label="getReorderLabel(image)"
+                      :index="index"
+                      :total="items.length"
+                      :loading="reorderLoading"
+                      @move="moveCollectionItem(image, $event)"
+                    />
+                    <ImageListItem
+                      :image="image"
+                      :username="image.Uploader?.username || usernameVar"
+                      :show-favorite-button="false"
+                      :allow-add-to-list="true"
+                    />
                   </div>
-                  <LibraryCommentCard
-                    :comment="comment"
-                    :author-info="getAuthorInfo(comment)"
-                    :context-type="getCommentContextType(comment)"
-                    :context-title="getCommentContextTitle(comment)"
-                    :context-permalink="getCommentContextPermalink(comment)"
-                    :permalink="getCommentPermalink(comment)"
-                    :show-favorite-button="true"
-                    :allow-add-to-list="true"
-                    :is-favorited="Boolean(comment.isFavorited)"
-                  />
                 </div>
-              </div>
-
-              <div
-                v-else-if="collection.collectionType === 'IMAGES'"
-                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-              >
-                <div
-                  v-for="(image, index) in items"
-                  :key="getItemId(image)"
-                  class="space-y-2"
-                >
-                  <div class="flex gap-2">
-                    <button
-                      type="button"
-                      class="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                      :disabled="index === 0 || reorderLoading"
-                      :aria-label="`Move ${image.alt || 'image'} up`"
-                      @click="moveCollectionItem(image, index - 1)"
-                    >
-                      Up
-                    </button>
-                    <button
-                      type="button"
-                      class="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-medium text-gray-700 shadow-sm transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
-                      :disabled="index === items.length - 1 || reorderLoading"
-                      :aria-label="`Move ${image.alt || 'image'} down`"
-                      @click="moveCollectionItem(image, index + 1)"
-                    >
-                      Down
-                    </button>
-                  </div>
-                  <ImageListItem
-                    :image="image"
-                    :username="image.Uploader?.username || usernameVar"
-                    :show-favorite-button="false"
-                    :allow-add-to-list="true"
-                  />
-                </div>
-              </div>
+              </template>
             </template>
           </div>
         </div>

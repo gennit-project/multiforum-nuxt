@@ -6,6 +6,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import FolderOpenIcon from '@/components/icons/FolderOpenIcon.vue';
 import WarningModal from '@/components/WarningModal.vue';
+import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 import { useUsername } from '@/composables/useAuthState';
 import { GET_UPLOADED_DOWNLOADABLE_FILES } from '@/graphQLData/user/queries';
 import { PERMANENTLY_DELETE_DOWNLOADABLE_FILE } from '@/graphQLData/discussion/mutations';
@@ -139,14 +140,12 @@ const deleteSelectedFile = async () => {
             </p>
           </div>
 
-          <div v-if="loading" class="py-10 text-center">
-            <div
-              class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
-            />
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Loading uploaded files...
-            </p>
-          </div>
+          <LibraryListSkeleton
+            v-if="loading"
+            label="Loading uploaded files"
+            variant="rows"
+            :count="4"
+          />
 
           <ErrorBanner
             v-else-if="error"

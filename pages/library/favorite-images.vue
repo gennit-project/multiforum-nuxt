@@ -6,6 +6,7 @@ import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ImageListItem from '@/components/image/ImageListItem.vue';
+import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 
 const usernameVar = useUsername();
 
@@ -73,14 +74,11 @@ const user = computed(() => {
             </div>
 
             <!-- Loading state -->
-            <div v-if="loading" class="py-8 text-center">
-              <div
-                class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
-              />
-              <p class="mt-2 text-gray-600 dark:text-gray-400">
-                Loading your favorite images...
-              </p>
-            </div>
+            <LibraryListSkeleton
+              v-if="loading"
+              label="Loading your favorite images"
+              variant="images"
+            />
 
             <!-- Error state -->
             <div

@@ -4,6 +4,7 @@ import { useQuery } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 import type { Collection, Discussion } from '@/__generated__/graphql';
 import {
   GET_ALL_USER_COLLECTIONS,
@@ -181,14 +182,11 @@ const getFirstAlbumImage = (download: Download): string | undefined => {
               </p>
             </div>
 
-            <div v-if="loadingState" class="py-8 text-center">
-              <div
-                class="border-brand-500 inline-block h-8 w-8 animate-spin rounded-full border-b-2"
-              />
-              <p class="mt-2 text-gray-600 dark:text-gray-400">
-                Loading your downloads...
-              </p>
-            </div>
+            <LibraryListSkeleton
+              v-if="loadingState"
+              label="Loading your downloads"
+              variant="cards"
+            />
 
             <div
               v-else-if="errorState"

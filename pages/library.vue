@@ -6,6 +6,7 @@ import type { Collection } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
+import LibraryItemIcon from '@/components/library/LibraryItemIcon.vue';
 import {
   GET_USER_FAVORITE_COUNTS,
   GET_USER_OWNED_DOWNLOADS_COUNT,
@@ -225,15 +226,6 @@ const isLoading = computed(
     !uploadedFilesResult.value &&
     !customCollectionsResult.value
 );
-
-const itemIconLabel = (item: SidebarItem) => {
-  if (item.id === 'all-favorites') return '★';
-  if (item.collectionType === 'IMAGES') return 'I';
-  if (item.collectionType === 'DOWNLOADS') return 'D';
-  if (item.collectionType === 'COMMENTS') return 'C';
-  if (item.collectionType === 'CHANNELS') return 'F';
-  return 'L';
-};
 </script>
 
 <template>
@@ -355,7 +347,7 @@ const itemIconLabel = (item: SidebarItem) => {
                         "
                       >
                         <span
-                          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-sm font-bold text-gray-500 dark:bg-gray-800 dark:text-gray-300"
+                          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-300"
                           :class="
                             item.id === 'all-favorites'
                               ? 'text-brand-600 dark:text-brand-300'
@@ -363,7 +355,11 @@ const itemIconLabel = (item: SidebarItem) => {
                           "
                           aria-hidden="true"
                         >
-                          {{ itemIconLabel(item) }}
+                          <LibraryItemIcon
+                            class="h-5 w-5"
+                            :collection-type="item.collectionType"
+                            :item-id="item.id"
+                          />
                         </span>
                         <span class="min-w-0 flex-1">
                           <span class="block truncate text-sm font-semibold">

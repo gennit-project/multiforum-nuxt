@@ -18,6 +18,20 @@ vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
 }));
 
+vi.mock('@headlessui/vue', () => ({
+  Menu: { name: 'Menu', template: '<div><slot /></div>' },
+  MenuButton: {
+    name: 'MenuButton',
+    template: '<button v-bind="$attrs"><slot /></button>',
+  },
+  MenuItems: { name: 'MenuItems', template: '<div><slot /></div>' },
+  MenuItem: {
+    name: 'MenuItem',
+    methods: { close() {} },
+    template: '<div><slot :active="false" :close="close" /></div>',
+  },
+}));
+
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ref('alice'),
 }));
@@ -163,6 +177,31 @@ const mountWith = async (collection: unknown) => {
           template:
             '<nav>{{ links.map((link) => link.label).join(" > ") }}</nav>',
         },
+        LibraryListSkeleton: {
+          name: 'LibraryListSkeleton',
+          props: ['label'],
+          template: '<div role="status" :aria-label="label">{{ label }}</div>',
+        },
+        LibraryReorderControls: {
+          name: 'LibraryReorderControls',
+          props: ['itemLabel', 'index'],
+          emits: ['move'],
+          template:
+            '<div><button :aria-label="`Move ${itemLabel} up`" @click="$emit(\'move\', index - 1)">up</button><button :aria-label="`Move ${itemLabel} down`" @click="$emit(\'move\', index + 1)">down</button></div>',
+        },
+        Tooltip: {
+          name: 'Tooltip',
+          props: ['ariaLabel'],
+          template:
+            '<div><slot name="activator" :props="{}" /><span class="tooltip-copy"><slot /></span></div>',
+        },
+        Menu: { template: '<div><slot /></div>' },
+        MenuButton: { template: '<button><slot /></button>' },
+        MenuItems: { template: '<div><slot /></div>' },
+        MenuItem: {
+          methods: { close() {} },
+          template: '<div><slot :active="false" :close="close" /></div>',
+        },
       },
     },
   });
@@ -173,7 +212,9 @@ describe('library collection detail page', () => {
     queryLoading = true;
     const wrapper = await mountWith(null);
 
-    expect(wrapper.text()).toContain('Loading collection...');
+    expect(wrapper.get('[role="status"]').attributes('aria-label')).toBe(
+      'Loading collection'
+    );
   });
 
   it('shows an error state when the collection query fails', async () => {
@@ -243,14 +284,16 @@ describe('library collection detail page', () => {
       itemCount: 0,
     });
 
-    const shareButton = wrapper.find(
-      'button[title="Make this collection public before sharing it to a forum"]'
-    );
-    expect(shareButton.exists()).toBe(true);
-    expect(shareButton.attributes('disabled')).toBeDefined();
-    expect(wrapper.text()).toContain(
-      'Make this collection public before sharing it to a forum discussion.'
-    );
+    const shareButton = wrapper.get('[data-testid="share-collection-button"]');
+    expect({
+      exists: shareButton.exists(),
+      ariaDisabled: shareButton.attributes('aria-disabled'),
+      tooltip: wrapper.get('.tooltip-copy').text(),
+    }).toEqual({
+      exists: true,
+      ariaDisabled: 'true',
+      tooltip: "This collection can't be shared because it is private.",
+    });
   });
 
   it('renames a collection from the edit modal', async () => {
@@ -286,9 +329,6 @@ describe('library collection detail page', () => {
       itemCount: 0,
     });
 
-    await wrapper.find(
-      'button[title="Share this public collection to a forum discussion"]'
-    ).element;
     await wrapper
       .findAll('button')
       .find((button) => button.text().includes('Make Private'))!
@@ -334,9 +374,7 @@ describe('library collection detail page', () => {
     });
 
     await wrapper
-      .find(
-        'button[title="Share this public collection to a forum discussion"]'
-      )
+      .find('[data-testid="share-collection-button"]')
       .trigger('click');
     await wrapper.find('[data-testid="forum-picker"]').trigger('click');
     await wrapper.find('[data-testid="modal-primary"]').trigger('click');
@@ -365,9 +403,7 @@ describe('library collection detail page', () => {
     });
 
     await wrapper
-      .find(
-        'button[title="Share this public collection to a forum discussion"]'
-      )
+      .find('[data-testid="share-collection-button"]')
       .trigger('click');
     await wrapper.find('[data-testid="forum-picker"]').trigger('click');
     await wrapper.find('[data-testid="modal-primary"]').trigger('click');
@@ -443,6 +479,10 @@ describe('library collection detail page', () => {
     });
 
     await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Reorder')!
+      .trigger('click');
+    await wrapper
       .find('button[aria-label="Move First saved down"]')
       .trigger('click');
 
@@ -452,6 +492,33 @@ describe('library collection detail page', () => {
       newPosition: 1,
     });
     expect(refetchCollection).toHaveBeenCalled();
+  });
+
+  it('only shows item move controls while reorder mode is active', async () => {
+    const wrapper = await mountWith({
+      id: 'col-1',
+      name: 'Ordered discussions',
+      collectionType: 'DISCUSSIONS',
+      visibility: 'PRIVATE',
+      itemCount: 2,
+      Discussions: [
+        { id: 'd1', title: 'First saved', DiscussionChannels: [] },
+        { id: 'd2', title: 'Second saved', DiscussionChannels: [] },
+      ],
+    });
+
+    const before = wrapper
+      .find('button[aria-label="Move First saved down"]')
+      .exists();
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Reorder')!
+      .trigger('click');
+    const after = wrapper
+      .find('button[aria-label="Move First saved down"]')
+      .exists();
+
+    expect({ before, after }).toEqual({ before: false, after: true });
   });
 
   it.each([
@@ -500,6 +567,10 @@ describe('library collection detail page', () => {
       itemCount: 2,
       ...data,
     });
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text() === 'Reorder')!
+      .trigger('click');
     await wrapper.find(`button[aria-label="${label}"]`).trigger('click');
     expect(mutationMocks.reorder).toHaveBeenCalledWith({
       collectionId: 'col-1',
