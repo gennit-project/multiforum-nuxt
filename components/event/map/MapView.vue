@@ -442,11 +442,11 @@ const isClientSide = typeof window !== 'undefined';
   <div class="map-explorer flex min-w-0 flex-col bg-gray-50 dark:bg-gray-950">
     <client-only>
       <header
-        class="shrink-0 border-b border-gray-200 bg-white px-4 py-4 sm:px-6 dark:border-gray-800 dark:bg-gray-900"
+        class="shrink-0 border-b border-gray-200 bg-white px-4 py-3 sm:px-5 dark:border-gray-800 dark:bg-gray-900"
       >
         <div
           v-if="isMapRoute"
-          class="mb-4 flex flex-wrap items-center justify-between gap-3"
+          class="mb-3 flex flex-wrap items-center justify-between gap-2"
         >
           <div>
             <h1
@@ -454,7 +454,7 @@ const isClientSide = typeof window !== 'undefined';
             >
               Explore events
             </h1>
-            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+            <p class="mt-0.5 text-sm text-gray-600 dark:text-gray-300">
               Find your people, around the corner.
             </p>
           </div>
@@ -467,7 +467,7 @@ const isClientSide = typeof window !== 'undefined';
           </button>
         </div>
         <div
-          class="rounded-xl border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-950"
+          class="rounded-xl border border-gray-200 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-950"
         >
           <EventFilterBar
             :show-map="true"
@@ -479,42 +479,25 @@ const isClientSide = typeof window !== 'undefined';
         </div>
       </header>
 
+      <p class="sr-only" role="status" data-testid="map-results-status">
+        {{
+          eventLoading
+            ? 'Loading events…'
+            : `${eventResult?.eventsAggregate?.count ?? 0} events`
+        }}
+      </p>
+
       <!-- Desktop View -->
       <div
         v-if="isClientSide && mdAndUp"
         class="grid min-h-0 flex-1 grid-cols-[minmax(20rem,42%)_minmax(0,1fr)]"
       >
         <section
-          aria-labelledby="map-results-heading"
+          :aria-label="resultsHeading"
           class="min-h-0 overflow-y-auto border-r border-gray-200 dark:border-gray-800"
           tabindex="0"
         >
-          <div
-            class="sticky top-0 z-10 border-b border-gray-200 bg-gray-50 px-4 py-4 dark:border-gray-800 dark:bg-gray-950"
-          >
-            <h2
-              id="map-results-heading"
-              class="text-lg font-semibold text-gray-900 dark:text-white"
-            >
-              {{ resultsHeading }}
-            </h2>
-            <p
-              class="mt-1 text-sm text-gray-600 dark:text-gray-300"
-              role="status"
-            >
-              {{
-                eventLoading
-                  ? 'Loading events…'
-                  : `${eventResult?.eventsAggregate?.count ?? 0} events`
-              }}
-              <span v-if="!eventLoading" class="float-right">{{
-                filterValues.timeShortcut === timeShortcutValues.PAST_EVENTS
-                  ? 'Newest first'
-                  : 'Soonest first'
-              }}</span>
-            </p>
-          </div>
-          <div class="py-3">
+          <div class="py-2">
             <LoadingSpinner v-if="eventLoading" class="mx-auto my-4" />
             <ErrorBanner
               v-else-if="eventError"
@@ -634,18 +617,7 @@ const isClientSide = typeof window !== 'undefined';
               class="mx-auto my-4"
             />
           </section>
-          <section aria-labelledby="mobile-results-heading" class="w-full py-4">
-            <div class="mb-3 px-4">
-              <h2
-                id="mobile-results-heading"
-                class="text-lg font-semibold text-gray-900 dark:text-white"
-              >
-                {{ resultsHeading }}
-              </h2>
-              <p class="text-sm text-gray-600 dark:text-gray-300" role="status">
-                {{ eventResult.eventsAggregate?.count ?? 0 }} events
-              </p>
-            </div>
+          <section :aria-label="resultsHeading" class="w-full py-2">
             <div class="mx-auto">
               <EventList
                 :events="eventResult.events"

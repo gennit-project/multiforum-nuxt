@@ -77,7 +77,7 @@ const handleTimeFilterShortcutClick = (shortcut: string) => {
 <template>
   <div
     v-if="mapStyle"
-    class="flex flex-wrap gap-2"
+    class="flex min-w-0 max-w-full gap-2 overflow-x-auto pb-1"
     role="group"
     aria-label="Event dates"
   >
@@ -87,7 +87,7 @@ const handleTimeFilterShortcutClick = (shortcut: string) => {
       type="button"
       :data-testid="`time-shortcut-${shortcut.label}`"
       :aria-pressed="shortcut.value === filterValues.timeShortcut"
-      class="focus-visible:ring-brand-500 min-h-11 rounded-lg border px-3 py-2 text-sm font-medium focus-visible:ring-2"
+      class="focus-visible:ring-brand-500 min-h-10 shrink-0 rounded-lg border px-2.5 py-1.5 text-xs font-medium focus-visible:ring-2"
       :class="
         shortcut.value === filterValues.timeShortcut
           ? 'border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-950 dark:text-brand-300'

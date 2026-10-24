@@ -59,8 +59,11 @@ function getTimeZone(startTime: string) {
 }
 </script>
 <template>
-  <div class="mt-4 text-xs text-gray-700 dark:text-gray-200">
-    <div v-if="showPoster" class="organizer flex items-center gap-1">
+  <footer
+    class="border-t border-gray-200 pt-3 text-xs leading-5 text-gray-500 dark:border-gray-800 dark:text-gray-400"
+    :class="compactMode ? 'mt-0' : 'mt-1'"
+  >
+    <div v-if="showPoster" class="organizer flex flex-wrap items-center gap-x-1">
       <UsernameWithTooltip
         v-if="eventData.Poster?.username"
         :is-server-admin="posterBadges.isServerAdmin"
@@ -88,5 +91,5 @@ function getTimeZone(startTime: string) {
       a location or a virtual event URL. It will only appear in forum specific
       search results.
     </p>
-  </div>
+  </footer>
 </template>

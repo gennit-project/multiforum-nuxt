@@ -71,7 +71,22 @@ describe('MapEventCard', () => {
     );
   });
   it('shows venue and start time', () => {
-    expect(mountCard().text()).toMatch(/Crescent Ballroom.*6:00 PM/);
+    const wrapper = mountCard();
+    expect(wrapper.get('time').text()).toContain('6:00 PM');
+    expect(wrapper.text()).toContain('Crescent Ballroom');
+  });
+  it('shows compact forum submissions without presenting the submitter as host', () => {
+    const wrapper = mountCard({
+      Poster: { username: 'cluse' },
+      EventChannels: [{ channelUniqueName: 'phoenix' }],
+    } as Partial<Event>);
+    expect(wrapper.text()).not.toContain('Hosted by');
+    expect(wrapper.text()).not.toContain('cluse');
+    expect(
+      wrapper
+        .get('[data-testid="forum-submissions"] a')
+        .attributes('aria-label')
+    ).toBe('View event in phoenix');
   });
   it('renders an optional thumbnail as decorative beside the title', () => {
     expect(
@@ -117,7 +132,7 @@ it('preserves links to other dates in a series', () => {
 });
 
 describe('online discovery cards', () => {
-  it('shows one event-wide count even when forum submissions have different counts', () => {
+  it('shows compact forum submissions without comment counts', () => {
     const wrapper = mountCard(
       {
         CommentsAggregate: { count: 9 },
@@ -128,7 +143,12 @@ describe('online discovery cards', () => {
       } as Partial<Event>,
       { onlineList: true }
     );
-    expect(wrapper.text()).toContain('9 comments · Shared across all forums');
+    const submissions = wrapper.get('[data-testid="forum-submissions"]');
+    expect(submissions.findAll('a').map((link) => link.text())).toEqual([
+      'cats',
+      'books',
+    ]);
+    expect(submissions.findAll('svg')).toHaveLength(0);
   });
   it('marks the selected online event', () => {
     expect(

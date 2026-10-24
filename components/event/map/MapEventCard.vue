@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { DateTime } from 'luxon';
-import { MapPin, Clock, Repeat, MessageSquare, Video } from 'lucide-vue-next';
+import { MapPin, Repeat } from 'lucide-vue-next';
 import { useRouter } from 'nuxt/app';
 import ForumSubmissions from '@/components/discovery/ForumSubmissions.vue';
 import type { Event } from '@/__generated__/graphql';
@@ -64,84 +64,60 @@ const multipleDays = computed(
 
 <template>
   <li
-    class="relative overflow-hidden rounded-xl border bg-white transition-colors dark:bg-gray-900"
-    :class="
+    class="relative overflow-hidden rounded-xl border bg-white transition-[border-color,box-shadow] dark:bg-gray-900"
+    :class="[
       isHighlighted || (onlineList && selectedEventId === event.id)
         ? 'border-brand-600 ring-brand-600 dark:border-brand-400 dark:ring-brand-400 ring-1'
-        : 'border-gray-200 hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-500'
-    "
+        : 'border-gray-200 hover:border-gray-400 dark:border-gray-700 dark:hover:border-gray-500',
+      'shadow-sm hover:shadow-md dark:shadow-none',
+    ]"
     :data-testid="`event-list-item-${event.title}`"
   >
     <button
       type="button"
       :aria-label="`Preview ${event.title}`"
-      class="focus-visible:ring-brand-500 flex w-full items-start gap-3 rounded-lg text-left focus-visible:ring-2 focus-visible:ring-inset"
-      :class="onlineList ? 'px-3 pt-2 pb-1' : 'p-3'"
+      class="focus-visible:ring-brand-500 w-full items-start rounded-lg text-left focus-visible:ring-2 focus-visible:ring-inset"
+      :class="
+        event.coverImageURL
+          ? 'grid grid-cols-[minmax(0,1fr)_5rem] gap-x-3 gap-y-1 p-3 sm:grid-cols-[minmax(0,1fr)_7rem]'
+          : 'grid grid-cols-1 gap-y-1 p-3'
+      "
       @click="openEvent"
     >
-      <time
-        :datetime="event.startTime"
-        :class="onlineList ? 'py-1' : 'py-2'"
-        class="flex w-12 shrink-0 flex-col items-center rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-700 dark:bg-gray-950"
-      >
-        <span
-          class="text-brand-700 dark:text-brand-300 text-[11px] font-semibold uppercase"
-          >{{ start.toFormat('ccc') }}</span
+      <span class="col-start-1 row-start-1 min-w-0">
+        <time
+          :datetime="event.startTime"
+          class="flex w-auto shrink-0 items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400"
         >
-        <span
-          class="leading-tight font-bold text-gray-950 dark:text-white"
-          :class="onlineList ? 'text-xl' : 'text-2xl'"
-          >{{ start.toFormat('d') }}</span
-        >
-        <span
-          class="text-[11px] font-medium text-gray-600 uppercase dark:text-gray-300"
-          >{{ start.toFormat('LLL') }}</span
-        >
-        <span class="sr-only">{{ start.toFormat('yyyy') }}</span>
-      </time>
-      <span class="min-w-0 flex-1">
-        <span
-          class="block text-base leading-snug font-semibold text-gray-950 dark:text-white"
-          data-testid="event-title"
-        >
-          <HighlightedSearchTerms
-            :text="event.title"
-            :search-input="searchInput"
-          />
-        </span>
-        <span
-          :class="
-            onlineList
-              ? 'mt-1 flex flex-wrap items-center gap-x-3 gap-y-1'
-              : 'block'
-          "
-        >
+          <span>{{ start.toFormat('ccc, LLL d') }}</span>
+          <span aria-hidden="true">·</span>
+          <span class="text-gray-700 dark:text-gray-300">{{ time }}</span>
+          <span>{{ start.offsetNameShort }}</span>
+          <span v-if="multipleDays">· Multiple days</span>
+          <span class="sr-only">{{ start.toFormat('yyyy') }}</span>
+        </time>
+        <span class="mt-1 block min-w-0">
           <span
-            v-if="onlineList"
-            class="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-300"
-            ><Video class="h-4 w-4" aria-hidden="true" /> Online event</span
+            class="block text-base leading-snug font-bold tracking-tight text-gray-950 dark:text-white"
+            data-testid="event-title"
           >
-          <span
-            v-if="event.locationName && !onlineList"
-            class="mt-2 flex items-start gap-1.5 text-sm text-gray-600 dark:text-gray-300"
-          >
-            <MapPin class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            {{ event.locationName }}
+            <HighlightedSearchTerms
+              :text="event.title"
+              :search-input="searchInput"
+            />
           </span>
           <span
-            :class="onlineList ? '' : 'mt-1'"
-            class="flex items-start gap-1.5 text-sm text-gray-600 dark:text-gray-300"
+            v-if="!onlineList && (event.locationName || event.address)"
+            class="mt-1 flex items-start gap-1.5 text-sm text-gray-600 dark:text-gray-300"
           >
-            <Clock class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-            {{ time }}<span v-if="onlineList">{{ start.offsetNameShort }}</span
-            ><span v-if="multipleDays"> · Multiple days</span>
+            <MapPin class="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>{{ event.locationName || event.address }}</span>
           </span>
           <span
             v-if="
               event.canceled || archived || event.free || event.EventSeries?.id
             "
-            :class="onlineList ? '' : 'mt-2'"
-            class="flex flex-wrap items-center gap-2 text-xs font-medium"
+            class="mt-1 flex flex-wrap items-center gap-2 text-xs font-medium"
           >
             <span v-if="event.canceled" class="text-red-700 dark:text-red-300"
               >Canceled</span
@@ -164,49 +140,40 @@ const multipleDays = computed(
         v-if="event.coverImageURL"
         :src="event.coverImageURL"
         alt=""
-        class="shrink-0 rounded-lg object-cover"
-        :class="onlineList ? 'h-16 w-16' : 'h-20 w-20 xl:h-24 xl:w-28'"
-        :width="onlineList ? 64 : 112"
-        :height="onlineList ? 64 : 96"
-        :sizes="onlineList ? '64px' : '112px'"
+        class="col-start-2 row-start-1 h-20 w-20 shrink-0 self-start rounded-lg object-cover sm:h-24 sm:w-28"
+        :width="112"
+        :height="96"
+        sizes="(min-width: 640px) 112px, 80px"
       />
     </button>
     <div
       v-if="event.Tags.length"
-      class="flex flex-wrap gap-2 px-3 pl-[4.5rem]"
-      :class="onlineList ? 'pb-1' : 'pb-3'"
+      class="flex flex-wrap gap-2 px-3 pb-2 sm:px-4"
     >
       <button
         v-for="tag in event.Tags"
         :key="tag.text"
         type="button"
         :aria-pressed="selectedTags.includes(tag.text)"
-        class="focus-visible:ring-brand-500 min-h-8 rounded-md border px-2 py-1 text-xs font-medium focus-visible:ring-2"
-        :class="
+        class="focus-visible:ring-brand-500 min-h-8 rounded-md border px-2 py-1 text-xs focus-visible:ring-2"
+        :class="[
           selectedTags.includes(tag.text)
-            ? 'border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-950 dark:text-brand-300'
-            : 'border-gray-300 bg-gray-100 text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200'
-        "
+            ? 'border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-950 dark:text-brand-300 font-medium'
+            : 'border-gray-200 bg-gray-50 font-normal text-gray-600 dark:border-gray-700 dark:bg-gray-800/70 dark:text-gray-300',
+        ]"
         @click="emit('filterByTag', tag.text)"
       >
         {{ tag.text }}
       </button>
     </div>
-    <div v-if="onlineList" class="px-3 pb-2 sm:pl-[4.5rem]">
+    <div v-if="event.EventChannels.length" class="px-3 pb-3">
       <ForumSubmissions
         :submissions="event.EventChannels"
         :content-id="event.id"
         kind="event"
         :compact="true"
+        :subtle="true"
       />
-      <p
-        class="mt-1 flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300"
-      >
-        <MessageSquare class="h-4 w-4" aria-hidden="true" />{{
-          event.CommentsAggregate?.count ?? 0
-        }}
-        comments · Shared across all forums
-      </p>
     </div>
     <SeriesOccurrenceButtons
       v-if="
@@ -216,7 +183,7 @@ const multipleDays = computed(
       :occurrences="event.EventSeries.Occurrences"
       :current-event-id="event.id"
       :channel-unique-name="event.EventChannels[0]?.channelUniqueName || ''"
-      class="px-3 pb-3 pl-[4.5rem]"
+      class="px-3 pb-3 sm:px-4 sm:pb-4"
     />
   </li>
 </template>

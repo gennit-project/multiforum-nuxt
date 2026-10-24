@@ -134,10 +134,15 @@ for (const mobile of [false, true]) {
       exact: true,
     });
     await expect(preview).toBeVisible();
+    await expect(preview).not.toContainText('Hosted by');
     const dates = page.getByRole('group', { name: 'Event dates' });
     await expect(
       dates.getByRole('button', { name: 'Past events' })
     ).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      page.getByRole('heading', { name: 'Past events', exact: true })
+    ).toHaveCount(0);
+    await expect(page.getByTestId('map-results-status')).toHaveClass(/sr-only/);
     await expect
       .poll(
         () =>
@@ -177,7 +182,29 @@ for (const mobile of [false, true]) {
         await page.evaluate(() => document.documentElement.scrollHeight)
       ).toBeLessThanOrEqual(1001);
     }
+
+    const moreFilters = page.getByTestId('more-filters-button');
+    await moreFilters.click();
+    const distanceButtons = page.locator('[data-testid^="distance-"]');
+    await expect(distanceButtons).toHaveCount(6);
+    const distanceButtonBoxes = await distanceButtons.evaluateAll((buttons) =>
+      buttons.map((button) => button.getBoundingClientRect().toJSON())
+    );
+    expect(
+      distanceButtonBoxes.every(
+        (box) => box.left >= 0 && box.right <= page.viewportSize()!.width
+      )
+    ).toBe(true);
+    const canceledCheckbox = await page
+      .getByTestId('canceled-checkbox')
+      .boundingBox();
+    expect(canceledCheckbox).toMatchObject({ width: 16, height: 16 });
+    await page.screenshot({
+      path: testInfo.outputPath('distance-filter-light.png'),
+      fullPage: false,
+    });
     await expectNoAxeViolations(page);
+    await moreFilters.click();
     await page.screenshot({
       path: testInfo.outputPath('map-layout-light.png'),
       fullPage: false,

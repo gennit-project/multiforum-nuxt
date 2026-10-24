@@ -384,35 +384,41 @@ function openFeedbackFormModal() {
     />
 
     <div
-      class="mb-4 flex justify-between border-b pt-2 pb-2 text-sm text-gray-700 dark:border-gray-500 dark:text-gray-200"
+      class="flex justify-between gap-4 rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 sm:p-4 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-200"
     >
-      <ul class="space-y-2">
-        <li class="hanging-indent flex items-start">
-          <div class="mr-3 h-5 w-5">
+      <ul class="min-w-0 space-y-2.5">
+        <li class="hanging-indent flex items-start gap-3">
+          <div
+            class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-gray-400 dark:text-gray-500"
+          >
             <CalendarIcon />
           </div>
-          <span>{{
-            `${getFormattedDateString(eventData.startTime)}, ${
-              eventData.isAllDay
-                ? 'all day'
-                : getDuration(eventData.startTime, eventData.endTime)
-            }`
-          }}</span>
-          <span
-            v-if="discoveryMode"
-            class="ml-2 text-xs text-gray-600 dark:text-gray-400"
-            >{{ DateTime.local().zoneName }}</span
-          >
+          <div class="min-w-0">
+            <span class="font-semibold text-gray-900 dark:text-gray-100">{{
+              `${getFormattedDateString(eventData.startTime)}, ${
+                eventData.isAllDay
+                  ? 'all day'
+                  : getDuration(eventData.startTime, eventData.endTime)
+              }`
+            }}</span>
+            <span
+              v-if="discoveryMode"
+              class="ml-2 text-xs text-gray-500 dark:text-gray-400"
+              >{{ DateTime.local().zoneName }}</span
+            >
+          </div>
         </li>
         <li
           v-if="eventData.virtualEventUrl"
-          class="hanging-indent flex items-start"
+          class="hanging-indent flex items-start gap-3"
         >
-          <div class="mr-3 h-5 w-5">
+          <div
+            class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-gray-400 dark:text-gray-500"
+          >
             <LinkIcon />
           </div>
           <a
-            class="flex-1 cursor-pointer break-all underline"
+            class="min-w-0 flex-1 cursor-pointer break-all font-medium underline decoration-gray-400 underline-offset-2 dark:decoration-gray-500"
             target="_blank"
             rel="noreferrer"
             :href="eventData.virtualEventUrl"
@@ -424,11 +430,16 @@ function openFeedbackFormModal() {
             }}
           </a>
         </li>
-        <li v-if="eventData.address" class="hanging-indent flex items-start">
-          <div class="mr-4 h-5 w-5">
+        <li
+          v-if="eventData.address"
+          class="hanging-indent flex items-start gap-3"
+        >
+          <div
+            class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-gray-400 dark:text-gray-500"
+          >
             <LocationIcon />
           </div>
-          <div class="inline">
+          <div class="min-w-0">
             {{ eventData.address }}
             <button
               v-if="!addressCopied"
@@ -451,22 +462,26 @@ function openFeedbackFormModal() {
         </li>
         <li
           v-if="!eventData.free && eventData.cost && eventData.cost !== '0'"
-          class="hanging-indent flex items-start"
+          class="hanging-indent flex items-start gap-3"
         >
-          <div class="h-5 w-5">
+          <div
+            class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-gray-400 dark:text-gray-500"
+          >
             <i class="fa-solid fa-ticket h-5" />
           </div>
           <MarkdownPreview
-            class="ml-3 flex-1"
+            class="min-w-0 flex-1"
             :disable-gallery="true"
             :text="eventData.cost"
           />
         </li>
         <li
           v-if="eventData.isHostedByOP && eventData.Poster"
-          class="hanging-indent flex items-start"
+          class="hanging-indent flex items-start gap-3"
         >
-          <div class="mr-3 h-5 w-5">
+          <div
+            class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center text-gray-400 dark:text-gray-500"
+          >
             <i class="fa-regular fa-user h-5" />
           </div>
           <nuxt-link
@@ -493,7 +508,7 @@ function openFeedbackFormModal() {
           </nuxt-link>
         </li>
       </ul>
-      <div>
+      <div class="shrink-0">
         <MenuButton
           v-if="showMenuButtons && eventData && menuItems.length > 0"
           :data-testid="'event-menu-button'"

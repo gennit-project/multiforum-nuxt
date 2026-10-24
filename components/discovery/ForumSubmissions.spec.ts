@@ -74,7 +74,7 @@ describe('ForumSubmissions', () => {
         .props('to')
     ).toBe('/forums/forum-0/discussions/topic');
   });
-  it('never presents separate comment counts for event forums', () => {
+  it('shows event forum names without comment counts', () => {
     const wrapper = mountForums({ kind: 'event' });
     expect({
       counts: wrapper.findAll('svg').length,

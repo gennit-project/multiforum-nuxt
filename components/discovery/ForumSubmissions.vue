@@ -2,13 +2,10 @@
 import { computed, ref, useId } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { MessageSquare } from 'lucide-vue-next';
-import type { DiscussionChannel } from '@/__generated__/graphql';
 
-type Submission = Pick<DiscussionChannel, 'channelUniqueName'> & {
-  CommentsAggregate?: Pick<
-    NonNullable<DiscussionChannel['CommentsAggregate']>,
-    'count'
-  > | null;
+type Submission = {
+  channelUniqueName: string;
+  CommentsAggregate?: { count: number } | null;
 };
 const props = withDefaults(
   defineProps<{
@@ -18,8 +15,9 @@ const props = withDefaults(
     selectedForum?: string;
     preview?: boolean;
     compact?: boolean;
+    subtle?: boolean;
   }>(),
-  { selectedForum: '', preview: false, compact: false }
+  { selectedForum: '', preview: false, compact: false, subtle: false }
 );
 const route = useRoute();
 const expanded = ref(false);
@@ -55,18 +53,28 @@ const label = (submission: Submission) =>
   <div
     v-if="submissions.length"
     class="min-w-0"
-    :class="
-      compact
+    :class="[
+      compact && kind === 'event'
+        ? 'flex flex-wrap items-center gap-x-2 gap-y-1'
+        : '',
+      compact && kind === 'discussion'
         ? 'grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2 gap-y-1'
-        : ''
-    "
+        : '',
+    ]"
     data-testid="forum-submissions"
   >
     <p
-      class="text-xs font-medium text-gray-600 dark:text-gray-400"
-      :class="compact ? 'pt-1.5' : 'mb-2'"
+      class="text-xs"
+      :class="[
+        compact && kind === 'discussion' ? 'pt-1.5' : '',
+        compact && kind === 'event' ? 'shrink-0' : '',
+        !compact ? 'mb-2' : '',
+        subtle
+          ? 'font-normal text-gray-500 dark:text-gray-400'
+          : 'font-medium text-gray-600 dark:text-gray-400',
+      ]"
     >
-      {{ kind === 'discussion' ? 'Discuss in' : 'Shared in' }}
+      {{ kind === 'discussion' ? 'Discuss in' : 'Submitted to' }}
       <span :class="compact ? 'sr-only' : ''"
         >{{ submissions.length }}
         {{ submissions.length === 1 ? 'forum' : 'forums' }}</span
@@ -97,7 +105,7 @@ const label = (submission: Submission) =>
           :aria-current="
             selectedForum === submission.channelUniqueName ? 'true' : undefined
           "
-          class="focus-visible:ring-brand-500 max-w-full items-center gap-2 rounded-lg border text-xs font-medium focus-visible:ring-2"
+          class="focus-visible:ring-brand-500 max-w-full items-center gap-2 rounded-lg border text-xs focus-visible:ring-2"
           :class="[
             compact ? 'min-h-7 px-2 py-1' : 'min-h-9 px-2.5 py-1.5',
             mode === 'mobile'
@@ -106,8 +114,10 @@ const label = (submission: Submission) =>
                 ? 'hidden lg:inline-flex'
                 : 'inline-flex',
             selectedForum === submission.channelUniqueName
-              ? 'border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-950 dark:text-brand-300'
-              : 'border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700',
+              ? 'border-brand-600 bg-brand-50 font-medium text-brand-800 dark:border-brand-400 dark:bg-brand-950 dark:text-brand-300'
+              : subtle
+                ? 'border-gray-200 bg-gray-50 font-normal text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800/70 dark:text-gray-300 dark:hover:bg-gray-700'
+                : 'border-gray-300 bg-gray-50 font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700',
           ]"
         >
           <span class="truncate">{{ submission.channelUniqueName }}</span>
@@ -118,15 +128,37 @@ const label = (submission: Submission) =>
         </NuxtLink>
       </li>
     </ul>
+    <div
+      v-if="compact && (submissions.length > 4 || $slots.trailing)"
+      class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1"
+      :class="
+        kind === 'discussion'
+          ? 'col-start-2 justify-between'
+          : 'basis-full justify-start'
+      "
+    >
+      <button
+        v-if="submissions.length > 4"
+        type="button"
+        :aria-expanded="expanded"
+        :aria-controls="listId"
+        class="focus-visible:ring-brand-500 min-h-7 rounded px-1 text-xs font-semibold text-gray-700 underline underline-offset-4 focus-visible:ring-2 dark:text-gray-200"
+        @click="expanded = !expanded"
+      >
+        {{
+          expanded
+            ? 'Show fewer forums'
+            : `Show all ${submissions.length} forums`
+        }}
+      </button>
+      <slot name="trailing" />
+    </div>
     <button
-      v-if="submissions.length > 4"
+      v-else-if="submissions.length > 4"
       type="button"
       :aria-expanded="expanded"
       :aria-controls="listId"
-      class="focus-visible:ring-brand-500 rounded px-1 text-xs font-semibold text-gray-700 underline underline-offset-4 focus-visible:ring-2 dark:text-gray-200"
-      :class="
-        compact ? 'col-start-2 min-h-7 justify-self-start' : 'mt-1 min-h-9'
-      "
+      class="focus-visible:ring-brand-500 mt-1 min-h-9 rounded px-1 text-xs font-semibold text-gray-700 underline underline-offset-4 focus-visible:ring-2 dark:text-gray-200"
       @click="expanded = !expanded"
     >
       {{

@@ -255,8 +255,8 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
 
 <template>
   <div
-    class="mt-1 flex-1 flex-col space-y-1 dark:text-white"
-    :class="[showMap ? 'map-filters w-full' : 'mx-4']"
+    class="flex-1 flex-col dark:text-white"
+    :class="[showMap ? 'map-filters w-full' : 'px-4 sm:px-5']"
   >
     <div
       v-if="
@@ -298,9 +298,9 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
     <div
       v-if="showMainFilters"
       class="flex flex-col gap-2"
-      :class="showMap ? 'p-0' : 'p-2'"
+      :class="showMap ? 'p-0' : 'py-3'"
     >
-      <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
+      <div v-if="route.name !== 'EventDetail'" class="w-full">
         <div
           class="flex items-center gap-2"
           :class="{ 'flex-wrap sm:flex-nowrap': showMap }"
@@ -426,40 +426,42 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
               <Popper v-if="showLocationSearchBarAndDistanceButtons">
                 <template #default>
                   <button
-                    class="absolute inset-y-0 right-2 m-1 flex cursor-pointer items-center justify-center rounded-full bg-white p-2 dark:bg-gray-700 dark:text-white"
+                    class="absolute top-1/2 right-1.5 flex h-9 w-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full bg-white text-gray-700 hover:bg-gray-100 focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:outline-none dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
                     aria-label="More filters"
                     title="More filters"
                     data-testid="more-filters-button"
                   >
-                    <FilterIcon
-                      class="h-4 w-4 bg-white dark:bg-gray-700 dark:text-white"
-                    />
+                    <FilterIcon class="h-4 w-4" aria-hidden="true" />
                   </button>
                 </template>
 
                 <template #content>
                   <div
-                    class="flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-4 dark:bg-gray-700"
+                    class="flex w-[min(22rem,calc(100vw-2rem))] max-w-[calc(100vw-2rem)] flex-col gap-2 rounded-lg border border-gray-300 bg-white p-3 shadow-lg dark:border-gray-600 dark:bg-gray-700"
                   >
                     <div v-if="showLocationSearchBarAndDistanceButtons">
                       <div
                         v-if="selectedDistanceUnit === MilesOrKm.KM"
-                        class="flex flex-wrap gap-x-1 gap-y-3"
+                        class="grid grid-cols-2 gap-2 sm:grid-cols-3"
                       >
                         <GenericButton
                           v-for="distance in distanceOptionsForKilometers"
                           :key="distance.value"
+                          class="min-h-9 justify-center !px-2 !py-1.5"
                           :active="distance.value === filterValues.radius"
+                          :aria-pressed="distance.value === filterValues.radius"
                           :data-testid="`distance-${distance.value}`"
                           :text="`${distance.label} ${distance.value !== 0 ? 'km' : ''}`"
                           @click="updateSelectedDistance(distance)"
                         />
                       </div>
-                      <div v-else class="flex flex-wrap gap-x-1 gap-y-3">
+                      <div v-else class="grid grid-cols-2 gap-2 sm:grid-cols-3">
                         <GenericButton
                           v-for="distance in distanceOptionsForMiles"
                           :key="distance.value"
+                          class="min-h-9 justify-center !px-2 !py-1.5"
                           :active="distance.value === filterValues.radius"
+                          :aria-pressed="distance.value === filterValues.radius"
                           :data-testid="`distance-${distance.value}`"
                           :text="`${distance.label} ${distance.value !== 0 ? 'mi' : ''}`"
                           @click="updateSelectedDistance(distance)"
@@ -498,7 +500,7 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
             </template>
           </RequireAuth>
         </div>
-        <div v-if="!channelId" class="mt-4 flex items-center md:hidden">
+        <div v-if="!channelId" class="mt-2 flex items-center md:hidden">
           <FilterChip
             class="items-center align-middle"
             :data-testid="'forum-filter-button'"
@@ -525,36 +527,37 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
           </FilterChip>
         </div>
       </div>
-      <slot />
-      <div
-        v-if="toggleShowArchivedEnabled"
-        class="flex flex-wrap items-center justify-start gap-4 py-2 dark:text-gray-300"
-      >
-        <CheckBox
-          :checked="filterValues.showArchived"
-          data-testid="show-archived-discussions"
-          :label="'Show archived events'"
-          @input="updateShowArchived"
-        />
-        <!-- Tags dropdown moved here -->
-        <FilterChip
-          class="items-center align-middle"
-          data-testid="tag-filter-button"
-          :highlighted="tagLabel !== defaultFilterLabels.tags"
-          :label="tagLabel"
+      <div class="flex flex-wrap items-center gap-2">
+        <slot />
+        <div
+          v-if="toggleShowArchivedEnabled"
+          class="flex flex-wrap items-center justify-start gap-3 dark:text-gray-300"
         >
-          <template #icon>
-            <TagIcon class="mr-2 -ml-0.5 h-4 w-4" />
-          </template>
-          <template #content>
-            <div class="relative w-96">
-              <SearchableTagList
-                :selected-tags="filterValues.tags"
-                @toggle-selection="toggleSelectedTag"
-              />
-            </div>
-          </template>
-        </FilterChip>
+          <CheckBox
+            :checked="filterValues.showArchived"
+            data-testid="show-archived-discussions"
+            :label="'Show archived events'"
+            @input="updateShowArchived"
+          />
+          <FilterChip
+            class="items-center align-middle"
+            data-testid="tag-filter-button"
+            :highlighted="tagLabel !== defaultFilterLabels.tags"
+            :label="tagLabel"
+          >
+            <template #icon>
+              <TagIcon class="mr-2 -ml-0.5 h-4 w-4" />
+            </template>
+            <template #content>
+              <div class="relative w-96">
+                <SearchableTagList
+                  :selected-tags="filterValues.tags"
+                  @toggle-selection="toggleSelectedTag"
+                />
+              </div>
+            </template>
+          </FilterChip>
+        </div>
       </div>
     </div>
   </div>
