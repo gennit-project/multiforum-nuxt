@@ -372,7 +372,7 @@ describe('admin dashboard page', () => {
     ).toEqual({
       startDate: '2026-05-27',
       endDate: '2026-06-26',
-      limit: 200,
+      limit: 100,
       sortBy: 'activityScore',
       sortDirection: 'desc',
     });
@@ -395,7 +395,7 @@ describe('admin dashboard page', () => {
     ).toEqual({
       startDate: '2026-05-27',
       endDate: '2026-06-26',
-      limit: 200,
+      limit: 100,
       sortBy: 'channelUniqueName',
       sortDirection: 'asc',
     });

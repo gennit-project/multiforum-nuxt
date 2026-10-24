@@ -1,11 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { flushPromises, mount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import ServerDashboardAttention from './ServerDashboardAttention.vue';
 
-const mockClear = vi.hoisted(() => vi.fn());
-const mockRetry = vi.hoisted(() => vi.fn());
-const mockRefetch = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 const mockQueue = vi.hoisted(() => ({ items: [] as unknown[] }));
 
 const reviewItem = {
@@ -26,28 +23,7 @@ vi.mock('@vue/apollo-composable', () => ({
     result: ref({ getDownloadScanReviewQueue: mockQueue.items }),
     loading: ref(false),
     error: ref(null),
-    refetch: mockRefetch,
   })),
-  useMutation: vi.fn((document) => {
-    const doneHandlers: Array<() => void> = [];
-    const target =
-      document.definitions?.[0]?.name?.value === 'retryDownloadableFileScan'
-        ? mockRetry
-        : mockClear;
-    return {
-      // Mirror Apollo: the mutation resolves, then onDone handlers run.
-      mutate: vi.fn((variables) => {
-        target(variables);
-        doneHandlers.forEach((handler) => handler());
-        return Promise.resolve();
-      }),
-      loading: ref(false),
-      error: ref(null),
-      onDone: (handler: () => void) => {
-        doneHandlers.push(handler);
-      },
-    };
-  }),
 }));
 
 const mountAttention = (props: Record<string, unknown> = {}) =>
@@ -63,13 +39,7 @@ const mountAttention = (props: Record<string, unknown> = {}) =>
     },
   });
 
-const buttonByText = (
-  wrapper: ReturnType<typeof mountAttention>,
-  text: string
-) => wrapper.findAll('button').find((button) => button.text() === text);
-
 beforeEach(() => {
-  vi.clearAllMocks();
   mockQueue.items = [reviewItem];
 });
 
@@ -78,96 +48,37 @@ describe('ServerDashboardAttention', () => {
     const wrapper = mountAttention();
 
     expect(wrapper.get('[data-testid="scan-review-item"]').text()).toMatch(
-      /asset\.zip\s*Suspicious\s*Asset pack\s*· alice · Archive contains an installer/
+      /asset\.zip\s*Suspicious\s*Review requested\s*Asset pack\s*· alice · Archive contains an installer/
     );
   });
 
-  it('keeps the release form collapsed until Review is pressed', () => {
+  it('links each file to its download page instead of acting on it in place', () => {
     const wrapper = mountAttention();
 
-    expect(wrapper.find('[data-testid="release-quarantine"]').exists()).toBe(
-      false
+    expect(wrapper.get('[data-testid="review-link"]').attributes('href')).toBe(
+      '/forums/general/downloads/discussion-1'
     );
   });
 
-  it('expands the release form when Review is pressed', async () => {
+  it('names the file in the review link for assistive technology', () => {
     const wrapper = mountAttention();
-    await wrapper.get('[data-testid="review-toggle"]').trigger('click');
 
     expect(
-      wrapper.get('[data-testid="review-toggle"]').attributes('aria-expanded')
-    ).toBe('true');
+      wrapper.get('[data-testid="review-link"]').attributes('aria-label')
+    ).toBe('Review asset.zip');
   });
 
-  it('renders the creator review request once expanded', async () => {
+  it('offers no in-place scan actions', () => {
     const wrapper = mountAttention();
-    await wrapper.get('[data-testid="review-toggle"]').trigger('click');
 
-    expect(wrapper.text()).toContain(
-      'Creator requested human review: This is source code only'
-    );
+    expect(wrapper.findAll('button')).toHaveLength(0);
   });
 
-  it('keeps quarantine release disabled until an audit reason is entered', async () => {
+  it('renders no review link when the file has no channel to link into', () => {
+    mockQueue.items = [{ ...reviewItem, channelUniqueName: null }];
     const wrapper = mountAttention();
-    await wrapper.get('[data-testid="review-toggle"]').trigger('click');
 
-    expect(
-      wrapper.get('[data-testid="release-quarantine"]').attributes('disabled')
-    ).toBe('');
-  });
-
-  it('labels the reason input for assistive technology', async () => {
-    const wrapper = mountAttention();
-    await wrapper.get('[data-testid="review-toggle"]').trigger('click');
-    const inputId = wrapper.get('input').attributes('id');
-
-    expect(wrapper.get(`label[for="${inputId}"]`).text()).toBe(
-      'Required release reason'
-    );
-  });
-
-  it('clears a reviewed file with its reason', async () => {
-    const wrapper = mountAttention();
-    await wrapper.get('[data-testid="review-toggle"]').trigger('click');
-    await wrapper.get('input').setValue('Reviewed archive contents');
-    await wrapper.get('[data-testid="release-quarantine"]').trigger('click');
-    await flushPromises();
-
-    expect(mockClear).toHaveBeenCalledWith({
-      downloadableFileId: 'file-1',
-      reason: 'Reviewed archive contents',
-    });
-  });
-
-  it('refreshes the queue after releasing a file', async () => {
-    const wrapper = mountAttention();
-    await wrapper.get('[data-testid="review-toggle"]').trigger('click');
-    await wrapper.get('input').setValue('Reviewed archive contents');
-    await wrapper.get('[data-testid="release-quarantine"]').trigger('click');
-    await flushPromises();
-
-    expect(mockRefetch).toHaveBeenCalledTimes(1);
-  });
-
-  it('collapses the release form after releasing a file', async () => {
-    const wrapper = mountAttention();
-    await wrapper.get('[data-testid="review-toggle"]').trigger('click');
-    await wrapper.get('input').setValue('Reviewed archive contents');
-    await wrapper.get('[data-testid="release-quarantine"]').trigger('click');
-    await flushPromises();
-
-    expect(wrapper.find('[data-testid="release-quarantine"]').exists()).toBe(
-      false
-    );
-  });
-
-  it('retries a scan without expanding the review form', async () => {
-    const wrapper = mountAttention();
-    await buttonByText(wrapper, 'Retry scan')?.trigger('click');
-    await flushPromises();
-
-    expect(mockRetry).toHaveBeenCalledWith({ downloadableFileId: 'file-1' });
+    expect(wrapper.find('[data-testid="review-link"]').exists()).toBe(false);
   });
 
   it('shows the open admin issues row with the oldest issue and its channel', () => {

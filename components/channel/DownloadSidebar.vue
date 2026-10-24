@@ -4,6 +4,7 @@ import type { Discussion } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import DownloadNowButton from '@/components/channel/DownloadNowButton.vue';
 import FunctionalDownloadNow from '@/components/channel/FunctionalDownloadNow.vue';
+import DownloadScanReviewPanel from '@/components/download/DownloadScanReviewPanel.vue';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
 import DownloadPipelineStatusSummary from '@/components/plugins/DownloadPipelineStatusSummary.vue';
 import { computed, ref } from 'vue';
@@ -361,6 +362,10 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
             the scanner findings before clearing it.
           </p>
         </div>
+        <DownloadScanReviewPanel
+          v-if="scanStatus !== 'CLEAN' && primaryFile.id"
+          :downloadable-file-id="primaryFile.id"
+        />
         <dl class="mt-3 grid grid-cols-2 gap-3 text-sm">
           <div>
             <dt class="text-gray-500 dark:text-gray-400">Total downloads</dt>

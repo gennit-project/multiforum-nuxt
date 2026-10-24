@@ -146,9 +146,12 @@ const endDate = ref(
     ? getQueryString(route.query.endDate) || defaultEndDate
     : defaultEndDate
 );
-// The table filters client-side (needs review / active / quiet), so ask for
-// every channel rather than a page of them.
-const channelLimit = ref(200);
+// The table filters client-side (needs review / active / quiet), so ask for as
+// many channels as the backend allows. The backend rejects anything above 100
+// (BAD_USER_INPUT), which the /api/graphql proxy surfaces as "backend service
+// is temporarily unavailable" and leaves the table empty.
+const MAX_CHANNEL_LIMIT = 100;
+const channelLimit = ref(MAX_CHANNEL_LIMIT);
 
 const activeSortBy = computed(() => getSortByFromQuery(route.query.sort));
 const activeSortDirection = computed(() =>

@@ -124,10 +124,12 @@ test.describe('Admin dashboard + roles', () => {
     await expect(attention).toContainText('Chateau_Frise.zip');
     await expect(attention).toContainText('1 admin issue is still open');
 
-    // The release form stays collapsed until an admin chooses to review.
-    await expect(page.getByLabel('Required release reason')).toBeHidden();
-    await attention.getByRole('button', { name: /^Review Chateau_Frise\.zip/ }).click();
-    await expect(page.getByLabel('Required release reason')).toBeVisible();
+    // Scan actions are not offered in place: the row links to the download's
+    // detail page, where retry and release live.
+    await expect(attention.getByRole('button')).toHaveCount(0);
+    await expect(
+      attention.getByRole('link', { name: 'Review Chateau_Frise.zip' })
+    ).toHaveAttribute('href', '/forums/lively/downloads/discussion-1');
 
     // Missing pipeline metrics read "No data", never NaN/undefined.
     const pipeline = page.getByRole('region', { name: 'Plugin pipeline' });
