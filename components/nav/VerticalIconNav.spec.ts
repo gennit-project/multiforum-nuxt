@@ -1,11 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import VerticalIconNav from '@/components/nav/VerticalIconNav.vue';
 
 const h = vi.hoisted(() => ({
   route: null as unknown,
+  recentForums: [] as Array<{
+    uniqueName: string;
+    channelIconURL: string | null;
+    timestamp: number;
+  }>,
   isAuthenticated: false,
   username: '',
   serverAdminUsernames: [] as string[],
@@ -16,7 +21,7 @@ const h = vi.hoisted(() => ({
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
 vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ height: ref(900) }) }));
 vi.mock('@/utils/localStorageUtils', () => ({
-  getLocalStorageItem: () => [],
+  getLocalStorageItem: () => h.recentForums,
   setLocalStorageItem: vi.fn(),
 }));
 vi.mock('@/composables/useAuthState', () => ({
@@ -61,6 +66,7 @@ const navLink = (w: ReturnType<typeof mount>, label: string) =>
 beforeEach(() => {
   vi.clearAllMocks();
   h.route = { params: {}, name: 'home' };
+  h.recentForums = [];
   h.isAuthenticated = false;
   h.username = '';
   h.serverAdminUsernames = [];
@@ -158,5 +164,47 @@ describe('VerticalIconNav drawer', () => {
     expect(wrapper.getComponent({ name: 'RecentForumsDrawer' }).props('isOpen')).toBe(
       false
     );
+  });
+});
+
+describe('VerticalIconNav dividers', () => {
+  it('renders no dividers when recent forums and user actions are empty', async () => {
+    const wrapper = mountNav();
+    await nextTick();
+
+    expect(wrapper.findAll('.nav-section-divider')).toHaveLength(0);
+  });
+
+  it('renders one divider when only recent forums are visible', async () => {
+    h.recentForums = [
+      { uniqueName: 'recent-forum', channelIconURL: null, timestamp: 1 },
+    ];
+    const wrapper = mountNav();
+    await nextTick();
+
+    expect(wrapper.findAll('.nav-section-divider')).toHaveLength(1);
+  });
+
+  it('renders one divider when only user actions are visible', async () => {
+    h.isAuthenticated = true;
+    h.username = 'alice';
+    h.serverAdminUsernames = ['alice'];
+    const wrapper = mountNav();
+    await nextTick();
+
+    expect(wrapper.findAll('.nav-section-divider')).toHaveLength(1);
+  });
+
+  it('renders two dividers when recent forums and user actions are visible', async () => {
+    h.recentForums = [
+      { uniqueName: 'recent-forum', channelIconURL: null, timestamp: 1 },
+    ];
+    h.isAuthenticated = true;
+    h.username = 'alice';
+    h.serverAdminUsernames = ['alice'];
+    const wrapper = mountNav();
+    await nextTick();
+
+    expect(wrapper.findAll('.nav-section-divider')).toHaveLength(2);
   });
 });
