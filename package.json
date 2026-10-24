@@ -72,6 +72,7 @@
     "crypto-js": "^4.2.0",
     "diff-match-patch": "^1.0.5",
     "dotenv": "^18.0.8",
+    "emoji-picker-element": "^1.29.1",
     "graphql": "^16.14.2",
     "graphql-tag": "^2.12.7",
     "h3": "^1.15.11",
@@ -95,8 +96,7 @@
     "vue-easy-lightbox": "^1.19.0",
     "vue-router": "^5.3.1",
     "vue3-popper": "^1.5.0",
-    "vuedraggable": "^4.1.0",
-    "vuemoji-picker": "^0.3.2"
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.12.1",

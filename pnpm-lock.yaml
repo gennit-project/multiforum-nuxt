@@ -93,6 +93,9 @@ importers:
       dotenv:
         specifier: ^18.0.8
         version: 18.0.8
+      emoji-picker-element:
+        specifier: ^1.29.1
+        version: 1.29.1
       graphql:
         specifier: ^16.14.2
         version: 16.14.2
@@ -165,9 +168,6 @@ importers:
       vuedraggable:
         specifier: ^4.1.0
         version: 4.1.0(vue@3.5.44(typescript@6.0.3))
-      vuemoji-picker:
-        specifier: ^0.3.2
-        version: 0.3.2(vue@3.5.44(typescript@6.0.3))
     devDependencies:
       '@axe-core/playwright':
         specifier: ^4.12.1
@@ -7461,15 +7461,6 @@ packages:
     resolution: {integrity: sha512-FU5HCWBmsf20GpP3eudURW3WdWTKIbEIQxh9/8GE806hydR9qZqRRxRE3RjqX7PkuLuMQG/A7n3cfj9rCEchww==}
     peerDependencies:
       vue: ^3.0.1
-
-  vuemoji-picker@0.3.2:
-    resolution: {integrity: sha512-yjNUSlth1HHxrqvSReG/JRFd1RiKP4CMdkhGiehy/IcajtVTrmzJtZ7zyXS4gFDX2YZDY43zw+LQzypkWWO6Lw==}
-    peerDependencies:
-      '@vue/composition-api': ^1.7.0
-      vue: ^2.6.14 || ^3.2.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
 
   w3c-keyname@2.2.8:
     resolution: {integrity: sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ==}
@@ -15484,12 +15475,6 @@ snapshots:
     dependencies:
       sortablejs: 1.14.0
       vue: 3.5.44(typescript@6.0.3)
-
-  vuemoji-picker@0.3.2(vue@3.5.44(typescript@6.0.3)):
-    dependencies:
-      emoji-picker-element: 1.29.1
-      vue: 3.5.44(typescript@6.0.3)
-      vue-demi: 0.14.10(vue@3.5.44(typescript@6.0.3))
 
   w3c-keyname@2.2.8: {}
 

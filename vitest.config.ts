@@ -38,7 +38,7 @@ export default defineConfig({
     deps: {
       optimizer: {
         web: {
-          include: ['@vue', 'vuemoji-picker'],
+          include: ['@vue'],
         },
       },
     },
