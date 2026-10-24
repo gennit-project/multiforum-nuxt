@@ -819,8 +819,11 @@ export type ModerationActionFixture = {
   recommendedAction: 'EDIT' | 'REMOVE' | null;
   recommendationConfidence: number | null;
   recommendationRationale: string | null;
-  ModerationProfile: { displayName: string } | null;
-  User: { username: string } | null;
+  ModerationProfile: {
+    displayName: string;
+    User: { isBot: boolean } | null;
+  } | null;
+  User: { username: string; isBot: boolean } | null;
   Revision: null;
   Comment: CommentFixture | IssueActivityCommentFixture | null;
 };
@@ -834,6 +837,7 @@ export const buildModerationAction = ({
   recommendedAction = null,
   recommendationConfidence = null,
   recommendationRationale = null,
+  actorIsBot = false,
   comment = null,
   overrides = {},
 }: {
@@ -845,6 +849,7 @@ export const buildModerationAction = ({
   recommendedAction?: 'EDIT' | 'REMOVE' | null;
   recommendationConfidence?: number | null;
   recommendationRationale?: string | null;
+  actorIsBot?: boolean;
   comment?: CommentFixture | null;
   overrides?: Override<ModerationActionFixture>;
 } = {}): ModerationActionFixture => ({
@@ -857,7 +862,10 @@ export const buildModerationAction = ({
   recommendationConfidence,
   recommendationRationale,
   ModerationProfile: moderatorDisplayName
-    ? { displayName: moderatorDisplayName }
+    ? {
+        displayName: moderatorDisplayName,
+        User: { isBot: actorIsBot },
+      }
     : null,
   User: null,
   Revision: null,
@@ -892,7 +900,10 @@ export const buildModCommentActivityItem = ({
   recommendedAction: null,
   recommendationConfidence: null,
   recommendationRationale: null,
-  ModerationProfile: { displayName: modDisplayName },
+  ModerationProfile: {
+    displayName: modDisplayName,
+    User: { isBot: false },
+  },
   User: null,
   Revision: null,
   Comment: {

@@ -112,3 +112,58 @@ describe('ActivityFeedListItem server role badge', () => {
     expect(wrapper.text()).not.toContain('Server');
   });
 });
+
+describe('ActivityFeedListItem bot badge', () => {
+  it('shows a Bot badge for a bot moderation-profile actor', () => {
+    const wrapper = mountItem({
+      id: 'bot-mod-action',
+      actionType: 'report',
+      actionDescription: 'reported the discussion',
+      createdAt: '2024-01-01T00:00:00.000Z',
+      ModerationProfile: {
+        displayName: 'moderation-bot',
+        User: { isBot: true },
+      },
+    });
+
+    expect(wrapper.text()).toContain('Bot');
+  });
+
+  it('shows a Bot badge for a direct bot-user actor', () => {
+    const wrapper = mountItem({
+      id: 'bot-user-action',
+      actionType: 'report',
+      actionDescription: 'reported the discussion',
+      createdAt: '2024-01-01T00:00:00.000Z',
+      User: { username: 'moderation-bot', isBot: true },
+    });
+
+    expect(wrapper.text()).toContain('Bot');
+  });
+
+  it.each([
+    {
+      label: 'human moderation profile',
+      actor: {
+        ModerationProfile: {
+          displayName: 'mod-bob',
+          User: { isBot: false },
+        },
+      },
+    },
+    {
+      label: 'legacy moderation profile without a user',
+      actor: { ModerationProfile: { displayName: 'mod-legacy', User: null } },
+    },
+  ])('does not show a Bot badge for a $label', ({ actor }) => {
+    const wrapper = mountItem({
+      id: 'human-action',
+      actionType: 'close',
+      actionDescription: 'closed the issue',
+      createdAt: '2024-01-01T00:00:00.000Z',
+      ...actor,
+    });
+
+    expect(wrapper.text()).not.toContain('Bot');
+  });
+});

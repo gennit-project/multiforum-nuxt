@@ -150,7 +150,8 @@ test.describe('Moderation issue detail', () => {
           id: 'action-report',
           actionType: 'report',
           actionDescription: 'reported this discussion',
-          moderatorDisplayName: 'mod-alice',
+          moderatorDisplayName: 'moderation-bot',
+          actorIsBot: true,
         }),
         buildModerationAction({
           id: 'action-close',
@@ -230,6 +231,7 @@ test.describe('Moderation issue detail', () => {
       );
       // ActivityFeedListItem renders a distinct passive label per action type.
       await expect(page.getByText(/was reported by/i).first()).toBeVisible();
+      await expect(page.getByText('Bot', { exact: true })).toBeVisible();
       await expect(page.getByText(/the issue was closed by/i)).toBeVisible();
       await expect(page.getByText(/the user was suspended by/i)).toBeVisible();
 

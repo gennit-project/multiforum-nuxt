@@ -57,9 +57,13 @@ export const ISSUE_FIELDS = gql`
         recommendationRationale
         ModerationProfile {
           displayName
+          User {
+            isBot
+          }
         }
         User {
           username
+          isBot
         }
         Revision {
           id
@@ -161,9 +165,13 @@ export const GET_ISSUE_ACTIVITY = gql`
           recommendationRationale
           ModerationProfile {
             displayName
+            User {
+              isBot
+            }
           }
           User {
             username
+            isBot
           }
           Revision {
             id
