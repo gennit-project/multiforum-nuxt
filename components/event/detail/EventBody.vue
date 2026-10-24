@@ -31,9 +31,13 @@ const description = computed(() => {
       :event="event"
       @close-editor="$emit('closeEditEventDescription')"
     />
-    <div v-else class="flex">
-      <MarkdownPreview :text="description || ''" :disable-gallery="false" />
-      <div v-if="usernameVar === event.Poster?.username">
+    <div v-else class="flex items-start gap-4">
+      <MarkdownPreview
+        class="min-w-0 flex-1 text-[0.95rem] leading-7 text-gray-800 dark:text-gray-200"
+        :text="description || ''"
+        :disable-gallery="false"
+      />
+      <div v-if="usernameVar === event.Poster?.username" class="shrink-0">
         <button
           v-if="!eventDescriptionEditMode"
           type="button"

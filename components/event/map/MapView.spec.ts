@@ -468,16 +468,16 @@ describe('MapView', () => {
   });
 });
 
-describe('map results header', () => {
-  it('labels past results with the searched place', () => {
+describe('map results', () => {
+  it('labels the results region without rendering a visible summary header', () => {
     h.route.query = {
       timeShortcut: 'PAST_EVENTS',
       placeName: 'Phoenix',
       radius: '25',
     };
-    expect(mountView().get('#map-results-heading').text()).toBe(
-      'Past events near Phoenix'
-    );
+    expect(
+      mountView().get('section[tabindex="0"]').attributes('aria-label')
+    ).toBe('Past events near Phoenix');
   });
 
   it('announces the actual result count', () => {

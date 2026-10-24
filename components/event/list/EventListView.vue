@@ -282,16 +282,18 @@ watch(isSearchListRoute, (isSearchRoute) => {
     >
       <div
         v-if="isSearchListRoute"
-        class="event-explorer-heading flex flex-wrap items-center justify-between gap-3 px-6 py-5"
+        class="event-explorer-heading flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-gray-200 px-4 py-3 sm:px-5 dark:border-gray-800"
       >
-        <h1
-          class="text-2xl font-semibold tracking-tight text-gray-900 dark:text-gray-100"
-        >
-          Online events
-        </h1>
-        <p class="order-last w-full text-sm text-gray-600 dark:text-gray-400">
-          Find your next conversation, class, or community gathering.
-        </p>
+        <div class="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1">
+          <h1
+            class="text-xl font-semibold tracking-tight text-gray-900 dark:text-gray-100"
+          >
+            Online events
+          </h1>
+          <p class="text-sm text-gray-600 dark:text-gray-400">
+            Find your next conversation, class, or community gathering.
+          </p>
+        </div>
         <div class="flex flex-wrap items-center gap-2">
           <button
             class="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-gray-300 px-2.5 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
@@ -333,10 +335,6 @@ watch(isSearchListRoute, (isSearchRoute) => {
           </RequireAuth>
         </div>
       </div>
-      <hr
-        v-if="isSearchListRoute"
-        class="mx-4 -mt-2 border-t border-gray-200 dark:border-gray-700"
-      />
       <EventFilterBar
         class="event-explorer-filters"
         :show-distance-filters="false"

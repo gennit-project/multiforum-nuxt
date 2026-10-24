@@ -85,6 +85,7 @@ const events = [
       id: `ec-${i}-${j}`,
       eventId: event.id,
       channelUniqueName: name,
+      CommentsAggregate: { count: j === 0 ? 3 : j },
       Channel: {
         ...event.EventChannels[0]!.Channel,
         __typename: 'Channel',
@@ -337,9 +338,25 @@ for (const mobile of [false, true]) {
     await page.goto('/events/list/search?timeShortcut=PAST_EVENTS');
     const row = page.getByTestId(`event-list-item-${events[0]!.title}`);
     await expect(
-      row.getByText('3 comments · Shared across all forums')
+      row.getByRole('link', { name: 'View event in prototaxites' })
     ).toBeVisible();
-    if (!mobile) expect((await row.boundingBox())!.height).toBeLessThan(200);
+    await expect(row.getByText('Shared across all forums')).toHaveCount(0);
+    if (!mobile) {
+      expect((await row.boundingBox())!.height).toBeLessThan(200);
+      const topInset = async (eventTitle: string) => {
+        const itemBox = await page
+          .getByTestId(`event-list-item-${eventTitle}`)
+          .boundingBox();
+        const timeBox = await page
+          .getByTestId(`event-list-item-${eventTitle}`)
+          .locator('time')
+          .boundingBox();
+        return timeBox!.y - itemBox!.y;
+      };
+      const imageInset = await topInset(events[1]!.title);
+      const textOnlyInset = await topInset(events[2]!.title);
+      expect(Math.abs(imageInset - textOnlyInset)).toBeLessThanOrEqual(1);
+    }
     await row.getByRole('button', { name: 'Show all 6 forums' }).click();
     await expect(
       row.getByRole('link', { name: 'View event in science' })
@@ -351,7 +368,7 @@ for (const mobile of [false, true]) {
       const preview = page.getByRole('complementary', {
         name: 'Event preview',
       });
-      await expect(preview.getByText('One shared conversation')).toBeVisible();
+      await expect(preview.getByText('One shared conversation')).toHaveCount(0);
       await expect(
         preview.getByRole('link', { name: 'Visit event website' })
       ).toBeVisible();

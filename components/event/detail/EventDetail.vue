@@ -338,6 +338,13 @@ const eventIsInThePast = computed(() => isEventInThePast(event.value));
 
 const eventHasStarted = computed(() => hasEventStarted(event.value));
 
+const displayTitle = computed(
+  () =>
+    props.showTitle ||
+    route.name === 'map-search-eventId' ||
+    route.name === 'forums-forumId-events-eventId'
+);
+
 const originalPoster = computed(() => event.value?.Poster?.username || '');
 
 const editedAt = computed(() => {
@@ -367,10 +374,12 @@ useHead(
 </script>
 
 <template>
-  <div class="w-full space-y-4 bg-white md:px-6 dark:bg-black dark:text-white">
-    <div class="mb-10 flex w-full justify-center rounded-lg px-2">
+  <div class="w-full bg-white dark:bg-black dark:text-white">
+    <div
+      class="mx-auto flex w-full max-w-4xl justify-center rounded-lg px-4 pb-8 sm:px-6"
+    >
       <div class="w-full">
-        <div class="mt-1 w-full space-y-2">
+        <div class="w-full">
           <p v-if="eventLoading && !event" class="px-4 lg:px-10">Loading...</p>
           <ErrorBanner
             v-else-if="eventError"
@@ -389,7 +398,7 @@ useHead(
 
           <div
             v-else-if="event"
-            class="dark:bg-dark-700 flex flex-col gap-4"
+            class="dark:bg-dark-700 flex flex-col gap-5"
             data-testid="event-detail-content"
           >
             <nuxt-link
@@ -453,11 +462,18 @@ useHead(
             />
 
             <div
-              v-if="showTitle || (route.name === 'map-search-eventId' && event)"
+              v-if="displayTitle"
               class="md:flex md:items-center md:justify-between dark:text-gray-100"
             >
               <div class="min-w-0 flex-1">
-                <h2 class="px-1 text-2xl font-bold text-wrap sm:tracking-tight">
+                <h1
+                  class="leading-tight font-extrabold tracking-tight text-wrap"
+                  :class="
+                    compactMode || discoveryMode
+                      ? 'text-2xl'
+                      : 'text-2xl sm:text-3xl'
+                  "
+                >
                   <template v-if="props.issueEventId && channelId && event">
                     <nuxt-link
                       :to="{
@@ -482,7 +498,7 @@ useHead(
                           eventId: event.id,
                         },
                       }"
-                      class="underline"
+                      class="decoration-gray-400 underline-offset-4 hover:underline focus-visible:underline dark:decoration-gray-500"
                     >
                       {{ event.title }}
                     </nuxt-link>
@@ -490,23 +506,24 @@ useHead(
                   <template v-else>
                     {{ event.title }}
                   </template>
-                </h2>
+                </h1>
               </div>
             </div>
 
-            <EventTitleVersions v-if="showTitle && event" :event="event" />
+            <EventTitleVersions v-if="displayTitle && event" :event="event" />
 
             <ExpandableImage
               v-if="event.coverImageURL"
               :src="event.coverImageURL"
               :alt="event.title"
               :full-width="true"
+              class="overflow-hidden rounded-xl"
               sizes="(min-width: 1024px) 896px, 100vw"
               loading="eager"
               fetchpriority="high"
             />
 
-            <div>
+            <div class="space-y-5">
               <EventHeader
                 :event-data="event"
                 :discovery-mode="discoveryMode"
@@ -517,7 +534,6 @@ useHead(
               />
               <EventBody
                 v-if="event.description"
-                class="px-0"
                 :event="event"
                 :event-description-edit-mode="eventDescriptionEditMode"
                 @handle-click-edit-event-description="
@@ -533,26 +549,24 @@ useHead(
               </div>
             </div>
 
-            <div v-if="event.Tags?.length > 0" class="my-2 px-0 sm:px-4">
-              <div class="flex space-x-1">
+            <div v-if="event.Tags?.length > 0">
+              <div class="flex flex-wrap gap-1.5">
                 <Tag
                   v-for="tag in event.Tags"
                   :key="tag.text"
-                  class="mt-2"
                   :tag="tag.text"
                   :event-id="eventId"
                 />
               </div>
             </div>
-            <div>
+            <div v-if="event && showAddToCalendar" class="pt-1">
               <AddToCalendarButton
-                v-if="event && showAddToCalendar"
                 :event="event"
-                class="mt-4"
               />
             </div>
             <EventFooter
               :event-data="event"
+              :compact-mode="compactMode || discoveryMode"
               :channels-except-current="channelsExceptCurrent"
               :show-poster="!usernameOnTop"
             />
@@ -566,11 +580,6 @@ useHead(
                 :content-id="event.id"
                 kind="event"
               />
-              <h3 class="mt-4 font-semibold">One shared conversation</h3>
-              <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                Comments and event updates are visible to everyone across all
-                these forums.
-              </p>
             </div>
             <div v-if="showComments">
               <div class="my-6 mb-2 rounded-lg">

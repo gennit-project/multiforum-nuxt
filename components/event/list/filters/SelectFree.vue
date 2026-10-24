@@ -18,24 +18,18 @@ const toggleShowOnlyFree = () => {
 };
 </script>
 <template>
-  <div>
-    <div class="grid grid-cols-2 gap-2">
-      <div class="cursor-pointer rounded p-2">
-        <label for="free-checkbox" class="flex items-center">
-          <input
-            id="free-checkbox"
-            type="checkbox"
-            :data-testid="'free-checkbox'"
-            class="text-brand-600 focus:ring-brand-500 mr-1 h-4 w-4 rounded border border-gray-400"
-            :checked="copyOfShowOnlyFree"
-            @input="() => toggleShowOnlyFree()"
-          />
-          <span
-            class="ml-2 text-sm font-medium whitespace-nowrap dark:text-white"
-            >Show only free events</span
-          >
-        </label>
-      </div>
-    </div>
-  </div>
+  <label
+    for="free-checkbox"
+    class="flex min-h-11 cursor-pointer items-center gap-2 rounded-md px-1.5 py-1 text-sm font-medium text-gray-800 hover:bg-gray-50 dark:text-gray-100 dark:hover:bg-gray-600"
+  >
+    <input
+      id="free-checkbox"
+      type="checkbox"
+      :data-testid="'free-checkbox'"
+      class="text-brand-600 focus:ring-brand-500 h-4 !min-h-4 w-4 shrink-0 rounded border border-gray-400"
+      :checked="copyOfShowOnlyFree"
+      @input="() => toggleShowOnlyFree()"
+    />
+    <span>Show only free events</span>
+  </label>
 </template>
