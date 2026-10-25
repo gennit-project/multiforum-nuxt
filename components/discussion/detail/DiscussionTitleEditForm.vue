@@ -130,7 +130,7 @@ const formattedDate = computed(() => {
 </script>
 
 <template>
-  <div class="w-full pb-2 shadow-sm">
+  <div class="w-full pb-2 dark:shadow-sm">
     <div
       class="mt-4 mb-3 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >
