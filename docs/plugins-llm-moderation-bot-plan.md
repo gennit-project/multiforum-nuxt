@@ -1,35 +1,68 @@
 # LLM Moderation Bot Plugin — Design Doc & Implementation Plan
 
-**Status:** Proposal / Draft — for review
-**Date:** 2026-10-22
+**Status:** Core v1 implementation merged; deployment and experimental rollout pending
+**Originally proposed:** 2026-10-22
+**Last implementation audit:** 2026-10-24
 **Scope:** Experimental plugin. Full-stack: new plugin repo + external service, plus changes in `gennit-backend` and `multiforum-nuxt`.
 
-> This is a design proposal, not a commitment. Sections marked **Decision needed** call out
-> choices to confirm before implementation. File:line references point at the code the design
-> builds on; they reflect `main` as of the date above and should be re-checked before coding.
+> This document began as a proposal and now records both the accepted design and its implementation
+> status. “Merged” means the code is on each repository's default branch; it does **not** mean the service
+> has been deployed, the plugin has been released, or an end-to-end production trial has passed. File:line
+> references are historical orientation and should still be re-checked before further changes.
+
+## 0. Implementation status
+
+### Merged
+
+| Area                                                                         | Status            | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ---------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Invocation context and consolidated dispatch                                 | **Complete**      | Backend [#366](https://github.com/gennit-project/multiforum-backend/pull/366), [#368](https://github.com/gennit-project/multiforum-backend/pull/368), [#372](https://github.com/gennit-project/multiforum-backend/pull/372); plugin [#1](https://github.com/gennit-project/multiforum-plugin-llm-moderation/pull/1)                                                                                                                                                                   |
+| Comment and per-forum discussion creation/edit events                        | **Complete**      | Backend [#371](https://github.com/gennit-project/multiforum-backend/pull/371), [#372](https://github.com/gennit-project/multiforum-backend/pull/372), [#374](https://github.com/gennit-project/multiforum-backend/pull/374); plugin [#2](https://github.com/gennit-project/multiforum-plugin-llm-moderation/pull/2), [#3](https://github.com/gennit-project/multiforum-plugin-llm-moderation/pull/3), [#4](https://github.com/gennit-project/multiforum-plugin-llm-moderation/pull/4) |
+| Idempotency, stale-job supersession, async queue, rate limiting, and retries | **Complete**      | Backend [#377](https://github.com/gennit-project/multiforum-backend/pull/377), [#380](https://github.com/gennit-project/multiforum-backend/pull/380), [#382](https://github.com/gennit-project/multiforum-backend/pull/382), [#384](https://github.com/gennit-project/multiforum-backend/pull/384)                                                                                                                                                                                    |
+| Structured recommendation persistence and moderation UI                      | **Complete**      | Backend [#385](https://github.com/gennit-project/multiforum-backend/pull/385); plugin [#5](https://github.com/gennit-project/multiforum-plugin-llm-moderation/pull/5); frontend [#675](https://github.com/gennit-project/multiforum-nuxt/pull/675), [#676](https://github.com/gennit-project/multiforum-nuxt/pull/676)                                                                                                                                                                |
+| Server-rule mode and conditional forum allowlist picker                      | **Complete**      | Frontend [#677](https://github.com/gennit-project/multiforum-nuxt/pull/677); plugin [#6](https://github.com/gennit-project/multiforum-plugin-llm-moderation/pull/6)                                                                                                                                                                                                                                                                                                                   |
+| External FastAPI moderation service, provider guard, and deployment code     | **Code complete** | Service initial implementation plus [#1](https://github.com/gennit-project/multiforum-plugin-llm-moderation-service/pull/1) and [#2](https://github.com/gennit-project/multiforum-plugin-llm-moderation-service/pull/2)                                                                                                                                                                                                                                                               |
+
+### Still incomplete
+
+- **Service rollout:** no GitHub `production` environment, deployment variables, or deployment secrets have
+  been configured in the service repository, and the Cloud Run workflow has not been run. In particular,
+  `MOD_API_KEY` (the plugin-to-service shared key) and `MOD_PROVIDER_API_KEY` (the LLM provider credential)
+  still need to be stored as secrets in that environment.
+- **Plugin release:** `multiforum-plugin-llm-moderation` has no `v0.7.0` GitHub release yet.
+- **Registry publication:** the plugin is not present in `multiforum-plugins/registry-sources.json` and is not
+  published in `registry-experimental.json`.
+- **Multiforum configuration:** no server has yet been pointed at the deployed service or configured with the
+  plugin secret `MODERATION_SERVICE_API_KEY` (whose value must match the service repository's `MOD_API_KEY`)
+  and a trial forum allowlist.
+- **End-to-end rollout proof:** a real provider-backed create/edit flow has not yet been verified from content
+  mutation through the async queue, Cloud Run service, report persistence, and moderator UI.
+- **Optional/v2 work:** callback-based processing, multi-post batching, per-channel provider secrets, a daily
+  spend cap, and cross-forum server-rule dedup remain deferred.
 
 ---
 
 ## 1. Summary
 
-Add an experimental LLM-backed moderation bot that an admin installs **at server scope** so it reviews
-**every discussion and comment** against the server's rules and **reports** likely violations for human
-moderators. The admin can additionally **enable it per forum (channel)** so that, for posts in that forum,
-the same single evaluation also considers that forum's rules.
+Add an experimental LLM-backed moderation bot that an admin installs **at server scope**. It reviews
+discussion submissions and discussion comments in the forums selected by the server-rule mode and/or
+per-forum enablement, then **reports** likely violations for human moderators. Per-forum enablement adds that
+forum's rules to the same evaluation; it does not create a second evaluation for the same forum/content unit.
 
 The bot **only reports** — it never edits, archives, deletes, or suspends. Each report includes a
 recommendation ("suggest edit" or "suggest removal") and cites the specific rules it believes were
 violated. Humans take all actions.
 
 To keep latency, cost, and rate pressure under control, the LLM work runs **asynchronously** via an
-**external service** (a Cloud Run service / cloud function, following the existing security-scan
-precedent) and is **rate limited**. It is acceptable for the bot to take some time to get to each item.
+**external Cloud Run service**, following the existing security-scan precedent, and is **rate limited**. It
+is acceptable for the bot to take some time to get to each item.
 
 ---
 
 ## 2. Motivation, goals, non-goals
 
 ### Goals
+
 - Server-scope install → review new discussions and comments against **server rules** and report violations,
   with an admin-chosen **mode**: all forums, an **allowlist** of forums (trial / phased rollout), or off (§4.1).
 - Optional per-forum enable → additionally evaluate against **that forum's rules** (independent of the mode).
@@ -44,11 +77,12 @@ precedent) and is **rate limited**. It is acceptable for the bot to take some ti
 - Reuse the existing moderation (Issue/ModerationAction) and plugin admin surfaces wherever possible.
 
 ### Non-goals (for the initial version)
+
 - The bot taking any moderation **action** (edit/archive/delete/suspend). Report-only, by construction.
 - Batching **multiple posts** into one LLM call (a separate future optimization — see §7.4).
-- Per-channel LLM API keys / billing (server-scoped secret only; see §6.1 and the gap in §10).
+- Per-channel LLM API keys / billing (server-scoped secret only; see §6.1 and the deferred items in §10).
 - Moderating non-discussion surfaces (feedback comments, event comments, issue-thread comments) — these are
-  currently skipped by the comment trigger (§10, gap 7).
+  skipped by the comment trigger and remain out of scope (§10).
 
 ---
 
@@ -58,7 +92,9 @@ Research into the current codebase found that **most of the moderation-bot machi
 plugin is largely an assembly + extension job, not a greenfield build.
 
 ### 3.1 `auto-moderation-bot` — the closest precedent (reuse heavily)
+
 `gennit-project/multiforum-plugin-auto-moderation-bot` already does LLM moderation:
+
 - OpenAI Chat Completions via the runtime's global `fetch` (no `openai` npm dep; zero runtime deps). Default `gpt-4o-mini`.
 - Trigger `events: ["comment.created"]`.
 - **Structured JSON output** (`response_format: { type: "json_object" }`) parsed and clamped into
@@ -73,9 +109,11 @@ Its siblings `chatgpt-bot-profiles` and `beta-reader-bot` are the conversational
 for the "extend vs. new plugin" decision.
 
 ### 3.2 `security-attachment-scan` + `security-scan-service` — the external-service precedent
+
 A TypeScript plugin that runs in-process and makes an authenticated HTTP call to a standalone
 **Python/FastAPI service on Cloud Run** which does the heavy/risky work. This is the model for moving LLM
 work off the backend process:
+
 - Plugin → service: `POST ${serviceUrl}/<route>`, `x-api-key` shared secret (from a server secret),
   `x-correlation-id` from `execution.correlationId`, JSON body. Service URL is a **setting**; the API key is a **secret**.
 - Service: FastAPI, constant-time `X-API-Key` auth, pydantic settings (`SCAN_`-prefixed env), `/health` +
@@ -86,9 +124,11 @@ work off the backend process:
   `mfctl plugin-config apply` (`apiVersion: multiforum.gennit.dev/v1alpha1`).
 
 **Important caveat:** this precedent is **synchronous** (the plugin `await`s the service inline and blocks the
-pipeline step). Genuine async (fire-and-forget + callback) is **new work** — see §7.
+pipeline step). The implemented v1 keeps that service call synchronous inside the durable worker, off the
+content-write path; a fire-and-forget service callback remains a deferred v2 option (§7).
 
 ### 3.3 The report / moderation model (reuse as-is)
+
 - A report creates an **`Issue`** with an `ActivityFeed` of **`ModerationAction`** nodes; the originating
   report is a `ModerationAction` with `actionType: "report"`. Actor is a `ModerationProfile | User` union.
 - `services/botReportService.ts` `createBotReport(...)` ensures the bot user + `ModerationProfile`, finds or
@@ -98,16 +138,19 @@ pipeline step). Genuine async (fire-and-forget + callback) is **new work** — s
   rule** (`selectedForumRules` and/or `selectedServerRules`) — and it already accepts **both** lists, which is
   the key enabler for the consolidated server+channel report (§4).
 - Exposed to comment plugins as `context.reportContentAsBot({ contentType, contentId, reportText,
-  selectedForumRules, selectedServerRules, botName, profileId, profileLabel })` (`commentTrigger.ts` ~578–610).
+selectedForumRules, selectedServerRules, botName, profileId, profileLabel })` (`commentTrigger.ts` ~578–610).
   It is **suspension-gated** (a misbehaving bot can be suspended). Because dedup is channel-scoped, the
   per-`DiscussionChannel` reporting path must carry/resolve its channel (`channelUniqueName` /
   `discussionChannelId`) so each forum gets its own Issue — see §8.
 - The bot **cannot** take mod actions: `archiveComment`/`suspendUser`/`unarchiveComment` are not exposed to
   plugins. Report-only is guaranteed by construction.
 
-### 3.4 Plugin admin UI (reuse unchanged)
-`multiforum-nuxt` already has the full lifecycle UI — a correct manifest renders automatically with **no new
-admin code**:
+### 3.4 Plugin admin UI (mostly reused; one generic field type added)
+
+`multiforum-nuxt` already had the lifecycle UI for install, enablement, secrets, settings, and pipelines.
+The implementation reused those surfaces and added one generic manifest capability: a conditional
+`forum-multiselect` field backed by the existing forum picker ([frontend #677](https://github.com/gennit-project/multiforum-nuxt/pull/677)):
+
 - Server: `pages/admin/settings/plugins/[pluginId].vue` (install version, enable/disable via
   `EnableServerPlugin`, set secrets via `SetServerPluginSecret`, save settings; "enable" gated on
   `hasCompleteConfig`). Driven by `manifest.ui.forms.server` + `manifest.secrets`.
@@ -123,8 +166,9 @@ admin code**:
 This is the central behaviour and the part that needs the most care.
 
 ### 4.1 Desired behaviour
-- **Server-rule checking has a mode (Decision 4.E).** Because this is an experimental bot with a large blast
-  radius (cost + report volume), the admin chooses *how broadly* the server rules are applied:
+
+- **Server-rule checking has a mode (implemented decision 4.E).** Because this is an experimental bot with a large blast
+  radius (cost + report volume), the admin chooses _how broadly_ the server rules are applied:
   - `all_forums` — review every discussion and comment in every forum against the server rules (full rollout).
   - `allowlist` — review only forums on an admin-chosen allowlist. This is the **trial / phased-rollout**
     path: pilot the bot on a few forums, build trust, then switch to `all_forums`. The allowlist also doubles
@@ -140,30 +184,33 @@ This is the central behaviour and the part that needs the most care.
   Never a server call + a separate channel call; never two reports for one piece of content in one forum.
 - **Per-forum matrix** — for a given post's forum:
 
-  | Server-rule checking active here? | Channel-rule checking enabled here? | Evaluated against |
-  |---|---|---|
-  | yes (mode `all_forums`, or forum in allowlist) | yes | server rules + forum rules (one call) |
-  | yes | no | server rules only |
-  | no (mode `off`, or not allowlisted) | yes | forum rules only |
-  | no | no | not evaluated (skipped — no call, no cost) |
+  | Server-rule checking active here?              | Channel-rule checking enabled here? | Evaluated against                          |
+  | ---------------------------------------------- | ----------------------------------- | ------------------------------------------ |
+  | yes (mode `all_forums`, or forum in allowlist) | yes                                 | server rules + forum rules (one call)      |
+  | yes                                            | no                                  | server rules only                          |
+  | no (mode `off`, or not allowlisted)            | yes                                 | forum rules only                           |
+  | no                                             | no                                  | not evaluated (skipped — no call, no cost) |
 
 ### 4.2 Why this is feasible and is the right design
+
 - The report model already represents "violations from both scopes in one report": `createBotReport` takes
   **both** `selectedServerRules` and `selectedForumRules` and writes a **single Issue** per target. So the
-  *output* side is a direct fit — no new reporting primitive needed.
+  _output_ side is a direct fit — no new reporting primitive needed.
 - One call per post (instead of two) is strictly better for **cost and rate limiting**, which the user
   explicitly cares about.
 - Combining the rule sets in a single prompt tends to produce **more coherent** judgments than two
   independent passes that can't see each other.
 
 ### 4.3 The thing to get right: dispatch must be ONE run per post
-The risk: if per-forum enablement is modelled as a **second trigger** (a channel pipeline entry *and* a
+
+The risk: if per-forum enablement is modelled as a **second trigger** (a channel pipeline entry _and_ a
 server pipeline entry both naming this plugin), a comment in `cats` fires the plugin **twice** → two LLM
 calls and potentially two reports. The current dispatcher resolves channel `pluginPipelines` and server
 `pluginPipelines` and, absent a configured pipeline, falls back to running every enabled plugin that handles
 the event (`commentTrigger.ts` ~238–315) — so double-dispatch is a real hazard.
 
-**Recommended model — channel enablement is an additive modifier on a single server-driven run:**
+**Implemented model — channel enablement is an additive modifier on a single server-driven run:**
+
 - The plugin runs **at most once per post**. A run fires when **server-rule checking covers this forum**
   (mode `all_forums`, or the forum is on the allowlist) **or** the bot is **channel-enabled** for the forum;
   if neither applies, the post is skipped (no run, no cost).
@@ -173,35 +220,37 @@ the event (`commentTrigger.ts` ~238–315) — so double-dispatch is a real haza
   `selectedServerRules` and/or `selectedForumRules` populated.
 
 This keeps the generic pipeline model intact (one server pipeline step) while making per-forum enablement a
-*configuration* the single run reads — not an independent execution.
+_configuration_ the single run reads — not an independent execution.
 
-**Decision needed (4.A):** confirm this "single server-driven run, channel-enable as a modifier" model vs.
-the alternative of keeping two pipeline entries and adding **coalescing/idempotency** in the dispatcher so
-the plugin still runs once with the union of rules. The former is simpler and recommended; the latter keeps
-scopes orthogonal but needs new dedup logic in `commentTrigger`.
+**Implemented decision (4.A):** use one consolidated run. The backend combines server and forum pipeline
+candidates and deduplicates execution per forum; the plugin then evaluates the union of applicable rules
+([backend #372](https://github.com/gennit-project/multiforum-backend/pull/372),
+[plugin #1](https://github.com/gennit-project/multiforum-plugin-llm-moderation/pull/1)).
 
 ### 4.4 What the plugin run needs in context to do this
+
 For the single run to evaluate both scopes it must have, in `handleEvent`'s payload/context:
-1. **Server rules** — *gap:* the comment context currently supplies the **forum** rules
-   (`channel.rules[]` via `buildBotInvocationContext.ts`); confirm/add **server** rules to the context.
+
+1. **Server rules** — implemented in [backend #366](https://github.com/gennit-project/multiforum-backend/pull/366).
 2. **This forum's rules** — already present as `channel.rules[]`.
 3. **Whether the bot is channel-enabled for this forum** — so it knows whether to include the forum rules.
    This can be read from the channel's `EnabledPlugins` edge (`ChannelPluginProperties.enabled` /
    `settingsJson`) and passed into the run, or encoded in the merged settings handed to the plugin.
 
-**Decision needed (4.B):** should "channel-enabled" be surfaced to the plugin as (a) a resolved boolean +
-the forum rules in the invocation context (backend does the lookup), or (b) left for the plugin to infer
-from merged `settings.channel`? Option (a) is cleaner and keeps the plugin dumb.
+**Implemented decision (4.B):** the backend supplies a resolved `channelEnabled` boolean plus canonical
+forum rules, resolved against the exact plugin version being executed
+([backend #368](https://github.com/gennit-project/multiforum-backend/pull/368)).
 
 ### 4.5 The unit of evaluation is the `DiscussionChannel`, not the `Discussion`
 
 Multiforum's data model matters here:
+
 - A **comment** always belongs to exactly **one** forum — it hangs off a single `DiscussionChannel` (the
   per-forum submission node, which owns that forum's comment section). So a comment is always **one**
   evaluation: server rules + (if channel-enabled) that one forum's rules → one report in that forum.
 - A **discussion** can be **shared to multiple forums**. Each share is its own `DiscussionChannel` node with
-  its own comment section and its own forum rules. The discussion *body* is shared, but the *applicable
-  channel rules* and the *mod team / report queue* differ per forum.
+  its own comment section and its own forum rules. The discussion _body_ is shared, but the _applicable
+  channel rules_ and the _mod team / report queue_ differ per forum.
 
 **Consequence (confirms the intended behaviour):** a discussion submitted to both `cats` and `dogs`, with the
 bot channel-enabled in both, is evaluated **per `DiscussionChannel`** → **two LLM calls and two reports**:
@@ -219,13 +268,13 @@ once per forum submission** (a valid channel-pipeline event), so a discussion sh
 triggers automatically — the two-calls behaviour falls out of the existing per-`DiscussionChannel` event
 rather than needing new fan-out logic.
 
-**Known redundancy (accept for v1):** evaluating the *same* discussion body against the *same* server rules
+**Known redundancy (accept for v1):** evaluating the _same_ discussion body against the _same_ server rules
 once per forum is duplicated work and duplicated spend when a discussion is widely shared. For v1 this is
 acceptable (it keeps report routing trivially per-forum). A later optimization could cache a pure
 server-rule verdict keyed by `(discussionId, bodyHash, serverRulesVersion)` and only re-run the
-*channel-rule* portion per forum — but that complicates where a server-only violation's report is filed when
-the content lives in several forums, so it is deliberately deferred. **Decision needed (4.C):** confirm
-per-`DiscussionChannel` evaluation for v1 (recommended) with the dedup optimization deferred.
+_channel-rule_ portion per forum — but that complicates where a server-only violation's report is filed when
+the content lives in several forums, so it is deliberately deferred. **Implemented decision (4.C):** v1
+uses per-`DiscussionChannel` evaluation; cross-forum server-rule dedup remains optional future work.
 
 ### 4.6 Edits are a first-class trigger (closing the "edit after approval" hole)
 
@@ -240,24 +289,25 @@ nice-to-have — without it the bot provides little real protection.
   title/body is shared, so one edit can change conformance in all forums it lives in at once.)
 - **Re-use Issue dedup:** a newly-introduced violation opens or appends to the existing per-forum Issue
   (`createBotReport` finds-or-creates and reopens), so edits update the case rather than spawning duplicates.
-  If an edit *removes* a previously-reported violation, the bot does **not** auto-resolve — humans decide
+  If an edit _removes_ a previously-reported violation, the bot does **not** auto-resolve — humans decide
   (report-only); it may optionally append a note that the content changed.
-- **Content-change guard (spend optimization, not a security relaxation):** skip re-evaluation when an edit
-  doesn't materially change the moderated text (hash/length compare), but **always** re-evaluate on material
-  change. This controls churn/cost without opening the evasion hole.
+- **Content-change guard (implemented for mutation semantics):** comment middleware dispatches text edits,
+  while discussion middleware skips no-op and metadata-only edits. Stable content revisions also drive
+  idempotency and stale-job supersession. A separate fuzzy hash/length threshold was not added.
 
-**Per-forum, not cross-forum consolidated (Decision 4.D).** When a discussion shared to many forums is edited,
+**Implemented decision (4.D): per-forum, not cross-forum consolidated.** When a discussion shared to many forums is edited,
 re-evaluate **once per `DiscussionChannel`** (server rules + that forum's rules) — **not** a single call
 carrying all forums' rule sets. Collapsing N forums into one multi-forum call would save input tokens (the
 shared body + server rules are otherwise re-sent per forum) and one-call-vs-N eases rate limits, but it is
 **not recommended as the default**:
-- *Accuracy:* asking one call to attribute violations across (say) 10 rule sets to the correct forum is
+
+- _Accuracy:_ asking one call to attribute violations across (say) 10 rule sets to the correct forum is
   markedly more error-prone than N focused single-forum calls. For moderation, mis-attribution means a report
   in the wrong forum's queue citing the wrong rules — the worst failure mode.
-- *Complexity / asymmetry:* it adds a second, discussion-edit-only evaluation shape (multi-forum prompt +
+- _Complexity / asymmetry:_ it adds a second, discussion-edit-only evaluation shape (multi-forum prompt +
   response schema + result fan-out) that diverges from the uniform per-`DiscussionChannel` unit used
   everywhere else (comments are always single-forum), and makes retry coarse (one failure fails all forums).
-- *Benefit is tail-only:* most discussions live in 1–3 forums, and the async queue + rate limiting (§7)
+- _Benefit is tail-only:_ most discussions live in 1–3 forums, and the async queue + rate limiting (§7)
   already absorbs the N-call burst ("it's OK to take time"), so the win mostly applies to the uncommon
   widely-shared + frequently-edited + long-body case.
 
@@ -265,8 +315,9 @@ If cost on widely-shared discussions ever bites, prefer the **server-rule dedup*
 shared body against server rules once; keep channel-rule evaluation per forum) over a giant multi-forum call
 — it removes the duplicated tokens without the attribution risk. Deferred either way.
 
-Because this is a correctness/anti-evasion property rather than a feature, the edit events (gap 1) and the
-per-forum re-evaluation should land in the **same milestone as creation coverage**, not a deferred phase.
+The edit events and per-forum re-evaluation shipped with creation coverage
+([backend #371](https://github.com/gennit-project/multiforum-backend/pull/371),
+[#374](https://github.com/gennit-project/multiforum-backend/pull/374)).
 
 ---
 
@@ -300,47 +351,46 @@ per-forum re-evaluation should land in the **same milestone as creation coverage
 
 ## 6. Detailed design
 
-### 6.1 The plugin (new repo: `multiforum-plugin-llm-moderation` or similar)
-Model on `auto-moderation-bot` + the security-scan plugin's external-call shape.
+### 6.1 The plugin (`multiforum-plugin-llm-moderation`)
+
+The plugin is implemented on `main` at manifest version `0.7.0`, modelled on `auto-moderation-bot` plus the
+security-scan plugin's external-call shape. The `v0.7.0` release artifact has not yet been published.
 
 - **Manifest (`plugin.json`):**
   - `id`, `name`, `version`, `description`, `entry: "dist/index.js"`.
-  - `events`: `["comment.created", "comment.edited", "discussionChannel.created", "discussionChannel.updated"]`.
-    `comment.created` and `discussionChannel.created` **already exist**; only `comment.edited` and
-    `discussionChannel.updated` are **new backend events** (see §6.3 / §10 gap 1). Discussion submissions are
-    moderated **per forum** via `discussionChannel.*`, not a single `discussion.*` event.
+  - `events`: `["comment.created", "comment.edited", "discussionChannel.created", "discussionChannel.edited"]`.
+    Discussion submissions and edits are moderated **per forum** via `discussionChannel.*`, not a single
+    `discussion.*` event.
   - `compatibility: { minServerVersion, apiVersion: "1" }`.
   - `secrets`: `MODERATION_SERVICE_API_KEY` `scope: "server"`, required (shared secret for the external
     service). The LLM **provider key lives on the external service** (Secret Manager) and is therefore **not**
-    declared in this manifest. A provider key (`OPENAI_API_KEY` or other) is required here **only if** the
-    in-process alternative is chosen (Decision 6.A = LLM call in the plugin) — the default design keeps it off
-    the backend entirely.
-  - `settingsDefaults.server`: `{ serviceUrl, model, temperature, maxTokens, confidenceThreshold,
-    recommendationPolicy, serverProfileId/profilesJson, serverRuleCheckMode ("all_forums" | "allowlist" |
-    "off"), serverRuleForumAllowlist (forum ids, used when mode = "allowlist"), shadowMode (bool, optional
-    dry-run) }`.
-  - `settingsDefaults.channel`: `{ enabled toggle is handled by the ENABLED edge; optional per-forum
-    confidenceThreshold / profile override }`.
+    declared in this manifest.
+  - `settingsDefaults.server`: `serviceUrl`, `serverRuleCheckMode` (`all_forums` | `allowlist` | `off`),
+    `serverRuleForumAllowlist` (forum unique names), `model`, `temperature`, `maxTokens`,
+    `confidenceThreshold`, `serviceTimeoutMs`, and `botName`. The conservative default is
+    `serverRuleCheckMode: "off"`.
+  - `settingsDefaults.channel`: `{}`; enablement is handled by the existing channel plugin edge.
   - `ui.forms.server` / `ui.forms.channel`, `metadata`, `documentation.readmePath: "README.md"`, `source`.
 - **Code shape:** default-exported class; `constructor(ctx: HookContext)`; `async handleEvent(envelope)`;
   static `validateSecrets(secrets)`. Read key from `ctx.secrets.server`, service URL from `ctx.settings`.
   Guard against `author.isBot` to avoid loops. Return `{ success, result | error, retryable? }`.
-- **Behaviour per event:** assemble `{ content, serverRules[], channelRules[] (if channel-enabled),
-  policy }`, call the external service, parse the structured verdict, and if it clears the threshold call
+- **Behaviour per event:** assemble `{ content, serverRules[], channelRules[] (if channel-enabled), policy }`,
+  call the external service, parse the structured verdict, and if it clears the threshold call
   `reportContentAsBot` once (see §8).
 
-**Decision needed (6.A):** does the LLM call live **in the external service** (recommended — lets us do
-true async, keep the provider key off the backend process, and add batching later), or **in the plugin**
-(simpler, matches `auto-moderation-bot`, but re-introduces the in-process synchronous problem)? This design
-assumes the external service owns the LLM call.
+**Implemented decision (6.A):** the LLM call lives in the external service. The plugin stores only the
+service URL and shared service credential; the provider credential remains in the service environment.
 
-### 6.2 The external moderation service (new repo: `multiforum-plugin-llm-moderation-service`)
-Mirror `security-scan-service`:
-- FastAPI (or a GCP cloud function), `/health` + authed `POST /moderate`.
+### 6.2 The external moderation service (`multiforum-plugin-llm-moderation-service`)
+
+The service code and deployment foundation are merged. The following capabilities are implemented, but the
+Cloud Run service has **not** yet been provisioned or deployed:
+
+- FastAPI on Cloud Run, with `/health` plus authenticated `POST /moderate`.
 - Constant-time `X-API-Key` auth; pydantic settings (`MOD_`-prefixed env); provider key from Secret Manager.
 - `POST /moderate` request: `{ content: {type, id, title?, body}, rules: [{scope, id, text}], policy }`.
   Response (structured): `{ violations: [{ scope: "server"|"channel", ruleId }], recommendation:
-  "edit" | "remove" | "none", confidence: 0..1, rationale: string }` — **rule IDs only; no model-authored
+"edit" | "remove" | "none", confidence: 0..1, rationale: string }` — **rule IDs only; no model-authored
   rule text**. The backend then validates every `(scope, ruleId)` against the exact rule set it submitted,
   derives the stored scope + canonical rule text from backend data, and **rejects unknown, mis-scoped, or
   duplicate citations** (if none survive validation, no report is filed). This prevents hallucinated IDs,
@@ -351,109 +401,115 @@ Mirror `security-scan-service`:
 - Deploy: Dockerfile on `$PORT`, Cloud Run v2 + Terraform + Secret Manager + Artifact Registry + WIF CI,
   scale-to-zero, public ingress + app-level API key (so a non-GCP backend can call it).
 
+The deployment workflow reads `MOD_API_KEY` and `MOD_PROVIDER_API_KEY` from the service repository's
+protected GitHub `production` environment and writes them to Google Secret Manager. After deployment,
+Multiforum stores the same shared-key value as the plugin's `MODERATION_SERVICE_API_KEY`; the provider key is
+never copied into Multiforum.
+
 **Rate limiting / backpressure** can live here (service-side concurrency + token-bucket per minute) and/or
 in the backend queue (§7). Recommended: **both** — a hard ceiling in the backend worker (so we never enqueue
 faster than we drain) and a provider-rate guard in the service.
 
+Both layers are implemented: the backend uses a durable multi-instance worker limit, and the service uses
+per-instance provider concurrency and rolling per-minute admission limits with bounded transient retries.
+The deployment defaults to one maximum Cloud Run instance so the service-side ceiling is global during the
+experimental trial.
+
 ### 6.3 Backend (`gennit-backend`) changes
-1. **Events — creation already exists; edits are the gap.** The unit is the `DiscussionChannel` (§4.5):
-   - **Creation is already covered.** `discussionChannel.created` (per-forum submission) and `comment.created`
-     already exist in `services/plugin/constants.ts` `PLUGIN_EVENTS` and are both valid channel-pipeline
-     events (`VALID_CHANNEL_EVENTS`). A discussion shared to N forums already fires N
-     `discussionChannel.created` triggers. For discussion-body moderation we trigger on
-     `discussionChannel.created` and evaluate the discussion **body** (not just its first comment).
-   - **Edits are new (gap 1).** Add edit events + middleware so re-posted/edited content is re-checked:
-     - `updateComments` → fire `comment.edited` (new middleware, mirror `commentPluginPipelineMiddleware.ts`).
-     - discussion-body update → fire a per-forum edit event (e.g. `discussionChannel.updated`, fanning out to
-       each `DiscussionChannel` the discussion is shared to). Add it to `PLUGIN_EVENTS` + `VALID_CHANNEL_EVENTS`.
-   - **Expose the report callback on the channel-trigger path (gap 5).** `reportContentAsBot` /
-     `createCommentAsBot` are currently only on the **comment** trigger context; `channelTrigger.ts`
-     (which handles `discussionChannel.created`) does not expose them. Add `reportContentAsBot` there so the
-     bot can report discussion submissions, not only comments.
-   - Note: the frontend pipeline editor also lists `discussion.created`/`event.created` as event types
-     (`graphQLData/admin/queries.js`) that the backend doesn't dispatch; we standardize on the
-     per-`DiscussionChannel` events above and can tidy that list separately.
-2. **Async queue + rate limiting on the event path (gap 2 & 3).** Today comment runs execute **inline and
-   synchronously** inside `createComments`, with no throttle; the only limiter
-   (`pipelineCampaign.ts` `concurrency`/`rateLimitPerMinute`) is scoped to download backfill campaigns.
-   Introduce an **enqueue-and-drain** path so the write mutation is not blocked and runs are rate limited.
-   **Decision needed (6.B):** (a) **generalize the existing campaign limiter** to the comment/discussion
-   event path (least new infra, reuses `PluginPipelineRun`/lease/watchdog), or (b) **true async**: enqueue a
-   job, return immediately, let the external service process and **call back** a new authenticated backend
-   webhook that writes the report. (b) is the best fit for "it's OK to take time" + long LLM latency, but is
-   the most new infrastructure (a callback endpoint, job store, idempotency). (a) is a pragmatic first step.
-3. **Server rules in the bot context (§4.4).** Ensure `buildBotInvocationContext.ts` / the trigger supplies
-   **server rules** (and a resolved `channelEnabled` flag + forum rules) to `handleEvent`.
-4. **Single-run consolidation (§4.3).** Implement the chosen dispatch model so the plugin runs **once** per
-   post with the union of applicable rules.
-5. **Recommendation field (gap 4).** See §6.4.
-6. (Optional) **Per-channel secret** support if a per-forum provider key is ever needed (gap 6) — out of
-   scope for v1.
 
-### 6.4 Data-model change: structured recommendation (gap 4)
-Currently `ModerationAction.actionType` is a free `String` and the recommendation would only live in free-text
-`reportText`. To render a typed recommendation in the UI, add a structured field:
-- Add `recommendedAction` (enum-ish: `EDIT` | `REMOVE` | `NONE`) and optional `confidence` / `rationale` to
-  the bot's `ModerationAction` (or `Issue`). Keep `reportText` as the human-readable explanation.
-- "Remove" maps to the human **archive** action (soft removal); Multiforum has no one-click hard delete for
-  comments/discussions (only `permanentlyRemoveImage`). The doc should use "remove/archive", not "delete".
+All v1 backend gaps are merged:
 
-**Decision needed (6.C):** add `recommendedAction` on `ModerationAction` vs. on `Issue`. On the action keeps
-it with the report event and the activity feed; on the Issue makes it a top-level attribute of the case.
+1. **Canonical context and consolidated dispatch:** server rules, forum rules, and exact-version channel
+   enablement are exposed to the plugin; server and channel candidates are combined and deduplicated per
+   forum ([#366](https://github.com/gennit-project/multiforum-backend/pull/366),
+   [#368](https://github.com/gennit-project/multiforum-backend/pull/368),
+   [#372](https://github.com/gennit-project/multiforum-backend/pull/372)).
+2. **Creation and edit coverage:** `comment.created`, `comment.edited`, `discussionChannel.created`, and
+   `discussionChannel.edited` dispatch moderation with the suspension-gated report callback. Discussion
+   events fan out per final forum membership ([#371](https://github.com/gennit-project/multiforum-backend/pull/371),
+   [#372](https://github.com/gennit-project/multiforum-backend/pull/372),
+   [#374](https://github.com/gennit-project/multiforum-backend/pull/374)).
+3. **Idempotency and ordering:** stable content/rule identities prevent duplicate report actions, newer
+   revisions supersede pending work, and already-running stale jobs cannot publish
+   ([#377](https://github.com/gennit-project/multiforum-backend/pull/377),
+   [#380](https://github.com/gennit-project/multiforum-backend/pull/380)).
+4. **Async execution and retries:** mutations enqueue persisted jobs; a multi-instance-safe worker enforces
+   concurrency and a rolling start rate, with bounded persisted retry/backoff
+   ([#382](https://github.com/gennit-project/multiforum-backend/pull/382),
+   [#384](https://github.com/gennit-project/multiforum-backend/pull/384)).
+5. **Structured recommendations:** report actions persist normalized action, confidence, and rationale while
+   retaining legacy report compatibility ([#385](https://github.com/gennit-project/multiforum-backend/pull/385)).
+
+Per-channel provider secrets remain intentionally out of scope. Cleaning unsupported legacy event names from
+the pipeline editor is independent cleanup, not a blocker for this plugin.
+
+### 6.4 Data-model change: structured recommendation
+
+**Implemented decision (6.C):** recommendation metadata lives on the originating `ModerationAction`, not the
+top-level `Issue`. The nullable fields preserve legacy reports and keep the model output with the report event.
+`REMOVE` remains an advisory recommendation for the human archive flow; the bot never deletes content.
 
 ### 6.5 Frontend (`multiforum-nuxt`) changes
-Admin install/enable/config/secrets/pipelines + per-forum enable all **reuse existing UI**. New work:
-1. **Recommendation display.** Surface `recommendedAction` + confidence + rationale in
-   `components/mod/ModerationWizard.vue`'s decision card (~:386–408), ideally pre-selecting the matching human
-   action button (Edit → `EditContentModal`; Remove → `ArchiveButton`). Extend the relevant Issue GraphQL
-   (`graphQLData/issue/queries.js` `ISSUE_FIELDS`, `graphQLData/issue/mutations.js`).
-2. **Bot actor badge in the activity feed.** `components/mod/ActivityFeedListItem.vue` currently has no bot
-   badge for the report actor; add one (copy the pattern from `components/comments/CommentHeader.vue`'s bot
-   badge). The report itself already surfaces in every Issue queue for free because the Issue author is the
-   bot's `ModerationProfile`/`User`.
-3. **Server-rule mode + forum allowlist control.** The server config form needs a mode selector
-   (`all_forums` / `allowlist` / `off`) and, for `allowlist`, a **forum picker**. A multi-select of forums
-   likely exceeds the current manifest `ui.forms` field types (text/select/toggle), so this may need a new
-   field type or a small custom admin control. UI copy must clearly distinguish **server-rule checking
-   (mode)** from the existing **per-forum channel-rule enable** so the two per-forum notions aren't confused.
+
+The existing lifecycle UI remains in use, and all required generic/frontend extensions are merged:
+
+1. **Recommendation display:** the moderation wizard shows the newest action, confidence, and rationale and
+   programmatically associates edit/remove advice with the matching manual control. It does not execute or
+   auto-confirm an action ([#675](https://github.com/gennit-project/multiforum-nuxt/pull/675)).
+2. **Bot actor badge:** moderation activity queries explicit bot identity and labels bot actors without
+   guessing from names or recommendation fields
+   ([#676](https://github.com/gennit-project/multiforum-nuxt/pull/676)).
+3. **Server-rule mode and forum allowlist:** the reusable `forum-multiselect` manifest field supports arrays,
+   conditional `visibleWhen` rendering, validation, upgrades, keyboard behavior, and accessibility coverage
+   ([#677](https://github.com/gennit-project/multiforum-nuxt/pull/677)). The plugin manifest uses it only when
+   `serverRuleCheckMode` is `allowlist`
+   ([plugin #6](https://github.com/gennit-project/multiforum-plugin-llm-moderation/pull/6)).
 
 ---
 
 ## 7. Async processing, rate limiting & cost control (the net-new piece)
 
-This is the largest genuinely new area; everything else is extension/assembly.
+This was the largest genuinely new area; everything else was extension/assembly.
 
 ### 7.1 Why async
+
 LLM latency is far higher than the hash-lookup in the security-scan precedent, and we must not hold the
 `createComments`/discussion write open on a model call, nor let bursts of posts translate 1:1 into bursts of
 LLM calls. The user explicitly accepts delay ("it's OK for it to take some time… rate limited").
 
-### 7.2 Options (Decision 6.B)
-- **A — Generalize the campaign limiter to the event path.** Reuse `pipelineCampaign.ts`
-  (`concurrency`, `rateLimitPerMinute`), `PluginPipelineRun`, `executionLease.ts`, `pipelineWatchdog.ts`.
-  New posts enqueue a `PENDING` run; a ticking service drains at a bounded rate. The plugin call is still
-  synchronous *within the worker*, but off the request path and throttled. **Least new infra; recommended v1.**
+### 7.2 Selected v1 model and deferred v2 alternative (Decision 6.B)
+
+- **A — Durable backend enqueue-and-drain (implemented for v1).** Reuse the existing lease/run model for
+  event work. The implementation persists jobs, snapshots exact pipeline versions, and enforces worker
+  concurrency plus a rolling per-minute start limit. The plugin call remains synchronous _within the worker_,
+  but is off the content-write path and throttled.
   Caveat: the lease/watchdog model is **at-least-once** (a worker can persist a report, then die before
   marking the run complete, and the job retries), so report creation must be **idempotent** and jobs must
-  carry revision context — see the idempotency + supersession bullet in §8.
-- **B — True fire-and-forget + callback.** Backend enqueues a job and returns; the external service processes
-  and calls back an authenticated backend webhook that writes the report. Best for very long LLM work and
-  future batching, but needs a callback endpoint, idempotency keys, and a durable job store. **v2.**
+  carry revision context. Both protections are implemented; see §8.
+- **B — True fire-and-forget + callback (deferred v2).** Backend enqueues a job and returns; the external
+  service processes and calls back an authenticated backend webhook that writes the report. Best for very
+  long LLM work and future batching, but needs a callback endpoint and durable callback state.
 
 ### 7.3 Rate limiting & cost
-- Hard per-minute + concurrency ceiling in the backend worker (so enqueue never outruns drain).
-- Provider-rate guard + timeout + retry in the external service.
-- Config knobs (server scope): `rateLimitPerMinute`, `concurrency`, `maxTokens`, `model`,
-  `confidenceThreshold`. Consider a daily spend cap.
-- Skip re-evaluation when an edit doesn't materially change content (hash/length guard) to avoid churn.
+
+- **Implemented:** backend worker limits through `PLUGIN_EVENT_WORKER_CONCURRENCY` and
+  `PLUGIN_EVENT_WORKER_RATE_LIMIT_PER_MINUTE`.
+- **Implemented:** service-side provider concurrency, rolling rate limit, timeout, bounded retry/backoff, and
+  `Retry-After` propagation through `MOD_PROVIDER_*` deployment settings.
+- **Implemented:** plugin settings for `maxTokens`, `model`, and `confidenceThreshold`.
+- **Implemented:** no-op/metadata edit suppression, revision-based job supersession, and stale-result blocking.
+- **Incomplete / optional:** a per-server daily spend cap and distributed service-side limiting for more than
+  one Cloud Run instance. The experimental deployment intentionally defaults to one maximum instance.
 
 ### 7.4 Future: batching multiple posts (out of scope v1)
+
 Distinct from §4's per-post consolidation: a worker could batch several queued posts into one LLM call to cut
 cost further. Deferred; the service contract (`POST /moderate`) can later accept an array.
 
 ---
 
 ## 8. Reporting semantics
+
 - Report only when `confidence >= confidenceThreshold` **and** at least one rule is violated (matches
   `createBotReport`'s "≥1 cited rule" requirement).
 - One `reportContentAsBot` call per post, populating `selectedServerRules` and/or `selectedForumRules` from
@@ -468,13 +524,11 @@ cost further. Deferred; the service contract (`POST /moderate`) can later accept
 - **Dedup / re-evaluation on edit:** within a forum, `createBotReport` finds-or-creates the per-forum Issue
   and reopens it, so re-evaluating an edited post **updates the existing Issue** rather than spawning
   duplicates. An edit **appends** a new report action (so the feed shows history).
-- **Idempotency + revision ordering (at-least-once queue, §7.2-A):** a retry can re-run a job after its report
-  was already persisted, which would append a **duplicate `ModerationAction`** (the Issue dedupes; the action
-  does not). So compute a stable **idempotency key** — `(discussionChannelId | commentId, contentRevisionHash,
-  ruleSetVersion)` — persist the revision/body hash + rule-set version on each job, and make report-action
-  creation **idempotent** (no-op if an action already exists for that key). Define **supersession**: a newer
-  revision's job cancels or ignores older still-pending jobs for the same target, so out-of-order execution
-  can never post a stale verdict.
+- **Idempotency + revision ordering (implemented for the at-least-once queue, §7.2-A):** stable content
+  revision and rule-set identities feed a unique report key. Repeated or concurrent delivery is a successful
+  no-op, newer revisions cancel older pending jobs, and already-running stale jobs are blocked before report
+  publication ([backend #377](https://github.com/gennit-project/multiforum-backend/pull/377),
+  [#380](https://github.com/gennit-project/multiforum-backend/pull/380)).
 - **Report-only guarantee:** the bot uses only `reportContentAsBot` (and never `createCommentAsBot` unless we
   later want it to also explain itself in-thread). Action mutations are not exposed to plugins.
 - **Suspension:** `reportContentAsBot` is suspension-gated — a misbehaving bot can be stopped by suspending
@@ -483,13 +537,15 @@ cost further. Deferred; the service contract (`POST /moderate`) can later accept
 ---
 
 ## 9. Security & trust
+
 - **In-process execution (no sandbox).** Plugins are loaded via `pluginLoader.ts` (`import()` of a downloaded
   GCS/HTTP tarball) and run **in the backend process** with backend privileges and their own network egress.
   An experimental moderation bot therefore runs trusted code; the external-service design keeps the LLM
   provider key and the heavy logic **off** the backend process, which is a meaningful trust improvement.
 - **Secrets** are AES-256-GCM encrypted (`services/plugin/encryption.ts`). Note: the encryption key falls back
   to an **insecure hardcoded default** if `PLUGIN_SECRET_ENCRYPTION_KEY` is unset — ensure it is set in every
-  environment before storing a real provider key. (Worth fixing independently.)
+  environment before storing the service's shared `MODERATION_SERVICE_API_KEY`. The LLM provider key is never
+  stored in Multiforum; it stays in the service deployment's Secret Manager environment.
 - **Shared-secret auth** between plugin and service (`X-API-Key`), plus correlation IDs for cross-system logs.
 - **PII / content egress:** post content is sent to an LLM provider. Call this out for forum operators;
   consider provider zero-retention settings and a per-server opt-in.
@@ -498,87 +554,117 @@ cost further. Deferred; the service contract (`POST /moderate`) can later accept
 
 ---
 
-## 10. Gaps summary — exists vs. new
+## 10. Status summary — merged vs. remaining
 
-| # | Capability | Status today | Work needed |
-|---|---|---|---|
-| — | LLM moderation → report | **Exists** (`auto-moderation-bot`) | Extend / re-point |
-| — | Plugin install (server) + enable (server & per-channel) + config/secrets UI | **Exists** | Reuse unchanged |
-| — | Issue/ModerationAction report model; report with both server + forum rules | **Exists** (`createBotReport`) | Reuse |
-| — | External plugin→Cloud Run service pattern | **Exists** (security-scan) | Reuse (but it's synchronous) |
-| — | Per-forum discussion + comment **creation** events (`discussionChannel.created`, `comment.created`) | **Exists** (valid channel-pipeline events) | Reuse; evaluate discussion **body** on `discussionChannel.created` |
-| 1 | **Edit** events (`comment.edited`, per-forum discussion-body edit e.g. `discussionChannel.updated`) | **Missing** | Add events + middleware |
-| 2 | Async queue + rate limiting on the event path | **Missing** (only download campaigns) | Build (§7) |
-| 3 | External fire-and-forget + callback/webhook | **Missing** | v2 (§7.2 B) |
-| 4 | Structured recommendation (edit/remove) | **Missing** (free-text only) | Schema + UI |
-| 5 | `reportContentAsBot` on the channel-trigger (`discussionChannel.*`) context | Comment path only | Add to channel path (needed to report discussion submissions) |
-| — | Server rules in bot invocation context | Forum rules only | Add server rules (§4.4) |
-| 9 | Idempotent report creation + per-job revision/rule-set context (at-least-once queue) | **Missing** | Build (§8); idempotency key + supersession |
-| 10 | Citation validation (resolve `(scope, ruleId)` against canonical rules; reject hallucinated/mis-scoped) | **Missing** | Build (§6.2 / §8) |
-| 6 | Per-channel secrets (per-forum LLM key) | **Missing** | Out of scope v1 |
-| 7 | Moderating feedback/event/issue comments | Skipped by `isDiscussionComment` | Out of scope v1 |
-| 8 | Dedicated per-channel enable resolver / audit | Rides generic `updateChannels` | Optional |
+| Capability                                                               | Status                   | Remaining work                                                       |
+| ------------------------------------------------------------------------ | ------------------------ | -------------------------------------------------------------------- |
+| Dedicated LLM moderation plugin and external FastAPI service             | **Merged**               | Publish plugin release and deploy service                            |
+| Server and forum rule context with single-run consolidation              | **Merged**               | Production E2E verification                                          |
+| Comment/discussion creation and edit events, per `DiscussionChannel`     | **Merged**               | Production E2E verification                                          |
+| Channel-trigger bot reporting and canonical citation validation          | **Merged**               | Production E2E verification                                          |
+| Durable async queue, concurrency/rate limiting, and transient retries    | **Merged**               | Tune operator values after trial telemetry                           |
+| Idempotent report actions and stale-job supersession                     | **Merged**               | Production E2E verification                                          |
+| Structured recommendation persistence and moderator UI                   | **Merged**               | Production E2E verification                                          |
+| Server-rule mode plus conditional forum allowlist picker                 | **Merged**               | Configure a one-forum trial allowlist                                |
+| Service provider guard, Terraform, WIF workflow, and deployment verifier | **Merged, not deployed** | Bootstrap GCP/GitHub environment, configure secrets, run workflow    |
+| Plugin `v0.7.0` release                                                  | **Incomplete**           | Tag plugin `main` and let its publish workflow create the release    |
+| Experimental registry entry                                              | **Incomplete**           | Add the plugin source after the release and publish the registry     |
+| Server install/configuration and real provider-backed smoke test         | **Incomplete**           | Requires deployed URL, shared key, registry release, and trial forum |
+| External callback/webhook processing                                     | **Deferred v2**          | Only if worker-held service calls become operationally unsuitable    |
+| Multi-post batching and cross-forum server-rule dedup                    | **Deferred v2**          | Revisit only with cost/volume evidence                               |
+| Per-channel provider secrets                                             | **Out of scope**         | No v1 work planned                                                   |
+| Moderating feedback/event/issue comments                                 | **Out of scope**         | No v1 work planned                                                   |
+| Per-server daily spend cap / multi-instance distributed limiter          | **Optional, incomplete** | Revisit before scaling beyond the experimental limits                |
 
 ---
 
-## 11. Open questions / decisions needed
-- **(11.A) Extend `auto-moderation-bot` or ship a new plugin?** It already does comment-created LLM
-  moderation → report. The new requirements (discussion + edit events, consolidated server+channel evaluation,
-  external service, async + rate limiting, structured recommendation) are substantial. Recommendation:
-  **new experimental plugin** that borrows `auto-moderation-bot`'s code, so the stable bot is undisturbed —
-  and publish the new one to the **experimental registry** created in the registry-split PR.
-- **(4.A)** Single server-driven run + channel-enable modifier (recommended) vs. two pipeline entries + dispatcher coalescing.
-- **(4.B)** Backend resolves `channelEnabled` + forum rules into context vs. plugin infers from merged settings.
-- **(4.C)** Per-`DiscussionChannel` evaluation for v1 (recommended; discussion shared to N forums → N evaluations/reports) with the server-rule dedup optimization deferred.
-- **(4.D)** Discussion-**edit** re-checks run per `DiscussionChannel` (recommended) rather than one consolidated multi-forum call; cross-forum token optimization deferred (prefer the §4.5 server-rule dedup if it's ever needed).
-- **(4.E)** Server-rule checking is a mode: `all_forums` | `allowlist[forums]` (trial/phased rollout + cost gate) | `off`, kept independent of the per-forum channel-rule enable (§4.1). Sub-questions: default mode (recommend `allowlist` or `off` for an experimental bot so it never goes server-wide unintentionally); whether to also ship the optional `shadowMode` dry-run.
-- **(6.A)** LLM call in the external service (recommended) vs. in the plugin.
-- **(6.B)** Async model: generalize the campaign limiter (v1) vs. true callback/webhook (v2).
-- **(6.C)** `recommendedAction` on `ModerationAction` vs. `Issue`.
-- Cost controls: per-server daily spend cap? default `model`? default `rateLimitPerMinute`/`concurrency`?
-- Should the bot also post an in-thread bot comment explaining its report, or only file the Issue? (Default: only the Issue.)
+## 11. Resolved decisions and remaining questions
+
+| Decision | Resolution                                                                                             |
+| -------- | ------------------------------------------------------------------------------------------------------ |
+| 11.A     | Ship the separate experimental `multiforum-plugin-llm-moderation`; leave `auto-moderation-bot` stable. |
+| 4.A      | One consolidated execution per content/forum unit; deduplicate server and channel candidates.          |
+| 4.B      | Backend resolves exact-version channel enablement and supplies canonical forum rules.                  |
+| 4.C      | Evaluate discussions per `DiscussionChannel`; defer cross-forum server-rule dedup.                     |
+| 4.D      | Re-check discussion edits per `DiscussionChannel`, not in one multi-forum prompt.                      |
+| 4.E      | Use `off`, `allowlist`, and `all_forums`; default to `off`. `shadowMode` was not shipped.              |
+| 6.A      | The external service owns the provider call and provider credential.                                   |
+| 6.B      | Use the durable backend enqueue-and-drain worker for v1; callback/webhook remains v2.                  |
+| 6.C      | Store recommendation metadata on the originating `ModerationAction`.                                   |
+
+Remaining product/operations questions are intentionally outside the core v1 merge:
+
+- Whether trial telemetry justifies a per-server daily spend cap.
+- Whether to add a distributed provider limiter before allowing more than one Cloud Run instance.
+- Which provider retention/privacy settings are required before sending real community content.
+- Whether a future version should post an explanatory in-thread bot comment. V1 files only the Issue.
 
 ---
 
 ## 12. Phased rollout
 
-### Phase 0 — Spike (no schema changes)
-- [ ] New plugin repo from the `auto-moderation-bot` template; new external service repo from the
-      `security-scan-service` template. End-to-end on `comment.created` only, synchronous, server rules only.
-- [ ] Publish to the **experimental** registry.
+### Phase 0 — Repositories and core service/plugin
+
+- [x] Create `multiforum-plugin-llm-moderation` and `multiforum-plugin-llm-moderation-service`.
+- [x] Implement the plugin-to-service contract, structured provider response, authentication, correlation,
+      citation validation, provider limits, retries, and tests.
+- [ ] Publish plugin `v0.7.0` to the **experimental** registry.
 
 ### Phase 1 — Consolidated server + per-forum evaluation (per `DiscussionChannel`)
-- [ ] Backend: supply server rules (+ `channelEnabled` + forum rules) to the bot context.
-- [ ] Server-rule **mode** (`all_forums` | `allowlist` | `off`) + forum allowlist (Decision 4.E); dispatch
+
+- [x] Backend: supply server rules (+ `channelEnabled` + forum rules) to the bot context.
+- [x] Server-rule **mode** (`all_forums` | `allowlist` | `off`) + forum allowlist (Decision 4.E); dispatch
       gates on it (§4.3) so non-covered forums are skipped. Default to a conservative mode for the trial.
-- [ ] Single-run consolidation per `DiscussionChannel` (Decisions 4.A/4.C); one `reportContentAsBot` with
+- [x] Single-run consolidation per `DiscussionChannel` (Decisions 4.A/4.C); one `reportContentAsBot` with
       both rule lists; discussion shared to N forums → N evaluations/reports.
-- [ ] Plugin: build the combined prompt; service returns scope-tagged violations.
+- [x] Plugin: build the combined request; service returns scope-tagged violations.
+- [x] Frontend/plugin manifest: conditional forum picker for the allowlist; default mode `off`.
 
 ### Phase 2 — Discussion submissions & edits
-- [ ] Evaluate the discussion **body** on the existing `discussionChannel.created`; expose
-      `reportContentAsBot` on the channel-trigger context (gap 5).
-- [ ] Add edit events + middleware: `comment.edited` and a per-forum discussion-body edit event
-      (e.g. `discussionChannel.updated`).
-- [ ] Re-evaluation-on-edit semantics (dedup / append to existing Issue).
+
+- [x] Evaluate the discussion **body** on `discussionChannel.created`; expose `reportContentAsBot` on the
+      channel-trigger context.
+- [x] Add edit events + middleware: `comment.edited` and per-forum `discussionChannel.edited`.
+- [x] Re-evaluation-on-edit semantics: append distinct revisions, make retries idempotent, and supersede
+      stale pending/running work.
 
 ### Phase 3 — Async + rate limiting
-- [ ] Enqueue-and-drain off the write path with a per-minute + concurrency ceiling (Decision 6.B, option A).
-- [ ] Config knobs + (optional) daily spend cap.
+
+- [x] Enqueue-and-drain off the write path with a per-minute + concurrency ceiling (Decision 6.B, option A).
+- [x] Persist bounded transient retries and backoff in the worker.
+- [x] Add provider-side concurrency/rate limits, timeout, retries, and deployment configuration.
+- [ ] Optional per-server daily spend cap.
 
 ### Phase 4 — Recommendation UX
-- [ ] Schema: `recommendedAction` (+ confidence/rationale) (Decision 6.C).
-- [ ] `ModerationWizard.vue`: show the recommendation, pre-select the matching human action.
-- [ ] `ActivityFeedListItem.vue`: bot actor badge.
 
-### Phase 5 (optional / v2)
+- [x] Schema: recommendation action, confidence, and rationale on `ModerationAction` (Decision 6.C).
+- [x] `ModerationWizard.vue`: show the recommendation and associate it with the matching human action.
+- [x] `ActivityFeedListItem.vue`: explicit bot actor badge.
+
+### Phase 5 — Deployment and experimental rollout
+
+- [x] Add reviewed Terraform, WIF deployment workflow, secret handling, probes, deployment verification, and
+      operator documentation.
+- [ ] Bootstrap the GCP project and GitHub `production` environment; configure deployment variables and the
+      `MOD_API_KEY` / `MOD_PROVIDER_API_KEY` secrets.
+- [ ] Deploy the service and record its Cloud Run URL; run the optional live provider check.
+- [ ] Tag and publish plugin `v0.7.0`.
+- [ ] Add `llm-moderation` to `registry-sources.json` as `experimental` and publish the registry.
+- [ ] Configure one server and one trial forum with the deployed URL, `MODERATION_SERVICE_API_KEY` set to the
+      same value as the service's `MOD_API_KEY`, pipelines, and allowlist.
+- [ ] Complete a real create/edit E2E trial and verify reports, recommendations, retries, and deduplication.
+
+### Phase 6 (optional / v2)
+
 - [ ] True fire-and-forget + authenticated callback webhook.
 - [ ] Multi-post batching in the service.
+- [ ] Cross-forum server-rule verdict dedup if trial costs justify it.
 - [ ] Per-channel secrets; audited per-channel enable resolver.
 
 ---
 
 ## Appendix — key source references
+
 - Backend plugin runtime & triggers: `services/plugin/commentTrigger.ts`, `channelTrigger.ts`,
   `downloadTrigger.ts`, `constants.ts`, `buildBotInvocationContext.ts`, `pluginLoader.ts`.
 - Async/lease/rate-limit infra: `services/plugin/{executionLease,pipelineAttempt,pipelineWatchdog,pipelineCampaign,pipelineNotifications}.ts`.
