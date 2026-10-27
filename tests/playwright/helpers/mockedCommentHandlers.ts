@@ -186,7 +186,7 @@ export const createCommentHandlers = (
       state.comments = [newComment, ...state.comments];
       return {
         data: {
-          createComments: {
+          createCommentWithOwnedConnections: {
             comments: [buildCommentFixture(newComment, state.comments, config)],
           },
         },

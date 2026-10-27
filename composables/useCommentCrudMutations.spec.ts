@@ -263,7 +263,7 @@ describe('useCommentCrudMutations', () => {
 
       update(cache, {
         data: {
-          createComments: {
+          createCommentWithOwnedConnections: {
             comments: [
               {
                 __typename: 'Comment',
@@ -376,7 +376,7 @@ describe('useCommentCrudMutations', () => {
       };
       update(cache, {
         data: {
-          createComments: {
+          createCommentWithOwnedConnections: {
             comments: [{ __typename: 'Comment', id: 'root-1', ParentComment: null }],
           },
         },
@@ -423,7 +423,7 @@ describe('useCommentCrudMutations', () => {
       };
       update(cache, {
         data: {
-          createComments: {
+          createCommentWithOwnedConnections: {
             comments: [
               { __typename: 'Comment', id: 'reply-1', ParentComment: { id: 'parent-1' } },
             ],

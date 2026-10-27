@@ -191,7 +191,7 @@ export const ADD_FEEDBACK_COMMENT_TO_EVENT = gql`
     $eventId: ID!
     $channelId: String!
   ) {
-    createComments(
+    createCommentWithOwnedConnections(
       input: [
         {
           isRootComment: true

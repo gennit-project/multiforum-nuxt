@@ -195,7 +195,8 @@ const {
   onDone: onAddFeedbackCommentToCommentDone,
 } = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, {
   update: (cache, result) => {
-    const newFeedbackComment = result.data.createComments.comments[0];
+    const newFeedbackComment =
+      result.data.createCommentWithOwnedConnections.comments[0];
 
     if (commentToGiveFeedbackOn.value) {
       const prevQueryResult = cache.readQuery<{ comments: Comment[] }>({

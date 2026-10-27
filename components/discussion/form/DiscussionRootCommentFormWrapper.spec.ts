@@ -198,7 +198,9 @@ describe('DiscussionRootCommentFormWrapper onDone', () => {
 
 describe('DiscussionRootCommentFormWrapper cache update', () => {
   const newComment = { id: 'c1', text: 'hi', CommentAuthor: {} };
-  const result = { data: { createComments: { comments: [newComment] } } };
+  const result = {
+    data: { createCommentWithOwnedConnections: { comments: [newComment] } },
+  };
 
   const makeCache = (queryResult: unknown) => ({
     writeFragment: vi.fn(() => ({ __ref: 'Comment:c1' })),

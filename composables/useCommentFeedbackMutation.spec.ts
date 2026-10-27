@@ -124,7 +124,7 @@ describe('useCommentFeedbackMutation', () => {
 
     const feedbackComment = { id: 'feedback-1', __typename: 'Comment' };
     const mutationResult = {
-      data: { createComments: { comments: [feedbackComment] } },
+      data: { createCommentWithOwnedConnections: { comments: [feedbackComment] } },
     };
 
     it('should call cache.modify when parent id and target comment exist', () => {

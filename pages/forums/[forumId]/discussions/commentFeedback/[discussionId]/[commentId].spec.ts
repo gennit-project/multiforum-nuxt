@@ -266,7 +266,7 @@ describe('comment feedback page', () => {
     };
 
     mockState.mutationUpdate?.(cache, {
-      data: { createComments: { comments: [{ id: 'new' }] } },
+      data: { createCommentWithOwnedConnections: { comments: [{ id: 'new' }] } },
     });
 
     const written = cache.writeQuery.mock.calls[0]?.[0].data.comments[0];

@@ -17822,6 +17822,67 @@ export type CreateCommentsMutationResponse = {
   info: CreateInfo;
 };
 
+/**
+ * Response of the custom `createCommentWithOwnedConnections` mutation (v7
+ * owned-write path). Comment creation moved off the generated `createComments`
+ * mutation because v7 removed to-one `connect` from create inputs. See
+ * docs/v7-frontend-contract.md.
+ */
+export type CreateCommentsWithOwnedConnectionsResponse = {
+  __typename?: 'CreateCommentsWithOwnedConnectionsResponse';
+  comments: Array<Comment>;
+};
+
+/**
+ * Connect leaf for the owned-comment custom mutation. Intentionally the pre-v7
+ * plain connect shape (`{ node: { id } }`), NOT the v7 filter form
+ * (`{ id: { eq } }`) — the resolver parses this input directly.
+ */
+export type OwnedCommentConnectNode = {
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  uniqueName?: InputMaybe<Scalars['String']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type OwnedCommentConnectWhere = {
+  node?: InputMaybe<OwnedCommentConnectNode>;
+};
+
+export type OwnedCommentConnect = {
+  where?: InputMaybe<OwnedCommentConnectWhere>;
+};
+
+export type OwnedCommentToOneConnect = {
+  connect?: InputMaybe<OwnedCommentConnect>;
+};
+
+export type OwnedCommentAuthorConnect = {
+  ModerationProfile?: InputMaybe<OwnedCommentToOneConnect>;
+  User?: InputMaybe<OwnedCommentToOneConnect>;
+};
+
+/**
+ * Input for `createCommentWithOwnedConnections`. Scalars accepted by the
+ * backend: text, isRootComment, isFeedbackComment, botMentions. Keeps the same
+ * connect shape the old `createComments` call used. See
+ * docs/v7-frontend-contract.md.
+ */
+export type OwnedCommentCreateInput = {
+  Channel?: InputMaybe<OwnedCommentToOneConnect>;
+  CommentAuthor?: InputMaybe<OwnedCommentAuthorConnect>;
+  DiscussionChannel?: InputMaybe<OwnedCommentToOneConnect>;
+  Event?: InputMaybe<OwnedCommentToOneConnect>;
+  GivesFeedbackOnComment?: InputMaybe<OwnedCommentToOneConnect>;
+  GivesFeedbackOnDiscussion?: InputMaybe<OwnedCommentToOneConnect>;
+  GivesFeedbackOnEvent?: InputMaybe<OwnedCommentToOneConnect>;
+  ParentComment?: InputMaybe<OwnedCommentToOneConnect>;
+  botMentions?: InputMaybe<Scalars['String']['input']>;
+  isFeedbackComment?: InputMaybe<Scalars['Boolean']['input']>;
+  isRootComment: Scalars['Boolean']['input'];
+  text?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CreateContactsMutationResponse = {
   __typename?: 'CreateContactsMutationResponse';
   contacts: Array<Contact>;
@@ -48563,6 +48624,7 @@ export type Mutation = {
   createCommentRepliesFormats: CreateCommentRepliesFormatsMutationResponse;
   createCommentSectionFormats: CreateCommentSectionFormatsMutationResponse;
   createComments: CreateCommentsMutationResponse;
+  createCommentWithOwnedConnections: CreateCommentsWithOwnedConnectionsResponse;
   createContacts: CreateContactsMutationResponse;
   createDayData: CreateDayDataMutationResponse;
   createDeleteEventInSeriesResults: CreateDeleteEventInSeriesResultsMutationResponse;
@@ -49076,6 +49138,11 @@ export type MutationCreateDiscussionChannelsArgs = {
 
 export type MutationCreateDiscussionInfosArgs = {
   input: Array<DiscussionInfoCreateInput>;
+};
+
+
+export type MutationCreateCommentWithOwnedConnectionsArgs = {
+  input: Array<OwnedCommentCreateInput>;
 };
 
 

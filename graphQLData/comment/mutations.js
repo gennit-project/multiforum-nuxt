@@ -81,8 +81,8 @@ export const UNDO_UPVOTE_COMMENT = gql`
 // comment fails to render until a refetch. The extra Channel/role/ChildComments
 // selections below cover fields a few consumers read beyond the fragment.
 export const CREATE_COMMENT = gql`
-  mutation createComment($createCommentInput: [CommentCreateInput!]!) {
-    createComments(input: $createCommentInput) {
+  mutation createComment($createCommentInput: [OwnedCommentCreateInput!]!) {
+    createCommentWithOwnedConnections(input: $createCommentInput) {
       comments {
         ...CommentFields
         Channel {
@@ -246,7 +246,7 @@ export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
     $commentId: ID!
     $channelId: String!
   ) {
-    createComments(
+    createCommentWithOwnedConnections(
       input: [
         {
           isRootComment: true

@@ -50,7 +50,8 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
   } = useMutation(CREATE_COMMENT, {
     errorPolicy: 'none',
     update: (cache, result) => {
-      const newComment: CommentType = result.data?.createComments?.comments?.[0];
+      const newComment: CommentType =
+        result.data?.createCommentWithOwnedConnections?.comments?.[0];
       const newCommentParentId = newComment?.ParentComment?.id;
 
       // Handle root comments

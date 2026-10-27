@@ -275,7 +275,7 @@ test.describe('Give feedback flows', () => {
           feedbackVariables = body.variables as AddFeedbackVariables;
           return {
             data: {
-              createComments: {
+              createCommentWithOwnedConnections: {
                 comments: [
                   {
                     id: 'feedback-comment-1',
@@ -395,7 +395,7 @@ test.describe('Give feedback flows', () => {
           feedbackVariables = body.variables as AddFeedbackVariables;
           return {
             data: {
-              createComments: {
+              createCommentWithOwnedConnections: {
                 comments: [
                   {
                     id: 'feedback-comment-1',
@@ -587,7 +587,7 @@ test.describe('Give feedback flows', () => {
           feedbackVariables = body.variables as AddFeedbackVariables;
           return {
             data: {
-              createComments: {
+              createCommentWithOwnedConnections: {
                 comments: [
                   {
                     id: 'feedback-comment-1',

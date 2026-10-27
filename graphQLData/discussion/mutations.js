@@ -409,7 +409,7 @@ export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
     $channelId: String!
     $discussionChannelId: ID!
   ) {
-    createComments(
+    createCommentWithOwnedConnections(
       input: [
         {
           isRootComment: true

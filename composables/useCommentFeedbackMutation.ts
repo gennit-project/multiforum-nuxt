@@ -47,7 +47,8 @@ export function useCommentFeedbackMutation(
       const parentId = JSON.parse(
         JSON.stringify(parentIdOfCommentToGiveFeedbackOn.value)
       );
-      const newFeedbackComment = result.data.createComments.comments[0];
+      const newFeedbackComment =
+        result.data.createCommentWithOwnedConnections.comments[0];
       const commentWeGaveFeedbackOn = commentToGiveFeedbackOn.value;
 
       if (parentId && commentWeGaveFeedbackOn) {

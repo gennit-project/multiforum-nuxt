@@ -171,9 +171,12 @@ const {
   },
   update: (cache: ApolloCache<NormalizedCacheObject>, result: FetchResult) => {
     try {
-      const newComment: Comment = result.data?.createComments?.comments?.[0];
+      const newComment: Comment =
+        result.data?.createCommentWithOwnedConnections?.comments?.[0];
       if (!newComment) {
-        console.error('No new comment returned from createComments mutation');
+        console.error(
+          'No new comment returned from createCommentWithOwnedConnections mutation'
+        );
         return;
       }
 

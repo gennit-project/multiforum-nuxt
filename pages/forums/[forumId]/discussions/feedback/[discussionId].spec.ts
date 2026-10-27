@@ -202,7 +202,7 @@ describe('discussion feedback page', () => {
       writeQuery: vi.fn(),
     };
     h.mutationOptions?.update(cache, {
-      data: { createComments: { comments: [{ id: 'new' }] } },
+      data: { createCommentWithOwnedConnections: { comments: [{ id: 'new' }] } },
     });
     expect(
       cache.writeQuery.mock.calls[0][0].data.discussions[0].FeedbackComments

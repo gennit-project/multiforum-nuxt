@@ -123,7 +123,7 @@ describe('CommentSection — mutation callbacks', () => {
     const wrapper = mountSection();
     router.get('createComment').update!(fakeCache(), {
       data: {
-        createComments: {
+        createCommentWithOwnedConnections: {
           comments: [
             { __typename: 'Comment', id: 'new-1', ParentComment: null },
           ],
@@ -158,7 +158,7 @@ describe('CommentSection — mutation callbacks', () => {
     const wrapper = mountSection();
     router.get('addFeedbackCommentToComment').update?.(fakeCache(), {
       data: {
-        createComments: {
+        createCommentWithOwnedConnections: {
           comments: [makeComment({ id: 'feedback-1', text: 'Feedback' })],
         },
       },
