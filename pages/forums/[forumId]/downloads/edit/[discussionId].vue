@@ -269,15 +269,8 @@ const getAlbumUpdateInput = () =>
 const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => {
     return {
-      onCreate: {
-        node: {
-          text: tag,
-        },
-      },
       where: {
-        node: {
-          text: tag,
-        },
+        node: { text: { eq: tag } },
       },
     };
   });
@@ -290,9 +283,7 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
       .map((tag: string) => {
         return {
           where: {
-            node: {
-              text: tag,
-            },
+            node: { text: { eq: tag } },
           },
         };
       });
@@ -311,7 +302,7 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
     // update resolver still accepts this payload, so preserve the shape.
     Tags: [
       {
-        connectOrCreate: tagConnections,
+        connect: tagConnections,
         disconnect: tagDisconnections,
       } as unknown as DiscussionTagsUpdateFieldInput,
     ],

@@ -55,8 +55,8 @@ describe('useIssueCloseReopen', () => {
       modify: vi.fn(),
       readQuery: vi
         .fn()
-        .mockReturnValueOnce({ issuesAggregate: { count: 3 } })
-        .mockReturnValueOnce({ issuesAggregate: { count: 7 } }),
+        .mockReturnValueOnce({ issuesConnection: { aggregate: { count: { nodes: 3 } } } })
+        .mockReturnValueOnce({ issuesConnection: { aggregate: { count: { nodes: 7 } } } }),
       writeQuery: vi.fn(),
     };
 
@@ -70,8 +70,8 @@ describe('useIssueCloseReopen', () => {
       modifiedId: 'Issue:issue-1',
       isOpenAfter: false,
       writeData: [
-        { issuesAggregate: { count: 4 } },
-        { issuesAggregate: { count: 6 } },
+        { issuesConnection: { aggregate: { count: { nodes: 4 } } } },
+        { issuesConnection: { aggregate: { count: { nodes: 6 } } } },
       ],
     });
   });
@@ -87,8 +87,8 @@ describe('useIssueCloseReopen', () => {
       modify: vi.fn(),
       readQuery: vi
         .fn()
-        .mockReturnValueOnce({ issuesAggregate: { count: 3 } })
-        .mockReturnValueOnce({ issuesAggregate: { count: 7 } }),
+        .mockReturnValueOnce({ issuesConnection: { aggregate: { count: { nodes: 3 } } } })
+        .mockReturnValueOnce({ issuesConnection: { aggregate: { count: { nodes: 7 } } } }),
       writeQuery: vi.fn(),
     };
 
@@ -102,8 +102,8 @@ describe('useIssueCloseReopen', () => {
       modifiedId: 'Issue:issue-1',
       isOpenAfter: true,
       writeData: [
-        { issuesAggregate: { count: 2 } },
-        { issuesAggregate: { count: 8 } },
+        { issuesConnection: { aggregate: { count: { nodes: 2 } } } },
+        { issuesConnection: { aggregate: { count: { nodes: 8 } } } },
       ],
     });
   });

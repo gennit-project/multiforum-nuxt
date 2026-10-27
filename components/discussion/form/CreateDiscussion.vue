@@ -4,7 +4,6 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import type {
   DiscussionChannel,
   DiscussionCreateInput,
-  DiscussionTagsFieldInput,
   DiscussionAuthorFieldInput,
   DiscussionCrosspostedDiscussionFieldInput,
 } from '@/__generated__/graphql';
@@ -167,23 +166,18 @@ const crosspostPreviewDiscussion = computed(() => {
 
 const discussionCreateInput = computed<DiscussionCreateInput>(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
-    onCreate: {
-      node: { text: tag },
-    },
-    where: {
-      node: { text: tag },
-    },
+    where: { node: { text: { eq: tag } } },
   }));
 
   const result: DiscussionCreateInput = {
     title: formValues.value.title,
     body: formValues.value.body,
     hasDownload: false,
-    // v7 Tags input no longer exposes `connectOrCreate`; the custom create
-    // resolver still accepts this payload, so preserve the shape via a cast.
+    // v7 removed `connectOrCreate`; attach existing tags with `connect` (the
+    // backend merges-if-missing server-side).
     Tags: {
-      connectOrCreate: tagConnections,
-    } as unknown as DiscussionTagsFieldInput,
+      connect: tagConnections,
+    },
     // v7 Author input no longer exposes `connect`; preserve the existing
     // connect payload the custom resolver expects via a cast.
     Author: {

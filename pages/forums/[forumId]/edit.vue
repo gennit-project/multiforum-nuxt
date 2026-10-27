@@ -173,14 +173,13 @@ const existingFilterGroups = computed(() => {
 
 const channelUpdateInput = computed<ChannelUpdateInput>(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
-    onCreate: { node: { text: tag } },
-    where: { node: { text: tag } },
+    where: { node: { text: { eq: tag } } },
   }));
 
   const tagDisconnections = existingTags.value
     .filter((tag: string) => !formValues.value.selectedTags.includes(tag))
     .map((tag: TagData) => ({
-      where: { node: { text: tag } },
+      where: { node: { text: { eq: tag } } },
     }));
 
   // Only changed groups/options are sent; see utils/filterGroupUpdates.ts
@@ -208,7 +207,7 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     // update resolver still accepts this payload, so preserve the shape.
     Tags: [
       {
-        connectOrCreate: tagConnections,
+        connect: tagConnections,
         disconnect: tagDisconnections,
       } as unknown as ChannelTagsUpdateFieldInput,
     ],

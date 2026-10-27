@@ -277,9 +277,8 @@ describe('comment feedback page', () => {
       {
         id: 'f1',
         FeedbackComments: [{ id: 'old' }, { id: 'new' }],
-        FeedbackCommentsAggregate: {
-          count: 2,
-          __typename: 'FeedbackCommentsAggregate',
+        FeedbackCommentsConnection: {
+          aggregate: { count: { nodes: 2 } },
         },
       },
     ]);

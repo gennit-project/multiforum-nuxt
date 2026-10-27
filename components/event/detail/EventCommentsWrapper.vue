@@ -247,11 +247,17 @@ function incrementCommentCount(cache: ApolloCache<unknown>) {
     cache.modify({
       id: eventId,
       fields: {
-        CommentsAggregate(existing) {
-          const data = (existing || {}) as { count?: number };
+        CommentsConnection(existing) {
+          const data = (existing || {}) as {
+            aggregate?: { count?: { nodes?: number } };
+          };
+          const nodes = data.aggregate?.count?.nodes || 0;
           return {
             ...data,
-            count: (data.count || 0) + 1,
+            aggregate: {
+              ...data.aggregate,
+              count: { ...data.aggregate?.count, nodes: nodes + 1 },
+            },
           };
         },
       },
@@ -283,11 +289,17 @@ function decrementCommentCount(cache: ApolloCache<unknown>) {
     cache.modify({
       id: eventId,
       fields: {
-        CommentsAggregate(existing) {
-          const data = (existing || {}) as { count?: number };
+        CommentsConnection(existing) {
+          const data = (existing || {}) as {
+            aggregate?: { count?: { nodes?: number } };
+          };
+          const nodes = data.aggregate?.count?.nodes || 0;
           return {
             ...data,
-            count: Math.max(0, (data.count || 0) - 1),
+            aggregate: {
+              ...data.aggregate,
+              count: { ...data.aggregate?.count, nodes: Math.max(0, nodes - 1) },
+            },
           };
         },
       },

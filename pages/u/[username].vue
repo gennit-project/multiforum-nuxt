@@ -55,16 +55,16 @@ const user = computed(() => {
   if (userLoading.value && username.value) {
     return {
       username: username.value,
-      CommentsAggregate: { count: 0 },
-      DiscussionsAggregate: { count: 0 },
-      DownloadsAggregate: { count: 0 },
-      EventsAggregate: { count: 0 },
+      CommentsConnection: { aggregate: { count: { nodes: 0 } } },
+      DiscussionsConnection: { aggregate: { count: { nodes: 0 } } },
+      DownloadsConnection: { aggregate: { count: { nodes: 0 } } },
+      EventsConnection: { aggregate: { count: { nodes: 0 } } },
       wikiEditsCount: 0,
-      AuthoredWikiPageVersionsAggregate: { count: 0 },
-      ImagesAggregate: { count: 0 },
-      AlbumsAggregate: { count: 0 },
-      AdminOfChannelsAggregate: { count: 0 },
-      ModOfChannelsAggregate: { count: 0 },
+      AuthoredWikiPageVersionsConnection: { aggregate: { count: { nodes: 0 } } },
+      ImagesConnection: { aggregate: { count: { nodes: 0 } } },
+      AlbumsConnection: { aggregate: { count: { nodes: 0 } } },
+      AdminOfChannelsConnection: { aggregate: { count: { nodes: 0 } } },
+      ModOfChannelsConnection: { aggregate: { count: { nodes: 0 } } },
     };
   }
   return null;

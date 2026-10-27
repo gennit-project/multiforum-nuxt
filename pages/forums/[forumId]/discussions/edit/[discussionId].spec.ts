@@ -356,13 +356,8 @@ describe('discussion edit page', () => {
         body: { set: 'Body' },
         Tags: [
           {
-            connectOrCreate: [
-              {
-                onCreate: { node: { text: 'new-tag' } },
-                where: { node: { text: 'new-tag' } },
-              },
-            ],
-            disconnect: [{ where: { node: { text: 'old-tag' } } }],
+            connect: [{ where: { node: { text: { eq: 'new-tag' } } } }],
+            disconnect: [{ where: { node: { text: { eq: 'old-tag' } } } }],
           },
         ],
       },

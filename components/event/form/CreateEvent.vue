@@ -63,14 +63,9 @@ const eventCreateInput = computed<EventCreateInput>(() => {
     isHostedByOP: formValues.value.isHostedByOP || false,
     coverImageURL: formValues.value.coverImageURL || null,
     Tags: { connect: tagConnections },
-    // v7 note: EventPosterFieldInput exposes only `create` (no `connect`), so an
-    // existing user cannot be connected as poster through the generated v7 type.
-    // The custom createEventWithChannelConnections resolver still consumes this
-    // connect payload, so keep it and cast to the v7 field type. See the migration
-    // report — this is the one field without a clean v7 reshape.
-    Poster: {
-      connect: { where: { node: { username: usernameVar.value } } },
-    } as unknown as EventCreateInput['Poster'],
+    // v7: the POSTED_BY edge is set server-side from the authenticated user by
+    // the createEventWithChannelConnections resolver (EventPosterFieldInput has
+    // no `connect`), so no Poster payload is sent.
   };
 
   if (formValues.value.latitude && formValues.value.longitude) {

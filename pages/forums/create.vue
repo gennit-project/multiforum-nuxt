@@ -46,15 +46,8 @@ const formValues = ref<CreateEditChannelFormValues>(createChannelDefaultValues);
 const createChannelInput = computed(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => {
     return {
-      onCreate: {
-        node: {
-          text: tag,
-        },
-      },
       where: {
-        node: {
-          text: tag,
-        },
+        node: { text: { eq: tag } },
       },
     };
   });
@@ -75,7 +68,7 @@ const createChannelInput = computed(() => {
       // v7 Tags input no longer exposes `connectOrCreate`; the custom create
       // resolver still accepts this payload, so preserve the shape via a cast.
       Tags: {
-        connectOrCreate: tagConnections,
+        connect: tagConnections,
       } as unknown as ChannelTagsFieldInput,
       Admins: {
         connect: [

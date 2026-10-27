@@ -278,15 +278,10 @@ describe('download edit page', () => {
         title: { set: 'Cool model' },
         Tags: [
           {
-            connectOrCreate: [
-              {
-                onCreate: { node: { text: 'new-tag' } },
-                where: { node: { text: 'new-tag' } },
-              },
-            ],
+            connect: [{ where: { node: { text: { eq: 'new-tag' } } } }],
             disconnect: [
-              { where: { node: { text: 'art' } } },
-              { where: { node: { text: '3d' } } },
+              { where: { node: { text: { eq: 'art' } } } },
+              { where: { node: { text: { eq: '3d' } } } },
             ],
           },
         ],

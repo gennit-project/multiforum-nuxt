@@ -372,10 +372,14 @@ const incrementCommentCount = (cache: ApolloCache<NormalizedCacheObject>) => {
         id: props.discussionChannel.id,
       }),
       fields: {
-        CommentsAggregate(existing = { count: 0 }) {
+        CommentsConnection(existing) {
+          const nodes = existing?.aggregate?.count?.nodes || 0;
           return {
             ...existing,
-            count: (existing.count || 0) + 1,
+            aggregate: {
+              ...existing?.aggregate,
+              count: { ...existing?.aggregate?.count, nodes: nodes + 1 },
+            },
           };
         },
       },
@@ -400,10 +404,17 @@ const decrementCommentCount = (cache: ApolloCache<NormalizedCacheObject>) => {
         id: props.discussionChannel.id,
       }),
       fields: {
-        CommentsAggregate(existing = { count: 0 }) {
+        CommentsConnection(existing) {
+          const nodes = existing?.aggregate?.count?.nodes || 0;
           return {
             ...existing,
-            count: Math.max(0, (existing.count || 0) - 1),
+            aggregate: {
+              ...existing?.aggregate,
+              count: {
+                ...existing?.aggregate?.count,
+                nodes: Math.max(0, nodes - 1),
+              },
+            },
           };
         },
       },

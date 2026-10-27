@@ -114,7 +114,7 @@ describe('Create forum page', () => {
     expect(h.mutate).toHaveBeenCalledTimes(1);
     const input = h.mutate.mock.calls[0][0].createChannelInput[0];
     expect(input.uniqueName).toBe('cats');
-    expect(input.Tags.connectOrCreate[0].where.node.text).toBe('pets');
+    expect(input.Tags.connect[0].where.node.text).toEqual({ eq: 'pets' });
     expect(input.Admins.connect[0].where.node.username).toEqual({ eq: 'alice' });
   });
 

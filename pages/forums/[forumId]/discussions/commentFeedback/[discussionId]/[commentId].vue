@@ -226,11 +226,14 @@ const {
           {
             ...commentToGiveFeedbackOn.value,
             FeedbackComments: [...prevFeedbackComments, newFeedbackComment],
-            FeedbackCommentsAggregate: {
-              count:
-                (prevQueryResult?.comments?.[0]?.FeedbackCommentsConnection
-                  ?.aggregate?.count?.nodes ?? 0) + 1,
-              __typename: 'FeedbackCommentsAggregate',
+            FeedbackCommentsConnection: {
+              aggregate: {
+                count: {
+                  nodes:
+                    (prevQueryResult?.comments?.[0]?.FeedbackCommentsConnection
+                      ?.aggregate?.count?.nodes ?? 0) + 1,
+                },
+              },
             },
           },
         ],

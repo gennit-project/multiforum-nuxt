@@ -124,7 +124,7 @@ const loadMoreImages = async () => {
             {
               ...previousResult.users[0],
               Images: [...previousResult.users[0].Images, ...newImages],
-              ImagesAggregate: fetchMoreResult.users[0].ImagesAggregate,
+              ImagesConnection: fetchMoreResult.users[0].ImagesConnection,
             },
           ],
         };

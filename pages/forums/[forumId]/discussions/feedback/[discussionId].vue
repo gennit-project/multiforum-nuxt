@@ -176,7 +176,11 @@ const {
         loggedInModName: modProfileNameVar.value,
       },
     }) as {
-      discussions: Array<{ FeedbackCommentsAggregate?: { count?: number } }>;
+      discussions: Array<{
+        FeedbackCommentsConnection?: {
+          aggregate?: { count?: { nodes?: number } };
+        };
+      }>;
     } | null;
     const prevOriginalFeedbackList = discussion.value.FeedbackComments;
     const prevFeedbackComments =
@@ -190,11 +194,14 @@ const {
         {
           ...commentToGiveFeedbackOn.value,
           FeedbackComments: [...prevFeedbackComments, newFeedbackComment],
-          FeedbackCommentsAggregate: {
-            count:
-              (prevQueryResult?.discussions?.[0]?.FeedbackCommentsAggregate
-                ?.count || 0) + 1,
-            __typename: 'FeedbackCommentsAggregate',
+          FeedbackCommentsConnection: {
+            aggregate: {
+              count: {
+                nodes:
+                  (prevQueryResult?.discussions?.[0]?.FeedbackCommentsConnection
+                    ?.aggregate?.count?.nodes || 0) + 1,
+              },
+            },
           },
         },
       ],

@@ -178,6 +178,9 @@ importers:
       '@graphql-codegen/client-preset':
         specifier: ^6.2.3
         version: 6.2.3(graphql@16.14.2)
+      '@graphql-codegen/typescript':
+        specifier: 6.1.2
+        version: 6.1.2(graphql@16.14.2)
       '@nuxt/eslint-config':
         specifier: ^1.17.0
         version: 1.17.0(@typescript-eslint/utils@8.70.1(eslint@10.6.0(jiti@2.7.0))(typescript@6.0.3))(@vue/compiler-sfc@3.5.44)(eslint@10.6.0(jiti@2.7.0))(typescript@6.0.3)
