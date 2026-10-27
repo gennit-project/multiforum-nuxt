@@ -78,11 +78,9 @@ const {
   GET_EVENTS,
   () => ({
     where: eventWhere.value,
-    options: {
-      limit: 25,
-      offset: 0,
-      sort: resultsOrder.value,
-    },
+    limit: 25,
+    offset: 0,
+    sort: [resultsOrder.value],
   }),
   {
     fetchPolicy: 'cache-first',
@@ -94,11 +92,10 @@ const previewIsOpen = ref(false);
 const loadMore = () => {
   fetchMore({
     variables: {
-      options: {
-        limit: 25,
-        offset: eventResult.value?.events?.length || 0,
-        sort: resultsOrder.value,
-      },
+      where: eventWhere.value,
+      limit: 25,
+      offset: eventResult.value?.events?.length || 0,
+      sort: [resultsOrder.value],
     },
     // Prevent cache clearing which causes content shift
     updateQuery: (previousResult, { fetchMoreResult }) => {
@@ -108,7 +105,7 @@ const loadMore = () => {
       return {
         ...previousResult,
         events: [...(previousResult?.events || []), ...fetchMoreResult.events],
-        eventsAggregate: fetchMoreResult.eventsAggregate, // Update the aggregate count
+        eventsConnection: fetchMoreResult.eventsConnection, // Update the aggregate count
       };
     },
   });
@@ -367,7 +364,7 @@ watch(isSearchListRoute, (isSearchRoute) => {
           v-if="eventResult?.events"
           id="listView"
           class="relative"
-          :result-count="eventResult.eventsAggregate?.count || 0"
+          :result-count="eventResult.eventsConnection?.aggregate?.count?.nodes || 0"
           :events="eventResult.events"
           :channel-id="channelId"
           :search-input="filterValues.searchInput"

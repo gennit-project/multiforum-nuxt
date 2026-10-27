@@ -170,10 +170,10 @@ describe('event edit page', () => {
       channelConnections: variables.channelConnections,
       channelDisconnections: variables.channelDisconnections,
       tagConnection:
-        variables.updateEventInput.Tags[0].connectOrCreate[0].where.node.text,
+        variables.updateEventInput.Tags[0].connect[0].where.node.text.eq,
       tagDisconnection:
-        variables.updateEventInput.Tags[0].disconnect[0].where.node.text,
-      location: variables.updateEventInput.location,
+        variables.updateEventInput.Tags[0].disconnect[0].where.node.text.eq,
+      location: variables.updateEventInput.location.set,
     }).toEqual({
       channelConnections: ['cats', 'birds'],
       channelDisconnections: ['dogs'],

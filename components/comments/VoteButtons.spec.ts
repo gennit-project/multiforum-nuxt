@@ -53,7 +53,9 @@ const votesProps = (wrapper: ReturnType<typeof mountVotes>) =>
 describe('VoteButtons', () => {
   it('passes the upvote count from the aggregate', () => {
     const wrapper = mountVotes(
-      comment({ UpvotedByUsersAggregate: { count: 3 } })
+      comment({
+        UpvotedByUsersConnection: { aggregate: { count: { nodes: 3 } } },
+      })
     );
     expect(votesProps(wrapper).upvoteCount).toBe(3);
   });
@@ -95,7 +97,10 @@ describe('VoteButtons', () => {
 
   it('falls back to the feedback aggregate when no feedback comments are loaded', () => {
     const wrapper = mountVotes(
-      comment({ FeedbackComments: null, FeedbackCommentsAggregate: { count: 2 } })
+      comment({
+        FeedbackComments: null,
+        FeedbackCommentsConnection: { aggregate: { count: { nodes: 2 } } },
+      })
     );
     expect(votesProps(wrapper).downvoteActive).toBe(true);
   });

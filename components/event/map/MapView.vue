@@ -25,7 +25,7 @@ import {
   cleanQueryParams,
   buildInfowindowContent,
 } from '@/utils/eventMap';
-import type { Event as EventData, EventOptions } from '@/__generated__/graphql';
+import type { Event as EventData } from '@/__generated__/graphql';
 import type { SearchEventValues } from '@/types/Event';
 import type { Ref, PropType } from 'vue';
 import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
@@ -137,7 +137,7 @@ const {
   GET_EVENTS,
   {
     where: eventWhere,
-    options: computed<EventOptions>(() => ({ sort: [resultsOrder.value] })),
+    sort: computed(() => [resultsOrder.value]),
   },
   {
     fetchPolicy: 'cache-first',
@@ -483,7 +483,7 @@ const isClientSide = typeof window !== 'undefined';
         {{
           eventLoading
             ? 'Loading events…'
-            : `${eventResult?.eventsAggregate?.count ?? 0} events`
+            : `${eventResult?.eventsConnection?.aggregate?.count?.nodes ?? 0} events`
         }}
       </p>
 
@@ -515,7 +515,7 @@ const isClientSide = typeof window !== 'undefined';
               :selected-tags="filterValues.tags"
               :selected-channels="filterValues.channels"
               :loaded-event-count="eventResult.events.length"
-              :result-count="eventResult.eventsAggregate?.count"
+              :result-count="eventResult.eventsConnection?.aggregate?.count?.nodes"
               :show-map="true"
               @filter-by-tag="filterByTag"
               @filter-by-channel="filterByChannel"
@@ -629,7 +629,7 @@ const isClientSide = typeof window !== 'undefined';
                 :selected-tags="filterValues.tags"
                 :selected-channels="filterValues.channels"
                 :loaded-event-count="eventResult.events.length"
-                :result-count="eventResult.eventsAggregate?.count"
+                :result-count="eventResult.eventsConnection?.aggregate?.count?.nodes"
                 @filter-by-tag="filterByTag"
                 @filter-by-channel="filterByChannel"
                 @highlight-event="highlightEvent"

@@ -13,7 +13,7 @@ export function getTotalCommentCount(discussion: Discussion | null): number {
   if (!discussion?.DiscussionChannels) return 0;
 
   return discussion.DiscussionChannels.reduce((total, dc: DiscussionChannel) => {
-    return total + (dc.CommentsAggregate?.count || 0);
+    return total + (dc.CommentsConnection?.aggregate?.count?.nodes || 0);
   }, 0);
 }
 
@@ -23,7 +23,7 @@ export function getTotalCommentCount(discussion: Discussion | null): number {
 export function getChannelCommentCount(
   discussionChannel: DiscussionChannel | null
 ): number {
-  return discussionChannel?.CommentsAggregate?.count || 0;
+  return discussionChannel?.CommentsConnection?.aggregate?.count?.nodes || 0;
 }
 
 export type DiscussionDetailOption = {
@@ -41,7 +41,7 @@ export function getDiscussionDetailOptions(
   if (!discussion?.DiscussionChannels) return [];
 
   return discussion.DiscussionChannels.map((dc) => {
-    const commentCount = dc.CommentsAggregate?.count || 0;
+    const commentCount = dc.CommentsConnection?.aggregate?.count?.nodes || 0;
     const discussionDetailLink = `/forums/${dc.channelUniqueName}/discussions/${discussion.id}`;
     return {
       label: `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
@@ -59,7 +59,7 @@ export function getDownloadDetailOptions(
   if (!discussion?.DiscussionChannels) return [];
 
   return discussion.DiscussionChannels.map((dc) => {
-    const commentCount = dc.CommentsAggregate?.count || 0;
+    const commentCount = dc.CommentsConnection?.aggregate?.count?.nodes || 0;
     return {
       label: `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
       value: `/forums/${dc.channelUniqueName}/downloads/${discussion.id}`,

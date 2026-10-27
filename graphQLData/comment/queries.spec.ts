@@ -10,6 +10,6 @@ describe('GET_DISCUSSION_COMMENTS', () => {
   });
 
   it('retains the child count needed to decide whether to load replies', () => {
-    expect(source).toContain('ChildCommentsAggregate');
+    expect(source).toContain('ChildCommentsConnection');
   });
 });

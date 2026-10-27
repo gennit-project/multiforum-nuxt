@@ -149,7 +149,10 @@ const feedbackComments = computed(() => {
 
 const feedbackCommentsAggregate = computed(() => {
   if (originalComment.value) {
-    return originalComment.value.FeedbackCommentsAggregate?.count || 0;
+    return (
+      originalComment.value.FeedbackCommentsConnection?.aggregate?.count
+        ?.nodes || 0
+    );
   }
   return 0;
 });
@@ -225,8 +228,8 @@ const {
             FeedbackComments: [...prevFeedbackComments, newFeedbackComment],
             FeedbackCommentsAggregate: {
               count:
-                (prevQueryResult?.comments?.[0]?.FeedbackCommentsAggregate
-                  ?.count ?? 0) + 1,
+                (prevQueryResult?.comments?.[0]?.FeedbackCommentsConnection
+                  ?.aggregate?.count?.nodes ?? 0) + 1,
               __typename: 'FeedbackCommentsAggregate',
             },
           },

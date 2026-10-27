@@ -43,19 +43,19 @@ const tabs = computed(() => {
       name: 'Comments',
       href: `/mod/${modNameInParams.value}/comments`,
       current: true,
-      count: props.mod?.AuthoredCommentsAggregate?.count,
+      count: props.mod?.AuthoredCommentsConnection?.aggregate?.count?.nodes,
     },
     {
       name: 'Mod Actions',
       href: `/mod/${modNameInParams.value}/actions`,
       current: false,
-      count: props.mod?.ActivityFeedAggregate?.count,
+      count: props.mod?.ActivityFeedConnection?.aggregate?.count?.nodes,
     },
     {
       name: 'Issues',
       href: `/mod/${modNameInParams.value}/issues`,
       current: false,
-      count: props.mod?.AuthoredIssuesAggregate?.count,
+      count: props.mod?.AuthoredIssuesConnection?.aggregate?.count?.nodes,
     },
   ];
   return tabList;

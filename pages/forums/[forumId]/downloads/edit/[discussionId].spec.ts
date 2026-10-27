@@ -275,7 +275,7 @@ describe('download edit page', () => {
       channelDisconnections: ['cats'],
       albumImageDisconnections: [],
       updateDiscussionInput: {
-        title: 'Cool model',
+        title: { set: 'Cool model' },
         Tags: [
           {
             connectOrCreate: [
@@ -330,9 +330,9 @@ describe('download edit page', () => {
     };
 
     expect(tracker.options().variables.updateDiscussionInput).toMatchObject({
-      hasDownload: true,
+      hasDownload: { set: true },
       DownloadableFiles: [
-        { connect: [{ where: { node: { id: 'new-file' } } }] },
+        { connect: [{ where: { node: { id: { eq: 'new-file' } } } }] },
       ],
     });
   });

@@ -352,8 +352,8 @@ describe('discussion edit page', () => {
     expect(hState.mutationOptions?.().variables).toEqual({
       where: { id: 'd1' },
       updateDiscussionInput: {
-        title: 'Hello',
-        body: 'Body',
+        title: { set: 'Hello' },
+        body: { set: 'Body' },
         Tags: [
           {
             connectOrCreate: [

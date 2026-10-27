@@ -148,9 +148,7 @@ const addNewGroup = () => {
     // Required fields for GraphQL type but not used in this context
     __typename: 'FilterGroup' as const,
     channel: emptyChannel,
-    channelAggregate: null,
     channelConnection: emptyChannelConnection,
-    optionsAggregate: null,
     optionsConnection: emptyOptionsConnection,
   };
 

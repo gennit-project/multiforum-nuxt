@@ -12,6 +12,22 @@ import {
 } from './graphqlFixtures';
 import { createBaseHandlers, type BaseHandlerConfig } from './baseHandlers';
 
+// v7 removed connectOrCreate from tag field inputs. The app sends tag
+// connections under connect (or still connectOrCreate while that migration
+// lands); read either shape without pinning to the generated input type.
+type MockTagConnect = { where?: { node?: { text?: string | null } } };
+const extractTagTexts = (tagsField: unknown): string[] | undefined => {
+  const field = tagsField as
+    | { connectOrCreate?: MockTagConnect[]; connect?: MockTagConnect[] }
+    | null
+    | undefined;
+  const connections = field?.connectOrCreate ?? field?.connect;
+  if (!connections) return undefined;
+  return connections
+    .map((tag) => tag?.where?.node?.text)
+    .filter((text): text is string => Boolean(text));
+};
+
 export type DiscussionTestConfig = {
   channelId: string;
   username: string;
@@ -287,10 +303,7 @@ export const createDiscussionHandlers = (
         discussionChannelId,
         title: input.title,
         body: input.body ?? '',
-        tags:
-          input.Tags?.connectOrCreate
-            ?.map((tag) => tag.where.node.text)
-            .filter((tag): tag is string => Boolean(tag)) || [],
+        tags: extractTagTexts(input.Tags) ?? [],
         deleted: false,
       };
 
@@ -343,12 +356,9 @@ export const createDiscussionHandlers = (
         throw new Error('No active discussion to update');
       }
 
-      discussion.title = update?.title ?? discussion.title;
-      discussion.body = update?.body ?? discussion.body;
-      discussion.tags =
-        update?.Tags?.[0]?.connectOrCreate
-          ?.map((tag) => tag.where.node.text)
-          .filter((tag): tag is string => Boolean(tag)) || discussion.tags;
+      discussion.title = update?.title?.set ?? discussion.title;
+      discussion.body = update?.body?.set ?? discussion.body;
+      discussion.tags = extractTagTexts(update?.Tags?.[0]) ?? discussion.tags;
 
       const channelFlairSelections =
         body.variables?.channelFlairSelections ?? [];

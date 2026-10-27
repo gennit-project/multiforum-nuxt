@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, type PropType } from 'vue';
-import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import type { ServerConfig } from '@/__generated__/graphql';
 import FormRow from '@/components/FormRow.vue';
 import { useBrandingLock } from '@/composables/useBranding';
 import { useImageUpload } from '@/composables/useImageUpload';
@@ -21,7 +21,7 @@ const props = defineProps({
     required: true,
   },
   formValues: {
-    type: Object as PropType<ServerConfigUpdateInput | null>,
+    type: Object as PropType<Partial<ServerConfig> | null>,
     default: null,
   },
 });
@@ -32,7 +32,7 @@ const props = defineProps({
 const locked = useBrandingLock();
 
 const emit = defineEmits<{
-  updateFormValues: [value: ServerConfigUpdateInput];
+  updateFormValues: [value: Partial<ServerConfig>];
 }>();
 
 type UrlField = 'brandingDocsURL' | 'brandingSourceURL' | 'brandingIssuesURL';

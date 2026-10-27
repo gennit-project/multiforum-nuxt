@@ -77,7 +77,9 @@ const defaultLink = computed(() => {
 const commentCount = computed(() => {
   if (!props.discussion?.DiscussionChannels?.length) return 0;
   return props.discussion.DiscussionChannels.reduce((total, channel) => {
-    return total + (channel.CommentsAggregate?.count || 0);
+    return (
+      total + (channel.CommentsConnection?.aggregate?.count?.nodes || 0)
+    );
   }, 0);
 });
 
@@ -92,7 +94,7 @@ const discussionDetailOptions = computed(() => {
     return [];
   }
   return props.discussion.DiscussionChannels.map((dc) => {
-    const comments = dc.CommentsAggregate?.count || 0;
+    const comments = dc.CommentsConnection?.aggregate?.count?.nodes || 0;
     return {
       label: `${comments} ${comments === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
       value: `/forums/${dc.channelUniqueName}/downloads/${props.discussion.id}`,

@@ -164,7 +164,7 @@ describe('account_settings', () => {
     expect(updateUser).toHaveBeenCalledWith({
       where: { username: 'alice' },
       update: expect.objectContaining({
-        notifyOnSubscribedIssueUpdates: false,
+        notifyOnSubscribedIssueUpdates: { set: false },
       }),
     });
   });
@@ -186,7 +186,7 @@ describe('account_settings', () => {
     expect(updateUser).toHaveBeenCalledWith({
       where: { username: 'alice' },
       update: expect.objectContaining({
-        notifyOnSuspensionBlocks: false,
+        notifyOnSuspensionBlocks: { set: false },
       }),
     });
   });
@@ -204,7 +204,7 @@ describe('account_settings', () => {
     await vi.advanceTimersByTimeAsync(900);
     expect(updateUser).toHaveBeenCalledWith({
       where: { username: 'alice' },
-      update: expect.objectContaining({ [field]: true }),
+      update: expect.objectContaining({ [field]: { set: true } }),
     });
   });
 
@@ -224,9 +224,9 @@ describe('account_settings', () => {
       mutation: {
         where: { username: 'alice' },
         update: {
-          displayName: 'Alicia',
-          bio: 'Hello',
-          profilePicURL: '/alice.png',
+          displayName: { set: 'Alicia' },
+          bio: { set: 'Hello' },
+          profilePicURL: { set: '/alice.png' },
         },
       },
       refetches: 1,

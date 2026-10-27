@@ -26,13 +26,9 @@ const {
   GET_NOTIFICATIONS,
   () => ({
     username: username.value,
-    options: {
-      limit: NOTIFICATION_PAGE_LIMIT,
-      offset: 0,
-      sort: {
-        createdAt: 'DESC',
-      },
-    },
+    limit: NOTIFICATION_PAGE_LIMIT,
+    offset: 0,
+    sort: [{ createdAt: 'DESC' }],
   }),
   {
     fetchPolicy: 'cache-and-network',
@@ -71,19 +67,16 @@ const aggregateNotificationCount = computed(() => {
   if (!userData) {
     return 0;
   }
-  return userData.NotificationsAggregate?.count || 0;
+  return userData.NotificationsAggregate?.aggregate?.count?.nodes || 0;
 });
 
 const loadMore = () => {
   fetchMore({
     variables: {
-      options: {
-        limit: NOTIFICATION_PAGE_LIMIT,
-        offset: notificationResult.value.users[0]?.Notifications?.length,
-        sort: {
-          createdAt: 'DESC',
-        },
-      },
+      username: username.value,
+      limit: NOTIFICATION_PAGE_LIMIT,
+      offset: notificationResult.value.users[0]?.Notifications?.length,
+      sort: [{ createdAt: 'DESC' }],
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;

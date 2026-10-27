@@ -35,12 +35,16 @@ export const PERMANENTLY_DELETE_PROFILE_IMAGE = gql`
 export const MARK_NOTIFICATIONS_AS_READ = gql`
   mutation markNotificationsAsRead($username: String!) {
     updateUsers(
-      where: { username: $username }
+      where: { username: { eq: $username } }
       update: {
-        Notifications: {
-          where: { node: { read: false } }
-          update: { node: { read: true } }
-        }
+        Notifications: [
+          {
+            update: {
+              where: { node: { read: { eq: false } } }
+              node: { read: { set: true } }
+            }
+          }
+        ]
       }
     ) {
       users {
@@ -60,17 +64,21 @@ export const MARK_NOTIFICATIONS_AS_READ = gql`
 export const MARK_NOTIFICATION_AS_READ = gql`
   mutation markNotificationAsRead($username: String!, $notificationId: ID!) {
     updateUsers(
-      where: { username: $username }
+      where: { username: { eq: $username } }
       update: {
-        Notifications: {
-          where: { node: { id: $notificationId } }
-          update: { node: { read: true } }
-        }
+        Notifications: [
+          {
+            update: {
+              where: { node: { id: { eq: $notificationId } } }
+              node: { read: { set: true } }
+            }
+          }
+        ]
       }
     ) {
       users {
         username
-        Notifications(where: { id: $notificationId }) {
+        Notifications(where: { id: { eq: $notificationId } }) {
           id
           read
         }
@@ -82,10 +90,10 @@ export const MARK_NOTIFICATION_AS_READ = gql`
 export const ADD_FAVORITE_CHANNEL = gql`
   mutation addFavoriteChannel($channel: String!, $username: String!) {
     updateUsers(
-      where: { username: $username }
+      where: { username: { eq: $username } }
       update: {
         FavoriteChannels: {
-          connect: [{ where: { node: { uniqueName: $channel } } }]
+          connect: [{ where: { node: { uniqueName: { eq: $channel } } } }]
         }
       }
     ) {
@@ -102,10 +110,10 @@ export const ADD_FAVORITE_CHANNEL = gql`
 export const REMOVE_FAVORITE_CHANNEL = gql`
   mutation removeFavoriteChannel($channel: String!, $username: String!) {
     updateUsers(
-      where: { username: $username }
+      where: { username: { eq: $username } }
       update: {
         FavoriteChannels: {
-          disconnect: [{ where: { node: { uniqueName: $channel } } }]
+          disconnect: [{ where: { node: { uniqueName: { eq: $channel } } } }]
         }
       }
     ) {
@@ -122,10 +130,10 @@ export const REMOVE_FAVORITE_CHANNEL = gql`
 export const ADD_FAVORITE_DISCUSSION = gql`
   mutation addFavoriteDiscussion($discussionId: ID!, $username: String!) {
     updateUsers(
-      where: { username: $username }
+      where: { username: { eq: $username } }
       update: {
         FavoriteDiscussions: {
-          connect: [{ where: { node: { id: $discussionId } } }]
+          connect: [{ where: { node: { id: { eq: $discussionId } } } }]
         }
       }
     ) {
@@ -143,10 +151,10 @@ export const ADD_FAVORITE_DISCUSSION = gql`
 export const REMOVE_FAVORITE_DISCUSSION = gql`
   mutation removeFavoriteDiscussion($discussionId: ID!, $username: String!) {
     updateUsers(
-      where: { username: $username }
+      where: { username: { eq: $username } }
       update: {
         FavoriteDiscussions: {
-          disconnect: [{ where: { node: { id: $discussionId } } }]
+          disconnect: [{ where: { node: { id: { eq: $discussionId } } } }]
         }
       }
     ) {
@@ -164,9 +172,11 @@ export const REMOVE_FAVORITE_DISCUSSION = gql`
 export const ADD_FAVORITE_COMMENT = gql`
   mutation addFavoriteComment($commentId: ID!, $username: String!) {
     updateUsers(
-      where: { username: $username }
+      where: { username: { eq: $username } }
       update: {
-        FavoriteComments: { connect: [{ where: { node: { id: $commentId } } }] }
+        FavoriteComments: {
+          connect: [{ where: { node: { id: { eq: $commentId } } } }]
+        }
       }
     ) {
       users {
@@ -182,10 +192,10 @@ export const ADD_FAVORITE_COMMENT = gql`
 export const REMOVE_FAVORITE_COMMENT = gql`
   mutation removeFavoriteComment($commentId: ID!, $username: String!) {
     updateUsers(
-      where: { username: $username }
+      where: { username: { eq: $username } }
       update: {
         FavoriteComments: {
-          disconnect: [{ where: { node: { id: $commentId } } }]
+          disconnect: [{ where: { node: { id: { eq: $commentId } } } }]
         }
       }
     ) {
@@ -202,9 +212,11 @@ export const REMOVE_FAVORITE_COMMENT = gql`
 export const ADD_FAVORITE_IMAGE = gql`
   mutation addFavoriteImage($imageId: ID!, $username: String!) {
     updateUsers(
-      where: { username: $username }
+      where: { username: { eq: $username } }
       update: {
-        FavoriteImages: { connect: [{ where: { node: { id: $imageId } } }] }
+        FavoriteImages: {
+          connect: [{ where: { node: { id: { eq: $imageId } } } }]
+        }
       }
     ) {
       users {
@@ -221,9 +233,11 @@ export const ADD_FAVORITE_IMAGE = gql`
 export const REMOVE_FAVORITE_IMAGE = gql`
   mutation removeFavoriteImage($imageId: ID!, $username: String!) {
     updateUsers(
-      where: { username: $username }
+      where: { username: { eq: $username } }
       update: {
-        FavoriteImages: { disconnect: [{ where: { node: { id: $imageId } } }] }
+        FavoriteImages: {
+          disconnect: [{ where: { node: { id: { eq: $imageId } } } }]
+        }
       }
     ) {
       users {

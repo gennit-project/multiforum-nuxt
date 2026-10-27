@@ -6,7 +6,7 @@ import CreateRootCommentForm from '@/components/comments/CreateRootCommentForm.v
 import type {
   Comment,
   DiscussionChannel,
-  CommentCreateInput,
+  OwnedCommentCreateInput,
   CommentSectionFormat,
 } from '@/__generated__/graphql';
 import type { NormalizedCacheObject, ApolloCache, FetchResult  } from '@apollo/client/core';
@@ -100,8 +100,8 @@ const channelConnections = computed(() =>
     : []
 );
 
-const createCommentInput = computed((): CommentCreateInput[] => {
-  const input: CommentCreateInput = {
+const createCommentInput = computed((): OwnedCommentCreateInput[] => {
+  const input: OwnedCommentCreateInput = {
     isRootComment: true,
     isFeedbackComment: false,
     text: createFormValues.value.text || '',

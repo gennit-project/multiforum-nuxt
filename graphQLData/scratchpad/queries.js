@@ -7,14 +7,20 @@ export const GET_PUBLIC_SCRATCHPAD_ENTRIES = gql`
     $limit: Int
     $offset: Int
   ) {
-    scratchpadEntriesAggregate(
-      where: { Recipient: { username: $username }, isPublic: true }
+    scratchpadEntriesConnection(
+      where: { Recipient: { username: { eq: $username } }, isPublic: { eq: true } }
     ) {
-      count
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
     scratchpadEntries(
-      where: { Recipient: { username: $username }, isPublic: true }
-      options: { sort: [{ createdAt: DESC }], limit: $limit, offset: $offset }
+      where: { Recipient: { username: { eq: $username } }, isPublic: { eq: true } }
+      sort: [{ createdAt: DESC }]
+      limit: $limit
+      offset: $offset
     ) {
       id
       createdAt
@@ -40,8 +46,8 @@ export const GET_PUBLIC_SCRATCHPAD_ENTRIES = gql`
 export const GET_PENDING_SCRATCHPAD_ENTRIES = gql`
   query getPendingScratchpadEntries($username: String!) {
     scratchpadEntries(
-      where: { Recipient: { username: $username }, isPublic: false }
-      options: { sort: [{ createdAt: DESC }] }
+      where: { Recipient: { username: { eq: $username } }, isPublic: { eq: false } }
+      sort: [{ createdAt: DESC }]
     ) {
       id
       createdAt
@@ -67,8 +73,8 @@ export const GET_PENDING_SCRATCHPAD_ENTRIES = gql`
 export const GET_ALL_SCRATCHPAD_ENTRIES = gql`
   query getAllScratchpadEntries($username: String!) {
     scratchpadEntries(
-      where: { Recipient: { username: $username } }
-      options: { sort: [{ createdAt: DESC }] }
+      where: { Recipient: { username: { eq: $username } } }
+      sort: [{ createdAt: DESC }]
     ) {
       id
       createdAt
@@ -93,8 +99,14 @@ export const GET_ALL_SCRATCHPAD_ENTRIES = gql`
 // Count of super upvotes received by a user (for profile sidebar)
 export const GET_SUPER_UPVOTE_COUNT = gql`
   query getSuperUpvoteCount($username: String!) {
-    scratchpadEntriesAggregate(where: { Recipient: { username: $username } }) {
-      count
+    scratchpadEntriesConnection(
+      where: { Recipient: { username: { eq: $username } } }
+    ) {
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
   }
 `;

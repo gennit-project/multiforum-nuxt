@@ -25,7 +25,14 @@ const suspension = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const withSuspensions = (list: unknown[], count?: number) => ({
-  channels: [{ SuspendedMods: list, SuspendedModsAggregate: { count: count ?? list.length } }],
+  channels: [
+    {
+      SuspendedMods: list,
+      SuspendedModsConnection: {
+        aggregate: { count: { nodes: count ?? list.length } },
+      },
+    },
+  ],
 });
 
 const mountList = () =>

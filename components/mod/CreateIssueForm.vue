@@ -8,10 +8,7 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import type {
-  IssueAggregateSelection,
-  IssueCreateInput,
-} from '@/__generated__/graphql';
+import type { IssueCreateInput } from '@/__generated__/graphql';
 import { CREATE_ISSUE } from '@/graphQLData/issue/mutations';
 import {
   COUNT_OPEN_ISSUES,
@@ -100,8 +97,20 @@ const issueInput = computed<IssueCreateInput>(
         : undefined,
       Author: authorInput.value || undefined,
       authorName: authorName.value || undefined,
-    }) as IssueCreateInput
+      // The custom `createIssue` resolver accepts Channel/Author connect
+      // portions that the generated `IssueCreateInput` no longer models, so
+      // narrow through `unknown`.
+    }) as unknown as IssueCreateInput
 );
+
+// Shape of the open-issue count queries after the v7 migration
+// (`issuesConnection { aggregate { count { nodes } } }`). Kept loose so the
+// optimistic cache write does not need to supply every connection field.
+type IssueCountCache = {
+  issuesConnection?: {
+    aggregate?: { count?: { nodes?: number | null } | null } | null;
+  } | null;
+};
 
 const canSubmit = computed(() => {
   return (
@@ -126,18 +135,21 @@ const {
 
     if (selectedChannelId.value) {
       try {
-        const openCount = cache.readQuery<{
-          issuesAggregate: IssueAggregateSelection;
-        }>({
+        const openCount = cache.readQuery<IssueCountCache>({
           query: COUNT_OPEN_ISSUES,
           variables: { channelUniqueName: selectedChannelId.value },
         });
-        const currentCount = openCount?.issuesAggregate?.count;
+        const currentCount =
+          openCount?.issuesConnection?.aggregate?.count?.nodes;
         if (typeof currentCount === 'number') {
-          cache.writeQuery({
+          cache.writeQuery<IssueCountCache>({
             query: COUNT_OPEN_ISSUES,
             variables: { channelUniqueName: selectedChannelId.value },
-            data: { issuesAggregate: { count: currentCount + 1 } },
+            data: {
+              issuesConnection: {
+                aggregate: { count: { nodes: currentCount + 1 } },
+              },
+            },
           });
         }
       } catch {
@@ -146,16 +158,19 @@ const {
     }
 
     try {
-      const serverCount = cache.readQuery<{
-        issuesAggregate: IssueAggregateSelection;
-      }>({
+      const serverCount = cache.readQuery<IssueCountCache>({
         query: SERVER_SCOPED_ISSUE_COUNT,
       });
-      const currentServerCount = serverCount?.issuesAggregate?.count;
+      const currentServerCount =
+        serverCount?.issuesConnection?.aggregate?.count?.nodes;
       if (typeof currentServerCount === 'number') {
-        cache.writeQuery({
+        cache.writeQuery<IssueCountCache>({
           query: SERVER_SCOPED_ISSUE_COUNT,
-          data: { issuesAggregate: { count: currentServerCount + 1 } },
+          data: {
+            issuesConnection: {
+              aggregate: { count: { nodes: currentServerCount + 1 } },
+            },
+          },
         });
       }
     } catch {

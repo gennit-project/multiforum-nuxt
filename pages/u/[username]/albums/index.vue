@@ -159,7 +159,7 @@ const getAlbumThumbnail = (album: Album) => {
               </div>
               <!-- Image count badge -->
               <div class="absolute bottom-2 right-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
-                {{ album.ImagesAggregate?.count || 0 }} images
+                {{ album.ImagesConnection?.aggregate?.count?.nodes || 0 }} images
               </div>
             </div>
 
@@ -207,7 +207,7 @@ const getAlbumThumbnail = (album: Album) => {
               </div>
               <!-- Image count badge -->
               <div class="absolute bottom-2 right-2 rounded bg-black/60 px-2 py-1 text-xs text-white">
-                {{ album.ImagesAggregate?.count || 0 }} images
+                {{ album.ImagesConnection?.aggregate?.count?.nodes || 0 }} images
               </div>
             </div>
 

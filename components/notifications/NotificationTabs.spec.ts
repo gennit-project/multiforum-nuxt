@@ -34,8 +34,8 @@ const mockGeneralResult = ref({
           notificationType: 'mention',
         },
       ],
-      NotificationsAggregate: { count: 1 },
-      totalNotificationsAggregate: { count: 2 },
+      NotificationsAggregate: { aggregate: { count: { nodes: 1 } } },
+      totalNotificationsAggregate: { aggregate: { count: { nodes: 2 } } },
     },
   ],
 });
@@ -53,8 +53,8 @@ const mockFeedbackResult = ref({
           notificationType: 'feedback',
         },
       ],
-      NotificationsAggregate: { count: 1 },
-      totalNotificationsAggregate: { count: 1 },
+      NotificationsAggregate: { aggregate: { count: { nodes: 1 } } },
+      totalNotificationsAggregate: { aggregate: { count: { nodes: 1 } } },
     },
   ],
 });
@@ -134,8 +134,8 @@ describe('NotificationTabs', () => {
               notificationType: 'mention',
             },
           ],
-          NotificationsAggregate: { count: 1 },
-          totalNotificationsAggregate: { count: 2 },
+          NotificationsAggregate: { aggregate: { count: { nodes: 1 } } },
+          totalNotificationsAggregate: { aggregate: { count: { nodes: 2 } } },
         },
       ],
     };
@@ -152,8 +152,8 @@ describe('NotificationTabs', () => {
               notificationType: 'feedback',
             },
           ],
-          NotificationsAggregate: { count: 1 },
-          totalNotificationsAggregate: { count: 1 },
+          NotificationsAggregate: { aggregate: { count: { nodes: 1 } } },
+          totalNotificationsAggregate: { aggregate: { count: { nodes: 1 } } },
         },
       ],
     };
@@ -259,7 +259,7 @@ describe('NotificationTabs', () => {
         {
           username: 'testuser',
           Notifications: [],
-          NotificationsAggregate: { count: 0 },
+          NotificationsAggregate: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     });
@@ -301,24 +301,22 @@ describe('NotificationTabs', () => {
     expect(typeof feedbackVariables).toBe('function');
     expect(generalVariables()).toEqual({
       username: 'testuser',
-      options: {
-        limit: 15,
-        offset: 0,
-        sort: { createdAt: 'DESC' },
-      },
+      limit: 15,
+      offset: 0,
+      sort: [{ createdAt: 'DESC' }],
     });
     expect(feedbackVariables()).toEqual({
       username: 'testuser',
-      options: {
-        limit: 15,
-        offset: 0,
-        sort: { createdAt: 'DESC' },
-      },
+      limit: 15,
+      offset: 0,
+      sort: [{ createdAt: 'DESC' }],
     });
   });
 
   it('loads more notifications using the current list length as the offset', async () => {
-    mockGeneralResult.value.users[0].totalNotificationsAggregate = { count: 6 };
+    mockGeneralResult.value.users[0].totalNotificationsAggregate = {
+      aggregate: { count: { nodes: 6 } },
+    };
     const wrapper = mountNotificationTabs();
 
     await wrapper.get('[data-testid="load-more"]').trigger('click');
@@ -326,19 +324,22 @@ describe('NotificationTabs', () => {
     expect(mockFetchMoreGeneral).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: {
-          options: {
-            limit: 15,
-            offset: 2,
-            sort: { createdAt: 'DESC' },
-          },
+          username: 'testuser',
+          limit: 15,
+          offset: 2,
+          sort: [{ createdAt: 'DESC' }],
         },
       })
     );
   });
 
   it('keeps load more available when all loaded notifications are read but more exist', () => {
-    mockGeneralResult.value.users[0].NotificationsAggregate = { count: 0 };
-    mockGeneralResult.value.users[0].totalNotificationsAggregate = { count: 6 };
+    mockGeneralResult.value.users[0].NotificationsAggregate = {
+      aggregate: { count: { nodes: 0 } },
+    };
+    mockGeneralResult.value.users[0].totalNotificationsAggregate = {
+      aggregate: { count: { nodes: 6 } },
+    };
 
     const wrapper = mountNotificationTabs();
 
@@ -420,21 +421,19 @@ describe('NotificationTabs', () => {
     ).toContain('Showing on your Kudos page');
   });
 
-  it('declares pagination options and total aggregates in the tab queries', () => {
+  it('declares pagination variables and total aggregates in the tab queries', () => {
     expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain(
-      '$options: NotificationOptions'
+      '$sort: [NotificationSort!]'
     );
-    expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain(
-      'options: $options'
-    );
+    expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain('sort: $sort');
     expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain(
       'totalNotificationsAggregate'
     );
     expect(GET_FEEDBACK_NOTIFICATIONS.loc?.source.body).toContain(
-      '$options: NotificationOptions'
+      '$sort: [NotificationSort!]'
     );
     expect(GET_FEEDBACK_NOTIFICATIONS.loc?.source.body).toContain(
-      'options: $options'
+      'sort: $sort'
     );
     expect(GET_FEEDBACK_NOTIFICATIONS.loc?.source.body).toContain(
       'totalNotificationsAggregate'

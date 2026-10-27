@@ -80,7 +80,7 @@ export const UPDATE_CHANNEL = gql`
           VersionAuthor {
             username
           }
-          PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+          PastVersions(sort: [{ createdAt: DESC }]) {
             id
             body
             editReason
@@ -138,7 +138,7 @@ export const CREATE_WIKI_PAGE = gql`
           VersionAuthor {
             username
           }
-          PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+          PastVersions(sort: [{ createdAt: DESC }]) {
             id
             body
             editReason
@@ -290,7 +290,7 @@ export const UPDATE_CHANNEL_ENABLED_PLUGINS = gql`
     $enabledPlugins: [ChannelEnabledPluginsUpdateFieldInput!]!
   ) {
     updateChannels(
-      where: { uniqueName: $channelUniqueName }
+      where: { uniqueName: { eq: $channelUniqueName } }
       update: { EnabledPlugins: $enabledPlugins }
     ) {
       channels {

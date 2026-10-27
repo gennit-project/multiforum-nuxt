@@ -66,7 +66,7 @@ const {
 );
 
 const commentsAggregate = computed(() => {
-  return commentResult.value?.users?.[0]?.CommentsAggregate?.count || 0;
+  return commentResult.value?.users?.[0]?.CommentsConnection?.aggregate?.count?.nodes || 0;
 });
 
 const loadMore = () => {

@@ -1,5 +1,6 @@
 import type {
   Channel,
+  ChannelRole,
   Comment,
   Discussion,
   DiscussionChannel,
@@ -495,7 +496,7 @@ export const buildChannel = ({
     canUpvoteComment: true,
     canUpvoteDiscussion: true,
     channelUniqueName: uniqueName,
-  },
+  } as unknown as ChannelRole,
   DiscussionChannelsAggregate: { count: discussionChannelsCount },
   IssuesAggregate: { count: 0 },
   EventChannelsAggregate: { count: 0 },

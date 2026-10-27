@@ -85,7 +85,7 @@ const feedbackComments = computed(
   () => discussion.value?.FeedbackComments || []
 );
 const feedbackCommentsAggregate = computed(
-  () => discussion.value?.FeedbackCommentsAggregate?.count || 0
+  () => discussion.value?.FeedbackCommentsConnection?.aggregate?.count?.nodes || 0
 );
 
 const loadMore = () => {

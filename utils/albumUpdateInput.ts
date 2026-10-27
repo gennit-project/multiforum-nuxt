@@ -1,5 +1,6 @@
 import type {
-  DiscussionUpdateInput,
+  AlbumUpdateInput,
+  DiscussionAlbumCreateFieldInput,
   AlbumImagesConnectFieldInput,
   AlbumImagesUpdateFieldInput,
 } from '@/__generated__/graphql';
@@ -33,7 +34,16 @@ export type AlbumFormData =
 
 export type ExistingAlbumImage = { id?: string | null };
 
-export type AlbumUpdatePortion = Pick<DiscussionUpdateInput, 'Album'>;
+// v7's generated `DiscussionUpdateInput` no longer exposes the nested `Album`
+// relationship, but the custom `updateDiscussionWithChannelConnections` resolver
+// still accepts an `Album` create/update portion on the discussion update input.
+// Describe that portion here from the generated Album input types.
+export type AlbumUpdatePortion = {
+  Album?: {
+    create?: DiscussionAlbumCreateFieldInput;
+    update?: { node: AlbumUpdateInput };
+  };
+};
 
 export function buildAlbumUpdateInput(params: {
   albumData: AlbumFormData;
@@ -58,7 +68,7 @@ export function buildAlbumUpdateInput(params: {
     }
 
     const connect: AlbumImagesConnectFieldInput[] = validImages.map((img) => ({
-      where: { node: { id: img.id } },
+      where: { node: { id: { eq: img.id } } },
     }));
     const normalizedImageOrder = normalizeImageOrder({
       images: validImages,
@@ -87,25 +97,27 @@ export function buildAlbumUpdateInput(params: {
 
   const connectImageArray: AlbumImagesUpdateFieldInput[] = newImages
     .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
-    .map((img) => ({ connect: [{ where: { node: { id: img.id } } }] }));
+    .map((img) => ({ connect: [{ where: { node: { id: { eq: img.id } } } }] }));
 
   const updateImageArray: AlbumImagesUpdateFieldInput[] = newImages
     .filter((img) => img.id && oldImages.some((old) => old.id === img.id))
     .map((img) => ({
-      where: { node: { id: img.id } },
       update: {
+        where: { node: { id: { eq: img.id } } },
         node: {
-          url: img.url,
-          alt: img.alt,
-          caption: img.caption,
-          copyright: img.copyright,
+          url: { set: img.url },
+          alt: { set: img.alt },
+          caption: { set: img.caption },
+          copyright: { set: img.copyright },
         },
       },
     }));
 
   const disconnectImageArray: AlbumImagesUpdateFieldInput[] = oldImages
     .filter((old) => !newImages.some((img) => img.id === old.id))
-    .map((old) => ({ disconnect: [{ where: { node: { id: old.id } } }] }));
+    .map((old) => ({
+      disconnect: [{ where: { node: { id: { eq: old.id } } } }],
+    }));
 
   const imagesOps: AlbumImagesUpdateFieldInput[] = [
     ...connectImageArray,
@@ -117,7 +129,7 @@ export function buildAlbumUpdateInput(params: {
     Album: {
       update: {
         node: {
-          imageOrder: normalizedImageOrder,
+          imageOrder: { set: normalizedImageOrder },
           Images: imagesOps,
         },
       },

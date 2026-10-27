@@ -92,7 +92,7 @@ const eventDetailOptions = computed(() => {
     return [];
   }
   return props.event.EventChannels.map((dc) => {
-    const commentCount = dc.CommentsAggregate?.count || 0;
+    const commentCount = dc.CommentsConnection?.aggregate?.count?.nodes || 0;
     return {
       label: `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
       value: `/forums/${dc.channelUniqueName}/events/${props.event.id}`,
@@ -191,7 +191,7 @@ const eventSpansMultipleDates = computed(() => {
   );
 });
 
-const commentCount = computed(() => props.event?.CommentsAggregate?.count || 0);
+const commentCount = computed(() => props.event?.CommentsConnection?.aggregate?.count?.nodes || 0);
 const channelCount = computed(() => props.event?.EventChannels.length || 0);
 
 // Series-related computed properties

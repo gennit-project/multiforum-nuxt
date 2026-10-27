@@ -20,7 +20,7 @@ const suspendedUsers = computed(() => {
 });
 
 const aggregateCount = computed(() => {
-  return result.value?.serverConfigs?.[0]?.SuspendedUsersAggregate?.count ?? 0;
+  return result.value?.serverConfigs?.[0]?.SuspendedUsersConnection?.aggregate?.count?.nodes ?? 0;
 });
 
 const humanReadableDate = (dateISO?: string | null): string => {

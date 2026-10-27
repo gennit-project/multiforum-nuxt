@@ -28,7 +28,7 @@ vi.mock('@vue/apollo-composable', () => ({
 vi.mock('@/composables/useAuthState', () => ({ useUsername: () => h.username }));
 
 const entries = (ids: string[], count = ids.length) => ({
-  scratchpadEntriesAggregate: { count },
+  scratchpadEntriesConnection: { aggregate: { count: { nodes: count } } },
   scratchpadEntries: ids.map((id) => ({ id })),
 });
 

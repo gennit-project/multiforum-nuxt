@@ -56,13 +56,13 @@ const getFeedbackHandlers = (username: string, modProfileName: string) => ({
     channelId: TEST_CHANNEL,
     discussionsCount: 1,
     serverConfigOverrides: {
-      DefaultModRole: FEEDBACK_MOD_ROLE,
-      DefaultElevatedModRole: FEEDBACK_MOD_ROLE,
+      DefaultModRole: FEEDBACK_MOD_ROLE as any,
+      DefaultElevatedModRole: FEEDBACK_MOD_ROLE as any,
     },
     channelOverrides: {
       feedbackEnabled: true,
-      DefaultModRole: FEEDBACK_MOD_ROLE,
-      ElevatedModRole: FEEDBACK_MOD_ROLE,
+      DefaultModRole: FEEDBACK_MOD_ROLE as any,
+      ElevatedModRole: FEEDBACK_MOD_ROLE as any,
     },
   }),
   getOwnEmail: () => ({
@@ -83,8 +83,8 @@ const getFeedbackHandlers = (username: string, modProfileName: string) => ({
           uniqueName: TEST_CHANNEL,
           overrides: {
             feedbackEnabled: true,
-            DefaultModRole: FEEDBACK_MOD_ROLE,
-            ElevatedModRole: FEEDBACK_MOD_ROLE,
+            DefaultModRole: FEEDBACK_MOD_ROLE as any,
+            ElevatedModRole: FEEDBACK_MOD_ROLE as any,
           },
         }),
       ],

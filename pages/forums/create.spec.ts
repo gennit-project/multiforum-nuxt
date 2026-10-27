@@ -115,7 +115,7 @@ describe('Create forum page', () => {
     const input = h.mutate.mock.calls[0][0].createChannelInput[0];
     expect(input.uniqueName).toBe('cats');
     expect(input.Tags.connectOrCreate[0].where.node.text).toBe('pets');
-    expect(input.Admins.connect[0].where.node.username).toBe('alice');
+    expect(input.Admins.connect[0].where.node.username).toEqual({ eq: 'alice' });
   });
 
   it('navigates to the new forum once creation completes', () => {

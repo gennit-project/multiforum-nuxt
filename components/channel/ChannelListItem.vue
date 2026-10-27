@@ -120,7 +120,7 @@ defineEmits(['filterByTag']);
         >
           <DiscussionIcon class="h-4 w-4" />
           <span class="font-medium">{{
-            channel?.DiscussionChannelsAggregate?.count || 0
+            channel?.DiscussionChannelsConnection?.aggregate?.count?.nodes || 0
           }}</span>
           <span class="hidden md:inline">Discussions</span>
         </nuxt-link>
@@ -136,13 +136,13 @@ defineEmits(['filterByTag']);
         </nuxt-link>
 
         <nuxt-link
-          v-if="channel?.EventChannelsAggregate?.count"
+          v-if="channel?.EventChannelsConnection?.aggregate?.count?.nodes"
           :to="`/forums/${channel.uniqueName}/events`"
           class="flex items-center gap-1 hover:text-gray-700 dark:hover:text-gray-200"
         >
           <CalendarIcon class="h-4 w-4" />
           <span class="font-medium">{{
-            channel?.EventChannelsAggregate?.count || 0
+            channel?.EventChannelsConnection?.aggregate?.count?.nodes || 0
           }}</span>
           <span class="hidden md:inline">Events</span>
         </nuxt-link>
@@ -156,7 +156,7 @@ defineEmits(['filterByTag']);
         class="flex items-center gap-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
       >
         <DiscussionIcon class="h-4 w-4" />
-        {{ channel?.DiscussionChannelsAggregate?.count || 0 }} Discussions
+        {{ channel?.DiscussionChannelsConnection?.aggregate?.count?.nodes || 0 }} Discussions
       </nuxt-link>
       <nuxt-link
         v-if="downloadCount > 0"
@@ -167,12 +167,12 @@ defineEmits(['filterByTag']);
         {{ downloadCount }} Downloads
       </nuxt-link>
       <nuxt-link
-        v-if="channel?.EventChannelsAggregate?.count"
+        v-if="channel?.EventChannelsConnection?.aggregate?.count?.nodes"
         :to="`/forums/${channel.uniqueName}/events`"
         class="flex items-center gap-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
       >
         <CalendarIcon class="h-4 w-4" />
-        {{ channel?.EventChannelsAggregate?.count || 0 }} Events
+        {{ channel?.EventChannelsConnection?.aggregate?.count?.nodes || 0 }} Events
       </nuxt-link>
     </div>
   </div>

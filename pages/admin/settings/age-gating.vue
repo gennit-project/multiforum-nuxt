@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
-import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import type { ServerConfig } from '@/__generated__/graphql';
 import FormRow from '@/components/FormRow.vue';
 
 defineProps({
@@ -9,13 +9,13 @@ defineProps({
     required: true,
   },
   formValues: {
-    type: Object as PropType<ServerConfigUpdateInput | null>,
+    type: Object as PropType<Partial<ServerConfig> | null>,
     default: null,
   },
 });
 
 const emit = defineEmits<{
-  updateFormValues: [value: ServerConfigUpdateInput];
+  updateFormValues: [value: Partial<ServerConfig>];
 }>();
 
 type BooleanUpdate = {

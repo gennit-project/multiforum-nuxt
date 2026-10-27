@@ -21,7 +21,7 @@ const channel = (overrides: Record<string, unknown> = {}) =>
     rules: '[]',
     Tags: [{ text: 'pets' }],
     Admins: [{ username: 'alice' }],
-    EventChannelsAggregate: { count: 7 },
+    EventChannelsConnection: { aggregate: { count: { nodes: 7 } } },
     ...overrides,
   }) as unknown as Channel;
 

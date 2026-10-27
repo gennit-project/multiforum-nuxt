@@ -15,7 +15,10 @@ const tabButtonStub = {
 };
 
 const mod = (overrides: Record<string, unknown> = {}) =>
-  ({ AuthoredCommentsAggregate: { count: 4 }, ...overrides }) as unknown as ModerationProfile;
+  ({
+    AuthoredCommentsConnection: { aggregate: { count: { nodes: 4 } } },
+    ...overrides,
+  }) as unknown as ModerationProfile;
 
 const mountTabs = (props: Record<string, unknown> = {}) =>
   mount(ModProfileTabs, {

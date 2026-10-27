@@ -2,56 +2,84 @@ import { gql } from '@apollo/client/core';
 
 export const COUNT_OPEN_ISSUES = gql`
   query countOpenIssues($channelUniqueName: String!) {
-    issuesAggregate(
-      where: { channelUniqueName: $channelUniqueName, isOpen: true }
+    issuesConnection(
+      where: { channelUniqueName: { eq: $channelUniqueName }, isOpen: { eq: true } }
     ) {
-      count
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
   }
 `;
 
 export const SERVER_SCOPED_ISSUE_COUNT = gql`
   query countIssuesByServer($issueWhere: IssueWhere) {
-    issuesAggregate(where: $issueWhere) {
-      count
+    issuesConnection(where: $issueWhere) {
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
   }
 `;
 
 export const COUNT_CLOSED_ISSUES = gql`
   query countClosedIssues($channelUniqueName: String!) {
-    issuesAggregate(
-      where: { channelUniqueName: $channelUniqueName, isOpen: false }
+    issuesConnection(
+      where: { channelUniqueName: { eq: $channelUniqueName }, isOpen: { eq: false } }
     ) {
-      count
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
   }
 `;
 
 export const SERVER_SCOPED_CLOSED_ISSUE_COUNT = gql`
   query countClosedIssuesByServer($issueWhere: IssueWhere) {
-    issuesAggregate(where: $issueWhere) {
-      count
+    issuesConnection(where: $issueWhere) {
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
   }
 `;
 
 export const GET_MOD = gql`
   query getMod($displayName: String!) {
-    moderationProfiles(where: { displayName: $displayName }) {
+    moderationProfiles(where: { displayName: { eq: $displayName } }) {
       displayName
       createdAt
-      AuthoredCommentsAggregate {
-        count
+      AuthoredCommentsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      AuthoredIssuesAggregate {
-        count
+      AuthoredIssuesConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      ActivityFeedAggregate {
-        count
+      ActivityFeedConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       AuthoredComments(
-        options: { limit: 25, offset: 0, sort: { createdAt: DESC } }
+        limit: 25, offset: 0, sort: { createdAt: DESC }
       ) {
         id
         text
@@ -92,7 +120,7 @@ export const GET_MOD = gql`
         }
       }
       AuthoredIssues(
-        options: { limit: 25, offset: 0, sort: { createdAt: DESC } }
+        limit: 25, offset: 0, sort: { createdAt: DESC }
       ) {
         id
         issueNumber
@@ -118,10 +146,10 @@ export const GET_MOD = gql`
 
 export const GET_MOD_COMMENTS = gql`
   query getModComments($displayName: String!, $offset: Int!, $limit: Int!) {
-    moderationProfiles(where: { displayName: $displayName }) {
+    moderationProfiles(where: { displayName: { eq: $displayName } }) {
       displayName
       AuthoredComments(
-        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+        limit: $limit, offset: $offset, sort: { createdAt: DESC }
       ) {
         id
         text
@@ -167,10 +195,10 @@ export const GET_MOD_COMMENTS = gql`
 
 export const GET_MOD_ISSUES = gql`
   query getModIssues($displayName: String!, $offset: Int!, $limit: Int!) {
-    moderationProfiles(where: { displayName: $displayName }) {
+    moderationProfiles(where: { displayName: { eq: $displayName } }) {
       displayName
       AuthoredIssues(
-        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+        limit: $limit, offset: $offset, sort: { createdAt: DESC }
       ) {
         id
         issueNumber
@@ -266,10 +294,14 @@ export const GET_MOD_CONTRIBUTIONS = gql`
 
 export const GET_SUSPENDED_MODS_BY_CHANNEL = gql`
   query getModsByChannel($channelUniqueName: String!) {
-    channels(where: { uniqueName: $channelUniqueName }) {
+    channels(where: { uniqueName: { eq: $channelUniqueName } }) {
       uniqueName
-      SuspendedModsAggregate {
-        count
+      SuspendedModsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       SuspendedMods {
         id
@@ -291,7 +323,7 @@ export const GET_SUSPENDED_MODS_BY_CHANNEL = gql`
 
 export const GET_MODS_BY_CHANNEL = gql`
   query getModsByChannel($channelUniqueName: String!) {
-    channels(where: { uniqueName: $channelUniqueName }) {
+    channels(where: { uniqueName: { eq: $channelUniqueName } }) {
       uniqueName
       Admins {
         username
@@ -313,7 +345,7 @@ export const GET_MODS_BY_CHANNEL = gql`
 
 export const GET_CHANNEL_OWNERS_BY_CHANNEL = gql`
   query getChannelOwnersByChannel($channelUniqueName: String!) {
-    channels(where: { uniqueName: $channelUniqueName }) {
+    channels(where: { uniqueName: { eq: $channelUniqueName } }) {
       uniqueName
       Admins {
         username
@@ -329,7 +361,7 @@ export const GET_CHANNEL_OWNERS_BY_CHANNEL = gql`
 
 export const GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL = gql`
   query getPendingChannelOwnersByChannel($channelUniqueName: String!) {
-    channels(where: { uniqueName: $channelUniqueName }) {
+    channels(where: { uniqueName: { eq: $channelUniqueName } }) {
       uniqueName
       PendingOwnerInvites {
         username
@@ -345,7 +377,7 @@ export const GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL = gql`
 
 export const GET_PENDING_CHANNEL_MODS_BY_CHANNEL = gql`
   query getPendingChannelModsByChannel($channelUniqueName: String!) {
-    channels(where: { uniqueName: $channelUniqueName }) {
+    channels(where: { uniqueName: { eq: $channelUniqueName } }) {
       uniqueName
       PendingModInvites {
         username
@@ -358,9 +390,9 @@ export const GET_PENDING_CHANNEL_MODS_BY_CHANNEL = gql`
 
 export const PENDING_FORUM_OWNER_INVITE_EXISTS = gql`
   query pendingInviteExists($channelId: String!, $username: String!) {
-    channels(where: { uniqueName: $channelId }) {
+    channels(where: { uniqueName: { eq: $channelId } }) {
       uniqueName
-      PendingOwnerInvites(where: { username: $username }) {
+      PendingOwnerInvites(where: { username: { eq: $username } }) {
         username
       }
     }
@@ -369,9 +401,9 @@ export const PENDING_FORUM_OWNER_INVITE_EXISTS = gql`
 
 export const PENDING_FORUM_MOD_INVITE_EXISTS = gql`
   query pendingModInviteExists($channelId: String!, $username: String!) {
-    channels(where: { uniqueName: $channelId }) {
+    channels(where: { uniqueName: { eq: $channelId } }) {
       uniqueName
-      PendingModInvites(where: { username: $username }) {
+      PendingModInvites(where: { username: { eq: $username } }) {
         username
       }
     }
@@ -385,8 +417,8 @@ export const GET_DISCUSSION_CHANNEL = gql`
   ) {
     discussionChannels(
       where: {
-        discussionId: $discussionId
-        channelUniqueName: $channelUniqueName
+        discussionId: { eq: $discussionId }
+        channelUniqueName: { eq: $channelUniqueName }
       }
     ) {
       id
@@ -397,7 +429,7 @@ export const GET_DISCUSSION_CHANNEL = gql`
 
 export const GET_DISCUSSION_ISSUE = gql`
   query getDiscussionChannels($discussionChannelId: ID!) {
-    discussionChannels(where: { id: $discussionChannelId }) {
+    discussionChannels(where: { id: { eq: $discussionChannelId } }) {
       id
       RelatedIssues {
         id
@@ -409,7 +441,7 @@ export const GET_DISCUSSION_ISSUE = gql`
 
 export const GET_EVENT_ISSUE = gql`
   query getEventChannels($eventChannelId: ID!) {
-    eventChannels(where: { id: $eventChannelId }) {
+    eventChannels(where: { id: { eq: $eventChannelId } }) {
       id
       RelatedIssues {
         id
@@ -422,7 +454,7 @@ export const GET_EVENT_ISSUE = gql`
 export const GET_EVENT_CHANNEL = gql`
   query getEventChannelID($eventId: ID!, $channelUniqueName: String!) {
     eventChannels(
-      where: { eventId: $eventId, channelUniqueName: $channelUniqueName }
+      where: { eventId: { eq: $eventId }, channelUniqueName: { eq: $channelUniqueName } }
     ) {
       id
       archived
@@ -438,10 +470,14 @@ export const IS_ORIGINAL_POSTER_SUSPENDED = gql`
 
 export const GET_SUSPENDED_USERS_IN_CHANNEL = gql`
   query getChannel($channelUniqueName: String!) {
-    channels(where: { uniqueName: $channelUniqueName }) {
+    channels(where: { uniqueName: { eq: $channelUniqueName } }) {
       uniqueName
-      SuspendedUsersAggregate {
-        count
+      SuspendedUsersConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       SuspendedUsers {
         id
@@ -463,7 +499,7 @@ export const GET_SUSPENDED_USERS_IN_CHANNEL = gql`
 
 export const GET_COMMENT_ISSUE = gql`
   query getCommentIssue($commentId: ID!) {
-    comments(where: { id: $commentId }) {
+    comments(where: { id: { eq: $commentId } }) {
       id
       RelatedIssues {
         id

@@ -5,6 +5,7 @@ import {
   buildUser,
 } from './graphqlFixtures';
 import { DEFAULT_RULES_JSON, DEFAULT_MOD_ROLE } from './moderationFixtures';
+import type { ModChannelRole } from '@/__generated__/graphql';
 
 /**
  * Base GraphQL operations fired by the app shell + channel/issues layout when an
@@ -70,8 +71,8 @@ export const getIssueDetailBaseMocks = ({
           overrides: {
             rules: DEFAULT_RULES_JSON,
             Admins: [buildUser({ username })],
-            DefaultModRole: DEFAULT_MOD_ROLE,
-            ElevatedModRole: DEFAULT_MOD_ROLE,
+            DefaultModRole: DEFAULT_MOD_ROLE as unknown as ModChannelRole,
+            ElevatedModRole: DEFAULT_MOD_ROLE as unknown as ModChannelRole,
           },
         }),
       ],

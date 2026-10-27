@@ -92,7 +92,7 @@ describe('EventListView', () => {
             EventChannels: [{ channelUniqueName: 'forum-2' }],
           },
         ],
-        eventsAggregate: { count: 2 },
+        eventsConnection: { aggregate: { count: { nodes: 2 } } },
       }),
       fetchMore: vi.fn(),
     });
@@ -144,20 +144,20 @@ describe('EventListView', () => {
       (useQuery as unknown as ReturnType<typeof vi.fn>).mock.calls[0]?.[1] as
         | (() => {
             where: unknown;
-            options: { limit: number; offset: number; sort: unknown[] };
+            limit: number;
+            offset: number;
+            sort: unknown[];
           })
         | undefined
     )?.();
 
     expect(eventQueryVariables).toMatchObject({
-      options: {
-        limit: 25,
-        offset: 0,
-      },
+      limit: 25,
+      offset: 0,
     });
-    expect(eventQueryVariables?.options.sort).toEqual(
-      expect.objectContaining({ startTime: expect.any(String) })
-    );
+    expect(eventQueryVariables?.sort).toEqual([
+      expect.objectContaining({ startTime: expect.any(String) }),
+    ]);
     expect('value' in ((eventQueryVariables?.where as object) ?? {})).toBe(
       false
     );
@@ -194,7 +194,10 @@ describe('EventListView — filters and navigation', () => {
     mockRoute.query = {};
     (useQuery as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       error: ref(null),
-      result: ref({ events: [], eventsAggregate: { count: 0 } }),
+      result: ref({
+        events: [],
+        eventsConnection: { aggregate: { count: { nodes: 0 } } },
+      }),
       fetchMore: fetchMoreMock,
     });
   });

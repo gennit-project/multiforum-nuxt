@@ -34,7 +34,7 @@ export const CREATE_ISSUE = gql`
 
 export const CLOSE_ISSUE = gql`
   mutation closeIssue($id: ID!) {
-    updateIssues(where: { id: $id }, update: { isOpen: false }) {
+    updateIssues(where: { id: { eq: $id } }, update: { isOpen: { set: false } }) {
       issues {
         id
         issueNumber
@@ -47,7 +47,7 @@ export const CLOSE_ISSUE = gql`
 
 export const REOPEN_ISSUE = gql`
   mutation reopenIssue($id: ID!) {
-    updateIssues(where: { id: $id }, update: { isOpen: true }) {
+    updateIssues(where: { id: { eq: $id } }, update: { isOpen: { set: true } }) {
       issues {
         id
         issueNumber
@@ -106,21 +106,11 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM = gql`
     $actionType: String!
     $displayName: String!
   ) {
-    updateIssues(
-      where: { id: $issueId }
-      create: {
-        ActivityFeed: [
-          {
-            node: {
-              actionDescription: $actionDescription
-              actionType: $actionType
-              ModerationProfile: {
-                connect: { where: { node: { displayName: $displayName } } }
-              }
-            }
-          }
-        ]
-      }
+    addIssueActivityFeedItem(
+      where: { id: { eq: $issueId } }
+      actionType: $actionType
+      actionDescription: $actionDescription
+      displayName: $displayName
     ) {
       issues {
         ...IssueFields
@@ -140,43 +130,14 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD = gql`
     $channelUniqueName: String!
     $flaggedServerRuleViolation: Boolean
   ) {
-    updateIssues(
-      where: { id: $issueId }
-      update: { flaggedServerRuleViolation: $flaggedServerRuleViolation }
-      create: {
-        ActivityFeed: [
-          {
-            node: {
-              actionDescription: $actionDescription
-              actionType: $actionType
-              ModerationProfile: {
-                connect: { where: { node: { displayName: $displayName } } }
-              }
-              Comment: {
-                create: {
-                  node: {
-                    isRootComment: false
-                    text: $commentText
-                    Channel: {
-                      connect: {
-                        where: { node: { uniqueName: $channelUniqueName } }
-                      }
-                    }
-                    Issue: { connect: { where: { node: { id: $issueId } } } }
-                    CommentAuthor: {
-                      ModerationProfile: {
-                        connect: {
-                          where: { node: { displayName: $displayName } }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ]
-      }
+    addIssueActivityFeedItem(
+      where: { id: { eq: $issueId } }
+      actionType: $actionType
+      actionDescription: $actionDescription
+      displayName: $displayName
+      commentText: $commentText
+      channelUniqueName: $channelUniqueName
+      flaggedServerRuleViolation: $flaggedServerRuleViolation
     ) {
       issues {
         ...IssueFields
@@ -196,39 +157,14 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER = gql`
     $channelUniqueName: String!
     $flaggedServerRuleViolation: Boolean
   ) {
-    updateIssues(
-      where: { id: $issueId }
-      update: { flaggedServerRuleViolation: $flaggedServerRuleViolation }
-      create: {
-        ActivityFeed: [
-          {
-            node: {
-              actionDescription: $actionDescription
-              actionType: $actionType
-              User: { connect: { where: { node: { username: $username } } } }
-              Comment: {
-                create: {
-                  node: {
-                    isRootComment: false
-                    text: $commentText
-                    Channel: {
-                      connect: {
-                        where: { node: { uniqueName: $channelUniqueName } }
-                      }
-                    }
-                    Issue: { connect: { where: { node: { id: $issueId } } } }
-                    CommentAuthor: {
-                      User: {
-                        connect: { where: { node: { username: $username } } }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ]
-      }
+    addIssueActivityFeedItem(
+      where: { id: { eq: $issueId } }
+      actionType: $actionType
+      actionDescription: $actionDescription
+      username: $username
+      commentText: $commentText
+      channelUniqueName: $channelUniqueName
+      flaggedServerRuleViolation: $flaggedServerRuleViolation
     ) {
       issues {
         ...IssueFields

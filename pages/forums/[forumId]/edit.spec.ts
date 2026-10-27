@@ -176,19 +176,19 @@ describe('forum settings edit page', () => {
     expect(update.FilterGroups).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          where: { node: { id: 'group-1' } },
           update: expect.objectContaining({
+            where: { node: { id: { eq: 'group-1' } } },
             node: expect.objectContaining({
-              displayName: 'Required Game Packs',
-              mode: FilterMode.Exclude,
+              displayName: { set: 'Required Game Packs' },
+              mode: { set: FilterMode.Exclude },
               options: expect.arrayContaining([
                 expect.objectContaining({
-                  where: { node: { id: 'option-1' } },
                   update: {
+                    where: { node: { id: { eq: 'option-1' } } },
                     node: {
-                      value: 'vampires',
-                      displayName: 'Vampires Updated',
-                      order: 0,
+                      value: { set: 'vampires' },
+                      displayName: { set: 'Vampires Updated' },
+                      order: { set: 0 },
                     },
                   },
                 }),
@@ -205,7 +205,7 @@ describe('forum settings edit page', () => {
                   ],
                 }),
                 expect.objectContaining({
-                  delete: [{ where: { node: { id: 'option-2' } } }],
+                  delete: [{ where: { node: { id: { eq: 'option-2' } } } }],
                 }),
               ]),
             }),
@@ -214,7 +214,7 @@ describe('forum settings edit page', () => {
         {
           delete: [
             {
-              where: { node: { id: 'group-2' } },
+              where: { node: { id: { eq: 'group-2' } } },
               delete: { options: [{}] },
             },
           ],
@@ -233,11 +233,11 @@ describe('forum settings edit page', () => {
       h.autosaves[4].save(false),
     ]);
     expect(h.mutate.mock.calls.map((call) => call[0].update)).toEqual([
-      { eventsEnabled: false },
-      { imageUploadsEnabled: false },
-      { markdownImagesEnabled: false },
-      { feedbackEnabled: false },
-      { emojiEnabled: false },
+      { eventsEnabled: { set: false } },
+      { imageUploadsEnabled: { set: false } },
+      { markdownImagesEnabled: { set: false } },
+      { feedbackEnabled: { set: false } },
+      { emojiEnabled: { set: false } },
     ]);
   });
 

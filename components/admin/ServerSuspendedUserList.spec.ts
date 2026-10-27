@@ -25,7 +25,14 @@ const suspension = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const withUsers = (list: unknown[], count?: number) => ({
-  serverConfigs: [{ SuspendedUsers: list, SuspendedUsersAggregate: { count: count ?? list.length } }],
+  serverConfigs: [
+    {
+      SuspendedUsers: list,
+      SuspendedUsersConnection: {
+        aggregate: { count: { nodes: count ?? list.length } },
+      },
+    },
+  ],
 });
 
 const mountList = () =>
@@ -99,7 +106,7 @@ describe('ServerSuspendedUserList content', () => {
       serverConfigs: [
         {
           SuspendedUsers: [suspension({ SuspendedUser: { username: 'botty', isBot: true } })],
-          SuspendedUsersAggregate: { count: 1 },
+          SuspendedUsersConnection: { aggregate: { count: { nodes: 1 } } },
         },
       ],
     });

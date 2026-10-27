@@ -83,11 +83,9 @@ const {
   GET_GENERAL_NOTIFICATIONS,
   () => ({
     username: username.value,
-    options: {
-      limit: NOTIFICATION_PAGE_LIMIT,
-      offset: 0,
-      sort: { createdAt: 'DESC' },
-    },
+    limit: NOTIFICATION_PAGE_LIMIT,
+    offset: 0,
+    sort: [{ createdAt: 'DESC' }],
   }),
   {
     fetchPolicy: 'cache-and-network',
@@ -106,11 +104,9 @@ const {
   GET_FEEDBACK_NOTIFICATIONS,
   () => ({
     username: username.value,
-    options: {
-      limit: NOTIFICATION_PAGE_LIMIT,
-      offset: 0,
-      sort: { createdAt: 'DESC' },
-    },
+    limit: NOTIFICATION_PAGE_LIMIT,
+    offset: 0,
+    sort: [{ createdAt: 'DESC' }],
   }),
   {
     fetchPolicy: 'cache-and-network',
@@ -206,12 +202,12 @@ const feedbackNotifications = computed<NotificationWithEntry[]>(() => {
 
 const generalUnreadCount = computed(() => {
   if (!generalResult.value?.users?.[0]) return 0;
-  return generalResult.value.users[0].NotificationsAggregate?.count || 0;
+  return generalResult.value.users[0].NotificationsAggregate?.aggregate?.count?.nodes || 0;
 });
 
 const feedbackUnreadCount = computed(() => {
   if (!feedbackResult.value?.users?.[0]) return 0;
-  return feedbackResult.value.users[0].NotificationsAggregate?.count || 0;
+  return feedbackResult.value.users[0].NotificationsAggregate?.aggregate?.count?.nodes || 0;
 });
 
 const currentNotifications = computed(() => {
@@ -228,12 +224,12 @@ const currentUnreadCount = computed(() => {
 
 const generalTotalCount = computed(() => {
   if (!generalResult.value?.users?.[0]) return 0;
-  return generalResult.value.users[0].totalNotificationsAggregate?.count || 0;
+  return generalResult.value.users[0].totalNotificationsAggregate?.aggregate?.count?.nodes || 0;
 });
 
 const feedbackTotalCount = computed(() => {
   if (!feedbackResult.value?.users?.[0]) return 0;
-  return feedbackResult.value.users[0].totalNotificationsAggregate?.count || 0;
+  return feedbackResult.value.users[0].totalNotificationsAggregate?.aggregate?.count?.nodes || 0;
 });
 
 const currentTotalCount = computed(() => {
@@ -264,11 +260,10 @@ const loadMore = () => {
 
   fetchMoreFn({
     variables: {
-      options: {
-        limit: NOTIFICATION_PAGE_LIMIT,
-        offset: currentResult.users[0].Notifications?.length || 0,
-        sort: { createdAt: 'DESC' },
-      },
+      username: username.value,
+      limit: NOTIFICATION_PAGE_LIMIT,
+      offset: currentResult.users[0].Notifications?.length || 0,
+      sort: [{ createdAt: 'DESC' }],
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;

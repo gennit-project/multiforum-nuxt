@@ -15,7 +15,7 @@ const makeChannel = (overrides: Record<string, unknown> = {}) =>
     discussionId: 'd1',
     channelUniqueName: 'cats',
     createdAt: '2024-01-01T00:00:00Z',
-    CommentsAggregate: { count: 3 },
+    CommentsConnection: { aggregate: { count: { nodes: 3 } } },
     archived: false,
     answered: false,
     isFavorited: false,
@@ -153,7 +153,7 @@ describe('ChannelDownloadListItem album image', () => {
 
 describe('ChannelDownloadListItem metadata', () => {
   it('shows the comment count', () => {
-    const wrapper = mountItem(makeDiscussion(), makeChannel({ CommentsAggregate: { count: 7 } }));
+    const wrapper = mountItem(makeDiscussion(), makeChannel({ CommentsConnection: { aggregate: { count: { nodes: 7 } } } }));
 
     expect(wrapper.text()).toContain('7');
   });

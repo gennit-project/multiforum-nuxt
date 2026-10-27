@@ -167,7 +167,7 @@ export const CANCEL_EVENT = gql`
 
 export const DELETE_EVENT = gql`
   mutation deleteEvent($id: ID!) {
-    deleteEvents(where: { id: $id }) {
+    deleteEvents(where: { id: { eq: $id } }) {
       nodesDeleted
       relationshipsDeleted
     }

@@ -28,8 +28,8 @@ describe('buildAlbumUpdateInput', () => {
               imageOrder: ['img1', 'img2'],
               Images: {
                 connect: [
-                  { where: { node: { id: 'img1' } } },
-                  { where: { node: { id: 'img2' } } },
+                  { where: { node: { id: { eq: 'img1' } } } },
+                  { where: { node: { id: { eq: 'img2' } } } },
                 ],
               },
             },
@@ -59,7 +59,7 @@ describe('buildAlbumUpdateInput', () => {
         result as { Album: { update: { node: { Images: unknown[] } } } }
       ).Album.update.node.Images;
       expect(ops).toContainEqual({
-        connect: [{ where: { node: { id: 'new1' } } }],
+        connect: [{ where: { node: { id: { eq: 'new1' } } } }],
       });
     });
 
@@ -83,9 +83,14 @@ describe('buildAlbumUpdateInput', () => {
         result as { Album: { update: { node: { Images: unknown[] } } } }
       ).Album.update.node.Images;
       expect(ops).toContainEqual({
-        where: { node: { id: 'old1' } },
         update: {
-          node: { url: 'u', alt: 'new alt', caption: 'c', copyright: 'r' },
+          where: { node: { id: { eq: 'old1' } } },
+          node: {
+            url: { set: 'u' },
+            alt: { set: 'new alt' },
+            caption: { set: 'c' },
+            copyright: { set: 'r' },
+          },
         },
       });
     });
@@ -100,7 +105,7 @@ describe('buildAlbumUpdateInput', () => {
         result as { Album: { update: { node: { Images: unknown[] } } } }
       ).Album.update.node.Images;
       expect(ops).toContainEqual({
-        disconnect: [{ where: { node: { id: 'gone' } } }],
+        disconnect: [{ where: { node: { id: { eq: 'gone' } } } }],
       });
     });
 
@@ -111,17 +116,17 @@ describe('buildAlbumUpdateInput', () => {
         existingImages: [{ id: 'last-image' }],
       });
       const node = (
-        result as {
+        result as unknown as {
           Album: {
-            update: { node: { imageOrder: string[]; Images: unknown[] } };
+            update: { node: { imageOrder: unknown; Images: unknown[] } };
           };
         }
       ).Album.update.node;
       expect(node).toEqual({
-        imageOrder: [],
+        imageOrder: { set: [] },
         Images: [
           {
-            disconnect: [{ where: { node: { id: 'last-image' } } }],
+            disconnect: [{ where: { node: { id: { eq: 'last-image' } } } }],
           },
         ],
       });
@@ -134,9 +139,11 @@ describe('buildAlbumUpdateInput', () => {
         existingImages: [{ id: 'a' }],
       });
       const order = (
-        result as { Album: { update: { node: { imageOrder: string[] } } } }
+        result as unknown as {
+          Album: { update: { node: { imageOrder: unknown } } };
+        }
       ).Album.update.node.imageOrder;
-      expect(order).toEqual(['a']);
+      expect(order).toEqual({ set: ['a'] });
     });
   });
 });

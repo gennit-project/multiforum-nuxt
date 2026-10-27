@@ -28,7 +28,7 @@ const suspendedUsers = computed(() => {
 
 const aggregateCount = computed(() => {
   return (
-    suspendedUsersResult.value?.channels?.[0]?.SuspendedUsersAggregate?.count ??
+    suspendedUsersResult.value?.channels?.[0]?.SuspendedUsersConnection?.aggregate?.count?.nodes ??
     0
   );
 });

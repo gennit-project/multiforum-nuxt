@@ -1,4 +1,4 @@
-import type { CommentCreateInput } from '@/__generated__/graphql';
+import type { OwnedCommentCreateInput } from '@/__generated__/graphql';
 import {
   buildComment,
   buildDiscussion,
@@ -25,7 +25,7 @@ export const DEFAULT_COMMENT_CONFIG: CommentTestConfig = {
 };
 
 export type CreateCommentVariables = {
-  createCommentInput?: CommentCreateInput | CommentCreateInput[];
+  createCommentInput?: OwnedCommentCreateInput | OwnedCommentCreateInput[];
 };
 
 export type UpdateCommentVariables = {

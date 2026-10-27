@@ -455,10 +455,13 @@ test('edits an event with mocked GraphQL', async ({ context, page }, testInfo) =
       updateVariables = body.variables as UpdateEventVariables;
       // Update the state based on mutation
       if (updateVariables.updateEventInput?.title) {
-        eventState.title = updateVariables.updateEventInput.title;
+        eventState.title =
+          updateVariables.updateEventInput.title.set ?? eventState.title;
       }
       if (updateVariables.updateEventInput?.description) {
-        eventState.description = updateVariables.updateEventInput.description;
+        eventState.description =
+          updateVariables.updateEventInput.description.set ??
+          eventState.description;
       }
       return {
         data: {

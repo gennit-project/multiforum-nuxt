@@ -12,7 +12,7 @@ const issue = (overrides: Record<string, unknown> = {}) =>
     createdAt: '2024-01-01T00:00:00Z',
     Channel: { uniqueName: 'cats' },
     Author: { __typename: 'User', username: 'alice' },
-    ActivityFeedAggregate: { count: 0 },
+    ActivityFeedConnection: { aggregate: { count: { nodes: 0 } } },
     ...overrides,
   }) as unknown as Issue;
 
@@ -96,20 +96,20 @@ describe('ModIssueListItem badges', () => {
   });
 
   it('shows a singular report badge', () => {
-    const wrapper = mountItem({ issue: issue({ ActivityFeedAggregate: { count: 1 } }) });
+    const wrapper = mountItem({ issue: issue({ ActivityFeedConnection: { aggregate: { count: { nodes: 1 } } } }) });
 
     expect(wrapper.text()).toContain('1 report');
   });
 
   it('shows a plural report badge', () => {
-    const wrapper = mountItem({ issue: issue({ ActivityFeedAggregate: { count: 3 } }) });
+    const wrapper = mountItem({ issue: issue({ ActivityFeedConnection: { aggregate: { count: { nodes: 3 } } } }) });
 
     expect(wrapper.text()).toContain('3 reports');
   });
 
   it('uses top-level reportCount when present', () => {
     const wrapper = mountItem({
-      issue: issue({ ActivityFeedAggregate: undefined, reportCount: 4 }),
+      issue: issue({ ActivityFeedConnection: undefined, reportCount: 4 }),
     });
 
     expect(wrapper.text()).toContain('4 reports');

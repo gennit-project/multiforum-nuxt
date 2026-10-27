@@ -157,32 +157,40 @@ if (getUserResult.value && getUserResult.value.users.length > 0) {
 
 const basicUserUpdateInput = computed(() => {
   return {
-    displayName: basicFormValues.value.displayName,
-    bio: basicFormValues.value.bio,
-    profilePicURL: basicFormValues.value.profilePicURL,
+    displayName: { set: basicFormValues.value.displayName },
+    bio: { set: basicFormValues.value.bio },
+    profilePicURL: { set: basicFormValues.value.profilePicURL },
   } as UserUpdateInput;
 });
 
 const notificationUserUpdateInput = computed(() => {
   return {
-    notifyOnReplyToCommentByDefault:
-      notificationFormValues.value.notifyOnReplyToCommentByDefault,
-    notifyOnReplyToDiscussionByDefault:
-      notificationFormValues.value.notifyOnReplyToDiscussionByDefault,
-    notifyOnReplyToEventByDefault:
-      notificationFormValues.value.notifyOnReplyToEventByDefault,
-    notifyWhenTagged: notificationFormValues.value.notifyWhenTagged,
-    notifyOnSubscribedIssueUpdates:
-      notificationFormValues.value.notifyOnSubscribedIssueUpdates,
-    notifyOnFeedback: notificationFormValues.value.notifyOnFeedback,
-    notifyOnSuspensionBlocks:
-      notificationFormValues.value.notifyOnSuspensionBlocks,
-    notificationBundleInterval:
-      notificationFormValues.value.notificationBundleInterval,
-    notificationBundleEnabled:
-      notificationFormValues.value.notificationBundleEnabled,
-    enableSensitiveContentByDefault:
-      notificationFormValues.value.enableSensitiveContentByDefault,
+    notifyOnReplyToCommentByDefault: {
+      set: notificationFormValues.value.notifyOnReplyToCommentByDefault,
+    },
+    notifyOnReplyToDiscussionByDefault: {
+      set: notificationFormValues.value.notifyOnReplyToDiscussionByDefault,
+    },
+    notifyOnReplyToEventByDefault: {
+      set: notificationFormValues.value.notifyOnReplyToEventByDefault,
+    },
+    notifyWhenTagged: { set: notificationFormValues.value.notifyWhenTagged },
+    notifyOnSubscribedIssueUpdates: {
+      set: notificationFormValues.value.notifyOnSubscribedIssueUpdates,
+    },
+    notifyOnFeedback: { set: notificationFormValues.value.notifyOnFeedback },
+    notifyOnSuspensionBlocks: {
+      set: notificationFormValues.value.notifyOnSuspensionBlocks,
+    },
+    notificationBundleInterval: {
+      set: notificationFormValues.value.notificationBundleInterval,
+    },
+    notificationBundleEnabled: {
+      set: notificationFormValues.value.notificationBundleEnabled,
+    },
+    enableSensitiveContentByDefault: {
+      set: notificationFormValues.value.enableSensitiveContentByDefault,
+    },
   } as UserUpdateInput;
 });
 

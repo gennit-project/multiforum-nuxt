@@ -87,7 +87,7 @@ defineProps({
 });
 
 const totalImageCount = computed(() => {
-  return user.value?.ImagesAggregate?.count || 0;
+  return user.value?.ImagesConnection?.aggregate?.count?.nodes || 0;
 });
 
 const hasMoreImages = computed(() => {

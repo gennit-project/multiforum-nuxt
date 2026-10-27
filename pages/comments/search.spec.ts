@@ -41,7 +41,7 @@ const mountWith = async (opts: {
   mockedUseQuery.mockReturnValue({
     result: ref({
       comments: opts.comments ?? [],
-      commentsAggregate: { count: opts.count ?? 0 },
+      commentsConnection: { aggregate: { count: { nodes: opts.count ?? 0 } } },
     }),
     loading: ref(opts.loading ?? false),
     error: ref(opts.error ?? null),
@@ -205,7 +205,7 @@ describe('comment search result navigation', () => {
     mockedUseQuery.mockReturnValue({
       result: ref({
         comments: [discussionComment],
-        commentsAggregate: { count: 1 },
+        commentsConnection: { aggregate: { count: { nodes: 1 } } },
       }),
       loading: ref(false),
       error: ref(null),

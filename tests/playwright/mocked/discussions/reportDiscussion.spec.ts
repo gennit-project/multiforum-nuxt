@@ -50,7 +50,7 @@ test('reports a discussion with mocked GraphQL', async ({
           DefaultModRole: {
             canReport: true,
             canHideDiscussion: true,
-          },
+          } as any,
         },
       }),
       getServerRules: () => ({

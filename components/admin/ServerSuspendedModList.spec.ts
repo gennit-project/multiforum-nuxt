@@ -25,7 +25,14 @@ const suspension = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const withMods = (list: unknown[], count?: number) => ({
-  serverConfigs: [{ SuspendedMods: list, SuspendedModsAggregate: { count: count ?? list.length } }],
+  serverConfigs: [
+    {
+      SuspendedMods: list,
+      SuspendedModsConnection: {
+        aggregate: { count: { nodes: count ?? list.length } },
+      },
+    },
+  ],
 });
 
 const mountList = () =>

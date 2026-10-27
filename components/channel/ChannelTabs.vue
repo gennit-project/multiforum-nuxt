@@ -149,7 +149,7 @@ const baseTabs = computed((): Tab[] => {
       routeSuffix: 'discussions',
       label: 'Discussions',
       icon: DiscussionIcon,
-      countProperty: 'DiscussionChannelsAggregate',
+      countProperty: 'DiscussionChannelsConnection',
     },
   ];
 
@@ -170,7 +170,7 @@ const baseTabs = computed((): Tab[] => {
       routeSuffix: 'events',
       label: 'Calendar',
       icon: CalendarIcon,
-      countProperty: 'EventChannelsAggregate',
+      countProperty: 'EventChannelsConnection',
     });
   }
 
@@ -243,7 +243,7 @@ const tabs = computed((): Tab[] => {
         routeSuffix: 'issues',
         label: 'Issues',
         icon: FlagIcon,
-        countProperty: 'IssuesAggregate',
+        countProperty: 'IssuesConnection',
       });
     }
   }
@@ -309,7 +309,7 @@ watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
             tab.countProperty === '__DOWNLOAD_COUNT__'
               ? downloadCount
               : tab.countProperty
-                ? channel[tab.countProperty]?.count
+                ? channel[tab.countProperty]?.aggregate?.count?.nodes
                 : 0
           "
           :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
@@ -344,14 +344,14 @@ watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
                     activeTab?.countProperty &&
                     (activeTab?.countProperty === '__DOWNLOAD_COUNT__'
                       ? downloadCount
-                      : channel[activeTab?.countProperty]?.count)
+                      : channel[activeTab?.countProperty]?.aggregate?.count?.nodes)
                   "
                   class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
                 >
                   {{
                     activeTab?.countProperty === '__DOWNLOAD_COUNT__'
                       ? downloadCount
-                      : channel[activeTab?.countProperty]?.count
+                      : channel[activeTab?.countProperty]?.aggregate?.count?.nodes
                   }}
                 </span>
               </div>
@@ -391,14 +391,14 @@ watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
                       tab.countProperty &&
                       (tab.countProperty === '__DOWNLOAD_COUNT__'
                         ? downloadCount
-                        : channel[tab.countProperty]?.count)
+                        : channel[tab.countProperty]?.aggregate?.count?.nodes)
                     "
                     class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
                   >
                     {{
                       tab.countProperty === '__DOWNLOAD_COUNT__'
                         ? downloadCount
-                        : channel[tab.countProperty]?.count
+                        : channel[tab.countProperty]?.aggregate?.count?.nodes
                     }}
                   </span>
                 </nuxt-link>
@@ -425,7 +425,7 @@ watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
               tab.countProperty === '__DOWNLOAD_COUNT__'
                 ? downloadCount
                 : tab.countProperty
-                  ? channel[tab.countProperty]?.count
+                  ? channel[tab.countProperty]?.aggregate?.count?.nodes
                   : 0
             "
             :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"

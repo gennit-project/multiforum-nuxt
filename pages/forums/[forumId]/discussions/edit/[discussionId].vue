@@ -14,7 +14,7 @@ import type {
   Discussion,
   DiscussionChannel,
   Tag as TagData,
-  DiscussionTagsConnectOrCreateFieldInput,
+  DiscussionTagsUpdateFieldInput,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
   Image,
@@ -251,21 +251,20 @@ const existingTags = computed(() => {
 });
 
 const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
-  const tagConnections: DiscussionTagsConnectOrCreateFieldInput[] =
-    formValues.value.selectedTags.map((tag: string) => {
-      return {
-        onCreate: {
-          node: {
-            text: tag,
-          },
+  const tagConnections = formValues.value.selectedTags.map((tag: string) => {
+    return {
+      onCreate: {
+        node: {
+          text: tag,
         },
-        where: {
-          node: {
-            text: tag,
-          },
+      },
+      where: {
+        node: {
+          text: tag,
         },
-      };
-    });
+      },
+    };
+  });
 
   const tagDisconnections: DiscussionTagsDisconnectFieldInput[] =
     existingTags.value
@@ -283,13 +282,15 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
       });
 
   const result: DiscussionUpdateInput = {
-    title: formValues.value.title,
-    body: formValues.value.body,
+    title: { set: formValues.value.title },
+    body: { set: formValues.value.body },
+    // v7 Tags update input no longer exposes `connectOrCreate`; the custom
+    // update resolver still accepts this payload, so preserve the shape.
     Tags: [
       {
         connectOrCreate: tagConnections,
         disconnect: tagDisconnections,
-      },
+      } as unknown as DiscussionTagsUpdateFieldInput,
     ],
   };
   return result;

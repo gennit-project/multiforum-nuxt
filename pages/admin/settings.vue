@@ -7,7 +7,10 @@ import {
 } from '@/graphQLData/admin/mutations';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import Notification from '@/components/NotificationComponent.vue';
-import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import type {
+  ServerConfig,
+  ServerConfigUpdateInput,
+} from '@/__generated__/graphql';
 import type { BrandingLink } from '@/utils/branding';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { config } from '@/config';
@@ -17,9 +20,11 @@ import {
   type AutosaveStatus,
 } from '@/composables/useSettingAutosave';
 
-type ServerSettingsFormValues = ServerConfigUpdateInput & {
-  featuredWikiPageIds?: string[];
-};
+// The form model holds plain scalar values (mirroring the ServerConfig entity),
+// not GraphQL update inputs. The v7 ServerConfigUpdateInput wraps every scalar
+// in `{ set: ... }`; that wrapping happens only at the mutation boundary
+// (serverUpdateInput / saveServerField), so the form itself stays plain.
+type ServerSettingsFormValues = Partial<ServerConfig>;
 
 // The API returns the JSON column as either a parsed array or a string,
 // depending on the driver; normalize before the form binds to it.
@@ -133,39 +138,44 @@ onGetServerResult((result) => {
   enableEventsAutosave.setInitial(Boolean(serverConfig.enableEvents));
 });
 
-const serverUpdateInput = computed(() => {
+const serverUpdateInput = computed<ServerConfigUpdateInput>(() => {
   // For now, this is the same format as form values,
   // but if the form supports RBAC in the future, this
-  // will be more complicated.
+  // will be more complicated. v7 requires each scalar wrapped in `{ set: ... }`.
   return {
-    serverDescription: formValues.value.serverDescription,
-    rules: JSON.stringify(formValues.value.rules) || '[]',
-    allowedFileTypes: formValues.value.allowedFileTypes || [],
-    enableDownloads: formValues.value.enableDownloads || false,
-    enableEvents: formValues.value.enableEvents || false,
-    accountAgeGateEnabled: formValues.value.accountAgeGateEnabled || false,
-    minimumAccountAge: formValues.value.minimumAccountAge ?? 13,
-    sensitiveContentAgeGateEnabled:
-      formValues.value.sensitiveContentAgeGateEnabled || false,
-    minimumSensitiveContentAge:
-      formValues.value.minimumSensitiveContentAge ?? 18,
-    pluginRegistries: formValues.value.pluginRegistries || [],
-    serverIconURL: formValues.value.serverIconURL || '',
-    brandingLogoDarkURL: formValues.value.brandingLogoDarkURL || '',
-    brandingLogoAlt: formValues.value.brandingLogoAlt || '',
-    brandingFaviconURL: formValues.value.brandingFaviconURL || '',
-    brandingPrimaryColor: formValues.value.brandingPrimaryColor || '',
-    brandingProductName: formValues.value.brandingProductName || '',
-    brandingDocsURL: formValues.value.brandingDocsURL || '',
-    brandingSourceURL: formValues.value.brandingSourceURL || '',
-    brandingIssuesURL: formValues.value.brandingIssuesURL || '',
-    brandingSupportEmail: formValues.value.brandingSupportEmail || '',
-    brandingShowUpstreamLinks:
-      formValues.value.brandingShowUpstreamLinks !== false,
+    serverDescription: { set: formValues.value.serverDescription },
+    rules: { set: JSON.stringify(formValues.value.rules) || '[]' },
+    allowedFileTypes: { set: formValues.value.allowedFileTypes || [] },
+    enableDownloads: { set: formValues.value.enableDownloads || false },
+    enableEvents: { set: formValues.value.enableEvents || false },
+    accountAgeGateEnabled: {
+      set: formValues.value.accountAgeGateEnabled || false,
+    },
+    minimumAccountAge: { set: formValues.value.minimumAccountAge ?? 13 },
+    sensitiveContentAgeGateEnabled: {
+      set: formValues.value.sensitiveContentAgeGateEnabled || false,
+    },
+    minimumSensitiveContentAge: {
+      set: formValues.value.minimumSensitiveContentAge ?? 18,
+    },
+    pluginRegistries: { set: formValues.value.pluginRegistries || [] },
+    serverIconURL: { set: formValues.value.serverIconURL || '' },
+    brandingLogoDarkURL: { set: formValues.value.brandingLogoDarkURL || '' },
+    brandingLogoAlt: { set: formValues.value.brandingLogoAlt || '' },
+    brandingFaviconURL: { set: formValues.value.brandingFaviconURL || '' },
+    brandingPrimaryColor: { set: formValues.value.brandingPrimaryColor || '' },
+    brandingProductName: { set: formValues.value.brandingProductName || '' },
+    brandingDocsURL: { set: formValues.value.brandingDocsURL || '' },
+    brandingSourceURL: { set: formValues.value.brandingSourceURL || '' },
+    brandingIssuesURL: { set: formValues.value.brandingIssuesURL || '' },
+    brandingSupportEmail: { set: formValues.value.brandingSupportEmail || '' },
+    brandingShowUpstreamLinks: {
+      set: formValues.value.brandingShowUpstreamLinks !== false,
+    },
     // Stored as a JSON column, the same way rules are.
-    brandingCustomFooterLinks: JSON.stringify(
-      formValues.value.brandingCustomFooterLinks || []
-    ),
+    brandingCustomFooterLinks: {
+      set: JSON.stringify(formValues.value.brandingCustomFooterLinks || []),
+    },
   };
 });
 
@@ -240,10 +250,11 @@ const saveServerField = (input: ServerConfigUpdateInput) =>
   updateServer({ input, serverName: config.serverName });
 
 const descriptionAutosave = useSettingAutosave<string>({
-  save: (serverDescription) => saveServerField({ serverDescription }),
+  save: (serverDescription) =>
+    saveServerField({ serverDescription: { set: serverDescription } }),
 });
 const enableEventsAutosave = useSettingAutosave<boolean>({
-  save: (enableEvents) => saveServerField({ enableEvents }),
+  save: (enableEvents) => saveServerField({ enableEvents: { set: enableEvents } }),
 });
 
 const autosaveStatus = computed<AutosaveStatus>(() => {
@@ -314,7 +325,7 @@ function updateFormValues(data: ServerSettingsFormValues) {
             :get-server-error="getServerError"
             :update-server-error="combinedUpdateError"
             :edit-server-loading="isSaving"
-            :form-values="formValues"
+            :form-values="(formValues as unknown as ServerConfigUpdateInput)"
             :save-status="autosaveStatus"
             :save-error-message="autosaveErrorMessage"
             @submit="submit"

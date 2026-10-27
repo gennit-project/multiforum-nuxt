@@ -9,7 +9,7 @@ import { CREATE_CHANNEL } from '@/graphQLData/channel/mutations';
 import type {
   Channel,
   ChannelCreateInput,
-  ChannelTagsConnectOrCreateFieldInput,
+  ChannelTagsFieldInput,
 } from '@/__generated__/graphql';
 import type { CreateEditChannelFormValues } from '@/types/Channel';
 import { useUsername } from '@/composables/useAuthState';
@@ -44,21 +44,20 @@ const createChannelDefaultValues: CreateEditChannelFormValues = {
 const formValues = ref<CreateEditChannelFormValues>(createChannelDefaultValues);
 
 const createChannelInput = computed(() => {
-  const tagConnections: ChannelTagsConnectOrCreateFieldInput[] =
-    formValues.value.selectedTags.map((tag: string) => {
-      return {
-        onCreate: {
-          node: {
-            text: tag,
-          },
+  const tagConnections = formValues.value.selectedTags.map((tag: string) => {
+    return {
+      onCreate: {
+        node: {
+          text: tag,
         },
-        where: {
-          node: {
-            text: tag,
-          },
+      },
+      where: {
+        node: {
+          text: tag,
         },
-      };
-    });
+      },
+    };
+  });
 
   const result: ChannelCreateInput[] = [
     {
@@ -73,15 +72,17 @@ const createChannelInput = computed(() => {
       imageUploadsEnabled: formValues.value.imageUploadsEnabled,
       markdownImagesEnabled: formValues.value.markdownImagesEnabled,
       emojiEnabled: formValues.value.emojiEnabled,
+      // v7 Tags input no longer exposes `connectOrCreate`; the custom create
+      // resolver still accepts this payload, so preserve the shape via a cast.
       Tags: {
         connectOrCreate: tagConnections,
-      },
+      } as unknown as ChannelTagsFieldInput,
       Admins: {
         connect: [
           {
             where: {
               node: {
-                username: usernameVar.value,
+                username: { eq: usernameVar.value },
               },
             },
           },

@@ -167,8 +167,8 @@ describe('Forum plugin detail page', () => {
               {
                 where: {
                   node: {
-                    Plugin: { id: 'scanner' },
-                    version: '1.0.0',
+                    Plugin: { id: { eq: 'scanner' } },
+                    version: { eq: '1.0.0' },
                   },
                 },
                 edge: {
@@ -239,15 +239,15 @@ describe('Forum plugin detail page', () => {
       channelUniqueName: 'cats',
       enabledPlugins: [
         {
-          where: {
-            node: {
-              Plugin: { id: 'scanner' },
-              version: '1.0.0',
-            },
-          },
           update: {
+            where: {
+              node: {
+                Plugin: { id: { eq: 'scanner' } },
+                version: { eq: '1.0.0' },
+              },
+            },
             edge: {
-              settingsJson: JSON.stringify({ strict: false }),
+              settingsJson: { set: JSON.stringify({ strict: false }) },
             },
           },
         },

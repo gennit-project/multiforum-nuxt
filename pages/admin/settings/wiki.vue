@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import type { ServerConfig } from '@/__generated__/graphql';
 import FormRow from '@/components/FormRow.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import {
@@ -18,9 +18,7 @@ type WikiPageOption = {
   channelUniqueName?: string | null;
 };
 
-type ServerSettingsFormValues = ServerConfigUpdateInput & {
-  featuredWikiPageIds?: string[];
-};
+type ServerSettingsFormValues = Partial<ServerConfig>;
 
 const props = defineProps({
   editMode: {

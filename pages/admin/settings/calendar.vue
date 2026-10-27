@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PropType } from 'vue';
-import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import type { ServerConfig } from '@/__generated__/graphql';
 import FormRow from '@/components/FormRow.vue';
 import CheckBox from '@/components/CheckBox.vue';
 
@@ -10,7 +10,7 @@ const props = defineProps({
     required: true,
   },
   formValues: {
-    type: Object as PropType<ServerConfigUpdateInput | null>,
+    type: Object as PropType<Partial<ServerConfig> | null>,
     required: false,
     default: null,
   },

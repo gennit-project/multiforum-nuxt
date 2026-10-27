@@ -111,7 +111,8 @@ const defaultUniqueName = computed(
   () => channelIdInParams.value || props.discussionChannel.channelUniqueName
 );
 const commentCount = computed(
-  () => props.discussionChannel?.CommentsAggregate?.count || 0
+  () =>
+    props.discussionChannel?.CommentsConnection?.aggregate?.count?.nodes || 0
 );
 
 const authorBadges = computed(() =>

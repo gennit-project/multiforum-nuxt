@@ -4,6 +4,9 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import type {
   DiscussionChannel,
   DiscussionCreateInput,
+  DiscussionTagsFieldInput,
+  DiscussionAuthorFieldInput,
+  DiscussionCrosspostedDiscussionFieldInput,
 } from '@/__generated__/graphql';
 import {
   GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
@@ -176,14 +179,20 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
     title: formValues.value.title,
     body: formValues.value.body,
     hasDownload: false,
-    Tags: { connectOrCreate: tagConnections },
+    // v7 Tags input no longer exposes `connectOrCreate`; the custom create
+    // resolver still accepts this payload, so preserve the shape via a cast.
+    Tags: {
+      connectOrCreate: tagConnections,
+    } as unknown as DiscussionTagsFieldInput,
+    // v7 Author input no longer exposes `connect`; preserve the existing
+    // connect payload the custom resolver expects via a cast.
     Author: {
       connect: {
         where: {
           node: { username: usernameVar.value },
         },
       },
-    },
+    } as unknown as DiscussionAuthorFieldInput,
   };
 
   if (formValues.value.album.images.length > 0) {
@@ -198,7 +207,7 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
     const albumNode: {
       imageOrder: string[];
       Images: {
-        connect: { where: { node: { id: string } } }[];
+        connect: { where: { node: { id: { eq: string } } } }[];
       };
     } = {
       // Use the explicit imageOrder if it's valid, otherwise generate from image IDs
@@ -208,7 +217,7 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
           : imageIds.filter((id) => id !== undefined),
       Images: {
         connect: validImages.map((image) => ({
-          where: { node: { id: image.id } },
+          where: { node: { id: { eq: image.id } } },
         })),
       },
     };
@@ -221,13 +230,15 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
   }
 
   if (formValues.value.crosspostId) {
+    // v7 CrosspostedDiscussion input no longer exposes `connect`; preserve the
+    // existing connect payload the custom resolver expects via a cast.
     result.CrosspostedDiscussion = {
       connect: {
         where: {
           node: { id: formValues.value.crosspostId },
         },
       },
-    };
+    } as unknown as DiscussionCrosspostedDiscussionFieldInput;
   }
 
   return result;

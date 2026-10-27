@@ -13,7 +13,10 @@ const h = vi.hoisted(() => ({
   push: vi.fn(),
   replace: vi.fn(),
   result: null as unknown as {
-    value: { events: unknown[]; eventsAggregate: { count: number } };
+    value: {
+      events: unknown[];
+      eventsConnection: { aggregate: { count: { nodes: number } } };
+    };
   },
   loading: null as unknown as { value: boolean },
   error: null as unknown as { value: null | { message: string } },
@@ -22,7 +25,7 @@ const h = vi.hoisted(() => ({
   mdAndUp: null as unknown as { value: boolean },
   queryVariables: null as null | {
     where: { value: unknown };
-    options: { value: unknown };
+    sort: { value: unknown };
   },
   mapsCapability: null as unknown as { value: unknown },
   mapsAvailable: null as unknown as { value: boolean },
@@ -59,7 +62,7 @@ vi.mock('@vue/apollo-composable', () => ({
   ) => {
     h.queryVariables = variables;
     void variables.where.value;
-    void variables.options.value;
+    void variables.sort.value;
     return {
       result: h.result,
       loading: h.loading,
@@ -71,7 +74,7 @@ vi.mock('@vue/apollo-composable', () => ({
   },
 }));
 
-h.result = ref({ events: [] as unknown[], eventsAggregate: { count: 0 } });
+h.result = ref({ events: [] as unknown[], eventsConnection: { aggregate: { count: { nodes: 0 } } } });
 h.loading = ref(false);
 h.error = ref(null);
 h.mdAndUp = ref(true);
@@ -216,7 +219,7 @@ beforeEach(() => {
     query: {},
     params: {},
   });
-  h.result.value = { events: [], eventsAggregate: { count: 0 } };
+  h.result.value = { events: [], eventsConnection: { aggregate: { count: { nodes: 0 } } } };
   h.loading.value = false;
   h.error.value = null;
   h.onResultCb = null;
@@ -247,7 +250,7 @@ describe('MapView', () => {
   });
 
   it('renders the setup placeholder instead of the map when maps are unavailable', () => {
-    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    h.result.value = { events: [event('1')], eventsConnection: { aggregate: { count: { nodes: 1 } } } };
     h.mapsCapability.value = {
       configured: false,
       enabled: false,
@@ -275,14 +278,14 @@ describe('MapView', () => {
   });
 
   it('updates the route query when filtering by tag', async () => {
-    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    h.result.value = { events: [event('1')], eventsConnection: { aggregate: { count: { nodes: 1 } } } };
     const wrapper = mountView();
     await wrapper.findComponent(EventList).vm.$emit('filter-by-tag', 'music');
     expect(h.replace).toHaveBeenCalled();
   });
 
   it('updates the route query when filtering by channel', async () => {
-    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    h.result.value = { events: [event('1')], eventsConnection: { aggregate: { count: { nodes: 1 } } } };
     const wrapper = mountView();
     await wrapper
       .findComponent(EventList)
@@ -324,15 +327,13 @@ describe('MapView', () => {
   it('uses reverse chronological order for past events', () => {
     h.route.query = { timeShortcut: 'PAST_EVENTS' };
     mountView();
-    expect(h.queryVariables?.options.value).toEqual({
-      sort: [{ startTime: 'DESC' }],
-    });
+    expect(h.queryVariables?.sort.value).toEqual([{ startTime: 'DESC' }]);
   });
 
   it('opens the multiple-event preview when a map marker represents more than one event', async () => {
     h.result.value = {
       events: [event('1'), event('2')],
-      eventsAggregate: { count: 2 },
+      eventsConnection: { aggregate: { count: { nodes: 2 } } },
     };
     const wrapper = mountView();
 
@@ -378,7 +379,7 @@ describe('MapView', () => {
   });
 
   it('opens a specific info window and navigates when a single marker is clicked', async () => {
-    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    h.result.value = { events: [event('1')], eventsConnection: { aggregate: { count: { nodes: 1 } } } };
     const wrapper = mountView();
     const marker = markerData();
     const map = wrapper.findComponent(EventMap);
@@ -401,7 +402,7 @@ describe('MapView', () => {
   });
 
   it('uses supplied event data when a marker does not contain the event', async () => {
-    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    h.result.value = { events: [event('1')], eventsConnection: { aggregate: { count: { nodes: 1 } } } };
     const wrapper = mountView();
     const marker = markerData();
     const suppliedEvent = event('missing', 'Supplied');
@@ -424,7 +425,7 @@ describe('MapView', () => {
   });
 
   it('locks marker colors while a preview is open and unlocks them when it closes', async () => {
-    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    h.result.value = { events: [event('1')], eventsConnection: { aggregate: { count: { nodes: 1 } } } };
     const wrapper = mountView();
     const map = wrapper.findComponent(EventMap);
     await map.vm.$emit('lock-colors');
@@ -436,7 +437,7 @@ describe('MapView', () => {
   it('closes the multiple-event preview and its marker info window', async () => {
     h.result.value = {
       events: [event('1'), event('2')],
-      eventsAggregate: { count: 2 },
+      eventsConnection: { aggregate: { count: { nodes: 2 } } },
     };
     const wrapper = mountView();
     const marker = markerData(2);
@@ -453,14 +454,14 @@ describe('MapView', () => {
 
   it('renders the mobile map when the viewport is below md', () => {
     h.mdAndUp.value = false;
-    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    h.result.value = { events: [event('1')], eventsConnection: { aggregate: { count: { nodes: 1 } } } };
     const wrapper = mountView();
     expect(wrapper.findAllComponents(EventMap)).toHaveLength(1);
   });
 
   it('locks marker colors from the mobile map', async () => {
     h.mdAndUp.value = false;
-    h.result.value = { events: [event('1')], eventsAggregate: { count: 1 } };
+    h.result.value = { events: [event('1')], eventsConnection: { aggregate: { count: { nodes: 1 } } } };
     const wrapper = mountView();
     const map = wrapper.findComponent(EventMap);
     await map.vm.$emit('lock-colors');
@@ -481,7 +482,7 @@ describe('map results', () => {
   });
 
   it('announces the actual result count', () => {
-    h.result.value = { events: [event('1')], eventsAggregate: { count: 42 } };
+    h.result.value = { events: [event('1')], eventsConnection: { aggregate: { count: { nodes: 42 } } } };
     expect(mountView().get('[role="status"]').text()).toContain('42 events');
   });
 

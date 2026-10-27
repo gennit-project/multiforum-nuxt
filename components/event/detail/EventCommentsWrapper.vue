@@ -4,7 +4,7 @@ import type { PropType } from 'vue';
 import type {
   Event,
   Comment as CommentType,
-  CommentCreateInput,
+  OwnedCommentCreateInput,
 } from '@/__generated__/graphql';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import CommentSection from '@/components/comments/CommentSection.vue';
@@ -79,7 +79,7 @@ const hasEventIdInRoute = computed(
 );
 
 const aggregateCommentCount = computed(() => {
-  return props.event?.CommentsAggregate?.count || 0;
+  return props.event?.CommentsConnection?.aggregate?.count?.nodes || 0;
 });
 
 const commentSectionQueryVariables = computed(() => ({
@@ -126,7 +126,7 @@ const notifyOnReplyToCommentByDefault = computed(() => {
 });
 
 const createCommentInput = computed(() => {
-  const input: CommentCreateInput = {
+  const input: OwnedCommentCreateInput = {
     isRootComment: false,
     Event: {
       connect: {

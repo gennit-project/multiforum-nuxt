@@ -45,12 +45,21 @@ export const SEARCH_COMMENT_FIELDS = gql`
 
 // Query for searching comments site-wide
 export const SEARCH_COMMENTS = gql`
-  query searchComments($where: CommentWhere, $options: CommentOptions) {
-    comments(where: $where, options: $options) {
+  query searchComments(
+    $where: CommentWhere
+    $sort: [CommentSort!]
+    $limit: Int
+    $offset: Int
+  ) {
+    comments(where: $where, sort: $sort, limit: $limit, offset: $offset) {
       ...SearchCommentFields
     }
-    commentsAggregate(where: $where) {
-      count
+    commentsConnection(where: $where) {
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
   }
   ${SEARCH_COMMENT_FIELDS}
@@ -61,8 +70,12 @@ export const COMMENT_VOTE_FIELDS = gql`
     UpvotedByUsers {
       username
     }
-    UpvotedByUsersAggregate {
-      count
+    UpvotedByUsersConnection {
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
     SuperUpvotedByUsers {
       username
@@ -98,8 +111,12 @@ export const COMMENT_FIELDS = gql`
         isBot
       }
     }
-    ChildCommentsAggregate {
-      count
+    ChildCommentsConnection {
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
     ParentComment {
       id
@@ -157,8 +174,12 @@ export const GET_DISCUSSION_COMMENTS = gql`
         UpvotedByUsers {
           username
         }
-        UpvotedByUsersAggregate {
-          count
+        UpvotedByUsersConnection {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
         SuperUpvotedByUsers {
           username
@@ -186,20 +207,38 @@ export const GET_DISCUSSION_COMMENTS = gql`
             ...AuthorFields
           }
         }
-        CommentsAggregate(
+        CommentsConnection(
           where: {
-            OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+            node: {
+              OR: [
+                { isFeedbackComment: { eq: null } }
+                { isFeedbackComment: { eq: false } }
+              ]
+            }
           }
         ) {
-          count
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
-        RootCommentsAggregate: CommentsAggregate(
+        RootCommentsConnection: CommentsConnection(
           where: {
-            isRootComment: true
-            OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+            node: {
+              isRootComment: { eq: true }
+              OR: [
+                { isFeedbackComment: { eq: null } }
+                { isFeedbackComment: { eq: false } }
+              ]
+            }
           }
         ) {
-          count
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
         SubscribedToNotifications {
           username
@@ -239,8 +278,12 @@ export const GET_DISCUSSION_COMMENTS = gql`
         CommentAuthor {
           ...AuthorFields
         }
-        ChildCommentsAggregate {
-          count
+        ChildCommentsConnection {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
         ParentComment {
           id
@@ -349,8 +392,8 @@ export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
   ) {
     discussionChannels(
       where: {
-        channelUniqueName: $channelUniqueName
-        discussionId: $discussionId
+        channelUniqueName: { eq: $channelUniqueName }
+        discussionId: { eq: $discussionId }
       }
     ) {
       id
@@ -359,13 +402,22 @@ export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
       archived
       answered
       locked
-      CommentsAggregate(
+      CommentsConnection(
         where: {
-          isRootComment: true
-          OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+          node: {
+            isRootComment: { eq: true }
+            OR: [
+              { isFeedbackComment: { eq: null } }
+              { isFeedbackComment: { eq: false } }
+            ]
+          }
         }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -377,8 +429,8 @@ export const GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE = gql`
   ) {
     discussionChannels(
       where: {
-        channelUniqueName: $channelUniqueName
-        discussionId: $discussionId
+        channelUniqueName: { eq: $channelUniqueName }
+        discussionId: { eq: $discussionId }
       }
     ) {
       id
@@ -387,12 +439,21 @@ export const GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE = gql`
       archived
       answered
       locked
-      CommentsAggregate(
+      CommentsConnection(
         where: {
-          OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+          node: {
+            OR: [
+              { isFeedbackComment: { eq: null } }
+              { isFeedbackComment: { eq: false } }
+            ]
+          }
         }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -400,10 +461,14 @@ export const GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE = gql`
 
 export const GET_EVENT_ROOT_COMMENT_AGGREGATE = gql`
   query getEventRootCommentAggregate($eventId: ID!) {
-    events(where: { id: $eventId }) {
+    events(where: { id: { eq: $eventId } }) {
       id
-      CommentsAggregate(where: { isRootComment: true }) {
-        count
+      CommentsConnection(where: { node: { isRootComment: { eq: true } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -411,7 +476,7 @@ export const GET_EVENT_ROOT_COMMENT_AGGREGATE = gql`
 
 export const GET_COMMENT_AND_REPLIES = gql`
   query getCommentWithReplies($id: ID!) {
-    comments(where: { id: $id }) {
+    comments(where: { id: { eq: $id } }) {
       ...CommentFields
       ChildComments {
         ...CommentFields
@@ -427,7 +492,7 @@ export const GET_COMMENT_AND_REPLIES = gql`
 
 export const GET_FEEDBACK_COMMENT = gql`
   query getFeedbackComment($id: ID!) {
-    comments(where: { id: $id }) {
+    comments(where: { id: { eq: $id } }) {
       id
       text
       createdAt
@@ -460,7 +525,7 @@ export const GET_FEEDBACK_COMMENT = gql`
 
 export const GET_ACTIVITY_FEED_COMMENT = gql`
   query getActivityFeedComment($id: ID!) {
-    comments(where: { id: $id }) {
+    comments(where: { id: { eq: $id } }) {
       id
       ModerationAction {
         id
@@ -507,7 +572,7 @@ export const GET_ACTIVITY_FEED_COMMENT = gql`
 
 export const GET_COMMENT = gql`
   query getComment($id: ID!) {
-    comments(where: { id: $id }) {
+    comments(where: { id: { eq: $id } }) {
       ...CommentFields
       GivesFeedbackOnComment {
         id
@@ -542,7 +607,7 @@ export const GET_COMMENT = gql`
 
 export const GET_COMMENT_ARCHIVED = gql`
   query getComment($commentId: ID!) {
-    comments(where: { id: $commentId }) {
+    comments(where: { id: { eq: $commentId } }) {
       id
       archived
     }
@@ -584,7 +649,7 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
     $offset: Int
     $loggedInModName: String
   ) {
-    comments(where: { id: $commentId }) {
+    comments(where: { id: { eq: $commentId } }) {
       id
       CommentAuthor {
         ... on User {
@@ -603,8 +668,12 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
       createdAt
       text
       archived
-      FeedbackCommentsAggregate {
-        count
+      FeedbackCommentsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       GivesFeedbackOnComment {
         id
@@ -615,7 +684,7 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
       GivesFeedbackOnEvent {
         id
       }
-      FeedbackComments(options: { limit: $limit, offset: $offset }) {
+      FeedbackComments(limit: $limit, offset: $offset) {
         id
         text
         archived
@@ -637,19 +706,29 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
           }
         }
         createdAt
-        FeedbackCommentsAggregate(
+        FeedbackCommentsConnection(
           where: {
-            CommentAuthorConnection: {
-              ModerationProfile: { node: { displayName: $loggedInModName } }
+            node: {
+              CommentAuthorConnection: {
+                ModerationProfile: {
+                  node: { displayName: { eq: $loggedInModName } }
+                }
+              }
             }
           }
         ) {
-          count
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
         FeedbackComments(
           where: {
             CommentAuthorConnection: {
-              ModerationProfile: { node: { displayName: $loggedInModName } }
+              ModerationProfile: {
+                node: { displayName: { eq: $loggedInModName } }
+              }
             }
           }
         ) {
@@ -667,9 +746,9 @@ export const GET_SPECIFIC_COMMENT_FEEDBACK = gql`
   query getSpecificCommentFeedback($commentId: ID, $modName: String) {
     comments(
       where: {
-        GivesFeedbackOnComment: { id: $commentId }
+        GivesFeedbackOnComment: { id: { eq: $commentId } }
         CommentAuthorConnection: {
-          ModerationProfile: { node: { displayName: $modName } }
+          ModerationProfile: { node: { displayName: { eq: $modName } } }
         }
       }
     ) {
@@ -680,7 +759,9 @@ export const GET_SPECIFIC_COMMENT_FEEDBACK = gql`
       Channel {
         uniqueName
       }
-      CommentAuthor(where: { ModerationProfile: { displayName: $modName } }) {
+      # v7 removed the where argument on the Comment.CommentAuthor union field; the
+      # mod filter already lives in the top-level comments where (CommentAuthorConnection).
+      CommentAuthor {
         ... on ModerationProfile {
           displayName
         }

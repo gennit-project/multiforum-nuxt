@@ -23,8 +23,8 @@ describe('getTotalCommentCount', () => {
     expect(
       getTotalCommentCount(
         discussion([
-          { CommentsAggregate: { count: 2 } },
-          { CommentsAggregate: { count: 3 } },
+          { CommentsConnection: { aggregate: { count: { nodes: 2 } } } },
+          { CommentsConnection: { aggregate: { count: { nodes: 3 } } } },
         ])
       )
     ).toBe(5);
@@ -39,7 +39,7 @@ describe('getChannelCommentCount', () => {
   it('reads the channel comment count', () => {
     expect(
       getChannelCommentCount({
-        CommentsAggregate: { count: 4 },
+        CommentsConnection: { aggregate: { count: { nodes: 4 } } },
       } as unknown as DiscussionChannel)
     ).toBe(4);
   });
@@ -54,7 +54,10 @@ describe('getDiscussionDetailOptions', () => {
     expect(
       getDiscussionDetailOptions(
         discussion([
-          { channelUniqueName: 'cats', CommentsAggregate: { count: 1 } },
+          {
+            channelUniqueName: 'cats',
+            CommentsConnection: { aggregate: { count: { nodes: 1 } } },
+          },
         ])
       )[0]
     ).toEqual({
@@ -73,7 +76,10 @@ describe('getDownloadDetailOptions', () => {
     expect(
       getDownloadDetailOptions(
         discussion([
-          { channelUniqueName: 'cats', CommentsAggregate: { count: 2 } },
+          {
+            channelUniqueName: 'cats',
+            CommentsConnection: { aggregate: { count: { nodes: 2 } } },
+          },
         ])
       )[0].value
     ).toBe('/forums/cats/downloads/d1');

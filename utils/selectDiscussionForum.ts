@@ -1,9 +1,9 @@
 import type { DiscussionChannel } from '@/__generated__/graphql';
 
 type Submission = Pick<DiscussionChannel, 'channelUniqueName'> & {
-  CommentsAggregate?: Pick<
-    NonNullable<DiscussionChannel['CommentsAggregate']>,
-    'count'
+  CommentsConnection?: Pick<
+    NonNullable<DiscussionChannel['CommentsConnection']>,
+    'aggregate'
   > | null;
 };
 
@@ -17,7 +17,8 @@ export const selectDiscussionForum = (
       (submission) => submission.channelUniqueName === requested
     ) ||
     submissions.find(
-      (submission) => (submission.CommentsAggregate?.count ?? 0) > 0
+      (submission) =>
+        (submission.CommentsConnection?.aggregate?.count?.nodes ?? 0) > 0
     ) ||
     submissions[0]
   )?.channelUniqueName || '';

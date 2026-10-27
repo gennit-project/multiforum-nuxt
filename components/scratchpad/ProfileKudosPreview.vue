@@ -42,7 +42,7 @@ const publicEntries = computed<ScratchpadPreviewEntry[]>(() => {
 
 const publicKudosCount = computed(() => {
   return (
-    result.value?.scratchpadEntriesAggregate?.count ??
+    result.value?.scratchpadEntriesConnection?.aggregate?.count?.nodes ??
     publicEntries.value.length ??
     0
   );

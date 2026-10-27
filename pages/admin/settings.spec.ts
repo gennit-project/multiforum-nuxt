@@ -200,8 +200,8 @@ describe('Admin server settings page', () => {
     expect(harness.updateMutate).toHaveBeenCalledWith(
       expect.objectContaining({
         input: expect.objectContaining({
-          serverDescription: 'Updated',
-          rules: JSON.stringify([{ summary: 'Rule' }]),
+          serverDescription: { set: 'Updated' },
+          rules: { set: JSON.stringify([{ summary: 'Rule' }]) },
         }),
       })
     );
@@ -232,10 +232,10 @@ describe('Admin server settings page', () => {
     expect(harness.updateMutate).toHaveBeenCalledWith(
       expect.objectContaining({
         input: expect.objectContaining({
-          accountAgeGateEnabled: true,
-          minimumAccountAge: 16,
-          sensitiveContentAgeGateEnabled: true,
-          minimumSensitiveContentAge: 21,
+          accountAgeGateEnabled: { set: true },
+          minimumAccountAge: { set: 16 },
+          sensitiveContentAgeGateEnabled: { set: true },
+          minimumSensitiveContentAge: { set: 21 },
         }),
       })
     );
@@ -342,11 +342,11 @@ describe('Admin server settings page', () => {
     expect(harness.updateMutate.mock.calls).toEqual([
       [
         {
-          input: { serverDescription: 'Description' },
+          input: { serverDescription: { set: 'Description' } },
           serverName: 'test-server',
         },
       ],
-      [{ input: { enableEvents: true }, serverName: 'test-server' }],
+      [{ input: { enableEvents: { set: true } }, serverName: 'test-server' }],
     ]);
   });
 

@@ -37,7 +37,7 @@ describe('forum suspended users page', () => {
   it('shows the active suspension count from the aggregate', async () => {
     const wrapper = await mountWith({
       SuspendedUsers: [{ username: 'a' }],
-      SuspendedUsersAggregate: { count: 4 },
+      SuspendedUsersConnection: { aggregate: { count: { nodes: 4 } } },
     });
     expect(wrapper.text()).toContain('Active Suspensions (4)');
   });

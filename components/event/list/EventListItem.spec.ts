@@ -8,12 +8,12 @@ import EventListItem from '@/components/event/list/EventListItem.vue';
 import Tag from '@/components/TagComponent.vue';
 
 // Minimal EventChannel shape the component reads (channelUniqueName / archived /
-// CommentsAggregate). Typed loosely so test fixtures stay terse.
+// CommentsConnection aggregate). Typed loosely so test fixtures stay terse.
 const eventChannel = (overrides: Record<string, unknown> = {}): Partial<EventChannel> => ({
   __typename: 'EventChannel',
   channelUniqueName: 'cats',
   archived: false,
-  CommentsAggregate: { __typename: 'EventChannelCommentsAggregationSelection', count: 0 },
+  CommentsConnection: { aggregate: { count: { nodes: 0 } } },
   ...overrides,
 });
 
@@ -199,8 +199,14 @@ describe('EventListItem', () => {
       makeEvent({
         id: 'e5',
         EventChannels: [
-          eventChannel({ channelUniqueName: 'cats', CommentsAggregate: { count: 1 } }),
-          eventChannel({ channelUniqueName: 'dogs', CommentsAggregate: { count: 3 } }),
+          eventChannel({
+            channelUniqueName: 'cats',
+            CommentsConnection: { aggregate: { count: { nodes: 1 } } },
+          }),
+          eventChannel({
+            channelUniqueName: 'dogs',
+            CommentsConnection: { aggregate: { count: { nodes: 3 } } },
+          }),
         ],
       });
 

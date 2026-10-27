@@ -11,7 +11,7 @@ import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/Conf
 import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import type {
-  CommentCreateInput,
+  OwnedCommentCreateInput,
   Comment as CommentType,
 } from '@/__generated__/graphql';
 import type {
@@ -71,7 +71,7 @@ const props = defineProps({
     default: () => [],
   },
   createCommentInput: {
-    type: Object as PropType<CommentCreateInput>,
+    type: Object as PropType<OwnedCommentCreateInput>,
     required: true,
   },
   createFormValues: {

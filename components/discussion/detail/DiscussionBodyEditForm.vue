@@ -35,7 +35,7 @@ const formValues = ref({
 function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
   // Only update the discussion body
   return {
-    body: formValues.value.body,
+    body: { set: formValues.value.body },
   };
 }
 

@@ -2,7 +2,7 @@ import { LocationFilterTypes } from '@/components/event/list/filters/locationFil
 import type { SearchEventValues } from '@/types/Event';
 import { timeShortcutValues } from '@/components/event/list/filters/eventSearchOptions';
 import { DateTime } from 'luxon';
-import type { EventWhere } from '@/__generated__/graphql';
+import type { EventWhere, EventChannelWhere } from '@/__generated__/graphql';
 
 const getStartOfThisWeekend = () => {
   const now = DateTime.utc();
@@ -49,7 +49,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
           NOT: {
             channelUniqueName: null,
           },
-          archived: false,
+          archived: { eq: false },
         },
       });
     } else {
@@ -65,7 +65,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
 
   // Free event filter
   if (free) {
-    conditions.push({ free: true });
+    conditions.push({ free: { eq: true } });
   } else {
     // if free is false, do not filter for { free: false },
     // because the default value is null instead of false.
@@ -76,7 +76,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
   }
 
   if (!showCanceledEvents) {
-    conditions.push({ canceled: false });
+    conditions.push({ canceled: { eq: false } });
     // If showCanceledEvents is true, we want to
     // show all events, so we don't need to add a filter.
   }
@@ -178,14 +178,14 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
     if (!showArchived) {
       conditions.push({
         EventChannels_SOME: {
-          channelUniqueName: channelId,
-          archived: false,
+          channelUniqueName: { eq: channelId },
+          archived: { eq: false },
         },
       });
     } else {
       conditions.push({
         EventChannels_SOME: {
-          channelUniqueName: channelId,
+          channelUniqueName: { eq: channelId },
         },
       });
     }
@@ -193,23 +193,19 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
     // If we are in the sitewide event search page,
     // show events from any channel in the query params.
 
-    type ChannelMatchCondition = {
-      channelUniqueName_CONTAINS: string;
-      archived?: boolean;
-    };
     const matchChannels = truthyChannels.reduce(
       // Technically a selected channel could be an array
       // of strings, but we expect it to always be a string.
-      (prev: ChannelMatchCondition[], curr: string) => {
+      (prev: EventChannelWhere[], curr: string) => {
         if (!showArchived) {
           return prev.concat({
             channelUniqueName_CONTAINS: curr,
-            archived: false,
+            archived: { eq: false },
           });
         }
         return prev.concat({ channelUniqueName_CONTAINS: curr });
       },
-      []
+      [] as EventChannelWhere[]
     );
     conditions.push({
       EventChannels_SOME: {

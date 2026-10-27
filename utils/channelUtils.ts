@@ -58,7 +58,7 @@ export function generateChannelTabs(params: TabGenerationParams): Tab[] {
       name: 'discussions',
       routeSuffix: 'discussions',
       label: 'Discussions',
-      countProperty: 'DiscussionChannelsAggregate',
+      countProperty: 'DiscussionChannelsConnection',
     },
   ];
 
@@ -77,7 +77,7 @@ export function generateChannelTabs(params: TabGenerationParams): Tab[] {
       name: 'events',
       routeSuffix: 'events',
       label: 'Calendar',
-      countProperty: 'EventChannelsAggregate',
+      countProperty: 'EventChannelsConnection',
     });
   }
 
@@ -121,7 +121,7 @@ export function generateChannelTabs(params: TabGenerationParams): Tab[] {
       name: 'moderation',
       routeSuffix: 'issues',
       label: 'Issues',
-      countProperty: 'IssuesAggregate',
+      countProperty: 'IssuesConnection',
     });
   }
 

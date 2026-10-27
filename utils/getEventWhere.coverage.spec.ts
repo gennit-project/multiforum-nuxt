@@ -64,7 +64,9 @@ describe('getEventWhere (structural coverage)', () => {
       expect(where.AND).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            EventChannels_SOME: expect.objectContaining({ archived: false }),
+            EventChannels_SOME: expect.objectContaining({
+              archived: { eq: false },
+            }),
           }),
         ])
       );
@@ -81,7 +83,10 @@ describe('getEventWhere (structural coverage)', () => {
       expect(where.AND).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            EventChannels_SOME: { channelUniqueName: 'cats', archived: false },
+            EventChannels_SOME: {
+              channelUniqueName: { eq: 'cats' },
+              archived: { eq: false },
+            },
           }),
         ])
       );
@@ -92,7 +97,7 @@ describe('getEventWhere (structural coverage)', () => {
       expect(where.AND).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
-            EventChannels_SOME: { channelUniqueName: 'cats' },
+            EventChannels_SOME: { channelUniqueName: { eq: 'cats' } },
           }),
         ])
       );
@@ -104,7 +109,9 @@ describe('getEventWhere (structural coverage)', () => {
         expect.arrayContaining([
           expect.objectContaining({
             EventChannels_SOME: expect.objectContaining({
-              OR: [{ channelUniqueName_CONTAINS: 'cats', archived: false }],
+              OR: [
+                { channelUniqueName_CONTAINS: 'cats', archived: { eq: false } },
+              ],
             }),
           }),
         ])
@@ -114,7 +121,7 @@ describe('getEventWhere (structural coverage)', () => {
 
   describe('boolean filters', () => {
     it('adds a free filter when free is true', () => {
-      expect(hasCondition(build({ filterValues: { free: true } }), { free: true })).toBe(true);
+      expect(hasCondition(build({ filterValues: { free: true } }), { free: { eq: true } })).toBe(true);
     });
 
     it('omits the free filter when free is false', () => {
@@ -122,7 +129,7 @@ describe('getEventWhere (structural coverage)', () => {
     });
 
     it('hides canceled events by default', () => {
-      expect(hasCondition(build(), { canceled: false })).toBe(true);
+      expect(hasCondition(build(), { canceled: { eq: false } })).toBe(true);
     });
 
     it('shows canceled events when requested', () => {

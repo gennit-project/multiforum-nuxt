@@ -47,7 +47,7 @@ const user = computed(() => {
       ...userResult.value.users[0],
       wikiEditsCount:
         userResult.value.getUserWikiEditsCount ??
-        userResult.value.users[0].AuthoredWikiPageVersionsAggregate?.count ??
+        userResult.value.users[0].AuthoredWikiPageVersionsConnection?.aggregate?.count?.nodes ??
         0,
     };
   }

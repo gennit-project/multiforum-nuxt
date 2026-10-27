@@ -65,13 +65,13 @@ describe('buildDownloadableFilesUpdateInput', () => {
       currentFiles: [{ id: 'f1' }, { id: 'f2' }],
     });
     expect(result.DownloadableFiles).toEqual([
-      { connect: [{ where: { node: { id: 'f1' } } }, { where: { node: { id: 'f2' } } }] },
+      { connect: [{ where: { node: { id: { eq: 'f1' } } } }, { where: { node: { id: { eq: 'f2' } } } }] },
     ]);
   });
 
   it('sets hasDownload false when there are no files at all', () => {
     const result = buildDownloadableFilesUpdateInput({ originalFiles: [], currentFiles: [] });
-    expect(result.hasDownload).toBe(false);
+    expect(result.hasDownload).toEqual({ set: false });
   });
 
   it('omits DownloadableFiles when no files have ids', () => {
@@ -88,7 +88,7 @@ describe('buildDownloadableFilesUpdateInput', () => {
       currentFiles: [{ id: 'f1' }, { id: 'f2' }],
     });
     expect(result.DownloadableFiles).toEqual([
-      { connect: [{ where: { node: { id: 'f2' } } }] },
+      { connect: [{ where: { node: { id: { eq: 'f2' } } } }] },
     ]);
   });
 
@@ -98,7 +98,7 @@ describe('buildDownloadableFilesUpdateInput', () => {
       currentFiles: [{ id: 'f1' }],
     });
     expect(result.DownloadableFiles).toEqual([
-      { disconnect: [{ where: { node: { id: 'f2' } } }] },
+      { disconnect: [{ where: { node: { id: { eq: 'f2' } } } }] },
     ]);
   });
 

@@ -31,8 +31,13 @@ const channelsExceptActive = computed(() => {
           :channel-id="discussionChannel.channelUniqueName"
           :channel-icon="discussionChannel.Channel?.channelIconURL || ''"
           :channel-display-name="discussionChannel.Channel?.displayName || ''"
-          :comment-count="discussionChannel.CommentsAggregate?.count || 0"
-          :upvote-count="discussionChannel.UpvotedByUsersAggregate?.count || 0"
+          :comment-count="
+            discussionChannel.CommentsConnection?.aggregate?.count?.nodes || 0
+          "
+          :upvote-count="
+            discussionChannel.UpvotedByUsersConnection?.aggregate?.count
+              ?.nodes || 0
+          "
           :discussion-id="discussionChannel.discussionId"
         />
       </ul>
@@ -48,8 +53,10 @@ const channelsExceptActive = computed(() => {
             :channel-id="dc.channelUniqueName"
             :channel-icon="dc.Channel?.channelIconURL || ''"
             :channel-display-name="dc.Channel?.displayName || ''"
-            :comment-count="dc.CommentsAggregate?.count || 0"
-            :upvote-count="dc.UpvotedByUsersAggregate?.count || 0"
+            :comment-count="dc.CommentsConnection?.aggregate?.count?.nodes || 0"
+            :upvote-count="
+              dc.UpvotedByUsersConnection?.aggregate?.count?.nodes || 0
+            "
             :discussion-id="dc.discussionId"
           />
         </ul>

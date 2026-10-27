@@ -33,7 +33,7 @@ const {
             { id: 'ci-1', url: 'https://img.test/ci1.jpg' },
             { id: 'ci-2', url: 'https://img.test/ci2.jpg' },
           ],
-          ImagesAggregate: { count: 30 },
+          ImagesConnection: { aggregate: { count: { nodes: 30 } } },
         },
       ],
     } as Record<string, unknown>,

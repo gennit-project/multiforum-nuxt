@@ -123,7 +123,9 @@ const {
   SEARCH_COMMENTS,
   computed(() => ({
     where: commentWhere.value,
-    options: commentOptions.value,
+    sort: commentOptions.value.sort,
+    limit: commentOptions.value.limit,
+    offset: commentOptions.value.offset,
   })),
   {
     enabled: computed(() => !shouldSkipQuery.value),
@@ -133,7 +135,7 @@ const {
 
 const comments = computed(() => searchResult.value?.comments ?? []);
 const totalCount = computed(
-  () => searchResult.value?.commentsAggregate?.count ?? 0
+  () => searchResult.value?.commentsConnection?.aggregate?.count?.nodes ?? 0
 );
 const hasMore = computed(() => comments.value.length < totalCount.value);
 
@@ -147,10 +149,9 @@ const loadMore = async () => {
     await fetchMore({
       variables: {
         where: commentWhere.value,
-        options: {
-          ...commentOptions.value,
-          offset: comments.value.length,
-        },
+        sort: commentOptions.value.sort,
+        limit: commentOptions.value.limit,
+        offset: comments.value.length,
       },
       updateQuery: (prev, { fetchMoreResult }) => {
         if (!fetchMoreResult) return prev;

@@ -5,7 +5,7 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import type {
   Comment,
   DiscussionChannel,
-  CommentCreateInput,
+  OwnedCommentCreateInput,
   CommentSectionFormat,
 } from '@/__generated__/graphql';
 import type {
@@ -91,8 +91,8 @@ const createFormValues = ref({
   depth: 1,
 });
 
-const createCommentInput = computed((): CommentCreateInput[] => {
-  const input: CommentCreateInput = {
+const createCommentInput = computed((): OwnedCommentCreateInput[] => {
+  const input: OwnedCommentCreateInput = {
     isRootComment: true,
     isFeedbackComment: false,
     text: createFormValues.value.text || '',
