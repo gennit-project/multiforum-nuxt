@@ -106,6 +106,14 @@ async function expectContained(locator: Locator, width: number) {
   expect(overflowing).toEqual([]);
 }
 
+async function waitForListFonts(page: Page) {
+  // Rows mount before font-display: swap finishes loading Inter. Measure only
+  // after the real typography is ready, not the narrower fallback font.
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+  });
+}
+
 async function screenshot(page: Page, path: string) {
   // Nuxt's development toggle is unrelated to the application UI.
   await page.evaluate(() => {
@@ -215,6 +223,7 @@ test.describe('Compact sitewide discussion list', () => {
         await page.goto('/discussions');
         const list = page.getByTestId('sitewide-discussion-list');
         await expect(list.locator(':scope > li')).toHaveCount(titles.length);
+        await waitForListFonts(page);
         await page.evaluate(
           (dark) => document.documentElement.classList.toggle('dark', dark),
           dark
@@ -383,11 +392,23 @@ test.describe('Compact sitewide discussion list', () => {
   test('desktop dimensions and selection links remain unchanged; zoom reflows', async ({
     page,
   }, testInfo) => {
+    // Reproduce the CI race deterministically: mount the rows before allowing
+    // bundled fonts to load. Keep the exact desktop geometry assertions below.
+    let releaseFonts!: () => void;
+    const fontGate = new Promise<void>((resolve) => {
+      releaseFonts = resolve;
+    });
+    await page.route(/\.woff2?(?:\?|$)/, async (route) => {
+      await fontGate;
+      await route.continue();
+    });
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await page.goto('/discussions');
+    await page.goto('/discussions', { waitUntil: 'domcontentloaded' });
     const list = page.getByTestId('sitewide-discussion-list');
     const rows = list.locator(':scope > li');
     await expect(rows).toHaveCount(titles.length);
+    releaseFonts();
+    await waitForListFonts(page);
     for (const [i, height] of [98.625, 151.25, 98.625].entries())
       expect((await rows.nth(i).boundingBox())!.height).toBeCloseTo(height, 0);
     await expect(
