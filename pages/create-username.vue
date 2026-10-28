@@ -22,6 +22,17 @@ const emailVar = useEmail();
 // Auth state + verified email come from the server session (cache vars seeded by
 // plugins/auth-session.ts), not the SPA.
 const router = useRouter();
+const returnToPreviousPage = () => {
+  const previousPath = sessionStorage.getItem('previousPath') || '/';
+  sessionStorage.removeItem('previousPath');
+  const safePath =
+    previousPath.startsWith('/') &&
+    !previousPath.startsWith('//') &&
+    !previousPath.split(/[?#]/)[0]?.startsWith('/create-username')
+      ? previousPath
+      : '/';
+  router.replace(safePath);
+};
 const emailNotInSystem = ref(false);
 const initialCheckComplete = ref(false);
 const loading = ref(true);
@@ -31,34 +42,27 @@ const shouldQueryOwnEmail = computed(
   () => isClient && isAuthenticatedVar.value && !usernameVar.value
 );
 
-const { onResult: onEmailResult } = useQuery(
-  GET_OWN_EMAIL,
-  null,
-  { enabled: shouldQueryOwnEmail }
-);
+const { onResult: onEmailResult } = useQuery(GET_OWN_EMAIL, null, {
+  enabled: shouldQueryOwnEmail,
+});
 
 // Handle redirects when mounted
 if (isClient) {
   onMounted(() => {
-    // Check for stored username
-    const storedUsername = localStorage.getItem('username');
-
     // Redirect unauthenticated users to home page
     if (!isAuthenticatedVar.value) {
       router.push('/');
     }
-    // If we already have a username in state or storage, redirect back to previous page or home
-    else if (usernameVar.value || storedUsername) {
-      const previousPath = sessionStorage.getItem('previousPath') || '/';
-      router.push(previousPath);
+    // If we already have a username in the current session, redirect back to previous page or home
+    else if (usernameVar.value) {
+      returnToPreviousPage();
     }
   });
 
   // Also watch for username changes (in case it loads after mount)
   watch(usernameVar, (newUsername) => {
     if (newUsername) {
-      const previousPath = sessionStorage.getItem('previousPath') || '/';
-      router.push(previousPath);
+      returnToPreviousPage();
     }
   });
 
@@ -66,7 +70,9 @@ if (isClient) {
   // so it needs no variables. A returned `username` means the account already
   // exists; its absence means this verified email still needs a username.
   onEmailResult(
-    (result: { data?: { getOwnEmail?: { username?: string | null } | null } }) => {
+    (result: {
+      data?: { getOwnEmail?: { username?: string | null } | null };
+    }) => {
       const ownEmail = result.data?.getOwnEmail;
       if (ownEmail?.username) {
         // User already exists, redirect to home
@@ -107,10 +113,7 @@ if (isClient) {
             initialCheckComplete
           "
         >
-          <CreateUsernameForm
-            :email="emailVar"
-            @email-and-user-created="router.push('/')"
-          />
+          <CreateUsernameForm :email="emailVar" />
         </div>
       </client-only>
     </div>

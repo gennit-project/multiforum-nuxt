@@ -14,11 +14,14 @@ const h = vi.hoisted(() => ({
   setModProfileName: vi.fn(),
   setProfilePicURL: vi.fn(),
   fetch: vi.fn(),
+  replace: vi.fn(),
+  route: { path: '/forums', fullPath: '/forums?sort=new' },
   appMounted: undefined as undefined | (() => void),
 }));
 
 vi.mock('nuxt/app', () => ({
   defineNuxtPlugin: (fn: unknown) => fn,
+  useRouter: () => ({ currentRoute: { value: h.route }, replace: h.replace }),
 }));
 vi.mock('@/composables/useAuthState', () => ({
   useIsAuthenticated: () => h.isAuthenticated,
@@ -81,6 +84,8 @@ const fullUser = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  sessionStorage.clear();
+  h.route = { path: '/forums', fullPath: '/forums?sort=new' };
   h.appMounted = undefined;
   h.isAuthenticated.value = true;
   h.username.value = '';
@@ -180,5 +185,51 @@ describe('auth-username-fallback plugin: degrades gracefully', () => {
     h.fetch.mockRejectedValue(new Error('network'));
     await run();
     expect(h.setUsername).not.toHaveBeenCalled();
+  });
+});
+
+describe('new-user onboarding', () => {
+  const newProfile = () =>
+    h.fetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        isAuthenticated: true,
+        username: '',
+        needsOnboarding: true,
+      }),
+    });
+
+  it.each([true, false])(
+    'redirects a confirmed new user (SSR: %s)',
+    async (ssr) => {
+      newProfile();
+      await run(ssr);
+      expect(h.replace).toHaveBeenCalledWith('/create-username');
+    }
+  );
+
+  it('preserves the full return path', async () => {
+    newProfile();
+    await run();
+    expect(sessionStorage.getItem('previousPath')).toBe('/forums?sort=new');
+  });
+
+  it('does not loop on the onboarding page', async () => {
+    h.route.path = '/create-username';
+    newProfile();
+    await run();
+    expect(h.replace).not.toHaveBeenCalled();
+  });
+
+  it('does not redirect an inconclusive profile lookup', async () => {
+    h.fetch.mockResolvedValue(resolvedUser(null));
+    await run();
+    expect(h.replace).not.toHaveBeenCalled();
+  });
+
+  it('does not redirect when the request fails', async () => {
+    h.fetch.mockRejectedValue(new Error('offline'));
+    await run();
+    expect(h.replace).not.toHaveBeenCalled();
   });
 });

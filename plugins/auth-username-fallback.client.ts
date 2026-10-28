@@ -25,7 +25,7 @@
 // still import the valid server session after it mounts. Using a same-origin
 // Nitro endpoint avoids depending on browser token storage, which is brittle in
 // some embedded browser environments.
-import { defineNuxtPlugin } from 'nuxt/app';
+import { defineNuxtPlugin, useRouter } from 'nuxt/app';
 import {
   useIsAuthenticated,
   useUsername,
@@ -37,6 +37,7 @@ import {
 } from '@/composables/useAuthState';
 
 type AuthProfileResponse = {
+  needsOnboarding?: boolean;
   isAuthenticated?: boolean;
   username?: string | null;
   email?: string | null;
@@ -44,7 +45,7 @@ type AuthProfileResponse = {
   modProfileName?: string | null;
 };
 
-const resolveAuthProfile = async () => {
+const resolveAuthProfile = async (router: ReturnType<typeof useRouter>) => {
   try {
     const res = await fetch('/api/session/profile', {
       credentials: 'include',
@@ -73,6 +74,17 @@ const resolveAuthProfile = async () => {
     if (profile.profilePicURL) {
       setProfilePicURL(profile.profilePicURL);
     }
+    if (
+      profile.needsOnboarding === true &&
+      !useUsername().value &&
+      router.currentRoute.value.path !== '/create-username'
+    ) {
+      sessionStorage.setItem(
+        'previousPath',
+        router.currentRoute.value.fullPath
+      );
+      await router.replace('/create-username');
+    }
   } catch {
     // Ignore — username stays empty and will be retried on the next load.
   }
@@ -81,6 +93,7 @@ const resolveAuthProfile = async () => {
 export default defineNuxtPlugin((nuxtApp) => {
   if (typeof window === 'undefined') return;
 
+  const router = useRouter();
   const isAuthenticated = useIsAuthenticated();
   const username = useUsername();
 
@@ -96,6 +109,6 @@ export default defineNuxtPlugin((nuxtApp) => {
       nuxtApp.payload.serverRendered === false && !isAuthenticated.value;
     const needsUsernameFallback = isAuthenticated.value && !username.value;
     if (!needsClientRenderedSession && !needsUsernameFallback) return;
-    void resolveAuthProfile();
+    void resolveAuthProfile(router);
   });
 });

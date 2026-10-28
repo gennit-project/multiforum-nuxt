@@ -4,7 +4,11 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 const h = vi.hoisted(() => ({
   push: vi.fn(),
-  onResult: null as null | ((result: { data?: { getOwnEmail?: { username?: string | null } | null } }) => void),
+  onResult: null as
+    | null
+    | ((result: {
+        data?: { getOwnEmail?: { username?: string | null } | null };
+      }) => void),
   username: null as unknown as { value: string },
   isAuthenticated: null as unknown as { value: boolean },
   email: null as unknown as { value: string },
@@ -17,7 +21,7 @@ h.email = ref('alice@example.com');
 h.userDataLoadingVar = ref(false);
 
 vi.mock('vue-router', () => ({
-  useRouter: () => ({ push: h.push }),
+  useRouter: () => ({ push: h.push, replace: h.push }),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -43,12 +47,16 @@ vi.mock('@/composables/useAuthState', () => ({
 }));
 
 const stubs = {
-  LoadingSpinner: { name: 'LoadingSpinner', template: '<div class="spinner" />' },
+  LoadingSpinner: {
+    name: 'LoadingSpinner',
+    template: '<div class="spinner" />',
+  },
   CreateUsernameForm: {
     name: 'CreateUsernameForm',
     props: ['email'],
     emits: ['email-and-user-created'],
-    template: '<button class="create-form" @click="$emit(\'email-and-user-created\')" />',
+    template:
+      '<button class="create-form" @click="$emit(\'email-and-user-created\')" />',
   },
 };
 
@@ -74,14 +82,14 @@ describe('create-username page', () => {
     expect(h.push).toHaveBeenCalledWith('/');
   });
 
-  it('redirects authenticated users with a stored username back to the previous path', async () => {
+  it('ignores a stale stored username from another account', async () => {
     h.isAuthenticated.value = true;
     localStorage.setItem('username', 'alice');
     sessionStorage.setItem('previousPath', '/forums/cats');
 
     await mountPage();
 
-    expect(h.push).toHaveBeenCalledWith('/forums/cats');
+    expect(h.push).not.toHaveBeenCalled();
   });
 
   it('shows the create username form when the verified email is not yet in the system', async () => {
@@ -91,9 +99,9 @@ describe('create-username page', () => {
     h.onResult?.({ data: { getOwnEmail: { username: null } } });
     await wrapper.vm.$nextTick();
 
-    expect(wrapper.findComponent({ name: 'CreateUsernameForm' }).props('email')).toBe(
-      'alice@example.com'
-    );
+    expect(
+      wrapper.findComponent({ name: 'CreateUsernameForm' }).props('email')
+    ).toBe('alice@example.com');
   });
 
   it('redirects authenticated users home when the email query returns an existing username', async () => {
@@ -112,4 +120,26 @@ describe('create-username page', () => {
 
     expect(wrapper.find('main#main-content').exists()).toBe(true);
   });
+});
+
+describe('onboarding completion navigation', () => {
+  it('returns to the original route after the session gets a username', async () => {
+    h.isAuthenticated.value = true;
+    sessionStorage.setItem('previousPath', '/forums?sort=new');
+    const wrapper = await mountPage();
+    h.username.value = 'newcomer';
+    await wrapper.vm.$nextTick();
+    expect(h.push).toHaveBeenCalledWith('/forums?sort=new');
+  });
+
+  it.each(['/create-username', '//other.example/path'])(
+    'rejects an invalid return path: %s',
+    async (path) => {
+      h.isAuthenticated.value = true;
+      h.username.value = 'alice';
+      sessionStorage.setItem('previousPath', path);
+      await mountPage();
+      expect(h.push).toHaveBeenCalledWith('/');
+    }
+  );
 });
