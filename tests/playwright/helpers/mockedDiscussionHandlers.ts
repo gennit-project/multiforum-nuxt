@@ -12,10 +12,19 @@ import {
 } from './graphqlFixtures';
 import { createBaseHandlers, type BaseHandlerConfig } from './baseHandlers';
 
-// v7 removed connectOrCreate from tag field inputs. The app sends tag
-// connections under connect (or still connectOrCreate while that migration
-// lands); read either shape without pinning to the generated input type.
-type MockTagConnect = { where?: { node?: { text?: string | null } } };
+// v7 removed connectOrCreate from tag field inputs. The app connects tags by
+// text using the v7 filter shape `where: { node: { text: { eq: "<tag>" } } }`.
+// Accept that shape, plus the legacy plain-string `text` and connectOrCreate,
+// without pinning to the generated input type.
+type MockTagText = string | { eq?: string | null } | null;
+type MockTagConnect = { where?: { node?: { text?: MockTagText } } };
+const readTagText = (text: MockTagText): string | undefined => {
+  if (typeof text === 'string') return text;
+  if (text && typeof text === 'object' && typeof text.eq === 'string') {
+    return text.eq;
+  }
+  return undefined;
+};
 const extractTagTexts = (tagsField: unknown): string[] | undefined => {
   const field = tagsField as
     | { connectOrCreate?: MockTagConnect[]; connect?: MockTagConnect[] }
@@ -24,7 +33,7 @@ const extractTagTexts = (tagsField: unknown): string[] | undefined => {
   const connections = field?.connectOrCreate ?? field?.connect;
   if (!connections) return undefined;
   return connections
-    .map((tag) => tag?.where?.node?.text)
+    .map((tag) => readTagText(tag?.where?.node?.text))
     .filter((text): text is string => Boolean(text));
 };
 
