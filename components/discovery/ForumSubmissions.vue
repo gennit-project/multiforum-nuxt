@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, useId } from 'vue';
 import { useRoute } from 'nuxt/app';
+import AvatarComponent from '@/components/AvatarComponent.vue';
 import { MessageSquare } from 'lucide-vue-next';
 
 type Submission = {
   channelUniqueName: string;
+  Channel?: { channelIconURL?: string | null } | null;
   CommentsConnection?: {
     aggregate?: { count?: { nodes?: number | null } | null } | null;
   } | null;
@@ -18,8 +20,15 @@ const props = withDefaults(
     preview?: boolean;
     compact?: boolean;
     subtle?: boolean;
+    mobileLayout?: boolean;
   }>(),
-  { selectedForum: '', preview: false, compact: false, subtle: false }
+  {
+    selectedForum: '',
+    preview: false,
+    compact: false,
+    subtle: false,
+    mobileLayout: false,
+  }
 );
 const route = useRoute();
 const expanded = ref(false);
@@ -53,19 +62,23 @@ const label = (submission: Submission) =>
 
 <template>
   <div
-    v-if="submissions.length"
+    v-if="submissions.length || $slots.actions"
     class="min-w-0"
     :class="[
+      mobileLayout ? 'mobile-forum-submissions' : '',
       compact && kind === 'event'
         ? 'flex flex-wrap items-center gap-x-2 gap-y-1'
         : '',
       compact && kind === 'discussion'
-        ? 'grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2 gap-y-1'
+        ? mobileLayout
+          ? 'flex flex-wrap items-center gap-x-1.5 gap-y-1 lg:grid lg:grid-cols-[auto_minmax(0,1fr)] lg:items-start lg:gap-x-2'
+          : 'grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-2 gap-y-1'
         : '',
     ]"
     data-testid="forum-submissions"
   >
     <p
+      v-if="submissions.length"
       class="text-xs"
       :class="[
         compact && kind === 'discussion' ? 'pt-1.5' : '',
@@ -84,8 +97,11 @@ const label = (submission: Submission) =>
     </p>
     <ul
       :id="listId"
-      class="flex flex-wrap items-center"
-      :class="compact ? 'min-w-0 flex-1 gap-1' : 'gap-2'"
+      class="flex-wrap items-center"
+      :class="[
+        mobileLayout ? 'contents lg:flex' : 'flex',
+        compact ? 'min-w-0 flex-1 gap-1' : 'gap-2',
+      ]"
       role="list"
     >
       <li
@@ -116,23 +132,40 @@ const label = (submission: Submission) =>
                 ? 'hidden lg:inline-flex'
                 : 'inline-flex',
             selectedForum === submission.channelUniqueName
-              ? 'border-brand-600 bg-brand-50 font-medium text-brand-800 dark:border-brand-400 dark:bg-brand-950 dark:text-brand-300'
+              ? 'border-brand-600 bg-brand-50 text-brand-800 dark:border-brand-400 dark:bg-brand-950 dark:text-brand-300 font-medium'
               : subtle
                 ? 'border-gray-200 bg-gray-50 font-normal text-gray-600 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800/70 dark:text-gray-300 dark:hover:bg-gray-700'
                 : 'border-gray-300 bg-gray-50 font-medium text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700',
           ]"
         >
-          <span class="truncate">{{ submission.channelUniqueName }}</span>
+          <AvatarComponent
+            v-if="mobileLayout"
+            class="forum-icon h-5 w-5 shrink-0 rounded-full lg:hidden"
+            :text="submission.channelUniqueName"
+            :src="submission.Channel?.channelIconURL || ''"
+            :is-square="false"
+            :is-decorative="true"
+          />
+          <span
+            :class="
+              mobileLayout
+                ? 'min-w-0 wrap-anywhere whitespace-normal lg:truncate'
+                : 'truncate'
+            "
+            >{{ submission.channelUniqueName }}</span
+          >
           <template v-if="kind === 'discussion'">
             <MessageSquare class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            <span>{{ submission.CommentsConnection?.aggregate?.count?.nodes ?? 0 }}</span>
+            <span>{{
+              submission.CommentsConnection?.aggregate?.count?.nodes ?? 0
+            }}</span>
           </template>
         </NuxtLink>
       </li>
     </ul>
     <div
       v-if="compact && (submissions.length > 4 || $slots.trailing)"
-      class="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1"
+      class="forum-submissions-trailing flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1"
       :class="
         kind === 'discussion'
           ? 'col-start-2 justify-between'
@@ -167,5 +200,36 @@ const label = (submission: Submission) =>
         expanded ? 'Show fewer forums' : `Show all ${submissions.length} forums`
       }}
     </button>
+    <slot name="actions" />
   </div>
 </template>
+
+<style scoped>
+@media (width < 64rem) {
+  .mobile-forum-submissions > p {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .forum-icon :deep(img) {
+    width: 20px;
+    height: 20px;
+  }
+
+  .mobile-forum-submissions li > a {
+    min-height: 32px;
+    gap: 6px;
+    padding: 4px 6px;
+  }
+
+  .mobile-forum-submissions > .forum-submissions-trailing {
+    flex-basis: 100%;
+  }
+}
+</style>

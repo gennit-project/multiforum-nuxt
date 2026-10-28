@@ -81,7 +81,6 @@ describe('AddToFavoritesButton', () => {
     await clickFavorite(wrapper);
     expect(wrapper.emitted('toggle')).toBeUndefined();
   });
-
 });
 
 describe('AddToFavoritesButton sizing', () => {
@@ -144,5 +143,73 @@ describe('AddToFavoritesButton (unauthenticated)', () => {
   it('renders the unauthenticated button as clickable (cursor-pointer)', () => {
     const wrapper = mountUnauthButton();
     expect(wrapper.get('[aria-label]').classes()).toContain('cursor-pointer');
+  });
+});
+
+describe('shared bookmark affordance', () => {
+  it.each(['discussion', 'comment', 'image', 'channel', 'download'])(
+    'keeps the %s save action and accessible name',
+    async (entityType) => {
+      const wrapper = mountButton({
+        entityType,
+        displayName: 'Example',
+        itemId: 'example',
+      });
+      await clickFavorite(wrapper);
+      expect({
+        icon: wrapper.get('svg').classes().includes('lucide-bookmark'),
+        decorative: wrapper.get('svg').attributes('aria-hidden'),
+        fill: wrapper.get('svg').attributes('fill'),
+        label: wrapper.get('button').attributes('aria-label'),
+        toggles: wrapper.emitted('toggle')?.length,
+      }).toEqual({
+        icon: true,
+        decorative: 'true',
+        fill: 'none',
+        label: 'Add Example to favorites',
+        toggles: 1,
+      });
+    }
+  );
+
+  it.each(['discussion', 'comment', 'image', 'channel', 'download'])(
+    'keeps collection management for a saved %s',
+    async (entityType) => {
+      const wrapper = mountButton({
+        entityType,
+        displayName: 'Example',
+        itemId: 'example',
+        isFavorited: true,
+      });
+      await clickFavorite(wrapper);
+      expect({
+        icon: wrapper.get('svg').classes().includes('lucide-bookmark'),
+        fill: wrapper.get('svg').attributes('fill'),
+        label: wrapper.get('button').attributes('aria-label'),
+        toggles: wrapper.emitted('toggle'),
+        popover: wrapper
+          .get('.add-to-list-popover-stub')
+          .attributes('is-visible'),
+      }).toEqual({
+        icon: true,
+        fill: 'currentColor',
+        label: 'Manage Example favorites and collections',
+        toggles: undefined,
+        popover: 'true',
+      });
+    }
+  );
+
+  it('uses the same bookmark for the login-gated control', () => {
+    const wrapper = mountUnauthButton({ displayName: 'Example' });
+    expect({
+      icon: wrapper.get('svg').classes().includes('lucide-bookmark'),
+      label: wrapper.get('button').attributes('aria-label'),
+      decorative: wrapper.get('svg').attributes('aria-hidden'),
+    }).toEqual({
+      icon: true,
+      label: 'Add Example to favorites',
+      decorative: 'true',
+    });
   });
 });

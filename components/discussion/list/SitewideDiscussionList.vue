@@ -363,7 +363,7 @@ const filterByChannel = (channel: string) => {
             </p>
             <div v-if="discussions && discussions.length > 0" class="p-0">
               <ul
-                class="m-0 flex flex-col gap-2 p-0"
+                class="m-0 flex flex-col gap-0 p-0 lg:gap-2"
                 data-testid="sitewide-discussion-list"
                 role="list"
               >
