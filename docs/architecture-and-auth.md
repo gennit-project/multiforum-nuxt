@@ -216,3 +216,42 @@ schema live in the
 | [`types/`](../types) | Hand-written TypeScript types complementing the generated ones |
 | [`nuxt.config.ts`](../nuxt.config.ts) | Nuxt/Nitro config: modules, storage mounts, route caching |
 | [`docs/`](.) | This documentation |
+
+## Signup email verification recovery
+
+Signup keeps email verification before account creation. The username form reads
+`/api/session/verification`, which distinguishes a signed-session boolean
+`email_verified: false` from a missing claim, lookup failure, or expired session.
+A username or email address by itself is never evidence of verification. The
+backend remains responsible for enforcing verification on `createEmailAndUser`.
+
+The recovery screen provides resend, a fresh login after verification, and sign
+out / use another account. `/auth/signup/refresh` requests `prompt=login` and
+`max_age=0`, then returns to `/create-username`. This obtains fresh claims and an
+API token instead of reusing an unverified identity cached by the backend. Save
+also waits for the browser to synchronize that token into Apollo’s token storage.
+Username and birthday are saved only when following that recovery link, in
+email-scoped tab session storage, and removed after account creation or switching
+accounts. They are not written to persistent local storage.
+
+### Enable resend in Auth0
+
+Create a dedicated Machine-to-Machine application authorized for your tenant's
+Auth0 Management API with the `update:users` scope, as required by Auth0's
+[verification email job API](https://support.auth0.com/center/s/article/How-to-Resend-a-User-Verification-Email).
+Set these **server-only** runtime variables:
+
+- `NUXT_SIGNUP_EMAIL_VERIFICATION_CLIENT_ID`
+- `NUXT_SIGNUP_EMAIL_VERIFICATION_CLIENT_SECRET`
+
+The endpoint uses the existing `NUXT_AUTH0_DOMAIN` and web application's
+`NUXT_AUTH0_CLIENT_ID`. Configure Auth0's verification-email template and email
+provider before enabling resend. No management credentials reach the browser.
+
+`POST /api/session/verification` accepts only same-origin requests, derives the
+recipient solely from the authenticated session (never request parameters), and
+uses a 60-second per-user cooldown in the existing session storage mount. Resend
+is supported for unverified Auth0 database identities; social providers must
+verify email through their own login. When resend isn't configured or a provider
+fails, the screen explains the limitation and keeps sign-in and account-switch
+recovery available. Error responses never include provider credential details.

@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ref, nextTick, computed } from 'vue';
+import { ref, nextTick, computed, onMounted } from 'vue';
+import { useSignupVerification } from '@/composables/useSignupVerification';
+import { useServerLogout } from '@/composables/useServerLogout';
+import {
+  readSignupDraft,
+  saveSignupDraft,
+  clearSignupDraft,
+} from '@/utils/signupDraft';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -34,6 +41,31 @@ const props = defineProps({
 });
 const newUsername = ref(props.email?.split('@')[0]);
 const birthday = ref('');
+const {
+  status: verificationStatus,
+  canResend,
+  sending,
+  message: verificationMessage,
+  check,
+  resend,
+} = useSignupVerification();
+const { logout } = useServerLogout();
+const preserveDraft = () =>
+  saveSignupDraft(props.email, {
+    username: newUsername.value || '',
+    birthday: birthday.value,
+  });
+const switchAccount = () => {
+  clearSignupDraft(props.email);
+  logout();
+};
+onMounted(() => {
+  const draft = readSignupDraft(props.email);
+  if (draft) {
+    newUsername.value = draft.username;
+    birthday.value = draft.birthday;
+  }
+});
 
 const {
   result: agePolicyResult,
@@ -130,6 +162,7 @@ onEmailAndUserCreated((result) => {
   const user = result.data.createEmailAndUser;
 
   if (user) {
+    clearSignupDraft(props.email);
     const username = user?.username;
     const modProfileName = user?.ModerationProfile?.displayName;
 
@@ -168,7 +201,24 @@ nextTick(() => {
   usernameInput.value?.focus();
 });
 
+const loginRejected = computed(() =>
+  /verified login is required|must match the verified login/i.test(
+    createEmailAndUserError.value?.message || ''
+  )
+);
+const signupErrorMessage = computed(() =>
+  loginRejected.value
+    ? "We couldn't confirm your login. Sign in again to continue. Your entries will be kept in this tab."
+    : getAgeErrorMessage(createEmailAndUserError.value?.message)
+);
+
 const canSave = computed(() => {
+  if (
+    verificationStatus.value !== 'verified' ||
+    loginRejected.value ||
+    createEmailAndUserLoading.value
+  )
+    return false;
   if (usernameIsTaken.value) {
     return false;
   }
@@ -194,7 +244,7 @@ const canSave = computed(() => {
 
 <template>
   <div>
-    <div class="my-4 h-72 px-10 py-6">
+    <div class="my-4 space-y-4 px-4 py-6 sm:px-10">
       <h1 class="my-8 flex justify-center text-xl">Create Username</h1>
       <label
         for="username"
@@ -297,23 +347,106 @@ const canSave = computed(() => {
         </p>
       </div>
 
-      <PrimaryButton
-        class="float-right my-4"
-        :label="'Save'"
-        :disabled="!canSave"
-        :loading="createEmailAndUserLoading"
-        @click="createEmailAndUser"
+      <p
+        v-if="verificationStatus === 'verified' && !loginRejected"
+        role="status"
+        class="text-sm text-gray-700 dark:text-gray-200"
+      >
+        Email verified. You can finish creating your account.
+      </p>
+      <section
+        v-if="verificationStatus !== 'verified' || loginRejected"
+        aria-labelledby="verification-heading"
+        class="space-y-3 rounded-lg border border-gray-300 p-4 text-sm text-gray-800 dark:border-gray-600 dark:text-gray-100"
+      >
+        <h2 id="verification-heading" class="font-semibold">
+          {{
+            verificationStatus === 'unverified'
+              ? 'Verify your email to finish creating your account'
+              : 'Confirm your login to continue'
+          }}
+        </h2>
+        <p v-if="verificationStatus === 'checking'" role="status">
+          Checking email verification...
+        </p>
+        <template v-else-if="verificationStatus === 'unverified'">
+          <p class="break-words">
+            Check the verification email sent to {{ email }}. After opening the
+            link, return here and check again.
+          </p>
+          <p>
+            Checking again asks you to sign in to refresh verification. Your
+            entries will be kept in this tab.
+          </p>
+          <p v-if="!canResend">
+            Resending is unavailable for this login. Try signing in again or use
+            another account.
+          </p>
+          <PrimaryButton
+            v-if="canResend"
+            class="min-h-11 max-w-full whitespace-normal!"
+            label="Resend verification email"
+            :disabled="sending"
+            :loading="sending"
+            @click="resend"
+          />
+          <a
+            href="/auth/signup/refresh"
+            class="flex min-h-11 items-center underline"
+            @click="preserveDraft"
+            >I've verified my email—check again</a
+          >
+        </template>
+        <template v-else>
+          <p v-if="verificationStatus === 'unknown'">
+            We couldn't check your email verification. Try again or sign in
+            again. Your entries will be kept in this tab.
+          </p>
+          <p v-if="verificationStatus === 'signed-out'">
+            Your session has expired. Sign in again to continue.
+          </p>
+          <PrimaryButton
+            v-if="verificationStatus === 'unknown'"
+            class="min-h-11 max-w-full whitespace-normal!"
+            label="Try checking again"
+            @click="check"
+          />
+          <a
+            href="/auth/signup/refresh"
+            class="flex min-h-11 items-center underline"
+            @click="preserveDraft"
+            >Sign in again</a
+          >
+        </template>
+        <p role="status" aria-live="polite">{{ verificationMessage }}</p>
+      </section>
+      <ErrorBanner
+        v-if="agePolicyError || createEmailAndUserError"
+        :text="
+          agePolicyError?.message ||
+          signupErrorMessage ||
+          'Unable to load age requirements.'
+        "
       />
-      <p v-if="createEmailAndUserLoading">Loading...</p>
+      <div class="flex flex-wrap items-center justify-between gap-4 pt-4">
+        <button
+          type="button"
+          class="min-h-11 text-sm text-gray-700 underline dark:text-gray-200"
+          @click="switchAccount"
+        >
+          Sign out / use another account
+        </button>
+        <PrimaryButton
+          class="min-h-11"
+          :label="'Save'"
+          :disabled="!canSave"
+          :loading="createEmailAndUserLoading"
+          @click="createEmailAndUser"
+        />
+      </div>
+      <p v-if="createEmailAndUserLoading" role="status">
+        Creating your account...
+      </p>
     </div>
-    <ErrorBanner
-      v-if="agePolicyError || createEmailAndUserError"
-      class="mx-auto my-3 max-w-5xl"
-      :text="
-        agePolicyError?.message ||
-        getAgeErrorMessage(createEmailAndUserError?.message) ||
-        'Unable to load age requirements.'
-      "
-    />
   </div>
 </template>

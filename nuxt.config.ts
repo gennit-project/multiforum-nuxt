@@ -460,6 +460,10 @@ export default defineNuxtConfig({
         },
       },
     },
+    signupEmailVerification: {
+      clientId: '',
+      clientSecret: '',
+    },
     public: {
       // Deployment-specific values use matching NUXT_PUBLIC_* environment
       // variables at container startup. VITE_* remains the build-time fallback
