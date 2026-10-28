@@ -453,6 +453,8 @@ test.describe('Compact sitewide discussion list', () => {
           row: row.getBoundingClientRect().toJSON(),
           title: title.getBoundingClientRect().toJSON(),
           font: style.font,
+          fontSize: style.fontSize,
+          lineHeight: style.lineHeight,
           text: span.textContent,
           fonts: [...document.fonts].map((face) => ({
             family: face.family,
@@ -467,8 +469,34 @@ test.describe('Compact sitewide discussion list', () => {
       body: Buffer.from(JSON.stringify(metrics, null, 2)),
       contentType: 'application/json',
     });
-    for (const [i, height] of [98.625, 151.25, 98.625].entries())
-      expect((await rows.nth(i).boundingBox())!.height).toBeCloseTo(height, 0);
+    // CI and the remote browser wrap this title differently even with the
+    // same loaded font descriptors and 562px title width. Preserve the exact
+    // desktop layout contract without pinning a platform-specific line break.
+    for (const [i, nonTitleHeight] of [78, 110, 78].entries()) {
+      const metric = metrics[i]!;
+      expect({
+        rowWidth: metric.row.width,
+        titleWidth: metric.title.width,
+        titleLeftInset: metric.title.x - metric.row.x,
+        titleTopInset: metric.title.y - metric.row.y,
+        fontSize: metric.fontSize,
+        lineHeight: metric.lineHeight,
+        text: metric.text,
+      }).toEqual({
+        rowWidth: 632,
+        titleWidth: 562,
+        titleLeftInset: 57,
+        titleTopInset: 9,
+        fontSize: '15px',
+        lineHeight: '20.625px',
+        text: titles[i],
+      });
+      expect(metric.title.height).toBeGreaterThanOrEqual(20.625);
+      expect(metric.row.height - metric.title.height).toBeCloseTo(
+        nonTitleHeight,
+        0
+      );
+    }
     await expect(
       rows.nth(0).getByRole('link', { name: titles[0], exact: true })
     ).toHaveAttribute('href', /selectedDiscussionId=mobile-0/);
