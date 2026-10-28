@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, watch, defineAsyncComponent } from 'vue';
+import { Bookmark } from 'lucide-vue-next';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 
 const AddToListPopover = defineAsyncComponent(
@@ -277,37 +278,12 @@ watch(
           @mouseenter="handleMouseEnter"
           @mouseleave="handleMouseLeave"
         >
-          <svg
-            v-if="!isFavorited"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
+          <Bookmark
             :class="sizeClasses"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
-          </svg>
-          <svg
-            v-else
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            :class="sizeClasses"
-          >
-            <!-- White background circle -->
-            <circle cx="12" cy="12" r="9.75" fill="white" />
-            <!-- Green circle with checkmark -->
-            <path
-              fill="currentColor"
-              fill-rule="evenodd"
-              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-              clip-rule="evenodd"
-            />
-          </svg>
+            :fill="isFavorited ? 'currentColor' : 'none'"
+            :stroke-width="1.5"
+            aria-hidden="true"
+          />
         </button>
 
         <!-- Tooltip -->
@@ -356,20 +332,11 @@ watch(
           @mouseenter="handleMouseEnter"
           @mouseleave="handleMouseLeave"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
+          <Bookmark
             :class="sizeClasses"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-            />
-          </svg>
+            :stroke-width="1.5"
+            aria-hidden="true"
+          />
         </button>
 
         <!-- Tooltip for unauthenticated users -->

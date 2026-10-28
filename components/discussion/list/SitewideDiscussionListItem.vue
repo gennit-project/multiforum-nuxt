@@ -14,7 +14,6 @@ import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ForumSubmissions from '@/components/discovery/ForumSubmissions.vue';
 import ExpandIcon from '@/components/icons/ExpandIcon.vue';
-import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
@@ -172,7 +171,7 @@ const relative = computed(() =>
   props.discussion ? stableRelativeTime(props.discussion.createdAt) : ''
 );
 
-// Thumbnail for the mobile card layout. Prefers the first album image
+// Thumbnail for the discussion list. Prefers the first album image
 // (respecting imageOrder), then falls back to the first image embedded in the
 // discussion body markdown so image posts without an album still show one.
 const thumbnailUrl = computed(() => {
@@ -212,9 +211,8 @@ const thumbnailUrl = computed(() => {
   return '';
 });
 
-// Channel icons for the mobile card. A discussion can be posted to multiple
-// forums; we show up to three overlapping channel icons and an "and N more"
-// label for the remainder.
+// The desktop gutter retains the first forum icon. Mobile forum links render
+// their own icons so each name stays associated with its conversation count.
 const channelIcons = computed(() =>
   (props.discussion?.DiscussionChannels || []).map((dc: DiscussionChannel) => ({
     uniqueName: dc.channelUniqueName,
@@ -247,7 +245,7 @@ const revealSensitiveContent = () => {
 <template>
   <li class="list-none">
     <div
-      class="flex flex-col gap-1 rounded-xl border px-3 py-2 transition-colors"
+      class="discussion-list-item flex flex-col gap-1 border-b px-0 py-2 transition-colors lg:rounded-xl lg:border lg:px-3"
       :class="{
         'border-brand-600 bg-brand-50/50 dark:border-brand-400 dark:bg-gray-900':
           isSelected,
@@ -256,34 +254,26 @@ const revealSensitiveContent = () => {
       }"
     >
       <!-- Discussion row -->
-      <div class="flex items-start gap-3">
-        <div class="flex shrink-0 flex-col items-center gap-1">
+      <div class="relative flex items-start gap-3">
+        <div
+          class="hidden min-h-14 shrink-0 flex-col items-center gap-1 lg:flex"
+        >
           <ChannelIconStack
             :channels="channelIcons"
             :max-visible="1"
             :show-extra-count="false"
             tooltip-position-class="pointer-events-none absolute -top-8 left-0 z-30 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover/chicon:opacity-100 dark:bg-gray-700"
           />
-          <AddToDiscussionFavorites
-            v-if="discussion"
-            :allow-add-to-list="true"
-            :discussion-id="discussion.id"
-            :discussion-title="discussion.title"
-            :initial-is-favorited="
-              (discussion as Discussion & DiscussionWithFavorited).isFavorited
-            "
-            size="small"
-          />
         </div>
         <div class="min-w-0 flex-1">
           <nuxt-link
             v-if="discussion"
             :to="getDetailLink()"
-            class="block lg:hidden"
+            class="flex items-start gap-3 lg:hidden"
           >
-            <div class="flex items-start gap-2">
+            <div class="min-w-0 flex-1 leading-snug">
               <span
-                class="text-[15px] leading-snug font-semibold text-gray-900 dark:text-gray-100"
+                class="text-[15px] leading-snug font-semibold wrap-anywhere text-gray-900 dark:text-gray-100"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -297,6 +287,15 @@ const revealSensitiveContent = () => {
                 Sensitive
               </span>
             </div>
+            <AppImage
+              v-if="thumbnailUrl && shouldShowContent"
+              :src="thumbnailUrl"
+              :alt="title"
+              class="h-14 w-14 shrink-0 rounded-lg object-cover sm:h-16 sm:w-16"
+              :width="64"
+              :height="64"
+              sizes="(max-width: 639px) 56px, 64px"
+            />
           </nuxt-link>
           <nuxt-link
             v-if="discussion"
@@ -321,13 +320,17 @@ const revealSensitiveContent = () => {
             </div>
           </nuxt-link>
           <div
-            class="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-gray-500 dark:text-gray-400"
+            class="discussion-metadata mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-600 lg:mt-1.5 lg:gap-x-1.5 lg:text-gray-500 dark:text-gray-400"
           >
-            <span class="inline-flex items-center gap-x-1.5 whitespace-nowrap">
+            <span
+              class="inline-flex min-w-0 items-center gap-x-1.5 lg:whitespace-nowrap"
+            >
               <span>{{ relative }}</span>
             </span>
-            <span class="inline-flex items-center gap-x-1.5 whitespace-nowrap">
-              <span aria-hidden="true">•</span>
+            <span
+              class="inline-flex min-w-0 items-center gap-x-1.5 lg:whitespace-nowrap"
+            >
+              <span class="hidden lg:inline" aria-hidden="true">•</span>
               <UsernameWithTooltip
                 v-if="authorUsername"
                 :is-server-admin="authorIsAdmin"
@@ -342,9 +345,9 @@ const revealSensitiveContent = () => {
             </span>
             <span
               v-if="discussion && (discussion.body || discussion.Album)"
-              class="inline-flex items-center gap-x-1.5 whitespace-nowrap"
+              class="hidden items-center gap-x-1.5 whitespace-nowrap lg:inline-flex"
             >
-              <span aria-hidden="true">•</span>
+              <span class="hidden lg:inline" aria-hidden="true">•</span>
               <button
                 type="button"
                 class="inline-flex items-center gap-1 whitespace-nowrap hover:underline"
@@ -363,29 +366,49 @@ const revealSensitiveContent = () => {
           </div>
           <ForumSubmissions
             v-if="discussion"
-            class="mt-1.5"
+            class="mt-1 lg:mt-1.5"
             :compact="true"
+            :mobile-layout="true"
             :submissions="discussion.DiscussionChannels"
             :content-id="discussion.id"
             kind="discussion"
             :preview="true"
             :selected-forum="isSelected ? forumId : ''"
-          />
+          >
+            <template #actions>
+              <div
+                class="discussion-actions ml-auto flex shrink-0 items-center lg:absolute lg:top-9 lg:left-1.5 lg:ml-0"
+              >
+                <button
+                  v-if="discussion.body || discussion.Album"
+                  type="button"
+                  class="focus-visible:ring-brand-500 inline-flex min-h-11 items-center gap-1 rounded px-2 text-xs text-gray-600 hover:underline focus-visible:ring-2 lg:hidden dark:text-gray-400"
+                  :aria-expanded="isExpanded"
+                  @click="isExpanded = !isExpanded"
+                >
+                  <XmarkIcon
+                    v-if="isExpanded"
+                    class="h-3 w-3"
+                    aria-hidden="true"
+                  />
+                  <ExpandIcon v-else class="h-3 w-3" aria-hidden="true" />
+                  {{ isExpanded ? 'Collapse' : 'Expand' }}
+                </button>
+                <AddToDiscussionFavorites
+                  v-if="discussion"
+                  :allow-add-to-list="true"
+                  :discussion-id="discussion.id"
+                  :discussion-title="discussion.title"
+                  :initial-is-favorited="
+                    (discussion as Discussion & DiscussionWithFavorited)
+                      .isFavorited
+                  "
+                  size="small"
+                />
+              </div>
+            </template>
+          </ForumSubmissions>
         </div>
-        <nuxt-link
-          v-if="thumbnailUrl && discussion && shouldShowContent"
-          :to="getDetailLink()"
-          class="shrink-0 lg:hidden"
-        >
-          <AppImage
-            :src="thumbnailUrl"
-            :alt="title"
-            class="h-14 w-14 rounded-lg object-cover sm:h-16 sm:w-16"
-            :width="64"
-            :height="64"
-            sizes="(max-width: 639px) 56px, 64px"
-          />
-        </nuxt-link>
         <nuxt-link
           v-if="thumbnailUrl && discussion && shouldShowContent"
           :to="getDesktopSelectionLink()"
@@ -399,14 +422,6 @@ const revealSensitiveContent = () => {
             :height="64"
             sizes="64px"
           />
-        </nuxt-link>
-        <nuxt-link
-          v-if="discussion"
-          :to="getDetailLink()"
-          class="flex items-center self-center text-gray-300 lg:hidden dark:text-gray-600"
-          aria-label="Open discussion"
-        >
-          <RightArrowIcon class="h-4 w-4" aria-hidden="true" />
         </nuxt-link>
       </div>
 
@@ -486,3 +501,32 @@ const revealSensitiveContent = () => {
     </div>
   </li>
 </template>
+
+<style scoped>
+@media (width < 64rem) {
+  /* Wrap the existing profile link and badge without changing other usages. */
+  .discussion-metadata :deep(.flex),
+  .discussion-metadata :deep(a) {
+    min-width: 0;
+    flex-wrap: wrap;
+    overflow-wrap: anywhere;
+  }
+
+  .discussion-metadata :deep(a) {
+    min-height: 24px;
+  }
+
+  .discussion-actions :deep(.add-to-favorites-button) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .discussion-list-item :deep([data-testid='discussion-flair']) {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+</style>
