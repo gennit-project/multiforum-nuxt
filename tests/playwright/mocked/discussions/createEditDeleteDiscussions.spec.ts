@@ -163,7 +163,11 @@ test('creates, edits and deletes a discussion', async ({
   );
 
   const bodyInput = page.getByTestId('body-input');
-  await expect(bodyInput).toBeVisible();
+  // The edit page is auth-gated (RequireAuth) and renders the form only after
+  // its getDiscussion query resolves inside <ClientOnly>. Under heavy parallel
+  // CI load that chain can exceed the default 30s; allow extra headroom so this
+  // flow is not flaky (it renders in seconds at --workers=1).
+  await expect(bodyInput).toBeVisible({ timeout: 60000 });
   await bodyInput.fill(UPDATED_BODY);
 
   await tagPicker.click();
