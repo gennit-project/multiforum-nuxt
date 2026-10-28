@@ -18,7 +18,7 @@ import { createBaseHandlers, type BaseHandlerConfig } from './baseHandlers';
 // without pinning to the generated input type.
 type MockTagText = string | { eq?: string | null } | null;
 type MockTagConnect = { where?: { node?: { text?: MockTagText } } };
-const readTagText = (text: MockTagText): string | undefined => {
+const readTagText = (text: MockTagText | undefined): string | undefined => {
   if (typeof text === 'string') return text;
   if (text && typeof text === 'object' && typeof text.eq === 'string') {
     return text.eq;
