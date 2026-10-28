@@ -1,6 +1,6 @@
 services:
   neo4j-playwright:
-    image: neo4j:5.26
+    image: neo4j:2026.10
     ports:
       - '7688:7687'
       - '7475:7474'

@@ -140,7 +140,7 @@ docker compose \
   config --format json >"$contract_tmp_dir/quickstart.json"
 
 jq --exit-status '
-  .services.database.image == "neo4j:5.1.0" and
+  .services.database.image == "neo4j:2026.10" and
   .services.backend.image == "ghcr.io/gennit-project/multiforum-backend:edge" and
   .services.frontend.image == "ghcr.io/gennit-project/multiforum-nuxt:edge" and
   (.services.backend.build == null) and
@@ -175,7 +175,7 @@ jq --exit-status '
 echo "Confirming production configuration rejects missing secrets..."
 if env \
   MULTIFORUM_RELEASE_VERSION=1.2.3 \
-  MULTIFORUM_NEO4J_IMAGE=neo4j:5.1.0 \
+  MULTIFORUM_NEO4J_IMAGE=neo4j:2026.10 \
   MULTIFORUM_BACKEND_IMAGE=ghcr.io/gennit-project/multiforum-backend:1.2.3 \
   MULTIFORUM_FRONTEND_IMAGE=ghcr.io/gennit-project/multiforum-nuxt:1.2.3 \
   MULTIFORUM_CADDY_IMAGE=caddy:2.11.4-alpine \
@@ -202,7 +202,7 @@ if env \
   CADDY_ACME_EMAIL=admin@example.com \
   MULTIFORUM_DOMAIN=forum.example.com \
   MULTIFORUM_RELEASE_VERSION= \
-  MULTIFORUM_NEO4J_IMAGE=neo4j:5.1.0 \
+  MULTIFORUM_NEO4J_IMAGE=neo4j:2026.10 \
   MULTIFORUM_BACKEND_IMAGE=ghcr.io/gennit-project/multiforum-backend:1.2.3 \
   MULTIFORUM_FRONTEND_IMAGE=ghcr.io/gennit-project/multiforum-nuxt:1.2.3 \
   MULTIFORUM_CADDY_IMAGE=caddy:2.11.4-alpine \
