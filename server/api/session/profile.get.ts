@@ -2,16 +2,19 @@
 //
 // Same-origin session-backed profile fallback for embedded browsers where
 // localStorage-backed token flows are unreliable or unavailable.
+import type { OwnEmail } from '@/__generated__/graphql';
 import { getServerGraphqlUrl } from '@/server/utils/local-auth';
 
 type OwnEmailResponse = {
+  errors?: readonly unknown[];
   data?: {
-    getOwnEmail?: {
-      username?: string | null;
-      profilePicURL?: string | null;
-      modProfileName?: string | null;
-      unreadNotificationCount?: number | null;
-    } | null;
+    getOwnEmail?: Pick<
+      OwnEmail,
+      | 'username'
+      | 'profilePicURL'
+      | 'modProfileName'
+      | 'unreadNotificationCount'
+    > | null;
   };
 };
 
@@ -46,8 +49,10 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const tokenSet = await useAuth0(event).getAccessToken();
-    const accessToken = tokenSet?.accessToken;
+    const tokenSet = event.context.accessToken
+      ? null
+      : await useAuth0(event).getAccessToken();
+    const accessToken = event.context.accessToken || tokenSet?.accessToken;
     const graphqlUrl = getServerGraphqlUrl(useRuntimeConfig(event));
 
     if (!accessToken || !graphqlUrl) {
@@ -65,9 +70,15 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    const ownEmail = res?.data?.getOwnEmail;
-    if (!ownEmail?.username) {
+    // An empty username is only conclusive after a successful, complete lookup.
+    if (res.errors?.length || !res.data || !('getOwnEmail' in res.data)) {
       return session;
+    }
+    const ownEmail = res.data.getOwnEmail;
+    // The backend returns null when the API token has no verified email.
+    if (!ownEmail) return session;
+    if (!ownEmail.username) {
+      return { ...session, needsOnboarding: true };
     }
 
     return {

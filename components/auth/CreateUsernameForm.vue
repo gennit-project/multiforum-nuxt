@@ -204,6 +204,7 @@ const canSave = computed(() => {
       </label>
       <div class="relative mt-1 flex rounded-full shadow-sm">
         <input
+          id="username"
           ref="usernameInput"
           v-model="newUsername"
           type="text"
