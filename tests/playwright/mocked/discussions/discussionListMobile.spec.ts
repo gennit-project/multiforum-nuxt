@@ -107,11 +107,42 @@ async function expectContained(locator: Locator, width: number) {
 }
 
 async function waitForListFonts(page: Page) {
-  // Rows mount before font-display: swap finishes loading Inter. Measure only
-  // after the real typography is ready, not the narrower fallback font.
-  await page.evaluate(async () => {
-    await document.fonts.ready;
-  });
+  // ready only covers font requests that have already started. These rows are
+  // mounted asynchronously; force style resolution and load their actual faces
+  // before waiting for layout, including the author/badge and flair variants.
+  const loaded = await page
+    .getByTestId('sitewide-discussion-list')
+    .evaluate(async (list) => {
+      const requests = new Map<string, string>();
+      for (const element of list.querySelectorAll('span, a, button')) {
+        if (!element.getClientRects().length) continue;
+        const style = getComputedStyle(element);
+        const font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+        requests.set(font, (requests.get(font) || '') + element.textContent);
+      }
+      const faces = await Promise.all(
+        [...requests].map(async ([font, text]) => ({
+          font,
+          loaded: (await document.fonts.load(font, text)).map((face) => ({
+            family: face.family,
+            weight: face.weight,
+            status: face.status,
+          })),
+        }))
+      );
+      await document.fonts.ready;
+      await new Promise<void>((resolve) =>
+        requestAnimationFrame(() => resolve())
+      );
+      return faces;
+    });
+  expect(
+    loaded.every(
+      (request) =>
+        request.loaded.length > 0 &&
+        request.loaded.every((face) => face.status === 'loaded')
+    )
+  ).toBe(true);
 }
 
 async function screenshot(page: Page, path: string) {
@@ -409,6 +440,33 @@ test.describe('Compact sitewide discussion list', () => {
     await expect(rows).toHaveCount(titles.length);
     releaseFonts();
     await waitForListFonts(page);
+    const metrics = await rows.evaluateAll((elements) =>
+      elements.slice(0, 3).map((row) => {
+        const title = [...row.querySelectorAll('a')].find(
+          (link) =>
+            link.getBoundingClientRect().height &&
+            link.href.includes('selectedDiscussionId')
+        )!;
+        const span = title.querySelector('span')!;
+        const style = getComputedStyle(span);
+        return {
+          row: row.getBoundingClientRect().toJSON(),
+          title: title.getBoundingClientRect().toJSON(),
+          font: style.font,
+          text: span.textContent,
+          fonts: [...document.fonts].map((face) => ({
+            family: face.family,
+            weight: face.weight,
+            status: face.status,
+          })),
+        };
+      })
+    );
+    console.log('Desktop discussion geometry:', JSON.stringify(metrics));
+    await testInfo.attach('desktop-geometry.json', {
+      body: Buffer.from(JSON.stringify(metrics, null, 2)),
+      contentType: 'application/json',
+    });
     for (const [i, height] of [98.625, 151.25, 98.625].entries())
       expect((await rows.nth(i).boundingBox())!.height).toBeCloseTo(height, 0);
     await expect(
