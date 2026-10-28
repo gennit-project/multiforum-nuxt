@@ -32,7 +32,7 @@ const channelId = route.params.forumId as string;
 // before the channel query's immediate watch so the watch can prime baselines.
 const { mutate: updateChannelField } = useMutation(UPDATE_CHANNEL);
 const saveChannelField = (update: ChannelUpdateInput) =>
-  updateChannelField({ where: { uniqueName: channelId }, update });
+  updateChannelField({ where: { uniqueName: { eq: channelId } }, update });
 
 const eventsAutosave = useSettingAutosave<boolean>({
   save: (eventsEnabled) => saveChannelField({ eventsEnabled: { set: eventsEnabled } }),
@@ -243,7 +243,7 @@ function submit() {
   try {
     const updateInput = channelUpdateInput.value;
     updateChannel({
-      where: { uniqueName: channelId },
+      where: { uniqueName: { eq: channelId } },
       update: updateInput,
     });
   } catch (error) {

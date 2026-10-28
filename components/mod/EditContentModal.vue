@@ -244,7 +244,7 @@ const saveEdits = async () => {
     props.targetType === 'download'
   ) {
     await updateDiscussion({
-      where: { id: props.discussionId },
+      where: { id: { eq: props.discussionId } },
       updateDiscussionInput: {
         title: titleValue.value,
         body: bodyValue.value,
@@ -259,7 +259,7 @@ const saveEdits = async () => {
         description: bodyValue.value,
         editReason: editDetails,
       },
-      where: { id: props.eventId },
+      where: { id: { eq: props.eventId } },
       channelConnections: [],
       channelDisconnections: [],
     });

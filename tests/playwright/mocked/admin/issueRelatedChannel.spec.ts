@@ -38,7 +38,7 @@ const issueHandler = () => ({
         flaggedServerRuleViolation: true,
         SubscribedToNotifications: [],
         ActivityFeed: [],
-        ActivityFeedAggregate: { count: 1 },
+        ActivityFeedConnection: { aggregate: { count: { nodes: 1 } } },
         Author: { __typename: 'User', username: 'reporter1' },
       },
     ],
@@ -66,9 +66,9 @@ const handlersFor = (channelLocked: boolean) => ({
   }),
   getIssue: issueHandler,
   // Issue-tab count badges in the admin layout.
-  countIssuesByServer: () => ({ data: { issuesAggregate: { count: 1 } } }),
+  countIssuesByServer: () => ({ data: { issuesConnection: { aggregate: { count: { nodes: 1 } } } } }),
   countClosedIssuesByServer: () => ({
-    data: { issuesAggregate: { count: 0 } },
+    data: { issuesConnection: { aggregate: { count: { nodes: 0 } } } },
   }),
   lockChannel: () => ({ data: { lockChannel: channelResponse(true) } }),
   unlockChannel: () => ({ data: { unlockChannel: channelResponse(false) } }),

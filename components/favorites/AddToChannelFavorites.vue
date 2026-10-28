@@ -41,7 +41,7 @@ const GET_USER_FAVORITES = gql`
   query getUserFavorites($username: String!, $channelUniqueName: String!) {
     users(where: { username: $username }) {
       username
-      FavoriteChannels(where: { uniqueName: $channelUniqueName }) {
+      FavoriteChannels(where: { uniqueName: { eq: $channelUniqueName } }) {
         uniqueName
       }
     }

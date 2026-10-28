@@ -42,7 +42,7 @@ const buildEvent = (overrides: Partial<{
   location: { latitude: 33.4484, longitude: -112.074 },
   cost: '',
   Tags: [],
-  CommentsAggregate: { count: 0 },
+  CommentsConnection: { aggregate: { count: { nodes: 0 } } },
   EventChannels: [
     {
       id: 'event-channel-1',
@@ -57,7 +57,7 @@ const buildEvent = (overrides: Partial<{
     },
   ],
   Poster: buildUser(),
-  FeedbackCommentsAggregate: { count: 0 },
+  FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
   FeedbackComments: [],
 });
 
@@ -139,19 +139,19 @@ const getCommonMocks = (username: string) => ({
       channels: [
         {
           uniqueName: TEST_CHANNEL,
-          DiscussionChannelsAggregate: { count: 1 },
+          DiscussionChannelsConnection: { aggregate: { count: { nodes: 1 } } },
         },
       ],
     },
   }),
   countOpenIssues: () => ({
     data: {
-      issuesAggregate: { count: 1 },
+      issuesConnection: { aggregate: { count: { nodes: 1 } } },
     },
   }),
   countClosedIssues: () => ({
     data: {
-      issuesAggregate: { count: 0 },
+      issuesConnection: { aggregate: { count: { nodes: 0 } } },
     },
   }),
   getIssue: () => ({
@@ -184,7 +184,7 @@ const getCommonMocks = (username: string) => ({
           archived: false,
           answered: false,
           locked: false,
-          CommentsAggregate: { count: 0 },
+          CommentsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },
@@ -296,7 +296,7 @@ test.describe('Link verification - pages resolve correctly', () => {
                 displayName: TEST_CHANNEL,
               },
               UpvotedByUsers: [],
-              UpvotedByUsersAggregate: { count: 0 },
+              UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
               Discussion: buildDiscussion({ id: discussionId }),
             },
           ],
@@ -332,7 +332,7 @@ test.describe('Link verification - pages resolve correctly', () => {
           discussionChannels: [
             {
               id: discussionChannelId,
-              CommentsAggregate: { count: 0 },
+              CommentsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },
@@ -426,7 +426,7 @@ test.describe('Link verification - pages resolve correctly', () => {
                 displayName: TEST_CHANNEL,
               },
               UpvotedByUsers: [],
-              UpvotedByUsersAggregate: { count: 0 },
+              UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
               Discussion: buildDiscussion({ id: discussionId }),
             },
           ],
@@ -448,7 +448,7 @@ test.describe('Link verification - pages resolve correctly', () => {
           discussionChannels: [
             {
               id: discussionChannelId,
-              CommentsAggregate: { count: 1 },
+              CommentsConnection: { aggregate: { count: { nodes: 1 } } },
             },
           ],
         },
@@ -463,7 +463,7 @@ test.describe('Link verification - pages resolve correctly', () => {
               archived: false,
               answered: false,
               locked: false,
-              CommentsAggregate: { count: 1 },
+              CommentsConnection: { aggregate: { count: { nodes: 1 } } },
             },
           ],
         },
@@ -548,7 +548,7 @@ test.describe('Link verification - pages resolve correctly', () => {
           events: [
             {
               id: eventId,
-              CommentsAggregate: { count: 0 },
+              CommentsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },
@@ -602,8 +602,8 @@ test.describe('Link verification - pages resolve correctly', () => {
       isRootComment: true,
       isFeedbackComment: true,
       UpvotedByUsers: [],
-      UpvotedByUsersAggregate: { count: 0 },
-      ChildCommentsAggregate: { count: 0 },
+      UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
+      ChildCommentsConnection: { aggregate: { count: { nodes: 0 } } },
       CommentAuthor: {
         __typename: 'ModerationProfile',
         displayName: 'moderator',
@@ -624,7 +624,7 @@ test.describe('Link verification - pages resolve correctly', () => {
                 title: 'Test Discussion',
               }),
               FeedbackComments: [feedbackComment],
-              FeedbackCommentsAggregate: { count: 1 },
+              FeedbackCommentsConnection: { aggregate: { count: { nodes: 1 } } },
             },
           ],
         },
@@ -642,7 +642,7 @@ test.describe('Link verification - pages resolve correctly', () => {
                 displayName: TEST_CHANNEL,
               },
               UpvotedByUsers: [],
-              UpvotedByUsersAggregate: { count: 0 },
+              UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
               Discussion: buildDiscussion({ id: discussionId }),
             },
           ],
@@ -654,7 +654,7 @@ test.describe('Link verification - pages resolve correctly', () => {
             {
               id: discussionId,
               FeedbackComments: [feedbackComment],
-              FeedbackCommentsAggregate: { count: 1 },
+              FeedbackCommentsConnection: { aggregate: { count: { nodes: 1 } } },
             },
           ],
         },
@@ -710,7 +710,7 @@ test.describe('Link verification - pages resolve correctly', () => {
               relatedCommentId: null,
               flaggedServerRuleViolation: false,
               ActivityFeed: [],
-              ActivityFeedAggregate: { count: 0 },
+              ActivityFeedConnection: { aggregate: { count: { nodes: 0 } } },
               Author: {
                 __typename: 'ModerationProfile',
                 displayName: 'reporter',

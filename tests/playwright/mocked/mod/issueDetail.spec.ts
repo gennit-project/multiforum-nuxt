@@ -74,7 +74,7 @@ const getBaseMocks = (username: string) => ({
       channels: [
         {
           uniqueName: TEST_CHANNEL,
-          DiscussionChannelsAggregate: { count: 0 },
+          DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },
@@ -84,7 +84,7 @@ const getBaseMocks = (username: string) => ({
       channels: [
         {
           uniqueName: TEST_CHANNEL,
-          SuspendedModsAggregate: { count: 0 },
+          SuspendedModsConnection: { aggregate: { count: { nodes: 0 } } },
           SuspendedMods: [],
         },
       ],
@@ -103,11 +103,11 @@ const getBaseMocks = (username: string) => ({
       ],
     },
   }),
-  countOpenIssues: () => ({ data: { issuesAggregate: { count: 1 } } }),
-  countClosedIssues: () => ({ data: { issuesAggregate: { count: 0 } } }),
+  countOpenIssues: () => ({ data: { issuesConnection: { aggregate: { count: { nodes: 1 } } } } }),
+  countClosedIssues: () => ({ data: { issuesConnection: { aggregate: { count: { nodes: 0 } } } } }),
   GetInstanceSetupStatus: () => ({ data: { getInstanceSetupStatus: null } }),
   getEvents: () => ({
-    data: { events: [], eventsAggregate: { count: 0 } },
+    data: { events: [], eventsConnection: { aggregate: { count: { nodes: 0 } } } },
   }),
   // Rules shown in the broken-rules modal: server-wide + channel-scoped.
   getServerRules: () => ({

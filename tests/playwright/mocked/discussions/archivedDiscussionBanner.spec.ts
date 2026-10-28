@@ -77,7 +77,7 @@ test('shows the archived banner on initial load with a link to the related issue
               archived: true,
               answered: false,
               locked: false,
-              CommentsAggregate: { count: 0 },
+              CommentsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },

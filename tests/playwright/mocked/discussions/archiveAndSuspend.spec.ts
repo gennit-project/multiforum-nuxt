@@ -123,7 +123,7 @@ test('archives a discussion and suspends user with mocked GraphQL', async ({
               archived: false,
               answered: false,
               locked: false,
-              CommentsAggregate: { count: 0 },
+              CommentsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },

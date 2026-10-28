@@ -43,7 +43,7 @@ test.describe('Auto-unsubscribe via ?action=unsubscribe', () => {
         }),
         getEventRootCommentAggregate: () => ({
           data: {
-            events: [{ id: EVENT_ID, CommentsAggregate: { count: 0 } }],
+            events: [{ id: EVENT_ID, CommentsConnection: { aggregate: { count: { nodes: 0 } } } }],
           },
         }),
         getEventChannelID: () => ({
@@ -52,7 +52,7 @@ test.describe('Auto-unsubscribe via ?action=unsubscribe', () => {
           },
         }),
         getEvents: () => ({
-          data: { eventsAggregate: { count: 1 }, events: [subscribedEvent] },
+          data: { eventsConnection: { aggregate: { count: { nodes: 1 } } }, events: [subscribedEvent] },
         }),
         unsubscribeFromEvent: () => ({
           data: {

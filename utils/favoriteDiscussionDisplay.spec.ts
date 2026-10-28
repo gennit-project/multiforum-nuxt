@@ -66,14 +66,14 @@ describe('getFavoriteDiscussionCommentCount', () => {
   it('sums comment counts across all channels', () => {
     expect(
       getFavoriteDiscussionCommentCount([
-        { CommentsAggregate: { count: 2 } },
-        { CommentsAggregate: { count: 3 } },
+        { CommentsConnection: { aggregate: { count: { nodes: 2 } } } },
+        { CommentsConnection: { aggregate: { count: { nodes: 3 } } } },
       ])
     ).toBe(5);
   });
 
   it('treats missing aggregates as zero', () => {
-    expect(getFavoriteDiscussionCommentCount([{}, { CommentsAggregate: { count: 4 } }])).toBe(
+    expect(getFavoriteDiscussionCommentCount([{}, { CommentsConnection: { aggregate: { count: { nodes: 4 } } } }])).toBe(
       4
     );
   });

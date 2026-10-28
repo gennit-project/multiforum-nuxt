@@ -91,7 +91,7 @@ const getMocks = (serverEnableDownloads: boolean) => ({
         {
           __typename: 'Channel',
           uniqueName: TEST_CHANNEL,
-          DiscussionChannelsAggregate: { count: 0 },
+          DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },

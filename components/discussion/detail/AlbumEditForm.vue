@@ -247,7 +247,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION, () => ({
   variables: {
-    where: { id: props.discussion?.id || discussionIdInParams.value },
+    where: { id: { eq: props.discussion?.id || discussionIdInParams.value } },
     updateDiscussionInput: getUpdateDiscussionInputForAlbum(),
   },
 }));

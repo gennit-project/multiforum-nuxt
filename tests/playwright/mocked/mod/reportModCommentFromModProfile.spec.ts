@@ -39,9 +39,9 @@ const modProfile = {
   __typename: 'ModerationProfile',
   displayName: TARGET_MOD,
   createdAt: MOCK_DATE,
-  AuthoredCommentsAggregate: { count: 1 },
-  AuthoredIssuesAggregate: { count: 0 },
-  ActivityFeedAggregate: { count: 0 },
+  AuthoredCommentsConnection: { aggregate: { count: { nodes: 1 } } },
+  AuthoredIssuesConnection: { aggregate: { count: { nodes: 0 } } },
+  ActivityFeedConnection: { aggregate: { count: { nodes: 0 } } },
   AuthoredComments: [modAuthoredComment],
   AuthoredIssues: [],
 };

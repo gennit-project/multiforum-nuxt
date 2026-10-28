@@ -137,7 +137,7 @@ const saveDownloadAlbum = async (discussionId: string) => {
     };
 
     await updateDiscussion({
-      where: { id: discussionId },
+      where: { id: { eq: discussionId } },
       updateDiscussionInput: albumUpdateInput,
     });
   } catch (error) {

@@ -22,7 +22,7 @@ const buildPublicCollection = (overrides = {}) => ({
     displayName: 'Bob',
     profilePicURL: '',
   },
-  DownloadsAggregate: { count: 1 },
+  DownloadsConnection: { aggregate: { count: { nodes: 1 } } },
   Downloads: [
     {
       id: 'download-1',

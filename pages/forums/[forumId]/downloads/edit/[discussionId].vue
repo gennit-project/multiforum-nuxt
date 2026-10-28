@@ -330,9 +330,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: {
-    where: {
-      id: discussionId.value,
-    },
+    where: { id: { eq: discussionId.value } },
     updateDiscussionInput: updateDiscussionInput.value,
     channelConnections: channelConnections.value,
     channelDisconnections: discussion.value.DiscussionChannels.filter((dc) => {

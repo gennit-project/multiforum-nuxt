@@ -12,7 +12,9 @@ type CommentAuthorLike = {
 type SubscriberLike = { username?: string | null };
 
 type CommentLike = {
-  ChildCommentsAggregate?: { count?: number | null } | null;
+  ChildCommentsConnection?: {
+    aggregate?: { count?: { nodes?: number | null } | null } | null;
+  } | null;
   CommentAuthor?: CommentAuthorLike;
   SubscribedToNotifications?: SubscriberLike[] | null;
   GivesFeedbackOnDiscussion?: unknown;
@@ -23,7 +25,7 @@ type CommentLike = {
 
 /** Number of direct replies to a comment; 0 when the aggregate is missing. */
 export function getCommentReplyCount(comment: CommentLike): number {
-  return comment?.ChildCommentsAggregate?.count ?? 0;
+  return comment?.ChildCommentsConnection?.aggregate?.count?.nodes ?? 0;
 }
 
 /** Whether the given user is subscribed to notifications on the comment. */

@@ -96,7 +96,7 @@ describe('forums index page', () => {
   it('renders the channel list with the result count', async () => {
     const wrapper = await mountWith({
       channels: [
-        { uniqueName: 'cats', DiscussionChannelsAggregate: { count: 0 } },
+        { uniqueName: 'cats', DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } } },
       ],
       total: 1,
     });
@@ -106,10 +106,10 @@ describe('forums index page', () => {
   it('merges download counts onto the channels', async () => {
     const wrapper = await mountWith({
       channels: [
-        { uniqueName: 'cats', DiscussionChannelsAggregate: { count: 0 } },
+        { uniqueName: 'cats', DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } } },
       ],
       downloads: [
-        { uniqueName: 'cats', DiscussionChannelsAggregate: { count: 2 } },
+        { uniqueName: 'cats', DiscussionChannelsConnection: { aggregate: { count: { nodes: 2 } } } },
       ],
     });
     const channels = wrapper
@@ -126,7 +126,7 @@ describe('forums index page', () => {
         {
           uniqueName: 'cats',
           isFavorited: true,
-          DiscussionChannelsAggregate: { count: 0 },
+          DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     });

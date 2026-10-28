@@ -63,7 +63,7 @@ const {
 } = useMutation(UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: {
     where: {
-      id: eventId.value,
+      id: { eq: eventId.value },
     },
     updateEventInput: formValues.value,
     channelConnections: [],

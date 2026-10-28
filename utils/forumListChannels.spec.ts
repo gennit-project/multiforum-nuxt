@@ -8,8 +8,8 @@ import {
 describe('buildChannelCountMap', () => {
   it('maps each channel name to its aggregate count', () => {
     const map = buildChannelCountMap([
-      { uniqueName: 'cats', DiscussionChannelsAggregate: { count: 3 } },
-      { uniqueName: 'dogs', DiscussionChannelsAggregate: { count: 5 } },
+      { uniqueName: 'cats', DiscussionChannelsConnection: { aggregate: { count: { nodes: 3 } } } },
+      { uniqueName: 'dogs', DiscussionChannelsConnection: { aggregate: { count: { nodes: 5 } } } },
     ]);
     expect(map.get('dogs')).toBe(5);
   });
@@ -21,7 +21,7 @@ describe('buildChannelCountMap', () => {
 
   it('skips channels without a unique name', () => {
     const map = buildChannelCountMap([
-      { DiscussionChannelsAggregate: { count: 1 } },
+      { DiscussionChannelsConnection: { aggregate: { count: { nodes: 1 } } } },
     ]);
     expect(map.size).toBe(0);
   });
@@ -29,7 +29,7 @@ describe('buildChannelCountMap', () => {
 
 describe('mergeChannelCounts', () => {
   const baseChannels = [
-    { uniqueName: 'cats', DiscussionChannelsAggregate: { count: 0 } },
+    { uniqueName: 'cats', DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } } },
   ];
 
   it('injects the corrected discussion count from the map', () => {
@@ -38,7 +38,7 @@ describe('mergeChannelCounts', () => {
       discussionCountMap: new Map([['cats', 7]]),
       downloadCountMap: new Map(),
     });
-    expect(merged[0].DiscussionChannelsAggregate.count).toBe(7);
+    expect(merged[0].DiscussionChannelsConnection.aggregate.count.nodes).toBe(7);
   });
 
   it('injects the download count from the map', () => {
@@ -57,7 +57,7 @@ describe('mergeChannelCounts', () => {
       downloadCountMap: new Map(),
     });
     expect([
-      merged[0].DiscussionChannelsAggregate.count,
+      merged[0].DiscussionChannelsConnection.aggregate.count.nodes,
       merged[0].downloadCount,
     ]).toEqual([0, 0]);
   });

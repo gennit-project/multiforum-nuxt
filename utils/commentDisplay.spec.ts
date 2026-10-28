@@ -9,7 +9,7 @@ import {
 describe('getCommentReplyCount', () => {
   it('returns the aggregate count when present', () => {
     expect(
-      getCommentReplyCount({ ChildCommentsAggregate: { count: 4 } })
+      getCommentReplyCount({ ChildCommentsConnection: { aggregate: { count: { nodes: 4 } } } })
     ).toBe(4);
   });
 

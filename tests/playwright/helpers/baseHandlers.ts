@@ -56,8 +56,8 @@ export const createBaseHandlers = (
           buildBasicUser({
             username,
             displayName: username,
-            CommentsAggregate: { count: commentsCount },
-            DiscussionsAggregate: { count: discussionsCount },
+            CommentsConnection: { aggregate: { count: { nodes: commentsCount } } },
+            DiscussionsConnection: { aggregate: { count: { nodes: discussionsCount } } },
             ...userOverrides,
           }),
         ],
@@ -154,7 +154,7 @@ export const createBaseHandlers = (
         channels: [
           {
             uniqueName: channelId,
-            DiscussionChannelsAggregate: { count: discussionsCount },
+            DiscussionChannelsConnection: { aggregate: { count: { nodes: discussionsCount } } },
           },
         ],
       },

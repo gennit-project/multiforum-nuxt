@@ -133,9 +133,14 @@ export const createCommentHandlers = (
             archived: false,
             answered: false,
             locked: false,
-            CommentsAggregate: {
-              count: state.comments.filter((c) => c.parentCommentId === null)
-                .length,
+            CommentsConnection: {
+              aggregate: {
+                count: {
+                  nodes: state.comments.filter(
+                    (c) => c.parentCommentId === null
+                  ).length,
+                },
+              },
             },
           },
         ],

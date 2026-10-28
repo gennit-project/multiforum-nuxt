@@ -30,7 +30,7 @@ const channelReports = [
     lockReason: null,
     LockedBy: null,
     Author: { __typename: 'User', username: 'reporter1' },
-    ActivityFeedAggregate: { count: 1 },
+    ActivityFeedConnection: { aggregate: { count: { nodes: 1 } } },
   },
   {
     id: 'issue-2',
@@ -47,7 +47,7 @@ const channelReports = [
     lockReason: 'Spam wave',
     LockedBy: { displayName: 'cluse' },
     Author: { __typename: 'User', username: 'reporter2' },
-    ActivityFeedAggregate: { count: 2 },
+    ActivityFeedConnection: { aggregate: { count: { nodes: 2 } } },
   },
 ];
 

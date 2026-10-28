@@ -115,7 +115,7 @@ const getFeedbackHandlers = (username: string, modProfileName: string) => ({
           archived: false,
           answered: false,
           locked: false,
-          CommentsAggregate: { count: 0 },
+          CommentsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },
@@ -232,7 +232,7 @@ test.describe('Give feedback flows', () => {
                   feedbackEnabled: true,
                 },
                 UpvotedByUsers: [],
-                UpvotedByUsersAggregate: { count: 0 },
+                UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
                 Discussion: buildDiscussion({
                   id: discussionId,
                 }),
@@ -256,7 +256,7 @@ test.describe('Give feedback flows', () => {
             discussionChannels: [
               {
                 id: discussionChannelId,
-                CommentsAggregate: { count: 0 },
+                CommentsConnection: { aggregate: { count: { nodes: 0 } } },
               },
             ],
           },
@@ -376,7 +376,7 @@ test.describe('Give feedback flows', () => {
             events: [
               {
                 id: eventId,
-                CommentsAggregate: { count: 0 },
+                CommentsConnection: { aggregate: { count: { nodes: 0 } } },
               },
             ],
           },
@@ -515,7 +515,7 @@ test.describe('Give feedback flows', () => {
                   feedbackEnabled: true,
                 },
                 UpvotedByUsers: [],
-                UpvotedByUsersAggregate: { count: 0 },
+                UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
                 Discussion: buildDiscussion({
                   id: discussionId,
                 }),
@@ -539,7 +539,7 @@ test.describe('Give feedback flows', () => {
             discussionChannels: [
               {
                 id: discussionChannelId,
-                CommentsAggregate: { count: 1 },
+                CommentsConnection: { aggregate: { count: { nodes: 1 } } },
               },
             ],
           },
@@ -554,7 +554,7 @@ test.describe('Give feedback flows', () => {
                 archived: false,
                 answered: false,
                 locked: false,
-                CommentsAggregate: { count: 1 },
+                CommentsConnection: { aggregate: { count: { nodes: 1 } } },
               },
             ],
           },

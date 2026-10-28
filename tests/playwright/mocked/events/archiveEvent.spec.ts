@@ -93,7 +93,7 @@ test('archives an event with mocked GraphQL', async ({
           events: [
             {
               id: EVENT_ID,
-              CommentsAggregate: { count: 0 },
+              CommentsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },
@@ -110,7 +110,7 @@ test('archives an event with mocked GraphQL', async ({
       }),
       getEvents: () => ({
         data: {
-          eventsAggregate: { count: 1 },
+          eventsConnection: { aggregate: { count: { nodes: 1 } } },
           events: [mockEvent],
         },
       }),

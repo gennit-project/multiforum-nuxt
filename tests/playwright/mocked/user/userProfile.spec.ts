@@ -27,8 +27,8 @@ const getPublicProfile = ({ body }: MockHandlerInput) => {
             commentKarma: 42,
             discussionKarma: 100,
           }),
-          AuthoredWikiPageVersionsAggregate: { count: 0 },
-          ModOfChannelsAggregate: { count: 0 },
+          AuthoredWikiPageVersionsConnection: { aggregate: { count: { nodes: 0 } } },
+          ModOfChannelsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
       getUserWikiEditsCount: 0,
@@ -42,7 +42,7 @@ const getBaseMocks = (loggedInUsername: string) => ({
   getPublicUserProfile: getPublicProfile,
   getPublicScratchpadEntries: () => ({
     data: {
-      scratchpadEntriesAggregate: { count: 0 },
+      scratchpadEntriesConnection: { aggregate: { count: { nodes: 0 } } },
       scratchpadEntries: [],
     },
   }),
@@ -110,7 +110,7 @@ const getBaseMocks = (loggedInUsername: string) => ({
           {
             username,
             profilePicURL: '',
-            CommentsAggregate: { count: 0 },
+            CommentsConnection: { aggregate: { count: { nodes: 0 } } },
             Comments: [],
           },
         ],

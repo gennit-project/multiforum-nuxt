@@ -146,7 +146,7 @@ const getCommonMocks = (username: string) => ({
   }),
   getChannelDownloadCount: () => ({
     data: {
-      channels: [{ uniqueName: TEST_CHANNEL, DiscussionChannelsAggregate: { count: 0 } }],
+      channels: [{ uniqueName: TEST_CHANNEL, DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } } }],
     },
   }),
   getChannelTags: () => ({
@@ -195,7 +195,7 @@ test.describe('Series List Display', () => {
       ...getCommonMocks(TEST_USERNAME),
       getEvents: () => ({
         data: {
-          eventsAggregate: { count: 2 },
+          eventsConnection: { aggregate: { count: { nodes: 2 } } },
           events: [
             buildSeriesEvent({ id: 'series-event-1', title: 'Series Event' }),
             buildSingleEvent({ id: 'single-event-1', title: 'Single Event' }),
@@ -237,7 +237,7 @@ test.describe('Series List Display', () => {
       ...getCommonMocks(TEST_USERNAME),
       getEvents: () => ({
         data: {
-          eventsAggregate: { count: 1 },
+          eventsConnection: { aggregate: { count: { nodes: 1 } } },
           events: [buildSeriesEvent({ id: 'series-event-1', title: 'Weekly Meetup' })],
         },
       }),
@@ -264,7 +264,7 @@ test.describe('Series List Display', () => {
       ...getCommonMocks(TEST_USERNAME),
       getEvents: () => ({
         data: {
-          eventsAggregate: { count: 1 },
+          eventsConnection: { aggregate: { count: { nodes: 1 } } },
           events: [buildSeriesEvent({ id: 'event-1', title: 'Weekly Meetup' })],
         },
       }),
@@ -282,7 +282,7 @@ test.describe('Series List Display', () => {
         },
       }),
       getEventRootCommentAggregate: () => ({
-        data: { events: [{ id: 'event-2', CommentsAggregate: { count: 0 } }] },
+        data: { events: [{ id: 'event-2', CommentsConnection: { aggregate: { count: { nodes: 0 } } } }] },
       }),
       getEventChannelID: () => ({
         data: { eventChannels: [{ id: 'event-channel-1', archived: false }] },
@@ -342,7 +342,7 @@ test.describe('Series List Display', () => {
       ...getCommonMocks(TEST_USERNAME),
       getEvents: () => ({
         data: {
-          eventsAggregate: { count: 1 },
+          eventsConnection: { aggregate: { count: { nodes: 1 } } },
           events: [eventWithManyOccurrences],
         },
       }),

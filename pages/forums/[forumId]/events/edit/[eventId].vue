@@ -283,7 +283,7 @@ function submit() {
     channelConnections: channelConnections.value,
     channelDisconnections: channelDisconnections.value,
     where: {
-      id: eventId,
+      id: { eq: eventId },
     },
   };
   updateEvent(variables);

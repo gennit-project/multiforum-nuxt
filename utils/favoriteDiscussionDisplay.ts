@@ -10,7 +10,9 @@ import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 type FavoriteChannel = {
   channelUniqueName?: string | null;
-  CommentsAggregate?: { count?: number | null } | null;
+  CommentsConnection?: {
+    aggregate?: { count?: { nodes?: number | null } | null } | null;
+  } | null;
 };
 
 type FavoriteAuthor = {
@@ -67,7 +69,8 @@ export function getFavoriteDiscussionCommentCount(
   discussionChannels: FavoriteChannel[] | undefined | null
 ): number {
   return (discussionChannels || []).reduce(
-    (total, dc) => total + (dc.CommentsAggregate?.count || 0),
+    (total, dc) =>
+      total + (dc.CommentsConnection?.aggregate?.count?.nodes || 0),
     0
   );
 }

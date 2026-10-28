@@ -81,7 +81,7 @@ export const getIssueDetailBaseMocks = ({
   getChannelDownloadCount: () => ({
     data: {
       channels: [
-        { uniqueName: channel, DiscussionChannelsAggregate: { count: 0 } },
+        { uniqueName: channel, DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } } },
       ],
     },
   }),
@@ -90,7 +90,7 @@ export const getIssueDetailBaseMocks = ({
       channels: [
         {
           uniqueName: channel,
-          SuspendedModsAggregate: { count: 0 },
+          SuspendedModsConnection: { aggregate: { count: { nodes: 0 } } },
           SuspendedMods: [],
         },
       ],
@@ -113,13 +113,13 @@ export const getIssueDetailBaseMocks = ({
       ],
     },
   }),
-  countOpenIssues: () => ({ data: { issuesAggregate: { count: 1 } } }),
-  countClosedIssues: () => ({ data: { issuesAggregate: { count: 0 } } }),
-  countIssuesByServer: () => ({ data: { issuesAggregate: { count: 1 } } }),
+  countOpenIssues: () => ({ data: { issuesConnection: { aggregate: { count: { nodes: 1 } } } } }),
+  countClosedIssues: () => ({ data: { issuesConnection: { aggregate: { count: { nodes: 0 } } } } }),
+  countIssuesByServer: () => ({ data: { issuesConnection: { aggregate: { count: { nodes: 1 } } } } }),
   countClosedIssuesByServer: () => ({
-    data: { issuesAggregate: { count: 0 } },
+    data: { issuesConnection: { aggregate: { count: { nodes: 0 } } } },
   }),
-  getEvents: () => ({ data: { events: [], eventsAggregate: { count: 0 } } }),
+  getEvents: () => ({ data: { events: [], eventsConnection: { aggregate: { count: { nodes: 0 } } } } }),
   // Rules shown in the broken-rules report modal.
   getServerRules: () => ({
     data: {

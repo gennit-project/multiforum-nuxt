@@ -138,7 +138,7 @@ test('reports a comment with mocked GraphQL', async ({ page, setupMockedPage }) 
               archived: false,
               answered: false,
               locked: false,
-              CommentsAggregate: { count: 1 },
+              CommentsConnection: { aggregate: { count: { nodes: 1 } } },
             },
           ],
         },

@@ -270,7 +270,7 @@ describe('download edit page', () => {
       options: () => { variables: Record<string, unknown> };
     };
     expect(tracker.options().variables).toMatchObject({
-      where: { id: 'd1' },
+      where: { id: { eq: 'd1' } },
       channelConnections: ['dogs'],
       channelDisconnections: ['cats'],
       albumImageDisconnections: [],

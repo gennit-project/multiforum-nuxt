@@ -182,9 +182,7 @@ function handleSubmit() {
     };
 
     updateChannel({
-      where: {
-        uniqueName: forumId,
-      },
+      where: { uniqueName: { eq: forumId } },
       update: updateInput,
     });
   } else {

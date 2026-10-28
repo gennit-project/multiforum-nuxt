@@ -15,7 +15,7 @@ test.describe('Admin moderation queues', () => {
     await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
     const diagnostics = await installGraphqlMocks(page, {
       ...createBaseHandlers({ username: TEST_USER }),
-      getIssues: () => ({ data: { issues: [], issuesAggregate: { count: 0 } } }),
+      getIssues: () => ({ data: { issues: [], issuesConnection: { aggregate: { count: { nodes: 0 } } } } }),
     });
 
     try {
@@ -36,7 +36,7 @@ test.describe('Admin moderation queues', () => {
     await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
     const diagnostics = await installGraphqlMocks(page, {
       ...createBaseHandlers({ username: TEST_USER }),
-      getIssues: () => ({ data: { issues: [], issuesAggregate: { count: 0 } } }),
+      getIssues: () => ({ data: { issues: [], issuesConnection: { aggregate: { count: { nodes: 0 } } } } }),
     });
 
     try {

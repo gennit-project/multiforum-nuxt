@@ -77,7 +77,7 @@ test('channel wiki is a searchable knowledge hub', async ({
           data: {
             users: response.data.users.map((user) => ({
               ...user,
-              AuthoredWikiPageVersionsAggregate: { count: 0 },
+              AuthoredWikiPageVersionsConnection: { aggregate: { count: { nodes: 0 } } },
             })),
             getUserWikiEditsCount: 0,
           },

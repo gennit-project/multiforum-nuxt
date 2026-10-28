@@ -85,7 +85,7 @@ test('reports an album image from the lightbox with the selected rules', async (
             archived: false,
             answered: false,
             locked: false,
-            CommentsAggregate: { count: 0 },
+            CommentsConnection: { aggregate: { count: { nodes: 0 } } },
           },
         ],
       },

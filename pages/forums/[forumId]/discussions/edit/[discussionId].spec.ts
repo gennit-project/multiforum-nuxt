@@ -350,7 +350,7 @@ describe('discussion edit page', () => {
       });
     await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
     expect(hState.mutationOptions?.().variables).toEqual({
-      where: { id: 'd1' },
+      where: { id: { eq: 'd1' } },
       updateDiscussionInput: {
         title: { set: 'Hello' },
         body: { set: 'Body' },

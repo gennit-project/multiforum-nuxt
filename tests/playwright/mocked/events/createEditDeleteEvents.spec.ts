@@ -90,7 +90,7 @@ const buildEvent = (overrides: Partial<{
   location: { latitude: 33.4484, longitude: -112.074 },
   cost: '',
   Tags: [],
-  CommentsAggregate: { count: 0 },
+  CommentsConnection: { aggregate: { count: { nodes: 0 } } },
   EventChannels: [
     {
       id: 'event-channel-1',
@@ -106,7 +106,7 @@ const buildEvent = (overrides: Partial<{
   ],
   SubscribedToNotifications: [],
   SubscribedToEventUpdates: [],
-  FeedbackCommentsAggregate: { count: 0 },
+  FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
   FeedbackComments: [],
   Poster: buildUser({
     username: overrides.posterUsername || 'cluse',
@@ -189,7 +189,7 @@ const getCommonMocks = (username: string) => ({
       channels: [
         {
           uniqueName: TEST_CHANNEL,
-          DiscussionChannelsAggregate: { count: 0 },
+          DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },
@@ -222,8 +222,8 @@ const getCommonMocks = (username: string) => ({
   getSitewideTagCounts: () => ({
     data: {
       tags: [
-        { text: TAG_ONE, EventsAggregate: { count: 1 } },
-        { text: TAG_TWO, EventsAggregate: { count: 0 } },
+        { text: TAG_ONE, EventsConnection: { aggregate: { count: { nodes: 1 } } } },
+        { text: TAG_TWO, EventsConnection: { aggregate: { count: { nodes: 0 } } } },
       ],
     },
   }),
@@ -298,7 +298,7 @@ test('creates an event with mocked GraphQL', async ({ context, page }, testInfo)
         events: [
           {
             id: 'event-1',
-            CommentsAggregate: { count: 0 },
+            CommentsConnection: { aggregate: { count: { nodes: 0 } } },
           },
         ],
       },
@@ -315,7 +315,7 @@ test('creates an event with mocked GraphQL', async ({ context, page }, testInfo)
     }),
     getEvents: () => ({
       data: {
-        eventsAggregate: { count: 1 },
+        eventsConnection: { aggregate: { count: { nodes: 1 } } },
         events: [buildEvent()],
       },
     }),
@@ -436,7 +436,7 @@ test('edits an event with mocked GraphQL', async ({ context, page }, testInfo) =
         events: [
           {
             id: eventState.id,
-            CommentsAggregate: { count: 0 },
+            CommentsConnection: { aggregate: { count: { nodes: 0 } } },
           },
         ],
       },
@@ -503,8 +503,10 @@ test('edits an event with mocked GraphQL', async ({ context, page }, testInfo) =
 
     // Verify update mutation was called with correct data
     expect(updateVariables).not.toBeNull();
-    expect(updateVariables!.updateEventInput?.title).toBe(UPDATED_TITLE);
-    expect(updateVariables!.where?.id).toBe(eventState.id);
+    expect(updateVariables!.updateEventInput?.title).toEqual({
+      set: UPDATED_TITLE,
+    });
+    expect(updateVariables!.where?.id).toEqual({ eq: eventState.id });
 
     expect(diagnostics.pageErrors).toEqual([]);
   } finally {
@@ -567,7 +569,7 @@ test('deletes an event with mocked GraphQL', async ({ context, page }, testInfo)
         events: [
           {
             id: eventState.id,
-            CommentsAggregate: { count: 0 },
+            CommentsConnection: { aggregate: { count: { nodes: 0 } } },
           },
         ],
       },
@@ -586,14 +588,14 @@ test('deletes an event with mocked GraphQL', async ({ context, page }, testInfo)
       if (eventState.deleted) {
         return {
           data: {
-            eventsAggregate: { count: 0 },
+            eventsConnection: { aggregate: { count: { nodes: 0 } } },
             events: [],
           },
         };
       }
       return {
         data: {
-          eventsAggregate: { count: 1 },
+          eventsConnection: { aggregate: { count: { nodes: 1 } } },
           events: [buildEvent({
             id: eventState.id,
             title: eventState.title,

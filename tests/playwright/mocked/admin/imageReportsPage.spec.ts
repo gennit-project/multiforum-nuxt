@@ -43,7 +43,7 @@ const getBaseMocks = (username: string) => ({
   }),
   getChannelDownloadCount: () => ({
     data: {
-      channels: [{ uniqueName: 'cats', DiscussionChannelsAggregate: { count: 0 } }],
+      channels: [{ uniqueName: 'cats', DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } } }],
     },
   }),
 });
@@ -66,7 +66,7 @@ const buildImageReport = (overrides: Record<string, unknown>) => ({
   relatedChannelUniqueName: null,
   flaggedServerRuleViolation: true,
   Author: { __typename: 'User', username: 'reporter', displayName: 'reporter' },
-  ActivityFeedAggregate: { count: 1 },
+  ActivityFeedConnection: { aggregate: { count: { nodes: 1 } } },
   ...overrides,
 });
 

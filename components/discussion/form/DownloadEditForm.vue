@@ -196,7 +196,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION, () => ({
   variables: {
-    where: { id: props.discussion.id },
+    where: { id: { eq: props.discussion.id } },
     updateDiscussionInput: getUpdateDiscussionInputForDownloadableFiles(),
   },
 }));

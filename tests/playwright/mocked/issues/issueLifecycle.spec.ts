@@ -19,7 +19,7 @@ const issuesRow = () => ({
         __typename: 'Channel',
         uniqueName: TEST_CHANNEL,
         Issues: [],
-        IssuesAggregate: { count: 0 },
+        IssuesConnection: { aggregate: { count: { nodes: 0 } } },
       },
     ],
   },
