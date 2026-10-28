@@ -2,7 +2,7 @@ import { gql } from '@apollo/client/core';
 
 export const GET_IMAGE_DETAILS = gql`
   query GetImageDetails($imageId: ID!) {
-    images(where: { id: $imageId }) {
+    images(where: { id: { eq: $imageId } }) {
       id
       archived
       url
@@ -25,14 +25,16 @@ export const GET_IMAGE_DETAILS = gql`
 
 export const GET_ALBUM_DETAILS = gql`
   query GetAlbumDetails($albumId: ID!) {
-    albums(where: { id: $albumId }) {
+    albums(where: { id: { eq: $albumId } }) {
       id
       imageOrder
       Owner {
         username
         displayName
       }
-      Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+      Images(
+        where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }
+      ) {
         id
         url
         alt
@@ -70,8 +72,9 @@ export const GET_USER_ALBUMS = gql`
         displayName
       }
       Images(
-        where: { archived_NOT: true, permanentlyRemoved_NOT: true }
-        options: { limit: 4, sort: { createdAt: DESC } }
+        where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }
+        limit: 4
+        sort: { createdAt: DESC }
       ) {
         id
         url
@@ -82,12 +85,18 @@ export const GET_USER_ALBUMS = gql`
           username
         }
       }
-      ImagesAggregate(
-        where: { archived_NOT: true, permanentlyRemoved_NOT: true }
+      ImagesConnection(
+        where: {
+          node: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }
+        }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      Discussions(options: { sort: { createdAt: DESC } }) {
+      Discussions(sort: { createdAt: DESC }) {
         id
         title
         createdAt
@@ -102,21 +111,27 @@ export const GET_USER_ALBUMS = gql`
 
 export const GET_USER_ALBUMS_FOR_IMAGE_SAVE = gql`
   query GetUserAlbumsForImageSave($username: String!, $imageId: ID!) {
-    albums(where: { Owner: { username: $username } }) {
+    albums(where: { Owner: { username: { eq: $username } } }) {
       id
       Owner {
         username
         displayName
       }
-      matchingImages: Images(where: { id: $imageId }) {
+      matchingImages: Images(where: { id: { eq: $imageId } }) {
         id
       }
-      ImagesAggregate(
-        where: { archived_NOT: true, permanentlyRemoved_NOT: true }
+      ImagesConnection(
+        where: {
+          node: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }
+        }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      Discussions(options: { sort: { createdAt: DESC } }) {
+      Discussions(sort: { createdAt: DESC }) {
         id
         title
       }
@@ -132,12 +147,14 @@ export const GET_USER_IMAGES = gql`
     $limit: Int!
     $where: ImageWhere
   ) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       displayName
       Images(
         where: $where
-        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+        limit: $limit
+        offset: $offset
+        sort: { createdAt: DESC }
       ) {
         id
         url
@@ -154,8 +171,12 @@ export const GET_USER_IMAGES = gql`
           displayName
         }
       }
-      ImagesAggregate(where: $where) {
-        count
+      ImagesConnection(where: { node: $where }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -174,11 +195,13 @@ export const GET_REUSABLE_USER_IMAGES = gql`
     $offset: Int!
     $limit: Int!
   ) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Images(
         where: $where
-        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+        limit: $limit
+        offset: $offset
+        sort: { createdAt: DESC }
       ) {
         id
         url
@@ -191,8 +214,12 @@ export const GET_REUSABLE_USER_IMAGES = gql`
           displayName
         }
       }
-      ImagesAggregate(where: $where) {
-        count
+      ImagesConnection(where: { node: $where }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -205,11 +232,13 @@ export const GET_REUSABLE_FAVORITE_IMAGES = gql`
     $offset: Int!
     $limit: Int!
   ) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       FavoriteImages(
         where: $where
-        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+        limit: $limit
+        offset: $offset
+        sort: { createdAt: DESC }
       ) {
         id
         url
@@ -222,8 +251,12 @@ export const GET_REUSABLE_FAVORITE_IMAGES = gql`
           displayName
         }
       }
-      FavoriteImagesAggregate(where: $where) {
-        count
+      FavoriteImagesConnection(where: { node: $where }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -231,11 +264,11 @@ export const GET_REUSABLE_FAVORITE_IMAGES = gql`
 
 export const GET_REUSABLE_IMAGE_COLLECTIONS = gql`
   query GetReusableImageCollections($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
-        where: { collectionType: IMAGES }
-        options: { sort: [{ updatedAt: DESC }] }
+        where: { collectionType: { eq: IMAGES } }
+        sort: [{ updatedAt: DESC }]
       ) {
         id
         name
@@ -252,12 +285,14 @@ export const GET_REUSABLE_COLLECTION_IMAGES = gql`
     $offset: Int!
     $limit: Int!
   ) {
-    collections(where: { id: $collectionId }) {
+    collections(where: { id: { eq: $collectionId } }) {
       id
       name
       Images(
         where: $where
-        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+        limit: $limit
+        offset: $offset
+        sort: { createdAt: DESC }
       ) {
         id
         url
@@ -270,8 +305,12 @@ export const GET_REUSABLE_COLLECTION_IMAGES = gql`
           displayName
         }
       }
-      ImagesAggregate(where: $where) {
-        count
+      ImagesConnection(where: { node: $where }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }

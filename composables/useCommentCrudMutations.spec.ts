@@ -263,7 +263,7 @@ describe('useCommentCrudMutations', () => {
 
       update(cache, {
         data: {
-          createComments: {
+          createCommentWithOwnedConnections: {
             comments: [
               {
                 __typename: 'Comment',
@@ -330,10 +330,11 @@ describe('useCommentCrudMutations', () => {
 
     it('increments the parent comment ChildCommentsAggregate count', () => {
       const { captured } = runReplyUpdate('parent-1', 'new-1');
-      expect(captured.parentCountFields.ChildCommentsAggregate({ count: 2 })).toEqual({
-        __typename: 'CommentsAggregate',
-        count: 3,
-      });
+      expect(
+        captured.parentCountFields.ChildCommentsConnection({
+          aggregate: { count: { nodes: 2 } },
+        })
+      ).toEqual({ aggregate: { count: { nodes: 3 } } });
     });
   });
 
@@ -376,7 +377,7 @@ describe('useCommentCrudMutations', () => {
       };
       update(cache, {
         data: {
-          createComments: {
+          createCommentWithOwnedConnections: {
             comments: [{ __typename: 'Comment', id: 'root-1', ParentComment: null }],
           },
         },
@@ -393,12 +394,16 @@ describe('useCommentCrudMutations', () => {
 
     it('increments the CommentsAggregate count', () => {
       const { captured } = runRootUpdate();
-      expect(captured.fields.CommentsAggregate({ count: 2 })).toEqual({ count: 3 });
+      expect(
+        captured.fields.CommentsConnection({ aggregate: { count: { nodes: 2 } } })
+      ).toEqual({ aggregate: { count: { nodes: 3 } } });
     });
 
     it('defaults the CommentsAggregate count to 1 when none exists', () => {
       const { captured } = runRootUpdate();
-      expect(captured.fields.CommentsAggregate(undefined)).toEqual({ count: 1 });
+      expect(captured.fields.CommentsConnection(undefined)).toEqual({
+        aggregate: { count: { nodes: 1 } },
+      });
     });
 
     it('calls onIncrementCommentCount for root comments', () => {
@@ -423,7 +428,7 @@ describe('useCommentCrudMutations', () => {
       };
       update(cache, {
         data: {
-          createComments: {
+          createCommentWithOwnedConnections: {
             comments: [
               { __typename: 'Comment', id: 'reply-1', ParentComment: { id: 'parent-1' } },
             ],
@@ -487,7 +492,11 @@ describe('useCommentCrudMutations', () => {
         commentToDeleteId: 'c-1',
         parentOfCommentToDelete: 'parent-1',
       });
-      expect(captured.fields.ChildCommentsAggregate({ count: 0 })).toEqual({ count: 0 });
+      expect(
+        captured.fields.ChildCommentsConnection({
+          aggregate: { count: { nodes: 0 } },
+        })
+      ).toEqual({ aggregate: { count: { nodes: 0 } } });
     });
 
     it('filters the deleted root comment out of the DiscussionChannel Comments', () => {
@@ -505,7 +514,9 @@ describe('useCommentCrudMutations', () => {
         commentToDeleteId: 'c-1',
         parentOfCommentToDelete: '',
       });
-      expect(captured.fields.CommentsAggregate({ count: 3 })).toEqual({ count: 2 });
+      expect(
+        captured.fields.CommentsConnection({ aggregate: { count: { nodes: 3 } } })
+      ).toEqual({ aggregate: { count: { nodes: 2 } } });
     });
 
     it('runs garbage collection and calls onDecrementCommentCount', () => {

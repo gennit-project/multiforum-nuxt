@@ -374,7 +374,21 @@ const hasRelatedContent = computed(() =>
   checkHasRelatedContent(activeIssue.value)
 );
 
-const reportCount = computed(() => getReportCount(activeIssue.value));
+const reportCount = computed(() =>
+  // `getReportCount` still reads the legacy `ActivityFeedAggregate` shape, so
+  // adapt the v7 issue's `ActivityFeedConnection` count into it.
+  getReportCount(
+    activeIssue.value
+      ? {
+          ActivityFeedAggregate: {
+            count:
+              activeIssue.value.ActivityFeedConnection?.aggregate?.count
+                ?.nodes,
+          },
+        }
+      : null
+  )
+);
 
 const reportCountLabel = computed(() =>
   formatReportCountLabel(reportCount.value)

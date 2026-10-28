@@ -56,13 +56,13 @@ const getFeedbackHandlers = (username: string, modProfileName: string) => ({
     channelId: TEST_CHANNEL,
     discussionsCount: 1,
     serverConfigOverrides: {
-      DefaultModRole: FEEDBACK_MOD_ROLE,
-      DefaultElevatedModRole: FEEDBACK_MOD_ROLE,
+      DefaultModRole: FEEDBACK_MOD_ROLE as any,
+      DefaultElevatedModRole: FEEDBACK_MOD_ROLE as any,
     },
     channelOverrides: {
       feedbackEnabled: true,
-      DefaultModRole: FEEDBACK_MOD_ROLE,
-      ElevatedModRole: FEEDBACK_MOD_ROLE,
+      DefaultModRole: FEEDBACK_MOD_ROLE as any,
+      ElevatedModRole: FEEDBACK_MOD_ROLE as any,
     },
   }),
   getOwnEmail: () => ({
@@ -83,8 +83,8 @@ const getFeedbackHandlers = (username: string, modProfileName: string) => ({
           uniqueName: TEST_CHANNEL,
           overrides: {
             feedbackEnabled: true,
-            DefaultModRole: FEEDBACK_MOD_ROLE,
-            ElevatedModRole: FEEDBACK_MOD_ROLE,
+            DefaultModRole: FEEDBACK_MOD_ROLE as any,
+            ElevatedModRole: FEEDBACK_MOD_ROLE as any,
           },
         }),
       ],
@@ -115,7 +115,7 @@ const getFeedbackHandlers = (username: string, modProfileName: string) => ({
           archived: false,
           answered: false,
           locked: false,
-          CommentsAggregate: { count: 0 },
+          CommentsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },
@@ -232,7 +232,7 @@ test.describe('Give feedback flows', () => {
                   feedbackEnabled: true,
                 },
                 UpvotedByUsers: [],
-                UpvotedByUsersAggregate: { count: 0 },
+                UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
                 Discussion: buildDiscussion({
                   id: discussionId,
                 }),
@@ -256,7 +256,7 @@ test.describe('Give feedback flows', () => {
             discussionChannels: [
               {
                 id: discussionChannelId,
-                CommentsAggregate: { count: 0 },
+                CommentsConnection: { aggregate: { count: { nodes: 0 } } },
               },
             ],
           },
@@ -275,7 +275,7 @@ test.describe('Give feedback flows', () => {
           feedbackVariables = body.variables as AddFeedbackVariables;
           return {
             data: {
-              createComments: {
+              createCommentWithOwnedConnections: {
                 comments: [
                   {
                     id: 'feedback-comment-1',
@@ -376,7 +376,7 @@ test.describe('Give feedback flows', () => {
             events: [
               {
                 id: eventId,
-                CommentsAggregate: { count: 0 },
+                CommentsConnection: { aggregate: { count: { nodes: 0 } } },
               },
             ],
           },
@@ -395,7 +395,7 @@ test.describe('Give feedback flows', () => {
           feedbackVariables = body.variables as AddFeedbackVariables;
           return {
             data: {
-              createComments: {
+              createCommentWithOwnedConnections: {
                 comments: [
                   {
                     id: 'feedback-comment-1',
@@ -515,7 +515,7 @@ test.describe('Give feedback flows', () => {
                   feedbackEnabled: true,
                 },
                 UpvotedByUsers: [],
-                UpvotedByUsersAggregate: { count: 0 },
+                UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
                 Discussion: buildDiscussion({
                   id: discussionId,
                 }),
@@ -539,7 +539,7 @@ test.describe('Give feedback flows', () => {
             discussionChannels: [
               {
                 id: discussionChannelId,
-                CommentsAggregate: { count: 1 },
+                CommentsConnection: { aggregate: { count: { nodes: 1 } } },
               },
             ],
           },
@@ -554,7 +554,7 @@ test.describe('Give feedback flows', () => {
                 archived: false,
                 answered: false,
                 locked: false,
-                CommentsAggregate: { count: 1 },
+                CommentsConnection: { aggregate: { count: { nodes: 1 } } },
               },
             ],
           },
@@ -587,7 +587,7 @@ test.describe('Give feedback flows', () => {
           feedbackVariables = body.variables as AddFeedbackVariables;
           return {
             data: {
-              createComments: {
+              createCommentWithOwnedConnections: {
                 comments: [
                   {
                     id: 'feedback-comment-1',

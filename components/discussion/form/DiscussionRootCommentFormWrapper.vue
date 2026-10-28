@@ -6,7 +6,7 @@ import CreateRootCommentForm from '@/components/comments/CreateRootCommentForm.v
 import type {
   Comment,
   DiscussionChannel,
-  CommentCreateInput,
+  OwnedCommentCreateInput,
   CommentSectionFormat,
 } from '@/__generated__/graphql';
 import type { NormalizedCacheObject, ApolloCache, FetchResult  } from '@apollo/client/core';
@@ -100,8 +100,8 @@ const channelConnections = computed(() =>
     : []
 );
 
-const createCommentInput = computed((): CommentCreateInput[] => {
-  const input: CommentCreateInput = {
+const createCommentInput = computed((): OwnedCommentCreateInput[] => {
+  const input: OwnedCommentCreateInput = {
     isRootComment: true,
     isFeedbackComment: false,
     text: createFormValues.value.text || '',
@@ -185,9 +185,12 @@ const {
     // the cache after replying to a comment, see the CommentSection
     // component.
     try {
-      const newComment: Comment = result.data?.createComments?.comments?.[0];
+      const newComment: Comment =
+        result.data?.createCommentWithOwnedConnections?.comments?.[0];
       if (!newComment) {
-        console.error('No new comment returned from createComments mutation');
+        console.error(
+          'No new comment returned from createCommentWithOwnedConnections mutation'
+        );
         return;
       }
 
@@ -289,10 +292,14 @@ const {
             id: props.discussionChannel.id,
           }),
           fields: {
-            CommentsAggregate(existing = {}) {
+            CommentsConnection(existing) {
+              const nodes = existing?.aggregate?.count?.nodes || 0;
               return {
                 ...existing,
-                count: (existing.count || 0) + 1,
+                aggregate: {
+                  ...existing?.aggregate,
+                  count: { ...existing?.aggregate?.count, nodes: nodes + 1 },
+                },
               };
             },
           },

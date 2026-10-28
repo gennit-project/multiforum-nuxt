@@ -53,8 +53,8 @@ type UserAlbumListItem = {
     username?: string | null;
     displayName?: string | null;
   } | null;
-  ImagesAggregate?: {
-    count?: number | null;
+  ImagesConnection?: {
+    aggregate?: { count?: { nodes?: number | null } | null } | null;
   } | null;
   matchingImages?: Array<{
     id: string;
@@ -761,7 +761,7 @@ onUnmounted(() => {
                   {{ getAlbumDisplayName(album) }}
                 </span>
                 <span class="block text-sm text-gray-600 dark:text-gray-400">
-                  {{ album.ImagesAggregate?.count || 0 }} images
+                  {{ album.ImagesConnection?.aggregate?.count?.nodes || 0 }} images
                 </span>
               </span>
               <span

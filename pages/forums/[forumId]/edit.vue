@@ -7,7 +7,11 @@ import type { CreateEditChannelFormValues } from '@/types/Channel';
 import CreateEditChannelFields from '@/components/channel/form/CreateEditChannelFields.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useUsername } from '@/composables/useAuthState';
-import type { ChannelUpdateInput, Tag as TagData } from '@/__generated__/graphql';
+import type {
+  ChannelUpdateInput,
+  ChannelTagsUpdateFieldInput,
+  Tag as TagData,
+} from '@/__generated__/graphql';
 import { buildFilterGroupsUpdate } from '@/utils/filterGroupUpdates';
 import { useRoute } from 'nuxt/app';
 import { useQuery, useMutation } from '@vue/apollo-composable';
@@ -28,22 +32,25 @@ const channelId = route.params.forumId as string;
 // before the channel query's immediate watch so the watch can prime baselines.
 const { mutate: updateChannelField } = useMutation(UPDATE_CHANNEL);
 const saveChannelField = (update: ChannelUpdateInput) =>
-  updateChannelField({ where: { uniqueName: channelId }, update });
+  updateChannelField({ where: { uniqueName: { eq: channelId } }, update });
 
 const eventsAutosave = useSettingAutosave<boolean>({
-  save: (eventsEnabled) => saveChannelField({ eventsEnabled }),
+  save: (eventsEnabled) => saveChannelField({ eventsEnabled: { set: eventsEnabled } }),
 });
 const imageUploadsAutosave = useSettingAutosave<boolean>({
-  save: (imageUploadsEnabled) => saveChannelField({ imageUploadsEnabled }),
+  save: (imageUploadsEnabled) =>
+    saveChannelField({ imageUploadsEnabled: { set: imageUploadsEnabled } }),
 });
 const markdownImagesAutosave = useSettingAutosave<boolean>({
-  save: (markdownImagesEnabled) => saveChannelField({ markdownImagesEnabled }),
+  save: (markdownImagesEnabled) =>
+    saveChannelField({ markdownImagesEnabled: { set: markdownImagesEnabled } }),
 });
 const feedbackAutosave = useSettingAutosave<boolean>({
-  save: (feedbackEnabled) => saveChannelField({ feedbackEnabled }),
+  save: (feedbackEnabled) =>
+    saveChannelField({ feedbackEnabled: { set: feedbackEnabled } }),
 });
 const emojiAutosave = useSettingAutosave<boolean>({
-  save: (emojiEnabled) => saveChannelField({ emojiEnabled }),
+  save: (emojiEnabled) => saveChannelField({ emojiEnabled: { set: emojiEnabled } }),
 });
 
 const channelAutosaves = [
@@ -166,14 +173,13 @@ const existingFilterGroups = computed(() => {
 
 const channelUpdateInput = computed<ChannelUpdateInput>(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
-    onCreate: { node: { text: tag } },
-    where: { node: { text: tag } },
+    where: { node: { text: { eq: tag } } },
   }));
 
   const tagDisconnections = existingTags.value
     .filter((tag: string) => !formValues.value.selectedTags.includes(tag))
     .map((tag: TagData) => ({
-      where: { node: { text: tag } },
+      where: { node: { text: { eq: tag } } },
     }));
 
   // Only changed groups/options are sent; see utils/filterGroupUpdates.ts
@@ -184,25 +190,32 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
   });
 
   return {
-    description: formValues.value.description,
-    displayName: formValues.value.displayName,
-    channelIconURL: formValues.value.channelIconURL,
-    channelBannerURL: formValues.value.channelBannerURL,
-    rules: JSON.stringify(formValues.value.rules),
-    wikiEnabled: formValues.value.wikiEnabled,
-    eventsEnabled: formValues.value.eventsEnabled,
-    feedbackEnabled: formValues.value.feedbackEnabled,
-    imageUploadsEnabled: formValues.value.imageUploadsEnabled,
-    markdownImagesEnabled: formValues.value.markdownImagesEnabled,
-    emojiEnabled: formValues.value.emojiEnabled,
-    downloadsEnabled: formValues.value.downloadsEnabled,
-    allowedFileTypes: formValues.value.allowedFileTypes,
-    Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
+    description: { set: formValues.value.description },
+    displayName: { set: formValues.value.displayName },
+    channelIconURL: { set: formValues.value.channelIconURL },
+    channelBannerURL: { set: formValues.value.channelBannerURL },
+    rules: { set: JSON.stringify(formValues.value.rules) },
+    wikiEnabled: { set: formValues.value.wikiEnabled },
+    eventsEnabled: { set: formValues.value.eventsEnabled },
+    feedbackEnabled: { set: formValues.value.feedbackEnabled },
+    imageUploadsEnabled: { set: formValues.value.imageUploadsEnabled },
+    markdownImagesEnabled: { set: formValues.value.markdownImagesEnabled },
+    emojiEnabled: { set: formValues.value.emojiEnabled },
+    downloadsEnabled: { set: formValues.value.downloadsEnabled },
+    allowedFileTypes: { set: formValues.value.allowedFileTypes },
+    // v7 Tags update input no longer exposes `connectOrCreate`; the custom
+    // update resolver still accepts this payload, so preserve the shape.
+    Tags: [
+      {
+        connect: tagConnections,
+        disconnect: tagDisconnections,
+      } as unknown as ChannelTagsUpdateFieldInput,
+    ],
     ...(filterGroupsUpdate.length > 0
       ? { FilterGroups: filterGroupsUpdate }
       : {}),
     Admins: [
-      { connect: [{ where: { node: { username: usernameVar.value } } }] },
+      { connect: [{ where: { node: { username: { eq: usernameVar.value } } } }] },
     ],
   };
 });
@@ -230,7 +243,7 @@ function submit() {
   try {
     const updateInput = channelUpdateInput.value;
     updateChannel({
-      where: { uniqueName: channelId },
+      where: { uniqueName: { eq: channelId } },
       update: updateInput,
     });
   } catch (error) {

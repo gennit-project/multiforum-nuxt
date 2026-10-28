@@ -11,7 +11,7 @@ describe('buildAlbumUpdateInput', () => {
       albumData: { images: [{ id: 'i1' }], imageOrder: ['i1'] },
     });
     expect(result.Album?.create?.node?.Images?.connect).toEqual([
-      { where: { node: { id: 'i1' } } },
+      { where: { node: { id: { eq: 'i1' } } } },
     ]);
   });
 
@@ -28,7 +28,7 @@ describe('buildAlbumUpdateInput', () => {
       existingImages: [{ id: 'i1' }],
     });
     expect(result.Album?.update?.node?.Images).toContainEqual({
-      connect: [{ where: { node: { id: 'i2' } } }],
+      connect: [{ where: { node: { id: { eq: 'i2' } } } }],
     });
   });
 
@@ -41,7 +41,9 @@ describe('buildAlbumUpdateInput', () => {
       existingAlbumId: 'a1',
       existingImages: [{ id: 'i1' }],
     });
-    expect(result.Album?.update?.node?.imageOrder).toEqual(['i1', 'i2']);
+    expect(result.Album?.update?.node?.imageOrder).toEqual({
+      set: ['i1', 'i2'],
+    });
   });
 
   it('disconnects images removed from an existing album', () => {
@@ -51,7 +53,7 @@ describe('buildAlbumUpdateInput', () => {
       existingImages: [{ id: 'i1' }],
     });
     expect(result.Album?.update?.node?.Images).toContainEqual({
-      disconnect: [{ where: { node: { id: 'i1' } } }],
+      disconnect: [{ where: { node: { id: { eq: 'i1' } } } }],
     });
   });
 });

@@ -1,5 +1,6 @@
 import type {
   Channel,
+  ChannelRole,
   Comment,
   Discussion,
   DiscussionChannel,
@@ -20,7 +21,7 @@ export type MockCommentState = {
   stickyByUsername?: string | null;
 };
 
-type CountAggregate = { count: number };
+type CountAggregate = { aggregate: { count: { nodes: number } } };
 type Override<T> = Partial<T>;
 type TagFixture = { text: string };
 type EmailFixture = { address: string };
@@ -58,14 +59,14 @@ export type BasicUserFixture = UserFixture &
   > & {
     Email: EmailFixture;
     notifyOnSubscribedIssueUpdates: boolean;
-    NotificationsAggregate: CountAggregate;
-    CommentsAggregate: CountAggregate;
-    DiscussionsAggregate: CountAggregate;
-    DownloadsAggregate: CountAggregate;
-    EventsAggregate: CountAggregate;
-    ImagesAggregate: CountAggregate;
-    AlbumsAggregate: CountAggregate;
-    AdminOfChannelsAggregate: CountAggregate;
+    NotificationsConnection: CountAggregate;
+    CommentsConnection: CountAggregate;
+    DiscussionsConnection: CountAggregate;
+    DownloadsConnection: CountAggregate;
+    EventsConnection: CountAggregate;
+    ImagesConnection: CountAggregate;
+    AlbumsConnection: CountAggregate;
+    AdminOfChannelsConnection: CountAggregate;
   };
 
 export type ServerConfigFixture = Pick<
@@ -142,9 +143,9 @@ export type ChannelFixture = Pick<
   DefaultElevatedModRole: null;
   Admins: UserFixture[];
   LockedBy: { displayName: string } | null;
-  DiscussionChannelsAggregate: CountAggregate;
-  IssuesAggregate: CountAggregate;
-  EventChannelsAggregate: CountAggregate;
+  DiscussionChannelsConnection: CountAggregate;
+  IssuesConnection: CountAggregate;
+  EventChannelsConnection: CountAggregate;
 };
 
 export type DiscussionChannelFixture = Pick<
@@ -173,10 +174,10 @@ export type DiscussionChannelFixture = Pick<
     | 'emojiEnabled'
   > & { Bots: unknown[] };
   Discussion: Pick<Discussion, 'id' | 'title'> & { Author: UserFixture };
-  CommentsAggregate: CountAggregate;
-  RootCommentsAggregate: CountAggregate;
+  CommentsConnection: CountAggregate;
+  RootCommentsConnection: CountAggregate;
   UpvotedByUsers: Array<Pick<User, 'username'>>;
-  UpvotedByUsersAggregate: CountAggregate;
+  UpvotedByUsersConnection: CountAggregate;
   SuperUpvotedByUsers: Array<Pick<User, 'username'>>;
   SubscribedToNotifications: Array<Pick<User, 'username'>>;
 };
@@ -204,7 +205,7 @@ export type DiscussionFixture = Pick<
   Tags: TagFixture[];
   Author: UserFixture;
   DiscussionChannels: DiscussionChannelFixture[];
-  FeedbackCommentsAggregate: CountAggregate;
+  FeedbackCommentsConnection: CountAggregate;
 };
 
 export type CommentFixture = Pick<
@@ -226,10 +227,10 @@ export type CommentFixture = Pick<
   stickyAt: string | null;
   stickyByUsername: string | null;
   CommentAuthor: UserFixture;
-  ChildCommentsAggregate: CountAggregate;
+  ChildCommentsConnection: CountAggregate;
   ParentComment: Pick<Comment, 'id'> | null;
   ChildComments: CommentFixture[];
-  FeedbackCommentsAggregate: CountAggregate;
+  FeedbackCommentsConnection: CountAggregate;
   SubscribedToNotifications: Array<Pick<User, 'username'>>;
   DiscussionChannel: Pick<
     DiscussionChannel,
@@ -237,7 +238,7 @@ export type CommentFixture = Pick<
   >;
   Channel: Pick<Channel, '__typename' | 'uniqueName'>;
   UpvotedByUsers: Array<Pick<User, 'username'>>;
-  UpvotedByUsersAggregate: CountAggregate;
+  UpvotedByUsersConnection: CountAggregate;
   SuperUpvotedByUsers: Array<Pick<User, 'username'>>;
 };
 
@@ -275,14 +276,14 @@ export const buildBasicUser = (
   notificationBundleEnabled: false,
   notificationBundleContent: 'all',
   enableSensitiveContentByDefault: false,
-  NotificationsAggregate: { count: 0 },
-  CommentsAggregate: { count: 0 },
-  DiscussionsAggregate: { count: 0 },
-  DownloadsAggregate: { count: 0 },
-  EventsAggregate: { count: 0 },
-  ImagesAggregate: { count: 0 },
-  AlbumsAggregate: { count: 0 },
-  AdminOfChannelsAggregate: { count: 1 },
+  NotificationsConnection: { aggregate: { count: { nodes: 0 } } },
+  CommentsConnection: { aggregate: { count: { nodes: 0 } } },
+  DiscussionsConnection: { aggregate: { count: { nodes: 0 } } },
+  DownloadsConnection: { aggregate: { count: { nodes: 0 } } },
+  EventsConnection: { aggregate: { count: { nodes: 0 } } },
+  ImagesConnection: { aggregate: { count: { nodes: 0 } } },
+  AlbumsConnection: { aggregate: { count: { nodes: 0 } } },
+  AdminOfChannelsConnection: { aggregate: { count: { nodes: 1 } } },
   ...overrides,
 });
 
@@ -495,10 +496,10 @@ export const buildChannel = ({
     canUpvoteComment: true,
     canUpvoteDiscussion: true,
     channelUniqueName: uniqueName,
-  },
-  DiscussionChannelsAggregate: { count: discussionChannelsCount },
-  IssuesAggregate: { count: 0 },
-  EventChannelsAggregate: { count: 0 },
+  } as unknown as ChannelRole,
+  DiscussionChannelsConnection: { aggregate: { count: { nodes: discussionChannelsCount } } },
+  IssuesConnection: { aggregate: { count: { nodes: 0 } } },
+  EventChannelsConnection: { aggregate: { count: { nodes: 0 } } },
   FilterGroups: [],
   ...overrides,
 });
@@ -543,10 +544,10 @@ export const buildDiscussionChannel = ({
     title,
     Author: buildUser(),
   },
-  CommentsAggregate: { count: commentsCount },
-  RootCommentsAggregate: { count: commentsCount },
+  CommentsConnection: { aggregate: { count: { nodes: commentsCount } } },
+  RootCommentsConnection: { aggregate: { count: { nodes: commentsCount } } },
   UpvotedByUsers: [{ username: DEFAULT_USERNAME }],
-  UpvotedByUsersAggregate: { count: 1 },
+  UpvotedByUsersConnection: { aggregate: { count: { nodes: 1 } } },
   SuperUpvotedByUsers: [],
   SubscribedToNotifications: [],
   Answers: [],
@@ -597,7 +598,7 @@ export const buildDiscussion = ({
     }),
   ],
   DownloadableFiles: [],
-  FeedbackCommentsAggregate: { count: 0 },
+  FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
   FeedbackComments: [],
   PastTitleVersions: [],
   PastBodyVersions: [],
@@ -631,10 +632,8 @@ export const buildComment = ({
   stickyByUsername: comment.stickyByUsername ?? null,
   isFavoritedByUser: false,
   CommentAuthor: buildUser(),
-  ChildCommentsAggregate: {
-    count: comments.filter((child) => child.parentCommentId === comment.id)
-      .length,
-  },
+  ChildCommentsConnection: { aggregate: { count: { nodes: comments.filter((child) => child.parentCommentId === comment.id)
+      .length, } } },
   ParentComment: comment.parentCommentId
     ? { id: comment.parentCommentId }
     : null,
@@ -650,7 +649,7 @@ export const buildComment = ({
       })
     ),
   FeedbackComments: [],
-  FeedbackCommentsAggregate: { count: 0 },
+  FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
   PastVersions: [],
   SubscribedToNotifications: [],
   Event: null,
@@ -665,7 +664,7 @@ export const buildComment = ({
     uniqueName: channelUniqueName,
   },
   UpvotedByUsers: [{ username: DEFAULT_USERNAME }],
-  UpvotedByUsersAggregate: { count: 1 },
+  UpvotedByUsersConnection: { aggregate: { count: { nodes: 1 } } },
   SuperUpvotedByUsers: [],
 });
 
@@ -694,7 +693,7 @@ export type EventFixture = {
   location: { latitude: number; longitude: number } | null;
   cost: string;
   Tags: Array<{ text: string }>;
-  CommentsAggregate: { count: number };
+  CommentsConnection: { aggregate: { count: { nodes: number } } };
   EventChannels: Array<{
     id: string;
     eventId: string;
@@ -708,7 +707,7 @@ export type EventFixture = {
   }>;
   SubscribedToNotifications: unknown[];
   SubscribedToEventUpdates: unknown[];
-  FeedbackCommentsAggregate: { count: number };
+  FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } };
   FeedbackComments: unknown[];
   Poster: UserFixture;
 };
@@ -754,7 +753,7 @@ export const buildEvent = ({
   location: null,
   cost: '',
   Tags: [],
-  CommentsAggregate: { count: 0 },
+  CommentsConnection: { aggregate: { count: { nodes: 0 } } },
   EventChannels: [
     {
       id: eventChannelId,
@@ -770,7 +769,7 @@ export const buildEvent = ({
   ],
   SubscribedToNotifications: [],
   SubscribedToEventUpdates: [],
-  FeedbackCommentsAggregate: { count: 0 },
+  FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
   FeedbackComments: [],
   Poster: buildUser({
     username: posterUsername,
@@ -801,12 +800,12 @@ export type IssueActivityCommentFixture = {
     displayName: string;
   };
   Channel: { uniqueName: string };
-  ChildCommentsAggregate: CountAggregate;
+  ChildCommentsConnection: CountAggregate;
   ParentComment: null;
   editReason: string;
   PastVersions: [];
   UpvotedByUsers: [];
-  UpvotedByUsersAggregate: CountAggregate;
+  UpvotedByUsersConnection: CountAggregate;
   SuperUpvotedByUsers: [];
 };
 
@@ -920,12 +919,12 @@ export const buildModCommentActivityItem = ({
       displayName: modDisplayName,
     },
     Channel: { uniqueName: channelUniqueName },
-    ChildCommentsAggregate: { count: 0 },
+    ChildCommentsConnection: { aggregate: { count: { nodes: 0 } } },
     ParentComment: null,
     editReason: '',
     PastVersions: [],
     UpvotedByUsers: [],
-    UpvotedByUsersAggregate: { count: 0 },
+    UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
     SuperUpvotedByUsers: [],
   },
 });
@@ -956,7 +955,7 @@ export type IssueFixture = {
   lockReason: string | null;
   LockedBy: { displayName: string } | null;
   ActivityFeed: ModerationActionFixture[];
-  ActivityFeedAggregate: { count: number };
+  ActivityFeedConnection: { aggregate: { count: { nodes: number } } };
 };
 
 export const buildIssue = ({
@@ -1005,9 +1004,7 @@ export const buildIssue = ({
   lockReason: locked ? 'Locked for review' : null,
   LockedBy: locked ? { displayName: 'mod-alice' } : null,
   ActivityFeed: activityFeed,
-  ActivityFeedAggregate: {
-    count: activityFeed.filter((a) => a.actionType === 'report').length,
-  },
+  ActivityFeedConnection: { aggregate: { count: { nodes: activityFeed.filter((a) => a.actionType === 'report').length, } } },
   ...overrides,
 });
 

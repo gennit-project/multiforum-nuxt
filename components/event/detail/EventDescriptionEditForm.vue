@@ -27,7 +27,7 @@ const {
   onDone,
 } = useMutation(UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: {
-    where: { id: props.event.id },
+    where: { id: { eq: props.event.id } },
     updateEventInput: formValues.value,
     channelConnections: [],
     channelDisconnections: [],

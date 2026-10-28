@@ -31,7 +31,7 @@ describe('GET_DOWNLOAD_DETAIL', () => {
   it('keeps the fields required by the initial download view', () => {
     expect(source).toContain('query getDownloadDetail');
     expect(source).toContain(
-      'DiscussionChannels(where: {channelUniqueName: $channelUniqueName})'
+      'DiscussionChannels(where: {channelUniqueName: {eq: $channelUniqueName}})'
     );
     expect(source).toContain('DownloadableFiles');
     expect(source).toContain('scanStatus');

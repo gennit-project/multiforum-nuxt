@@ -4,7 +4,9 @@ import { ref } from 'vue';
 import InlineCommentForm from './InlineCommentForm.vue';
 import type { Mutation } from '@/__generated__/graphql';
 
-type CreateCommentsResult = { data?: Pick<Mutation, 'createComments'> };
+type CreateCommentsResult = {
+  data?: Pick<Mutation, 'createCommentWithOwnedConnections'>;
+};
 
 const createCommentError = ref<{ message: string } | null>(null);
 const createCommentLoading = ref(false);
@@ -110,7 +112,7 @@ const buildFakeCache = (
 
 const successResult = () => ({
   data: {
-    createComments: {
+    createCommentWithOwnedConnections: {
       comments: [{ id: 'new-comment-1', text: 'hi', __typename: 'Comment' }],
     },
   },
@@ -260,7 +262,7 @@ describe('InlineCommentForm — cache update', () => {
     buildWrapper();
     const cache = buildFakeCache({ getCommentSection: { Comments: [] } });
     capturedMutationOptions!().update(cache, {
-      data: { createComments: { comments: [] } },
+      data: { createCommentWithOwnedConnections: { comments: [] } },
     });
     errorSpy.mockRestore();
 

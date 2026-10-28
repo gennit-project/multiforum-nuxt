@@ -55,7 +55,7 @@ const getBaseMocks = (username: string) => ({
   getChannelDownloadCount: () => ({
     data: {
       channels: [
-        { uniqueName: 'cats', DiscussionChannelsAggregate: { count: 0 } },
+        { uniqueName: 'cats', DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } } },
       ],
     },
   }),
@@ -109,7 +109,7 @@ test('renders server-suspended users (temporary + indefinite) with issue links',
           {
             __typename: 'ServerConfig',
             serverName: 'Listical',
-            SuspendedUsersAggregate: { count: 2 },
+            SuspendedUsersConnection: { aggregate: { count: { nodes: 2 } } },
             SuspendedUsers: [
               userSuspension(),
               userSuspension({
@@ -167,7 +167,7 @@ test('shows the empty state when there are no server-suspended users', async ({
           {
             __typename: 'ServerConfig',
             serverName: 'Listical',
-            SuspendedUsersAggregate: { count: 0 },
+            SuspendedUsersConnection: { aggregate: { count: { nodes: 0 } } },
             SuspendedUsers: [],
           },
         ],
@@ -199,7 +199,7 @@ test('uses a dark background for the suspensions navigation in dark mode', async
           {
             __typename: 'ServerConfig',
             serverName: 'Listical',
-            SuspendedUsersAggregate: { count: 0 },
+            SuspendedUsersConnection: { aggregate: { count: { nodes: 0 } } },
             SuspendedUsers: [],
           },
         ],
@@ -239,7 +239,7 @@ test('renders server-suspended mods with the mod name and issue link', async ({
           {
             __typename: 'ServerConfig',
             serverName: 'Listical',
-            SuspendedModsAggregate: { count: 1 },
+            SuspendedModsConnection: { aggregate: { count: { nodes: 1 } } },
             SuspendedMods: [modSuspension()],
           },
         ],
@@ -275,7 +275,7 @@ test('shows the empty state when there are no server-suspended mods', async ({
           {
             __typename: 'ServerConfig',
             serverName: 'Listical',
-            SuspendedModsAggregate: { count: 0 },
+            SuspendedModsConnection: { aggregate: { count: { nodes: 0 } } },
             SuspendedMods: [],
           },
         ],
@@ -310,7 +310,7 @@ test('follows a user suspension to its reported discussion and unsuspends the au
           {
             __typename: 'ServerConfig',
             serverName: 'Listical',
-            SuspendedUsersAggregate: { count: suspended ? 1 : 0 },
+            SuspendedUsersConnection: { aggregate: { count: { nodes: suspended ? 1 : 0 } } },
             SuspendedUsers: suspended ? [scenario.suspension] : [],
           },
         ],
@@ -382,7 +382,7 @@ test('follows a mod suspension to its reported comment and unsuspends the mod', 
           {
             __typename: 'ServerConfig',
             serverName: 'Listical',
-            SuspendedModsAggregate: { count: suspended ? 1 : 0 },
+            SuspendedModsConnection: { aggregate: { count: { nodes: suspended ? 1 : 0 } } },
             SuspendedMods: suspended ? [scenario.suspension] : [],
           },
         ],

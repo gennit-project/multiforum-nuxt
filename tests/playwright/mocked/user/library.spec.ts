@@ -81,7 +81,7 @@ const getBaseMocks = (username: string) => ({
         {
           __typename: 'User',
           username,
-          OwnedDownloadsAggregate: { count: 7 },
+          OwnedDownloadsConnection: { aggregate: { count: { nodes: 7 } } },
         },
       ],
     },

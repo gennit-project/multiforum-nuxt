@@ -110,7 +110,7 @@ test('opens comment feedback from a discussion selected in list query state', as
           comments: [
             {
               ...comment,
-              FeedbackCommentsAggregate: { count: 0 },
+              FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
               FeedbackComments: [],
             },
           ],

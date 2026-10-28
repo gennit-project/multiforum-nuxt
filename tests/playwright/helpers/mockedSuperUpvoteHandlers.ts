@@ -81,7 +81,7 @@ const buildStatefulDiscussionChannel = (state: SuperUpvoteState) =>
     overrides: {
       weightedVotesCount: state.upvoters.length + state.superUpvoters.length,
       UpvotedByUsers: toUsernameList(state.upvoters),
-      UpvotedByUsersAggregate: { count: state.upvoters.length },
+      UpvotedByUsersConnection: { aggregate: { count: { nodes: state.upvoters.length } } },
       SuperUpvotedByUsers: toUsernameList(state.superUpvoters),
       Discussion: {
         id: state.discussionId,
@@ -97,7 +97,7 @@ const buildVoteMutationResult = (state: SuperUpvoteState) => ({
   id: state.discussionChannelId,
   weightedVotesCount: state.upvoters.length + state.superUpvoters.length,
   UpvotedByUsers: toUsernameList(state.upvoters),
-  UpvotedByUsersAggregate: { count: state.upvoters.length },
+  UpvotedByUsersConnection: { aggregate: { count: { nodes: state.upvoters.length } } },
   SuperUpvotedByUsers: toUsernameList(state.superUpvoters),
   __typename: 'DiscussionChannel',
 });
@@ -154,7 +154,7 @@ export const createSuperUpvoteHandlers = (
             archived: false,
             answered: false,
             locked: false,
-            CommentsAggregate: { count: 0 },
+            CommentsConnection: { aggregate: { count: { nodes: 0 } } },
           },
         ],
       },
@@ -353,8 +353,8 @@ export const createReceivedNotificationHandlers = (
           __typename: 'User',
           username: state.recipientUsername,
           Notifications: [buildScratchpadNotification(state)],
-          NotificationsAggregate: { count: state.read ? 0 : 1 },
-          totalNotificationsAggregate: { count: 1 },
+          NotificationsAggregate: { aggregate: { count: { nodes: state.read ? 0 : 1 } } },
+          totalNotificationsAggregate: { aggregate: { count: { nodes: 1 } } },
         },
       ],
     },
@@ -367,8 +367,8 @@ export const createReceivedNotificationHandlers = (
           __typename: 'User',
           username: state.recipientUsername,
           Notifications: [],
-          NotificationsAggregate: { count: 0 },
-          totalNotificationsAggregate: { count: 0 },
+          NotificationsAggregate: { aggregate: { count: { nodes: 0 } } },
+          totalNotificationsAggregate: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },
@@ -423,8 +423,8 @@ export const createKudosPageHandlers = (
 
   getPublicScratchpadEntries: () => ({
     data: {
-      scratchpadEntriesAggregate: {
-        count: state.isPublic ? 1 : 0,
+      scratchpadEntriesConnection: {
+        aggregate: { count: { nodes: state.isPublic ? 1 : 0 } },
       },
       scratchpadEntries: state.isPublic ? [buildScratchpadEntry(state)] : [],
     },
@@ -478,7 +478,7 @@ const buildStatefulComment = (state: CommentSuperUpvoteState) => ({
   }),
   CommentAuthor: buildUser({ username: state.commentAuthor }),
   UpvotedByUsers: toUsernameList(state.upvoters),
-  UpvotedByUsersAggregate: { count: state.upvoters.length },
+  UpvotedByUsersConnection: { aggregate: { count: { nodes: state.upvoters.length } } },
   SuperUpvotedByUsers: toUsernameList(state.superUpvoters),
 });
 
@@ -488,7 +488,7 @@ const buildCommentVoteResult = (state: CommentSuperUpvoteState) => ({
   id: state.commentId,
   weightedVotesCount: state.upvoters.length + state.superUpvoters.length,
   UpvotedByUsers: toUsernameList(state.upvoters),
-  UpvotedByUsersAggregate: { count: state.upvoters.length },
+  UpvotedByUsersConnection: { aggregate: { count: { nodes: state.upvoters.length } } },
   SuperUpvotedByUsers: toUsernameList(state.superUpvoters),
 });
 
@@ -504,7 +504,7 @@ export const createCommentSuperUpvoteHandlers = (
     title: 'Discussion with a comment',
     overrides: {
       UpvotedByUsers: [],
-      UpvotedByUsersAggregate: { count: 0 },
+      UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
       SuperUpvotedByUsers: [],
       Discussion: {
         id: state.discussionId,
@@ -559,7 +559,7 @@ export const createCommentSuperUpvoteHandlers = (
             archived: false,
             answered: false,
             locked: false,
-            CommentsAggregate: { count: 1 },
+            CommentsConnection: { aggregate: { count: { nodes: 1 } } },
           },
         ],
       },

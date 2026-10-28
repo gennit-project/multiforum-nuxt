@@ -46,7 +46,12 @@ describe('user owned forums page', () => {
 
   it('shows an empty-state message when the user owns no forums', () => {
     const wrapper = mountWith({
-      users: [{ AdminOfChannels: [], AdminOfChannelsAggregate: { count: 0 } }],
+      users: [
+        {
+          AdminOfChannels: [],
+          AdminOfChannelsConnection: { aggregate: { count: { nodes: 0 } } },
+        },
+      ],
     });
     expect(wrapper.text()).toContain('This user is not a forum owner.');
   });
@@ -56,7 +61,7 @@ describe('user owned forums page', () => {
       users: [
         {
           AdminOfChannels: [{ uniqueName: 'dogs' }],
-          AdminOfChannelsAggregate: { count: 1 },
+          AdminOfChannelsConnection: { aggregate: { count: { nodes: 1 } } },
         },
       ],
     });

@@ -15,7 +15,10 @@ const tabButtonStub = {
 };
 
 const user = (overrides: Record<string, unknown> = {}) =>
-  ({ CommentsAggregate: { count: 4 }, ...overrides }) as unknown as User;
+  ({
+    CommentsConnection: { aggregate: { count: { nodes: 4 } } },
+    ...overrides,
+  }) as unknown as User;
 
 const mountTabs = (props: Record<string, unknown> = {}) =>
   mount(UserProfileTabs, {
@@ -53,7 +56,7 @@ describe('UserProfileTabs', () => {
     const wrapper = mountTabs({
       user: user({
         wikiEditsCount: 7,
-        AuthoredWikiPageVersionsAggregate: { count: 11 },
+        AuthoredWikiPageVersionsConnection: { aggregate: { count: { nodes: 11 } } },
       }),
     });
 

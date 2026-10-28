@@ -49,7 +49,7 @@ describe('buildDownloadableFilesUpdateInput', () => {
       currentFiles: [{ id: 'f1' }],
     });
     expect(result.DownloadableFiles).toEqual([
-      { connect: [{ where: { node: { id: 'f1' } } }] },
+      { connect: [{ where: { node: { id: { eq: 'f1' } } } }] },
     ]);
   });
 
@@ -57,7 +57,7 @@ describe('buildDownloadableFilesUpdateInput', () => {
     expect(
       buildDownloadableFilesUpdateInput({ originalFiles: [], currentFiles: [] })
         .hasDownload
-    ).toBe(false);
+    ).toEqual({ set: false });
   });
 
   it('connects new files and disconnects removed ones for an existing set', () => {
@@ -67,8 +67,8 @@ describe('buildDownloadableFilesUpdateInput', () => {
     });
     expect(result.DownloadableFiles).toEqual([
       {
-        connect: [{ where: { node: { id: 'f2' } } }],
-        disconnect: [{ where: { node: { id: 'f1' } } }],
+        connect: [{ where: { node: { id: { eq: 'f2' } } } }],
+        disconnect: [{ where: { node: { id: { eq: 'f1' } } } }],
       },
     ]);
   });

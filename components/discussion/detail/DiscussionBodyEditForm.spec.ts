@@ -80,8 +80,11 @@ const mountForm = () =>
   });
 
 const mutationInput = () =>
-  (h.mutationOptions?.().variables as { updateDiscussionInput: { body: string } })
-    .updateDiscussionInput;
+  (
+    h.mutationOptions?.().variables as {
+      updateDiscussionInput: { body: { set: string } };
+    }
+  ).updateDiscussionInput;
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -105,7 +108,7 @@ describe('DiscussionBodyEditForm', () => {
 
     await wrapper.getComponent({ name: 'TextEditor' }).vm.$emit('update', 'Updated body');
 
-    expect(mutationInput().body).toBe('Updated body');
+    expect(mutationInput().body.set).toBe('Updated body');
   });
 
   it('calls the update mutation when Save is clicked', async () => {

@@ -115,7 +115,7 @@ test.describe('Bot suspension', () => {
           channels: [
             {
               uniqueName: TEST_CHANNEL,
-              DiscussionChannelsAggregate: { count: 0 },
+              DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },

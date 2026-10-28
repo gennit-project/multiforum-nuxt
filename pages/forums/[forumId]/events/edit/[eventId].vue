@@ -19,7 +19,7 @@ import type { EventEditScope } from '@/components/event/form/EditScopeModal.vue'
 import type {
   EventChannel,
   EventUpdateInput,
-  EventTagsConnectOrCreateFieldInput,
+  EventTagsConnectFieldInput,
   EventTagsDisconnectFieldInput,
   Event,
   Tag as TagData,
@@ -141,17 +141,12 @@ const channelDisconnections = computed(() => {
 });
 
 const updateEventInput = computed<EventUpdateInput>(() => {
-  const tagConnections: EventTagsConnectOrCreateFieldInput[] =
+  const tagConnections: EventTagsConnectFieldInput[] =
     formValues.value.selectedTags.map((tag: string) => {
       return {
-        onCreate: {
-          node: {
-            text: tag,
-          },
-        },
         where: {
           node: {
-            text: tag,
+            text: { eq: tag },
           },
         },
       };
@@ -166,7 +161,7 @@ const updateEventInput = computed<EventUpdateInput>(() => {
         return {
           where: {
             node: {
-              text: tag,
+              text: { eq: tag },
             },
           },
         };
@@ -190,23 +185,23 @@ const updateEventInput = computed<EventUpdateInput>(() => {
       title prevents the empty string from being created on the back
       end if the title is not provided.
     */
-    title: formValues.value.title || null,
-    description: formValues.value.description || null,
-    startTime: formValues.value.startTime || null,
-    startTimeDayOfWeek: startTimePieces.startTimeDayOfWeek || null,
-    startTimeHourOfDay: startTimePieces.startTimeHourOfDay,
-    endTime: formValues.value.endTime || null,
-    canceled: formValues.value.canceled,
-    cost: formValues.value.cost,
-    free: formValues.value.free,
-    virtualEventUrl: formValues.value.virtualEventUrl || null,
-    isInPrivateResidence: formValues.value.isInPrivateResidence || null,
-    isHostedByOP: formValues.value.isHostedByOP || false,
-    isAllDay: formValues.value.isAllDay || false,
-    coverImageURL: formValues.value.coverImageURL || null,
+    title: { set: formValues.value.title || null },
+    description: { set: formValues.value.description || null },
+    startTime: { set: formValues.value.startTime || null },
+    startTimeDayOfWeek: { set: startTimePieces.startTimeDayOfWeek || null },
+    startTimeHourOfDay: { set: startTimePieces.startTimeHourOfDay },
+    endTime: { set: formValues.value.endTime || null },
+    canceled: { set: formValues.value.canceled },
+    cost: { set: formValues.value.cost },
+    free: { set: formValues.value.free },
+    virtualEventUrl: { set: formValues.value.virtualEventUrl || null },
+    isInPrivateResidence: { set: formValues.value.isInPrivateResidence || null },
+    isHostedByOP: { set: formValues.value.isHostedByOP || false },
+    isAllDay: { set: formValues.value.isAllDay || false },
+    coverImageURL: { set: formValues.value.coverImageURL || null },
     Tags: [
       {
-        connectOrCreate: tagConnections,
+        connect: tagConnections,
         disconnect: tagDisconnections,
       },
     ],
@@ -214,12 +209,14 @@ const updateEventInput = computed<EventUpdateInput>(() => {
 
   if (formValues.value.latitude && formValues.value.longitude) {
     const locationValues = {
-      locationName: formValues.value.locationName,
+      locationName: { set: formValues.value.locationName },
       location: {
-        latitude: formValues.value.latitude,
-        longitude: formValues.value.longitude,
+        set: {
+          latitude: formValues.value.latitude,
+          longitude: formValues.value.longitude,
+        },
       },
-      address: formValues.value.address,
+      address: { set: formValues.value.address },
     };
     input = { ...input, ...locationValues };
   }
@@ -286,7 +283,7 @@ function submit() {
     channelConnections: channelConnections.value,
     channelDisconnections: channelDisconnections.value,
     where: {
-      id: eventId,
+      id: { eq: eventId },
     },
   };
   updateEvent(variables);

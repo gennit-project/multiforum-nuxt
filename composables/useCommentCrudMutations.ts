@@ -50,7 +50,8 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
   } = useMutation(CREATE_COMMENT, {
     errorPolicy: 'none',
     update: (cache, result) => {
-      const newComment: CommentType = result.data?.createComments?.comments?.[0];
+      const newComment: CommentType =
+        result.data?.createCommentWithOwnedConnections?.comments?.[0];
       const newCommentParentId = newComment?.ParentComment?.id;
 
       // Handle root comments
@@ -64,10 +65,14 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
             Comments(existingComments = []) {
               return [newComment, ...existingComments];
             },
-            CommentsAggregate(existing = { count: 0 }) {
+            CommentsConnection(existing) {
+              const nodes = existing?.aggregate?.count?.nodes || 0;
               return {
                 ...existing,
-                count: (existing?.count || 0) + 1,
+                aggregate: {
+                  ...existing?.aggregate,
+                  count: { ...existing?.aggregate?.count, nodes: nodes + 1 },
+                },
               };
             },
           },
@@ -128,10 +133,14 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
             id: newCommentParentId,
           }),
           fields: {
-            ChildCommentsAggregate(existing = { count: 0 }) {
+            ChildCommentsConnection(existing) {
+              const nodes = existing?.aggregate?.count?.nodes || 0;
               return {
-                __typename: 'CommentsAggregate',
-                count: (existing.count || 0) + 1,
+                ...existing,
+                aggregate: {
+                  ...existing?.aggregate,
+                  count: { ...existing?.aggregate?.count, nodes: nodes + 1 },
+                },
               };
             },
             replyCount(existing = 0) {
@@ -182,10 +191,17 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
                 (reply: CommentType) => reply.id !== commentToDeleteId.value
               );
             },
-            ChildCommentsAggregate(existing = { count: 0 }) {
+            ChildCommentsConnection(existing) {
+              const nodes = existing?.aggregate?.count?.nodes || 0;
               return {
                 ...existing,
-                count: Math.max(0, (existing.count || 0) - 1),
+                aggregate: {
+                  ...existing?.aggregate,
+                  count: {
+                    ...existing?.aggregate?.count,
+                    nodes: Math.max(0, nodes - 1),
+                  },
+                },
               };
             },
           },
@@ -203,10 +219,17 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
                 (comment: CommentType) => comment.id !== commentToDeleteId.value
               );
             },
-            CommentsAggregate(existing = { count: 0 }) {
+            CommentsConnection(existing) {
+              const nodes = existing?.aggregate?.count?.nodes || 0;
               return {
                 ...existing,
-                count: Math.max(0, (existing.count || 0) - 1),
+                aggregate: {
+                  ...existing?.aggregate,
+                  count: {
+                    ...existing?.aggregate?.count,
+                    nodes: Math.max(0, nodes - 1),
+                  },
+                },
               };
             },
           },

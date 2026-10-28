@@ -88,10 +88,10 @@ export function buildDownloadableFilesUpdateInput(params: {
     const connectArray: DiscussionDownloadableFilesConnectFieldInput[] =
       currentFiles
         .filter((file) => file.id)
-        .map((file) => ({ where: { node: { id: file.id } } }));
+        .map((file) => ({ where: { node: { id: { eq: file.id } } } }));
 
     return {
-      hasDownload: currentFiles.length > 0,
+      hasDownload: { set: currentFiles.length > 0 },
       DownloadableFiles:
         connectArray.length > 0 ? [{ connect: connectArray }] : undefined,
     };
@@ -103,13 +103,13 @@ export function buildDownloadableFilesUpdateInput(params: {
       .filter(
         (file) => file.id && !originalFiles.some((old) => old.id === file.id)
       )
-      .map((file) => ({ where: { node: { id: file.id } } }));
+      .map((file) => ({ where: { node: { id: { eq: file.id } } } }));
 
   // Disconnect old files no longer present.
   const disconnectArray: DiscussionDownloadableFilesDisconnectFieldInput[] =
     originalFiles
       .filter((old) => !currentFiles.some((file) => file.id === old.id))
-      .map((old) => ({ where: { node: { id: old.id } } }));
+      .map((old) => ({ where: { node: { id: { eq: old.id } } } }));
 
   const updateFieldInput: DiscussionDownloadableFilesUpdateFieldInput = {};
   if (connectArray.length > 0) {
@@ -120,7 +120,7 @@ export function buildDownloadableFilesUpdateInput(params: {
   }
 
   return {
-    hasDownload: currentFiles.length > 0,
+    hasDownload: { set: currentFiles.length > 0 },
     DownloadableFiles:
       Object.keys(updateFieldInput).length > 0 ? [updateFieldInput] : undefined,
   };

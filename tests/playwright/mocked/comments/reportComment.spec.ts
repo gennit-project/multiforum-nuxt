@@ -61,13 +61,13 @@ test('reports a comment with mocked GraphQL', async ({ page, setupMockedPage }) 
         moderatorDisplayName: 'alice',
         serverConfigOverrides: {
           rules: DEFAULT_RULES_JSON,
-          DefaultModRole: DEFAULT_MOD_ROLE,
-          DefaultElevatedModRole: DEFAULT_MOD_ROLE,
+          DefaultModRole: DEFAULT_MOD_ROLE as any,
+          DefaultElevatedModRole: DEFAULT_MOD_ROLE as any,
         },
         channelOverrides: {
           rules: DEFAULT_RULES_JSON,
-          DefaultModRole: DEFAULT_MOD_ROLE,
-          ElevatedModRole: DEFAULT_MOD_ROLE,
+          DefaultModRole: DEFAULT_MOD_ROLE as any,
+          ElevatedModRole: DEFAULT_MOD_ROLE as any,
         },
       }),
       getServerRules: () => ({
@@ -138,7 +138,7 @@ test('reports a comment with mocked GraphQL', async ({ page, setupMockedPage }) 
               archived: false,
               answered: false,
               locked: false,
-              CommentsAggregate: { count: 1 },
+              CommentsConnection: { aggregate: { count: { nodes: 1 } } },
             },
           ],
         },

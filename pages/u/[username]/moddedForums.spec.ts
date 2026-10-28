@@ -46,7 +46,12 @@ describe('user modded forums page', () => {
 
   it('shows an empty-state message when the user mods no forums', () => {
     const wrapper = mountWith({
-      users: [{ ModOfChannels: [], ModOfChannelsAggregate: { count: 0 } }],
+      users: [
+        {
+          ModOfChannels: [],
+          ModOfChannelsConnection: { aggregate: { count: { nodes: 0 } } },
+        },
+      ],
     });
     expect(wrapper.text()).toContain('This user is not a mod in any forums.');
   });
@@ -56,7 +61,7 @@ describe('user modded forums page', () => {
       users: [
         {
           ModOfChannels: [{ uniqueName: 'cats' }],
-          ModOfChannelsAggregate: { count: 1 },
+          ModOfChannelsConnection: { aggregate: { count: { nodes: 1 } } },
         },
       ],
     });

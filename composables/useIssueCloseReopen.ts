@@ -8,7 +8,7 @@ import {
 
 // Cache query result types
 interface IssuesAggregateData {
-  issuesAggregate?: { count: number };
+  issuesConnection?: { aggregate?: { count?: { nodes?: number } } };
 }
 
 type UseIssueCloseReopenParams = {
@@ -52,17 +52,19 @@ export function useIssueCloseReopen({
         });
 
         const closedIssuesData = existingClosedIssuesData as IssuesAggregateData | null;
-        if (closedIssuesData?.issuesAggregate) {
-          const existingClosedIssues = closedIssuesData.issuesAggregate;
+        if (closedIssuesData?.issuesConnection) {
+          const existingClosedIssues = closedIssuesData.issuesConnection;
           const newClosedIssues = {
-            count: existingClosedIssues.count + 1,
+            aggregate: {
+              count: { nodes: (existingClosedIssues.aggregate?.count?.nodes ?? 0) + 1 },
+            },
           };
 
           cache.writeQuery({
             query: COUNT_CLOSED_ISSUES,
             variables: { channelUniqueName: channelId.value },
             data: {
-              issuesAggregate: newClosedIssues,
+              issuesConnection: newClosedIssues,
             },
           });
         }
@@ -75,17 +77,19 @@ export function useIssueCloseReopen({
         });
 
         const openIssuesData = existingOpenIssuesData as IssuesAggregateData | null;
-        if (openIssuesData?.issuesAggregate) {
-          const existingOpenIssues = openIssuesData.issuesAggregate;
+        if (openIssuesData?.issuesConnection) {
+          const existingOpenIssues = openIssuesData.issuesConnection;
           const newOpenIssues = {
-            count: existingOpenIssues.count - 1,
+            aggregate: {
+              count: { nodes: (existingOpenIssues.aggregate?.count?.nodes ?? 0) - 1 },
+            },
           };
 
           cache.writeQuery({
             query: COUNT_OPEN_ISSUES,
             variables: { channelUniqueName: channelId.value },
             data: {
-              issuesAggregate: newOpenIssues,
+              issuesConnection: newOpenIssues,
             },
           });
         }
@@ -120,17 +124,19 @@ export function useIssueCloseReopen({
         });
 
         const closedIssuesData = existingClosedIssuesData as IssuesAggregateData | null;
-        if (closedIssuesData?.issuesAggregate) {
-          const existingClosedIssues = closedIssuesData.issuesAggregate;
+        if (closedIssuesData?.issuesConnection) {
+          const existingClosedIssues = closedIssuesData.issuesConnection;
           const newClosedIssues = {
-            count: existingClosedIssues.count - 1,
+            aggregate: {
+              count: { nodes: (existingClosedIssues.aggregate?.count?.nodes ?? 0) - 1 },
+            },
           };
 
           cache.writeQuery({
             query: COUNT_CLOSED_ISSUES,
             variables: { channelUniqueName: channelId.value },
             data: {
-              issuesAggregate: newClosedIssues,
+              issuesConnection: newClosedIssues,
             },
           });
         }
@@ -143,17 +149,19 @@ export function useIssueCloseReopen({
         });
 
         const openIssuesData = existingOpenIssuesData as IssuesAggregateData | null;
-        if (openIssuesData?.issuesAggregate) {
-          const existingOpenIssues = openIssuesData.issuesAggregate;
+        if (openIssuesData?.issuesConnection) {
+          const existingOpenIssues = openIssuesData.issuesConnection;
           const newOpenIssues = {
-            count: existingOpenIssues.count + 1,
+            aggregate: {
+              count: { nodes: (existingOpenIssues.aggregate?.count?.nodes ?? 0) + 1 },
+            },
           };
 
           cache.writeQuery({
             query: COUNT_OPEN_ISSUES,
             variables: { channelUniqueName: channelId.value },
             data: {
-              issuesAggregate: newOpenIssues,
+              issuesConnection: newOpenIssues,
             },
           });
         }

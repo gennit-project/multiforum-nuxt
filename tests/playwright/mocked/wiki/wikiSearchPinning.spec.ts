@@ -41,7 +41,7 @@ test('forum admin can pin a wiki page from site-wide search', async ({
           data: {
             users: response.data.users.map((user) => ({
               ...user,
-              AuthoredWikiPageVersionsAggregate: { count: 0 },
+              AuthoredWikiPageVersionsConnection: { aggregate: { count: { nodes: 0 } } },
             })),
             getUserWikiEditsCount: 0,
           },

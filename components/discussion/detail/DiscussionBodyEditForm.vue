@@ -35,7 +35,7 @@ const formValues = ref({
 function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
   // Only update the discussion body
   return {
-    body: formValues.value.body,
+    body: { set: formValues.value.body },
   };
 }
 
@@ -46,7 +46,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION, () => ({
   variables: {
-    where: { id: props.discussion.id },
+    where: { id: { eq: props.discussion.id } },
     updateDiscussionInput: getUpdateDiscussionInputFromFormValues(),
   },
 }));

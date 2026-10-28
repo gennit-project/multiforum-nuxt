@@ -111,16 +111,21 @@ const handleSuperUpvoteSuccess = () => {
 };
 
 const upvoteCount = computed(() => {
-  if (!props.commentData.UpvotedByUsersAggregate) {
+  if (!props.commentData.UpvotedByUsersConnection) {
     return 0;
   }
-  return props.commentData.UpvotedByUsersAggregate?.count || 0;
+  return (
+    props.commentData.UpvotedByUsersConnection?.aggregate?.count?.nodes || 0
+  );
 });
 
 const loggedInUserDownvoted = computed(() => {
   const feedbackCommentsByLoggedInUser = props.commentData.FeedbackComments;
   if (!feedbackCommentsByLoggedInUser) {
-    return (props.commentData.FeedbackCommentsAggregate?.count || 0) > 0;
+    return (
+      (props.commentData.FeedbackCommentsConnection?.aggregate?.count?.nodes ||
+        0) > 0
+    );
   }
   return feedbackCommentsByLoggedInUser.length > 0;
 });

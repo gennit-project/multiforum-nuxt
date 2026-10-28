@@ -39,9 +39,9 @@ const modProfile = {
   __typename: 'ModerationProfile',
   displayName: TARGET_MOD,
   createdAt: MOCK_DATE,
-  AuthoredCommentsAggregate: { count: 1 },
-  AuthoredIssuesAggregate: { count: 0 },
-  ActivityFeedAggregate: { count: 0 },
+  AuthoredCommentsConnection: { aggregate: { count: { nodes: 1 } } },
+  AuthoredIssuesConnection: { aggregate: { count: { nodes: 0 } } },
+  ActivityFeedConnection: { aggregate: { count: { nodes: 0 } } },
   AuthoredComments: [modAuthoredComment],
   AuthoredIssues: [],
 };
@@ -71,13 +71,13 @@ test('reports a comment from a moderation profile comments page', async ({
         moderatorDisplayName: TEST_USER,
         serverConfigOverrides: {
           rules: DEFAULT_RULES_JSON,
-          DefaultModRole: DEFAULT_MOD_ROLE,
-          DefaultElevatedModRole: DEFAULT_MOD_ROLE,
+          DefaultModRole: DEFAULT_MOD_ROLE as any,
+          DefaultElevatedModRole: DEFAULT_MOD_ROLE as any,
         },
         channelOverrides: {
           rules: DEFAULT_RULES_JSON,
-          DefaultModRole: DEFAULT_MOD_ROLE,
-          ElevatedModRole: DEFAULT_MOD_ROLE,
+          DefaultModRole: DEFAULT_MOD_ROLE as any,
+          ElevatedModRole: DEFAULT_MOD_ROLE as any,
         },
       }),
       getServerRules: () => ({

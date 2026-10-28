@@ -19,7 +19,7 @@ import type { CreateEditEventFormValues, DateOccurrence } from '@/types/Event';
 import type {
   CreateEventSeriesInput,
   EventCreateInput,
-  EventTagsConnectOrCreateFieldInput,
+  EventTagsConnectFieldInput,
   RepeatPatternInput,
   Event,
 } from '@/__generated__/graphql';
@@ -42,10 +42,9 @@ const defaultStartTimeObj = now.startOf('hour').plus({ hours: 1 });
 const startTimePieces = ref(getTimePieces(defaultStartTimeObj));
 
 const eventCreateInput = computed<EventCreateInput>(() => {
-  const tagConnections: EventTagsConnectOrCreateFieldInput[] =
+  const tagConnections: EventTagsConnectFieldInput[] =
     formValues.value.selectedTags.map((tag: string) => ({
-      onCreate: { node: { text: tag } },
-      where: { node: { text: tag } },
+      where: { node: { text: { eq: tag } } },
     }));
 
   let input: EventCreateInput = {
@@ -63,8 +62,10 @@ const eventCreateInput = computed<EventCreateInput>(() => {
     isAllDay: formValues.value.isAllDay || false,
     isHostedByOP: formValues.value.isHostedByOP || false,
     coverImageURL: formValues.value.coverImageURL || null,
-    Tags: { connectOrCreate: tagConnections },
-    Poster: { connect: { where: { node: { username: usernameVar.value } } } },
+    Tags: { connect: tagConnections },
+    // v7: the POSTED_BY edge is set server-side from the authenticated user by
+    // the createEventWithChannelConnections resolver (EventPosterFieldInput has
+    // no `connect`), so no Poster payload is sent.
   };
 
   if (formValues.value.latitude && formValues.value.longitude) {

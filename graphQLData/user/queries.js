@@ -4,7 +4,7 @@ import { AUTHOR_FIELDS, CHANNEL_ICON_FIELDS } from '../fragments';
 export const GET_USER = gql`
   query getBasicUserInfo($username: String!) {
     getUserWikiEditsCount(username: $username)
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       ...AuthorFields
       location
       pronouns
@@ -23,34 +23,74 @@ export const GET_USER = gql`
       notificationBundleEnabled
       notificationBundleContent
       enableSensitiveContentByDefault
-      NotificationsAggregate(where: { read: false }) {
-        count
+      NotificationsConnection(where: { node: { read: { eq: false } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      CommentsAggregate(where: { NOT: { archived: true } }) {
-        count
+      CommentsConnection(where: { node: { NOT: { archived: { eq: true } } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      DiscussionsAggregate(
-        where: { OR: [{ hasDownload: false }, { hasDownload: null }] }
+      DiscussionsConnection(
+        where: {
+          node: { OR: [{ hasDownload: { eq: false } }, { hasDownload: null }] }
+        }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      DownloadsAggregate: DiscussionsAggregate(where: { hasDownload: true }) {
-        count
+      DownloadsConnection: DiscussionsConnection(
+        where: { node: { hasDownload: { eq: true } } }
+      ) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      EventsAggregate {
-        count
+      EventsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      ImagesAggregate {
-        count
+      ImagesConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      AlbumsAggregate {
-        count
+      AlbumsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      AuthoredWikiPageVersionsAggregate {
-        count
+      AuthoredWikiPageVersionsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      AdminOfChannelsAggregate {
-        count
+      AdminOfChannelsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -63,39 +103,79 @@ export const GET_USER = gql`
 export const GET_PUBLIC_USER_PROFILE = gql`
   query getPublicUserProfile($username: String!) {
     getUserWikiEditsCount(username: $username)
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       ...AuthorFields
       location
       pronouns
       bio
-      CommentsAggregate(where: { NOT: { archived: true } }) {
-        count
+      CommentsConnection(where: { node: { NOT: { archived: { eq: true } } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      DiscussionsAggregate(
-        where: { OR: [{ hasDownload: false }, { hasDownload: null }] }
+      DiscussionsConnection(
+        where: {
+          node: { OR: [{ hasDownload: { eq: false } }, { hasDownload: null }] }
+        }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      DownloadsAggregate: DiscussionsAggregate(where: { hasDownload: true }) {
-        count
+      DownloadsConnection: DiscussionsConnection(
+        where: { node: { hasDownload: { eq: true } } }
+      ) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      EventsAggregate {
-        count
+      EventsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      ImagesAggregate {
-        count
+      ImagesConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      AlbumsAggregate {
-        count
+      AlbumsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      AuthoredWikiPageVersionsAggregate {
-        count
+      AuthoredWikiPageVersionsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      AdminOfChannelsAggregate {
-        count
+      AdminOfChannelsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      ModOfChannelsAggregate {
-        count
+      ModOfChannelsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -109,15 +189,21 @@ export const GET_USER_COMMENTS = gql`
     $limit: Int!
     $where: CommentWhere
   ) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       profilePicURL
-      CommentsAggregate(where: $where) {
-        count
+      CommentsConnection(where: { node: $where }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       Comments(
         where: $where
-        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+        limit: $limit
+        offset: $offset
+        sort: { createdAt: DESC }
       ) {
         id
         text
@@ -156,8 +242,12 @@ export const GET_USER_COMMENTS = gql`
         Channel {
           uniqueName
         }
-        UpvotedByUsersAggregate {
-          count
+        UpvotedByUsersConnection {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
         UpvotedByUsers {
           username
@@ -169,10 +259,10 @@ export const GET_USER_COMMENTS = gql`
 
 export const GET_USER_DISCUSSIONS = gql`
   query getUserDiscussions($username: String!, $where: DiscussionWhere) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       profilePicURL
-      Discussions(where: $where, options: { sort: { createdAt: DESC } }) {
+      Discussions(where: $where, sort: { createdAt: DESC }) {
         id
         Author {
           username
@@ -208,10 +298,10 @@ export const GET_USER_DISCUSSIONS = gql`
 
 export const GET_USER_DOWNLOADS = gql`
   query getUserDownloads($username: String!, $where: DiscussionWhere) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       profilePicURL
-      Discussions(where: $where, options: { sort: { createdAt: DESC } }) {
+      Discussions(where: $where, sort: { createdAt: DESC }) {
         id
         Author {
           username
@@ -235,8 +325,12 @@ export const GET_USER_DOWNLOADS = gql`
           Channel {
             uniqueName
           }
-          CommentsAggregate {
-            count
+          CommentsConnection {
+            aggregate {
+              count {
+                nodes
+              }
+            }
           }
           weightedVotesCount
           id
@@ -262,11 +356,11 @@ export const GET_USER_DOWNLOADS = gql`
 
 export const GET_USER_OWNED_DOWNLOADS = gql`
   query getUserOwnedDownloads($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       OwnedDownloads(
-        where: { hasDownload: true }
-        options: { sort: { createdAt: DESC } }
+        where: { hasDownload: { eq: true } }
+        sort: { createdAt: DESC }
       ) {
         id
         title
@@ -294,8 +388,12 @@ export const GET_USER_OWNED_DOWNLOADS = gql`
             uniqueName
             displayName
           }
-          CommentsAggregate {
-            count
+          CommentsConnection {
+            aggregate {
+              count {
+                nodes
+              }
+            }
           }
         }
         Tags {
@@ -318,10 +416,14 @@ export const GET_USER_OWNED_DOWNLOADS = gql`
 
 export const GET_USER_OWNED_DOWNLOADS_COUNT = gql`
   query getUserOwnedDownloadsCount($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
-      OwnedDownloadsAggregate(where: { hasDownload: true }) {
-        count
+      OwnedDownloadsConnection(where: { node: { hasDownload: { eq: true } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -352,10 +454,10 @@ export const GET_UPLOADED_DOWNLOADABLE_FILES = gql`
 
 export const GET_USER_EVENTS = gql`
   query getUserEvents($username: String!, $where: EventWhere) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       profilePicURL
-      Events(where: $where, options: { sort: { createdAt: DESC } }) {
+      Events(where: $where, sort: { createdAt: DESC }) {
         id
         title
         startTime
@@ -392,7 +494,7 @@ export const GET_USER_WIKI_EDITS = gql`
     $where: WikiPageWhere
     $versionWhere: TextVersionWhere
   ) {
-    wikiPages(where: $where, options: { sort: [{ updatedAt: DESC }] }) {
+    wikiPages(where: $where, sort: [{ updatedAt: DESC }]) {
       id
       title
       body
@@ -408,7 +510,7 @@ export const GET_USER_WIKI_EDITS = gql`
       }
       PastVersions(
         where: $versionWhere
-        options: { sort: [{ createdAt: DESC }] }
+        sort: [{ createdAt: DESC }]
       ) {
         id
         body
@@ -426,7 +528,7 @@ export const GET_USER_WIKI_EDITS = gql`
 
 export const DOES_USER_EXIST = gql`
   query doesUserExist($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       profilePicURL
       Email {
@@ -438,7 +540,7 @@ export const DOES_USER_EXIST = gql`
 
 export const GET_USER_FAVORITE_CHANNELS = gql`
   query getUserFavoriteChannels($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       FavoriteChannels {
         uniqueName
@@ -456,7 +558,7 @@ export const GET_USER_FAVORITE_CHANNELS = gql`
 
 export const GET_MODDED_CHANNELS = gql`
   query getModdedChannels($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       profilePicURL
       ModOfChannels {
@@ -466,15 +568,29 @@ export const GET_MODDED_CHANNELS = gql`
         Tags {
           text
         }
-        EventChannelsAggregate(where: { NOT: { Event: null } }) {
-          count
+        EventChannelsConnection(where: { node: { NOT: { Event: null } } }) {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
-        DiscussionChannelsAggregate(where: { NOT: { Discussion: null } }) {
-          count
+        DiscussionChannelsConnection(
+          where: { node: { NOT: { Discussion: null } } }
+        ) {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
       }
-      AdminOfChannelsAggregate {
-        count
+      AdminOfChannelsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -483,7 +599,7 @@ export const GET_MODDED_CHANNELS = gql`
 
 export const GET_OWNED_CHANNELS = gql`
   query getOwnedChannels($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       profilePicURL
       AdminOfChannels {
@@ -493,15 +609,29 @@ export const GET_OWNED_CHANNELS = gql`
         Tags {
           text
         }
-        EventChannelsAggregate(where: { NOT: { Event: null } }) {
-          count
+        EventChannelsConnection(where: { node: { NOT: { Event: null } } }) {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
-        DiscussionChannelsAggregate(where: { NOT: { Discussion: null } }) {
-          count
+        DiscussionChannelsConnection(
+          where: { node: { NOT: { Discussion: null } } }
+        ) {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
       }
-      AdminOfChannelsAggregate {
-        count
+      AdminOfChannelsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -593,18 +723,18 @@ export const USER_IS_MOD_OR_OWNER_IN_CHANNEL = gql`
     $username: String!
     $channelUniqueName: String!
   ) {
-    channels(where: { uniqueName: $channelUniqueName }) {
+    channels(where: { uniqueName: { eq: $channelUniqueName } }) {
       uniqueName
-      Admins(where: { username: $username }) {
+      Admins(where: { username: { eq: $username } }) {
         username
       }
-      SuspendedUsers(where: { username: $username }) {
+      SuspendedUsers(where: { username: { eq: $username } }) {
         username
       }
-      Moderators(where: { displayName: $modDisplayName }) {
+      Moderators(where: { displayName: { eq: $modDisplayName } }) {
         displayName
       }
-      SuspendedMods(where: { modProfileName: $modDisplayName }) {
+      SuspendedMods(where: { modProfileName: { eq: $modDisplayName } }) {
         modProfileName
       }
     }
@@ -616,9 +746,9 @@ export const GET_USER_SUSPENSION_IN_CHANNEL = gql`
     $channelUniqueName: String!
     $username: String!
   ) {
-    channels(where: { uniqueName: $channelUniqueName }) {
+    channels(where: { uniqueName: { eq: $channelUniqueName } }) {
       uniqueName
-      SuspendedUsers(where: { username: $username }) {
+      SuspendedUsers(where: { username: { eq: $username } }) {
         id
         suspendedUntil
         suspendedIndefinitely
@@ -632,16 +762,17 @@ export const GET_USER_SUSPENSION_IN_CHANNEL = gql`
 
 export const GET_USER_ACTIVE_SUSPENSIONS = gql`
   query getUserActiveSuspensions($username: String!, $now: DateTime!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Suspensions(
         where: {
           OR: [
-            { suspendedIndefinitely: true }
+            { suspendedIndefinitely: { eq: true } }
             { suspendedUntil_GT: $now }
           ]
         }
-        options: { limit: 1, sort: { suspendedUntil: DESC } }
+        limit: 1
+        sort: { suspendedUntil: DESC }
       ) {
         id
         channelUniqueName
@@ -657,7 +788,7 @@ export const GET_USER_ACTIVE_SUSPENSIONS = gql`
 
 export const GET_USER_FAVORITE_COUNTS = gql`
   query getUserFavoriteCounts($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       FavoriteChannelsConnection {
         totalCount
@@ -669,12 +800,14 @@ export const GET_USER_FAVORITE_COUNTS = gql`
         totalCount
       }
       FavoriteDiscussionsConnection(
-        where: { node: { OR: [{ hasDownload: false }, { hasDownload: null }] } }
+        where: {
+          node: { OR: [{ hasDownload: { eq: false } }, { hasDownload: null }] }
+        }
       ) {
         totalCount
       }
       FavoriteDownloadsConnection: FavoriteDiscussionsConnection(
-        where: { node: { hasDownload: true } }
+        where: { node: { hasDownload: { eq: true } } }
       ) {
         totalCount
       }

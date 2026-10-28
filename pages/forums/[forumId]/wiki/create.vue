@@ -110,9 +110,7 @@ function handleSubmit() {
   };
 
   createWikiPage({
-    where: {
-      uniqueName: forumId,
-    },
+    where: { uniqueName: { eq: forumId } },
     update: channelUpdateInput,
   });
 }

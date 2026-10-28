@@ -226,11 +226,16 @@ export function buildEnabledPluginsInput(
   params: EnabledPluginsInputParams
 ): ChannelEnabledPluginsUpdateFieldInput[] {
   const { enabled, hasEdge, pluginId, version, settingsJson } = params;
-  const node: PluginVersionWhere = { Plugin: { id: pluginId }, version };
+  const node: PluginVersionWhere = {
+    Plugin: { id: { eq: pluginId } },
+    version: { eq: version },
+  };
 
   if (enabled) {
     if (hasEdge) {
-      return [{ where: { node }, update: { edge: { settingsJson } } }];
+      return [
+        { update: { where: { node }, edge: { settingsJson: { set: settingsJson } } } },
+      ];
     }
     return [
       { connect: [{ where: { node }, edge: { enabled: true, settingsJson } }] },

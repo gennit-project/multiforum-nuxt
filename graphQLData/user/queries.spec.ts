@@ -11,7 +11,7 @@ describe('GET_USER_FAVORITE_COUNTS', () => {
   it('separates favorite discussions from downloads by node type', () => {
     const query = print(GET_USER_FAVORITE_COUNTS);
     expect(query).toMatch(
-      /FavoriteDownloadsConnection: FavoriteDiscussionsConnection\(\s*where: \{node: \{hasDownload: true\}\}\s*\)/
+      /FavoriteDownloadsConnection: FavoriteDiscussionsConnection\(\s*where: \{node: \{hasDownload: \{eq: true\}\}\}\s*\)/
     );
   });
 });

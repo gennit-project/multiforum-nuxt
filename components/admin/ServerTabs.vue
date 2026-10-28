@@ -79,7 +79,7 @@ const tabs = computed((): Tab[] => {
       routeSuffix: 'issues',
       label: 'Issues',
       icon: FlagIcon,
-      countProperty: 'IssuesAggregate',
+      countProperty: 'IssuesConnection',
     },
     {
       name: 'channelReports',

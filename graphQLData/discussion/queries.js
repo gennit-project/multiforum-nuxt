@@ -25,7 +25,7 @@ const CROSSPOST_PREVIEW_FIELDS = gql`
     Album {
       id
       imageOrder
-      Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+      Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
         id
         url
         alt
@@ -141,7 +141,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
             id
             imageOrder
             Images(
-              where: { archived_NOT: true, permanentlyRemoved_NOT: true }
+              where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }
             ) {
               id
               url
@@ -156,7 +156,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           Tags {
             text
           }
-          DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+          DownloadableFiles(where: { NOT: { permanentlyRemoved: { eq: true } } }) {
             id
             scanStatus
           }
@@ -221,12 +221,21 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           SuperUpvotedByUsers {
             username
           }
-          CommentsAggregate(
+          CommentsConnection(
             where: {
-              OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+              node: {
+                OR: [
+                  { isFeedbackComment: { eq: null } }
+                  { isFeedbackComment: { eq: false } }
+                ]
+              }
             }
           ) {
-            count
+            aggregate {
+              count {
+                nodes
+              }
+            }
           }
           Channel {
             uniqueName
@@ -237,7 +246,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
         Album {
           id
           imageOrder
-          Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+          Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
             id
             url
             alt
@@ -251,7 +260,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
         Tags {
           text
         }
-        DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+        DownloadableFiles(where: { NOT: { permanentlyRemoved: { eq: true } } }) {
           id
           scanStatus
         }
@@ -266,8 +275,8 @@ export const IS_DISCUSSION_ANSWERED = gql`
   query isDiscussionAnswered($channelUniqueName: String!, $discussionId: ID!) {
     discussionChannels(
       where: {
-        channelUniqueName: $channelUniqueName
-        discussionId: $discussionId
+        channelUniqueName: { eq: $channelUniqueName }
+        discussionId: { eq: $discussionId }
       }
     ) {
       id
@@ -315,7 +324,7 @@ export const GET_DOWNLOAD_DETAIL = gql`
           endCursor
           hasNextPage
         }
-        Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+        Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
           id
           url
           alt
@@ -327,7 +336,7 @@ export const GET_DOWNLOAD_DETAIL = gql`
           }
         }
       }
-      DiscussionChannels(where: { channelUniqueName: $channelUniqueName }) {
+      DiscussionChannels(where: { channelUniqueName: { eq: $channelUniqueName } }) {
         id
         discussionId
         channelUniqueName
@@ -340,8 +349,12 @@ export const GET_DOWNLOAD_DETAIL = gql`
         UpvotedByUsers {
           username
         }
-        UpvotedByUsersAggregate {
-          count
+        UpvotedByUsersConnection {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
         SuperUpvotedByUsers {
           username
@@ -355,8 +368,12 @@ export const GET_DOWNLOAD_DETAIL = gql`
           markdownImagesEnabled
           emojiEnabled
         }
-        CommentsAggregate(where: { isFeedbackComment: false }) {
-          count
+        CommentsConnection(where: { node: { isFeedbackComment: { eq: false } } }) {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
         LabelOptions {
           id
@@ -373,7 +390,7 @@ export const GET_DOWNLOAD_DETAIL = gql`
       Tags {
         text
       }
-      DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+      DownloadableFiles(where: { NOT: { permanentlyRemoved: { eq: true } } }) {
         id
         fileName
         url
@@ -402,13 +419,19 @@ export const GET_DOWNLOAD_DETAIL = gql`
         endCursor
         hasNextPage
       }
-      FeedbackCommentsAggregate {
-        count
+      FeedbackCommentsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       FeedbackComments(
         where: {
           CommentAuthorConnection: {
-            ModerationProfile: { node: { displayName: $loggedInModName } }
+            ModerationProfile: {
+              node: { displayName: { eq: $loggedInModName } }
+            }
           }
         }
       ) {
@@ -444,7 +467,7 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
         endCursor
         hasNextPage
       }
-      Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+      Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
         id
         url
         alt
@@ -470,8 +493,12 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
       UpvotedByUsers {
         username
       }
-      UpvotedByUsersAggregate {
-        count
+      UpvotedByUsersConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       SuperUpvotedByUsers {
         username
@@ -488,8 +515,12 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
       Discussion {
         id
       }
-      CommentsAggregate(where: { isFeedbackComment: false }) {
-        count
+      CommentsConnection(where: { node: { isFeedbackComment: { eq: false } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       Answers {
         id
@@ -513,7 +544,7 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
     Tags {
       text
     }
-    DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+    DownloadableFiles(where: { NOT: { permanentlyRemoved: { eq: true } } }) {
       id
       fileName
       url
@@ -542,13 +573,17 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
       endCursor
       hasNextPage
     }
-    FeedbackCommentsAggregate {
-      count
+    FeedbackCommentsConnection {
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
     FeedbackComments(
       where: {
         CommentAuthorConnection: {
-          ModerationProfile: { node: { displayName: $loggedInModName } }
+          ModerationProfile: { node: { displayName: { eq: $loggedInModName } } }
         }
       }
     ) {
@@ -689,9 +724,9 @@ export const GET_DISCUSSION_DETAIL_FILES_PAGE = gql`
 
 export const GET_DISCUSSION_ACTIVITY = gql`
   query getDiscussionActivity($id: ID!) {
-    discussions(where: { id: $id }) {
+    discussions(where: { id: { eq: $id } }) {
       id
-      PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
+      PastTitleVersions(sort: [{ createdAt: DESC }]) {
         id
         Author {
           username
@@ -700,7 +735,7 @@ export const GET_DISCUSSION_ACTIVITY = gql`
         editReason
         createdAt
       }
-      PastBodyVersions(options: { sort: [{ createdAt: DESC }] }) {
+      PastBodyVersions(sort: [{ createdAt: DESC }]) {
         id
         Author {
           username
@@ -723,7 +758,7 @@ export const GET_DISCUSSION_ACTIVITY = gql`
 export const GET_ISSUE_RELATED_DISCUSSION = gql`
   ${AUTHOR_FIELDS}
   query getIssueRelatedDiscussion($id: ID!) {
-    discussions(where: { id: $id }) {
+    discussions(where: { id: { eq: $id } }) {
       id
       title
       body
@@ -737,7 +772,7 @@ export const GET_ISSUE_RELATED_DISCUSSION = gql`
       DiscussionChannels {
         channelUniqueName
       }
-      DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+      DownloadableFiles(where: { NOT: { permanentlyRemoved: { eq: true } } }) {
         id
         fileName
         url
@@ -754,15 +789,15 @@ export const GET_ISSUE_RELATED_DISCUSSION = gql`
 
 export const GET_DOWNLOAD_ACTIVITY = gql`
   query getDownloadActivity($id: ID!, $channelUniqueName: String!) {
-    discussions(where: { id: $id }) {
+    discussions(where: { id: { eq: $id } }) {
       id
-      DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+      DownloadableFiles(where: { NOT: { permanentlyRemoved: { eq: true } } }) {
         id
       }
-      DiscussionChannels(where: { channelUniqueName: $channelUniqueName }) {
+      DiscussionChannels(where: { channelUniqueName: { eq: $channelUniqueName } }) {
         id
         channelUniqueName
-        LabelChangeHistory(options: { sort: [{ createdAt: DESC }] }) {
+        LabelChangeHistory(sort: [{ createdAt: DESC }]) {
           id
           createdAt
           actionType
@@ -777,7 +812,7 @@ export const GET_DOWNLOAD_ACTIVITY = gql`
           }
         }
       }
-      PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
+      PastTitleVersions(sort: [{ createdAt: DESC }]) {
         id
         Author {
           username
@@ -798,7 +833,7 @@ export const GET_DISCUSSION = gql`
     $loggedInUsername: String
     $channelUniqueName: String!
   ) {
-    discussions(where: { id: $id }) {
+    discussions(where: { id: { eq: $id } }) {
       ...DiscussionDetailFields
       isFavorited(username: $loggedInUsername)
       editReason
@@ -815,7 +850,7 @@ export const GET_DISCUSSION = gql`
             displayName
           }
         }
-        LabelChangeHistory(options: { sort: [{ createdAt: DESC }] }) {
+        LabelChangeHistory(sort: [{ createdAt: DESC }]) {
           id
           createdAt
           actionType
@@ -830,7 +865,7 @@ export const GET_DISCUSSION = gql`
           }
         }
       }
-      PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
+      PastTitleVersions(sort: [{ createdAt: DESC }]) {
         id
         Author {
           username
@@ -839,7 +874,7 @@ export const GET_DISCUSSION = gql`
         editReason
         createdAt
       }
-      PastBodyVersions(options: { sort: [{ createdAt: DESC }] }) {
+      PastBodyVersions(sort: [{ createdAt: DESC }]) {
         id
         Author {
           username
@@ -858,7 +893,7 @@ export const GET_DISCUSSION = gql`
 export const GET_CROSSPOST_PREVIEW = gql`
   ${CROSSPOST_PREVIEW_FIELDS}
   query getCrosspostPreview($id: ID!) {
-    discussions(where: { id: $id }) {
+    discussions(where: { id: { eq: $id } }) {
       ...CrosspostPreviewFields
     }
   }
@@ -872,7 +907,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
     $offset: Int
     $loggedInModName: String!
   ) {
-    discussions(where: { id: $id }) {
+    discussions(where: { id: { eq: $id } }) {
       id
       title
       body
@@ -883,7 +918,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
       Album {
         id
         imageOrder
-        Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+        Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
           id
           url
           alt
@@ -895,7 +930,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
           }
         }
       }
-      DownloadableFiles(where: { permanentlyRemoved_NOT: true }) {
+      DownloadableFiles(where: { NOT: { permanentlyRemoved: { eq: true } } }) {
         id
         fileName
         url
@@ -914,10 +949,14 @@ export const GET_DISCUSSION_FEEDBACK = gql`
       CrosspostedDiscussion {
         ...CrosspostPreviewFields
       }
-      FeedbackCommentsAggregate {
-        count
+      FeedbackCommentsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      FeedbackComments(options: { limit: $limit, offset: $offset }) {
+      FeedbackComments(limit: $limit, offset: $offset) {
         id
         text
         archived
@@ -935,19 +974,29 @@ export const GET_DISCUSSION_FEEDBACK = gql`
           }
         }
         createdAt
-        FeedbackCommentsAggregate(
+        FeedbackCommentsConnection(
           where: {
-            CommentAuthorConnection: {
-              ModerationProfile: { node: { displayName: $loggedInModName } }
+            node: {
+              CommentAuthorConnection: {
+                ModerationProfile: {
+                  node: { displayName: { eq: $loggedInModName } }
+                }
+              }
             }
           }
         ) {
-          count
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
         FeedbackComments(
           where: {
             CommentAuthorConnection: {
-              ModerationProfile: { node: { displayName: $loggedInModName } }
+              ModerationProfile: {
+                node: { displayName: { eq: $loggedInModName } }
+              }
             }
           }
         ) {
@@ -965,9 +1014,9 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
   query getSpecificDiscussionFeedback($discussionId: ID, $modName: String) {
     comments(
       where: {
-        GivesFeedbackOnDiscussion: { id: $discussionId }
+        GivesFeedbackOnDiscussion: { id: { eq: $discussionId } }
         CommentAuthorConnection: {
-          ModerationProfile: { node: { displayName: $modName } }
+          ModerationProfile: { node: { displayName: { eq: $modName } } }
         }
       }
     ) {
@@ -978,7 +1027,9 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
       Channel {
         uniqueName
       }
-      CommentAuthor(where: { ModerationProfile: { displayName: $modName } }) {
+      # v7 removed the where argument on the Comment.CommentAuthor union field; the
+      # mod filter already lives in the top-level comments where (CommentAuthorConnection).
+      CommentAuthor {
         ... on ModerationProfile {
           displayName
         }
@@ -992,9 +1043,9 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
 
 export const GET_DOWNLOAD_LABELS = gql`
   query getDownloadLabels($discussionId: ID!, $channelUniqueName: String!) {
-    discussions(where: { id: $discussionId }) {
+    discussions(where: { id: { eq: $discussionId } }) {
       id
-      DiscussionChannels(where: { channelUniqueName: $channelUniqueName }) {
+      DiscussionChannels(where: { channelUniqueName: { eq: $channelUniqueName } }) {
         channelUniqueName
         LabelOptions {
           id

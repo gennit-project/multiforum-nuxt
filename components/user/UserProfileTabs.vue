@@ -17,16 +17,11 @@ type TabData = {
 };
 
 type UserProfileCounts = User & {
-  DownloadsAggregate?: {
-    count?: number | null;
-  } | null;
-  AlbumsAggregate?: {
-    count?: number | null;
-  } | null;
+  // `DownloadsConnection` is an alias of `DiscussionsConnection` (hasDownload)
+  // added by the profile query; it is not a field on the generated User type.
+  DownloadsConnection?: User['DiscussionsConnection'] | null;
+  // Provided by the separate `getUserWikiEditsCount` root field, not on User.
   wikiEditsCount?: number | null;
-  AuthoredWikiPageVersionsAggregate?: {
-    count?: number | null;
-  } | null;
 };
 
 const props = defineProps({
@@ -86,28 +81,28 @@ const tabs = computed(() => {
       path: `/u/${usernameInParams.value}/comments`,
       to: getTabTo(`/u/${usernameInParams.value}/comments`),
       current: true,
-      count: props.user?.CommentsAggregate?.count,
+      count: props.user?.CommentsConnection?.aggregate?.count?.nodes,
     },
     {
       name: 'Discussions',
       path: `/u/${usernameInParams.value}/discussions`,
       to: getTabTo(`/u/${usernameInParams.value}/discussions`),
       current: false,
-      count: props.user?.DiscussionsAggregate?.count,
+      count: props.user?.DiscussionsConnection?.aggregate?.count?.nodes,
     },
     {
       name: 'Downloads',
       path: `/u/${usernameInParams.value}/downloads`,
       to: getTabTo(`/u/${usernameInParams.value}/downloads`),
       current: false,
-      count: props.user?.DownloadsAggregate?.count,
+      count: props.user?.DownloadsConnection?.aggregate?.count?.nodes,
     },
     {
       name: 'Events',
       path: `/u/${usernameInParams.value}/events`,
       to: getTabTo(`/u/${usernameInParams.value}/events`),
       current: false,
-      count: props.user?.EventsAggregate?.count,
+      count: props.user?.EventsConnection?.aggregate?.count?.nodes,
     },
     {
       name: 'Wiki Edits',
@@ -116,35 +111,35 @@ const tabs = computed(() => {
       current: false,
       count:
         props.user?.wikiEditsCount ??
-        props.user?.AuthoredWikiPageVersionsAggregate?.count,
+        props.user?.AuthoredWikiPageVersionsConnection?.aggregate?.count?.nodes,
     },
     {
       name: 'Images',
       path: `/u/${usernameInParams.value}/images`,
       to: getTabTo(`/u/${usernameInParams.value}/images`),
       current: false,
-      count: props.user?.ImagesAggregate?.count,
+      count: props.user?.ImagesConnection?.aggregate?.count?.nodes,
     },
     {
       name: 'Albums',
       path: `/u/${usernameInParams.value}/albums`,
       to: getTabTo(`/u/${usernameInParams.value}/albums`),
       current: false,
-      count: props.user?.AlbumsAggregate?.count,
+      count: props.user?.AlbumsConnection?.aggregate?.count?.nodes,
     },
     {
       name: 'Owned Forums',
       path: `/u/${usernameInParams.value}/ownedForums`,
       to: getTabTo(`/u/${usernameInParams.value}/ownedForums`),
       current: false,
-      count: props.user?.AdminOfChannelsAggregate?.count,
+      count: props.user?.AdminOfChannelsConnection?.aggregate?.count?.nodes,
     },
     {
       name: 'Modded Forums',
       path: `/u/${usernameInParams.value}/moddedForums`,
       to: getTabTo(`/u/${usernameInParams.value}/moddedForums`),
       current: false,
-      count: props.user?.ModOfChannelsAggregate?.count,
+      count: props.user?.ModOfChannelsConnection?.aggregate?.count?.nodes,
     },
   ];
 

@@ -71,7 +71,7 @@ const events = [
       address: '',
       description:
         'Join neighbors and curious readers for an informal conversation. Everyone is welcome.',
-      CommentsAggregate: { count: 3 },
+      CommentsConnection: { aggregate: { count: { nodes: 3 } } },
     },
   });
   return {
@@ -85,7 +85,7 @@ const events = [
       id: `ec-${i}-${j}`,
       eventId: event.id,
       channelUniqueName: name,
-      CommentsAggregate: { count: j === 0 ? 3 : j },
+      CommentsConnection: { aggregate: { count: { nodes: j === 0 ? 3 : j } } },
       Channel: {
         ...event.EventChannels[0]!.Channel,
         __typename: 'Channel',
@@ -161,7 +161,7 @@ const handlers: GraphQLHandlers = {
     },
   }),
   getEvents: () => ({
-    data: { events, eventsAggregate: { count: events.length } },
+    data: { events, eventsConnection: { aggregate: { count: { nodes: events.length } } } },
   }),
   getEvent: ({ body }) => ({
     data: {
@@ -186,7 +186,7 @@ const handlers: GraphQLHandlers = {
         {
           __typename: 'Event',
           id: events[0]!.id,
-          CommentsAggregate: { count: 3 },
+          CommentsConnection: { aggregate: { count: { nodes: 3 } } },
         },
       ],
     },

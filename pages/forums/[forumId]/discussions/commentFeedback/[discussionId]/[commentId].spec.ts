@@ -50,7 +50,7 @@ const baseComment = {
   id: 'c1',
   text: 'Original comment',
   FeedbackComments: [],
-  FeedbackCommentsAggregate: { count: 0 },
+  FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
 };
 
 const NuxtLinkStub = defineComponent({
@@ -169,7 +169,7 @@ describe('comment feedback page', () => {
     const wrapper = await mountWith({
       ...baseComment,
       FeedbackComments: feedback,
-      FeedbackCommentsAggregate: { count: 2 },
+      FeedbackCommentsConnection: { aggregate: { count: { nodes: 2 } } },
     });
     const section = wrapper.findComponent(FeedbackSection);
 
@@ -184,7 +184,7 @@ describe('comment feedback page', () => {
     const wrapper = await mountWith({
       ...baseComment,
       FeedbackComments: [{ id: 'f1' }],
-      FeedbackCommentsAggregate: { count: 2 },
+      FeedbackCommentsConnection: { aggregate: { count: { nodes: 2 } } },
     });
     wrapper.findComponent(FeedbackSection).props('loadMore')();
     const request = mockState.fetchMore.mock.calls[0]?.[0];
@@ -260,13 +260,15 @@ describe('comment feedback page', () => {
       .vm.$emit('update-comment-to-give-feedback-on', nested);
     const cache = {
       readQuery: vi.fn(() => ({
-        comments: [{ FeedbackCommentsAggregate: { count: 1 } }],
+        comments: [
+          { FeedbackCommentsConnection: { aggregate: { count: { nodes: 1 } } } },
+        ],
       })),
       writeQuery: vi.fn(),
     };
 
     mockState.mutationUpdate?.(cache, {
-      data: { createComments: { comments: [{ id: 'new' }] } },
+      data: { createCommentWithOwnedConnections: { comments: [{ id: 'new' }] } },
     });
 
     const written = cache.writeQuery.mock.calls[0]?.[0].data.comments[0];
@@ -275,9 +277,8 @@ describe('comment feedback page', () => {
       {
         id: 'f1',
         FeedbackComments: [{ id: 'old' }, { id: 'new' }],
-        FeedbackCommentsAggregate: {
-          count: 2,
-          __typename: 'FeedbackCommentsAggregate',
+        FeedbackCommentsConnection: {
+          aggregate: { count: { nodes: 2 } },
         },
       },
     ]);

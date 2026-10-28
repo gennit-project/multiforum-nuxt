@@ -226,7 +226,7 @@ describe('CreateIssueForm cache update', () => {
   const makeCache = () => ({
     readQuery: vi.fn(() => ({
       channels: [{ Issues: [] }],
-      issuesAggregate: { count: 2 },
+      issuesConnection: { aggregate: { count: { nodes: 2 } } },
     })),
     writeQuery: vi.fn(),
   });

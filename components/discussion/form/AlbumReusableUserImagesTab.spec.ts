@@ -10,12 +10,12 @@ const { usernameRef, queryResult, queryLoading, queryError, fetchMore } =
         users: [
           {
             Images: [{ id: 'upload-1', url: 'https://img.test/u1.jpg' }],
-            ImagesAggregate: { count: 30 },
+            ImagesConnection: { aggregate: { count: { nodes: 30 } } },
             FavoriteImages: [
               { id: 'fav-1', url: 'https://img.test/f1.jpg' },
               { id: 'fav-2', url: 'https://img.test/f2.jpg' },
             ],
-            FavoriteImagesAggregate: { count: 2 },
+            FavoriteImagesConnection: { aggregate: { count: { nodes: 2 } } },
           },
         ],
       } as Record<string, unknown>,

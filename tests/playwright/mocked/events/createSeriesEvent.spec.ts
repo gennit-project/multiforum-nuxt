@@ -85,7 +85,7 @@ const getCommonMocks = (username: string) => ({
       channels: [
         {
           uniqueName: TEST_CHANNEL,
-          DiscussionChannelsAggregate: { count: 0 },
+          DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },

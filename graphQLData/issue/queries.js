@@ -46,7 +46,7 @@ export const ISSUE_FIELDS = gql`
   ${COMMENT_VOTE_FIELDS}
   fragment IssueFields on Issue {
     ...IssueBaseFields
-    ActivityFeed(options: { sort: { createdAt: DESC } }) {
+    ActivityFeed(sort: { createdAt: DESC }) {
       ... on ModerationAction {
         id
         actionDescription
@@ -94,14 +94,18 @@ export const ISSUE_FIELDS = gql`
           Channel {
             uniqueName
           }
-          ChildCommentsAggregate {
-            count
+          ChildCommentsConnection {
+            aggregate {
+              count {
+                nodes
+              }
+            }
           }
           ParentComment {
             id
           }
           editReason
-          PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+          PastVersions(sort: [{ createdAt: DESC }]) {
             id
             body
             createdAt
@@ -113,8 +117,12 @@ export const ISSUE_FIELDS = gql`
         }
       }
     }
-    ActivityFeedAggregate(where: { actionType: "report" }) {
-      count
+    ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
   }
 `;
@@ -124,8 +132,8 @@ export const GET_ISSUE = gql`
   query getIssue($channelUniqueName: String!, $issueNumber: Int!) {
     issues(
       where: {
-        channelUniqueName: $channelUniqueName
-        issueNumber: $issueNumber
+        channelUniqueName: { eq: $channelUniqueName }
+        issueNumber: { eq: $issueNumber }
       }
     ) {
       ...IssueBaseFields
@@ -143,17 +151,15 @@ export const GET_ISSUE_ACTIVITY = gql`
   ) {
     issues(
       where: {
-        channelUniqueName: $channelUniqueName
-        issueNumber: $issueNumber
+        channelUniqueName: { eq: $channelUniqueName }
+        issueNumber: { eq: $issueNumber }
       }
     ) {
       id
       ActivityFeed(
-        options: {
-          sort: { createdAt: DESC }
-          limit: $activityFeedLimit
-          offset: $activityFeedOffset
-        }
+        sort: { createdAt: DESC }
+        limit: $activityFeedLimit
+        offset: $activityFeedOffset
       ) {
         ... on ModerationAction {
           id
@@ -202,14 +208,18 @@ export const GET_ISSUE_ACTIVITY = gql`
             Channel {
               uniqueName
             }
-            ChildCommentsAggregate {
-              count
+            ChildCommentsConnection {
+              aggregate {
+                count {
+                  nodes
+                }
+              }
             }
             ParentComment {
               id
             }
             editReason
-            PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+            PastVersions(sort: [{ createdAt: DESC }]) {
               id
               body
               createdAt
@@ -221,8 +231,12 @@ export const GET_ISSUE_ACTIVITY = gql`
           }
         }
       }
-      ActivityFeedAggregate(where: { actionType: "report" }) {
-        count
+      ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -232,8 +246,8 @@ export const CHECK_DISCUSSION_ISSUE_EXISTENCE = gql`
   query getIssue($discussionId: ID!, $channelUniqueName: String!) {
     issues(
       where: {
-        relatedDiscussionId: $discussionId
-        channelUniqueName: $channelUniqueName
+        relatedDiscussionId: { eq: $discussionId }
+        channelUniqueName: { eq: $channelUniqueName }
       }
     ) {
       id
@@ -246,7 +260,10 @@ export const CHECK_DISCUSSION_ISSUE_EXISTENCE = gql`
 export const CHECK_EVENT_ISSUE_EXISTENCE = gql`
   query getIssue($eventId: ID!, $channelUniqueName: String!) {
     issues(
-      where: { relatedEventId: $eventId, channelUniqueName: $channelUniqueName }
+      where: {
+        relatedEventId: { eq: $eventId }
+        channelUniqueName: { eq: $channelUniqueName }
+      }
     ) {
       id
       issueNumber
@@ -262,12 +279,12 @@ export const CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE = gql`
   ) {
     discussionChannels(
       where: {
-        discussionId: $discussionId
-        channelUniqueName: $channelUniqueName
+        discussionId: { eq: $discussionId }
+        channelUniqueName: { eq: $channelUniqueName }
       }
     ) {
       id
-      Comments(where: { RelatedIssues_SOME: {} }, options: { limit: 1 }) {
+      Comments(where: { RelatedIssues_SOME: {} }, limit: 1) {
         id
         RelatedIssues {
           issueNumber
@@ -279,7 +296,7 @@ export const CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE = gql`
 
 export const GET_ISSUES = gql`
   query getIssues($issueWhere: IssueWhere) {
-    issues(where: $issueWhere, options: { sort: { createdAt: DESC } }) {
+    issues(where: $issueWhere, sort: { createdAt: DESC }) {
       id
       issueNumber
       title
@@ -314,8 +331,12 @@ export const GET_ISSUES = gql`
           username
         }
       }
-      ActivityFeedAggregate(where: { actionType: "report" }) {
-        count
+      ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -376,7 +397,7 @@ export const GET_SITE_WIDE_ISSUE_LIST = gql`
 
 export const GET_CLOSED_ISSUES = gql`
   query getClosedIssues {
-    issues(where: { isOpen: false }, options: { sort: { createdAt: DESC } }) {
+    issues(where: { isOpen: { eq: false } }, sort: { createdAt: DESC }) {
       id
       issueNumber
       title
@@ -410,8 +431,12 @@ export const GET_CLOSED_ISSUES = gql`
           username
         }
       }
-      ActivityFeedAggregate(where: { actionType: "report" }) {
-        count
+      ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -422,10 +447,10 @@ export const GET_CHANNEL_REPORTS = gql`
     issues(
       where: {
         channelUniqueName: null
-        relatedChannelUniqueName_NOT: null
-        isOpen: $isOpen
+        NOT: { relatedChannelUniqueName: { eq: null } }
+        isOpen: { eq: $isOpen }
       }
-      options: { sort: { createdAt: DESC } }
+      sort: { createdAt: DESC }
     ) {
       id
       issueNumber
@@ -451,8 +476,12 @@ export const GET_CHANNEL_REPORTS = gql`
           username
         }
       }
-      ActivityFeedAggregate(where: { actionType: "report" }) {
-        count
+      ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -463,14 +492,14 @@ export const GET_IMAGE_REPORTS = gql`
     issues(
       where: {
         OR: [
-          { relatedImageId_NOT: null }
-          { relatedProfilePicUserId_NOT: null }
-          { relatedChannelIconName_NOT: null }
-          { relatedChannelBannerName_NOT: null }
+          { NOT: { relatedImageId: { eq: null } } }
+          { NOT: { relatedProfilePicUserId: { eq: null } } }
+          { NOT: { relatedChannelIconName: { eq: null } } }
+          { NOT: { relatedChannelBannerName: { eq: null } } }
         ]
-        isOpen: $isOpen
+        isOpen: { eq: $isOpen }
       }
-      options: { sort: { createdAt: DESC } }
+      sort: { createdAt: DESC }
     ) {
       id
       issueNumber
@@ -496,8 +525,12 @@ export const GET_IMAGE_REPORTS = gql`
           username
         }
       }
-      ActivityFeedAggregate(where: { actionType: "report" }) {
-        count
+      ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -511,14 +544,12 @@ export const GET_SERVER_ISSUE = gql`
     $activityFeedLimit: Int
     $activityFeedOffset: Int
   ) {
-    issues(where: { channelUniqueName: null, issueNumber: $issueNumber }) {
+    issues(where: { channelUniqueName: null, issueNumber: { eq: $issueNumber } }) {
       ...IssueBaseFields
       ActivityFeed(
-        options: {
-          sort: { createdAt: DESC }
-          limit: $activityFeedLimit
-          offset: $activityFeedOffset
-        }
+        sort: { createdAt: DESC }
+        limit: $activityFeedLimit
+        offset: $activityFeedOffset
       ) {
         ... on ModerationAction {
           id
@@ -560,14 +591,18 @@ export const GET_SERVER_ISSUE = gql`
             Channel {
               uniqueName
             }
-            ChildCommentsAggregate {
-              count
+            ChildCommentsConnection {
+              aggregate {
+                count {
+                  nodes
+                }
+              }
             }
             ParentComment {
               id
             }
             editReason
-            PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+            PastVersions(sort: [{ createdAt: DESC }]) {
               id
               body
               createdAt
@@ -579,8 +614,12 @@ export const GET_SERVER_ISSUE = gql`
           }
         }
       }
-      ActivityFeedAggregate(where: { actionType: "report" }) {
-        count
+      ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }

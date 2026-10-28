@@ -196,7 +196,7 @@ test.describe('User image detail', () => {
           ],
         },
       ],
-      ImagesAggregate: { count: 2 },
+      ImagesConnection: { aggregate: { count: { nodes: 2 } } },
     });
 
     const diagnostics = await installGraphqlMocks(page, {

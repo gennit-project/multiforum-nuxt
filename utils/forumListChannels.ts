@@ -6,7 +6,9 @@
 
 type ChannelCountLike = {
   uniqueName?: string | null;
-  DiscussionChannelsAggregate?: { count?: number | null } | null;
+  DiscussionChannelsConnection?: {
+    aggregate?: { count?: { nodes?: number | null } | null } | null;
+  } | null;
 };
 
 /**
@@ -20,7 +22,10 @@ export function buildChannelCountMap(
   const map = new Map<string, number>();
   for (const channel of channels || []) {
     if (channel.uniqueName) {
-      map.set(channel.uniqueName, channel.DiscussionChannelsAggregate?.count || 0);
+      map.set(
+        channel.uniqueName,
+        channel.DiscussionChannelsConnection?.aggregate?.count?.nodes || 0
+      );
     }
   }
   return map;
@@ -44,9 +49,8 @@ export function mergeChannelCounts<T extends ChannelCountLike>(
     const key = channel.uniqueName ?? '';
     return {
       ...channel,
-      DiscussionChannelsAggregate: {
-        ...channel.DiscussionChannelsAggregate,
-        count: discussionCountMap.get(key) || 0,
+      DiscussionChannelsConnection: {
+        aggregate: { count: { nodes: discussionCountMap.get(key) || 0 } },
       },
       downloadCount: downloadCountMap.get(key) || 0,
     };

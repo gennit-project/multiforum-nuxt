@@ -6,10 +6,11 @@ import {
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 
 // Archived / permanently-removed images are hidden from normal display purely by
-// an `archived_NOT: true, permanentlyRemoved_NOT: true` filter repeated on every
-// album/image-bearing query (there is no central/backend filter). If a regression
-// drops that filter from one of these queries, archived/removed images would leak
-// back into the album, gallery, or discussion view. Guard the key queries.
+// a `NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } }` filter
+// repeated on every album/image-bearing query (there is no central/backend
+// filter). If a regression drops that filter from one of these queries,
+// archived/removed images would leak back into the album, gallery, or discussion
+// view. Guard the key queries.
 const queryBody = (doc: { loc?: { source: { body: string } } }) =>
   doc.loc?.source.body ?? '';
 
@@ -22,8 +23,8 @@ describe('archived/removed image hiding filter', () => {
     const body = queryBody(doc as { loc?: { source: { body: string } } });
 
     expect([
-      body.includes('archived_NOT: true'),
-      body.includes('permanentlyRemoved_NOT: true'),
+      body.includes('archived: { eq: true }'),
+      body.includes('permanentlyRemoved: { eq: true }'),
     ]).toEqual([true, true]);
   });
 });

@@ -171,7 +171,6 @@ const addOption = () => {
     // Required fields for GraphQL type but not used in this context
     __typename: 'FilterOption' as const,
     group: props.filterGroup,
-    groupAggregate: null,
     groupConnection: {
       __typename: 'FilterOptionGroupConnection',
       edges: [],

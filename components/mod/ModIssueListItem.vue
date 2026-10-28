@@ -60,7 +60,8 @@ const issueAuthorName = (issue: Issue) => {
 
 const reportCount = computed(() => {
   const count =
-    props.issue?.reportCount ?? props.issue?.ActivityFeedAggregate?.count;
+    props.issue?.reportCount ??
+    props.issue?.ActivityFeedConnection?.aggregate?.count?.nodes;
   return typeof count === 'number' ? count : null;
 });
 

@@ -45,7 +45,7 @@ const GET_USER_FAVORITE_IMAGE = gql`
   query getUserFavoriteImage($username: String!, $imageId: ID!) {
     users(where: { username: $username }) {
       username
-      FavoriteImages(where: { id: $imageId }) {
+      FavoriteImages(where: { id: { eq: $imageId } }) {
         id
         url
       }

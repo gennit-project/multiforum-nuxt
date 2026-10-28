@@ -167,7 +167,7 @@ const makeDiscussion = (overrides: Record<string, unknown> = {}): Discussion =>
         locked: false,
         Answers: [],
         Channel: { feedbackEnabled: true, emojiEnabled: true },
-        CommentsAggregate: { count: 0 },
+        CommentsConnection: { aggregate: { count: { nodes: 0 } } },
         __typename: 'DiscussionChannel',
       },
     ],
@@ -188,8 +188,10 @@ const commentSection = (comments: Comment[]) => ({
       Answers: [],
       archived: false,
       locked: false,
-      CommentsAggregate: { count: comments.length },
-      RootCommentsAggregate: { count: comments.length },
+      CommentsConnection: { aggregate: { count: { nodes: comments.length } } },
+      RootCommentsConnection: {
+        aggregate: { count: { nodes: comments.length } },
+      },
       Channel: { feedbackEnabled: true, emojiEnabled: true },
       __typename: 'DiscussionChannel',
     },
@@ -376,7 +378,7 @@ describe('DiscussionDetailContent', () => {
   it('skips inline comment queries for downloads and reuses the discussion channel aggregate', () => {
     const discussion = makeDiscussion();
     Object.assign(discussion.DiscussionChannels[0], {
-      CommentsAggregate: { count: 7 },
+      CommentsConnection: { aggregate: { count: { nodes: 7 } } },
     });
 
     const { wrapper } = setup({
@@ -401,7 +403,7 @@ describe('DiscussionDetailContent', () => {
     const { wrapper } = setup({
       comments: [makeComment('a'), makeComment('b')],
       discussionChannelOverrides: {
-        RootCommentsAggregate: { count: 1 },
+        RootCommentsConnection: { aggregate: { count: { nodes: 1 } } },
       },
     });
 

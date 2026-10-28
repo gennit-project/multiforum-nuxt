@@ -160,10 +160,10 @@ const loggedInUserDownvoted = computed(
   () => props.discussion?.FeedbackComments?.length > 0 || false
 );
 const upvoteCount = computed(
-  () => props.discussionChannel?.UpvotedByUsersAggregate?.count || 0
+  () => props.discussionChannel?.UpvotedByUsersConnection?.aggregate?.count?.nodes || 0
 );
 const downvoteCount = computed(
-  () => props.discussion?.FeedbackCommentsAggregate?.count || 0
+  () => props.discussion?.FeedbackCommentsConnection?.aggregate?.count?.nodes || 0
 );
 const upvoteIcon = computed(() => {
   if (props.useHeartIcon) {

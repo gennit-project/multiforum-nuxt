@@ -184,8 +184,8 @@ const getIssueLink = (report: {
               <span>
                 {{ DateTime.fromISO(report.createdAt).toRelative() }}
               </span>
-              <span v-if="report.ActivityFeedAggregate?.count > 0">
-                {{ report.ActivityFeedAggregate.count }} report(s)
+              <span v-if="report.ActivityFeedConnection?.aggregate?.count?.nodes > 0">
+                {{ report.ActivityFeedConnection.aggregate.count.nodes }} report(s)
               </span>
             </div>
           </div>

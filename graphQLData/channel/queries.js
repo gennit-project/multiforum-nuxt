@@ -4,7 +4,7 @@ import { AUTHOR_FIELDS, CHANNEL_ICON_FIELDS } from '../fragments';
 
 export const GET_CHANNEL_NAMES = gql`
   query getChannelNames($channelWhere: ChannelWhere) {
-    channels(where: $channelWhere, options: { limit: 10 }) {
+    channels(where: $channelWhere, limit: 10) {
       uniqueName
       displayName
       ...ChannelIconFields
@@ -40,7 +40,9 @@ export const GET_CHANNEL_DISCUSSION_FLAIR_CONFIG = gql`
 
 export const GET_WIKI_PAGE = gql`
   query getWikiPage($channelUniqueName: String!, $slug: String!) {
-    wikiPages(where: { channelUniqueName: $channelUniqueName, slug: $slug }) {
+    wikiPages(
+      where: { channelUniqueName: { eq: $channelUniqueName }, slug: { eq: $slug } }
+    ) {
       id
       title
       body
@@ -70,7 +72,7 @@ export const GET_WIKI_PAGE = gql`
           username
         }
       }
-      PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+      PastVersions(sort: [{ createdAt: DESC }]) {
         id
         body
         editReason
@@ -85,7 +87,7 @@ export const GET_WIKI_PAGE = gql`
 
 export const GET_CHANNEL = gql`
   query getChannel($uniqueName: String!, $now: DateTime, $loggedInUsername: String) {
-    channels(where: { uniqueName: $uniqueName }) {
+    channels(where: { uniqueName: { eq: $uniqueName } }) {
       uniqueName
       displayName
       description
@@ -122,7 +124,7 @@ export const GET_CHANNEL = gql`
           username
         }
       }
-      PinnedWikiPages(options: { sort: [{ updatedAt: DESC }] }) {
+      PinnedWikiPages(sort: [{ updatedAt: DESC }]) {
         id
         title
         slug
@@ -139,15 +141,21 @@ export const GET_CHANNEL = gql`
         displayName
         botProfileId
         isDeprecated
-        SuspensionsAggregate(
+        SuspensionsConnection(
           where: {
-            OR: [
-              { suspendedIndefinitely: true }
-              { suspendedUntil_GT: $now }
-            ]
+            node: {
+              OR: [
+                { suspendedIndefinitely: { eq: true } }
+                { suspendedUntil_GT: $now }
+              ]
+            }
           }
         ) {
-          count
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
       }
       Moderators {
@@ -159,26 +167,42 @@ export const GET_CHANNEL = gql`
       SuspendedUsers {
         username
       }
-      DiscussionChannelsAggregate(
+      DiscussionChannelsConnection(
         where: {
-          AND: [
-            { NOT: { Discussion: null } }
-            { NOT: { Discussion: { hasDownload: true } } }
-          ]
+          node: {
+            AND: [
+              { NOT: { Discussion: null } }
+              { NOT: { Discussion: { hasDownload: { eq: true } } } }
+            ]
+          }
         }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      IssuesAggregate(where: { isOpen: true }) {
-        count
+      IssuesConnection(where: { node: { isOpen: { eq: true } } }) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      EventChannelsAggregate(
+      EventChannelsConnection(
         where: {
-          NOT: { archived: true, Event: null }
-          Event: { canceled: false, endTime_GT: $now }
+          node: {
+            NOT: { archived: { eq: true }, Event: null }
+            Event: { canceled: { eq: false }, endTime_GT: $now }
+          }
         }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       DefaultModRole {
         canHideComment
@@ -252,14 +276,14 @@ export const GET_CHANNEL = gql`
         canUpvoteDiscussion
         channelUniqueName
       }
-      FilterGroups(options: { sort: [{ order: ASC }] }) {
+      FilterGroups(sort: [{ order: ASC }]) {
         id
         key
         displayName
         mode
         uploadSelection
         order
-        options(options: { sort: [{ order: ASC }] }) {
+        options(sort: [{ order: ASC }]) {
           id
           value
           displayName
@@ -274,7 +298,7 @@ export const GET_CHANNEL = gql`
 
 export const GET_CHANNEL_RULES = gql`
   query getChannelRules($uniqueName: String!) {
-    channels(where: { uniqueName: $uniqueName }) {
+    channels(where: { uniqueName: { eq: $uniqueName } }) {
       uniqueName
       rules
     }
@@ -284,19 +308,20 @@ export const GET_CHANNEL_RULES = gql`
 export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
   query getEvents($uniqueName: String!, $now: DateTime) {
     events(
-      options: { limit: 4, sort: [{ startTime: ASC }] }
+      limit: 4
+      sort: [{ startTime: ASC }]
       where: {
         AND: [
           {
             EventChannels_SOME: {
-              channelUniqueName: $uniqueName
-              archived: false
+              channelUniqueName: { eq: $uniqueName }
+              archived: { eq: false }
             }
           }
           {
             OR: [
-              { canceled: false, endTime_GT: $now }
-              { canceled: false, startTime_LT: $now, endTime_GT: $now }
+              { canceled: { eq: false }, endTime_GT: $now }
+              { canceled: { eq: false }, startTime_LT: $now, endTime_GT: $now }
             ]
           }
         ]
@@ -322,18 +347,24 @@ const now = DateTime.now()
 
 export const GET_CHANNEL_DOWNLOAD_COUNT = gql`
   query getChannelDownloadCount($uniqueName: String!) {
-    channels(where: { uniqueName: $uniqueName }) {
+    channels(where: { uniqueName: { eq: $uniqueName } }) {
       uniqueName
-      DiscussionChannelsAggregate(
+      DiscussionChannelsConnection(
         where: {
-          AND: [
-            { OR: [{ archived: false }, { archived: null }] }
-            { NOT: { Discussion: null } }
-            { Discussion: { hasDownload: true } }
-          ]
+          node: {
+            AND: [
+              { OR: [{ archived: { eq: false } }, { archived: null }] }
+              { NOT: { Discussion: null } }
+              { Discussion: { hasDownload: { eq: true } } }
+            ]
+          }
         }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -364,32 +395,44 @@ export const GET_CHANNELS_DISCUSSIONS = gql`
         Tags {
           text
         }
-        EventChannelsAggregate(
+        EventChannelsConnection(
           where: {
-            NOT: { 
-              archived: true,
-              Event: null
-            }
-            Event: { 
-              canceled: false, 
-              endTime_GT: $now,
+            node: {
+              NOT: {
+                archived: { eq: true },
+                Event: null
+              }
+              Event: {
+                canceled: { eq: false },
+                endTime_GT: $now,
+              }
             }
           }
         ) {
-          count
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
-        DiscussionChannelsAggregate(
+        DiscussionChannelsConnection(
           where: {
-            AND: [
-              { NOT: { archived: true } },
-              { NOT: { Discussion: null } },
-              { NOT: {
-                Discussion: { hasDownload: true }
-               } }
-            ]
+            node: {
+              AND: [
+                { NOT: { archived: { eq: true } } },
+                { NOT: { Discussion: null } },
+                { NOT: {
+                  Discussion: { hasDownload: { eq: true } }
+                 } }
+              ]
+            }
           }
         ) {
-          count
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
       }
       aggregateChannelCount
@@ -413,16 +456,22 @@ export const GET_CHANNELS_DOWNLOADS = gql`
     ) {
       channels {
         uniqueName
-        DiscussionChannelsAggregate(
+        DiscussionChannelsConnection(
           where: {
-            AND: [
-              { NOT: { archived: true } }
-              { NOT: { Discussion: null } }
-              { Discussion: { hasDownload: true } }
-            ]
+            node: {
+              AND: [
+                { NOT: { archived: { eq: true } } }
+                { NOT: { Discussion: null } }
+                { Discussion: { hasDownload: { eq: true } } }
+              ]
+            }
           }
         ) {
-          count
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
       }
     }
@@ -497,7 +546,7 @@ export const GET_CHANNEL_CONTRIBUTIONS = gql`
 
 export const GET_USER_FAVORITE_CHANNELS = gql`
   query GetUserFavoriteChannels($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       FavoriteChannels {
         displayName
@@ -511,7 +560,7 @@ export const GET_USER_FAVORITE_CHANNELS = gql`
 
 export const GET_CHANNEL_PLUGIN_PIPELINES = gql`
   query GetChannelPluginPipelines($channelUniqueName: String!) {
-    channels(where: { uniqueName: $channelUniqueName }) {
+    channels(where: { uniqueName: { eq: $channelUniqueName } }) {
       uniqueName
       displayName
       pluginPipelines
@@ -524,7 +573,7 @@ export const GET_CHANNEL_PLUGIN_PIPELINES = gql`
 
 export const GET_CHANNEL_PLUGIN_SETTINGS = gql`
   query GetChannelPluginSettings($channelUniqueName: String!, $now: DateTime) {
-    channels(where: { uniqueName: $channelUniqueName }) {
+    channels(where: { uniqueName: { eq: $channelUniqueName } }) {
       uniqueName
       displayName
       Bots {
@@ -532,15 +581,21 @@ export const GET_CHANNEL_PLUGIN_SETTINGS = gql`
         displayName
         botProfileId
         isDeprecated
-        SuspensionsAggregate(
+        SuspensionsConnection(
           where: {
-            OR: [
-              { suspendedIndefinitely: true }
-              { suspendedUntil_GT: $now }
-            ]
+            node: {
+              OR: [
+                { suspendedIndefinitely: { eq: true } }
+                { suspendedUntil_GT: $now }
+              ]
+            }
           }
         ) {
-          count
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
       }
       EnabledPluginsConnection {

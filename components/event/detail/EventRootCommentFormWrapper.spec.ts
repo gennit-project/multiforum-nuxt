@@ -4,7 +4,9 @@ import { ref } from 'vue';
 import EventRootCommentFormWrapper from './EventRootCommentFormWrapper.vue';
 import type { Mutation } from '@/__generated__/graphql';
 
-type CreateCommentsResult = { data?: Pick<Mutation, 'createComments'> };
+type CreateCommentsResult = {
+  data?: Pick<Mutation, 'createCommentWithOwnedConnections'>;
+};
 
 const onDoneCallbacks: Array<(result: CreateCommentsResult) => void> = [];
 const suspensionIssueNumber = ref<number | null>(null);

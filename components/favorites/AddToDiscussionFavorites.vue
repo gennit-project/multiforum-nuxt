@@ -54,7 +54,7 @@ const GET_USER_FAVORITE_DISCUSSION = gql`
   query getUserFavoriteDiscussion($username: String!, $discussionId: ID!) {
     users(where: { username: $username }) {
       username
-      FavoriteDiscussions(where: { id: $discussionId }) {
+      FavoriteDiscussions(where: { id: { eq: $discussionId } }) {
         id
         title
       }

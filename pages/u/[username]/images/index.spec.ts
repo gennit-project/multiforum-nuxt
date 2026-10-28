@@ -57,7 +57,13 @@ const mountImages = () => mountWithDefaults(ImagesPage, { global: { stubs } });
 
 const withImages = (images: unknown[], total = images.length) => {
   h.resultRef.value = {
-    users: [{ username: 'alice', Images: images, ImagesAggregate: { count: total } }],
+    users: [
+      {
+        username: 'alice',
+        Images: images,
+        ImagesConnection: { aggregate: { count: { nodes: total } } },
+      },
+    ],
   };
 };
 

@@ -23,8 +23,8 @@ export type LibraryTabKey = 'uploads' | 'favorites' | 'collections';
 // match it against the image's text fields.
 export const buildReusableImageWhere = (searchTerm: string): ImageWhere => {
   const base: ImageWhere = {
-    archived: false,
-    permanentlyRemoved: false,
+    archived: { eq: false },
+    permanentlyRemoved: { eq: false },
   };
   const trimmedSearch = searchTerm.trim();
 

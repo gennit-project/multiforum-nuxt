@@ -122,8 +122,8 @@ const getPreviewImage = (item: {
 };
 
 type CollectionDiscussionChannel = {
-  CommentsAggregate?: {
-    count?: number | null;
+  CommentsConnection?: {
+    aggregate?: { count?: { nodes?: number | null } | null } | null;
   } | null;
 };
 
@@ -725,7 +725,7 @@ const handleDelete = async () => {
                             (
                               total: number,
                               item: CollectionDiscussionChannel
-                            ) => total + (item.CommentsAggregate?.count || 0),
+                            ) => total + (item.CommentsConnection?.aggregate?.count?.nodes || 0),
                             0
                           ) || 0
                         "

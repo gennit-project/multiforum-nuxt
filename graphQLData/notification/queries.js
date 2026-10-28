@@ -1,11 +1,16 @@
 import { gql } from '@apollo/client/core';
 
 export const GET_NOTIFICATIONS = gql`
-  query getNotifications($username: String!, $options: NotificationOptions) {
-    users(where: { username: $username }) {
+  query getNotifications(
+    $username: String!
+    $sort: [NotificationSort!]
+    $limit: Int
+    $offset: Int
+  ) {
+    users(where: { username: { eq: $username } }) {
       username
       profilePicURL
-      Notifications(options: $options) {
+      Notifications(sort: $sort, limit: $limit, offset: $offset) {
         id
         createdAt
         read
@@ -17,8 +22,14 @@ export const GET_NOTIFICATIONS = gql`
           isPublic
         }
       }
-      NotificationsAggregate(where: { read: false }) {
-        count
+      NotificationsAggregate: NotificationsConnection(
+        where: { node: { read: { eq: false } } }
+      ) {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -26,12 +37,19 @@ export const GET_NOTIFICATIONS = gql`
 
 // Get only feedback notifications
 export const GET_FEEDBACK_NOTIFICATIONS = gql`
-  query getFeedbackNotifications($username: String!, $options: NotificationOptions) {
-    users(where: { username: $username }) {
+  query getFeedbackNotifications(
+    $username: String!
+    $sort: [NotificationSort!]
+    $limit: Int
+    $offset: Int
+  ) {
+    users(where: { username: { eq: $username } }) {
       username
       Notifications(
-        where: { notificationType: "feedback" }
-        options: $options
+        where: { notificationType: { eq: "feedback" } }
+        sort: $sort
+        limit: $limit
+        offset: $offset
       ) {
         id
         createdAt
@@ -40,15 +58,23 @@ export const GET_FEEDBACK_NOTIFICATIONS = gql`
         notificationType
         link
       }
-      NotificationsAggregate(
-        where: { read: false, notificationType: "feedback" }
+      NotificationsAggregate: NotificationsConnection(
+        where: { node: { read: { eq: false }, notificationType: { eq: "feedback" } } }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      totalNotificationsAggregate: NotificationsAggregate(
-        where: { notificationType: "feedback" }
+      totalNotificationsAggregate: NotificationsConnection(
+        where: { node: { notificationType: { eq: "feedback" } } }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }
@@ -56,17 +82,24 @@ export const GET_FEEDBACK_NOTIFICATIONS = gql`
 
 // Get all notifications except feedback
 export const GET_GENERAL_NOTIFICATIONS = gql`
-  query getGeneralNotifications($username: String!, $options: NotificationOptions) {
-    users(where: { username: $username }) {
+  query getGeneralNotifications(
+    $username: String!
+    $sort: [NotificationSort!]
+    $limit: Int
+    $offset: Int
+  ) {
+    users(where: { username: { eq: $username } }) {
       username
       Notifications(
         where: {
           OR: [
-            { notificationType: null }
-            { NOT: { notificationType: "feedback" } }
+            { notificationType: { eq: null } }
+            { NOT: { notificationType: { eq: "feedback" } } }
           ]
         }
-        options: $options
+        sort: $sort
+        limit: $limit
+        offset: $offset
       ) {
         id
         createdAt
@@ -79,26 +112,38 @@ export const GET_GENERAL_NOTIFICATIONS = gql`
           isPublic
         }
       }
-      NotificationsAggregate(
+      NotificationsAggregate: NotificationsConnection(
         where: {
-          read: false
-          OR: [
-            { notificationType: null }
-            { NOT: { notificationType: "feedback" } }
-          ]
+          node: {
+            read: { eq: false }
+            OR: [
+              { notificationType: { eq: null } }
+              { NOT: { notificationType: { eq: "feedback" } } }
+            ]
+          }
         }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      totalNotificationsAggregate: NotificationsAggregate(
+      totalNotificationsAggregate: NotificationsConnection(
         where: {
-          OR: [
-            { notificationType: null }
-            { NOT: { notificationType: "feedback" } }
-          ]
+          node: {
+            OR: [
+              { notificationType: { eq: null } }
+              { NOT: { notificationType: { eq: "feedback" } } }
+            ]
+          }
         }
       ) {
-        count
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
     }
   }

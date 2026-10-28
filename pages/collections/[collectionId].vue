@@ -47,7 +47,7 @@ watch(
     const collectionData = val?.collections?.[0];
     if (!collectionData) return;
 
-    totalDownloads.value = collectionData.DownloadsAggregate?.count || 0;
+    totalDownloads.value = collectionData.DownloadsConnection?.aggregate?.count?.nodes || 0;
 
     downloads.value = mergeUniqueById<Discussion>(
       downloads.value,

@@ -11,8 +11,8 @@ export interface ExistingBot {
   username: string;
   botProfileId?: string | null;
   isDeprecated?: boolean | null;
-  SuspensionsAggregate?: {
-    count: number;
+  SuspensionsConnection?: {
+    aggregate?: { count?: { nodes?: number | null } | null } | null;
   } | null;
 }
 
@@ -142,7 +142,7 @@ const botStatusPreview = computed(() => {
     desiredUsernames.add(username);
 
     const existingBot = existingBotMap.get(username);
-    const isSuspended = (existingBot?.SuspensionsAggregate?.count ?? 0) > 0;
+    const isSuspended = (existingBot?.SuspensionsConnection?.aggregate?.count?.nodes ?? 0) > 0;
 
     const entry: BotPreviewEntry = {
       username,
@@ -163,7 +163,7 @@ const botStatusPreview = computed(() => {
   // Only check bots belonging to this plugin (already filtered in relevantBots)
   for (const bot of relevantBots) {
     if (!desiredUsernames.has(bot.username)) {
-      const isSuspended = (bot.SuspensionsAggregate?.count ?? 0) > 0;
+      const isSuspended = (bot.SuspensionsConnection?.aggregate?.count?.nodes ?? 0) > 0;
       deprecated.push({
         username: bot.username,
         profileId: bot.botProfileId || null,

@@ -82,7 +82,7 @@ test('keeps the discussion author avatar aligned with the identity on narrow scr
               archived: false,
               answered: false,
               locked: false,
-              CommentsAggregate: { count: 0 },
+              CommentsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },

@@ -108,7 +108,7 @@ const createDownloadHandlers = ({
           archived: false,
           answered: false,
           locked: false,
-          CommentsAggregate: { count: 0 },
+          CommentsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },

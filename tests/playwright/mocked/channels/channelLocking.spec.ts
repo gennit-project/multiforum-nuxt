@@ -130,7 +130,7 @@ const lockedChannelMocks = (username: string) => ({
       channels: [
         {
           uniqueName: TEST_CHANNEL,
-          DiscussionChannelsAggregate: { count: 0 },
+          DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },
@@ -173,7 +173,7 @@ test.describe('Channel locking', () => {
           channels: [
             {
               uniqueName: TEST_CHANNEL,
-              DiscussionChannelsAggregate: { count: 0 },
+              DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },
@@ -231,7 +231,7 @@ test.describe('Channel locking', () => {
           channels: [
             {
               uniqueName: TEST_CHANNEL,
-              DiscussionChannelsAggregate: { count: 0 },
+              DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },

@@ -19,7 +19,7 @@ import type {
   Discussion,
   DiscussionChannel,
   Tag as TagData,
-  DiscussionTagsConnectOrCreateFieldInput,
+  DiscussionTagsUpdateFieldInput,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
   Image,
@@ -267,21 +267,13 @@ const getAlbumUpdateInput = () =>
   });
 
 const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
-  const tagConnections: DiscussionTagsConnectOrCreateFieldInput[] =
-    formValues.value.selectedTags.map((tag: string) => {
-      return {
-        onCreate: {
-          node: {
-            text: tag,
-          },
-        },
-        where: {
-          node: {
-            text: tag,
-          },
-        },
-      };
-    });
+  const tagConnections = formValues.value.selectedTags.map((tag: string) => {
+    return {
+      where: {
+        node: { text: { eq: tag } },
+      },
+    };
+  });
 
   const tagDisconnections: DiscussionTagsDisconnectFieldInput[] =
     existingTags.value
@@ -291,9 +283,7 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
       .map((tag: string) => {
         return {
           where: {
-            node: {
-              text: tag,
-            },
+            node: { text: { eq: tag } },
           },
         };
       });
@@ -306,13 +296,15 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
   });
 
   const result: DiscussionUpdateInput = {
-    title: formValues.value.title,
-    body: formValues.value.body,
+    title: { set: formValues.value.title },
+    body: { set: formValues.value.body },
+    // v7 Tags update input no longer exposes `connectOrCreate`; the custom
+    // update resolver still accepts this payload, so preserve the shape.
     Tags: [
       {
-        connectOrCreate: tagConnections,
+        connect: tagConnections,
         disconnect: tagDisconnections,
-      },
+      } as unknown as DiscussionTagsUpdateFieldInput,
     ],
     ...albumUpdateInput, // Include album data
     ...downloadableFilesUpdateInput,
@@ -338,9 +330,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: {
-    where: {
-      id: discussionId.value,
-    },
+    where: { id: { eq: discussionId.value } },
     updateDiscussionInput: updateDiscussionInput.value,
     channelConnections: channelConnections.value,
     channelDisconnections: discussion.value.DiscussionChannels.filter((dc) => {

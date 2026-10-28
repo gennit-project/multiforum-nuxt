@@ -167,7 +167,7 @@ export const CANCEL_EVENT = gql`
 
 export const DELETE_EVENT = gql`
   mutation deleteEvent($id: ID!) {
-    deleteEvents(where: { id: $id }) {
+    deleteEvents(where: { id: { eq: $id } }) {
       nodesDeleted
       relationshipsDeleted
     }
@@ -191,7 +191,7 @@ export const ADD_FEEDBACK_COMMENT_TO_EVENT = gql`
     $eventId: ID!
     $channelId: String!
   ) {
-    createComments(
+    createCommentWithOwnedConnections(
       input: [
         {
           isRootComment: true

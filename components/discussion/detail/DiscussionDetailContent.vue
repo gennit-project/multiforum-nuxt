@@ -656,7 +656,9 @@ const relatedIssueLink = computed<RouteLocationRaw | null>(() => {
 });
 
 const commentCount = computed(
-  () => activeDiscussionChannel.value?.CommentsAggregate?.count || 0
+  () =>
+    activeDiscussionChannel.value?.CommentsConnection?.aggregate?.count
+      ?.nodes || 0
 );
 
 const imageUploadsEnabled = computed(
@@ -664,16 +666,21 @@ const imageUploadsEnabled = computed(
 );
 
 const aggregateCommentCount = computed(() => {
-  return activeDiscussionChannel.value?.CommentsAggregate?.count || 0;
+  return (
+    activeDiscussionChannel.value?.CommentsConnection?.aggregate?.count
+      ?.nodes || 0
+  );
 });
 
 const aggregateRootCommentCount = computed(() => {
   const channel = activeDiscussionChannel.value as
     | (DiscussionChannel & {
-        RootCommentsAggregate?: { count?: number | null } | null;
+        RootCommentsConnection?: {
+          aggregate?: { count?: { nodes?: number | null } | null } | null;
+        } | null;
       })
     | null;
-  return channel?.RootCommentsAggregate?.count || 0;
+  return channel?.RootCommentsConnection?.aggregate?.count?.nodes || 0;
 });
 
 const loadMore = () => {

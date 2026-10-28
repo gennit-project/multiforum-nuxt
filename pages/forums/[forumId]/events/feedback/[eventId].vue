@@ -55,7 +55,7 @@ const feedbackComments = computed(() => {
 
 const feedbackCommentsAggregate = computed(() => {
   if (event.value) {
-    return event.value.FeedbackCommentsAggregate?.count || 0;
+    return event.value.FeedbackCommentsConnection?.aggregate?.count?.nodes || 0;
   }
   return 0;
 });

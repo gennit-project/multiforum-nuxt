@@ -5,7 +5,9 @@ import { MessageSquare } from 'lucide-vue-next';
 
 type Submission = {
   channelUniqueName: string;
-  CommentsAggregate?: { count: number } | null;
+  CommentsConnection?: {
+    aggregate?: { count?: { nodes?: number | null } | null } | null;
+  } | null;
 };
 const props = withDefaults(
   defineProps<{
@@ -45,7 +47,7 @@ const previewLink = (forum: string) => ({
 });
 const label = (submission: Submission) =>
   props.kind === 'discussion'
-    ? `${submission.channelUniqueName}: ${submission.CommentsAggregate?.count ?? 0} ${submission.CommentsAggregate?.count === 1 ? 'comment' : 'comments'}`
+    ? `${submission.channelUniqueName}: ${submission.CommentsConnection?.aggregate?.count?.nodes ?? 0} ${submission.CommentsConnection?.aggregate?.count?.nodes === 1 ? 'comment' : 'comments'}`
     : `View event in ${submission.channelUniqueName}`;
 </script>
 
@@ -123,7 +125,7 @@ const label = (submission: Submission) =>
           <span class="truncate">{{ submission.channelUniqueName }}</span>
           <template v-if="kind === 'discussion'">
             <MessageSquare class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-            <span>{{ submission.CommentsAggregate?.count ?? 0 }}</span>
+            <span>{{ submission.CommentsConnection?.aggregate?.count?.nodes ?? 0 }}</span>
           </template>
         </NuxtLink>
       </li>

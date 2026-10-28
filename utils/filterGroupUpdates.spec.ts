@@ -79,18 +79,18 @@ describe('buildFilterGroupsUpdate', () => {
 
     expect(buildFilterGroupsUpdate({ current, existing: existing() })).toEqual([
       {
-        where: { node: { id: 'g-adv' } },
         update: {
+          where: { node: { id: { eq: 'g-adv' } } },
           node: {
-            displayName: 'Custom content',
+            displayName: { set: 'Custom content' },
             options: [
               {
-                where: { node: { id: 'o-cc' } },
                 update: {
+                  where: { node: { id: { eq: 'o-cc' } } },
                   node: {
-                    value: 'custom_content',
-                    displayName: 'Uses custom content (CC)',
-                    order: 0,
+                    value: { set: 'custom_content' },
+                    displayName: { set: 'Uses custom content (CC)' },
+                    order: { set: 0 },
                   },
                 },
               },
@@ -116,8 +116,8 @@ describe('buildFilterGroupsUpdate', () => {
     [current[0], current[1]] = [current[1], current[0]];
     expect(
       buildFilterGroupsUpdate({ current, existing: existing() }).map((u) => [
-        u.where!.node!.id,
-        u.update!.node!.order,
+        u.update!.where!.node!.id!.eq,
+        u.update!.node!.order!.set,
       ])
     ).toEqual([
       ['g-lot', 0],
@@ -165,7 +165,7 @@ describe('buildFilterGroupsUpdate', () => {
     expect(buildFilterGroupsUpdate({ current, existing: existing() })).toEqual([
       {
         delete: [
-          { where: { node: { id: 'g-adv' } }, delete: { options: [{}] } },
+          { where: { node: { id: { eq: 'g-adv' } } }, delete: { options: [{}] } },
         ],
       },
     ]);
@@ -177,8 +177,10 @@ describe('buildFilterGroupsUpdate', () => {
 
     expect(buildFilterGroupsUpdate({ current, existing: existing() })).toEqual([
       {
-        where: { node: { id: 'g-size' } },
-        update: { node: { uploadSelection: FilterSelection.Single } },
+        update: {
+          where: { node: { id: { eq: 'g-size' } } },
+          node: { uploadSelection: { set: FilterSelection.Single } },
+        },
       },
     ]);
   });
@@ -202,7 +204,7 @@ describe('buildFilterGroupsUpdate', () => {
           },
         ],
       },
-      { delete: [{ where: { node: { id: 'o-cc' } } }] },
+      { delete: [{ where: { node: { id: { eq: 'o-cc' } } } }] },
     ]);
   });
 });

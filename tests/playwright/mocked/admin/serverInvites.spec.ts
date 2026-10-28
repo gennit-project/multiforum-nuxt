@@ -60,7 +60,7 @@ const getBaseMocks = (username: string) => ({
       channels: [
         {
           uniqueName: 'cats',
-          DiscussionChannelsAggregate: { count: 1 },
+          DiscussionChannelsConnection: { aggregate: { count: { nodes: 1 } } },
         },
       ],
     },

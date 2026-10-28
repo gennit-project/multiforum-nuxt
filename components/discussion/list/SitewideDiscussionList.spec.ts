@@ -38,7 +38,7 @@ const makeDiscussion = (
   DiscussionChannels: [
     {
       channelUniqueName: 'cats',
-      CommentsAggregate: { count: 2 },
+      CommentsConnection: { aggregate: { count: { nodes: 2 } } },
       __typename: 'DiscussionChannel',
     },
   ],
@@ -276,8 +276,14 @@ it('loads the selected forum’s comments, not the first forum’s', () => {
       listResult([
         makeDiscussion('1', {
           DiscussionChannels: [
-            { channelUniqueName: 'cats', CommentsAggregate: { count: 2 } },
-            { channelUniqueName: 'dogs', CommentsAggregate: { count: 5 } },
+            {
+              channelUniqueName: 'cats',
+              CommentsConnection: { aggregate: { count: { nodes: 2 } } },
+            },
+            {
+              channelUniqueName: 'dogs',
+              CommentsConnection: { aggregate: { count: { nodes: 5 } } },
+            },
           ],
         }),
       ])
@@ -312,8 +318,14 @@ it.each([
         listResult([
           makeDiscussion('1', {
             DiscussionChannels: [
-              { channelUniqueName: 'cats', CommentsAggregate: { count: 0 } },
-              { channelUniqueName: 'dogs', CommentsAggregate: { count: 1 } },
+              {
+                channelUniqueName: 'cats',
+                CommentsConnection: { aggregate: { count: { nodes: 0 } } },
+              },
+              {
+                channelUniqueName: 'dogs',
+                CommentsConnection: { aggregate: { count: { nodes: 1 } } },
+              },
             ],
           }),
         ])

@@ -78,7 +78,7 @@ const getBaseMocks = (
     },
   }),
   getUserOwnedDownloadsCount: () => ({
-    data: { users: [{ username, OwnedDownloadsAggregate: { count: 0 } }] },
+    data: { users: [{ username, OwnedDownloadsConnection: { aggregate: { count: { nodes: 0 } } } }] },
   }),
   getUploadedDownloadableFiles: () => ({
     data: { getUploadedDownloadableFiles: [] },

@@ -72,7 +72,7 @@ describe('getEventWhere', () => {
         NOT: {
           channelUniqueName: null,
         },
-        archived: false,
+        archived: { eq: false },
       },
     });
   });
@@ -101,12 +101,12 @@ describe('getEventWhere', () => {
       findCondition(
         where,
         (condition) =>
-          condition.EventChannels_SOME?.channelUniqueName === 'cats'
+          condition.EventChannels_SOME?.channelUniqueName?.eq === 'cats'
       )
     ).toEqual({
       EventChannels_SOME: {
-        channelUniqueName: 'cats',
-        archived: false,
+        channelUniqueName: { eq: 'cats' },
+        archived: { eq: false },
       },
     });
   });
@@ -123,8 +123,8 @@ describe('getEventWhere', () => {
     ).toEqual({
       EventChannels_SOME: {
         OR: [
-          { channelUniqueName_CONTAINS: 'cats', archived: false },
-          { channelUniqueName_CONTAINS: 'dogs', archived: false },
+          { channelUniqueName_CONTAINS: 'cats', archived: { eq: false } },
+          { channelUniqueName_CONTAINS: 'dogs', archived: { eq: false } },
         ],
       },
     });
@@ -262,17 +262,17 @@ describe('getEventWhere', () => {
       filterValues: { free: true },
     });
 
-    expect(findCondition(where, (condition) => condition.free === true)).toEqual(
-      { free: true }
-    );
+    expect(
+      findCondition(where, (condition) => condition.free?.eq === true)
+    ).toEqual({ free: { eq: true } });
   });
 
   it('excludes canceled events by default', async () => {
     const where = await buildWhere();
 
     expect(
-      findCondition(where, (condition) => condition.canceled === false)
-    ).toEqual({ canceled: false });
+      findCondition(where, (condition) => condition.canceled?.eq === false)
+    ).toEqual({ canceled: { eq: false } });
   });
 
   it('does not add a canceled filter when showCanceledEvents is true', async () => {
@@ -281,7 +281,7 @@ describe('getEventWhere', () => {
     });
 
     expect(
-      where.AND?.some((condition) => condition.canceled === false)
+      where.AND?.some((condition) => condition.canceled?.eq === false)
     ).toBe(false);
   });
 

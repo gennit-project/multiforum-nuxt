@@ -5,7 +5,7 @@ export const UPDATE_SERVER_CONFIG = gql`
     $serverName: String!
     $input: ServerConfigUpdateInput
   ) {
-    updateServerConfigs(where: { serverName: $serverName }, update: $input) {
+    updateServerConfigs(where: { serverName: { eq: $serverName } }, update: $input) {
       serverConfigs {
         serverName
         serverIconURL
@@ -59,8 +59,12 @@ export const REFRESH_PLUGINS = gql`
 export const ALLOW_PLUGIN = gql`
   mutation AllowPlugin($pluginId: ID!, $serverName: String!) {
     updateServerConfigs(
-      where: { serverName: $serverName }
-      connect: { AllowedPlugins: { where: { node: { id: $pluginId } } } }
+      where: { serverName: { eq: $serverName } }
+      update: {
+        AllowedPlugins: [
+          { connect: [{ where: { node: { id: { eq: $pluginId } } } }] }
+        ]
+      }
     ) {
       serverConfigs {
         serverName
@@ -76,8 +80,12 @@ export const ALLOW_PLUGIN = gql`
 export const DISALLOW_PLUGIN = gql`
   mutation DisallowPlugin($pluginId: ID!, $serverName: String!) {
     updateServerConfigs(
-      where: { serverName: $serverName }
-      disconnect: { AllowedPlugins: { where: { node: { id: $pluginId } } } }
+      where: { serverName: { eq: $serverName } }
+      update: {
+        AllowedPlugins: [
+          { disconnect: [{ where: { node: { id: { eq: $pluginId } } } }] }
+        ]
+      }
     ) {
       serverConfigs {
         serverName
@@ -191,7 +199,7 @@ export const UPDATE_MOD_CHANNEL_ROLE = gql`
     $name: String!
     $input: ModChannelRoleUpdateInput!
   ) {
-    updateModChannelRoles(where: { name: $name }, update: $input) {
+    updateModChannelRoles(where: { name: { eq: $name } }, update: $input) {
       modChannelRoles {
         name
         description
@@ -214,7 +222,7 @@ export const UPDATE_MOD_CHANNEL_ROLE = gql`
 
 export const UPDATE_SERVER_ROLE = gql`
   mutation UpdateServerRole($name: String!, $input: ServerRoleUpdateInput!) {
-    updateServerRoles(where: { name: $name }, update: $input) {
+    updateServerRoles(where: { name: { eq: $name } }, update: $input) {
       serverRoles {
         name
         description
@@ -234,8 +242,12 @@ export const UPDATE_SERVER_ROLE = gql`
 export const ADD_SERVER_ADMIN = gql`
   mutation AddServerAdmin($serverName: String!, $username: String!) {
     updateServerConfigs(
-      where: { serverName: $serverName }
-      connect: { Admins: [{ where: { node: { username: $username } } }] }
+      where: { serverName: { eq: $serverName } }
+      update: {
+        Admins: [
+          { connect: [{ where: { node: { username: { eq: $username } } } }] }
+        ]
+      }
     ) {
       serverConfigs {
         serverName
@@ -251,8 +263,12 @@ export const ADD_SERVER_ADMIN = gql`
 export const REMOVE_SERVER_ADMIN = gql`
   mutation RemoveServerAdmin($serverName: String!, $username: String!) {
     updateServerConfigs(
-      where: { serverName: $serverName }
-      disconnect: { Admins: [{ where: { node: { username: $username } } }] }
+      where: { serverName: { eq: $serverName } }
+      update: {
+        Admins: [
+          { disconnect: [{ where: { node: { username: { eq: $username } } } }] }
+        ]
+      }
     ) {
       serverConfigs {
         serverName
@@ -268,9 +284,15 @@ export const REMOVE_SERVER_ADMIN = gql`
 export const ADD_SERVER_MODERATOR = gql`
   mutation AddServerModerator($serverName: String!, $displayName: String!) {
     updateServerConfigs(
-      where: { serverName: $serverName }
-      connect: {
-        Moderators: [{ where: { node: { displayName: $displayName } } }]
+      where: { serverName: { eq: $serverName } }
+      update: {
+        Moderators: [
+          {
+            connect: [
+              { where: { node: { displayName: { eq: $displayName } } } }
+            ]
+          }
+        ]
       }
     ) {
       serverConfigs {
@@ -286,9 +308,15 @@ export const ADD_SERVER_MODERATOR = gql`
 export const REMOVE_SERVER_MODERATOR = gql`
   mutation RemoveServerModerator($serverName: String!, $displayName: String!) {
     updateServerConfigs(
-      where: { serverName: $serverName }
-      disconnect: {
-        Moderators: [{ where: { node: { displayName: $displayName } } }]
+      where: { serverName: { eq: $serverName } }
+      update: {
+        Moderators: [
+          {
+            disconnect: [
+              { where: { node: { displayName: { eq: $displayName } } } }
+            ]
+          }
+        ]
       }
     ) {
       serverConfigs {
@@ -359,7 +387,7 @@ export const UPDATE_MOD_SERVER_ROLE = gql`
     $name: String!
     $input: ModServerRoleUpdateInput!
   ) {
-    updateModServerRoles(where: { name: $name }, update: $input) {
+    updateModServerRoles(where: { name: { eq: $name } }, update: $input) {
       modServerRoles {
         name
         description

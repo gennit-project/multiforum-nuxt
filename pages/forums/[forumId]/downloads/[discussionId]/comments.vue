@@ -151,20 +151,20 @@ const loadedRootCommentCount = computed(() => {
 });
 
 const commentCount = computed(
-  () => activeDiscussionChannel.value?.CommentsAggregate?.count || 0
+  () => activeDiscussionChannel.value?.CommentsConnection?.aggregate?.count?.nodes || 0
 );
 
 const aggregateCommentCount = computed(() => {
   return (
     getDiscussionChannelCommentAggregateResult.value?.discussionChannels?.[0]
-      ?.CommentsAggregate?.count || 0
+      ?.CommentsConnection?.aggregate?.count?.nodes || 0
   );
 });
 
 const aggregateRootCommentCount = computed(() => {
   return (
     getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels?.[0]
-      ?.CommentsAggregate?.count || 0
+      ?.CommentsConnection?.aggregate?.count?.nodes || 0
   );
 });
 

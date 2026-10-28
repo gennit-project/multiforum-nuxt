@@ -237,8 +237,12 @@ export const CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
         locked
         discussionId
         channelUniqueName
-        CommentsAggregate {
-          count
+        CommentsConnection {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
         weightedVotesCount
         createdAt
@@ -251,8 +255,12 @@ export const CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
         UpvotedByUsers {
           username
         }
-        UpvotedByUsersAggregate {
-          count
+        UpvotedByUsersConnection {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
       }
       Author {
@@ -281,14 +289,16 @@ export const UPDATE_DISCUSSION = gql`
         Album {
           id
           imageOrder
-          Images(where: { archived_NOT: true, permanentlyRemoved_NOT: true }) {
+          Images(
+            where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }
+          ) {
             id
             url
             caption
             copyright
           }
         }
-        PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
+        PastTitleVersions(sort: [{ createdAt: DESC }]) {
           id
           Author {
             username
@@ -296,7 +306,7 @@ export const UPDATE_DISCUSSION = gql`
           body
           createdAt
         }
-        PastBodyVersions(options: { sort: [{ createdAt: DESC }] }) {
+        PastBodyVersions(sort: [{ createdAt: DESC }]) {
           id
           Author {
             username
@@ -358,7 +368,7 @@ export const UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
 
 export const DELETE_DISCUSSION = gql`
   mutation deleteDiscussion($id: ID!) {
-    deleteDiscussions(where: { id: $id }) {
+    deleteDiscussions(where: { id: { eq: $id } }) {
       nodesDeleted
       relationshipsDeleted
     }
@@ -373,8 +383,12 @@ export const UPVOTE_DISCUSSION_CHANNEL = gql`
       UpvotedByUsers {
         username
       }
-      UpvotedByUsersAggregate {
-        count
+      UpvotedByUsersConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       SuperUpvotedByUsers {
         username
@@ -391,8 +405,12 @@ export const UNDO_UPVOTE_DISCUSSION_CHANNEL = gql`
       UpvotedByUsers {
         username
       }
-      UpvotedByUsersAggregate {
-        count
+      UpvotedByUsersConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       SuperUpvotedByUsers {
         username
@@ -409,7 +427,7 @@ export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
     $channelId: String!
     $discussionChannelId: ID!
   ) {
-    createComments(
+    createCommentWithOwnedConnections(
       input: [
         {
           isRootComment: true
@@ -459,8 +477,11 @@ export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
 export const MARK_AS_ANSWERED = gql`
   mutation markAsAnswered($channelId: String!, $discussionId: ID!) {
     updateDiscussionChannels(
-      where: { channelUniqueName: $channelId, discussionId: $discussionId }
-      update: { answered: true }
+      where: {
+        channelUniqueName: { eq: $channelId }
+        discussionId: { eq: $discussionId }
+      }
+      update: { answered: { set: true } }
     ) {
       discussionChannels {
         id
@@ -489,10 +510,13 @@ export const MARK_AS_ANSWERED_BY_COMMENT = gql`
     $discussionId: ID!
   ) {
     updateDiscussionChannels(
-      where: { channelUniqueName: $channelId, discussionId: $discussionId }
+      where: {
+        channelUniqueName: { eq: $channelId }
+        discussionId: { eq: $discussionId }
+      }
       update: {
-        answered: true
-        Answers: { connect: [{ where: { node: { id: $commentId } } }] }
+        answered: { set: true }
+        Answers: { connect: [{ where: { node: { id: { eq: $commentId } } } }] }
       }
     ) {
       discussionChannels {
@@ -518,7 +542,10 @@ export const MARK_AS_ANSWERED_BY_COMMENT = gql`
 export const MARK_AS_UNANSWERED = gql`
   mutation markAsUnAnswered($channelId: String!, $discussionId: ID!) {
     updateDiscussionChannels(
-      where: { channelUniqueName: $channelId, discussionId: $discussionId }
+      where: {
+        channelUniqueName: { eq: $channelId }
+        discussionId: { eq: $discussionId }
+      }
       update: { Answers: { disconnect: [{ where: { node: { NOT: null } } }] } }
     ) {
       discussionChannels {
@@ -545,9 +572,12 @@ export const UNMARK_COMMENT_AS_ANSWER = gql`
     $discussionId: ID!
   ) {
     updateDiscussionChannels(
-      where: { channelUniqueName: $channelId, discussionId: $discussionId }
+      where: {
+        channelUniqueName: { eq: $channelId }
+        discussionId: { eq: $discussionId }
+      }
       update: {
-        Answers: { disconnect: [{ where: { node: { id: $commentId } } }] }
+        Answers: { disconnect: [{ where: { node: { id: { eq: $commentId } } } }] }
       }
     ) {
       discussionChannels {
@@ -572,7 +602,10 @@ export const UNMARK_COMMENT_AS_ANSWER = gql`
 
 export const UPDATE_IMAGE = gql`
   mutation updateImage($imageId: ID!, $caption: String, $alt: String) {
-    updateImages(where: { id: $imageId }, update: { caption: $caption, alt: $alt }) {
+    updateImages(
+      where: { id: { eq: $imageId } }
+      update: { caption: { set: $caption }, alt: { set: $alt } }
+    ) {
       images {
         id
         caption
@@ -593,8 +626,12 @@ export const UPDATE_IMAGE_METADATA = gql`
     $copyright: String
   ) {
     updateImages(
-      where: { id: $imageId }
-      update: { alt: $alt, caption: $caption, copyright: $copyright }
+      where: { id: { eq: $imageId } }
+      update: {
+        alt: { set: $alt }
+        caption: { set: $caption }
+        copyright: { set: $copyright }
+      }
     ) {
       images {
         id
@@ -666,8 +703,8 @@ export const UPDATE_DISCUSSION_SENSITIVE_CONTENT = gql`
     $hasSensitiveContent: Boolean!
   ) {
     updateDiscussions(
-      where: { id: $discussionId }
-      update: { hasSensitiveContent: $hasSensitiveContent }
+      where: { id: { eq: $discussionId } }
+      update: { hasSensitiveContent: { set: $hasSensitiveContent } }
     ) {
       discussions {
         id
@@ -685,8 +722,8 @@ export const UPDATE_DISCUSSION_CHANNEL_LABELS = gql`
   ) {
     updateDiscussionChannels(
       where: {
-        channelUniqueName: $channelUniqueName
-        discussionId: $discussionId
+        channelUniqueName: { eq: $channelUniqueName }
+        discussionId: { eq: $discussionId }
       }
       update: {
         LabelOptions: {

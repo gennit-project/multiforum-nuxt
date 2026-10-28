@@ -204,7 +204,7 @@ describe('Comment (real mount)', () => {
   it('renders child comments while replies are visible', () => {
     const wrapper = mountComment(
       baseComment({
-        ChildCommentsAggregate: { count: 1 },
+        ChildCommentsConnection: { aggregate: { count: { nodes: 1 } } },
       } as unknown as Partial<CommentType>)
     );
 
@@ -214,7 +214,7 @@ describe('Comment (real mount)', () => {
   it('forwards events emitted by an inline child comment', async () => {
     const wrapper = mountComment(
       baseComment({
-        ChildCommentsAggregate: { count: 1 },
+        ChildCommentsConnection: { aggregate: { count: { nodes: 1 } } },
       } as unknown as Partial<CommentType>)
     );
     const child = wrapper.findAllComponents(Comment)[0];
@@ -277,7 +277,7 @@ describe('Comment (real mount)', () => {
   it('handles hover state on the child comment list', async () => {
     const wrapper = mountComment(
       baseComment({
-        ChildCommentsAggregate: { count: 1 },
+        ChildCommentsConnection: { aggregate: { count: { nodes: 1 } } },
       } as unknown as Partial<CommentType>)
     );
     const children = wrapper.findComponent({ name: 'ChildComments' });
@@ -290,7 +290,7 @@ describe('Comment (real mount)', () => {
     const wrapper = mountWithDefaults(Comment, {
       props: {
         commentData: baseComment({
-          ChildCommentsAggregate: { count: 1 },
+          ChildCommentsConnection: { aggregate: { count: { nodes: 1 } } },
         } as unknown as Partial<CommentType>),
         depth: 5,
       },

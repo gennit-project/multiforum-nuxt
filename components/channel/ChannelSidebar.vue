@@ -26,8 +26,8 @@ type BotSummary = {
   displayName?: string | null;
   botProfileId?: string | null;
   isDeprecated?: boolean | null;
-  SuspensionsAggregate?: {
-    count: number;
+  SuspensionsConnection?: {
+    aggregate?: { count?: { nodes?: number | null } | null } | null;
   } | null;
 };
 
@@ -52,7 +52,7 @@ const route = useRoute();
 const router = useRouter();
 const showBecomeAdminModal = ref(false);
 const eventChannelsAggregate = computed(() => {
-  return props.channel?.EventChannelsAggregate?.count ?? 0;
+  return props.channel?.EventChannelsConnection?.aggregate?.count?.nodes ?? 0;
 });
 
 const channelId = computed(() => {
@@ -80,7 +80,7 @@ const sidebarIconSrc = computed(
 
 // Check if a bot has active suspensions
 const isBotSuspended = (bot: BotSummary): boolean => {
-  return (bot.SuspensionsAggregate?.count ?? 0) > 0;
+  return (bot.SuspensionsConnection?.aggregate?.count?.nodes ?? 0) > 0;
 };
 
 // Extract the invoke handle from a bot username

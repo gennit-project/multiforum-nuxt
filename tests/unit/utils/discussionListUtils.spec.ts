@@ -15,6 +15,10 @@ import {
 } from '@/utils/discussionListUtils';
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
 
+// v7 moved the comment count to CommentsConnection.aggregate.count.nodes.
+const buildCommentsConnection = (nodes: number) =>
+  ({ aggregate: { count: { nodes } } }) as unknown as DiscussionChannel['CommentsConnection'];
+
 describe('discussionListUtils', () => {
   function createMockDiscussion(
     overrides: Partial<Discussion> = {}
@@ -36,7 +40,7 @@ describe('discussionListUtils', () => {
       id: 'dc-1',
       channelUniqueName: 'test-channel',
       discussionId: 'disc-1',
-      CommentsAggregate: { count: 0 },
+      CommentsConnection: buildCommentsConnection(0),
       Channel: { displayName: 'Test Channel' },
       ...overrides,
     } as unknown as DiscussionChannel;
@@ -56,10 +60,10 @@ describe('discussionListUtils', () => {
       const discussion = createMockDiscussion({
         DiscussionChannels: [
           createMockDiscussionChannel({
-            CommentsAggregate: { count: 5 },
+            CommentsConnection: buildCommentsConnection(5),
           }),
           createMockDiscussionChannel({
-            CommentsAggregate: { count: 3 },
+            CommentsConnection: buildCommentsConnection(3),
           }),
         ],
       });
@@ -70,7 +74,7 @@ describe('discussionListUtils', () => {
       const discussion = createMockDiscussion({
         DiscussionChannels: [
           createMockDiscussionChannel({
-            CommentsAggregate: undefined,
+            CommentsConnection: undefined,
           }),
         ],
       });
@@ -85,14 +89,14 @@ describe('discussionListUtils', () => {
 
     it('returns comment count from channel', () => {
       const channel = createMockDiscussionChannel({
-        CommentsAggregate: { count: 10 },
+        CommentsConnection: buildCommentsConnection(10),
       });
       expect(getChannelCommentCount(channel)).toBe(10);
     });
 
     it('returns 0 when CommentsAggregate is missing', () => {
       const channel = createMockDiscussionChannel({
-        CommentsAggregate: undefined,
+        CommentsConnection: undefined,
       });
       expect(getChannelCommentCount(channel)).toBe(0);
     });
@@ -114,11 +118,11 @@ describe('discussionListUtils', () => {
         DiscussionChannels: [
           createMockDiscussionChannel({
             channelUniqueName: 'channel-a',
-            CommentsAggregate: { count: 5 },
+            CommentsConnection: buildCommentsConnection(5),
           }),
           createMockDiscussionChannel({
             channelUniqueName: 'channel-b',
-            CommentsAggregate: { count: 1 },
+            CommentsConnection: buildCommentsConnection(1),
           }),
         ],
       });
@@ -134,7 +138,7 @@ describe('discussionListUtils', () => {
         DiscussionChannels: [
           createMockDiscussionChannel({
             channelUniqueName: 'test',
-            CommentsAggregate: { count: 1 },
+            CommentsConnection: buildCommentsConnection(1),
           }),
         ],
       });
@@ -148,7 +152,7 @@ describe('discussionListUtils', () => {
         DiscussionChannels: [
           createMockDiscussionChannel({
             channelUniqueName: 'test',
-            CommentsAggregate: { count: 5 },
+            CommentsConnection: buildCommentsConnection(5),
           }),
         ],
       });

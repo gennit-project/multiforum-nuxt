@@ -50,7 +50,7 @@ const events = Array.from({ length: 24 }, (_, index) => {
 const handlers = {
   ...createBaseHandlers({ serverConfigOverrides: { enableEvents: true } }),
   getEvents: () => ({
-    data: { events, eventsAggregate: { count: events.length } },
+    data: { events, eventsConnection: { aggregate: { count: { nodes: events.length } } } },
   }),
   getEvent: () => ({
     data: {
@@ -82,7 +82,7 @@ const handlers = {
         {
           __typename: 'Event',
           id: 'map-event-0',
-          CommentsAggregate: { count: 0 },
+          CommentsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },
@@ -148,9 +148,9 @@ for (const mobile of [false, true]) {
         () =>
           diagnostics.seenOperations.find(
             (op) => op.operationName === 'getEvents'
-          )?.variables?.options
+          )?.variables?.sort
       )
-      .toEqual({ sort: [{ startTime: 'DESC' }] });
+      .toEqual([{ startTime: 'DESC' }]);
 
     const map = await page.getByTestId('event-map-panel').boundingBox();
     const list = await page.getByTestId('event-list').boundingBox();

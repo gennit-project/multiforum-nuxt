@@ -31,7 +31,9 @@ type CollectionImagesResult = {
     id: string;
     name?: string | null;
     Images?: ReusableImage[] | null;
-    ImagesAggregate?: { count?: number | null } | null;
+    ImagesConnection?: {
+      aggregate?: { count?: { nodes?: number | null } | null } | null;
+    } | null;
   }> | null;
 };
 
@@ -110,7 +112,7 @@ const collectionImages = computed<ReusableImage[]>(
 );
 
 const collectionImagesTotal = computed(
-  () => selectedCollection.value?.ImagesAggregate?.count ?? 0
+  () => selectedCollection.value?.ImagesConnection?.aggregate?.count?.nodes ?? 0
 );
 
 const hasMoreCollectionImages = computed(
@@ -147,7 +149,7 @@ const loadMoreCollectionImages = async () => {
                 ...(prevCollection.Images || []),
                 ...(nextCollection.Images || []),
               ],
-              ImagesAggregate: nextCollection.ImagesAggregate,
+              ImagesConnection: nextCollection.ImagesConnection,
             },
           ],
         };

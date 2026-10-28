@@ -47,7 +47,9 @@ const userData = (notifications: unknown[], count?: number) => ({
   users: [
     {
       Notifications: notifications,
-      NotificationsAggregate: { count: count ?? notifications.length },
+      NotificationsAggregate: {
+        aggregate: { count: { nodes: count ?? notifications.length } },
+      },
     },
   ],
 });

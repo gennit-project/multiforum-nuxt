@@ -81,7 +81,7 @@ test('creates and edits a channel', async ({
       data: {
         users: [
           buildBasicUser({
-            AdminOfChannelsAggregate: { count: 1 },
+            AdminOfChannelsConnection: { aggregate: { count: { nodes: 1 } } },
           }),
         ],
       },
@@ -235,7 +235,7 @@ test('creates and edits a channel', async ({
         channels: [
           {
             uniqueName: channelState.uniqueName,
-            DiscussionChannelsAggregate: { count: 0 },
+            DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
           },
         ],
       },
@@ -251,15 +251,21 @@ test('creates and edits a channel', async ({
     updateChannel: ({ body }) => {
       const variables = body.variables as UpdateChannelVariables | undefined;
       const update = variables?.update;
+      // v7 removed connectOrCreate; read whichever connect field the app sends.
+      const tagsUpdate = update?.Tags?.[0] as any;
       const nextTags =
-        update?.Tags?.[0]?.connectOrCreate?.map(
-          (tag) => tag.where.node.text
-        ).filter((tag): tag is string => Boolean(tag)) || [];
+        (tagsUpdate?.connectOrCreate ?? tagsUpdate?.connect)
+          ?.map((tag: any) => {
+            const text = tag?.where?.node?.text;
+            // v7 wraps the scalar leaf as { eq: "..." }; accept either form.
+            return text && typeof text === 'object' ? text.eq : text;
+          })
+          .filter((tag: unknown): tag is string => Boolean(tag)) || [];
 
       channelState = {
         ...channelState,
-        description: update?.description ?? '',
-        displayName: update?.displayName ?? '',
+        description: update?.description?.set ?? '',
+        displayName: update?.displayName?.set ?? '',
         tags: nextTags,
       };
 

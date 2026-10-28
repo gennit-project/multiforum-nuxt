@@ -149,7 +149,10 @@ const feedbackComments = computed(() => {
 
 const feedbackCommentsAggregate = computed(() => {
   if (originalComment.value) {
-    return originalComment.value.FeedbackCommentsAggregate?.count || 0;
+    return (
+      originalComment.value.FeedbackCommentsConnection?.aggregate?.count
+        ?.nodes || 0
+    );
   }
   return 0;
 });
@@ -195,7 +198,8 @@ const {
   onDone: onAddFeedbackCommentToCommentDone,
 } = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, {
   update: (cache, result) => {
-    const newFeedbackComment = result.data.createComments.comments[0];
+    const newFeedbackComment =
+      result.data.createCommentWithOwnedConnections.comments[0];
 
     if (commentToGiveFeedbackOn.value) {
       const prevQueryResult = cache.readQuery<{ comments: Comment[] }>({
@@ -222,11 +226,14 @@ const {
           {
             ...commentToGiveFeedbackOn.value,
             FeedbackComments: [...prevFeedbackComments, newFeedbackComment],
-            FeedbackCommentsAggregate: {
-              count:
-                (prevQueryResult?.comments?.[0]?.FeedbackCommentsAggregate
-                  ?.count ?? 0) + 1,
-              __typename: 'FeedbackCommentsAggregate',
+            FeedbackCommentsConnection: {
+              aggregate: {
+                count: {
+                  nodes:
+                    (prevQueryResult?.comments?.[0]?.FeedbackCommentsConnection
+                      ?.aggregate?.count?.nodes ?? 0) + 1,
+                },
+              },
             },
           },
         ],

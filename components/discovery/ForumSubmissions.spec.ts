@@ -6,7 +6,7 @@ vi.mock('nuxt/app', () => ({
 }));
 const submissions = Array.from({ length: 7 }, (_, i) => ({
   channelUniqueName: `forum-${i}`,
-  CommentsAggregate: { count: i },
+  CommentsConnection: { aggregate: { count: { nodes: i } } },
 }));
 const mountForums = (props = {}) =>
   mount(ForumSubmissions, {

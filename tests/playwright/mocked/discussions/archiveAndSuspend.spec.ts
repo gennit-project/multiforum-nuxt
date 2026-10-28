@@ -51,13 +51,13 @@ test('archives a discussion and suspends user with mocked GraphQL', async ({
         moderatorDisplayName: 'alice',
         serverConfigOverrides: {
           rules: DEFAULT_RULES_JSON,
-          DefaultModRole: DEFAULT_MOD_ROLE,
-          DefaultElevatedModRole: DEFAULT_MOD_ROLE,
+          DefaultModRole: DEFAULT_MOD_ROLE as any,
+          DefaultElevatedModRole: DEFAULT_MOD_ROLE as any,
         },
         channelOverrides: {
           rules: DEFAULT_RULES_JSON,
-          DefaultModRole: DEFAULT_MOD_ROLE,
-          ElevatedModRole: DEFAULT_MOD_ROLE,
+          DefaultModRole: DEFAULT_MOD_ROLE as any,
+          ElevatedModRole: DEFAULT_MOD_ROLE as any,
         },
       }),
       getServerRules: () => ({
@@ -123,7 +123,7 @@ test('archives a discussion and suspends user with mocked GraphQL', async ({
               archived: false,
               answered: false,
               locked: false,
-              CommentsAggregate: { count: 0 },
+              CommentsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },

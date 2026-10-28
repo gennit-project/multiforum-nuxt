@@ -71,14 +71,14 @@ test('shows a Server Admin badge on an event comment from a server admin', async
       }),
       getEventRootCommentAggregate: () => ({
         data: {
-          events: [{ id: EVENT_ID, CommentsAggregate: { count: 1 } }],
+          events: [{ id: EVENT_ID, CommentsConnection: { aggregate: { count: { nodes: 1 } } } }],
         },
       }),
       getEventChannelID: () => ({
         data: { eventChannels: [{ id: EVENT_CHANNEL_ID, archived: false }] },
       }),
       getEvents: () => ({
-        data: { eventsAggregate: { count: 1 }, events: [mockEvent] },
+        data: { eventsConnection: { aggregate: { count: { nodes: 1 } } }, events: [mockEvent] },
       }),
     },
   });

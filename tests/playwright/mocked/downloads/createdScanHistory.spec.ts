@@ -88,7 +88,7 @@ test('checks page shows only creation scans and their retries', async ({
     title: 'Scanned download',
     overrides: {
       hasDownload: true,
-      DownloadableFiles: [file],
+      DownloadableFiles: [file as any],
     },
   });
   await setupMockedPage({

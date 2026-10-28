@@ -51,13 +51,13 @@ test('reports an event with mocked GraphQL', async ({
         moderatorDisplayName: 'alice',
         serverConfigOverrides: {
           rules: DEFAULT_RULES_JSON,
-          DefaultModRole: DEFAULT_MOD_ROLE,
-          DefaultElevatedModRole: DEFAULT_MOD_ROLE,
+          DefaultModRole: DEFAULT_MOD_ROLE as any,
+          DefaultElevatedModRole: DEFAULT_MOD_ROLE as any,
         },
         channelOverrides: {
           rules: DEFAULT_RULES_JSON,
-          DefaultModRole: DEFAULT_MOD_ROLE,
-          ElevatedModRole: DEFAULT_MOD_ROLE,
+          DefaultModRole: DEFAULT_MOD_ROLE as any,
+          ElevatedModRole: DEFAULT_MOD_ROLE as any,
         },
       }),
       getServerRules: () => ({
@@ -93,7 +93,7 @@ test('reports an event with mocked GraphQL', async ({
           events: [
             {
               id: EVENT_ID,
-              CommentsAggregate: { count: 0 },
+              CommentsConnection: { aggregate: { count: { nodes: 0 } } },
             },
           ],
         },
@@ -110,7 +110,7 @@ test('reports an event with mocked GraphQL', async ({
       }),
       getEvents: () => ({
         data: {
-          eventsAggregate: { count: 1 },
+          eventsConnection: { aggregate: { count: { nodes: 1 } } },
           events: [mockEvent],
         },
       }),

@@ -350,19 +350,14 @@ describe('discussion edit page', () => {
       });
     await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
     expect(hState.mutationOptions?.().variables).toEqual({
-      where: { id: 'd1' },
+      where: { id: { eq: 'd1' } },
       updateDiscussionInput: {
-        title: 'Hello',
-        body: 'Body',
+        title: { set: 'Hello' },
+        body: { set: 'Body' },
         Tags: [
           {
-            connectOrCreate: [
-              {
-                onCreate: { node: { text: 'new-tag' } },
-                where: { node: { text: 'new-tag' } },
-              },
-            ],
-            disconnect: [{ where: { node: { text: 'old-tag' } } }],
+            connect: [{ where: { node: { text: { eq: 'new-tag' } } } }],
+            disconnect: [{ where: { node: { text: { eq: 'old-tag' } } } }],
           },
         ],
       },

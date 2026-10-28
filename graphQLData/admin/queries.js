@@ -68,7 +68,7 @@ export const GET_INSTANCE_SETUP_STATUS = gql`
 // just to read a handful of links.
 export const GET_SERVER_BRANDING = gql`
   query getServerBranding($serverName: String!) {
-    serverConfigs(where: { serverName: $serverName }) {
+    serverConfigs(where: { serverName: { eq: $serverName } }) {
       serverName
       serverIconURL
       brandingLogoDarkURL
@@ -88,7 +88,7 @@ export const GET_SERVER_BRANDING = gql`
 
 export const GET_SERVER_CONFIG = gql`
   query getServerConfig($serverName: String!) {
-    serverConfigs(where: { serverName: $serverName }) {
+    serverConfigs(where: { serverName: { eq: $serverName } }) {
       serverName
       serverIconURL
       serverDescription
@@ -421,7 +421,7 @@ export const GET_SERVER_HEALTH_CHANNEL_HEALTH = gql`
 
 export const GET_SERVER_PERMISSIONS = gql`
   query getServerConfig($serverName: String!) {
-    serverConfigs(where: { serverName: $serverName }) {
+    serverConfigs(where: { serverName: { eq: $serverName } }) {
       serverName
       SuperAdmins {
         username
@@ -525,10 +525,14 @@ export const GET_SERVER_PERMISSIONS = gql`
 
 export const GET_SERVER_SUSPENDED_USERS = gql`
   query getServerSuspendedUsers($serverName: String!) {
-    serverConfigs(where: { serverName: $serverName }) {
+    serverConfigs(where: { serverName: { eq: $serverName } }) {
       serverName
-      SuspendedUsersAggregate {
-        count
+      SuspendedUsersConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       SuspendedUsers {
         id
@@ -556,10 +560,14 @@ export const GET_SERVER_SUSPENDED_USERS = gql`
 
 export const GET_SERVER_SUSPENDED_MODS = gql`
   query getServerSuspendedMods($serverName: String!) {
-    serverConfigs(where: { serverName: $serverName }) {
+    serverConfigs(where: { serverName: { eq: $serverName } }) {
       serverName
-      SuspendedModsAggregate {
-        count
+      SuspendedModsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       SuspendedMods {
         id
@@ -612,7 +620,7 @@ export const GET_MOD_CHANNEL_ROLES = gql`
 
 export const GET_PLUGINS = gql`
   query getPlugins($serverName: String!) {
-    serverConfigs(where: { serverName: $serverName }) {
+    serverConfigs(where: { serverName: { eq: $serverName } }) {
       AllowedPlugins {
         id
         name
@@ -629,8 +637,8 @@ export const GET_PLUGINS = gql`
 
 export const GET_PLUGIN_BY_ID = gql`
   query getPluginById($serverName: String!, $pluginId: ID!) {
-    serverConfigs(where: { serverName: $serverName }) {
-      AllowedPlugins(where: { id: $pluginId }) {
+    serverConfigs(where: { serverName: { eq: $serverName } }) {
+      AllowedPlugins(where: { id: { eq: $pluginId } }) {
         id
         name
       }
@@ -765,7 +773,7 @@ export const GET_PLUGIN_MANAGEMENT_DATA = gql`
         apiVersion
       }
     }
-    serverConfigs(where: { serverName: $serverName }) {
+    serverConfigs(where: { serverName: { eq: $serverName } }) {
       serverName
       pluginRegistries
       AllowedPlugins {
@@ -825,7 +833,7 @@ export const GET_PLUGIN_MANAGEMENT_DATA = gql`
 
 export const GET_PLUGIN_DETAIL = gql`
   query GetPluginDetail($pluginId: ID!) {
-    plugins(where: { id: $pluginId }) {
+    plugins(where: { id: { eq: $pluginId } }) {
       id
       name
       displayName
@@ -1163,7 +1171,7 @@ export const GET_PLUGIN_PIPELINE_CAMPAIGN_FAILURES = gql`
 
 export const GET_PLUGIN_PIPELINES = gql`
   query GetPluginPipelines($serverName: String!) {
-    serverConfigs(where: { serverName: $serverName }) {
+    serverConfigs(where: { serverName: { eq: $serverName } }) {
       serverName
       pluginPipelines
     }

@@ -71,12 +71,12 @@ const buildOptionUpdates = (
       // option update node, so send the full option.
       return [
         {
-          where: { node: { id: option.id } },
           update: {
+            where: { node: { id: { eq: option.id } } },
             node: {
-              value: option.value,
-              displayName: option.displayName,
-              order,
+              value: { set: option.value },
+              displayName: { set: option.displayName },
+              order: { set: order },
             },
           },
         },
@@ -93,7 +93,7 @@ const buildOptionUpdates = (
   );
   const deletes = existingOptions
     .filter((option) => !currentIds.has(option.id))
-    .map((option) => ({ where: { node: { id: option.id } } }));
+    .map((option) => ({ where: { node: { id: { eq: option.id } } } }));
 
   return [
     ...updates,
@@ -108,15 +108,15 @@ const buildGroupUpdateNode = (
   existingGroup?: FilterGroup
 ): FilterGroupUpdateInput | null => {
   const node: FilterGroupUpdateInput = {};
-  if (group.key !== existingGroup?.key) node.key = group.key;
+  if (group.key !== existingGroup?.key) node.key = { set: group.key };
   if (group.displayName !== existingGroup?.displayName) {
-    node.displayName = group.displayName;
+    node.displayName = { set: group.displayName };
   }
-  if (group.mode !== existingGroup?.mode) node.mode = group.mode;
+  if (group.mode !== existingGroup?.mode) node.mode = { set: group.mode };
   if (group.uploadSelection !== existingGroup?.uploadSelection) {
-    node.uploadSelection = group.uploadSelection;
+    node.uploadSelection = { set: group.uploadSelection };
   }
-  if (order !== existingGroup?.order) node.order = order;
+  if (order !== existingGroup?.order) node.order = { set: order };
 
   const optionUpdates = buildOptionUpdates(group, existingGroup);
   if (optionUpdates.length > 0) node.options = optionUpdates;
@@ -139,7 +139,7 @@ export const buildFilterGroupsUpdate = ({
         existingById.get(group.id)
       );
       return node
-        ? [{ where: { node: { id: group.id } }, update: { node } }]
+        ? [{ update: { where: { node: { id: { eq: group.id } } }, node } }]
         : [];
     }
   );
@@ -171,7 +171,7 @@ export const buildFilterGroupsUpdate = ({
   const deletes: ChannelFilterGroupsDeleteFieldInput[] = existing
     .filter((group) => !currentIds.has(group.id))
     .map((group) => ({
-      where: { node: { id: group.id } },
+      where: { node: { id: { eq: group.id } } },
       delete: { options: [{}] },
     }));
 

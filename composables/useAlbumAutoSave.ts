@@ -189,7 +189,7 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
       }
 
       await updateDiscussion({
-        where: { id: discussionId },
+        where: { id: { eq: discussionId } },
         updateDiscussionInput: albumUpdateInput,
         albumImageDisconnections,
       });

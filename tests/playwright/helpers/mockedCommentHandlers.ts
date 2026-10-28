@@ -1,4 +1,4 @@
-import type { CommentCreateInput } from '@/__generated__/graphql';
+import type { OwnedCommentCreateInput } from '@/__generated__/graphql';
 import {
   buildComment,
   buildDiscussion,
@@ -25,7 +25,7 @@ export const DEFAULT_COMMENT_CONFIG: CommentTestConfig = {
 };
 
 export type CreateCommentVariables = {
-  createCommentInput?: CommentCreateInput | CommentCreateInput[];
+  createCommentInput?: OwnedCommentCreateInput | OwnedCommentCreateInput[];
 };
 
 export type UpdateCommentVariables = {
@@ -133,9 +133,14 @@ export const createCommentHandlers = (
             archived: false,
             answered: false,
             locked: false,
-            CommentsAggregate: {
-              count: state.comments.filter((c) => c.parentCommentId === null)
-                .length,
+            CommentsConnection: {
+              aggregate: {
+                count: {
+                  nodes: state.comments.filter(
+                    (c) => c.parentCommentId === null
+                  ).length,
+                },
+              },
             },
           },
         ],
@@ -186,7 +191,7 @@ export const createCommentHandlers = (
       state.comments = [newComment, ...state.comments];
       return {
         data: {
-          createComments: {
+          createCommentWithOwnedConnections: {
             comments: [buildCommentFixture(newComment, state.comments, config)],
           },
         },

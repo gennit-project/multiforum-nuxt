@@ -297,7 +297,7 @@ const aggregateRootCommentCount = computed(() => {
   )
     return 0;
   const events = getEventRootCommentAggregateResult.value?.events || [];
-  return events[0]?.CommentsAggregate?.count || 0;
+  return events[0]?.CommentsConnection?.aggregate?.count?.nodes || 0;
 });
 const previousOffset = ref(0);
 const loadMore = () => {

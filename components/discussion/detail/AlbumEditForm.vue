@@ -157,13 +157,15 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
     };
 
     // All images should already have IDs since they're created when uploaded
+    // v7 dropped the `Album` relation from `DiscussionUpdateInput`; keep the
+    // existing payload shape and cast until the album write is migrated.
     return {
       Album: {
         create: {
           node: albumNode,
         },
       },
-    };
+    } as unknown as DiscussionUpdateInput;
   }
 
   // 2) If the album already exists, we build the connect/update/delete arrays
@@ -224,6 +226,8 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
   ];
 
   // Wrap them in the correct update shape
+  // v7 dropped the `Album` relation from `DiscussionUpdateInput`; keep the
+  // existing payload shape and cast until the album write is migrated.
   return {
     Album: {
       update: {
@@ -233,7 +237,7 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
         },
       },
     },
-  };
+  } as unknown as DiscussionUpdateInput;
 }
 
 const {
@@ -243,7 +247,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION, () => ({
   variables: {
-    where: { id: props.discussion?.id || discussionIdInParams.value },
+    where: { id: { eq: props.discussion?.id || discussionIdInParams.value } },
     updateDiscussionInput: getUpdateDiscussionInputForAlbum(),
   },
 }));

@@ -79,7 +79,7 @@ describe('event feedback page', () => {
       title: 'Cat Meetup',
       description: 'A nice gathering',
       FeedbackComments: [{ id: 'c1' }],
-      FeedbackCommentsAggregate: { count: 2 },
+      FeedbackCommentsConnection: { aggregate: { count: { nodes: 2 } } },
     });
 
     expect(wrapper.findComponent(EventHeader).exists()).toBe(true);
@@ -92,7 +92,7 @@ describe('event feedback page', () => {
       id: 'e1',
       title: 'Cat Meetup',
       FeedbackComments: [{ id: 'c1' }, { id: 'c2' }],
-      FeedbackCommentsAggregate: { count: 3 },
+      FeedbackCommentsConnection: { aggregate: { count: { nodes: 3 } } },
     });
 
     await wrapper.get('[data-testid="load-more"]').trigger('click');

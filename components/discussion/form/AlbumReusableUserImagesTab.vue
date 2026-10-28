@@ -13,14 +13,16 @@ import type { ReusableImage } from './reusableImageTypes';
 
 const PAGE_SIZE = 24;
 
-type Aggregate = { count?: number | null } | null;
+type ImagesCountConnection = {
+  aggregate?: { count?: { nodes?: number | null } | null } | null;
+} | null;
 
 type UserImagesResult = {
   users?: Array<{
     Images?: ReusableImage[] | null;
-    ImagesAggregate?: Aggregate;
+    ImagesConnection?: ImagesCountConnection;
     FavoriteImages?: ReusableImage[] | null;
-    FavoriteImagesAggregate?: Aggregate;
+    FavoriteImagesConnection?: ImagesCountConnection;
   }> | null;
 };
 
@@ -71,8 +73,8 @@ const images = computed<ReusableImage[]>(
 const totalCount = computed(
   () =>
     (isFavorites.value
-      ? user.value?.FavoriteImagesAggregate?.count
-      : user.value?.ImagesAggregate?.count) ?? 0
+      ? user.value?.FavoriteImagesConnection?.aggregate?.count?.nodes
+      : user.value?.ImagesConnection?.aggregate?.count?.nodes) ?? 0
 );
 
 const hasMore = computed(() => images.value.length < totalCount.value);
@@ -119,7 +121,7 @@ const loadMore = async () => {
                   ...(prevUser.FavoriteImages || []),
                   ...(nextUser.FavoriteImages || []),
                 ],
-                FavoriteImagesAggregate: nextUser.FavoriteImagesAggregate,
+                FavoriteImagesConnection: nextUser.FavoriteImagesConnection,
               },
             ],
           };
@@ -131,7 +133,7 @@ const loadMore = async () => {
             {
               ...prevUser,
               Images: [...(prevUser.Images || []), ...(nextUser.Images || [])],
-              ImagesAggregate: nextUser.ImagesAggregate,
+              ImagesConnection: nextUser.ImagesConnection,
             },
           ],
         };

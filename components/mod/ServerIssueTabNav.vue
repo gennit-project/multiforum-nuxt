@@ -62,14 +62,14 @@ const openCount = computed(() => {
   if (issuesLoading.value || issuesError.value) {
     return 0;
   }
-  return issuesResult.value?.issuesAggregate?.count || 0;
+  return issuesResult.value?.issuesConnection?.aggregate?.count?.nodes || 0;
 });
 
 const closedCount = computed(() => {
   if (closedIssuesLoading.value || closedIssuesError.value) {
     return 0;
   }
-  return closedIssuesResult.value?.issuesAggregate?.count || 0;
+  return closedIssuesResult.value?.issuesConnection?.aggregate?.count?.nodes || 0;
 });
 </script>
 

@@ -45,8 +45,12 @@ export const UPVOTE_COMMENT = gql`
       UpvotedByUsers {
         username
       }
-      UpvotedByUsersAggregate {
-        count
+      UpvotedByUsersConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       SuperUpvotedByUsers {
         username
@@ -63,8 +67,12 @@ export const UNDO_UPVOTE_COMMENT = gql`
       UpvotedByUsers {
         username
       }
-      UpvotedByUsersAggregate {
-        count
+      UpvotedByUsersConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       SuperUpvotedByUsers {
         username
@@ -81,8 +89,8 @@ export const UNDO_UPVOTE_COMMENT = gql`
 // comment fails to render until a refetch. The extra Channel/role/ChildComments
 // selections below cover fields a few consumers read beyond the fragment.
 export const CREATE_COMMENT = gql`
-  mutation createComment($createCommentInput: [CommentCreateInput!]!) {
-    createComments(input: $createCommentInput) {
+  mutation createComment($createCommentInput: [OwnedCommentCreateInput!]!) {
+    createCommentWithOwnedConnections(input: $createCommentInput) {
       comments {
         ...CommentFields
         Channel {
@@ -139,8 +147,12 @@ export const UPDATE_COMMENT = gql`
         UpvotedByUsers {
           username
         }
-        UpvotedByUsersAggregate {
-          count
+        UpvotedByUsersConnection {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
         FeedbackComments {
           id
@@ -153,8 +165,12 @@ export const UPDATE_COMMENT = gql`
             }
           }
         }
-        FeedbackCommentsAggregate {
-          count
+        FeedbackCommentsConnection {
+          aggregate {
+            count {
+              nodes
+            }
+          }
         }
       }
     }
@@ -162,14 +178,8 @@ export const UPDATE_COMMENT = gql`
 `;
 
 export const SOFT_DELETE_COMMENT = gql`
-  mutation updateComments($id: ID!) {
-    updateComments(
-      update: { text: "[Deleted]" }
-      disconnect: {
-        CommentAuthor: { User: { where: { node_NOT: { username: "null" } } } }
-      }
-      where: { id: $id }
-    ) {
+  mutation softDeleteComment($id: ID!) {
+    softDeleteComment(where: { id: { eq: $id } }) {
       comments {
         id
         text
@@ -188,7 +198,7 @@ export const SOFT_DELETE_COMMENT = gql`
 
 export const DELETE_COMMENT = gql`
   mutation deleteComment($id: ID!) {
-    deleteComments(where: { id: $id }) {
+    deleteComments(where: { id: { eq: $id } }) {
       nodesDeleted
       relationshipsDeleted
     }
@@ -246,7 +256,7 @@ export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
     $commentId: ID!
     $channelId: String!
   ) {
-    createComments(
+    createCommentWithOwnedConnections(
       input: [
         {
           isRootComment: true

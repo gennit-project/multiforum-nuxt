@@ -39,7 +39,7 @@ const { result, loading, error } = useQuery(
     <ChannelList
       v-else
       :channels="result.users[0].ModOfChannels"
-      :result-count="result.users[0].ModOfChannelsAggregate.count"
+      :result-count="result.users[0].ModOfChannelsConnection.aggregate.count.nodes"
     />
   </div>
 </template>

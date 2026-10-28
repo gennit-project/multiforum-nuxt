@@ -2,9 +2,18 @@ import { describe, it, expect } from 'vitest';
 import { selectDiscussionForum } from './selectDiscussionForum';
 
 const submissions = [
-  { channelUniqueName: 'empty', CommentsAggregate: { count: 0 } },
-  { channelUniqueName: 'active', CommentsAggregate: { count: 1 } },
-  { channelUniqueName: 'busy', CommentsAggregate: { count: 8 } },
+  {
+    channelUniqueName: 'empty',
+    CommentsConnection: { aggregate: { count: { nodes: 0 } } },
+  },
+  {
+    channelUniqueName: 'active',
+    CommentsConnection: { aggregate: { count: { nodes: 1 } } },
+  },
+  {
+    channelUniqueName: 'busy',
+    CommentsConnection: { aggregate: { count: { nodes: 8 } } },
+  },
 ];
 describe('selectDiscussionForum', () => {
   it.each([undefined, 'deleted', ['active']])(
@@ -23,7 +32,10 @@ describe('selectDiscussionForum', () => {
     expect(
       selectDiscussionForum([
         { channelUniqueName: 'first' },
-        { channelUniqueName: 'second', CommentsAggregate: { count: 0 } },
+        {
+          channelUniqueName: 'second',
+          CommentsConnection: { aggregate: { count: { nodes: 0 } } },
+        },
       ])
     ).toBe('first');
   });

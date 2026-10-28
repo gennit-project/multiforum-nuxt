@@ -86,7 +86,7 @@ const discussion = (overrides: Record<string, unknown> = {}) => ({
   DownloadableFiles: [],
   Album: { Images: [] },
   FeedbackComments: [],
-  FeedbackCommentsAggregate: { count: 0 },
+  FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
   Author: { username: 'alice' },
   ...overrides,
 });
@@ -144,7 +144,7 @@ describe('discussion feedback page', () => {
       discussions: [
         discussion({
           FeedbackComments: [{ id: 'one' }],
-          FeedbackCommentsAggregate: { count: 2 },
+          FeedbackCommentsConnection: { aggregate: { count: { nodes: 2 } } },
         }),
       ],
     };
@@ -185,7 +185,7 @@ describe('discussion feedback page', () => {
             { id: 'parent', FeedbackComments: [] },
             { id: 'other' },
           ],
-          FeedbackCommentsAggregate: { count: 2 },
+          FeedbackCommentsConnection: { aggregate: { count: { nodes: 2 } } },
         }),
       ],
     };
@@ -197,12 +197,12 @@ describe('discussion feedback page', () => {
     });
     const cache = {
       readQuery: vi.fn().mockReturnValue({
-        discussions: [{ FeedbackCommentsAggregate: { count: 2 } }],
+        discussions: [{ FeedbackCommentsConnection: { aggregate: { count: { nodes: 2 } } } }],
       }),
       writeQuery: vi.fn(),
     };
     h.mutationOptions?.update(cache, {
-      data: { createComments: { comments: [{ id: 'new' }] } },
+      data: { createCommentWithOwnedConnections: { comments: [{ id: 'new' }] } },
     });
     expect(
       cache.writeQuery.mock.calls[0][0].data.discussions[0].FeedbackComments
@@ -211,9 +211,8 @@ describe('discussion feedback page', () => {
       {
         id: 'parent',
         FeedbackComments: [{ id: 'existing' }, { id: 'new' }],
-        FeedbackCommentsAggregate: {
-          count: 3,
-          __typename: 'FeedbackCommentsAggregate',
+        FeedbackCommentsConnection: {
+          aggregate: { count: { nodes: 3 } },
         },
       },
     ]);

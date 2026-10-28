@@ -60,7 +60,7 @@ const buildSeriesEvent = (overrides: Partial<{
     ],
   },
   Tags: [],
-  CommentsAggregate: { count: 0 },
+  CommentsConnection: { aggregate: { count: { nodes: 0 } } },
   EventChannels: [
     {
       id: 'event-channel-1',
@@ -76,7 +76,7 @@ const buildSeriesEvent = (overrides: Partial<{
   ],
   SubscribedToNotifications: [],
   SubscribedToEventUpdates: [],
-  FeedbackCommentsAggregate: { count: 0 },
+  FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
   FeedbackComments: [],
   Poster: buildUser({ username: TEST_USERNAME }),
 });
@@ -122,7 +122,7 @@ const getCommonMocks = (username: string) => ({
   }),
   getChannelDownloadCount: () => ({
     data: {
-      channels: [{ uniqueName: TEST_CHANNEL, DiscussionChannelsAggregate: { count: 0 } }],
+      channels: [{ uniqueName: TEST_CHANNEL, DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } } }],
     },
   }),
   getChannelTags: () => ({
@@ -174,7 +174,7 @@ test.describe('Edit Series Event', () => {
         },
       }),
       getEventRootCommentAggregate: () => ({
-        data: { events: [{ id: TEST_EVENT_ID, CommentsAggregate: { count: 0 } }] },
+        data: { events: [{ id: TEST_EVENT_ID, CommentsConnection: { aggregate: { count: { nodes: 0 } } } }] },
       }),
       getEventChannelID: () => ({
         data: { eventChannels: [{ id: 'event-channel-1', archived: false }] },
@@ -229,7 +229,7 @@ test.describe('Edit Series Event', () => {
         },
       }),
       getEventRootCommentAggregate: () => ({
-        data: { events: [{ id: TEST_EVENT_ID, CommentsAggregate: { count: 0 } }] },
+        data: { events: [{ id: TEST_EVENT_ID, CommentsConnection: { aggregate: { count: { nodes: 0 } } } }] },
       }),
       getEventChannelID: () => ({
         data: { eventChannels: [{ id: 'event-channel-1', archived: false }] },
@@ -295,7 +295,7 @@ test.describe('Edit Series Event', () => {
         },
       }),
       getEventRootCommentAggregate: () => ({
-        data: { events: [{ id: TEST_EVENT_ID, CommentsAggregate: { count: 0 } }] },
+        data: { events: [{ id: TEST_EVENT_ID, CommentsConnection: { aggregate: { count: { nodes: 0 } } } }] },
       }),
       getEventChannelID: () => ({
         data: { eventChannels: [{ id: 'event-channel-1', archived: false }] },

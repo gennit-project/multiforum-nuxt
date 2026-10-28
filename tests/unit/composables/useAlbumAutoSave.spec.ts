@@ -52,7 +52,7 @@ describe('useAlbumAutoSave', () => {
       await performAutoSave();
 
       expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: 'disc-1' },
+        where: { id: { eq: 'disc-1' } },
         albumImageDisconnections: [],
         updateDiscussionInput: {
           Album: {
@@ -122,7 +122,7 @@ describe('useAlbumAutoSave', () => {
       await performAutoSave();
 
       expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: 'disc-1' },
+        where: { id: { eq: 'disc-1' } },
         albumImageDisconnections: [],
         updateDiscussionInput: {
           Album: {
@@ -167,7 +167,7 @@ describe('useAlbumAutoSave', () => {
       await performAutoSave();
 
       expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: 'disc-1' },
+        where: { id: { eq: 'disc-1' } },
         albumImageDisconnections: ['img-2'],
         updateDiscussionInput: {
           Album: {
@@ -210,7 +210,7 @@ describe('useAlbumAutoSave', () => {
       await performAutoSave();
 
       expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: 'disc-1' },
+        where: { id: { eq: 'disc-1' } },
         albumImageDisconnections: ['img-1'],
         updateDiscussionInput: {
           Album: {
@@ -254,7 +254,7 @@ describe('useAlbumAutoSave', () => {
       await performAutoSave();
 
       expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: 'disc-1' },
+        where: { id: { eq: 'disc-1' } },
         albumImageDisconnections: [],
         updateDiscussionInput: {
           Album: {
@@ -307,7 +307,7 @@ describe('useAlbumAutoSave', () => {
 
       // Should still be called to update imageOrder, but Images array should be empty
       expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: 'disc-1' },
+        where: { id: { eq: 'disc-1' } },
         albumImageDisconnections: [],
         updateDiscussionInput: {
           Album: {

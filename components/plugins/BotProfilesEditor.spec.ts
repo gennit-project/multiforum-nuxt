@@ -11,7 +11,7 @@ const mockExistingBots = [
     username: 'bot-testchannel-assistant-helper',
     botProfileId: 'helper',
     isDeprecated: false,
-    SuspensionsAggregate: { count: 0 },
+    SuspensionsConnection: { aggregate: { count: { nodes: 0 } } },
   },
 ];
 
@@ -20,7 +20,7 @@ const mockSuspendedBots = [
     username: 'bot-testchannel-assistant-helper',
     botProfileId: 'helper',
     isDeprecated: false,
-    SuspensionsAggregate: { count: 1 },
+    SuspensionsConnection: { aggregate: { count: { nodes: 1 } } },
   },
 ];
 
@@ -29,7 +29,7 @@ const mockDeprecatedSuspendedBots = [
     username: 'bot-testchannel-assistant-old',
     botProfileId: 'old',
     isDeprecated: true,
-    SuspensionsAggregate: { count: 1 },
+    SuspensionsConnection: { aggregate: { count: { nodes: 1 } } },
   },
 ];
 

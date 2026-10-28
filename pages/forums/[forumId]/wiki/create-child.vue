@@ -90,9 +90,8 @@ function handleSubmit() {
   };
 
   createChildWikiPage({
-    where: {
-      id: wikiHomePage.value.id, // Connect by parent page ID
-    },
+    // Connect by parent page ID
+    where: { id: { eq: wikiHomePage.value.id } },
     update: {
       ChildPages: {
         create: [

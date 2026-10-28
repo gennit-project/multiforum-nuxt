@@ -10,8 +10,8 @@ const channel = (overrides: Record<string, unknown> = {}) =>
     displayName: 'Cats Forum',
     description: 'All about cats',
     Tags: [{ text: 'pets' }, { text: 'cute' }],
-    DiscussionChannelsAggregate: { count: 12 },
-    EventChannelsAggregate: { count: 0 },
+    DiscussionChannelsConnection: { aggregate: { count: { nodes: 12 } } },
+    EventChannelsConnection: { aggregate: { count: { nodes: 0 } } },
     ...overrides,
   }) as unknown as Channel;
 
@@ -107,7 +107,7 @@ describe('ChannelListItem stats', () => {
 
   it('shows events when there are event channels', () => {
     const wrapper = mountItem({
-      channel: channel({ EventChannelsAggregate: { count: 3 } }),
+      channel: channel({ EventChannelsConnection: { aggregate: { count: { nodes: 3 } } } }),
     });
 
     expect(wrapper.text()).toContain('Events');

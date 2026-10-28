@@ -137,7 +137,7 @@ const saveDownloadAlbum = async (discussionId: string) => {
     };
 
     await updateDiscussion({
-      where: { id: discussionId },
+      where: { id: { eq: discussionId } },
       updateDiscussionInput: albumUpdateInput,
     });
   } catch (error) {
@@ -222,12 +222,7 @@ const submitForm = async () => {
 
     submitError.value = '';
     const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
-      onCreate: {
-        node: { text: tag },
-      },
-      where: {
-        node: { text: tag },
-      },
+      where: { node: { text: { eq: tag } } },
     }));
 
     // Build downloadable files connections
@@ -245,7 +240,7 @@ const submitForm = async () => {
       title: formValues.value.title,
       body: formValues.value.body,
       hasDownload: true,
-      Tags: { connectOrCreate: tagConnections },
+      Tags: { connect: tagConnections },
       Author: {
         connect: {
           where: {

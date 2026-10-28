@@ -67,7 +67,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION, () => ({
   variables: {
-    where: { id: discussionId.value },
+    where: { id: { eq: discussionId.value } },
     updateDiscussionInput: {
       body: formValues.value.body,
     } as DiscussionUpdateInput,

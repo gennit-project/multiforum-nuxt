@@ -46,7 +46,7 @@ export const EVENT_FIELDS = gql`
         endCount
         endDate
       }
-      Occurrences(options: { sort: [{ startTime: ASC }], limit: 20 }) {
+      Occurrences(sort: [{ startTime: ASC }], limit: 20) {
         id
         startTime
         endTime
@@ -61,8 +61,12 @@ export const EVENT_FIELDS = gql`
     Tags {
       text
     }
-    CommentsAggregate {
-      count
+    CommentsConnection {
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
     EventChannels {
       id
@@ -90,15 +94,19 @@ export const GET_EVENT = gql`
     $channelUniqueName: String!
     $loggedInModName: String
   ) {
-    events(where: { id: $id }) {
+    events(where: { id: { eq: $id } }) {
       ...EventFields
-      FeedbackCommentsAggregate {
-        count
+      FeedbackCommentsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       FeedbackComments(
         where: {
           CommentAuthorConnection: {
-            ModerationProfile: { node: { displayName: $loggedInModName } }
+            ModerationProfile: { node: { displayName: { eq: $loggedInModName } } }
           }
         }
       ) {
@@ -111,7 +119,7 @@ export const GET_EVENT = gql`
         discussionKarma
         commentKarma
       }
-      PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
+      PastTitleVersions(sort: [{ createdAt: DESC }]) {
         id
         Author {
           username
@@ -120,7 +128,7 @@ export const GET_EVENT = gql`
         editReason
         createdAt
       }
-      PastDescriptionVersions(options: { sort: [{ createdAt: DESC }] }) {
+      PastDescriptionVersions(sort: [{ createdAt: DESC }]) {
         id
         Author {
           username
@@ -138,18 +146,31 @@ export const GET_EVENT = gql`
 `;
 
 export const GET_EVENTS = gql`
-  query getEvents($where: EventWhere, $options: EventOptions) {
-    eventsAggregate(where: $where) {
-      count
+  query getEvents(
+    $where: EventWhere
+    $sort: [EventSort!]
+    $limit: Int
+    $offset: Int
+  ) {
+    eventsConnection(where: $where) {
+      aggregate {
+        count {
+          nodes
+        }
+      }
     }
-    events(where: $where, options: $options) {
+    events(where: $where, sort: $sort, limit: $limit, offset: $offset) {
       ...EventFields
       cost
       Poster {
         ...AuthorFields
       }
-      CommentsAggregate {
-        count
+      CommentsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
       EventChannels {
         id
@@ -165,17 +186,21 @@ export const GET_EVENTS = gql`
 
 export const GET_EVENT_FEEDBACK = gql`
   query getEventFeedback($id: ID!, $limit: Int, $offset: Int) {
-    events(where: { id: $id }) {
+    events(where: { id: { eq: $id } }) {
       id
       title
       startTime
       endTime
       cost
       free
-      FeedbackCommentsAggregate {
-        count
+      FeedbackCommentsConnection {
+        aggregate {
+          count {
+            nodes
+          }
+        }
       }
-      FeedbackComments(options: { limit: $limit, offset: $offset }) {
+      FeedbackComments(limit: $limit, offset: $offset) {
         id
         text
         createdAt

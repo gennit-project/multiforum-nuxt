@@ -5,6 +5,7 @@ import {
   buildUser,
 } from './graphqlFixtures';
 import { DEFAULT_RULES_JSON, DEFAULT_MOD_ROLE } from './moderationFixtures';
+import type { ModChannelRole } from '@/__generated__/graphql';
 
 /**
  * Base GraphQL operations fired by the app shell + channel/issues layout when an
@@ -70,8 +71,8 @@ export const getIssueDetailBaseMocks = ({
           overrides: {
             rules: DEFAULT_RULES_JSON,
             Admins: [buildUser({ username })],
-            DefaultModRole: DEFAULT_MOD_ROLE,
-            ElevatedModRole: DEFAULT_MOD_ROLE,
+            DefaultModRole: DEFAULT_MOD_ROLE as unknown as ModChannelRole,
+            ElevatedModRole: DEFAULT_MOD_ROLE as unknown as ModChannelRole,
           },
         }),
       ],
@@ -80,7 +81,7 @@ export const getIssueDetailBaseMocks = ({
   getChannelDownloadCount: () => ({
     data: {
       channels: [
-        { uniqueName: channel, DiscussionChannelsAggregate: { count: 0 } },
+        { uniqueName: channel, DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } } },
       ],
     },
   }),
@@ -89,7 +90,7 @@ export const getIssueDetailBaseMocks = ({
       channels: [
         {
           uniqueName: channel,
-          SuspendedModsAggregate: { count: 0 },
+          SuspendedModsConnection: { aggregate: { count: { nodes: 0 } } },
           SuspendedMods: [],
         },
       ],
@@ -112,13 +113,13 @@ export const getIssueDetailBaseMocks = ({
       ],
     },
   }),
-  countOpenIssues: () => ({ data: { issuesAggregate: { count: 1 } } }),
-  countClosedIssues: () => ({ data: { issuesAggregate: { count: 0 } } }),
-  countIssuesByServer: () => ({ data: { issuesAggregate: { count: 1 } } }),
+  countOpenIssues: () => ({ data: { issuesConnection: { aggregate: { count: { nodes: 1 } } } } }),
+  countClosedIssues: () => ({ data: { issuesConnection: { aggregate: { count: { nodes: 0 } } } } }),
+  countIssuesByServer: () => ({ data: { issuesConnection: { aggregate: { count: { nodes: 1 } } } } }),
   countClosedIssuesByServer: () => ({
-    data: { issuesAggregate: { count: 0 } },
+    data: { issuesConnection: { aggregate: { count: { nodes: 0 } } } },
   }),
-  getEvents: () => ({ data: { events: [], eventsAggregate: { count: 0 } } }),
+  getEvents: () => ({ data: { events: [], eventsConnection: { aggregate: { count: { nodes: 0 } } } } }),
   // Rules shown in the broken-rules report modal.
   getServerRules: () => ({
     data: {

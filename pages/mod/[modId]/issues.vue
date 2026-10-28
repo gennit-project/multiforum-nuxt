@@ -23,7 +23,7 @@ const mod = computed(() => {
 });
 
 const commentsAggregate = computed(() => {
-  return mod.value ? mod.value.AuthoredIssuesAggregate?.count : 0;
+  return mod.value ? mod.value.AuthoredIssuesConnection?.aggregate?.count?.nodes : 0;
 });
 
 const {

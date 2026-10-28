@@ -270,23 +270,18 @@ describe('download edit page', () => {
       options: () => { variables: Record<string, unknown> };
     };
     expect(tracker.options().variables).toMatchObject({
-      where: { id: 'd1' },
+      where: { id: { eq: 'd1' } },
       channelConnections: ['dogs'],
       channelDisconnections: ['cats'],
       albumImageDisconnections: [],
       updateDiscussionInput: {
-        title: 'Cool model',
+        title: { set: 'Cool model' },
         Tags: [
           {
-            connectOrCreate: [
-              {
-                onCreate: { node: { text: 'new-tag' } },
-                where: { node: { text: 'new-tag' } },
-              },
-            ],
+            connect: [{ where: { node: { text: { eq: 'new-tag' } } } }],
             disconnect: [
-              { where: { node: { text: 'art' } } },
-              { where: { node: { text: '3d' } } },
+              { where: { node: { text: { eq: 'art' } } } },
+              { where: { node: { text: { eq: '3d' } } } },
             ],
           },
         ],
@@ -330,9 +325,9 @@ describe('download edit page', () => {
     };
 
     expect(tracker.options().variables.updateDiscussionInput).toMatchObject({
-      hasDownload: true,
+      hasDownload: { set: true },
       DownloadableFiles: [
-        { connect: [{ where: { node: { id: 'new-file' } } }] },
+        { connect: [{ where: { node: { id: { eq: 'new-file' } } } }] },
       ],
     });
   });

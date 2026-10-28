@@ -431,8 +431,10 @@ describe('DownloadEditForm upload', () => {
       variables: { updateDiscussionInput: unknown };
     };
     expect(options().variables.updateDiscussionInput).toEqual({
-      hasDownload: true,
-      DownloadableFiles: [{ connect: [{ where: { node: { id: 'new1' } } }] }],
+      hasDownload: { set: true },
+      DownloadableFiles: [
+        { connect: [{ where: { node: { id: { eq: 'new1' } } } }] },
+      ],
     });
   });
 

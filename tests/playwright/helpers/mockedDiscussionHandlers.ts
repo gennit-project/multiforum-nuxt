@@ -12,6 +12,31 @@ import {
 } from './graphqlFixtures';
 import { createBaseHandlers, type BaseHandlerConfig } from './baseHandlers';
 
+// v7 removed connectOrCreate from tag field inputs. The app connects tags by
+// text using the v7 filter shape `where: { node: { text: { eq: "<tag>" } } }`.
+// Accept that shape, plus the legacy plain-string `text` and connectOrCreate,
+// without pinning to the generated input type.
+type MockTagText = string | { eq?: string | null } | null;
+type MockTagConnect = { where?: { node?: { text?: MockTagText } } };
+const readTagText = (text: MockTagText | undefined): string | undefined => {
+  if (typeof text === 'string') return text;
+  if (text && typeof text === 'object' && typeof text.eq === 'string') {
+    return text.eq;
+  }
+  return undefined;
+};
+const extractTagTexts = (tagsField: unknown): string[] | undefined => {
+  const field = tagsField as
+    | { connectOrCreate?: MockTagConnect[]; connect?: MockTagConnect[] }
+    | null
+    | undefined;
+  const connections = field?.connectOrCreate ?? field?.connect;
+  if (!connections) return undefined;
+  return connections
+    .map((tag) => readTagText(tag?.where?.node?.text))
+    .filter((text): text is string => Boolean(text));
+};
+
 export type DiscussionTestConfig = {
   channelId: string;
   username: string;
@@ -115,12 +140,12 @@ const buildDiscussionListResponse = (
               channelUniqueName: channelId,
               isFavorited: false,
               Flairs: discussion.flairs ?? [],
-              CommentsAggregate: { count: 0 },
+              CommentsConnection: { aggregate: { count: { nodes: 0 } } },
               weightedVotesCount: 1,
               createdAt: MOCK_DATE,
               Channel: { uniqueName: channelId },
               UpvotedByUsers: [{ username: DEFAULT_USERNAME }],
-              UpvotedByUsersAggregate: { count: 1 },
+              UpvotedByUsersConnection: { aggregate: { count: { nodes: 1 } } },
               locked: false,
               archived: false,
               answered: false,
@@ -200,7 +225,7 @@ export const createDiscussionHandlers = (
                     archived: false,
                     answered: false,
                     locked: false,
-                    CommentsAggregate: { count: 0 },
+                    CommentsConnection: { aggregate: { count: { nodes: 0 } } },
                   },
                 ],
         },
@@ -287,10 +312,7 @@ export const createDiscussionHandlers = (
         discussionChannelId,
         title: input.title,
         body: input.body ?? '',
-        tags:
-          input.Tags?.connectOrCreate
-            ?.map((tag) => tag.where.node.text)
-            .filter((tag): tag is string => Boolean(tag)) || [],
+        tags: extractTagTexts(input.Tags) ?? [],
         deleted: false,
       };
 
@@ -312,13 +334,13 @@ export const createDiscussionHandlers = (
                   discussionId: newDiscussion.id,
                   channelUniqueName: config.channelId,
                   Flairs: [],
-                  CommentsAggregate: { count: 0 },
+                  CommentsConnection: { aggregate: { count: { nodes: 0 } } },
                   weightedVotesCount: 1,
                   createdAt: MOCK_DATE,
                   Channel: { uniqueName: config.channelId },
                   Discussion: { id: newDiscussion.id },
                   UpvotedByUsers: [{ username: config.username }],
-                  UpvotedByUsersAggregate: { count: 1 },
+                  UpvotedByUsersConnection: { aggregate: { count: { nodes: 1 } } },
                 },
               ],
               Author: { username: config.username },
@@ -343,12 +365,9 @@ export const createDiscussionHandlers = (
         throw new Error('No active discussion to update');
       }
 
-      discussion.title = update?.title ?? discussion.title;
-      discussion.body = update?.body ?? discussion.body;
-      discussion.tags =
-        update?.Tags?.[0]?.connectOrCreate
-          ?.map((tag) => tag.where.node.text)
-          .filter((tag): tag is string => Boolean(tag)) || discussion.tags;
+      discussion.title = update?.title?.set ?? discussion.title;
+      discussion.body = update?.body?.set ?? discussion.body;
+      discussion.tags = extractTagTexts(update?.Tags?.[0]) ?? discussion.tags;
 
       const channelFlairSelections =
         body.variables?.channelFlairSelections ?? [];

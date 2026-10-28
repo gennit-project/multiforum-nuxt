@@ -30,12 +30,12 @@ const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 const mountNav = async (open: number, closed: number) => {
   mockedUseQuery
     .mockReturnValueOnce({
-      result: ref({ issuesAggregate: { count: open } }),
+      result: ref({ issuesConnection: { aggregate: { count: { nodes: open } } } }),
       error: ref(null),
       loading: ref(false),
     })
     .mockReturnValueOnce({
-      result: ref({ issuesAggregate: { count: closed } }),
+      result: ref({ issuesConnection: { aggregate: { count: { nodes: closed } } } }),
       error: ref(null),
       loading: ref(false),
     });

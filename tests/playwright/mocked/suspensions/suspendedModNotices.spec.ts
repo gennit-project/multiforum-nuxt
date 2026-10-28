@@ -105,7 +105,7 @@ const getBaseMocks = (username: string) => ({
       channels: [
         {
           uniqueName: TEST_CHANNEL,
-          DiscussionChannelsAggregate: { count: 0 },
+          DiscussionChannelsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },
@@ -143,7 +143,7 @@ const getBaseMocks = (username: string) => ({
           archived: false,
           answered: false,
           locked: false,
-          CommentsAggregate: { count: 0 },
+          CommentsConnection: { aggregate: { count: { nodes: 0 } } },
         },
       ],
     },
@@ -456,14 +456,14 @@ test.describe('Mod suspension notices', () => {
       }),
       getEventRootCommentAggregate: () => ({
         data: {
-          events: [{ id: 'event-1', CommentsAggregate: { count: 0 } }],
+          events: [{ id: 'event-1', CommentsConnection: { aggregate: { count: { nodes: 0 } } } }],
         },
       }),
       getEventChannelID: () => ({
         data: { eventChannels: [{ id: 'event-channel-1', archived: false }] },
       }),
       getEvents: () => ({
-        data: { eventsAggregate: { count: 1 }, events: [mockEvent] },
+        data: { eventsConnection: { aggregate: { count: { nodes: 1 } } }, events: [mockEvent] },
       }),
     });
 

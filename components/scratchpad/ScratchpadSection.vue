@@ -57,7 +57,7 @@ const publicEntries = computed(
 );
 const publicEntriesAggregateCount = computed(() => {
   return (
-    publicResult.value?.scratchpadEntriesAggregate?.count ??
+    publicResult.value?.scratchpadEntriesConnection?.aggregate?.count?.nodes ??
     publicEntries.value.length ??
     0
   );
