@@ -147,7 +147,7 @@ test('failed checks and resend failures offer recovery, and account switching ex
       ? route.fulfill({ status: 503, json: {} })
       : route.fulfill({ json: { status: 'unverified', canResend: true } });
   });
-  await page.route('**/auth/local-dev/logout', (route) =>
+  await page.route(/\/auth\/(?:local-dev\/)?logout$/, (route) =>
     route.fulfill({ contentType: 'text/html', body: '<main>Signed out</main>' })
   );
   await page.goto('/create-username');
@@ -172,7 +172,7 @@ test('failed checks and resend failures offer recovery, and account switching ex
   await page
     .getByRole('button', { name: 'Sign out / use another account' })
     .click();
-  await expect(page).toHaveURL(/\/auth\/local-dev\/logout$/);
+  await expect(page).toHaveURL(/\/auth\/(?:local-dev\/)?logout$/);
   expect(
     await page.evaluate(() =>
       sessionStorage.getItem('signup-draft:newcomer@example.com')
