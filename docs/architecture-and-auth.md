@@ -112,10 +112,11 @@ bookkeeping.
   [`graphQLData/`](../graphQLData), organized by domain (`discussion/`,
   `comment/`, `channel/`, `event/`, `issue/`, …).
 - **Types** are generated from the backend schema into
-  [`__generated__/`](../__generated__) (`pnpm run compile`, config in
-  [`codegen.ts`](../codegen.ts)). Components import these generated types
-  (`Discussion`, `Comment`, `Event`, …) so the API contract and the UI cannot
-  silently drift.
+  [`__generated__/`](../__generated__) (`pnpm run compile`, using the verified, committed
+  [`graphql-schema/`](../graphql-schema) contract). These are schema entity
+  types, not operation-specific result types. See the
+  [GraphQL contract campaign](graphql-contract-campaign.md) for current gaps
+  and the schema update workflow.
 - **Auth on requests** is handled by two small plugins so SSR and client both
   send the right token — see [Authentication](#authentication-and-sessions).
 

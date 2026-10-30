@@ -1,0 +1,19 @@
+{
+  "formatVersion": 1,
+  "source": {
+    "repository": "gennit-project/multiforum-backend",
+    "revision": "1027843361dc88ec0e66b327d27f6f056afdb0c2"
+  },
+  "dependencies": {
+    "@neo4j/graphql": "7.6.4",
+    "graphql": "16.14.2",
+    "neo4j-driver": "6.2.0"
+  },
+  "lockfileSha256": "239161afbf87723f18d728f92e12ec77ce1c6e248bbf09a3272e99a2bfd09687",
+  "files": {
+    "schema.graphql": {
+      "sha256": "ef7aca61c30f9d2f64235d9226916ca7ef8176d1cd9eaae2c789098d167085a1",
+      "bytes": 4793915
+    }
+  }
+}
