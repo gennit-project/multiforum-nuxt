@@ -39,3 +39,5 @@ Historical spikes, migration notes, and handoffs are kept in
 
 Images referenced by these docs live in [`assets/`](./assets/) (the header
 image and the [`assets/screenshots/`](./assets/screenshots/) gallery).
+
+- [GraphQL schema contract and typing campaign](graphql-contract-campaign.md)

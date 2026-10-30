@@ -5,6 +5,9 @@
 
 ## Build & Run Commands
 
+- `pnpm run schema:check` - Verify the pinned backend schema and report its source commit
+- `pnpm run schema:update /path/to/backend-artifact` - Update the schema pin; see [contract workflow](docs/graphql-contract-campaign.md)
+- `pnpm run compile` - Generate schema types offline from the pinned contract
 - `pnpm run dev` - Start development server
 - `pnpm run build` - Build for production
 - `pnpm run test:playwright` - Run Playwright tests

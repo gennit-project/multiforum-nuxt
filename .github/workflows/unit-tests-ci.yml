@@ -58,7 +58,6 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     env:
-      GRAPHQL_URL_FOR_TYPES: ${{ secrets.GRAPHQL_URL_FOR_TYPES }}
       VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL }}
       VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
       VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
@@ -109,7 +108,6 @@ jobs:
   accessibility:
     runs-on: ubuntu-latest
     env:
-      GRAPHQL_URL_FOR_TYPES: ${{ secrets.GRAPHQL_URL_FOR_TYPES }}
       VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL }}
       VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
       VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
@@ -160,7 +158,6 @@ jobs:
   typecheck:
     runs-on: ubuntu-latest
     env:
-      GRAPHQL_URL_FOR_TYPES: ${{ secrets.GRAPHQL_URL_FOR_TYPES }}
       VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL }}
       VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
       VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
@@ -205,13 +202,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify pinned GraphQL contract and tooling
+        run: |
+          pnpm run schema:test
+          pnpm run schema:check
+
+      - name: Generate types from the pinned backend revision (no server)
+        run: pnpm run compile
+
       - name: Run TypeScript type checking
         run: pnpm run tsc
 
   unit-tests:
     runs-on: ubuntu-latest
     env:
-      GRAPHQL_URL_FOR_TYPES: ${{ secrets.GRAPHQL_URL_FOR_TYPES }}
       VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL }}
       VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
       VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
@@ -282,7 +286,6 @@ jobs:
     # against the production build (see playwright.build.config.ts and
     # docs/archive/playwright-parallel-build-prototype.md).
     env:
-      GRAPHQL_URL_FOR_TYPES: ${{ secrets.GRAPHQL_URL_FOR_TYPES }}
       VITE_GRAPHQL_URL: ${{ secrets.VITE_GRAPHQL_URL }}
       VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
       VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.VITE_GOOGLE_MAPS_API_KEY }}
