@@ -1,7 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import PublicDownloadPipelines from './PublicDownloadPipelines.vue';
+import { pipelinePage } from '@/tests/unit/fixtures/pipelinePage';
 import type * as DownloadPipelineOverviewModule from '@/composables/useDownloadPipelineOverview';
+
+const mockPermalink = vi.hoisted(() => ({ query: '', data: null as unknown }));
+vi.mock('vue-router', () => ({
+  useRoute: () => ({ query: { attempt: mockPermalink.query } }),
+}));
 
 const mockOverview = vi.hoisted(() => ({
   applicablePipelines: [] as unknown[],
@@ -51,7 +57,9 @@ vi.mock('@vue/apollo-composable', async () => {
       };
     },
     useQuery: () => ({
-      result: ref(undefined),
+      result: ref({ getPipelineRunPage: mockPermalink.data }),
+      onResult: vi.fn(),
+      refetch: vi.fn(),
       loading: ref(false),
       error: ref(null),
     }),
@@ -132,6 +140,8 @@ const baseAttempt = (overrides: Record<string, unknown> = {}) => ({
 
 describe('PublicDownloadPipelines', () => {
   beforeEach(() => {
+    mockPermalink.query = '';
+    mockPermalink.data = null;
     mockOverview.applicablePipelines = [];
     mockOverview.attempts = [];
     mockOverview.hasPipelineContent = false;
@@ -149,6 +159,37 @@ describe('PublicDownloadPipelines', () => {
     mockRerunPipeline.mockReset();
     mockStartDoneCallbacks.length = 0;
     mockRerunDoneCallbacks.length = 0;
+  });
+
+  it.each(['attempt-1', 'pipeline-1'])(
+    'shows an unloaded attempt linked by %s',
+    (identifier) => {
+      mockPermalink.query = identifier;
+      mockPermalink.data = pipelinePage();
+      const wrapper = mountView('', '', 'downloadableFile.created');
+      expect(wrapper.findAll('h4').map((heading) => heading.text())).toEqual([
+        'Server pipeline  · Attempt 1',
+      ]);
+    }
+  );
+
+  it.each([
+    { id: 'different-id', pipelineId: 'different-pipeline' },
+    { targetId: 'another-file' },
+    { targetType: 'Discussion' },
+    {
+      scope: 'CHANNEL',
+      targetType: 'Discussion',
+      targetId: 'discussion-1',
+      channelId: 'another-channel',
+    },
+    { eventType: 'downloadableFile.downloaded' },
+  ])('does not display an unrelated linked response %j', (overrides) => {
+    mockPermalink.query = 'pipeline-1';
+    const page = pipelinePage();
+    mockPermalink.data = { ...page, run: { ...page.run, ...overrides } };
+    const wrapper = mountView('', '', 'downloadableFile.created');
+    expect(wrapper.findAll('h4')).toHaveLength(0);
   });
 
   it('shows policy-excluded and not-executed configured checks', () => {

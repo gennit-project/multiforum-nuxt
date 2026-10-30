@@ -133,11 +133,15 @@ const attempts = computed(() => {
   const page = permalinkResult.value?.getPipelineRunPage;
   if (
     page &&
-    page.run.id === permalinkId.value &&
-    (page.run.targetId === props.fileId ||
-      page.run.targetId === props.discussionId) &&
-    (page.run.scope !== 'CHANNEL' ||
-      page.run.channelId === props.channelName) &&
+    (page.run.id === permalinkId.value ||
+      page.run.pipelineId === permalinkId.value) &&
+    ((page.run.targetType === 'DownloadableFile' &&
+      page.run.targetId === props.fileId &&
+      page.run.scope === 'SERVER') ||
+      (page.run.targetType === 'Discussion' &&
+        page.run.targetId === props.discussionId &&
+        page.run.scope === 'CHANNEL' &&
+        page.run.channelId === props.channelName)) &&
     (!props.eventType || page.run.eventType === props.eventType) &&
     !items.some((item) => item.id === page.run.id)
   ) {

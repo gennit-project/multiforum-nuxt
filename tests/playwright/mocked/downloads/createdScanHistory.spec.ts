@@ -177,14 +177,15 @@ test('bounded checks retain status, retry history pages, load stages, and resolv
       },
       GetPipelineRunPage: ({ body }) => ({
         data: {
-          getPipelineRunPage:
-            body.variables?.pipelineRunId === 'run-creation-1'
-              ? older
-              : {
-                  ...latest,
-                  run: { ...latest.run, jobs: [job('hidden-stage', 'FAILED')] },
-                  jobsPageInfo: pageInfo(),
-                },
+          getPipelineRunPage: ['run-creation-1', 'creation-1'].includes(
+            String(body.variables?.pipelineRunId)
+          )
+            ? older
+            : {
+                ...latest,
+                run: { ...latest.run, jobs: [job('hidden-stage', 'FAILED')] },
+                jobsPageInfo: pageInfo(),
+              },
         },
       }),
       GetDownloadPipelineOverview: () => ({
@@ -232,4 +233,13 @@ test('bounded checks retain status, retry history pages, load stages, and resolv
       exact: true,
     })
   ).toBeVisible();
+  await page.goto(
+    `/forums/${channel}/downloads/${discussionId}/pipelines?attempt=creation-1#attempt-creation-1`
+  );
+  await expect(page.locator('#attempt-creation-1')).toBeVisible();
+  await expect(
+    page
+      .getByRole('region', { name: 'Attempt history' })
+      .getByRole('heading', { level: 4 })
+  ).toHaveText(['Server pipeline · Attempt 2', 'Server pipeline · Attempt 1']);
 });
