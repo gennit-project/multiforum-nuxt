@@ -1,8 +1,15 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, toRef, watch } from 'vue';
-import { useApolloClient, useMutation } from '@vue/apollo-composable';
+import { useRoute } from 'vue-router';
+import type {
+  PublicPluginPipelineRunPage,
+  QueryGetPipelineRunPageArgs,
+} from '@/__generated__/graphql';
+import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
 import {
   getApplicablePipelineStatus,
+  attemptDisplayStatus,
+  toPublicPipelineAttempt,
   useSharedDownloadPipelineOverview,
   type ApplicablePublicPipeline,
   type PublicPipelineAttempt,
@@ -15,7 +22,11 @@ import {
   RERUN_PLUGIN_PIPELINE,
   START_PLUGIN_PIPELINE,
 } from '@/graphQLData/admin/mutations';
-import { GET_INTERNAL_PLUGIN_PIPELINE_RUN } from '@/graphQLData/admin/queries';
+import PipelineJobPage from './PipelineJobPage.vue';
+import {
+  GET_INTERNAL_PLUGIN_PIPELINE_RUN,
+  GET_PLUGIN_PIPELINE_RUN_PAGE,
+} from '@/graphQLData/admin/queries';
 
 interface InternalPipelineJob {
   id: string;
@@ -70,14 +81,23 @@ const props = defineProps<{
 const {
   applicablePipelines: allApplicablePipelines,
   attempts: allAttempts,
+  latestAttempts,
+  hasMore,
+  moreLoading,
+  moreError,
+  loadMore,
+  updateAttempt,
+  hasActiveAttempt,
   isPolling,
+  ready,
   loading,
   error,
   refetch,
 } = useSharedDownloadPipelineOverview(
   toRef(props, 'fileId'),
   toRef(props, 'discussionId'),
-  toRef(props, 'channelName')
+  toRef(props, 'channelName'),
+  { eventType: toRef(props, 'eventType') }
 );
 
 // Scope this view without changing the overview shared with download activity.
@@ -86,18 +106,56 @@ const applicablePipelines = computed(() =>
     (pipeline) => !props.eventType || pipeline.eventType === props.eventType
   )
 );
-const attempts = computed(() =>
-  allAttempts.value.filter(
+const route = useRoute();
+const permalinkId = computed(() =>
+  typeof route?.query.attempt === 'string' ? route.query.attempt : ''
+);
+const {
+  result: permalinkResult,
+  error: permalinkError,
+  loading: permalinkLoading,
+} = useQuery<
+  { getPipelineRunPage: PublicPluginPipelineRunPage | null },
+  QueryGetPipelineRunPageArgs
+>(
+  GET_PLUGIN_PIPELINE_RUN_PAGE,
+  () => ({ pipelineRunId: permalinkId.value }),
+  () => ({
+    enabled: !!permalinkId.value,
+    fetchPolicy: 'no-cache',
+    prefetch: false,
+  })
+);
+const attempts = computed(() => {
+  const items = allAttempts.value.filter(
     (attempt) => !props.eventType || attempt.eventType === props.eventType
-  )
-);
+  );
+  const page = permalinkResult.value?.getPipelineRunPage;
+  if (
+    page &&
+    page.run.id === permalinkId.value &&
+    (page.run.targetId === props.fileId ||
+      page.run.targetId === props.discussionId) &&
+    (page.run.scope !== 'CHANNEL' ||
+      page.run.channelId === props.channelName) &&
+    (!props.eventType || page.run.eventType === props.eventType) &&
+    !items.some((item) => item.id === page.run.id)
+  ) {
+    return [...items, toPublicPipelineAttempt(page)];
+  }
+  return items;
+});
+const updateVisibleAttempt = (page: PublicPluginPipelineRunPage) => {
+  updateAttempt(page);
+  if (permalinkResult.value?.getPipelineRunPage?.run.id === page.run.id)
+    permalinkResult.value = { getPipelineRunPage: page };
+};
+
 const hasPipelineContent = computed(
-  () => applicablePipelines.value.length > 0 || attempts.value.length > 0
-);
-const hasActiveAttempt = computed(() =>
-  attempts.value.some((attempt) =>
-    ['QUEUED', 'RUNNING'].includes(attempt.status)
-  )
+  () =>
+    applicablePipelines.value.length > 0 ||
+    attempts.value.length > 0 ||
+    hasActiveAttempt.value
 );
 
 const username = useUsername();
@@ -136,6 +194,7 @@ onPipelineRerun(() => {
 });
 
 const canStartPipeline = (pipeline: ApplicablePublicPipeline) =>
+  !loading.value &&
   canStartPipelines.value &&
   ['DownloadableFile', 'Discussion'].includes(pipeline.targetType) &&
   pipeline.required &&
@@ -153,13 +212,14 @@ const startPipeline = (pipeline: ApplicablePublicPipeline) => {
 
 const retryableStatuses = new Set(['FAILED', 'TIMED_OUT', 'CANCELLED']);
 const isLatestPipelineAttempt = (attempt: PublicPipelineAttempt) =>
-  attempts.value.find(
+  latestAttempts.value.find(
     (candidate) =>
       candidate.scope === attempt.scope &&
       candidate.eventType === attempt.eventType &&
       (candidate.channelId || null) === (attempt.channelId || null)
   )?.pipelineId === attempt.pipelineId;
 const canRerunAttempt = (attempt: PublicPipelineAttempt) =>
+  !loading.value &&
   canStartPipelines.value &&
   retryableStatuses.has(attempt.status) &&
   isLatestPipelineAttempt(attempt) &&
@@ -225,22 +285,12 @@ const statusInfo: Record<
   },
 };
 
-const attemptStatus = (
-  attempt: PublicPipelineAttempt
-): PublicPipelineDisplayStatus => {
-  if (attempt.status === 'SUCCEEDED') {
-    return attempt.jobs.length > 0 &&
-      attempt.jobs.every((job) => job.status === 'SKIPPED')
-      ? 'SKIPPED'
-      : 'PASSED';
-  }
-  return attempt.status;
-};
+const attemptStatus = attemptDisplayStatus;
 
 const applicabilityStatus = (pipeline: ApplicablePublicPipeline) =>
   getApplicablePipelineStatus({
     pipeline,
-    attempts: attempts.value,
+    attempts: latestAttempts.value,
   });
 
 const policyExplanation = (pipeline: ApplicablePublicPipeline) => {
@@ -411,15 +461,15 @@ const filteredAttempts = computed(() =>
   })
 );
 
-const attemptPermalink = (pipelineId: string) =>
+const attemptPermalink = (attempt: PublicPipelineAttempt) =>
   `/forums/${encodeURIComponent(props.channelName)}/downloads/${encodeURIComponent(
     props.discussionId
   )}/pipelines?attempt=${encodeURIComponent(
-    pipelineId
-  )}#attempt-${encodeURIComponent(pipelineId)}`;
+    attempt.id
+  )}#attempt-${encodeURIComponent(attempt.pipelineId)}`;
 
 const absoluteAttemptUrl = (attempt: PublicPipelineAttempt) => {
-  const path = attemptPermalink(attempt.pipelineId);
+  const path = attemptPermalink(attempt);
   return typeof window === 'undefined'
     ? path
     : new URL(path, window.location.origin).toString();
@@ -431,6 +481,10 @@ const diagnosticsText = (attempt: PublicPipelineAttempt) => {
     `Status: ${attemptStatus(attempt)}`,
     `URL: ${absoluteAttemptUrl(attempt)}`,
   ];
+  if (attempt.page?.jobsPageInfo.hasNextPage)
+    lines.push(
+      'More stages are available; this report includes loaded stages only.'
+    );
   for (const job of attempt.jobs) {
     lines.push(`${job.pluginName} (${job.status})`);
     for (const diagnostic of job.diagnostics) {
@@ -505,7 +559,7 @@ watch(
     </div>
 
     <div
-      v-if="loading && !hasPipelineContent"
+      v-if="(loading && !ready) || (permalinkLoading && !hasPipelineContent)"
       aria-busy="true"
       class="rounded-lg border border-gray-200 p-6 text-center text-gray-600 dark:border-gray-700 dark:text-gray-300"
     >
@@ -518,6 +572,9 @@ watch(
       role="alert"
     >
       Pipeline information could not be loaded.
+      <button type="button" class="min-h-11 px-3 underline" @click="refetch">
+        Retry
+      </button>
     </div>
     <div
       v-else-if="!hasPipelineContent"
@@ -614,6 +671,16 @@ watch(
       </section>
 
       <section aria-labelledby="attempt-history-heading">
+        <p v-if="permalinkLoading" role="status">Loading linked attempt…</p>
+        <p
+          v-else-if="
+            permalinkError ||
+            (permalinkId && !permalinkResult?.getPipelineRunPage)
+          "
+          role="alert"
+        >
+          The linked attempt could not be loaded.
+        </p>
         <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h3
             id="attempt-history-heading"
@@ -638,6 +705,18 @@ watch(
             </select>
           </label>
         </div>
+        <p v-if="moreError" role="alert">
+          Earlier attempts could not be loaded. Try again.
+        </p>
+        <button
+          v-if="hasMore"
+          type="button"
+          class="min-h-11 px-3 text-sm underline"
+          :disabled="moreLoading"
+          @click="loadMore"
+        >
+          {{ moreLoading ? 'Loading attempts…' : 'Load more attempts' }}
+        </button>
         <p
           v-if="shareFeedback"
           role="status"
@@ -697,7 +776,7 @@ watch(
                   {{ statusInfo[attemptStatus(attempt)].label }}
                 </span>
                 <a
-                  :href="attemptPermalink(attempt.pipelineId)"
+                  :href="attemptPermalink(attempt)"
                   class="text-brand-700 dark:text-brand-300 text-sm underline"
                   :aria-label="`Permalink to attempt ${attempt.attemptNumber}`"
                 >
@@ -708,7 +787,11 @@ watch(
                   class="text-brand-700 dark:text-brand-300 text-sm underline"
                   @click="copyDiagnostics(attempt)"
                 >
-                  Copy diagnostics
+                  {{
+                    attempt.page?.jobsPageInfo.hasNextPage
+                      ? 'Copy loaded diagnostics'
+                      : 'Copy diagnostics'
+                  }}
                 </button>
                 <button
                   type="button"
@@ -759,6 +842,11 @@ watch(
               </div>
             </header>
 
+            <PipelineJobPage
+              v-if="attempt.page"
+              :attempt="attempt.page"
+              @update="updateVisibleAttempt"
+            />
             <ol class="divide-y divide-gray-100 dark:divide-gray-700">
               <li v-for="job in attempt.jobs" :key="job.id" class="p-4">
                 <div class="flex flex-wrap items-start justify-between gap-3">

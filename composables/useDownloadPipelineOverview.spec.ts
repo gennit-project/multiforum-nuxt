@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { defineComponent, h, ref } from 'vue';
+import { computed, defineComponent, h, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import {
   getApplicablePipelineStatus,
@@ -16,6 +16,48 @@ const mockUseQuery = vi.hoisted(() => vi.fn());
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: mockUseQuery,
+}));
+
+vi.mock('./usePipelineHistory', () => ({
+  usePipelineHistory: (
+    variables: { value: { targetType: string } },
+    _enabled: unknown,
+    interval: number
+  ) => {
+    const summary = computed(
+      () =>
+        mockQueryResult.value[
+          variables.value.targetType === 'Discussion'
+            ? 'channelSummary'
+            : 'serverSummary'
+        ] as { attempts?: PublicPipelineAttempt[] } | undefined
+    );
+    const active = computed(
+      () =>
+        summary.value?.attempts?.some((item) => item.status === 'RUNNING') ??
+        false
+    );
+    return {
+      attempts: computed(() =>
+        (summary.value?.attempts ?? []).map((run) => ({
+          run,
+          displayStatus: run.status === 'QUEUED' ? 'PENDING' : run.status,
+          hasActiveWork: active.value,
+          jobsPageInfo: { hasNextPage: false },
+        }))
+      ),
+      hasActiveWork: active,
+      isPolling: computed(() => active.value && interval > 0),
+      loading: ref(false),
+      error: ref(null),
+      moreLoading: ref(false),
+      moreError: ref(null),
+      hasMore: ref(false),
+      loadMore: vi.fn(),
+      updateAttempt: vi.fn(),
+      refetch: mockRefetch,
+    };
+  },
 }));
 
 vi.mock('@/graphQLData/admin/queries', () => ({
@@ -138,7 +180,7 @@ describe('useDownloadPipelineOverview', () => {
     });
   });
 
-  it('polls while an attempt is queued or running', async () => {
+  it('uses the history activity and polling state', async () => {
     mockQueryResult.value = {
       serverSummary: {
         attempts: [attempt({ status: 'RUNNING' })],
@@ -156,11 +198,9 @@ describe('useDownloadPipelineOverview', () => {
     expect({
       active: overview.hasActiveAttempt.value,
       polling: overview.isPolling.value,
-      refetches: mockRefetch.mock.calls.length,
     }).toEqual({
       active: true,
       polling: true,
-      refetches: 1,
     });
   });
 

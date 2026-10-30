@@ -861,42 +861,117 @@ export const GET_PLUGIN_DETAIL = gql`
   }
 `;
 
-export const GET_PLUGIN_PIPELINE_SUMMARY = gql`
-  query GetPipelineSummary($targetId: ID!, $targetType: String!) {
-    getPipelineSummary(targetId: $targetId, targetType: $targetType) {
+const PIPELINE_PAGE_FIELDS = gql`
+  fragment PipelinePageFields on PublicPluginPipelineRunPage {
+    displayStatus
+    hasActiveWork
+    jobsPageInfo {
+      hasNextPage
+      endCursor
+    }
+    run {
+      id
+      pipelineId
       targetId
       targetType
-      attempts {
+      eventType
+      scope
+      channelId
+      status
+      trigger
+      initiatedByUsername
+      retryOfPipelineRunId
+      attemptNumber
+      applicability
+      policyEffectiveAt
+      policyId
+      campaignId
+      queuedAt
+      startedAt
+      heartbeatAt
+      timeoutAt
+      finishedAt
+      createdAt
+      updatedAt
+      jobs {
         id
-        pipelineId
+        pluginId
+        pluginName
+        version
+        scope
+        channelId
+        eventType
         status
+        message
+        durationMs
+        executionOrder
+        skippedReason
+        queuedAt
+        startedAt
+        heartbeatAt
+        timeoutAt
+        finishedAt
         createdAt
-        jobs {
-          id
-          pluginId
-          pluginName
-          version
-          scope
-          channelId
-          eventType
-          status
+        updatedAt
+        diagnostics {
+          level
+          code
           message
-          durationMs
-          executionOrder
-          skippedReason
-          diagnostics {
-            level
-            code
-            message
-            details
-            helpUrl
-          }
-          createdAt
-          updatedAt
+          details
+          helpUrl
         }
       }
     }
   }
+`;
+
+export const GET_PLUGIN_PIPELINE_SUMMARY = gql`
+  query GetPipelineSummaryPage(
+    $targetId: ID!
+    $targetType: String!
+    $first: Int = 10
+    $after: String
+    $eventType: String
+    $scope: String
+    $channelId: String
+  ) {
+    getPipelineSummaryPage(
+      targetId: $targetId
+      targetType: $targetType
+      first: $first
+      after: $after
+      jobsFirst: 20
+      eventType: $eventType
+      scope: $scope
+      channelId: $channelId
+    ) {
+      targetId
+      targetType
+      hasActiveWork
+      hasFailedWork
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      attempts {
+        ...PipelinePageFields
+      }
+    }
+  }
+  ${PIPELINE_PAGE_FIELDS}
+`;
+
+export const GET_PLUGIN_PIPELINE_RUN_PAGE = gql`
+  query GetPipelineRunPage($pipelineRunId: ID!, $after: String) {
+    getPipelineRunPage(
+      pipelineRunId: $pipelineRunId
+      first: 20
+      after: $after
+    ) {
+      ...PipelinePageFields
+    }
+  }
+  ${PIPELINE_PAGE_FIELDS}
 `;
 
 export const GET_INTERNAL_PLUGIN_PIPELINE_RUN = gql`
@@ -991,122 +1066,6 @@ export const GET_DOWNLOAD_PIPELINE_OVERVIEW = gql`
         order
         condition
         continueOnError
-      }
-    }
-    serverSummary: getPipelineSummary(
-      targetId: $downloadableFileId
-      targetType: "DownloadableFile"
-    ) {
-      attempts {
-        id
-        pipelineId
-        targetId
-        targetType
-        eventType
-        scope
-        channelId
-        status
-        trigger
-        initiatedByUsername
-        retryOfPipelineRunId
-        attemptNumber
-        applicability
-        policyEffectiveAt
-        policyId
-        campaignId
-        queuedAt
-        startedAt
-        heartbeatAt
-        timeoutAt
-        finishedAt
-        createdAt
-        updatedAt
-        jobs {
-          id
-          pluginId
-          pluginName
-          version
-          scope
-          channelId
-          eventType
-          status
-          message
-          durationMs
-          executionOrder
-          skippedReason
-          queuedAt
-          startedAt
-          heartbeatAt
-          timeoutAt
-          finishedAt
-          diagnostics {
-            level
-            code
-            message
-            details
-            helpUrl
-          }
-          createdAt
-          updatedAt
-        }
-      }
-    }
-    channelSummary: getPipelineSummary(
-      targetId: $discussionId
-      targetType: "Discussion"
-    ) {
-      attempts {
-        id
-        pipelineId
-        targetId
-        targetType
-        eventType
-        scope
-        channelId
-        status
-        trigger
-        initiatedByUsername
-        retryOfPipelineRunId
-        attemptNumber
-        applicability
-        policyEffectiveAt
-        policyId
-        campaignId
-        queuedAt
-        startedAt
-        heartbeatAt
-        timeoutAt
-        finishedAt
-        createdAt
-        updatedAt
-        jobs {
-          id
-          pluginId
-          pluginName
-          version
-          scope
-          channelId
-          eventType
-          status
-          message
-          durationMs
-          executionOrder
-          skippedReason
-          queuedAt
-          startedAt
-          heartbeatAt
-          timeoutAt
-          finishedAt
-          diagnostics {
-            level
-            code
-            message
-            details
-            helpUrl
-          }
-          createdAt
-          updatedAt
-        }
       }
     }
   }

@@ -1,14 +1,10 @@
-import {
-  computed,
-  getCurrentInstance,
-  inject,
-  onUnmounted,
-  provide,
-  ref,
-  watch,
-  type InjectionKey,
-  type Ref,
-} from 'vue';
+import { computed, inject, provide, type InjectionKey, type Ref } from 'vue';
+import { usePipelineHistory } from './usePipelineHistory';
+import type {
+  Query,
+  PublicPluginPipelineRunPage,
+  QueryGetApplicablePluginPipelineArgs,
+} from '@/__generated__/graphql';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_DOWNLOAD_PIPELINE_OVERVIEW } from '@/graphQLData/admin/queries';
 import type {
@@ -18,12 +14,7 @@ import type {
 } from '@/composables/usePluginPipeline';
 
 export type PublicPipelineAttemptStatus =
-  | 'QUEUED'
-  | 'RUNNING'
-  | 'SUCCEEDED'
-  | 'FAILED'
-  | 'TIMED_OUT'
-  | 'CANCELLED';
+  'QUEUED' | 'RUNNING' | 'SUCCEEDED' | 'FAILED' | 'TIMED_OUT' | 'CANCELLED';
 
 export type PublicPipelineDisplayStatus =
   | 'NOT_REQUIRED'
@@ -53,26 +44,23 @@ export interface ApplicablePublicPipeline {
   scope: PipelineScope;
   channelId?: string | null;
   configured: boolean;
-  applicability:
-    | 'NEW_FILES_ONLY'
-    | 'ALL_FILES_GRADUAL'
-    | 'ALL_FILES_IMMEDIATE';
+  applicability: 'NEW_FILES_ONLY' | 'ALL_FILES_GRADUAL' | 'ALL_FILES_IMMEDIATE';
   effectiveAt?: string | null;
   policyId?: string | null;
   required: boolean;
-  reason:
-    | 'APPLICABLE'
-    | 'UPLOADED_BEFORE_POLICY'
-    | 'NO_APPLICABLE_PLUGINS';
+  reason: 'APPLICABLE' | 'UPLOADED_BEFORE_POLICY' | 'NO_APPLICABLE_PLUGINS';
   expectedJobs: PublicExpectedPipelineJob[];
 }
 
-export interface PublicPipelineJob
-  extends Omit<PipelineRun, 'pipelineId' | 'diagnostics'> {
+export interface PublicPipelineJob extends Omit<
+  PipelineRun,
+  'pipelineId' | 'diagnostics'
+> {
   diagnostics: PublicPipelineDiagnostic[];
 }
 
 export interface PublicPipelineAttempt {
+  page?: PublicPluginPipelineRunPage;
   id: string;
   pipelineId: string;
   targetId: string;
@@ -109,11 +97,19 @@ export interface PublicPipelineAttempt {
 const attemptTimestamp = (attempt: PublicPipelineAttempt) =>
   new Date(attempt.createdAt).getTime();
 
-const attemptDisplayStatus = (
+export const attemptDisplayStatus = (
   attempt: PublicPipelineAttempt
 ): PublicPipelineDisplayStatus => {
+  if (attempt.page) {
+    const status = attempt.page.displayStatus;
+    return status === 'SUCCEEDED'
+      ? 'PASSED'
+      : status === 'PENDING'
+        ? 'QUEUED'
+        : status;
+  }
   if (attempt.status === 'SUCCEEDED') {
-    return attempt.jobs.length > 0 &&
+    return attempt.jobs?.length > 0 &&
       attempt.jobs.every((job) => job.status === 'SKIPPED')
       ? 'SKIPPED'
       : 'PASSED';
@@ -142,6 +138,26 @@ export const getApplicablePipelineStatus = ({
   return latestAttempt ? attemptDisplayStatus(latestAttempt) : 'NOT_EXECUTED';
 };
 
+export const toPublicPipelineAttempt = (
+  page: PublicPluginPipelineRunPage
+): PublicPipelineAttempt => ({
+  ...page.run,
+  page,
+  scope: page.run.scope as PipelineScope,
+  jobs: page.run.jobs.map((job) => ({
+    ...job,
+    scope: job.scope as PipelineScope,
+    channelId: job.channelId ?? undefined,
+    message: job.message ?? undefined,
+    durationMs: job.durationMs ?? undefined,
+    skippedReason: job.skippedReason ?? undefined,
+    diagnostics: job.diagnostics.map((item) => ({
+      ...item,
+      helpUrl: item.helpUrl ?? undefined,
+    })),
+  })),
+});
+
 export function useDownloadPipelineOverview(
   downloadableFileId: Ref<string | null | undefined>,
   discussionId: Ref<string | null | undefined>,
@@ -149,13 +165,13 @@ export function useDownloadPipelineOverview(
   {
     pollInterval = 3000,
     pollWhileActive = true,
+    eventType,
   }: {
     pollInterval?: number;
     pollWhileActive?: boolean;
+    eventType?: Ref<string | undefined>;
   } = {}
 ) {
-  const pollingTimer = ref<ReturnType<typeof setInterval> | null>(null);
-  const isPolling = ref(false);
   const enabled = computed(
     () =>
       !!downloadableFileId.value &&
@@ -163,12 +179,25 @@ export function useDownloadPipelineOverview(
       !!channelUniqueName.value
   );
 
-  const { result, loading, error, refetch } = useQuery(
+  type ApplicableData = {
+    serverApplicable: Query['getApplicablePluginPipeline'];
+    channelApplicable: Query['getApplicablePluginPipeline'];
+  };
+  type ApplicableVariables = Required<
+    Pick<
+      QueryGetApplicablePluginPipelineArgs,
+      'downloadableFileId' | 'discussionId' | 'channelUniqueName'
+    >
+  >;
+  const { result, loading, error, refetch } = useQuery<
+    ApplicableData,
+    ApplicableVariables
+  >(
     GET_DOWNLOAD_PIPELINE_OVERVIEW,
     () => ({
-      downloadableFileId: downloadableFileId.value,
-      discussionId: discussionId.value,
-      channelUniqueName: channelUniqueName.value,
+      downloadableFileId: downloadableFileId.value || '',
+      discussionId: discussionId.value || '',
+      channelUniqueName: channelUniqueName.value || '',
     }),
     () => ({
       enabled: enabled.value,
@@ -181,75 +210,129 @@ export function useDownloadPipelineOverview(
   );
 
   const applicablePipelines = computed<ApplicablePublicPipeline[]>(() =>
-    [result.value?.serverApplicable, result.value?.channelApplicable].filter(
-      (pipeline): pipeline is ApplicablePublicPipeline =>
-        Boolean(
-          pipeline &&
-            (pipeline.configured || pipeline.expectedJobs?.length > 0)
-        )
+    [result.value?.serverApplicable, result.value?.channelApplicable].flatMap(
+      (pipeline) =>
+        pipeline && (pipeline.configured || pipeline.expectedJobs.length > 0)
+          ? [
+              {
+                ...pipeline,
+                scope: pipeline.scope as PipelineScope,
+                reason: pipeline.reason as ApplicablePublicPipeline['reason'],
+              },
+            ]
+          : []
     )
   );
 
-  const attempts = computed<PublicPipelineAttempt[]>(() =>
-    [
-      ...(result.value?.serverSummary?.attempts || []),
-      ...(result.value?.channelSummary?.attempts || []),
-    ].sort(
-      (left: PublicPipelineAttempt, right: PublicPipelineAttempt) =>
-        attemptTimestamp(right) - attemptTimestamp(left)
-    )
+  const server = usePipelineHistory(
+    computed(() => ({
+      targetId: downloadableFileId.value || '',
+      targetType: 'DownloadableFile',
+      scope: 'SERVER',
+      eventType: eventType?.value,
+    })),
+    enabled,
+    pollWhileActive ? pollInterval : 0
+  );
+  const channel = usePipelineHistory(
+    computed(() => ({
+      targetId: discussionId.value || '',
+      targetType: 'Discussion',
+      scope: 'CHANNEL',
+      channelId: channelUniqueName.value,
+      eventType: eventType?.value,
+    })),
+    enabled,
+    pollWhileActive ? pollInterval : 0
+  );
+  // A busy download history must not evict the latest applicable creation check.
+  const latestServer = usePipelineHistory(
+    computed(() => ({
+      targetId: downloadableFileId.value || '',
+      targetType: 'DownloadableFile',
+      scope: 'SERVER',
+      eventType: 'downloadableFile.created',
+      first: 1,
+    })),
+    enabled,
+    pollWhileActive ? pollInterval : 0
+  );
+  const latestChannel = usePipelineHistory(
+    computed(() => ({
+      targetId: discussionId.value || '',
+      targetType: 'Discussion',
+      scope: 'CHANNEL',
+      channelId: channelUniqueName.value,
+      eventType: 'discussionChannel.created',
+      first: 1,
+    })),
+    enabled,
+    pollWhileActive ? pollInterval : 0
   );
 
+  const attempts = computed(() =>
+    [...server.attempts.value, ...channel.attempts.value]
+      .map(toPublicPipelineAttempt)
+      .sort(
+        (a, b) =>
+          attemptTimestamp(b) - attemptTimestamp(a) || b.id.localeCompare(a.id)
+      )
+  );
+  const latestAttempts = computed(() =>
+    [...latestServer.attempts.value, ...latestChannel.attempts.value].map(
+      toPublicPipelineAttempt
+    )
+  );
   const hasPipelineContent = computed(
-    () => applicablePipelines.value.length > 0 || attempts.value.length > 0
+    () =>
+      applicablePipelines.value.length > 0 ||
+      attempts.value.length > 0 ||
+      hasActiveAttempt.value
   );
-  const hasActiveAttempt = computed(() =>
-    attempts.value.some(
-      (attempt) =>
-        attempt.status === 'QUEUED' || attempt.status === 'RUNNING'
-    )
+  const hasActiveAttempt = computed(
+    () => server.hasActiveWork.value || channel.hasActiveWork.value
   );
-
-  const stopPolling = () => {
-    if (pollingTimer.value) {
-      clearInterval(pollingTimer.value);
-      pollingTimer.value = null;
-    }
-    isPolling.value = false;
-  };
-  const startPolling = () => {
-    if (pollingTimer.value || typeof window === 'undefined') return;
-    isPolling.value = true;
-    pollingTimer.value = setInterval(async () => {
-      if (!hasActiveAttempt.value) {
-        stopPolling();
-        return;
-      }
-      await refetch();
-    }, pollInterval);
-  };
-
-  watch(
-    hasActiveAttempt,
-    (active) => {
-      if (active && pollWhileActive) startPolling();
-      else stopPolling();
-    },
-    { immediate: true }
+  const isPolling = computed(
+    () => server.isPolling.value || channel.isPolling.value
   );
-  if (getCurrentInstance()) {
-    onUnmounted(stopPolling);
-  }
+  const histories = [server, channel, latestServer, latestChannel];
 
   return {
     applicablePipelines,
+    ready: computed(
+      () => !enabled.value || histories.every((history) => history.ready.value)
+    ),
     attempts,
+    latestAttempts,
+    hasMore: computed(() => server.hasMore.value || channel.hasMore.value),
+    moreLoading: computed(
+      () => server.moreLoading.value || channel.moreLoading.value
+    ),
+    moreError: computed(
+      () => server.moreError.value || channel.moreError.value
+    ),
+    loadMore: () => {
+      server.loadMore();
+      channel.loadMore();
+    },
+    updateAttempt: (page: PublicPluginPipelineRunPage) =>
+      histories.forEach((history) => history.updateAttempt(page)),
     hasPipelineContent,
     hasActiveAttempt,
     isPolling,
-    loading,
-    error,
-    refetch,
+    loading: computed(
+      () => loading.value || histories.some((history) => history.loading.value)
+    ),
+    error: computed(
+      () =>
+        error.value ||
+        histories.find((history) => history.error.value)?.error.value
+    ),
+    refetch: () =>
+      Promise.all([
+        refetch(),
+        ...histories.map((history) => history.refetch()),
+      ]),
   };
 }
 
@@ -281,10 +364,11 @@ export function useSharedDownloadPipelineOverview(
   options: {
     pollInterval?: number;
     pollWhileActive?: boolean;
+    eventType?: Ref<string | undefined>;
   } = {}
 ) {
   return (
-    inject(downloadPipelineOverviewKey, null) ??
+    (options.eventType ? null : inject(downloadPipelineOverviewKey, null)) ??
     useDownloadPipelineOverview(
       downloadableFileId,
       discussionId,

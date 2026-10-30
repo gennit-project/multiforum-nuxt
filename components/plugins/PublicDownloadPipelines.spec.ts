@@ -50,6 +50,11 @@ vi.mock('@vue/apollo-composable', async () => {
         },
       };
     },
+    useQuery: () => ({
+      result: ref(undefined),
+      loading: ref(false),
+      error: ref(null),
+    }),
     useApolloClient: () => ({ client: { query: mockApolloQuery } }),
   };
 });
@@ -81,6 +86,7 @@ vi.mock('@/composables/useDownloadPipelineOverview', async () => {
     useSharedDownloadPipelineOverview: () => ({
       applicablePipelines: ref(mockOverview.applicablePipelines),
       attempts: ref(mockOverview.attempts),
+      latestAttempts: ref(mockOverview.attempts),
       hasPipelineContent: ref(mockOverview.hasPipelineContent),
       hasActiveAttempt: ref(mockOverview.hasActiveAttempt),
       isPolling: ref(mockOverview.isPolling),
@@ -290,7 +296,7 @@ describe('PublicDownloadPipelines', () => {
       correlationId: true,
       documentation: 'https://example.test/checks/scan-clean',
       permalink:
-        '/forums/cats/downloads/discussion-1/pipelines?attempt=pipeline-1#attempt-pipeline-1',
+        '/forums/cats/downloads/discussion-1/pipelines?attempt=passed#attempt-pipeline-1',
     });
   });
 
@@ -343,8 +349,8 @@ describe('PublicDownloadPipelines', () => {
     'allows retrying a creation scan while an unrelated scan is %s',
     (status) => {
       mockUsername.value = 'alice';
-      mockOverview.hasActiveAttempt = true;
-      mockOverview.isPolling = true;
+      mockOverview.hasActiveAttempt = false;
+      mockOverview.isPolling = false;
       mockOverview.attempts = [
         baseAttempt({
           pipelineId: 'download',

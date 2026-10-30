@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ref, toRef, useId } from 'vue';
-import { usePluginPipeline, type PipelineRun } from '@/composables/usePluginPipeline';
+import {
+  usePluginPipeline,
+  type PipelineRun,
+} from '@/composables/usePluginPipeline';
+import PipelineJobPage from './PipelineJobPage.vue';
 import PluginPipelineStage from './PluginPipelineStage.vue';
 import PluginLogsModal from './PluginLogsModal.vue';
 
@@ -18,15 +22,19 @@ const showLogsModal = ref(false);
 
 const {
   latestPipeline,
+  pipelineGroups,
+  hasMore,
+  moreLoading,
+  moreError,
+  loadMore,
+  updateAttempt,
+  refetch,
   hasActivePipeline,
   loading,
   error,
   isPolling,
   getStatusInfo,
-} = usePluginPipeline(
-  toRef(props, 'targetId'),
-  toRef(props, 'targetType')
-);
+} = usePluginPipeline(toRef(props, 'targetId'), toRef(props, 'targetType'));
 
 const handleViewLogs = (run: PipelineRun) => {
   selectedRun.value = run;
@@ -41,7 +49,7 @@ const handleCloseModal = () => {
 
 <template>
   <div
-    v-if="latestPipeline || loading"
+    v-if="latestPipeline || loading || error || hasActivePipeline"
     class="rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
   >
     <!-- Header -->
@@ -89,7 +97,9 @@ const handleCloseModal = () => {
           class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         >
           <i
-            :class="isExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"
+            :class="
+              isExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'
+            "
             aria-hidden="true"
           />
         </span>
@@ -110,15 +120,14 @@ const handleCloseModal = () => {
     </div>
 
     <!-- Error State -->
-    <div
-      v-else-if="error"
-      role="alert"
-      class="p-4 text-center"
-    >
+    <div v-else-if="error" role="alert" class="p-4 text-center">
       <i class="fa-solid fa-exclamation-triangle mr-2 text-red-400" />
       <span class="text-sm text-red-600 dark:text-red-400">
         {{ error.message }}
       </span>
+      <button type="button" class="min-h-11 px-3 underline" @click="refetch">
+        Retry
+      </button>
     </div>
 
     <!-- Pipeline Content -->
@@ -127,24 +136,52 @@ const handleCloseModal = () => {
       :id="pipelineContentId"
       class="p-4"
     >
-      <!-- Pipeline stages -->
-      <div class="space-y-0">
-        <PluginPipelineStage
-          v-for="(run, index) in latestPipeline.runs"
-          :key="run.id"
-          :run="run"
-          :is-last="index === latestPipeline.runs.length - 1"
-          @view-logs="handleViewLogs"
-        />
-      </div>
-
-      <!-- No plugins ran -->
-      <div
-        v-if="latestPipeline.runs.length === 0"
-        class="text-center text-sm text-gray-500 dark:text-gray-400"
+      <section
+        v-for="(group, groupIndex) in pipelineGroups"
+        :key="group.pipelineId"
       >
-        No plugins ran for this file.
-      </div>
+        <p
+          v-if="groupIndex"
+          class="mt-4 text-sm text-gray-600 dark:text-gray-300"
+        >
+          Earlier attempt · {{ getStatusInfo(group.status).label }}
+        </p>
+        <!-- Pipeline stages -->
+        <div class="space-y-0">
+          <PluginPipelineStage
+            v-for="(run, index) in group.runs"
+            :key="run.id"
+            :run="run"
+            :is-last="index === group.runs.length - 1"
+            @view-logs="handleViewLogs"
+          />
+        </div>
+
+        <!-- No plugins ran -->
+        <div
+          v-if="group.runs.length === 0"
+          class="text-center text-sm text-gray-500 dark:text-gray-400"
+        >
+          No plugins ran for this file.
+        </div>
+        <PipelineJobPage
+          v-if="group.page"
+          :attempt="group.page"
+          @update="updateAttempt"
+        />
+      </section>
+      <p v-if="moreError" role="alert">
+        Earlier attempts could not be loaded. Try again.
+      </p>
+      <button
+        v-if="hasMore"
+        type="button"
+        class="min-h-11 px-3 text-sm underline"
+        :disabled="moreLoading"
+        @click="loadMore"
+      >
+        {{ moreLoading ? 'Loading attempts…' : 'Load more attempts' }}
+      </button>
     </div>
 
     <!-- No pipeline data -->
@@ -152,7 +189,11 @@ const handleCloseModal = () => {
       v-else-if="!latestPipeline && !loading"
       class="p-4 text-center text-sm text-gray-500 dark:text-gray-400"
     >
-      No plugin activity for this file.
+      {{
+        hasActivePipeline
+          ? 'Work is still running. Refreshing status…'
+          : 'No plugin activity for this file.'
+      }}
     </div>
   </div>
 

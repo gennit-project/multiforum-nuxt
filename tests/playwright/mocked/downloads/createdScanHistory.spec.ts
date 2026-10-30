@@ -44,7 +44,7 @@ const attempt = (
   jobs: [],
 });
 
-test('checks page shows only creation scans and their retries', async ({
+test('bounded checks retain status, retry history pages, load stages, and resolve older permalinks', async ({
   page,
   setupMockedPage,
 }) => {
@@ -91,39 +91,106 @@ test('checks page shows only creation scans and their retries', async ({
       DownloadableFiles: [file as any],
     },
   });
+  let failHistory = true;
+  const job = (id: string, status = 'SUCCEEDED') => ({
+    __typename: 'PublicPluginJobRun',
+    id,
+    pluginId: id,
+    pluginName: id === 'first-stage' ? 'First stage' : 'Hidden failed stage',
+    version: '1.0.0',
+    scope: 'SERVER',
+    channelId: null,
+    eventType: 'downloadableFile.created',
+    status,
+    message: null,
+    durationMs: null,
+    executionOrder: id === 'first-stage' ? 0 : 1,
+    skippedReason: null,
+    diagnostics: [],
+    queuedAt: '2026-09-24T06:00:00.000Z',
+    startedAt: null,
+    heartbeatAt: null,
+    timeoutAt: null,
+    finishedAt: null,
+    createdAt: '2026-09-24T06:00:00.000Z',
+    updatedAt: '2026-09-24T06:00:00.000Z',
+  });
+  const pageInfo = (hasNextPage = false, endCursor: string | null = null) => ({
+    __typename: 'PluginPipelinePageInfo',
+    hasNextPage,
+    endCursor,
+  });
+  const latest = {
+    __typename: 'PublicPluginPipelineRunPage',
+    run: {
+      ...attempt('creation-2', 'downloadableFile.created', 2),
+      id: 'run-creation-2',
+      status: 'FAILED',
+      jobs: [job('first-stage')],
+    },
+    displayStatus: 'FAILED',
+    hasActiveWork: false,
+    jobsPageInfo: pageInfo(true, 'jobs-cursor'),
+  };
+  const older = {
+    __typename: 'PublicPluginPipelineRunPage',
+    run: {
+      ...attempt('creation-1', 'downloadableFile.created', 1),
+      id: 'run-creation-1',
+    },
+    displayStatus: 'SUCCEEDED',
+    hasActiveWork: false,
+    jobsPageInfo: pageInfo(),
+  };
   await setupMockedPage({
     username: 'alice',
     handlers: {
       ...createBaseHandlers({ channelId: channel, discussionId }),
       getDownloadDetail: () => ({ data: { discussions: [discussion] } }),
+      GetPipelineSummaryPage: ({ body }) => {
+        const variables = body.variables || {};
+        if (variables.after && failHistory) {
+          failHistory = false;
+          return { errors: [{ message: 'Temporary history failure' }] };
+        }
+        return {
+          data: {
+            getPipelineSummaryPage: {
+              __typename: 'PluginPipelineSummaryPage',
+              targetId: variables.targetId,
+              targetType: variables.targetType,
+              hasActiveWork: variables.targetType !== 'Discussion',
+              hasFailedWork: true,
+              pageInfo:
+                variables.targetType === 'Discussion' || variables.after
+                  ? pageInfo()
+                  : pageInfo(true, 'history-cursor'),
+              attempts:
+                variables.targetType === 'Discussion'
+                  ? []
+                  : variables.after
+                    ? [older]
+                    : [latest],
+            },
+          },
+        };
+      },
+      GetPipelineRunPage: ({ body }) => ({
+        data: {
+          getPipelineRunPage:
+            body.variables?.pipelineRunId === 'run-creation-1'
+              ? older
+              : {
+                  ...latest,
+                  run: { ...latest.run, jobs: [job('hidden-stage', 'FAILED')] },
+                  jobsPageInfo: pageInfo(),
+                },
+        },
+      }),
       GetDownloadPipelineOverview: () => ({
         data: {
           serverApplicable: null,
           channelApplicable: null,
-          serverSummary: {
-            __typename: 'PluginPipelineSummary',
-            attempts: [
-              attempt('download-3', 'downloadableFile.downloaded', 3),
-              attempt('download-2', 'downloadableFile.downloaded', 2),
-              attempt('download-1', 'downloadableFile.downloaded', 1),
-              {
-                ...attempt('creation-2', 'downloadableFile.created', 2),
-                trigger: 'OWNER_RETRY',
-                retryOfPipelineRunId: 'creation-1',
-              },
-              attempt('creation-1', 'downloadableFile.created', 1),
-            ],
-          },
-          channelSummary: {
-            __typename: 'PluginPipelineSummary',
-            attempts: [
-              {
-                ...attempt('channel-1', 'discussionChannel.created', 1),
-                scope: 'CHANNEL',
-                channelId: channel,
-              },
-            ],
-          },
         },
       }),
     },
@@ -133,10 +200,36 @@ test('checks page shows only creation scans and their retries', async ({
   const history = page.getByRole('region', { name: 'Attempt history' });
   await expect(history.getByRole('heading', { level: 4 })).toHaveText([
     'Server pipeline · Attempt 2',
+  ]);
+  await expect(history.getByText('Failed', { exact: true })).toBeVisible();
+  await expect(page.getByText('Updating', { exact: true })).toBeVisible();
+  await history.getByRole('button', { name: 'Load more stages' }).click();
+  await expect(
+    history.getByRole('heading', { name: '2. Hidden failed stage' })
+  ).toBeVisible();
+  await expect(
+    history.getByRole('heading', { name: '1. First stage' })
+  ).toBeVisible();
+  await history.getByRole('button', { name: 'Load more attempts' }).click();
+  await expect(history.getByRole('alert')).toHaveText(
+    'Earlier attempts could not be loaded. Try again.'
+  );
+  await history.getByRole('button', { name: 'Load more attempts' }).click();
+  await expect(history.getByRole('heading', { level: 4 })).toHaveText([
+    'Server pipeline · Attempt 2',
     'Server pipeline · Attempt 1',
   ]);
   await expect(
     history.getByRole('link', { name: 'Permalink to attempt 2' })
-  ).toHaveAttribute('href', /attempt=creation-2/);
+  ).toHaveAttribute('href', /attempt=run-creation-2/);
   await expectNoAxeViolations(page);
+  await page.goto(
+    `/forums/${channel}/downloads/${discussionId}/pipelines?attempt=run-creation-1#attempt-creation-1`
+  );
+  await expect(
+    page.getByRole('heading', {
+      name: 'Server pipeline · Attempt 1',
+      exact: true,
+    })
+  ).toBeVisible();
 });

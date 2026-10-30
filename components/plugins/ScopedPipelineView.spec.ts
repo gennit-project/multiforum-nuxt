@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 import ScopedPipelineView from '@/components/plugins/ScopedPipelineView.vue';
 
@@ -24,6 +24,10 @@ vi.mock('@/composables/usePluginPipeline', () => ({
           status === 'SUCCEEDED'
             ? 'Passed'
             : status.charAt(0) + status.slice(1).toLowerCase(),
+      }),
+      pipelineGroups: computed(() => {
+        const latest = state.latestPipeline as { value?: unknown } | undefined;
+        return latest?.value ? [latest.value] : [];
       }),
       ...state,
     };
@@ -103,6 +107,21 @@ describe('ScopedPipelineView', () => {
 
     expect(wrapper.find('.rounded-lg').exists()).toBe(false);
   });
+
+  it.each(['server', 'channel'])(
+    'announces an initial %s error without cached data',
+    (scope) => {
+      const state = { error: ref(new Error('Pipeline status unavailable')) };
+      setPipelineStates(
+        scope === 'server' ? state : {},
+        scope === 'channel' ? state : {}
+      );
+      const wrapper = mountView();
+      expect(wrapper.get('[role="alert"]').text()).toContain(
+        'Pipeline status unavailable'
+      );
+    }
+  );
 
   it('shows the loading state while pipeline data is loading', () => {
     setPipelineStates({ loading: ref(true) }, {});
@@ -190,9 +209,9 @@ describe('ScopedPipelineView', () => {
     expect({
       name: disclosure.text().includes('Plugin Pipelines'),
       expanded: disclosure.attributes('aria-expanded'),
-      controlsExistingContent: wrapper.find(
-        `#${disclosure.attributes('aria-controls')}`
-      ).exists(),
+      controlsExistingContent: wrapper
+        .find(`#${disclosure.attributes('aria-controls')}`)
+        .exists(),
     }).toEqual({
       name: true,
       expanded: 'true',
