@@ -50,6 +50,36 @@ export function usePipelineHistory(
       notifyOnNetworkStatusChange: true,
     })
   );
+  // A new first-page insertion must not drop an already loaded attempt between
+  // the refreshed first page and the continuation cursor from the previous page.
+  let previousFirst: PublicPluginPipelineRunPage[] = [];
+  initial.onResult(({ data, loading }) => {
+    if (
+      loading ||
+      data !== initial.result.value ||
+      !enabled.value ||
+      !data?.getPipelineSummaryPage
+    )
+      return;
+    const next = data.getPipelineSummaryPage;
+    if (
+      next.targetId !== variables.value.targetId ||
+      next.targetType !== variables.value.targetType
+    )
+      return;
+    const currentIds = new Set(next.attempts.map((item) => item.run.id));
+    if (after.value) {
+      older.value = [
+        ...new Map(
+          [
+            ...previousFirst.filter((item) => !currentIds.has(item.run.id)),
+            ...older.value,
+          ].map((item) => [item.run.id, item])
+        ).values(),
+      ];
+    }
+    previousFirst = next.attempts;
+  });
   const page = computed(() =>
     enabled.value ? initial.result.value?.getPipelineSummaryPage : undefined
   );
@@ -91,6 +121,7 @@ export function usePipelineHistory(
     continuation.value = next.pageInfo;
   });
   const reset = () => {
+    previousFirst = [];
     after.value = null;
     older.value = [];
     expandedJobs.value = new Map();

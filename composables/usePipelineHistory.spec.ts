@@ -202,6 +202,54 @@ describe('bounded pipeline history with Apollo', () => {
       'extra',
     ]);
   });
+  it('retains the former first page when a newer attempt arrives during pagination', async () => {
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'],
+    });
+    const { requests, history } = await setup(100);
+    requests[0]!.send(firstPage());
+    await flushPromises();
+    history.loadMore();
+    await flushPromises();
+    requests[1]!.send(olderPage());
+    await flushPromises();
+    await vi.advanceTimersByTimeAsync(100);
+    const newest = pipelinePage();
+    newest.run.id = 'newest';
+    newest.run.pipelineId = 'pipeline-newest';
+    requests[2]!.send(
+      pipelineSummary({
+        attempts: [newest],
+        hasActiveWork: true,
+        pageInfo: { hasNextPage: true, endCursor: 'newest-cursor' },
+      })
+    );
+    await flushPromises();
+    history.loadMore();
+    await flushPromises();
+    expect({
+      ids: history.attempts.value.map((item) => item.run.id),
+      cursor: requests[3]?.variables.after,
+    }).toEqual({ ids: ['newest', 'attempt-1', 'old'], cursor: 'cursor-2' });
+  });
+
+  it('keeps the latest-only view until history is explicitly expanded', async () => {
+    vi.useFakeTimers({
+      toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'],
+    });
+    const { requests, history } = await setup(100);
+    requests[0]!.send(firstPage());
+    await flushPromises();
+    await vi.advanceTimersByTimeAsync(100);
+    const newest = pipelinePage();
+    newest.run.id = 'newest';
+    requests[1]!.send(pipelineSummary({ attempts: [newest] }));
+    await flushPromises();
+    expect(history.attempts.value.map((item) => item.run.id)).toEqual([
+      'newest',
+    ]);
+  });
+
   it('stops polling once target-wide work finishes', async () => {
     vi.useFakeTimers({
       toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval'],

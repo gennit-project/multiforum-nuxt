@@ -2,7 +2,7 @@
 
 Deploy the backend change for [multiforum-backend#359](https://github.com/gennit-project/multiforum-backend/issues/359) before this frontend. The frontend requires `getPipelineSummaryPage` and `getPipelineRunPage`; it does not silently fall back to the unbounded history endpoint. The companion backend preserves its old APIs, so backend-first rollout remains compatible with older frontend instances. Neither PR performs a deployment.
 
-The generated schema was rebuilt from the companion backend's in-process Neo4j GraphQL introspection (no database or production endpoint). Contract source: `e1c06f20aba819bced36ee7de03cebc8e24dddfb`; verified unchanged in final backend `ada51e29762bc13dab27e4bbf728779f6593605c`. The three frontend pipeline operations were validated against that schema.
+The generated schema was rebuilt from the companion backend's in-process Neo4j GraphQL introspection (no database or production endpoint). Contract source: `e1c06f20aba819bced36ee7de03cebc8e24dddfb`; verified unchanged in backend `901aadc86665300b0fe5cbddd86fe82226076c5b`. The three frontend pipeline operations were validated against that schema.
 
 - Summary requests return at most 10 attempts (one for the compact latest-pipeline widgets) and 20 stages per attempt. The checks page applies its event filter before pagination; channel requests also send the exact channel filter.
 - Status comes from `displayStatus`, and polling comes from target-wide `hasActiveWork`, including work outside the loaded history. Historical `hasFailedWork` is not interpreted as the latest attempt's status.
