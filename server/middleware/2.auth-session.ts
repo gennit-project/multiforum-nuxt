@@ -272,14 +272,17 @@ export default defineEventHandler(async (event) => {
 
         if (accessToken && graphqlUrl) {
           const profileStartedAt = performance.now();
-          const queryBackend = <T>(query: string) =>
-            $fetch<T>(graphqlUrl, {
+          const queryBackend = () =>
+            $fetch<OwnEmailResponse>(graphqlUrl, {
               method: 'POST',
               headers: {
                 'content-type': 'application/json',
                 authorization: `Bearer ${accessToken}`,
               },
-              body: { query, variables: { emailAddress: email } },
+              body: {
+                query: GET_OWN_EMAIL,
+                variables: { emailAddress: email },
+              },
             });
 
           const cache = useStorage<StableProfile>('authProfileCache');
@@ -294,7 +297,7 @@ export default defineEventHandler(async (event) => {
             modProfileName = cached.modProfileName;
             profilePicURL = cached.profilePicURL;
           } else {
-            const res = await queryBackend<OwnEmailResponse>(GET_OWN_EMAIL);
+            const res = await queryBackend();
             const u = res?.data?.getOwnEmail;
             username = u?.username || '';
             modProfileName = u?.modProfileName || '';
