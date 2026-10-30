@@ -56,6 +56,14 @@ for (const staleUsername of ['', 'previous-account']) {
       },
     });
 
+    // The prebuilt CI app uses Auth0; dev runs use local-dev. Verification is
+    // part of this fixture, not a real identity-provider request in either mode.
+    await page.route('**/api/session/verification', (route) =>
+      route.fulfill({
+        json: { status: 'verified', canResend: false },
+      })
+    );
+
     await page.route('**/api/session/profile', (route) =>
       route.fulfill({
         json: {

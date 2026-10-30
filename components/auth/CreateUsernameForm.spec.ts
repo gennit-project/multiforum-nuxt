@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
+import { ref } from 'vue';
 
 import CreateUsernameForm from '@/components/auth/CreateUsernameForm.vue';
 
@@ -8,6 +9,13 @@ const h = vi.hoisted(() => ({
   setModProfileName: vi.fn(),
   setIsAuthenticated: vi.fn(),
   setIsLoadingAuth: vi.fn(),
+  verificationStatus: { value: 'verified' },
+  canResend: { value: false },
+  sending: { value: false },
+  message: { value: '' },
+  check: vi.fn(),
+  resend: vi.fn(),
+  logout: vi.fn(),
   createMutate: vi.fn(),
   onDone: undefined as undefined | ((r: unknown) => void),
   mutationOptions: undefined as undefined | (() => unknown),
@@ -26,6 +34,20 @@ const h = vi.hoisted(() => ({
   getLoading: { value: false },
   createError: { value: null as unknown },
   createLoading: { value: false },
+}));
+
+vi.mock('@/composables/useSignupVerification', () => ({
+  useSignupVerification: () => ({
+    status: h.verificationStatus,
+    canResend: h.canResend,
+    sending: h.sending,
+    message: h.message,
+    check: h.check,
+    resend: h.resend,
+  }),
+}));
+vi.mock('@/composables/useServerLogout', () => ({
+  useServerLogout: () => ({ logout: h.logout }),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -83,13 +105,20 @@ const mountForm = (email = 'alice@example.com') =>
   mount(CreateUsernameForm, { props: { email }, global: { stubs } });
 
 const saveButton = (wrapper: ReturnType<typeof mount>) =>
-  wrapper.getComponent({ name: 'PrimaryButton' });
+  wrapper
+    .findAllComponents({ name: 'PrimaryButton' })
+    .find((button) => button.props('label') === 'Save')!;
 
 const setBirthday = (wrapper: ReturnType<typeof mount>, date: string) =>
   wrapper.getComponent({ name: 'DatePicker' }).vm.$emit('update', date);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  sessionStorage.clear();
+  h.verificationStatus = ref('verified');
+  h.canResend = ref(false);
+  h.sending = ref(false);
+  h.message = ref('');
   h.onDone = undefined;
   h.mutationOptions = undefined;
   h.userResult = { value: { users: [] } };
@@ -270,4 +299,76 @@ describe('CreateUsernameForm account creation completion', () => {
 
     expect(h.setIsAuthenticated).toHaveBeenCalledWith(true);
   });
+});
+
+describe('signup verification recovery', () => {
+  it.each(['checking', 'unverified', 'unknown', 'signed-out'])(
+    'blocks Save while verification is %s',
+    async (status) => {
+      h.verificationStatus.value = status;
+      const wrapper = mountForm();
+      setBirthday(wrapper, '2000-01-01');
+      await wrapper.vm.$nextTick();
+      expect(saveButton(wrapper).props('disabled')).toBe(true);
+    }
+  );
+  it('explains unverified email and offers reauthentication', () => {
+    h.verificationStatus.value = 'unverified';
+    const wrapper = mountForm();
+    expect(wrapper.get('a[href="/auth/signup/refresh"]').text()).toContain(
+      "I've verified my email"
+    );
+  });
+  it('preserves entries before reauthentication', async () => {
+    h.verificationStatus.value = 'unverified';
+    const wrapper = mountForm();
+    await wrapper.get('input').setValue('chosen_name');
+    setBirthday(wrapper, '2000-01-01');
+    await wrapper.get('a[href="/auth/signup/refresh"]').trigger('click');
+    expect(
+      JSON.parse(sessionStorage.getItem('signup-draft:alice@example.com')!)
+    ).toEqual({ username: 'chosen_name', birthday: '2000-01-01' });
+  });
+  it('restores the draft after reauthentication', async () => {
+    sessionStorage.setItem(
+      'signup-draft:alice@example.com',
+      JSON.stringify({ username: 'chosen_name', birthday: '2000-01-01' })
+    );
+    const wrapper = mountForm();
+    await wrapper.vm.$nextTick();
+    expect((wrapper.get('input').element as HTMLInputElement).value).toBe(
+      'chosen_name'
+    );
+  });
+  it('clears the draft and signs out when switching accounts', async () => {
+    sessionStorage.setItem('signup-draft:alice@example.com', '{}');
+    const wrapper = mountForm();
+    await wrapper
+      .findAll('button')
+      .find((button) => button.text().includes('use another account'))!
+      .trigger('click');
+    expect({
+      calls: h.logout.mock.calls.length,
+      draft: sessionStorage.getItem('signup-draft:alice@example.com'),
+    }).toEqual({ calls: 1, draft: null });
+  });
+  it('offers sign in recovery for a backend login rejection without claiming the email is unverified', () => {
+    h.createError.value = {
+      message: 'A verified login is required to create an account',
+    };
+    const wrapper = mountForm();
+    expect(wrapper.get('a[href="/auth/signup/refresh"]').text()).toBe(
+      'Sign in again'
+    );
+  });
+});
+
+it('blocks repeated submission after a backend login rejection until reauthentication', async () => {
+  h.createError.value = {
+    message: 'A verified login is required to create an account',
+  };
+  const wrapper = mountForm();
+  setBirthday(wrapper, '2000-01-01');
+  await wrapper.vm.$nextTick();
+  expect(saveButton(wrapper).props('disabled')).toBe(true);
 });
