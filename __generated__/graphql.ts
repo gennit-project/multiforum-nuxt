@@ -80,6 +80,10 @@ export type Query = {
   getPipelineRuns: Array<PluginRun>;
   getApplicablePluginPipeline: ApplicablePluginPipeline;
   getPipelineSummary: PluginPipelineSummary;
+  /** Bounded history. Activity/failure indicators cover all matching history, not just this page. */
+  getPipelineSummaryPage: PluginPipelineSummaryPage;
+  /** One attempt with a bounded job page. Status considers every job. */
+  getPipelineRunPage?: Maybe<PublicPluginPipelineRunPage>;
   getPublicPipelineRun?: Maybe<PublicPluginPipelineRun>;
   getInternalPluginPipelineRun?: Maybe<InternalPluginPipelineRunDetail>;
   previewPluginPipelineCampaign: PluginPipelineCampaignPreview;
@@ -422,6 +426,25 @@ export type QueryGetApplicablePluginPipelineArgs = {
 export type QueryGetPipelineSummaryArgs = {
   targetId: Scalars['ID']['input'];
   targetType: Scalars['String']['input'];
+};
+
+
+export type QueryGetPipelineSummaryPageArgs = {
+  targetId: Scalars['ID']['input'];
+  targetType: Scalars['String']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+  jobsFirst?: InputMaybe<Scalars['Int']['input']>;
+  eventType?: InputMaybe<Scalars['String']['input']>;
+  scope?: InputMaybe<Scalars['String']['input']>;
+  channelId?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryGetPipelineRunPageArgs = {
+  pipelineRunId: Scalars['ID']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -11115,6 +11138,12 @@ export type PluginPipelineCampaignsConnection = {
   pageInfo: PageInfo;
 };
 
+export type PluginPipelinePageInfo = {
+  __typename?: 'PluginPipelinePageInfo';
+  hasNextPage: Scalars['Boolean']['output'];
+  endCursor?: Maybe<Scalars['String']['output']>;
+};
+
 export type PluginPipelineRun = {
   __typename?: 'PluginPipelineRun';
   id: Scalars['ID']['output'];
@@ -11194,6 +11223,16 @@ export type PluginPipelineSummary = {
   targetId: Scalars['ID']['output'];
   targetType: Scalars['String']['output'];
   attempts: Array<PublicPluginPipelineRun>;
+};
+
+export type PluginPipelineSummaryPage = {
+  __typename?: 'PluginPipelineSummaryPage';
+  targetId: Scalars['ID']['output'];
+  targetType: Scalars['String']['output'];
+  hasActiveWork: Scalars['Boolean']['output'];
+  hasFailedWork: Scalars['Boolean']['output'];
+  pageInfo: PluginPipelinePageInfo;
+  attempts: Array<PublicPluginPipelineRunPage>;
 };
 
 export type PluginPluginVersionVersionsAggregateSelection = {
@@ -11488,6 +11527,14 @@ export type PublicPluginPipelineRun = {
   createdAt: Scalars['DateTime']['output'];
   updatedAt: Scalars['DateTime']['output'];
   jobs: Array<PublicPluginJobRun>;
+};
+
+export type PublicPluginPipelineRunPage = {
+  __typename?: 'PublicPluginPipelineRunPage';
+  run: PublicPluginPipelineRun;
+  displayStatus: PluginRunStatus;
+  hasActiveWork: Scalars['Boolean']['output'];
+  jobsPageInfo: PluginPipelinePageInfo;
 };
 
 /** Single checkout / acquisition (free or paid) */
@@ -59037,6 +59084,8 @@ export type PluginConfigurationDesiredStateInput = {
   plugins: Array<DesiredServerPluginInput>;
   /** Omit to leave server pipelines unmanaged; pass an empty list to clear them. */
   pipelines?: InputMaybe<Array<EventPipelineInput>>;
+  /** When present, reconcile only these pipeline events and preserve all others. */
+  managedPipelineEvents?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type PluginConnectInput = {

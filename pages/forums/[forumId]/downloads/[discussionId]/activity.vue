@@ -52,7 +52,13 @@ const discussion = computed<Discussion | null>(() => {
 const downloadableFileId = computed(
   () => discussion.value?.DownloadableFiles?.[0]?.id || ''
 );
-const { attempts: pipelineAttempts } = useSharedDownloadPipelineOverview(
+const {
+  attempts: pipelineAttempts,
+  hasMore,
+  moreLoading,
+  moreError,
+  loadMore,
+} = useSharedDownloadPipelineOverview(
   downloadableFileId,
   discussionId,
   channelId,
@@ -68,12 +74,12 @@ const formatPipelineTime = (value: string) =>
     dateStyle: 'medium',
     timeStyle: 'short',
   }).format(new Date(value));
-const pipelineAttemptUrl = (pipelineId: string) =>
+const pipelineAttemptUrl = (attempt: { id: string; pipelineId: string }) =>
   `/forums/${encodeURIComponent(channelId.value)}/downloads/${encodeURIComponent(
     discussionId.value
   )}/pipelines?attempt=${encodeURIComponent(
-    pipelineId
-  )}#attempt-${encodeURIComponent(pipelineId)}`;
+    attempt.id
+  )}#attempt-${encodeURIComponent(attempt.pipelineId)}`;
 
 // Get the active discussion channel for this forum
 const activeDiscussionChannel = computed(() => {
@@ -130,7 +136,7 @@ const hasAnyActivity = computed(() => {
       />
 
       <section
-        v-if="significantPipelineAttempts.length"
+        v-if="significantPipelineAttempts.length || hasMore"
         aria-labelledby="pipeline-activity-heading"
         class="rounded-lg border border-gray-200 p-4 dark:border-gray-700"
       >
@@ -147,7 +153,7 @@ const hasAnyActivity = computed(() => {
             class="py-3 text-sm"
           >
             <NuxtLink
-              :to="pipelineAttemptUrl(attempt.pipelineId)"
+              :to="pipelineAttemptUrl(attempt)"
               class="text-brand-700 dark:text-brand-300 font-medium underline"
             >
               {{ attempt.scope === 'SERVER' ? 'Server' : 'Channel' }} checks
@@ -162,6 +168,18 @@ const hasAnyActivity = computed(() => {
             </span>
           </li>
         </ol>
+        <p v-if="moreError" role="alert">
+          Earlier activity could not be loaded.
+        </p>
+        <button
+          v-if="hasMore"
+          type="button"
+          class="min-h-11 px-3 text-sm underline"
+          :disabled="moreLoading"
+          @click="loadMore"
+        >
+          Load more activity
+        </button>
       </section>
     </div>
   </div>

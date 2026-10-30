@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, toRef } from 'vue';
 import {
   getApplicablePipelineStatus,
+  attemptDisplayStatus,
   useSharedDownloadPipelineOverview,
   type PublicPipelineDisplayStatus,
 } from '@/composables/useDownloadPipelineOverview';
@@ -24,6 +25,7 @@ const {
   hasPipelineContent,
   hasActiveAttempt,
   loading,
+  ready,
 } = useSharedDownloadPipelineOverview(
   toRef(props, 'fileId'),
   toRef(props, 'discussionId'),
@@ -34,15 +36,8 @@ const {
 const displayStatus = computed<PublicPipelineDisplayStatus>(() => {
   if (hasActiveAttempt.value) return 'RUNNING';
   const latest = attempts.value[0];
-  if (latest) {
-    if (latest.status === 'SUCCEEDED') {
-      return latest.jobs?.length > 0 &&
-        latest.jobs.every((job) => job.status === 'SKIPPED')
-        ? 'SKIPPED'
-        : 'PASSED';
-    }
-    return latest.status;
-  }
+  if (latest) return attemptDisplayStatus(latest);
+
   const applicable = applicablePipelines.value[0];
   return applicable
     ? getApplicablePipelineStatus({
@@ -80,7 +75,7 @@ const labels: Record<PublicPipelineDisplayStatus, string> = {
         aria-hidden="true"
       />
       {{
-        !hasMounted || (loading && !hasPipelineContent)
+        !hasMounted || (loading && !ready)
           ? 'Loading checks…'
           : labels[displayStatus]
       }}

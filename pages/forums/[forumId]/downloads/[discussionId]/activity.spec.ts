@@ -23,6 +23,7 @@ vi.mock('@/composables/useDownloadPipelineOverview', () => ({
   useSharedDownloadPipelineOverview: () => ({
     attempts: ref([
       {
+        id: 'attempt-1',
         pipelineId: 'pipeline-1',
         scope: 'SERVER',
         status: 'TIMED_OUT',
@@ -70,7 +71,7 @@ describe('download activity', () => {
     expect(wrapper.text()).toContain('timed out');
     expect(wrapper.text()).not.toContain('pipeline-active');
     expect(wrapper.get('a').attributes('href')).toContain(
-      '?attempt=pipeline-1#attempt-pipeline-1'
+      '?attempt=attempt-1#attempt-pipeline-1'
     );
   });
 

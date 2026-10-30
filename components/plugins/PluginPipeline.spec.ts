@@ -1,7 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
-import { ref } from 'vue';
-import type { PipelineRun, PipelineGroup } from '@/composables/usePluginPipeline';
+import { computed, ref } from 'vue';
+import type {
+  PipelineRun,
+  PipelineGroup,
+} from '@/composables/usePluginPipeline';
 
 // Create mock functions that we can control
 const mockRefetch = vi.fn();
@@ -19,7 +22,9 @@ vi.mock('@/composables/usePluginPipeline', () => ({
     loading: mockLoading,
     error: mockError,
     isPolling: mockIsPolling,
-    pipelineGroups: ref([]),
+    pipelineGroups: computed(() =>
+      mockLatestPipeline.value ? [mockLatestPipeline.value] : []
+    ),
     refetch: mockRefetch,
     formatDuration: (ms?: number) => {
       if (!ms) return '';
@@ -65,7 +70,9 @@ vi.mock('@/composables/usePluginPipeline', () => ({
 }));
 
 describe('PluginPipeline Component', () => {
-  const createMockRun = (overrides: Partial<PipelineRun> = {}): PipelineRun => ({
+  const createMockRun = (
+    overrides: Partial<PipelineRun> = {}
+  ): PipelineRun => ({
     id: 'run-1',
     pipelineId: 'pipeline-1',
     pluginId: 'test-plugin',
@@ -116,6 +123,17 @@ describe('PluginPipeline Component', () => {
 
     // Component should not render when there's no data and not loading
     expect(wrapper.find('.rounded-lg').exists()).toBe(false);
+  });
+
+  it('shows an initial query error when no pipeline data is available', async () => {
+    const PluginPipeline = (await import('./PluginPipeline.vue')).default;
+    mockError.value = new Error('Pipeline status unavailable');
+    const wrapper = mount(PluginPipeline, {
+      props: { targetId: 'file-1', targetType: 'DownloadableFile' },
+    });
+    expect(wrapper.get('[role="alert"]').text()).toContain(
+      'Pipeline status unavailable'
+    );
   });
 
   it('should show loading state', async () => {
@@ -359,8 +377,7 @@ describe('PluginPipeline Component', () => {
       global: {
         stubs: {
           PluginPipelineStage: {
-            template:
-              '<div class="mock-stage">{{ run.pluginName }}</div>',
+            template: '<div class="mock-stage">{{ run.pluginName }}</div>',
             props: ['run', 'isLast'],
           },
         },
