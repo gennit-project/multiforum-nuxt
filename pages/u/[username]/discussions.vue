@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import type { DiscussionWhere } from '@/__generated__/graphql';
 import { GET_USER_DISCUSSIONS } from '@/graphQLData/user/queries';
 import { useQuery } from '@vue/apollo-composable';
 import DiscussionItemInProfile from '@/components/user/DiscussionItemInProfile.vue';
@@ -7,7 +8,8 @@ import { useRoute } from 'nuxt/app';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 
 const route = useRoute();
-const { selectedChannels, hasSelectedChannels } = useSelectedChannelsFromQuery();
+const { selectedChannels, hasSelectedChannels } =
+  useSelectedChannelsFromQuery();
 
 const username = computed(() => {
   if (typeof route.params.username === 'string') {
@@ -16,9 +18,9 @@ const username = computed(() => {
   return '';
 });
 
-const discussionsWhere = computed(() => {
-  const baseWhere = {
-    OR: [{ hasDownload: false }, { hasDownload: null }],
+const discussionsWhere = computed<DiscussionWhere>(() => {
+  const baseWhere: DiscussionWhere = {
+    OR: [{ hasDownload: { eq: false } }, { hasDownload: { eq: null } }],
   };
   if (!hasSelectedChannels.value) {
     return baseWhere;

@@ -39,7 +39,9 @@ export const GET_USER = gql`
       }
       DiscussionsConnection(
         where: {
-          node: { OR: [{ hasDownload: { eq: false } }, { hasDownload: null }] }
+          node: {
+            OR: [{ hasDownload: { eq: false } }, { hasDownload: { eq: null } }]
+          }
         }
       ) {
         aggregate {
@@ -117,7 +119,9 @@ export const GET_PUBLIC_USER_PROFILE = gql`
       }
       DiscussionsConnection(
         where: {
-          node: { OR: [{ hasDownload: { eq: false } }, { hasDownload: null }] }
+          node: {
+            OR: [{ hasDownload: { eq: false } }, { hasDownload: { eq: null } }]
+          }
         }
       ) {
         aggregate {
@@ -801,7 +805,9 @@ export const GET_USER_FAVORITE_COUNTS = gql`
       }
       FavoriteDiscussionsConnection(
         where: {
-          node: { OR: [{ hasDownload: { eq: false } }, { hasDownload: null }] }
+          node: {
+            OR: [{ hasDownload: { eq: false } }, { hasDownload: { eq: null } }]
+          }
         }
       ) {
         totalCount

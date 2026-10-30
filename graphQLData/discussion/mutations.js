@@ -546,7 +546,7 @@ export const MARK_AS_UNANSWERED = gql`
         channelUniqueName: { eq: $channelId }
         discussionId: { eq: $discussionId }
       }
-      update: { Answers: { disconnect: [{ where: { node: { NOT: null } } }] } }
+      update: { Answers: { disconnect: [{ where: { node: {} } }] } }
     ) {
       discussionChannels {
         id

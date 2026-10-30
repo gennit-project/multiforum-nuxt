@@ -353,7 +353,7 @@ export const GET_CHANNEL_DOWNLOAD_COUNT = gql`
         where: {
           node: {
             AND: [
-              { OR: [{ archived: { eq: false } }, { archived: null }] }
+              { OR: [{ archived: { eq: false } }, { archived: { eq: null } }] }
               { NOT: { Discussion: null } }
               { Discussion: { hasDownload: { eq: true } } }
             ]

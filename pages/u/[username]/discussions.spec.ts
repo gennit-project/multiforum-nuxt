@@ -58,7 +58,9 @@ describe('user discussions profile page', () => {
       username: 'alice',
       where: {
         AND: [
-          { OR: [{ hasDownload: false }, { hasDownload: null }] },
+          {
+            OR: [{ hasDownload: { eq: false } }, { hasDownload: { eq: null } }],
+          },
           {
             DiscussionChannels_SOME: { channelUniqueName_IN: ['cats'] },
           },

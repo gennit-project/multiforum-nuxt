@@ -35,7 +35,7 @@ type FavoriteDiscussionChannel = Pick<
   | 'weightedVotesCount'
 > & {
   Channel?: Pick<Channel, 'uniqueName' | 'displayName'> | null;
-  CommentsAggregate?: { count: number };
+  CommentsConnection?: { aggregate?: { count?: { nodes?: number } } };
 };
 
 type FavoriteDiscussion = Pick<
@@ -72,11 +72,13 @@ useHead({
 
 const GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS = gql`
   query getUserFavoriteDiscussionsNoDownloads($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       FavoriteDiscussions(
-        where: { OR: [{ hasDownload: false }, { hasDownload: null }] }
-        options: { sort: { createdAt: DESC } }
+        where: {
+          OR: [{ hasDownload: { eq: false } }, { hasDownload: { eq: null } }]
+        }
+        sort: { createdAt: DESC }
       ) {
         id
         title
@@ -103,8 +105,12 @@ const GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS = gql`
             uniqueName
             displayName
           }
-          CommentsAggregate {
-            count
+          CommentsConnection {
+            aggregate {
+              count {
+                nodes
+              }
+            }
           }
         }
         Tags {
