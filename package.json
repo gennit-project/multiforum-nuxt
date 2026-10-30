@@ -17,7 +17,7 @@
     "postinstall": "nuxt prepare",
     "graphql:validate": "node scripts/validate-graphql-operations.mjs",
     "graphql:inventory": "node scripts/validate-graphql-operations.mjs --report-only --report artifacts/graphql/operations.json",
-    "graphql:check": "node scripts/validate-graphql-operations.mjs --baseline graphql-validation-baseline.json --report artifacts/graphql/operations.json",
+    "graphql:check": "node scripts/validate-graphql-operations.mjs --report artifacts/graphql/operations.json",
     "graphql:test": "node --test scripts/graphql-operations.test.mjs",
     "schema:check": "node scripts/check-graphql-schema.mjs",
     "schema:update": "node scripts/update-graphql-schema.mjs",

@@ -105,8 +105,8 @@ rg -n '\bgql\x60' graphQLData components composables pages utils --glob '*.{js,t
 The initial validator scans 986 production source files and finds 376 documents:
 358 operation definitions and 18 fragment-only documents. These include four
 `/* GraphQL */`-annotated server-side requests that the phase-1 gql-only count
-missed. At introduction, 79 schema diagnostics affect 31 documents. The baseline
-is reviewable in [`graphql-validation-baseline.json`](../graphql-validation-baseline.json):
+missed. At introduction, 79 schema diagnostics affected 31 documents. These have been
+resolved, and strict validation is now the CI gate:
 
 | Area                             | Diagnostics |
 | -------------------------------- | ----------: |
@@ -119,31 +119,21 @@ is reviewable in [`graphql-validation-baseline.json`](../graphql-validation-base
 | Tag query and cache fragment     |           2 |
 | Total                            |          79 |
 
-These counts are schema diagnostics, not confirmed user-visible bugs. Some
-operations may be unused or cache-only fragments; inspect each before changing
-behavior. The immediate follow-up is to fix these incompatibilities in focused
-slices, then remove the baseline and use strict validation as the only CI gate.
+These counts were schema diagnostics, not confirmed user-visible bugs. Collection
+queries and mutations, favorites, and cache fragments now match the pinned schema.
 
-### Commands and baseline policy
+### Commands and validation policy
 
 ```sh
-pnpm graphql:test       # extractor, source mapping and ratchet tests
+pnpm graphql:test       # extractor, source mapping and validator tests
 pnpm graphql:inventory  # write artifacts/graphql/operations.json, including all findings
-pnpm graphql:check      # CI gate against the reviewed migration baseline
-pnpm graphql:validate   # strict check; fails while any schema diagnostic remains
+pnpm graphql:check      # strict CI gate and inventory report
+pnpm graphql:validate   # strict check without writing a report
 ```
 
-The CI gate validates every discovered document and prints all findings. It
-fails for an unrecorded diagnostic, a stale baseline entry, a schema pin/hash
-mismatch, or **any** extraction error. A baseline entry identifies the pinned
-schema, document identity, complete expanded document hash, error message, and
-occurrence count. The stored source locations help review the original findings;
-current locations are reported separately, so unrelated line shifts do not
-invalidate the baseline. Changing a document or one of its fragments
-invalidates its existing entries; fix that document's errors and remove its
-resolved entries. Moving a document to another file requires review. Do not blindly re-record the
-baseline to make CI green. `--write-baseline <file>` is an explicit bootstrap or
-reviewed schema-migration tool; inspect every addition and deletion in its diff.
+The CI gate validates every discovered document and fails on any schema
+diagnostic, extraction error, or schema pin/hash mismatch. Fix invalid documents
+before merging; do not use a baseline to suppress failures in CI.
 
 The CI job publishes the complete inventory and diagnostics as the
 `graphql-operation-inventory` artifact, including when validation fails. The

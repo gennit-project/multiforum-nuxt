@@ -54,11 +54,11 @@ useHead({
 
 const GET_USER_FAVORITE_DOWNLOADS = gql`
   query getUserFavoriteDownloads($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       FavoriteDiscussions(
-        where: { hasDownload: true }
-        options: { sort: { createdAt: DESC } }
+        where: { hasDownload: { eq: true } }
+        sort: [{ createdAt: DESC }]
       ) {
         id
         title
@@ -85,8 +85,8 @@ const GET_USER_FAVORITE_DOWNLOADS = gql`
             uniqueName
             displayName
           }
-          CommentsAggregate {
-            count
+          CommentsConnection {
+            aggregate { count { nodes } }
           }
         }
         Tags {

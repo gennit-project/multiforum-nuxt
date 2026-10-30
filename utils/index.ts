@@ -404,7 +404,7 @@ export const updateTagsInCache = (cache: ApolloCache<unknown>, updatedTags: Arra
           return cache.writeFragment({
             data: tagData,
             fragment: gql`
-              fragment NewTag on Tags {
+              fragment NewTag on Tag {
                 text
               }
             `,

@@ -2,11 +2,11 @@ import { gql } from '@apollo/client/core';
 
 export const GET_USER_COLLECTIONS_DISCUSSIONS = gql`
   query GetUserCollectionsDiscussions($username: String!, $searchTerm: String) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
-        where: { collectionType: DISCUSSIONS, name_CONTAINS: $searchTerm }
-        options: { sort: [{ createdAt: DESC }] }
+        where: { collectionType: { eq: DISCUSSIONS }, name_CONTAINS: $searchTerm }
+        sort: [{ createdAt: DESC }]
       ) {
         id
         name
@@ -27,11 +27,11 @@ export const GET_USER_COLLECTIONS_DISCUSSIONS = gql`
 
 export const GET_USER_COLLECTIONS_COMMENTS = gql`
   query GetUserCollectionsComments($username: String!, $searchTerm: String) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
-        where: { collectionType: COMMENTS, name_CONTAINS: $searchTerm }
-        options: { sort: [{ createdAt: DESC }] }
+        where: { collectionType: { eq: COMMENTS }, name_CONTAINS: $searchTerm }
+        sort: [{ createdAt: DESC }]
       ) {
         id
         name
@@ -52,11 +52,11 @@ export const GET_USER_COLLECTIONS_COMMENTS = gql`
 
 export const GET_USER_COLLECTIONS_IMAGES = gql`
   query GetUserCollectionsImages($username: String!, $searchTerm: String) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
-        where: { collectionType: IMAGES, name_CONTAINS: $searchTerm }
-        options: { sort: [{ createdAt: DESC }] }
+        where: { collectionType: { eq: IMAGES }, name_CONTAINS: $searchTerm }
+        sort: [{ createdAt: DESC }]
       ) {
         id
         name
@@ -79,11 +79,11 @@ export const GET_USER_COLLECTIONS_IMAGES = gql`
 
 export const GET_USER_COLLECTIONS_CHANNELS = gql`
   query GetUserCollectionsChannels($username: String!, $searchTerm: String) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
-        where: { collectionType: CHANNELS, name_CONTAINS: $searchTerm }
-        options: { sort: [{ createdAt: DESC }] }
+        where: { collectionType: { eq: CHANNELS }, name_CONTAINS: $searchTerm }
+        sort: [{ createdAt: DESC }]
       ) {
         id
         name
@@ -104,11 +104,11 @@ export const GET_USER_COLLECTIONS_CHANNELS = gql`
 
 export const GET_USER_COLLECTIONS_DOWNLOADS = gql`
   query GetUserCollectionsDownloads($username: String!, $searchTerm: String) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
-        where: { collectionType: DOWNLOADS, name_CONTAINS: $searchTerm }
-        options: { sort: [{ createdAt: DESC }] }
+        where: { collectionType: { eq: DOWNLOADS }, name_CONTAINS: $searchTerm }
+        sort: [{ createdAt: DESC }]
       ) {
         id
         name
@@ -119,7 +119,7 @@ export const GET_USER_COLLECTIONS_DOWNLOADS = gql`
         createdAt
         updatedAt
       }
-      FavoriteDiscussions(where: { hasDownload: true }) {
+      FavoriteDiscussions(where: { hasDownload: { eq: true } }) {
         id
         title
       }
@@ -129,7 +129,7 @@ export const GET_USER_COLLECTIONS_DOWNLOADS = gql`
 
 export const GET_COLLECTION_ITEMS = gql`
   query GetCollectionItems($collectionId: ID!, $loggedInUsername: String) {
-    collections(where: { id: $collectionId }) {
+    collections(where: { id: { eq: $collectionId } }) {
       id
       name
       description
@@ -158,8 +158,8 @@ export const GET_COLLECTION_ITEMS = gql`
           channelUniqueName
           archived
           answered
-          CommentsAggregate {
-            count
+          CommentsConnection {
+            aggregate { count { nodes } }
           }
         }
         Tags {
@@ -222,8 +222,8 @@ export const GET_COLLECTION_ITEMS = gql`
           channelUniqueName
           archived
           answered
-          CommentsAggregate {
-            count
+          CommentsConnection {
+            aggregate { count { nodes } }
           }
         }
         Tags {
@@ -277,7 +277,7 @@ export const GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD = gql`
         displayName
         profilePicURL
       }
-      Downloads(options: { limit: 5 }) {
+      Downloads(limit: 5) {
         id
         title
         createdAt
@@ -294,8 +294,8 @@ export const GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD = gql`
         DiscussionChannels {
           id
           channelUniqueName
-          CommentsAggregate {
-            count
+          CommentsConnection {
+            aggregate { count { nodes } }
           }
           Channel {
             uniqueName
@@ -324,7 +324,7 @@ export const GET_PUBLIC_COLLECTION_BY_ID = gql`
     $downloadLimit: Int = 20
     $downloadOffset: Int = 0
   ) {
-    collections(where: { id: $collectionId, visibility: PUBLIC }) {
+    collections(where: { id: { eq: $collectionId }, visibility: { eq: PUBLIC } }) {
       id
       name
       description
@@ -337,15 +337,13 @@ export const GET_PUBLIC_COLLECTION_BY_ID = gql`
         displayName
         profilePicURL
       }
-      DownloadsAggregate {
-        count
+      DownloadsConnection {
+        aggregate { count { nodes } }
       }
       Downloads(
-        options: {
-          limit: $downloadLimit
-          offset: $downloadOffset
-          sort: [{ createdAt: DESC }]
-        }
+        limit: $downloadLimit
+        offset: $downloadOffset
+        sort: [{ createdAt: DESC }]
       ) {
         id
         title
@@ -379,12 +377,12 @@ export const CHECK_DISCUSSION_IN_COLLECTIONS = gql`
     $itemId: ID!
     $collectionType: CollectionType!
   ) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
         where: {
-          collectionType: $collectionType
-          Discussions_SOME: { id: $itemId }
+          collectionType: { eq: $collectionType }
+          Discussions_SOME: { id: { eq: $itemId } }
         }
       ) {
         id
@@ -402,12 +400,12 @@ export const CHECK_COMMENT_IN_COLLECTIONS = gql`
     $itemId: ID!
     $collectionType: CollectionType!
   ) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
         where: {
-          collectionType: $collectionType
-          Comments_SOME: { id: $itemId }
+          collectionType: { eq: $collectionType }
+          Comments_SOME: { id: { eq: $itemId } }
         }
       ) {
         id
@@ -425,12 +423,12 @@ export const CHECK_DOWNLOAD_IN_COLLECTIONS = gql`
     $itemId: ID!
     $collectionType: CollectionType!
   ) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
         where: {
-          collectionType: $collectionType
-          Downloads_SOME: { id: $itemId }
+          collectionType: { eq: $collectionType }
+          Downloads_SOME: { id: { eq: $itemId } }
         }
       ) {
         id
@@ -448,10 +446,10 @@ export const CHECK_IMAGE_IN_COLLECTIONS = gql`
     $itemId: ID!
     $collectionType: CollectionType!
   ) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
-        where: { collectionType: $collectionType, Images_SOME: { id: $itemId } }
+        where: { collectionType: { eq: $collectionType }, Images_SOME: { id: { eq: $itemId } } }
       ) {
         id
         name
@@ -468,12 +466,12 @@ export const CHECK_CHANNEL_IN_COLLECTIONS = gql`
     $itemId: String!
     $collectionType: CollectionType!
   ) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
         where: {
-          collectionType: $collectionType
-          Channels_SOME: { uniqueName: $itemId }
+          collectionType: { eq: $collectionType }
+          Channels_SOME: { uniqueName: { eq: $itemId } }
         }
       ) {
         id
@@ -487,9 +485,9 @@ export const CHECK_CHANNEL_IN_COLLECTIONS = gql`
 // Get all user collections (for library page)
 export const GET_ALL_USER_COLLECTIONS = gql`
   query GetAllUserCollections($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
-      Collections(options: { sort: [{ createdAt: DESC }] }) {
+      Collections(sort: [{ createdAt: DESC }]) {
         id
         name
         description
@@ -506,11 +504,11 @@ export const GET_ALL_USER_COLLECTIONS = gql`
 // Get user's channel collections with the channels in each collection
 export const GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS = gql`
   query GetUserChannelCollectionsWithChannels($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       Collections(
-        where: { collectionType: CHANNELS }
-        options: { sort: [{ createdAt: DESC }] }
+        where: { collectionType: { eq: CHANNELS } }
+        sort: [{ createdAt: DESC }]
       ) {
         id
         name

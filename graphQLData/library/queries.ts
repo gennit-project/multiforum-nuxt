@@ -2,9 +2,9 @@ import { gql } from '@apollo/client/core';
 
 export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
   query GetUnifiedLibraryFavorites($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
-      FavoriteDiscussions(options: { sort: { createdAt: DESC }, limit: 50 }) {
+      FavoriteDiscussions(sort: [{ createdAt: DESC }], limit: 50) {
         id
         title
         body
@@ -32,7 +32,7 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
           }
         }
       }
-      FavoriteImages(options: { sort: { createdAt: DESC }, limit: 50 }) {
+      FavoriteImages(sort: [{ createdAt: DESC }], limit: 50) {
         id
         url
         alt
@@ -43,9 +43,9 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
           displayName
           profilePicURL
         }
-        Albums(options: { limit: 1 }) {
+        Albums(limit: 1) {
           id
-          Discussions(options: { limit: 1 }) {
+          Discussions(limit: 1) {
             id
             DiscussionChannels {
               channelUniqueName
@@ -58,7 +58,7 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
           }
         }
       }
-      FavoriteComments(options: { sort: { createdAt: DESC }, limit: 50 }) {
+      FavoriteComments(sort: [{ createdAt: DESC }], limit: 50) {
         id
         text
         createdAt
@@ -92,13 +92,13 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
           channelIconURL
         }
       }
-      FavoriteChannels(options: { sort: { createdAt: DESC }, limit: 50 }) {
+      FavoriteChannels(sort: [{ createdAt: DESC }], limit: 50) {
         uniqueName
         displayName
         description
         channelIconURL
         createdAt
-        Admins(options: { limit: 1 }) {
+        Admins(limit: 1) {
           username
           displayName
           profilePicURL

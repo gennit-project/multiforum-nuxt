@@ -52,7 +52,7 @@ const props = defineProps({
 
 const GET_USER_FAVORITE_DISCUSSION = gql`
   query getUserFavoriteDiscussion($username: String!, $discussionId: ID!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       FavoriteDiscussions(where: { id: { eq: $discussionId } }) {
         id

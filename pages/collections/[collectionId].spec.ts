@@ -43,7 +43,12 @@ describe('public collection detail page', () => {
     const wrapper = await mountWith({
       result: {
         collections: [
-          { id: 'col-1', name: 'Cat GIFs', Downloads: [], DownloadsAggregate: { count: 0 } },
+          {
+            id: 'col-1',
+            name: 'Cat GIFs',
+            Downloads: [],
+            DownloadsConnection: { aggregate: { count: { nodes: 0 } } },
+          },
         ],
       },
     });

@@ -16,9 +16,9 @@ useHead({
 
 const GET_USER_FAVORITE_IMAGES = gql`
   query getUserFavoriteImages($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
-      FavoriteImages(options: { sort: { createdAt: DESC } }) {
+      FavoriteImages(sort: [{ createdAt: DESC }]) {
         id
         url
         alt

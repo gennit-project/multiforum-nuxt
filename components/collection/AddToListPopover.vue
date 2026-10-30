@@ -237,7 +237,6 @@ const handleCreateNewCollection = async () => {
       collectionType,
       visibility: newCollectionVisibility.value,
       updatedAt: now,
-      username: usernameVar.value,
     });
 
     if (result?.data?.createCollections?.collections?.[0]) {
