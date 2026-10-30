@@ -314,8 +314,10 @@ describe('library collection detail page', () => {
 
     expect(mutationMocks.update).toHaveBeenCalledWith({
       collectionId: 'col-1',
-      name: 'New Name',
-      description: 'Fresh description',
+      update: {
+        name: { set: 'New Name' },
+        description: { set: 'Fresh description' },
+      },
     });
   });
 
@@ -336,7 +338,7 @@ describe('library collection detail page', () => {
 
     expect(mutationMocks.update).toHaveBeenCalledWith({
       collectionId: 'col-1',
-      visibility: 'PRIVATE',
+      update: { visibility: { set: 'PRIVATE' } },
     });
     expect(refetchCollection).toHaveBeenCalled();
   });
