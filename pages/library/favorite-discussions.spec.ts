@@ -68,7 +68,10 @@ describe('favorite discussions page', () => {
         id: 'd1',
         title: 'My favorite post',
         DiscussionChannels: [
-          { channelUniqueName: 'cats', CommentsAggregate: { count: 0 } },
+          {
+            channelUniqueName: 'cats',
+            CommentsConnection: { aggregate: { count: { nodes: 0 } } },
+          },
         ],
         Tags: [],
         Album: null,

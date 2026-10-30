@@ -446,7 +446,7 @@ export const GET_CHANNEL_REPORTS = gql`
   query getChannelReports($isOpen: Boolean) {
     issues(
       where: {
-        channelUniqueName: null
+        channelUniqueName: { eq: null }
         NOT: { relatedChannelUniqueName: { eq: null } }
         isOpen: { eq: $isOpen }
       }
@@ -544,7 +544,12 @@ export const GET_SERVER_ISSUE = gql`
     $activityFeedLimit: Int
     $activityFeedOffset: Int
   ) {
-    issues(where: { channelUniqueName: null, issueNumber: { eq: $issueNumber } }) {
+    issues(
+      where: {
+        channelUniqueName: { eq: null }
+        issueNumber: { eq: $issueNumber }
+      }
+    ) {
       ...IssueBaseFields
       ActivityFeed(
         sort: { createdAt: DESC }

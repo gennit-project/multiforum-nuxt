@@ -47,7 +47,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       conditions.push({
         EventChannels_SOME: {
           NOT: {
-            channelUniqueName: null,
+            channelUniqueName: { eq: null },
           },
           archived: { eq: false },
         },
@@ -56,7 +56,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       conditions.push({
         EventChannels_SOME: {
           NOT: {
-            channelUniqueName: null,
+            channelUniqueName: { eq: null },
           },
         },
       });
@@ -82,7 +82,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
   }
 
   if (hasVirtualEventUrl) {
-    conditions.push({ NOT: { virtualEventUrl: null } });
+    conditions.push({ NOT: { virtualEventUrl: { eq: null } } });
   }
 
   // Text search filter
@@ -102,14 +102,14 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
   switch (locationFilter) {
     case LocationFilterTypes.NONE:
       if (showMap) {
-        conditions.push({ NOT: { location: null } });
+        conditions.push({ NOT: { location: { eq: null } } });
       }
       break;
     case LocationFilterTypes.ONLY_WITH_ADDRESS:
       // Filter by events that have a location
       // with coordinates
 
-      conditions.push({ NOT: { locationName: null } });
+      conditions.push({ NOT: { locationName: { eq: null } } });
       break;
 
     case LocationFilterTypes.ONLY_VIRTUAL:
@@ -119,7 +119,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
         // to show only virtual events, only include
         // events with both a physical location
         // and a virtual event url
-        conditions.push({ location: null });
+        conditions.push({ location: { eq: null } });
       }
       break;
 
@@ -140,14 +140,14 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       // if the radius is 0, that means any distance.
       // just add the location filter.
       else if (radius === 0) {
-        conditions.push({ NOT: { locationName: null } });
+        conditions.push({ NOT: { locationName: { eq: null } } });
       }
   }
 
   if (onlineOnly) {
     conditions.push({
       NOT: {
-        virtualEventUrl: null,
+        virtualEventUrl: { eq: null },
       },
     });
   }

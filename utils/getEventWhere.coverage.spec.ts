@@ -52,9 +52,7 @@ const hasCondition = (
   match: Record<string, unknown>
 ) =>
   conditions(where).some((c) =>
-    expect
-      .objectContaining(match)
-      .asymmetricMatch?.(c)
+    expect.objectContaining(match).asymmetricMatch?.(c)
   );
 
 describe('getEventWhere (structural coverage)', () => {
@@ -74,7 +72,9 @@ describe('getEventWhere (structural coverage)', () => {
 
     it('drops the archived constraint when showArchived is set (sitewide)', () => {
       const where = build({ filterValues: { showArchived: true } });
-      const channelCond = conditions(where).find((c) => 'EventChannels_SOME' in c);
+      const channelCond = conditions(where).find(
+        (c) => 'EventChannels_SOME' in c
+      );
       expect(channelCond?.EventChannels_SOME).not.toHaveProperty('archived');
     });
 
@@ -93,7 +93,10 @@ describe('getEventWhere (structural coverage)', () => {
     });
 
     it('includes archived channel events when showArchived is set with a channelId', () => {
-      const where = build({ channelId: 'cats', filterValues: { showArchived: true } });
+      const where = build({
+        channelId: 'cats',
+        filterValues: { showArchived: true },
+      });
       expect(where.AND).toEqual(
         expect.arrayContaining([
           expect.objectContaining({
@@ -121,7 +124,11 @@ describe('getEventWhere (structural coverage)', () => {
 
   describe('boolean filters', () => {
     it('adds a free filter when free is true', () => {
-      expect(hasCondition(build({ filterValues: { free: true } }), { free: { eq: true } })).toBe(true);
+      expect(
+        hasCondition(build({ filterValues: { free: true } }), {
+          free: { eq: true },
+        })
+      ).toBe(true);
     });
 
     it('omits the free filter when free is false', () => {
@@ -140,14 +147,16 @@ describe('getEventWhere (structural coverage)', () => {
     it('filters for virtual events when hasVirtualEventUrl is set', () => {
       expect(
         hasCondition(build({ filterValues: { hasVirtualEventUrl: true } }), {
-          NOT: { virtualEventUrl: null },
+          NOT: { virtualEventUrl: { eq: null } },
         })
       ).toBe(true);
     });
 
     it('filters for online events when onlineOnly is set', () => {
       expect(
-        hasCondition(build({ onlineOnly: true }), { NOT: { virtualEventUrl: null } })
+        hasCondition(build({ onlineOnly: true }), {
+          NOT: { virtualEventUrl: { eq: null } },
+        })
       ).toBe(true);
     });
   });
@@ -171,15 +180,21 @@ describe('getEventWhere (structural coverage)', () => {
   describe('location filters', () => {
     it('requires a location on the map for NONE + showMap', () => {
       expect(
-        hasCondition(build({ showMap: true }), { NOT: { location: null } })
+        hasCondition(build({ showMap: true }), {
+          NOT: { location: { eq: null } },
+        })
       ).toBe(true);
     });
 
     it('requires a location name for ONLY_WITH_ADDRESS', () => {
       expect(
         hasCondition(
-          build({ filterValues: { locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS } }),
-          { NOT: { locationName: null } }
+          build({
+            filterValues: {
+              locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS,
+            },
+          }),
+          { NOT: { locationName: { eq: null } } }
         )
       ).toBe(true);
     });
@@ -191,7 +206,7 @@ describe('getEventWhere (structural coverage)', () => {
             showMap: true,
             filterValues: { locationFilter: LocationFilterTypes.ONLY_VIRTUAL },
           }),
-          { location: null }
+          { location: { eq: null } }
         )
       ).toBe(true);
     });
@@ -223,7 +238,7 @@ describe('getEventWhere (structural coverage)', () => {
               radius: 0,
             },
           }),
-          { NOT: { locationName: null } }
+          { NOT: { locationName: { eq: null } } }
         )
       ).toBe(true);
     });
@@ -256,8 +271,10 @@ describe('getEventWhere (structural coverage)', () => {
 
     it('defaults to a now..+2y range for NONE', () => {
       const where = build();
-      const gt = conditions(where).find((c) => 'endTime_GT' in c)?.endTime_GT as string;
-      const lt = conditions(where).find((c) => 'endTime_LT' in c)?.endTime_LT as string;
+      const gt = conditions(where).find((c) => 'endTime_GT' in c)
+        ?.endTime_GT as string;
+      const lt = conditions(where).find((c) => 'endTime_LT' in c)
+        ?.endTime_LT as string;
       expect(new Date(lt).getTime() - new Date(gt).getTime()).toBeGreaterThan(
         // ~2 years in ms, minus a margin
         1.9 * 365 * 24 * 60 * 60 * 1000

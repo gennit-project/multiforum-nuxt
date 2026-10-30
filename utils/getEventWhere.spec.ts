@@ -70,7 +70,7 @@ describe('getEventWhere', () => {
     expect(where.AND?.[0]).toEqual({
       EventChannels_SOME: {
         NOT: {
-          channelUniqueName: null,
+          channelUniqueName: { eq: null },
         },
         archived: { eq: false },
       },
@@ -85,7 +85,7 @@ describe('getEventWhere', () => {
     expect(where.AND?.[0]).toEqual({
       EventChannels_SOME: {
         NOT: {
-          channelUniqueName: null,
+          channelUniqueName: { eq: null },
         },
       },
     });
@@ -191,9 +191,9 @@ describe('getEventWhere', () => {
     expect(
       findCondition(
         where,
-        (condition) => condition.NOT?.locationName === null
+        (condition) => condition.NOT?.locationName?.eq === null
       )
-    ).toEqual({ NOT: { locationName: null } });
+    ).toEqual({ NOT: { locationName: { eq: null } } });
   });
 
   it('requires virtual event URLs for online-only lists', async () => {
@@ -204,9 +204,9 @@ describe('getEventWhere', () => {
     expect(
       findCondition(
         where,
-        (condition) => condition.NOT?.virtualEventUrl === null
+        (condition) => condition.NOT?.virtualEventUrl?.eq === null
       )
-    ).toEqual({ NOT: { virtualEventUrl: null } });
+    ).toEqual({ NOT: { virtualEventUrl: { eq: null } } });
   });
 
   it('requires virtual event URLs when hasVirtualEventUrl is selected', async () => {
@@ -217,9 +217,9 @@ describe('getEventWhere', () => {
     expect(
       findCondition(
         where,
-        (condition) => condition.NOT?.virtualEventUrl === null
+        (condition) => condition.NOT?.virtualEventUrl?.eq === null
       )
-    ).toEqual({ NOT: { virtualEventUrl: null } });
+    ).toEqual({ NOT: { virtualEventUrl: { eq: null } } });
   });
 
   it('requires physical event locations for in-person filters', async () => {
@@ -230,9 +230,9 @@ describe('getEventWhere', () => {
     expect(
       findCondition(
         where,
-        (condition) => condition.NOT?.locationName === null
+        (condition) => condition.NOT?.locationName?.eq === null
       )
-    ).toEqual({ NOT: { locationName: null } });
+    ).toEqual({ NOT: { locationName: { eq: null } } });
   });
 
   it('requires mappable events when the map is shown without a location filter', async () => {
@@ -242,8 +242,8 @@ describe('getEventWhere', () => {
     });
 
     expect(
-      findCondition(where, (condition) => condition.NOT?.location === null)
-    ).toEqual({ NOT: { location: null } });
+      findCondition(where, (condition) => condition.NOT?.location?.eq === null)
+    ).toEqual({ NOT: { location: { eq: null } } });
   });
 
   it('keeps only non-mappable virtual events when virtual filtering is used on the map', async () => {
@@ -253,8 +253,8 @@ describe('getEventWhere', () => {
     });
 
     expect(
-      findCondition(where, (condition) => condition.location === null)
-    ).toEqual({ location: null });
+      findCondition(where, (condition) => condition.location?.eq === null)
+    ).toEqual({ location: { eq: null } });
   });
 
   it('adds a free event filter when free is selected', async () => {
