@@ -34,7 +34,7 @@ const props = defineProps({
 
 const GET_USER_FAVORITE_IMAGE = gql`
   query getUserFavoriteImage($username: String!, $imageId: ID!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       FavoriteImages(where: { id: { eq: $imageId } }) {
         id

@@ -23,9 +23,9 @@ useHead({
 
 const GET_USER_FAVORITE_COMMENTS = gql`
   query getUserFavoriteComments($username: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
-      FavoriteComments(options: { sort: { createdAt: DESC } }) {
+      FavoriteComments(sort: [{ createdAt: DESC }]) {
         id
         text
         createdAt

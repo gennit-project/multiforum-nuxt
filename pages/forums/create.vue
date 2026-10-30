@@ -132,8 +132,8 @@ const {
                 description
                 channelIconURL
                 channelBannerURL
-                Admins
-                Tags
+                Admins { username }
+                Tags { text }
               }
             `,
           });

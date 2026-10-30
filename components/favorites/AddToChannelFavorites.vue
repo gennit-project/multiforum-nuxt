@@ -39,7 +39,7 @@ const props = defineProps({
 
 const GET_USER_FAVORITES = gql`
   query getUserFavorites($username: String!, $channelUniqueName: String!) {
-    users(where: { username: $username }) {
+    users(where: { username: { eq: $username } }) {
       username
       FavoriteChannels(where: { uniqueName: { eq: $channelUniqueName } }) {
         uniqueName

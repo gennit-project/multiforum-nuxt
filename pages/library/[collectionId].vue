@@ -284,8 +284,10 @@ const handleRename = async () => {
   try {
     await updateCollection({
       collectionId: collectionId.value,
-      name: newCollectionName.value.trim(),
-      description: newCollectionDescription.value.trim(),
+      update: {
+        name: { set: newCollectionName.value.trim() },
+        description: { set: newCollectionDescription.value.trim() },
+      },
     });
 
     showRenameModal.value = false;
@@ -305,7 +307,7 @@ const handleToggleVisibility = async () => {
   try {
     await updateCollection({
       collectionId: collectionId.value,
-      visibility: nextVisibility,
+      update: { visibility: { set: nextVisibility } },
     });
     await refetchCollection();
   } catch (err: unknown) {

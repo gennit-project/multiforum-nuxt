@@ -216,14 +216,14 @@ const {
                 displayName
               }
             }
-            ChildCommentsAggregate {
-              count
+            ChildCommentsConnection {
+              aggregate { count { nodes } }
             }
             UpvotedByUsers {
               username
             }
-            UpvotedByUsersAggregate {
-              count
+            UpvotedByUsersConnection {
+              aggregate { count { nodes } }
             }
           }
         `,

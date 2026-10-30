@@ -7,7 +7,6 @@ export const CREATE_COLLECTION = gql`
     $collectionType: CollectionType!
     $visibility: CollectionVisibility!
     $updatedAt: DateTime!
-    $username: String!
   ) {
     createCollections(
       input: [
@@ -18,7 +17,6 @@ export const CREATE_COLLECTION = gql`
           visibility: $visibility
           itemOrder: []
           updatedAt: $updatedAt
-          CreatedBy: { connect: { where: { node: { username: $username } } } }
         }
       ]
     ) {
@@ -127,20 +125,8 @@ export const REMOVE_DOWNLOAD_FROM_COLLECTION = gql`
 `;
 
 export const UPDATE_COLLECTION = gql`
-  mutation UpdateCollection(
-    $collectionId: ID!
-    $name: String
-    $description: String
-    $visibility: CollectionVisibility
-  ) {
-    updateCollections(
-      where: { id: $collectionId }
-      update: {
-        name: $name
-        description: $description
-        visibility: $visibility
-      }
-    ) {
+  mutation UpdateCollection($collectionId: ID!, $update: CollectionUpdateInput!) {
+    updateCollections(where: { id: { eq: $collectionId } }, update: $update) {
       collections {
         id
         name
@@ -154,7 +140,7 @@ export const UPDATE_COLLECTION = gql`
 
 export const DELETE_COLLECTION = gql`
   mutation DeleteCollection($collectionId: ID!) {
-    deleteCollections(where: { id: $collectionId }) {
+    deleteCollections(where: { id: { eq: $collectionId } }) {
       nodesDeleted
     }
   }

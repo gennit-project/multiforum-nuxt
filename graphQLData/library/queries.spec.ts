@@ -83,7 +83,7 @@ describe('GET_UNIFIED_LIBRARY_FAVORITES', () => {
       query.indexOf('FavoriteImages'),
       query.indexOf('FavoriteComments')
     );
-    expect(favoriteImagesSelection).toMatch(/\bAlbums\(options:/);
+    expect(favoriteImagesSelection).toMatch(/\bAlbums\(limit: 1\)/);
   });
 
   it('writes nested discussions to the configured Apollo cache', () => {

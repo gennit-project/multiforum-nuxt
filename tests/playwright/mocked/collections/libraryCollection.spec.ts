@@ -78,7 +78,14 @@ const getBaseMocks = (
     },
   }),
   getUserOwnedDownloadsCount: () => ({
-    data: { users: [{ username, OwnedDownloadsConnection: { aggregate: { count: { nodes: 0 } } } }] },
+    data: {
+      users: [
+        {
+          username,
+          OwnedDownloadsConnection: { aggregate: { count: { nodes: 0 } } },
+        },
+      ],
+    },
   }),
   getUploadedDownloadableFiles: () => ({
     data: { getUploadedDownloadableFiles: [] },
@@ -119,6 +126,79 @@ test.describe('Library collection detail', () => {
         contentType: 'application/json',
       });
     }
+  });
+
+  test('renames without sending a visibility change', async ({
+    context,
+    page,
+  }) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+    const diagnostics = await installGraphqlMocks(page, {
+      ...getBaseMocks(TEST_USER),
+      UpdateCollection: () => ({
+        data: { updateCollections: { collections: [buildCollectionItems()] } },
+      }),
+    });
+
+    await page.goto(`/library/${COLLECTION_ID}`);
+    await page.getByRole('button', { name: 'Collection actions' }).click();
+    await page.getByRole('menuitem', { name: 'Edit collection' }).click();
+    await page.getByLabel('Collection Name').fill('New name');
+    await page.getByLabel('Description (optional)').fill('New description');
+    await page.getByRole('button', { name: 'Save', exact: true }).click();
+    await waitForGraphqlOperation(
+      diagnostics.completedOperations,
+      'UpdateCollection'
+    );
+    expect(
+      diagnostics.seenOperations.find(
+        (op) => op.operationName === 'UpdateCollection'
+      )?.variables
+    ).toEqual({
+      collectionId: COLLECTION_ID,
+      update: {
+        name: { set: 'New name' },
+        description: { set: 'New description' },
+      },
+    });
+  });
+
+  test('changes visibility without sending a name or description', async ({
+    context,
+    page,
+  }) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+    const diagnostics = await installGraphqlMocks(page, {
+      ...getBaseMocks(TEST_USER),
+      UpdateCollection: () => ({
+        data: {
+          updateCollections: {
+            collections: [buildCollectionItems({ visibility: 'PUBLIC' })],
+          },
+        },
+      }),
+    });
+
+    await page.goto(`/library/${COLLECTION_ID}`);
+    await page.getByRole('button', { name: 'Make Public' }).click();
+    await waitForGraphqlOperation(
+      diagnostics.completedOperations,
+      'UpdateCollection'
+    );
+    expect(
+      diagnostics.seenOperations.find(
+        (op) => op.operationName === 'UpdateCollection'
+      )?.variables
+    ).toEqual({
+      collectionId: COLLECTION_ID,
+      update: { visibility: { set: 'PUBLIC' } },
+    });
   });
 
   test('reveals accessible item controls only in reorder mode', async ({
