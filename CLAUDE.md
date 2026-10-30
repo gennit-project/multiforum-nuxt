@@ -5,6 +5,8 @@
 
 ## Build & Run Commands
 
+- `pnpm run graphql:check` - Validate production GraphQL documents against the pinned schema and reviewed baseline
+- `pnpm run graphql:test` - Test GraphQL extraction, source locations, and baseline enforcement
 - `pnpm run schema:check` - Verify the pinned backend schema and report its source commit
 - `pnpm run schema:update /path/to/backend-artifact` - Update the schema pin; see [contract workflow](docs/graphql-contract-campaign.md)
 - `pnpm run compile` - Generate schema types offline from the pinned contract

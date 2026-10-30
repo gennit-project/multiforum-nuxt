@@ -154,6 +154,31 @@ describe('auth session middleware', () => {
     }).toEqual({ context: {}, profileRequests: 0, auth0Requests: 0 });
   });
 
+  it('loads an uncached Auth0 profile with the static self-profile query', async () => {
+    h.provider = 'auth0';
+    h.useAuth0.mockReturnValue({
+      getSession: vi
+        .fn()
+        .mockResolvedValue({ user: { email: 'admin@example.test' } }),
+      getAccessToken: vi.fn().mockResolvedValue({ accessToken: 'auth0-token' }),
+    });
+
+    await handler(createEvent('/forums/vue_devs') as never);
+
+    expect(h.fetch).toHaveBeenCalledWith(
+      'http://backend:4000/graphql',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          authorization: 'Bearer auth0-token',
+        }),
+        body: expect.objectContaining({
+          query: expect.stringContaining('query getOwnEmail'),
+          variables: { emailAddress: 'admin@example.test' },
+        }),
+      })
+    );
+  });
+
   it('logs provider and profile phases for slow authenticated SSR', async () => {
     h.provider = 'auth0';
     process.env.NUXT_AUTH_SLOW_REQUEST_MS = '0';
