@@ -93,7 +93,13 @@ const setData = (
     ],
   };
   h.owned.value = {
-    users: [{ OwnedDownloadsAggregate: { count: params.ownedDownloads || 0 } }],
+    users: [
+      {
+        OwnedDownloadsConnection: {
+          aggregate: { count: { nodes: params.ownedDownloads || 0 } },
+        },
+      },
+    ],
   };
   h.uploaded.value = {
     getUploadedDownloadableFiles: params.uploadedFiles

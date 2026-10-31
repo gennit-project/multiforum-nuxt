@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { GetUserFavoriteDiscussionsNoDownloadsDocument as GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS } from '@/__generated__/operations';
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { gql } from '@apollo/client/core';
 import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
@@ -13,122 +13,16 @@ import {
   getFavoriteDiscussionCommentCount,
   buildFavoriteAuthorInfo,
 } from '@/utils/favoriteDiscussionDisplay';
-import type {
-  Discussion,
-  DiscussionChannel,
-  User,
-  Tag,
-  Album,
-  Image,
-  Channel,
-} from '@/__generated__/graphql';
+import type { GetUserFavoriteDiscussionsNoDownloadsQuery } from '@/__generated__/operations';
 
 const usernameVar = useUsername();
 
-type FavoriteDiscussionChannel = Pick<
-  DiscussionChannel,
-  | 'id'
-  | 'channelUniqueName'
-  | 'archived'
-  | 'answered'
-  | 'locked'
-  | 'weightedVotesCount'
-> & {
-  Channel?: Pick<Channel, 'uniqueName' | 'displayName'> | null;
-  CommentsConnection?: { aggregate?: { count?: { nodes?: number } } };
-};
-
-type FavoriteDiscussion = Pick<
-  Discussion,
-  | 'id'
-  | 'title'
-  | 'body'
-  | 'createdAt'
-  | 'updatedAt'
-  | 'hasDownload'
-  | 'hasSensitiveContent'
-> & {
-  Author?: Pick<
-    User,
-    | 'username'
-    | 'displayName'
-    | 'profilePicURL'
-    | 'commentKarma'
-    | 'discussionKarma'
-    | 'createdAt'
-  > | null;
-  DiscussionChannels?: FavoriteDiscussionChannel[];
-  Tags?: Pick<Tag, 'text'>[];
-  Album?:
-    | (Pick<Album, 'id'> & {
-        Images?: Pick<Image, 'id' | 'url' | 'caption'>[];
-      })
-    | null;
-};
+type FavoriteDiscussion =
+  GetUserFavoriteDiscussionsNoDownloadsQuery['users'][number]['FavoriteDiscussions'][number];
 
 useHead({
   title: 'Favorite Discussions - Library',
 });
-
-const GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS = gql`
-  query getUserFavoriteDiscussionsNoDownloads($username: String!) {
-    users(where: { username: { eq: $username } }) {
-      username
-      FavoriteDiscussions(
-        where: {
-          OR: [{ hasDownload: { eq: false } }, { hasDownload: { eq: null } }]
-        }
-        sort: { createdAt: DESC }
-      ) {
-        id
-        title
-        body
-        createdAt
-        updatedAt
-        hasDownload
-        Author {
-          username
-          displayName
-          profilePicURL
-          commentKarma
-          discussionKarma
-          createdAt
-        }
-        DiscussionChannels {
-          id
-          channelUniqueName
-          archived
-          answered
-          locked
-          weightedVotesCount
-          Channel {
-            uniqueName
-            displayName
-          }
-          CommentsConnection {
-            aggregate {
-              count {
-                nodes
-              }
-            }
-          }
-        }
-        Tags {
-          text
-        }
-        Album {
-          id
-          Images {
-            id
-            url
-            caption
-          }
-        }
-        hasSensitiveContent
-      }
-    }
-  }
-`;
 
 const { result, loading, error } = useQuery(
   GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS,

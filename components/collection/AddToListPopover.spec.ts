@@ -55,7 +55,12 @@ vi.mock('@/composables/usePopoverPositioning', () => ({
 
 const mountPopover = (props: Record<string, unknown> = {}) =>
   mount(AddToListPopover, {
-    props: { itemId: 'item-1', itemType: 'discussion', isVisible: true, ...props },
+    props: {
+      itemId: 'item-1',
+      itemType: 'discussion',
+      isVisible: true,
+      ...props,
+    },
     global: { stubs: { Teleport: { template: '<div><slot /></div>' } } },
   });
 
@@ -258,14 +263,14 @@ describe('AddToListPopover list rendering', () => {
 });
 
 describe('AddToListPopover favorites toggle', () => {
-  it('adds a discussion to favorites with a discussionId param', async () => {
+  it('passes the favorite item ID to the typed mutation dispatcher', async () => {
     const wrapper = mountPopover();
 
     await rows(wrapper)[0].trigger('click');
     await flushPromises();
 
     expect(h.addFav).toHaveBeenCalledWith({
-      discussionId: 'item-1',
+      itemId: 'item-1',
       username: 'alice',
     });
   });
@@ -335,19 +340,19 @@ describe('AddToListPopover favorites toggle', () => {
     await flushPromises();
 
     expect(h.addFav).toHaveBeenCalledWith({
-      channel: 'item-1',
+      itemId: 'item-1',
       username: 'alice',
     });
   });
 
-  it('uses a discussionId param for download favorites', async () => {
+  it('passes download favorite IDs to the typed mutation dispatcher', async () => {
     const wrapper = mountPopover({ itemType: 'download' });
 
     await rows(wrapper)[0].trigger('click');
     await flushPromises();
 
     expect(h.addFav).toHaveBeenCalledWith({
-      discussionId: 'item-1',
+      itemId: 'item-1',
       username: 'alice',
     });
   });
@@ -458,15 +463,21 @@ describe('AddToListPopover collection creation', () => {
   it('lets the user explicitly create a public collection', async () => {
     (h.createCollection as ReturnType<typeof vi.fn>).mockResolvedValue({
       data: {
-        createCollections: { collections: [{ id: 'new1', name: 'Shared List' }] },
+        createCollections: {
+          collections: [{ id: 'new1', name: 'Shared List' }],
+        },
       },
     });
 
     const wrapper = mountPopover();
 
     await clickNewListButton(wrapper);
-    await wrapper.get('input[aria-label="New list name"]').setValue('Shared List');
-    await wrapper.get('select[aria-label="New list visibility"]').setValue('PUBLIC');
+    await wrapper
+      .get('input[aria-label="New list name"]')
+      .setValue('Shared List');
+    await wrapper
+      .get('select[aria-label="New list visibility"]')
+      .setValue('PUBLIC');
     await wrapper.get('button[class*="bg-blue-600"]').trigger('click');
     await flushPromises();
 
@@ -488,9 +499,15 @@ describe('AddToListPopover create new collection', () => {
     });
     const wrapper = mountPopover();
 
-    await wrapper.findAll('button').find((b) => b.text().includes('New List'))!.trigger('click');
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('New List'))!
+      .trigger('click');
     await wrapper.get('input[aria-label="New list name"]').setValue('New List');
-    await wrapper.findAll('button').find((b) => b.text() === 'Create')!.trigger('click');
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Create')!
+      .trigger('click');
     await flushPromises();
 
     expect(h.addMutation).toHaveBeenCalledWith({
@@ -509,7 +526,10 @@ describe('AddToListPopover create new collection', () => {
 
     await clickNewListButton(wrapper);
     await wrapper.get('input[aria-label="New list name"]').setValue('New List');
-    await wrapper.findAll('button').find((b) => b.text() === 'Create')!.trigger('click');
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Create')!
+      .trigger('click');
     await flushPromises();
 
     expect(h.refetchCollections).toHaveBeenCalledTimes(1);
@@ -524,7 +544,10 @@ describe('AddToListPopover create new collection', () => {
 
     await clickNewListButton(wrapper);
     await wrapper.get('input[aria-label="New list name"]').setValue('New List');
-    await wrapper.findAll('button').find((b) => b.text() === 'Create')!.trigger('click');
+    await wrapper
+      .findAll('button')
+      .find((b) => b.text() === 'Create')!
+      .trigger('click');
     await flushPromises();
 
     expect(h.showToast).toHaveBeenCalledWith(

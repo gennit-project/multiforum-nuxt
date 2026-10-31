@@ -18,6 +18,7 @@ const handleClose = () => {
 <template>
   <AddToListPopover
     v-if="isVisible"
+    :key="`${modalStore.itemType}:${modalStore.itemId}`"
     :item-id="modalStore.itemId"
     :item-type="modalStore.itemType"
     :is-visible="isVisible"

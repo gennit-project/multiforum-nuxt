@@ -433,61 +433,6 @@
       ],
       "fragments": []
     },
-    "components/favorites/AddImageToFavorites.vue#GET_USER_FAVORITE_IMAGE": {
-      "operations": [
-        {
-          "name": "getUserFavoriteImage",
-          "document": "GetUserFavoriteImageDocument",
-          "result": "GetUserFavoriteImageQuery",
-          "variables": "GetUserFavoriteImageQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "components/favorites/AddToChannelFavorites.vue#GET_USER_FAVORITES": {
-      "operations": [
-        {
-          "name": "getUserFavorites",
-          "document": "GetUserFavoritesDocument",
-          "result": "GetUserFavoritesQuery",
-          "variables": "GetUserFavoritesQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "components/favorites/AddToCommentFavorites.vue#GET_USER_FAVORITE_COMMENT": {
-      "operations": [
-        {
-          "name": "getUserFavoriteComment",
-          "document": "GetUserFavoriteCommentDocument",
-          "result": "GetUserFavoriteCommentQuery",
-          "variables": "GetUserFavoriteCommentQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "components/favorites/AddToDiscussionFavorites.vue#GET_USER_FAVORITE_DISCUSSION": {
-      "operations": [
-        {
-          "name": "getUserFavoriteDiscussion",
-          "document": "GetUserFavoriteDiscussionDocument",
-          "result": "GetUserFavoriteDiscussionQuery",
-          "variables": "GetUserFavoriteDiscussionQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "components/favorites/AddToImageFavorites.vue#GET_USER_FAVORITE_IMAGE": {
-      "operations": [
-        {
-          "name": "getUserFavoriteImage",
-          "document": "GetUserFavoriteImageDocument",
-          "result": "GetUserFavoriteImageQuery",
-          "variables": "GetUserFavoriteImageQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
     "composables/useBestAnswerMutations.ts#UPDATED_ANSWERS_FRAGMENT": {
       "operations": [],
       "fragments": [
@@ -4668,50 +4613,6 @@
           "variables": "unknown"
         }
       ]
-    },
-    "pages/library/favorite-comments.vue#GET_USER_FAVORITE_COMMENTS": {
-      "operations": [
-        {
-          "name": "getUserFavoriteComments",
-          "document": "GetUserFavoriteCommentsDocument",
-          "result": "GetUserFavoriteCommentsQuery",
-          "variables": "GetUserFavoriteCommentsQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "pages/library/favorite-discussions.vue#GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS": {
-      "operations": [
-        {
-          "name": "getUserFavoriteDiscussionsNoDownloads",
-          "document": "GetUserFavoriteDiscussionsNoDownloadsDocument",
-          "result": "GetUserFavoriteDiscussionsNoDownloadsQuery",
-          "variables": "GetUserFavoriteDiscussionsNoDownloadsQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "pages/library/favorite-downloads.vue#GET_USER_FAVORITE_DOWNLOADS": {
-      "operations": [
-        {
-          "name": "getUserFavoriteDownloads",
-          "document": "GetUserFavoriteDownloadsDocument",
-          "result": "GetUserFavoriteDownloadsQuery",
-          "variables": "GetUserFavoriteDownloadsQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "pages/library/favorite-images.vue#GET_USER_FAVORITE_IMAGES": {
-      "operations": [
-        {
-          "name": "getUserFavoriteImages",
-          "document": "GetUserFavoriteImagesDocument",
-          "result": "GetUserFavoriteImagesQuery",
-          "variables": "GetUserFavoriteImagesQueryVariables"
-        }
-      ],
-      "fragments": []
     },
     "utils/index.ts#inline:NewTag": {
       "operations": [],

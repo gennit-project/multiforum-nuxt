@@ -74,6 +74,9 @@ export function shareDocumentNodes(content) {
   const declarations = [];
   const render = (value) => {
     if (!value || typeof value !== 'object') return JSON.stringify(value);
+    // A shared bare [] has no contextual element type and triggers implicit-any
+    // diagnostics. Keep empty lists inside their typed AST object expressions.
+    if (Array.isArray(value) && value.length === 0) return '[]';
     const key = JSON.stringify(value);
     if (shared.has(key)) return shared.get(key);
     const expression = Array.isArray(value)

@@ -1,21 +1,22 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
+import type { GetPublicCollectionByIdQuery } from '@/__generated__/operations';
 import AppImage from '@/components/image/AppImage.vue';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
 import { relativeTime } from '@/utils';
+type Discussion =
+  GetPublicCollectionByIdQuery['collections'][number]['Downloads'][number];
 
 const props = defineProps({
   discussion: {
-    type: Object as PropType<Partial<Discussion>>,
+    type: Object as PropType<Discussion>,
     required: true,
   },
 });
 
-const primaryChannel = computed<DiscussionChannel | null>(() => {
-  return (props.discussion?.DiscussionChannels ||
-    [])[0] as DiscussionChannel | null;
+const primaryChannel = computed(() => {
+  return (props.discussion?.DiscussionChannels || [])[0] || null;
 });
 
 const linkTarget = computed(() => {
@@ -43,12 +44,13 @@ const firstImage = computed(() => {
   return album.Images[0] || null;
 });
 
-const firstImageUrl = computed(() =>
-  getPreferredImageUrl({
-    source: firstImage.value,
-    preferred: ['list320', 'list160'],
-    originalUrl: firstImage.value?.url,
-  }) || ''
+const firstImageUrl = computed(
+  () =>
+    getPreferredImageUrl({
+      source: firstImage.value,
+      preferred: ['list320', 'list160'],
+      originalUrl: firstImage.value?.url,
+    }) || ''
 );
 
 const createdAgo = computed(() => {

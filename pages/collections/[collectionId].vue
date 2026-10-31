@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed } from 'vue';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import type { Discussion } from '@/__generated__/graphql';
-import { GET_PUBLIC_COLLECTION_BY_ID } from '@/graphQLData/collection/queries';
+import type { GetPublicCollectionByIdQuery } from '@/__generated__/operations';
+import { GetPublicCollectionByIdDocument as GET_PUBLIC_COLLECTION_BY_ID } from '@/__generated__/operations';
 import { mergeUniqueById } from '@/utils/mergeUniqueById';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import CollectionDownloadListItem from '@/components/collection/CollectionDownloadListItem.vue';
+type Discussion =
+  GetPublicCollectionByIdQuery['collections'][number]['Downloads'][number];
 
 const route = useRoute();
 
@@ -18,60 +20,75 @@ const collectionId = computed(() => {
 });
 
 const DOWNLOAD_LIMIT = 20;
-const downloads = ref<Discussion[]>([]);
-const totalDownloads = ref<number>(0);
-const downloadOffset = ref(0);
 
-const { result, loading, error, refetch } = useQuery(
+const { result, loading, error, fetchMore } = useQuery(
   GET_PUBLIC_COLLECTION_BY_ID,
-  {
-    collectionId: collectionId,
+  () => ({
+    collectionId: collectionId.value,
     downloadLimit: DOWNLOAD_LIMIT,
-    downloadOffset: downloadOffset,
-  },
+    downloadOffset: 0,
+  }),
   {
     fetchPolicy: 'cache-first',
     enabled: computed(() => !!collectionId.value),
   }
 );
 
-const collection = computed(() => result.value?.collections?.[0] || null);
+const collection = computed(
+  () =>
+    result.value?.collections?.find((item) => item.id === collectionId.value) ||
+    null
+);
 
 useHead({
   title: computed(() => collection.value?.name || 'Collection'),
 });
 
-watch(
-  () => result.value,
-  (val) => {
-    const collectionData = val?.collections?.[0];
-    if (!collectionData) return;
-
-    totalDownloads.value = collectionData.DownloadsConnection?.aggregate?.count?.nodes || 0;
-
-    downloads.value = mergeUniqueById<Discussion>(
-      downloads.value,
-      collectionData.Downloads
-    );
-  },
-  { immediate: true }
+const downloads = computed<Discussion[]>(
+  () => collection.value?.Downloads || []
+);
+const totalDownloads = computed(
+  () => collection.value?.DownloadsConnection?.aggregate?.count?.nodes || 0
 );
 
 const hasMoreDownloads = computed(
   () => downloads.value.length < (totalDownloads.value || 0)
 );
 
-const loadingMore = ref(false);
+const loadingMore = computed(() => loading.value);
 
-const loadMore = async () => {
+const loadMore = () => {
   if (!hasMoreDownloads.value || loadingMore.value) return;
-  loadingMore.value = true;
-  downloadOffset.value = downloads.value.length;
-  try {
-    await refetch?.();
-  } finally {
-    loadingMore.value = false;
-  }
+  const id = collectionId.value;
+  return fetchMore({
+    variables: {
+      collectionId: id,
+      downloadLimit: DOWNLOAD_LIMIT,
+      downloadOffset: downloads.value.length,
+    },
+    updateQuery: (previous, { fetchMoreResult }) => {
+      const oldCollection = previous.collections.find((item) => item.id === id);
+      const nextCollection = fetchMoreResult?.collections.find(
+        (item) => item.id === id
+      );
+      if (id !== collectionId.value || !oldCollection || !nextCollection)
+        return previous;
+      return {
+        ...previous,
+        collections: previous.collections.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                Downloads: mergeUniqueById(
+                  item.Downloads,
+                  nextCollection.Downloads
+                ),
+              }
+            : item
+        ),
+      };
+    },
+  });
 };
 </script>
 

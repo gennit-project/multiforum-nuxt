@@ -65,7 +65,10 @@ describe('SearchableForumList — favorites, collections, featured', () => {
         createQueryMock({
           users: [
             {
-              FavoriteChannels: [makeChannel('favforum'), makeChannel('otherfav')],
+              FavoriteChannels: [
+                makeChannel('favforum'),
+                makeChannel('otherfav'),
+              ],
             },
           ],
         })
@@ -142,12 +145,19 @@ describe('SearchableForumList — collections, expansion, query states', () => {
   const setup = (opts: {
     channels?: ReturnType<typeof makeChannel>[];
     favorites?: ReturnType<typeof makeChannel>[];
-    collections?: Array<{ id: string; name: string; Channels: ReturnType<typeof makeChannel>[] }>;
+    collections?: Array<{
+      id: string;
+      name: string;
+      Channels: ReturnType<typeof makeChannel>[];
+    }>;
     channelOverrides?: Record<string, unknown>;
   }) => {
     asMock(useQuery)
       .mockReturnValueOnce(
-        createQueryMock({ channels: opts.channels ?? [] }, opts.channelOverrides)
+        createQueryMock(
+          { channels: opts.channels ?? [] },
+          opts.channelOverrides
+        )
       )
       .mockReturnValueOnce(
         createQueryMock({ users: [{ FavoriteChannels: opts.favorites ?? [] }] })
@@ -201,7 +211,9 @@ describe('SearchableForumList — collections, expansion, query states', () => {
   it('toggles selection for all channels in a collection', async () => {
     setup({ collections: [collectionWithChannels(['ca', 'cb'])] });
     const wrapper = mountList();
-    const checkbox = wrapper.get('input[aria-label="Select all forums in Big Collection"]');
+    const checkbox = wrapper.get(
+      'input[aria-label="Select all forums in Big Collection"]'
+    );
     await checkbox.trigger('click');
 
     expect(wrapper.emitted('toggleSelection')).toBeTruthy();
@@ -220,9 +232,13 @@ describe('SearchableForumList — collections, expansion, query states', () => {
   it('expands and collapses a collection with more than three channels', async () => {
     setup({ collections: [collectionWithChannels(['ca', 'cb', 'cc', 'cd'])] });
     const wrapper = mountList();
-    const showMore = wrapper.findAll('button').find((b) => b.text().includes('show more'))!;
+    const showMore = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('show more'))!;
     await showMore.trigger('click');
-    const showLess = wrapper.findAll('button').find((b) => b.text().includes('show less'))!;
+    const showLess = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('show less'))!;
     await showLess.trigger('click');
 
     expect(
@@ -232,10 +248,17 @@ describe('SearchableForumList — collections, expansion, query states', () => {
 
   it('expands the favorites preview when there are more than three', async () => {
     setup({
-      favorites: [makeChannel('f1'), makeChannel('f2'), makeChannel('f3'), makeChannel('f4')],
+      favorites: [
+        makeChannel('f1'),
+        makeChannel('f2'),
+        makeChannel('f3'),
+        makeChannel('f4'),
+      ],
     });
     const wrapper = mountList();
-    const showAll = wrapper.findAll('button').find((b) => b.text().includes('show all'))!;
+    const showAll = wrapper
+      .findAll('button')
+      .find((b) => b.text().includes('show all'))!;
     await showAll.trigger('click');
 
     expect(
@@ -248,8 +271,26 @@ describe('SearchableForumList — collections, expansion, query states', () => {
     const wrapper = mountList();
     await wrapper.setProps({ selectedChannels: ['cats'] });
 
-    expect(wrapper.findComponent(SearchableForumListItem).props('selected')).toContain(
-      'cats'
-    );
+    expect(
+      wrapper.findComponent(SearchableForumListItem).props('selected')
+    ).toContain('cats');
+  });
+});
+
+describe('typed forum search variables', () => {
+  it('passes a reactive scalar search pattern instead of an embedded ref', async () => {
+    vi.clearAllMocks();
+    setupQueries([]);
+    const wrapper = mountWithDefaults(SearchableForumList, {
+      global: { stubs: { SearchBar: true } },
+    });
+    wrapper
+      .findComponent({ name: 'SearchBar' })
+      .vm.$emit('update-search-input', 'cats');
+    await wrapper.vm.$nextTick();
+    const variables = asMock(useQuery).mock.calls[0]![1];
+    expect(variables()).toEqual({
+      channelWhere: { uniqueName_MATCHES: '(?i).*cats.*' },
+    });
   });
 });

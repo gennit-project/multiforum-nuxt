@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, defineAsyncComponent } from 'vue';
+import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { useHead } from 'nuxt/app';
@@ -17,21 +17,21 @@ import LockOpenIcon from '@/components/icons/LockOpenIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
 import {
-  GET_COLLECTION_ITEMS,
-  GET_ALL_USER_COLLECTIONS,
-} from '@/graphQLData/collection/queries';
-import {
-  UPDATE_COLLECTION,
-  DELETE_COLLECTION,
-  REORDER_COLLECTION_ITEM,
-  SHARE_COLLECTION_AS_DISCUSSION,
-} from '@/graphQLData/collection/mutations';
+  GetCollectionItemsDocument as GET_COLLECTION_ITEMS,
+  GetAllUserCollectionsDocument as GET_ALL_USER_COLLECTIONS,
+  UpdateCollectionDocument as UPDATE_COLLECTION,
+  DeleteCollectionDocument as DELETE_COLLECTION,
+  ReorderCollectionItemDocument as REORDER_COLLECTION_ITEM,
+  ShareCollectionAsDiscussionDocument as SHARE_COLLECTION_AS_DISCUSSION,
+} from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
-import type { Discussion, Comment } from '@/__generated__/graphql';
+import { CollectionVisibility } from '@/__generated__/graphql';
+import type { GetCollectionItemsQuery } from '@/__generated__/operations';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import {
   getCollectionTypeLabel,
   getCollectionItems,
+  orderCollectionItems,
   getCollectionItemStableId,
   buildCollectionDiscussionLink,
   resolveCollectionItemAuthor,
@@ -43,6 +43,9 @@ import {
   getCommentContextType,
 } from '@/utils/commentUtils';
 import { isAutoSavedDownloadsCollection } from '@/utils/downloadLibraryCollection';
+type SelectedCollection = GetCollectionItemsQuery['collections'][number];
+type Discussion = SelectedCollection['Discussions'][number];
+type Comment = SelectedCollection['Comments'][number];
 
 const GenericModal = defineAsyncComponent(
   () => import('@/components/GenericModal.vue')
@@ -57,7 +60,9 @@ const ForumPicker = defineAsyncComponent(
 const usernameVar = useUsername();
 
 const route = useRoute();
-const collectionId = computed(() => route.params.collectionId as string);
+const collectionId = computed(() =>
+  typeof route.params.collectionId === 'string' ? route.params.collectionId : ''
+);
 const { serverAdminUsernames } = useServerRoleMembership();
 
 const {
@@ -77,7 +82,10 @@ const {
 );
 
 const collection = computed(() => {
-  return result.value?.collections?.[0] || null;
+  return (
+    result.value?.collections?.find((item) => item.id === collectionId.value) ||
+    null
+  );
 });
 
 const collectionName = computed(() => collection.value?.name || 'Collection');
@@ -129,6 +137,32 @@ type CollectionDiscussionChannel = {
 
 // Get items based on collection type
 const items = computed(() => getCollectionItems(collection.value));
+const discussionItems = computed(() =>
+  orderCollectionItems(
+    collection.value?.collectionType === 'DOWNLOADS'
+      ? collection.value.Downloads
+      : collection.value?.Discussions || [],
+    collection.value?.itemOrder
+  )
+);
+const commentItems = computed(() =>
+  orderCollectionItems(
+    collection.value?.Comments || [],
+    collection.value?.itemOrder
+  )
+);
+const channelItems = computed(() =>
+  orderCollectionItems(
+    collection.value?.Channels || [],
+    collection.value?.itemOrder
+  )
+);
+const imageItems = computed(() =>
+  orderCollectionItems(
+    collection.value?.Images || [],
+    collection.value?.itemOrder
+  )
+);
 
 const collectionTypeLabel = computed(() =>
   getCollectionTypeLabel(collection.value?.collectionType)
@@ -180,6 +214,15 @@ const {
 const visibilityUpdating = ref(false);
 const visibilityError = ref<string | null>(null);
 const shareSubmitError = ref<string | null>(null);
+watch(collectionId, () => {
+  showRenameModal.value = false;
+  showDeleteModal.value = false;
+  showShareModal.value = false;
+  isReorderMode.value = false;
+  visibilityUpdating.value = false;
+  visibilityError.value = null;
+  shareSubmitError.value = null;
+});
 
 const collectionIsPublic = computed(
   () => collection.value?.visibility === 'PUBLIC'
@@ -201,6 +244,7 @@ const getReorderLabel = (item: {
   displayName?: string | null;
   uniqueName?: string | null;
   alt?: string | null;
+  id?: string;
 }) =>
   item.title ||
   item.displayName ||
@@ -212,12 +256,13 @@ const moveCollectionItem = async (item: unknown, newPosition: number) => {
   const itemId = getItemId(item);
   if (!itemId || newPosition < 0 || newPosition >= items.value.length) return;
 
+  const id = collectionId.value;
   await reorderCollectionItem({
-    collectionId: collectionId.value,
+    collectionId: id,
     itemId,
     newPosition,
   });
-  await refetchCollection();
+  if (id === collectionId.value) await refetchCollection();
 };
 
 // Open rename modal with current values
@@ -242,6 +287,7 @@ const handleShareCollection = async () => {
   const targetForum = selectedShareForums.value[0];
   if (!targetForum || !shareTitle.value.trim()) return;
 
+  const id = collectionId.value;
   shareSubmitError.value = null;
   try {
     const result = await shareCollectionAsDiscussion({
@@ -250,15 +296,8 @@ const handleShareCollection = async () => {
       title: shareTitle.value.trim(),
       shareMessage: shareMessage.value.trim() || null,
     });
-    const shareResult = result as {
-      data?: {
-        shareCollectionAsDiscussion?: {
-          id?: string;
-          DiscussionChannels?: Array<{ channelUniqueName?: string | null }>;
-        };
-      };
-    } | null;
-    const sharedDiscussion = shareResult?.data?.shareCollectionAsDiscussion;
+    if (id !== collectionId.value) return;
+    const sharedDiscussion = result?.data?.shareCollectionAsDiscussion;
     const discussionId = sharedDiscussion?.id;
     const forumId =
       sharedDiscussion?.DiscussionChannels?.[0]?.channelUniqueName ||
@@ -269,6 +308,7 @@ const handleShareCollection = async () => {
       router.push(`/forums/${forumId}/discussions/${discussionId}`);
     }
   } catch (err: unknown) {
+    if (id !== collectionId.value) return;
     console.error('Error sharing collection:', err);
     shareSubmitError.value =
       err instanceof Error ? err.message : 'Failed to share collection.';
@@ -277,6 +317,7 @@ const handleShareCollection = async () => {
 
 // Handle rename
 const handleRename = async () => {
+  const id = collectionId.value;
   if (!newCollectionName.value.trim()) {
     return;
   }
@@ -290,7 +331,7 @@ const handleRename = async () => {
       },
     });
 
-    showRenameModal.value = false;
+    if (id === collectionId.value) showRenameModal.value = false;
   } catch (err) {
     console.error('Error updating collection:', err);
   }
@@ -299,8 +340,12 @@ const handleRename = async () => {
 const handleToggleVisibility = async () => {
   if (!collection.value) return;
 
+  const id = collectionId.value;
   const currentVisibility = collection.value.visibility;
-  const nextVisibility = currentVisibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC';
+  const nextVisibility =
+    currentVisibility === CollectionVisibility.Public
+      ? CollectionVisibility.Private
+      : CollectionVisibility.Public;
 
   visibilityUpdating.value = true;
   visibilityError.value = null;
@@ -309,18 +354,20 @@ const handleToggleVisibility = async () => {
       collectionId: collectionId.value,
       update: { visibility: { set: nextVisibility } },
     });
-    await refetchCollection();
+    if (id === collectionId.value) await refetchCollection();
   } catch (err: unknown) {
+    if (id !== collectionId.value) return;
     console.error('Error updating visibility:', err);
     visibilityError.value =
       err instanceof Error ? err.message : 'Failed to update visibility.';
   } finally {
-    visibilityUpdating.value = false;
+    if (id === collectionId.value) visibilityUpdating.value = false;
   }
 };
 
 // Handle delete
 const handleDelete = async () => {
+  const id = collectionId.value;
   try {
     await deleteCollection(
       {
@@ -339,6 +386,7 @@ const handleDelete = async () => {
       }
     );
 
+    if (id !== collectionId.value) return;
     showDeleteModal.value = false;
     router.push('/library');
   } catch (err) {
@@ -670,7 +718,7 @@ const handleDelete = async () => {
                   "
                 >
                   <template
-                    v-for="(discussion, index) in items"
+                    v-for="(discussion, index) in discussionItems"
                     :key="getItemId(discussion)"
                   >
                     <div
@@ -727,7 +775,10 @@ const handleDelete = async () => {
                             (
                               total: number,
                               item: CollectionDiscussionChannel
-                            ) => total + (item.CommentsConnection?.aggregate?.count?.nodes || 0),
+                            ) =>
+                              total +
+                              (item.CommentsConnection?.aggregate?.count
+                                ?.nodes || 0),
                             0
                           ) || 0
                         "
@@ -744,7 +795,7 @@ const handleDelete = async () => {
                   class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3"
                 >
                   <div
-                    v-for="(channel, index) in items"
+                    v-for="(channel, index) in channelItems"
                     :key="getItemId(channel)"
                     class="grid items-start gap-3"
                     :class="
@@ -765,7 +816,7 @@ const handleDelete = async () => {
                       :channel="channel"
                       :show-favorite-button="true"
                       :allow-add-to-list="true"
-                      :is-favorited="Boolean(channel.isFavorited)"
+                      :is-favorited="false"
                     />
                   </div>
                 </div>
@@ -775,7 +826,7 @@ const handleDelete = async () => {
                   class="space-y-4"
                 >
                   <div
-                    v-for="(comment, index) in items"
+                    v-for="(comment, index) in commentItems"
                     :key="getItemId(comment)"
                     class="grid items-start gap-3"
                     :class="
@@ -801,7 +852,7 @@ const handleDelete = async () => {
                       :permalink="getCommentPermalink(comment)"
                       :show-favorite-button="true"
                       :allow-add-to-list="true"
-                      :is-favorited="Boolean(comment.isFavorited)"
+                      :is-favorited="false"
                     />
                   </div>
                 </div>
@@ -811,7 +862,7 @@ const handleDelete = async () => {
                   class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
                 >
                   <div
-                    v-for="(image, index) in items"
+                    v-for="(image, index) in imageItems"
                     :key="getItemId(image)"
                     class="grid items-start gap-3"
                     :class="

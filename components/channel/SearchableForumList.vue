@@ -1,12 +1,15 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import type { Channel } from '@/__generated__/graphql';
+import type {
+  GetChannelNamesQuery,
+  GetUserChannelCollectionsWithChannelsQuery,
+} from '@/__generated__/operations';
 import {
-  GET_CHANNEL_NAMES,
-  GET_USER_FAVORITE_CHANNELS,
-} from '@/graphQLData/channel/queries';
-import { GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS } from '@/graphQLData/collection/queries';
+  GetChannelNamesDocument as GET_CHANNEL_NAMES,
+  GetUserFavoriteChannelsDocument as GET_USER_FAVORITE_CHANNELS,
+  GetUserChannelCollectionsWithChannelsDocument as GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS,
+} from '@/__generated__/operations';
 import SearchBar from '@/components/SearchBar.vue';
 import type { PropType } from 'vue';
 import SearchableForumListItem from './SearchableForumListItem.vue';
@@ -48,18 +51,12 @@ type ChannelOption = {
 };
 
 // Type for raw channel data from GraphQL
-type RawChannelData = {
-  uniqueName: string;
-  displayName?: string | null;
-  channelIconURL?: string | null;
-};
-
-// Type for raw collection data from GraphQL
-type RawCollectionData = {
-  id: string;
-  name: string;
-  Channels?: RawChannelData[];
-};
+type RawChannelData = Pick<
+  GetChannelNamesQuery['channels'][number],
+  'uniqueName' | 'displayName' | 'channelIconURL'
+>;
+type RawCollectionData =
+  GetUserChannelCollectionsWithChannelsQuery['users'][number]['Collections'][number];
 
 // Simplified channel type for collections (doesn't have description)
 type CollectionChannelOption = {
@@ -87,11 +84,11 @@ const {
   error: channelsError,
   result: channelsResult,
   onResult: onGetChannelNames,
-} = useQuery(GET_CHANNEL_NAMES, {
+} = useQuery(GET_CHANNEL_NAMES, () => ({
   channelWhere: {
-    uniqueName_MATCHES: searchInputComputed,
+    uniqueName_MATCHES: searchInputComputed.value,
   },
-});
+}));
 
 // Query for favorite channels (only when user is authenticated)
 const { result: favoritesResult } = useQuery(
@@ -165,11 +162,9 @@ const toggleCollectionExpansion = (collectionId: string) => {
 
 const toggleSelectAllCollection = (collection: {
   id: string;
-  allChannels: ChannelOption[];
+  allChannels: CollectionChannelOption[];
 }) => {
-  const collectionValues = collection.allChannels.map(
-    (ch: ChannelOption) => ch.uniqueName
-  );
+  const collectionValues = collection.allChannels.map((ch) => ch.uniqueName);
   getChannelsToToggle({
     channelNames: collectionValues,
     selectedChannels: props.selectedChannels || [],
@@ -177,12 +172,10 @@ const toggleSelectAllCollection = (collection: {
 };
 
 const isCollectionFullySelected = (collection: {
-  allChannels: ChannelOption[];
+  allChannels: CollectionChannelOption[];
 }) =>
   areAllChannelsSelected({
-    channelNames: collection.allChannels.map(
-      (ch: ChannelOption) => ch.uniqueName
-    ),
+    channelNames: collection.allChannels.map((ch) => ch.uniqueName),
     selectedChannels: props.selectedChannels || [],
   });
 
@@ -229,19 +222,19 @@ const featuredChannels = computed(() => {
 
 const regularChannels = computed(() => {
   return channelsResult.value?.channels
-    .filter((channel: Channel) => {
+    .filter((channel) => {
       return !props.featuredForums.some(
         (featuredChannel) => featuredChannel.uniqueName === channel.uniqueName
       );
     })
-    .sort((a: ChannelOption, b: ChannelOption) => {
+    .sort((a, b) => {
       return a.uniqueName.localeCompare(b.uniqueName);
     });
 });
 
 // Watch the query result
 onGetChannelNames(() => {
-  const channels = channelsResult.value?.channels.map((channel: Channel) => ({
+  const channels = channelsResult.value?.channels.map((channel) => ({
     uniqueName: channel.uniqueName,
     displayName: channel.displayName,
     icon: channel.channelIconURL,
@@ -262,9 +255,7 @@ const updateSearchResult = (input: string) => {
 };
 
 const toggleSelectAllFavorites = () => {
-  const favoriteValues = favoriteChannels.value.map(
-    (ch: ChannelOption) => ch.uniqueName
-  );
+  const favoriteValues = favoriteChannels.value.map((ch) => ch.uniqueName);
   // Use props.selectedChannels directly to avoid stale state issues, and
   // resolve which channels to toggle before emitting any events.
   getChannelsToToggle({
@@ -275,9 +266,7 @@ const toggleSelectAllFavorites = () => {
 
 const areAllFavoritesSelected = computed(() =>
   areAllChannelsSelected({
-    channelNames: favoriteChannels.value.map(
-      (ch: ChannelOption) => ch.uniqueName
-    ),
+    channelNames: favoriteChannels.value.map((ch) => ch.uniqueName),
     selectedChannels: props.selectedChannels || [],
   })
 );
@@ -369,17 +358,13 @@ const areAllFavoritesSelected = computed(() =>
             <!-- Preview list of forums -->
             <div class="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
               <span v-if="favoriteChannels.length <= 3">
-                {{
-                  favoriteChannels
-                    .map((ch: ChannelOption) => ch.uniqueName)
-                    .join(', ')
-                }}
+                {{ favoriteChannels.map((ch) => ch.uniqueName).join(', ') }}
               </span>
               <span v-else-if="!showAllFavorites">
                 {{
                   favoriteChannels
                     .slice(0, 3)
-                    .map((ch: ChannelOption) => ch.uniqueName)
+                    .map((ch) => ch.uniqueName)
                     .join(', ')
                 }}
                 <button
@@ -390,11 +375,7 @@ const areAllFavoritesSelected = computed(() =>
                 </button>
               </span>
               <span v-else>
-                {{
-                  favoriteChannels
-                    .map((ch: ChannelOption) => ch.uniqueName)
-                    .join(', ')
-                }}
+                {{ favoriteChannels.map((ch) => ch.uniqueName).join(', ') }}
                 <button
                   class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"
                   @click.stop="showAllFavorites = false"
@@ -446,15 +427,13 @@ const areAllFavoritesSelected = computed(() =>
               }}</span>
               <span class="ml-1 text-gray-500 dark:text-gray-400">
                 (<span v-if="collection.allChannels.length <= 3">{{
-                  collection.allChannels
-                    .map((ch: ChannelOption) => ch.uniqueName)
-                    .join(', ')
+                  collection.allChannels.map((ch) => ch.uniqueName).join(', ')
                 }}</span
                 ><span v-else-if="!expandedCollections.has(collection.id)"
                   >{{
                     collection.allChannels
                       .slice(0, 3)
-                      .map((ch: ChannelOption) => ch.uniqueName)
+                      .map((ch) => ch.uniqueName)
                       .join(', ')
                   }}<button
                     class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"
@@ -465,7 +444,7 @@ const areAllFavoritesSelected = computed(() =>
                 ><span v-else
                   >{{
                     collection.allChannels
-                      .map((ch: ChannelOption) => ch.uniqueName)
+                      .map((ch) => ch.uniqueName)
                       .join(', ')
                   }}<button
                     class="text-brand-600 hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300 ml-1"

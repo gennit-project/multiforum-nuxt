@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import type { Image } from '@/__generated__/graphql';
+import type { GetUserFavoriteImagesQuery } from '@/__generated__/operations';
 import AppImage from '@/components/image/AppImage.vue';
 import ModelPreviewTile from '@/components/image/ModelPreviewTile.vue';
 import AddToImageFavorites from '@/components/favorites/AddToImageFavorites.vue';
 import { is3DModelFile } from '@/utils/fileTypeUtils';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
+type SelectedImage =
+  GetUserFavoriteImagesQuery['users'][number]['FavoriteImages'][number];
+type Image = Pick<SelectedImage, 'id'> &
+  Partial<
+    Pick<
+      SelectedImage,
+      'url' | 'alt' | 'caption' | 'hasSensitiveContent' | 'hasSpoiler'
+    >
+  >;
 
 const props = defineProps({
   allowAddToList: {
@@ -36,12 +45,13 @@ const getImageAlt = (image: Image) => {
   return image.alt || image.caption || 'Image';
 };
 
-const imageUrl = computed(() =>
-  getPreferredImageUrl({
-    source: props.image,
-    preferred: ['list320', 'list160'],
-    originalUrl: props.image.url,
-  }) || ''
+const imageUrl = computed(
+  () =>
+    getPreferredImageUrl({
+      source: props.image,
+      preferred: ['list320', 'list160'],
+      originalUrl: props.image.url,
+    }) || ''
 );
 </script>
 

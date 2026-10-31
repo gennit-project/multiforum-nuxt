@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import type { GetUserFavoriteDownloadsQuery } from '@/__generated__/operations';
+import { GetUserFavoriteDownloadsDocument as GET_USER_FAVORITE_DOWNLOADS } from '@/__generated__/operations';
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
-import { gql } from '@apollo/client/core';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
@@ -12,100 +13,12 @@ import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 const usernameVar = useUsername();
 
-interface DiscussionChannel {
-  id: string;
-  channelUniqueName?: string;
-}
-
-interface AlbumImage {
-  id: string;
-  url?: string;
-  caption?: string;
-}
-
-interface FavoriteDownload {
-  id: string;
-  title: string;
-  body?: string;
-  createdAt: string;
-  updatedAt?: string;
-  hasDownload?: boolean;
-  hasSensitiveContent?: boolean;
-  Author?: {
-    username?: string;
-    displayName?: string;
-    profilePicURL?: string;
-    commentKarma?: number;
-    discussionKarma?: number;
-    createdAt?: string;
-  };
-  DiscussionChannels?: DiscussionChannel[];
-  Tags?: Array<{ text: string }>;
-  Album?: {
-    id: string;
-    imageOrder?: string[];
-    Images?: AlbumImage[];
-  };
-}
+type FavoriteDownload =
+  GetUserFavoriteDownloadsQuery['users'][number]['FavoriteDiscussions'][number];
 
 useHead({
   title: 'Favorite Downloads - Library',
 });
-
-const GET_USER_FAVORITE_DOWNLOADS = gql`
-  query getUserFavoriteDownloads($username: String!) {
-    users(where: { username: { eq: $username } }) {
-      username
-      FavoriteDiscussions(
-        where: { hasDownload: { eq: true } }
-        sort: [{ createdAt: DESC }]
-      ) {
-        id
-        title
-        body
-        createdAt
-        updatedAt
-        hasDownload
-        Author {
-          username
-          displayName
-          profilePicURL
-          commentKarma
-          discussionKarma
-          createdAt
-        }
-        DiscussionChannels {
-          id
-          channelUniqueName
-          archived
-          answered
-          locked
-          weightedVotesCount
-          Channel {
-            uniqueName
-            displayName
-          }
-          CommentsConnection {
-            aggregate { count { nodes } }
-          }
-        }
-        Tags {
-          text
-        }
-        Album {
-          id
-          imageOrder
-          Images {
-            id
-            url
-            caption
-          }
-        }
-        hasSensitiveContent
-      }
-    }
-  }
-`;
 
 const { result, loading, error } = useQuery(
   GET_USER_FAVORITE_DOWNLOADS,
@@ -123,8 +36,7 @@ const favoriteDownloads = computed(() => {
 const { serverAdminUsernames } = useServerRoleMembership();
 
 const getDownloadLink = (download: FavoriteDownload) => {
-  const firstChannel = safeArrayFirst(download.DiscussionChannels) as
-    DiscussionChannel | undefined;
+  const firstChannel = safeArrayFirst(download.DiscussionChannels);
   if (!firstChannel?.channelUniqueName) return '/';
 
   return `/forums/${firstChannel.channelUniqueName}/downloads/${download.id}`;
@@ -159,15 +71,13 @@ const getFirstAlbumImage = (download: FavoriteDownload): string | undefined => {
   const album = download?.Album;
   if (!album?.Images?.length) return undefined;
 
-  if (album.imageOrder?.length && album.imageOrder.length > 0) {
+  if ('imageOrder' in album && album.imageOrder?.length) {
     const firstImageId = album.imageOrder[0];
-    const orderedImage = album.Images.find(
-      (img: AlbumImage) => img.id === firstImageId
-    );
-    return orderedImage?.url;
+    const orderedImage = album.Images.find((img) => img.id === firstImageId);
+    return orderedImage?.url || undefined;
   }
 
-  return album.Images[0]?.url;
+  return album.Images[0]?.url || undefined;
 };
 </script>
 

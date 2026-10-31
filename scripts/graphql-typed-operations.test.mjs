@@ -220,3 +220,27 @@ test('every generated source mapping preserves the exact runtime selection and v
   }
   assert.deepEqual(failures, []);
 });
+
+test('empty AST lists stay inline instead of becoming implicit-any shared arrays', () => {
+  const document = JSON.parse(
+    JSON.stringify(
+      parse('query Empty { user(name: "alice") { id } }', { noLocation: true })
+    )
+  );
+  document.definitions[0].variableDefinitions = [];
+  document.definitions[0].directives = [];
+  document.definitions[0].selectionSet.selections[0].directives = [];
+  const source = `export const EmptyDocument = ${JSON.stringify(document)} as unknown as DocumentNode<Result, Variables>;`;
+  const shared = shareDocumentNodes(source);
+  const executable = shared
+    .replaceAll('export const ', 'const ')
+    .replaceAll(' as unknown as DocumentNode<Result, Variables>', '');
+  const result = new Function(`${executable}; return EmptyDocument;`)();
+  assert.deepEqual(
+    {
+      document: result,
+      bareEmptyArray: /const sharedNode\d+ = \[\];/.test(shared),
+    },
+    { document, bareEmptyArray: false }
+  );
+});

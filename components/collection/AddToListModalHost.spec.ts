@@ -60,7 +60,9 @@ describe('AddToListModalHost', () => {
     });
     await nextTick();
 
-    expect(wrapper.findComponent(AddToListPopoverStub).props('itemId')).toBe('c1');
+    expect(wrapper.findComponent(AddToListPopoverStub).props('itemId')).toBe(
+      'c1'
+    );
   });
 
   it('removes the popover when the store closes after mount', async () => {
@@ -101,4 +103,19 @@ describe('AddToListModalHost', () => {
       isAlreadyFavorite: false,
     });
   });
+});
+
+it('remounts the selector when an open modal switches item identity', async () => {
+  setActivePinia(createPinia());
+  const store = useAddToListModalStore();
+  store.open({
+    itemId: 'd1',
+    itemType: 'discussion',
+    isAlreadyFavorite: false,
+  });
+  const wrapper = mountHost();
+  const original = wrapper.findComponent(AddToListPopoverStub).vm;
+  store.open({ itemId: 'i1', itemType: 'image', isAlreadyFavorite: false });
+  await nextTick();
+  expect(wrapper.findComponent(AddToListPopoverStub).vm).not.toBe(original);
 });

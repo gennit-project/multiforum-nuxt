@@ -1,16 +1,31 @@
-import type { CollectionType } from '@/__generated__/graphql';
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type {
+  GetUserCollectionsDiscussionsQuery,
+  GetUserCollectionsCommentsQuery,
+  GetUserCollectionsImagesQuery,
+  GetUserCollectionsChannelsQuery,
+  GetUserCollectionsDownloadsQuery,
+  GetUserCollectionsDiscussionsQueryVariables,
+} from '@/__generated__/operations';
+import { CollectionType } from '@/__generated__/graphql';
 import {
-  GET_USER_COLLECTIONS_DISCUSSIONS,
-  GET_USER_COLLECTIONS_COMMENTS,
-  GET_USER_COLLECTIONS_IMAGES,
-  GET_USER_COLLECTIONS_CHANNELS,
-  GET_USER_COLLECTIONS_DOWNLOADS,
-  CHECK_DISCUSSION_IN_COLLECTIONS,
-  CHECK_COMMENT_IN_COLLECTIONS,
-  CHECK_DOWNLOAD_IN_COLLECTIONS,
-  CHECK_IMAGE_IN_COLLECTIONS,
-  CHECK_CHANNEL_IN_COLLECTIONS,
-} from '@/graphQLData/collection/queries';
+  GetUserCollectionsDiscussionsDocument as GET_USER_COLLECTIONS_DISCUSSIONS,
+  GetUserCollectionsCommentsDocument as GET_USER_COLLECTIONS_COMMENTS,
+  GetUserCollectionsImagesDocument as GET_USER_COLLECTIONS_IMAGES,
+  GetUserCollectionsChannelsDocument as GET_USER_COLLECTIONS_CHANNELS,
+  GetUserCollectionsDownloadsDocument as GET_USER_COLLECTIONS_DOWNLOADS,
+  CheckDiscussionInCollectionsDocument as CHECK_DISCUSSION_IN_COLLECTIONS,
+  CheckCommentInCollectionsDocument as CHECK_COMMENT_IN_COLLECTIONS,
+  CheckDownloadInCollectionsDocument as CHECK_DOWNLOAD_IN_COLLECTIONS,
+  CheckImageInCollectionsDocument as CHECK_IMAGE_IN_COLLECTIONS,
+  CheckChannelInCollectionsDocument as CHECK_CHANNEL_IN_COLLECTIONS,
+} from '@/__generated__/operations';
+type CollectionsResult =
+  | GetUserCollectionsDiscussionsQuery
+  | GetUserCollectionsCommentsQuery
+  | GetUserCollectionsImagesQuery
+  | GetUserCollectionsChannelsQuery
+  | GetUserCollectionsDownloadsQuery;
 
 type ItemType = 'discussion' | 'comment' | 'image' | 'channel' | 'download';
 
@@ -21,11 +36,11 @@ type ItemType = 'discussion' | 'comment' | 'image' | 'channel' | 'download';
 export function useCollectionQueries(itemType: ItemType) {
   // Map frontend item types to GraphQL enum values
   const collectionTypeMap: Record<ItemType, CollectionType> = {
-    discussion: 'DISCUSSIONS' as CollectionType,
-    comment: 'COMMENTS' as CollectionType,
-    image: 'IMAGES' as CollectionType,
-    channel: 'CHANNELS' as CollectionType,
-    download: 'DOWNLOADS' as CollectionType,
+    discussion: CollectionType.Discussions,
+    comment: CollectionType.Comments,
+    image: CollectionType.Images,
+    channel: CollectionType.Channels,
+    download: CollectionType.Downloads,
   };
 
   const collectionType = collectionTypeMap[itemType];
@@ -33,7 +48,10 @@ export function useCollectionQueries(itemType: ItemType) {
   /**
    * Get the appropriate query for fetching user collections based on item type
    */
-  const getCollectionQuery = () => {
+  const getCollectionQuery = (): TypedDocumentNode<
+    CollectionsResult,
+    GetUserCollectionsDiscussionsQueryVariables
+  > => {
     const queryMap = {
       discussion: GET_USER_COLLECTIONS_DISCUSSIONS,
       comment: GET_USER_COLLECTIONS_COMMENTS,

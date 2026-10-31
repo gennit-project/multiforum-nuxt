@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import {
+  GetUserFavoritesDocument as GET_USER_FAVORITES,
+  AddFavoriteChannelDocument as ADD_FAVORITE_CHANNEL,
+  RemoveFavoriteChannelDocument as REMOVE_FAVORITE_CHANNEL,
+} from '@/__generated__/operations';
 import { computed } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { gql } from '@apollo/client/core';
-import {
-  ADD_FAVORITE_CHANNEL,
-  REMOVE_FAVORITE_CHANNEL,
-} from '@/graphQLData/user/mutations';
 import { useUsername } from '@/composables/useAuthState';
 import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
 import { useFavoritedState } from '@/composables/useFavoritedState';
@@ -37,20 +37,12 @@ const props = defineProps({
   },
 });
 
-const GET_USER_FAVORITES = gql`
-  query getUserFavorites($username: String!, $channelUniqueName: String!) {
-    users(where: { username: { eq: $username } }) {
-      username
-      FavoriteChannels(where: { uniqueName: { eq: $channelUniqueName } }) {
-        uniqueName
-      }
-    }
-  }
-`;
-
 // Only fetch if initialIsFavorited was not provided
-const shouldFetchFavorite = computed(() =>
-  props.initialIsFavorited === undefined && !!usernameVar.value && !!props.channelUniqueName
+const shouldFetchFavorite = computed(
+  () =>
+    props.initialIsFavorited === undefined &&
+    !!usernameVar.value &&
+    !!props.channelUniqueName
 );
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
@@ -93,7 +85,7 @@ const { isLoading, handleToggleFavorite } = useFavoriteToggle({
   removedMessage: () => 'Removed from favorites.',
   addFavorite,
   removeFavorite,
-  mutationItemKey: 'channel',
+  variables: (itemId, username) => ({ channel: itemId, username }),
   // Only refetch if we're managing our own query
   onAfterToggle: () => {
     if (shouldFetchFavorite.value) {

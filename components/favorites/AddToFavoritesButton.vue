@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, watch, defineAsyncComponent } from 'vue';
+import type { AllowedItemType } from '@/stores/addToListModalStore';
 import { Bookmark } from 'lucide-vue-next';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 
@@ -41,6 +42,17 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+});
+
+const collectionItemType = computed(() => {
+  const types: AllowedItemType[] = [
+    'discussion',
+    'download',
+    'comment',
+    'image',
+    'channel',
+  ];
+  return types.find((type) => type === props.entityType);
 });
 
 const emit = defineEmits<{
@@ -305,9 +317,10 @@ watch(
 
         <!-- Add to List Popover -->
         <AddToListPopover
-          v-if="allowAddToList"
+          v-if="allowAddToList && collectionItemType"
+          :key="`${entityType}:${itemId}`"
           :item-id="itemId"
-          :item-type="entityType"
+          :item-type="collectionItemType"
           :is-visible="showPopover"
           :position="popoverPosition"
           :is-already-favorite="isFavorited"
@@ -358,9 +371,10 @@ watch(
 
         <!-- Add to List Popover for unauthenticated users -->
         <AddToListPopover
-          v-if="allowAddToList"
+          v-if="allowAddToList && collectionItemType"
+          :key="`${entityType}:${itemId}`"
           :item-id="itemId"
-          :item-type="entityType"
+          :item-type="collectionItemType"
           :is-visible="showPopover"
           :position="popoverPosition"
           :is-already-favorite="isFavorited"

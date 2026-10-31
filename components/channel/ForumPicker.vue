@@ -3,20 +3,17 @@ import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import {
-  GET_CHANNEL_NAMES,
-  GET_USER_FAVORITE_CHANNELS,
-} from '@/graphQLData/channel/queries';
-import { GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS } from '@/graphQLData/collection/queries';
+  GetChannelNamesDocument as GET_CHANNEL_NAMES,
+  GetUserFavoriteChannelsDocument as GET_USER_FAVORITE_CHANNELS,
+  GetUserChannelCollectionsWithChannelsDocument as GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS,
+} from '@/__generated__/operations';
 import MultiSelect from '@/components/MultiSelect.vue';
 import type {
   MultiSelectOption,
   MultiSelectSection,
 } from '@/components/MultiSelect.vue';
-import type {
-  Channel,
-  ChannelWhere,
-  Collection,
-} from '@/__generated__/graphql';
+import type { ChannelWhere } from '@/__generated__/graphql';
+import type { GetChannelNamesQuery } from '@/__generated__/operations';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 
@@ -25,7 +22,7 @@ const isAuthenticatedVar = useIsAuthenticated();
 
 type ChannelFlag = 'eventsEnabled' | 'downloadsEnabled';
 type ChannelOptionSource = Pick<
-  Channel,
+  GetChannelNamesQuery['channels'][number],
   'uniqueName' | 'displayName' | 'channelIconURL'
 > &
   Partial<Record<ChannelFlag, boolean | null>>;
@@ -226,14 +223,13 @@ const channelSections = computed<MultiSelectSection[]>(() => {
   // Channel collections - consolidated under single heading
   const collections = collectionsResult.value?.users?.[0]?.Collections || [];
   const collectionsWithChannels = collections.filter(
-    (collection: Pick<Collection, 'Channels'>) =>
-      collection.Channels && collection.Channels.length > 0
+    (collection) => collection.Channels && collection.Channels.length > 0
   );
 
   if (collectionsWithChannels.length > 0) {
     // Create options for each collection (for select all functionality)
     const collectionOptions = collectionsWithChannels
-      .map((collection: Pick<Collection, 'id' | 'name' | 'Channels'>) => ({
+      .map((collection) => ({
         value: collection.id,
         label: collection.name,
         // Store the channel uniqueNames for select all functionality
@@ -241,7 +237,7 @@ const channelSections = computed<MultiSelectSection[]>(() => {
           .filter((channel: ChannelOptionSource) =>
             channelHasRequiredFlags(channel)
           )
-          .map((ch: Pick<Channel, 'uniqueName'>) => ch.uniqueName),
+          .map((ch) => ch.uniqueName),
       }))
       .filter((collection: { channels: string[] }) => {
         return collection.channels.length > 0;
@@ -252,7 +248,7 @@ const channelSections = computed<MultiSelectSection[]>(() => {
         title: 'Forum Lists From Your Collections',
         options: collectionOptions,
         isCollectionSection: true, // Custom flag to render differently
-      } as MultiSelectSection & { isCollectionSection?: boolean });
+      });
     }
   }
 

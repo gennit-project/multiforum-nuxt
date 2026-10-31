@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { GetUploadedDownloadableFilesQuery } from '@/__generated__/operations';
 import { computed, ref } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
@@ -8,27 +9,14 @@ import FolderOpenIcon from '@/components/icons/FolderOpenIcon.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 import { useUsername } from '@/composables/useAuthState';
-import { GET_UPLOADED_DOWNLOADABLE_FILES } from '@/graphQLData/user/queries';
-import { PERMANENTLY_DELETE_DOWNLOADABLE_FILE } from '@/graphQLData/discussion/mutations';
+import {
+  GetUploadedDownloadableFilesDocument as GET_UPLOADED_DOWNLOADABLE_FILES,
+  PermanentlyDeleteDownloadableFileDocument as PERMANENTLY_DELETE_DOWNLOADABLE_FILE,
+} from '@/__generated__/operations';
 
-type UploadedFile = {
-  id: string;
-  fileName: string;
-  kind?: string | null;
-  size?: number | null;
-  url?: string | null;
-  uploadedAt?: string | null;
-  createdAt?: string | null;
-};
-
-type UploadedDownloadGroup = {
-  discussion: {
-    id: string;
-    title: string;
-    channelUniqueNames?: string[];
-  };
-  files: UploadedFile[];
-};
+type UploadedDownloadGroup =
+  GetUploadedDownloadableFilesQuery['getUploadedDownloadableFiles'][number];
+type UploadedFile = UploadedDownloadGroup['files'][number];
 
 const usernameVar = useUsername();
 const pendingDeleteFile = ref<UploadedFile | null>(null);

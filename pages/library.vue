@@ -2,19 +2,21 @@
 import { computed, ref, watch } from 'vue';
 import { useHead, useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import type { Collection } from '@/__generated__/graphql';
+import type { GetAllUserCollectionsQuery } from '@/__generated__/operations';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import LibraryItemIcon from '@/components/library/LibraryItemIcon.vue';
 import {
-  GET_USER_FAVORITE_COUNTS,
-  GET_USER_OWNED_DOWNLOADS_COUNT,
-  GET_UPLOADED_DOWNLOADABLE_FILES,
-} from '@/graphQLData/user/queries';
-import { GET_ALL_USER_COLLECTIONS } from '@/graphQLData/collection/queries';
+  GetUserFavoriteCountsDocument as GET_USER_FAVORITE_COUNTS,
+  GetUserOwnedDownloadsCountDocument as GET_USER_OWNED_DOWNLOADS_COUNT,
+  GetUploadedDownloadableFilesDocument as GET_UPLOADED_DOWNLOADABLE_FILES,
+  GetAllUserCollectionsDocument as GET_ALL_USER_COLLECTIONS,
+} from '@/__generated__/operations';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { isAutoSavedDownloadsCollection } from '@/utils/downloadLibraryCollection';
+type Collection =
+  GetAllUserCollectionsQuery['users'][number]['Collections'][number];
 
 type LibraryFilter =
   'all' | 'favorites' | 'collections' | 'images' | 'downloads';
@@ -116,8 +118,8 @@ const autoSavedDownloadsCollection = computed(() =>
 const myDownloadsCount = computed(
   () =>
     autoSavedDownloadsCollection.value?.itemCount ??
-    ownedDownloadsCountResult.value?.users?.[0]?.OwnedDownloadsAggregate
-      ?.count ??
+    ownedDownloadsCountResult.value?.users?.[0]?.OwnedDownloadsConnection
+      ?.aggregate?.count?.nodes ??
     0
 );
 

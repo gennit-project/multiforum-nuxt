@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { GetUserFavoriteCommentsDocument as GET_USER_FAVORITE_COMMENTS } from '@/__generated__/operations';
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { gql } from '@apollo/client/core';
 import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
@@ -20,57 +20,6 @@ const usernameVar = useUsername();
 useHead({
   title: 'Favorite Comments - Library',
 });
-
-const GET_USER_FAVORITE_COMMENTS = gql`
-  query getUserFavoriteComments($username: String!) {
-    users(where: { username: { eq: $username } }) {
-      username
-      FavoriteComments(sort: [{ createdAt: DESC }]) {
-        id
-        text
-        createdAt
-        updatedAt
-        CommentAuthor {
-          ... on User {
-            __typename
-            username
-            displayName
-            profilePicURL
-            commentKarma
-            discussionKarma
-            createdAt
-          }
-          ... on ModerationProfile {
-            __typename
-            displayName
-          }
-        }
-        DiscussionChannel {
-          id
-          discussionId
-          channelUniqueName
-          Channel {
-            uniqueName
-            displayName
-          }
-          Discussion {
-            id
-            title
-            hasDownload
-          }
-        }
-        Channel {
-          uniqueName
-          displayName
-        }
-        Event {
-          id
-          title
-        }
-      }
-    }
-  }
-`;
 
 const { result, loading, error } = useQuery(
   GET_USER_FAVORITE_COMMENTS,

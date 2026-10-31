@@ -1,10 +1,9 @@
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
-import type {
-  Discussion,
-  Comment,
-  DiscussionChannel,
-} from '@/__generated__/graphql';
+import type { GetCollectionItemsQuery } from '@/__generated__/operations';
+type SelectedCollection = GetCollectionItemsQuery['collections'][number];
+type Discussion = SelectedCollection['Discussions'][number];
+type Comment = SelectedCollection['Comments'][number];
 
 /**
  * Pure helpers for the collection detail page
@@ -52,13 +51,28 @@ export interface CollectionLike {
 
 /**
  * Select the items array that matches the collection's type. The element type
- * is heterogeneous across collection types, so the return is intentionally
- * loose (matching the page's original inline behavior).
+ * is the union of the selected item arrays. Rendering uses each selected
+ * array separately so a collection type never implies unselected item fields.
  */
+type CollectionItem<C> = C extends CollectionLike
+  ? NonNullable<
+      C[keyof Pick<
+        C,
+        Extract<
+          keyof C,
+          'Discussions' | 'Comments' | 'Images' | 'Channels' | 'Downloads'
+        >
+      >]
+    > extends Array<infer Item>
+    ? Item
+    : never
+  : never;
+export function getCollectionItems<C extends CollectionLike>(
+  collection: C | null | undefined
+): CollectionItem<C>[];
 export function getCollectionItems(
   collection: CollectionLike | null | undefined
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): any[] {
+): unknown[] {
   if (!collection) return [];
   let items: unknown[];
   switch (collection.collectionType) {
@@ -86,8 +100,10 @@ export function getCollectionItems(
 
 export function getCollectionItemStableId(item: unknown): string {
   if (!item || typeof item !== 'object') return '';
-  const record = item as { id?: string | null; uniqueName?: string | null };
-  return record.id || record.uniqueName || '';
+  if ('id' in item && typeof item.id === 'string') return item.id;
+  return 'uniqueName' in item && typeof item.uniqueName === 'string'
+    ? item.uniqueName
+    : '';
 }
 
 export function orderCollectionItems<T>(
@@ -118,13 +134,16 @@ export function orderCollectionItems<T>(
  * path. Returns '/' when no channel is available.
  */
 export function buildCollectionDiscussionLink(params: {
-  discussion: Discussion;
+  discussion: Pick<Discussion, 'id'> &
+    Partial<Pick<Discussion, 'hasDownload'>> & {
+      DiscussionChannels?: Array<
+        Pick<Discussion['DiscussionChannels'][number], 'channelUniqueName'>
+      >;
+    };
   isDownloadsCollection: boolean;
 }): string {
   const { discussion, isDownloadsCollection } = params;
-  const firstChannel = safeArrayFirst(
-    discussion.DiscussionChannels
-  ) as DiscussionChannel | null;
+  const firstChannel = safeArrayFirst(discussion.DiscussionChannels);
   if (!firstChannel?.channelUniqueName) return '/';
 
   const isDownload = discussion?.hasDownload === true || isDownloadsCollection;
@@ -149,7 +168,10 @@ export interface CollectionAuthorInfo {
  * author.
  */
 export function resolveCollectionItemAuthor(params: {
-  item: Discussion | Comment;
+  item: {
+    Author?: Partial<NonNullable<Discussion['Author']>> | null;
+    CommentAuthor?: Partial<NonNullable<Comment['CommentAuthor']>> | null;
+  };
   adminUsernames: string[];
 }): CollectionAuthorInfo | null {
   const { item, adminUsernames } = params;

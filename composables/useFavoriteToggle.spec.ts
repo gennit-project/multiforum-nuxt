@@ -35,7 +35,7 @@ describe('useFavoriteToggle', () => {
       removedMessage: () => 'Removed',
       addFavorite,
       removeFavorite: vi.fn(),
-      mutationItemKey: 'discussionId',
+      variables: (itemId, username) => ({ discussionId: itemId, username }),
       onAfterToggle,
     });
 
@@ -70,7 +70,7 @@ describe('useFavoriteToggle', () => {
       removedMessage: () => 'Removed',
       addFavorite: vi.fn(),
       removeFavorite,
-      mutationItemKey: 'discussionId',
+      variables: (itemId, username) => ({ discussionId: itemId, username }),
     });
 
     await handleToggleFavorite();
@@ -90,7 +90,8 @@ describe('useFavoriteToggle', () => {
   it('adds an Organize action when add-to-list is allowed', async () => {
     const { useFavoriteToggle } = await import('./useFavoriteToggle');
     const { useToastStore } = await import('@/stores/toastStore');
-    const { useAddToListModalStore } = await import('@/stores/addToListModalStore');
+    const { useAddToListModalStore } =
+      await import('@/stores/addToListModalStore');
     const isFavorited = ref(false);
 
     const { handleToggleFavorite } = useFavoriteToggle({
@@ -102,7 +103,7 @@ describe('useFavoriteToggle', () => {
       removedMessage: () => 'Removed',
       addFavorite: vi.fn().mockResolvedValue({}),
       removeFavorite: vi.fn(),
-      mutationItemKey: 'discussionId',
+      variables: (itemId, username) => ({ discussionId: itemId, username }),
     });
 
     await handleToggleFavorite();
@@ -138,7 +139,7 @@ describe('useFavoriteToggle', () => {
       removedMessage: () => 'Removed',
       addFavorite: vi.fn().mockRejectedValue(new Error('boom')),
       removeFavorite: vi.fn(),
-      mutationItemKey: 'discussionId',
+      variables: (itemId, username) => ({ discussionId: itemId, username }),
     });
 
     await handleToggleFavorite();
@@ -153,5 +154,70 @@ describe('useFavoriteToggle', () => {
       toast: 'Error updating favorites. Please try again.',
       type: 'error',
     });
+  });
+});
+
+describe('favorite mutation request scope', () => {
+  beforeEach(() => {
+    setActivePinia(createPinia());
+    h.username.value = 'alice';
+  });
+
+  it('ignores a repeated click while the first request is pending', async () => {
+    const { useFavoriteToggle } = await import('./useFavoriteToggle');
+    let finish = () => {};
+    const addFavorite = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        })
+    );
+    const { handleToggleFavorite } = useFavoriteToggle({
+      isFavorited: ref(false),
+      itemId: () => 'd1',
+      entityType: () => 'discussion',
+      allowAddToList: () => false,
+      addedMessage: () => 'Added',
+      removedMessage: () => 'Removed',
+      addFavorite,
+      removeFavorite: vi.fn(),
+      variables: (discussionId, username) => ({ discussionId, username }),
+    });
+    const pending = handleToggleFavorite();
+    await handleToggleFavorite();
+    finish();
+    await pending;
+    expect(addFavorite).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not refetch or toast for a different item after navigation', async () => {
+    const { useFavoriteToggle } = await import('./useFavoriteToggle');
+    const { useToastStore } = await import('@/stores/toastStore');
+    let finish = () => {};
+    const itemId = ref('d1');
+    const onAfterToggle = vi.fn();
+    const { handleToggleFavorite } = useFavoriteToggle({
+      isFavorited: ref(false),
+      itemId: () => itemId.value,
+      entityType: () => 'discussion',
+      allowAddToList: () => false,
+      addedMessage: () => 'Added',
+      removedMessage: () => 'Removed',
+      addFavorite: () =>
+        new Promise<void>((resolve) => {
+          finish = resolve;
+        }),
+      removeFavorite: vi.fn(),
+      variables: (discussionId, username) => ({ discussionId, username }),
+      onAfterToggle,
+    });
+    const pending = handleToggleFavorite();
+    itemId.value = 'd2';
+    finish();
+    await pending;
+    expect({
+      toasts: useToastStore().toasts.length,
+      refetches: onAfterToggle.mock.calls.length,
+    }).toEqual({ toasts: 0, refetches: 0 });
   });
 });
