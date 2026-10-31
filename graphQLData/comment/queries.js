@@ -423,7 +423,7 @@ export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
   }
 `;
 export const GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE = gql`
-  query getDiscussionChannelRootCommentAggregate(
+  query getDiscussionChannelCommentAggregate(
     $channelUniqueName: String!
     $discussionId: ID!
   ) {

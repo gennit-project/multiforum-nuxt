@@ -1,9 +1,10 @@
+import { incrementCreatedCommentCount } from '@/utils/rootCommentCache';
+import { CreateCommentDocument as CREATE_COMMENT } from '@/__generated__/operations';
 import type { Ref } from 'vue';
 import type { Reference } from '@apollo/client/core';
 import { useMutation } from '@vue/apollo-composable';
 import type { Comment as CommentType } from '@/__generated__/graphql';
 import {
-  CREATE_COMMENT,
   UPDATE_COMMENT,
   DELETE_COMMENT,
   SOFT_DELETE_COMMENT,
@@ -11,6 +12,7 @@ import {
 
 type UseCommentCrudMutationsParams = {
   discussionId: Ref<string | undefined>;
+  eventId?: Ref<string | undefined>;
   commentToDeleteId: Ref<string>;
   parentOfCommentToDelete: Ref<string>;
   onCommentDeleted?: () => void;
@@ -41,6 +43,8 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
     onDecrementCommentCount,
   } = params;
 
+  const completedCreates = new Set<string>();
+
   // CREATE COMMENT mutation
   const {
     mutate: createComment,
@@ -50,34 +54,45 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
   } = useMutation(CREATE_COMMENT, {
     errorPolicy: 'none',
     update: (cache, result) => {
-      const newComment: CommentType =
+      const newComment =
         result.data?.createCommentWithOwnedConnections?.comments?.[0];
+      if (!newComment || completedCreates.has(newComment.id)) return;
+      completedCreates.add(newComment.id);
+      incrementCreatedCommentCount(cache, newComment);
+      const notifyEventCount = () => {
+        if (
+          !newComment.DiscussionChannel &&
+          newComment.Event &&
+          newComment.Event.id === params.eventId?.value
+        )
+          onIncrementCommentCount?.(cache);
+      };
       const newCommentParentId = newComment?.ParentComment?.id;
 
       // Handle root comments
       if (!newCommentParentId) {
-        cache.modify({
-          id: cache.identify({
-            __typename: 'DiscussionChannel',
-            id: discussionId.value,
-          }),
-          fields: {
-            Comments(existingComments = []) {
-              return [newComment, ...existingComments];
+        if (newComment.DiscussionChannel)
+          cache.modify({
+            id: cache.identify({
+              __typename: 'DiscussionChannel',
+              id: newComment.DiscussionChannel?.id,
+            }),
+            fields: {
+              Comments(existingComments = [], { toReference, readField }) {
+                if (
+                  existingComments.some(
+                    (item: Reference) => readField('id', item) === newComment.id
+                  )
+                )
+                  return existingComments;
+                return [
+                  toReference({ __typename: 'Comment', id: newComment.id }),
+                  ...existingComments,
+                ];
+              },
             },
-            CommentsConnection(existing) {
-              const nodes = existing?.aggregate?.count?.nodes || 0;
-              return {
-                ...existing,
-                aggregate: {
-                  ...existing?.aggregate,
-                  count: { ...existing?.aggregate?.count, nodes: nodes + 1 },
-                },
-              };
-            },
-          },
-        });
-        onIncrementCommentCount?.(cache);
+          });
+        notifyEventCount();
         return;
       }
 
@@ -149,7 +164,7 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
           },
         });
 
-        onIncrementCommentCount?.(cache);
+        notifyEventCount();
       } catch (error) {
         console.error('Error updating cache:', error);
       }

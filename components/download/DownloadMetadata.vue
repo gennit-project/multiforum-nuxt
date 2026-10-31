@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, type PropType } from 'vue';
-import type { FilterOption } from '@/__generated__/graphql';
+import type { PresentationLabel as FilterOption } from '@/types/DiscussionPresentation';
 
 const props = defineProps({
   labelOptions: {

@@ -4,7 +4,7 @@ import { ref, computed, onMounted, defineAsyncComponent } from 'vue';
 import { useRoute } from 'nuxt/app';
 import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
-import type { Album, Image } from '@/__generated__/graphql';
+import type { PresentationAlbum as Album } from '@/types/DiscussionPresentation';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
@@ -121,7 +121,7 @@ const expandedThumbnailDimensions = computed(() => {
 
 const orderedImages = computed(() => {
   const albumImages = orderImagesByOrder({
-    images: (props.album?.Images || []) as Image[],
+    images: props.album?.Images || [],
     imageOrder: props.album?.imageOrder,
   });
 
@@ -145,8 +145,8 @@ const activeImage = computed(() => {
 });
 
 const activeFavoriteImage = computed(() => {
-  const image = activeImage.value as (Image & { isStlFile?: boolean }) | null;
-  return image?.id && !image.isStlFile ? image : null;
+  const image = activeImage.value;
+  return image?.id && !('isStlFile' in image && image.isStlFile) ? image : null;
 });
 
 const mainImageWidth = computed(() => (props.expandedView ? 600 : 384));

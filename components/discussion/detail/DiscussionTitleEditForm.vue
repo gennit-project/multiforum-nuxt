@@ -1,6 +1,9 @@
 <script lang="ts" setup>
+import {
+  GetDiscussionDetailDocument as GET_DISCUSSION_DETAIL,
+  GetDownloadDetailDocument as GET_DOWNLOAD_DETAIL,
+} from '@/__generated__/operations';
 import { ref, nextTick, computed } from 'vue';
-import type { Discussion } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
@@ -10,10 +13,7 @@ import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discus
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
-import {
-  GET_DISCUSSION_DETAIL,
-  GET_DOWNLOAD_DETAIL,
-} from '@/graphQLData/discussion/queries';
+
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
 import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { useRoute } from 'nuxt/app';
@@ -56,7 +56,7 @@ const {
     })
 );
 
-const discussion = computed<Discussion | null>(() => {
+const discussion = computed(() => {
   const discussion = getDiscussionResult.value?.discussions?.[0];
   if (getDiscussionLoading.value && !discussion) {
     return null;
@@ -88,7 +88,7 @@ const authorIsLoggedInUser = computed(
 
 const titleInputRef = ref<HTMLElement | null>(null);
 const formValues = ref({
-  title: getDiscussionResult.value?.discussion?.title || '',
+  title: getDiscussionResult.value?.discussions?.[0]?.title || '',
 });
 onGetDiscussionResult(
   (result) =>
@@ -222,7 +222,11 @@ const formattedDate = computed(() => {
             :discussion-title="discussion.title"
             :entity-name="isDownloadDetailPage ? 'Download' : 'Discussion'"
             :entity-type="isDownloadDetailPage ? 'download' : 'discussion'"
-            :initial-is-favorited="discussion.isFavorited ?? false"
+            :initial-is-favorited="
+              'isFavorited' in discussion
+                ? discussion.isFavorited === true
+                : false
+            "
             size="large"
           />
         </div>

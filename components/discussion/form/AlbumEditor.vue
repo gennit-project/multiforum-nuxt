@@ -18,7 +18,7 @@ import {
   moveImageOrderUp,
   moveImageOrderDown,
 } from '@/utils/albumImageOrder';
-import type { Album } from '@/__generated__/graphql';
+import type { PresentationAlbum as Album } from '@/types/DiscussionPresentation';
 import { useInstanceCapability } from '@/composables/useInstanceSetupStatus';
 
 const usernameVar = useUsername();

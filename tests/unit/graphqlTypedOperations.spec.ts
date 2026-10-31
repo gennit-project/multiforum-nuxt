@@ -1,8 +1,13 @@
-import { describe, expect, it } from 'vitest';
-import { ApolloClient, InMemoryCache } from '@apollo/client/core';
-import { MockLink } from '@apollo/client/testing/core';
-import { Kind, print, type DocumentNode } from 'graphql';
 import {
+  CreateCommentDocument,
+  GetDiscussionDetailAnswersPageDocument,
+  GetDiscussionDocument,
+  GetDownloadDetailDocument,
+  GetDiscussionDetailDocument,
+  GetDiscussionChannelRootCommentAggregateDocument,
+  GetDiscussionChannelCommentAggregateDocument,
+  GetCommentDocument,
+  GetCommentSectionDocument,
   GetPublicUserProfileDocument,
   GetBasicUserInfoDocument,
   UpdateUserDocument,
@@ -14,16 +19,34 @@ import {
   StickyCommentDocument,
   UnstickyCommentDocument,
 } from '@/__generated__/operations';
-import { GET_PUBLIC_USER_PROFILE, GET_USER } from '@/graphQLData/user/queries';
-import { UPDATE_USER } from '@/graphQLData/user/mutations';
-import { GET_COMMENT_REPLIES, GET_COMMENT_AND_REPLIES } from '@/graphQLData/comment/queries';
-import { GET_COMMENT_ISSUE } from '@/graphQLData/mod/queries';
 import {
+  CREATE_COMMENT,
   SUBSCRIBE_TO_COMMENT,
   UNSUBSCRIBE_FROM_COMMENT,
   STICKY_COMMENT,
   UNSTICKY_COMMENT,
 } from '@/graphQLData/comment/mutations';
+import {
+  GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
+  GET_DISCUSSION,
+  GET_DOWNLOAD_DETAIL,
+  GET_DISCUSSION_DETAIL,
+} from '@/graphQLData/discussion/queries';
+import {
+  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
+  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
+  GET_DISCUSSION_COMMENTS,
+  GET_COMMENT,
+  GET_COMMENT_REPLIES,
+  GET_COMMENT_AND_REPLIES,
+} from '@/graphQLData/comment/queries';
+import { describe, expect, it } from 'vitest';
+import { ApolloClient, InMemoryCache } from '@apollo/client/core';
+import { MockLink } from '@apollo/client/testing/core';
+import { Kind, print, type DocumentNode } from 'graphql';
+import { GET_PUBLIC_USER_PROFILE, GET_USER } from '@/graphQLData/user/queries';
+import { UPDATE_USER } from '@/graphQLData/user/mutations';
+import { GET_COMMENT_ISSUE } from '@/graphQLData/mod/queries';
 
 // Fragment order is immaterial; selection sets, variables and directives are not.
 const definitions = (document: DocumentNode) =>
@@ -31,14 +54,51 @@ const definitions = (document: DocumentNode) =>
 
 describe('generated operation runtime contracts', () => {
   it.each([
+    ['answer hydration', GetCommentDocument, GET_COMMENT],
+    ['CREATE_COMMENT', CreateCommentDocument, CREATE_COMMENT],
+    [
+      'GET_DISCUSSION_DETAIL_ANSWERS_PAGE',
+      GetDiscussionDetailAnswersPageDocument,
+      GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
+    ],
+    ['GET_DISCUSSION', GetDiscussionDocument, GET_DISCUSSION],
+    ['GET_DOWNLOAD_DETAIL', GetDownloadDetailDocument, GET_DOWNLOAD_DETAIL],
+    [
+      'GET_DISCUSSION_DETAIL',
+      GetDiscussionDetailDocument,
+      GET_DISCUSSION_DETAIL,
+    ],
+    [
+      'GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE',
+      GetDiscussionChannelRootCommentAggregateDocument,
+      GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
+    ],
+    [
+      'GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE',
+      GetDiscussionChannelCommentAggregateDocument,
+      GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
+    ],
+    [
+      'GET_DISCUSSION_COMMENTS',
+      GetCommentSectionDocument,
+      GET_DISCUSSION_COMMENTS,
+    ],
     ['public profile', GetPublicUserProfileDocument, GET_PUBLIC_USER_PROFILE],
     ['account', GetBasicUserInfoDocument, GET_USER],
     ['update profile', UpdateUserDocument, UPDATE_USER],
     ['comment issue', GetCommentIssueDocument, GET_COMMENT_ISSUE],
     ['comment replies', GetCommentWithRepliesDocument, GET_COMMENT_REPLIES],
-    ['permalinked comment', GetPermalinkedCommentDocument, GET_COMMENT_AND_REPLIES],
+    [
+      'permalinked comment',
+      GetPermalinkedCommentDocument,
+      GET_COMMENT_AND_REPLIES,
+    ],
     ['watch comment', SubscribeToCommentDocument, SUBSCRIBE_TO_COMMENT],
-    ['unwatch comment', UnsubscribeFromCommentDocument, UNSUBSCRIBE_FROM_COMMENT],
+    [
+      'unwatch comment',
+      UnsubscribeFromCommentDocument,
+      UNSUBSCRIBE_FROM_COMMENT,
+    ],
     ['pin comment', StickyCommentDocument, STICKY_COMMENT],
     ['unpin comment', UnstickyCommentDocument, UNSTICKY_COMMENT],
   ])(

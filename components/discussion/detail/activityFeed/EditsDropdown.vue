@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import type {
+  DiscussionPresentation as Discussion,
+  PresentationRevision as TextVersion,
+} from '@/types/DiscussionPresentation';
 import {
   ref,
   computed,
@@ -9,12 +13,12 @@ import {
   useId,
 } from 'vue';
 import type { PropType } from 'vue';
-import type { Discussion, TextVersion, User } from '@/__generated__/graphql';
 import {
   usePopoverPositioning,
   type PopoverPosition,
 } from '@/composables/usePopoverPositioning';
 import { timeAgo } from '@/utils';
+type User = NonNullable<TextVersion['Author']>;
 
 const RevisionDiffModal = defineAsyncComponent(
   () => import('./RevisionDiffModal.vue')
@@ -107,13 +111,13 @@ const allEdits = computed(() => {
       const authorOfNewContent =
         index === 0
           ? props.discussion.BodyLastEditedBy
-          : props.discussion.PastBodyVersions[index - 1]?.Author;
+          : props.discussion.PastBodyVersions?.[index - 1]?.Author;
 
       // Get the new version's body content
       const nextVersionBody =
         index === 0
           ? currentVersionBody
-          : props.discussion.PastBodyVersions[index - 1];
+          : props.discussion.PastBodyVersions?.[index - 1];
 
       // Skip if we don't have valid next version data
       if (!nextVersionBody) {

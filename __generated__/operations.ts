@@ -6,14 +6,133 @@ import type * as Types from './graphql';
 type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 /** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type GetCommentQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetCommentQuery = { comments: Array<{ id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, textLastEdited: string | null, archived: boolean | null, isSticky: boolean | null, stickyAt: string | null, stickyByUsername: string | null, isFavoritedByUser: boolean | null, GivesFeedbackOnComment: { id: string, DiscussionChannel: { channelUniqueName: string, discussionId: string } | null, Event: { id: string } | null } | null, GivesFeedbackOnDiscussion: { id: string } | null, GivesFeedbackOnEvent: { id: string } | null, DiscussionChannel: { channelUniqueName: string, discussionId: string, id: string } | null, Event: { id: string } | null, Channel: { uniqueName: string } | null, CommentAuthor:
+      | { username: string, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null, isBot: boolean | null }
+      | { displayName: string | null }
+     | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }>, SubscribedToNotifications: Array<{ username: string }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> }> };
+
+export type CommentFieldsFragment = { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, textLastEdited: string | null, archived: boolean | null, isSticky: boolean | null, stickyAt: string | null, stickyByUsername: string | null, isFavoritedByUser: boolean | null, CommentAuthor:
+    | { username: string, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null, isBot: boolean | null }
+    | { displayName: string | null }
+   | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }>, SubscribedToNotifications: Array<{ username: string }>, Event: { id: string } | null, DiscussionChannel: { id: string, channelUniqueName: string, discussionId: string } | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> };
+
+export type CommentVoteFieldsFragment = { UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> };
+
+export type GetCommentSectionQueryVariables = Exact<{
+  channelUniqueName: string;
+  discussionId: string | number;
+  modName?: string | null | undefined;
+  offset?: number | null | undefined;
+  limit?: number | null | undefined;
+  sort?: string | null | undefined;
+}>;
+
+
+export type GetCommentSectionQuery = { getCommentSection: { DiscussionChannel: { id: string, weightedVotesCount: number | null, discussionId: string, channelUniqueName: string, emoji: unknown, archived: boolean | null, locked: boolean | null, answered: boolean | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }>, Channel: { uniqueName: string, feedbackEnabled: boolean | null, imageUploadsEnabled: boolean | null, markdownImagesEnabled: boolean | null, emojiEnabled: boolean | null, Bots: Array<{ username: string, displayName: string | null, botProfileId: string | null, isDeprecated: boolean | null }>, Moderators: Array<{ displayName: string | null }> } | null, Discussion: { id: string, title: string, Author: { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null } | null } | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, RootCommentsConnection: { aggregate: { count: { nodes: number } } }, SubscribedToNotifications: Array<{ username: string }>, Answers: Array<{ id: string, text: string | null, createdAt: string, CommentAuthor:
+          | { username: string, displayName: string | null }
+          | { displayName: string | null }
+         | null }>, detailAnswersPageInfo: { endCursor: string | null, hasNextPage: boolean } } | null, Comments: Array<{ id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, textLastEdited: string | null, archived: boolean | null, isSticky: boolean | null, stickyAt: string | null, stickyByUsername: string | null, isFavoritedByUser: boolean | null, CommentAuthor:
+        | { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null }
+        | Record<PropertyKey, never>
+       | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, FeedbackComments: Array<{ id: string }>, PastVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, SubscribedToNotifications: Array<{ username: string }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> }> } | null };
+
+export type AuthorFieldsFragment = { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null };
+
+export type GetDiscussionChannelCommentAggregateQueryVariables = Exact<{
+  channelUniqueName: string;
+  discussionId: string | number;
+}>;
+
+
+export type GetDiscussionChannelCommentAggregateQuery = { discussionChannels: Array<{ id: string, discussionId: string, channelUniqueName: string, archived: boolean | null, answered: boolean | null, locked: boolean | null, CommentsConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetDiscussionChannelRootCommentAggregateQueryVariables = Exact<{
+  channelUniqueName: string;
+  discussionId: string | number;
+}>;
+
+
+export type GetDiscussionChannelRootCommentAggregateQuery = { discussionChannels: Array<{ id: string, discussionId: string, channelUniqueName: string, archived: boolean | null, answered: boolean | null, locked: boolean | null, CommentsConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetDiscussionDetailQueryVariables = Exact<{
+  id: string | number;
+  loggedInModName?: string | null | undefined;
+  channelUniqueName: string;
+}>;
+
+
+export type GetDiscussionDetailQuery = { discussions: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, hasDownload: boolean | null, hasSensitiveContent: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null } | null, Album: { id: string, imageOrder: Array<string> | null, detailImagesPageInfo: { endCursor: string | null, hasNextPage: boolean }, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, DiscussionChannels: Array<{ id: string, discussionId: string, channelUniqueName: string, weightedVotesCount: number | null, archived: boolean | null, answered: boolean | null, locked: boolean | null, Flairs: Array<{ id: string, channelUniqueName: string, displayName: string, color: string | null, order: number, archived: boolean }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }>, Channel: { uniqueName: string, channelIconURL: string | null, displayName: string | null, feedbackEnabled: boolean | null, imageUploadsEnabled: boolean | null, markdownImagesEnabled: boolean | null, emojiEnabled: boolean | null } | null, Discussion: { id: string } | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, Answers: Array<{ id: string, text: string | null, createdAt: string, CommentAuthor:
+          | { username: string, displayName: string | null }
+          | { displayName: string | null }
+         | null }>, detailAnswersPageInfo: { endCursor: string | null, hasNextPage: boolean } }>, Tags: Array<{ text: string }>, DownloadableFiles: Array<{ id: string, fileName: string, url: string, kind: Types.FileKind, size: number | null, priceModel: Types.PriceModel, priceCents: number | null, priceCurrency: string | null, downloadCountTotal: number | null, downloadCountUnique: number | null, attributionOverride: string | null, supportPatreonUrl: string | null, supportBuyMeACoffeeUrl: string | null, supportKoFiUrl: string | null, supportPayPalMeUrl: string | null, scanStatus: Types.ScanStatus, scanCheckedAt: string | null, scanReason: string | null, uploadedByUsername: string | null, license: { id: string, name: string } | null }>, detailFilesPageInfo: { endCursor: string | null, hasNextPage: boolean }, FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } }, FeedbackComments: Array<{ id: string }>, CrosspostedDiscussion: { id: string, title: string, body: string | null, createdAt: string, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, DiscussionChannels: Array<{ channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null } | null }> } | null, SharedCollection: { id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, CreatedBy: { username: string, displayName: string | null, profilePicURL: string | null } | null } | null }> };
+
+export type DiscussionDetailFieldsFragment = { id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, hasDownload: boolean | null, hasSensitiveContent: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null } | null, Album: { id: string, imageOrder: Array<string> | null, detailImagesPageInfo: { endCursor: string | null, hasNextPage: boolean }, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, DiscussionChannels: Array<{ id: string, discussionId: string, channelUniqueName: string, weightedVotesCount: number | null, archived: boolean | null, answered: boolean | null, locked: boolean | null, Flairs: Array<{ id: string, channelUniqueName: string, displayName: string, color: string | null, order: number, archived: boolean }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }>, Channel: { uniqueName: string, channelIconURL: string | null, displayName: string | null, feedbackEnabled: boolean | null, imageUploadsEnabled: boolean | null, markdownImagesEnabled: boolean | null, emojiEnabled: boolean | null } | null, Discussion: { id: string } | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, Answers: Array<{ id: string, text: string | null, createdAt: string, CommentAuthor:
+        | { username: string, displayName: string | null }
+        | { displayName: string | null }
+       | null }>, detailAnswersPageInfo: { endCursor: string | null, hasNextPage: boolean } }>, Tags: Array<{ text: string }>, DownloadableFiles: Array<{ id: string, fileName: string, url: string, kind: Types.FileKind, size: number | null, priceModel: Types.PriceModel, priceCents: number | null, priceCurrency: string | null, downloadCountTotal: number | null, downloadCountUnique: number | null, attributionOverride: string | null, supportPatreonUrl: string | null, supportBuyMeACoffeeUrl: string | null, supportKoFiUrl: string | null, supportPayPalMeUrl: string | null, scanStatus: Types.ScanStatus, scanCheckedAt: string | null, scanReason: string | null, uploadedByUsername: string | null, license: { id: string, name: string } | null }>, detailFilesPageInfo: { endCursor: string | null, hasNextPage: boolean }, FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } }, FeedbackComments: Array<{ id: string }>, CrosspostedDiscussion: { id: string, title: string, body: string | null, createdAt: string, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, DiscussionChannels: Array<{ channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null } | null }> } | null, SharedCollection: { id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, CreatedBy: { username: string, displayName: string | null, profilePicURL: string | null } | null } | null };
+
+export type CrosspostPreviewFieldsFragment = { id: string, title: string, body: string | null, createdAt: string, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, DiscussionChannels: Array<{ channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null } | null }> };
+
+export type SharedCollectionPreviewFieldsFragment = { id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, CreatedBy: { username: string, displayName: string | null, profilePicURL: string | null } | null };
+
+export type DiscussionFlairFieldsFragment = { id: string, channelUniqueName: string, displayName: string, color: string | null, order: number, archived: boolean };
+
+export type GetDownloadDetailQueryVariables = Exact<{
+  id: string | number;
+  loggedInModName?: string | null | undefined;
+  loggedInUsername?: string | null | undefined;
+  channelUniqueName: string;
+}>;
+
+
+export type GetDownloadDetailQuery = { discussions: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, hasDownload: boolean | null, hasSensitiveContent: boolean | null, isFavorited: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null } | null, Album: { id: string, imageOrder: Array<string> | null, detailImagesPageInfo: { endCursor: string | null, hasNextPage: boolean }, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, DiscussionChannels: Array<{ id: string, discussionId: string, channelUniqueName: string, archived: boolean | null, answered: boolean | null, locked: boolean | null, Flairs: Array<{ id: string, channelUniqueName: string, displayName: string, color: string | null, order: number, archived: boolean }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }>, Channel: { uniqueName: string, channelIconURL: string | null, displayName: string | null, feedbackEnabled: boolean | null, imageUploadsEnabled: boolean | null, markdownImagesEnabled: boolean | null, emojiEnabled: boolean | null } | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, LabelOptions: Array<{ id: string, value: string, displayName: string, order: number, group: { id: string, key: string, displayName: string } | null }> }>, Tags: Array<{ text: string }>, DownloadableFiles: Array<{ id: string, fileName: string, url: string, kind: Types.FileKind, size: number | null, priceModel: Types.PriceModel, priceCents: number | null, priceCurrency: string | null, downloadCountTotal: number | null, downloadCountUnique: number | null, attributionOverride: string | null, supportPatreonUrl: string | null, supportBuyMeACoffeeUrl: string | null, supportKoFiUrl: string | null, supportPayPalMeUrl: string | null, scanStatus: Types.ScanStatus, scanCheckedAt: string | null, scanReason: string | null, uploadedByUsername: string | null, license: { id: string, name: string } | null }>, detailFilesPageInfo: { endCursor: string | null, hasNextPage: boolean }, FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } }, FeedbackComments: Array<{ id: string }>, CrosspostedDiscussion: { id: string, title: string, body: string | null, createdAt: string, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, DiscussionChannels: Array<{ channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null } | null }> } | null }> };
+
+export type GetDiscussionQueryVariables = Exact<{
+  id: string | number;
+  loggedInModName?: string | null | undefined;
+  loggedInUsername?: string | null | undefined;
+  channelUniqueName: string;
+}>;
+
+
+export type GetDiscussionQuery = { discussions: Array<{ isFavorited: boolean | null, editReason: string | null, authorIsChannelModerator: boolean | null, id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, hasDownload: boolean | null, hasSensitiveContent: boolean | null, DiscussionChannels: Array<{ id: string, discussionId: string, channelUniqueName: string, weightedVotesCount: number | null, archived: boolean | null, answered: boolean | null, locked: boolean | null, LabelOptions: Array<{ id: string, value: string, displayName: string, order: number, group: { id: string, key: string, displayName: string } | null }>, LabelChangeHistory: Array<{ id: string, createdAt: string, actionType: string, labelDisplayName: string, labelValue: string, ActorUser: { username: string, displayName: string | null } | null, ActorMod: { displayName: string | null } | null }>, Flairs: Array<{ id: string, channelUniqueName: string, displayName: string, color: string | null, order: number, archived: boolean }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }>, Channel: { uniqueName: string, channelIconURL: string | null, displayName: string | null, feedbackEnabled: boolean | null, imageUploadsEnabled: boolean | null, markdownImagesEnabled: boolean | null, emojiEnabled: boolean | null } | null, Discussion: { id: string } | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, Answers: Array<{ id: string, text: string | null, createdAt: string, CommentAuthor:
+          | { username: string, displayName: string | null }
+          | { displayName: string | null }
+         | null }>, detailAnswersPageInfo: { endCursor: string | null, hasNextPage: boolean } }>, PastTitleVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }>, PastBodyVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }>, BodyLastEditedBy: { username: string } | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null } | null, Album: { id: string, imageOrder: Array<string> | null, detailImagesPageInfo: { endCursor: string | null, hasNextPage: boolean }, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, Tags: Array<{ text: string }>, DownloadableFiles: Array<{ id: string, fileName: string, url: string, kind: Types.FileKind, size: number | null, priceModel: Types.PriceModel, priceCents: number | null, priceCurrency: string | null, downloadCountTotal: number | null, downloadCountUnique: number | null, attributionOverride: string | null, supportPatreonUrl: string | null, supportBuyMeACoffeeUrl: string | null, supportKoFiUrl: string | null, supportPayPalMeUrl: string | null, scanStatus: Types.ScanStatus, scanCheckedAt: string | null, scanReason: string | null, uploadedByUsername: string | null, license: { id: string, name: string } | null }>, detailFilesPageInfo: { endCursor: string | null, hasNextPage: boolean }, FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } }, FeedbackComments: Array<{ id: string }>, CrosspostedDiscussion: { id: string, title: string, body: string | null, createdAt: string, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, DiscussionChannels: Array<{ channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null } | null }> } | null, SharedCollection: { id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, CreatedBy: { username: string, displayName: string | null, profilePicURL: string | null } | null } | null }> };
+
+export type GetDiscussionDetailAnswersPageQueryVariables = Exact<{
+  discussionId: string | number;
+  channelUniqueName: string;
+  after?: string | null | undefined;
+}>;
+
+
+export type GetDiscussionDetailAnswersPageQuery = { getDiscussionDetailAnswers: { answers: Array<{ id: string, text: string | null, createdAt: string, CommentAuthor:
+        | { username: string, displayName: string | null }
+        | { displayName: string | null }
+       | null }>, pageInfo: { endCursor: string | null, hasNextPage: boolean } } };
+
+export type CreateCommentMutationVariables = Exact<{
+  createCommentInput: Array<Types.OwnedCommentCreateInput> | Types.OwnedCommentCreateInput;
+}>;
+
+
+export type CreateCommentMutation = { createCommentWithOwnedConnections: { comments: Array<{ id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, textLastEdited: string | null, archived: boolean | null, isSticky: boolean | null, stickyAt: string | null, stickyByUsername: string | null, isFavoritedByUser: boolean | null, Channel: { uniqueName: string } | null, CommentAuthor:
+        | { displayName: string | null, username: string, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null, isBot: boolean | null, ChannelRoles: Array<{ name: string }>, ServerRoles: Array<{ name: string | null }> }
+        | { createdAt: string, displayName: string | null }
+       | null, FeedbackComments: Array<{ id: string }>, ChildComments: Array<{ id: string, text: string | null }>, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }>, SubscribedToNotifications: Array<{ username: string }>, Event: { id: string } | null, DiscussionChannel: { id: string, channelUniqueName: string, discussionId: string } | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> }> } };
+
 export type GetPublicUserProfileQueryVariables = Exact<{
   username: string;
 }>;
 
 
 export type GetPublicUserProfileQuery = { getUserWikiEditsCount: number, users: Array<{ location: string | null, pronouns: string | null, bio: string | null, username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, DiscussionsConnection: { aggregate: { count: { nodes: number } } }, DownloadsConnection: { aggregate: { count: { nodes: number } } }, EventsConnection: { aggregate: { count: { nodes: number } } }, ImagesConnection: { aggregate: { count: { nodes: number } } }, AlbumsConnection: { aggregate: { count: { nodes: number } } }, AuthoredWikiPageVersionsConnection: { aggregate: { count: { nodes: number } } }, AdminOfChannelsConnection: { aggregate: { count: { nodes: number } } }, ModOfChannelsConnection: { aggregate: { count: { nodes: number } } } }> };
-
-export type AuthorFieldsFragment = { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null };
 
 export type GetBasicUserInfoQueryVariables = Exact<{
   username: string;
@@ -50,13 +169,6 @@ export type GetCommentWithRepliesQuery = { getCommentReplies: { aggregateChildCo
         | { username: string, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null, isBot: boolean | null }
         | { displayName: string | null }
        | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }>, SubscribedToNotifications: Array<{ username: string }>, Event: { id: string } | null, DiscussionChannel: { id: string, channelUniqueName: string, discussionId: string } | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> }> } | null };
-
-export type CommentFieldsFragment = { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, textLastEdited: string | null, archived: boolean | null, isSticky: boolean | null, stickyAt: string | null, stickyByUsername: string | null, isFavoritedByUser: boolean | null, CommentAuthor:
-    | { username: string, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null, isBot: boolean | null }
-    | { displayName: string | null }
-   | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }>, SubscribedToNotifications: Array<{ username: string }>, Event: { id: string } | null, DiscussionChannel: { id: string, channelUniqueName: string, discussionId: string } | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> };
-
-export type CommentVoteFieldsFragment = { UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> };
 
 export type GetPermalinkedCommentQueryVariables = Exact<{
   id: string | number;
@@ -99,17 +211,600 @@ export type UnstickyCommentMutationVariables = Exact<{
 
 export type UnstickyCommentMutation = { unstickyComment: { id: string, isSticky: boolean | null, stickyAt: string | null, stickyByUsername: string | null } | null };
 
+const sharedNode0 = {"kind":"Name","value":"CommentVoteFields"};
+const sharedNode1 = {"kind":"Name","value":"Comment"};
+const sharedNode2 = {"kind":"NamedType","name":sharedNode1};
+const sharedNode3 = {"kind":"Name","value":"UpvotedByUsers"};
+const sharedNode4 = {"kind":"Name","value":"username"};
+const sharedNode5 = {"kind":"Field","name":sharedNode4};
+const sharedNode6 = [sharedNode5];
+const sharedNode7 = {"kind":"SelectionSet","selections":sharedNode6};
+const sharedNode8 = {"kind":"Field","name":sharedNode3,"selectionSet":sharedNode7};
+const sharedNode9 = {"kind":"Name","value":"UpvotedByUsersConnection"};
+const sharedNode10 = {"kind":"Name","value":"aggregate"};
+const sharedNode11 = {"kind":"Name","value":"count"};
+const sharedNode12 = {"kind":"Name","value":"nodes"};
+const sharedNode13 = {"kind":"Field","name":sharedNode12};
+const sharedNode14 = [sharedNode13];
+const sharedNode15 = {"kind":"SelectionSet","selections":sharedNode14};
+const sharedNode16 = {"kind":"Field","name":sharedNode11,"selectionSet":sharedNode15};
+const sharedNode17 = [sharedNode16];
+const sharedNode18 = {"kind":"SelectionSet","selections":sharedNode17};
+const sharedNode19 = {"kind":"Field","name":sharedNode10,"selectionSet":sharedNode18};
+const sharedNode20 = [sharedNode19];
+const sharedNode21 = {"kind":"SelectionSet","selections":sharedNode20};
+const sharedNode22 = {"kind":"Field","name":sharedNode9,"selectionSet":sharedNode21};
+const sharedNode23 = {"kind":"Name","value":"SuperUpvotedByUsers"};
+const sharedNode24 = {"kind":"Field","name":sharedNode23,"selectionSet":sharedNode7};
+const sharedNode25 = [sharedNode8,sharedNode22,sharedNode24];
+const sharedNode26 = {"kind":"SelectionSet","selections":sharedNode25};
+const sharedNode27 = {"kind":"FragmentDefinition","name":sharedNode0,"typeCondition":sharedNode2,"selectionSet":sharedNode26};
+const sharedNode28 = {"kind":"Name","value":"CommentFields"};
+const sharedNode29 = {"kind":"Name","value":"id"};
+const sharedNode30 = {"kind":"Field","name":sharedNode29};
+const sharedNode31 = {"kind":"Name","value":"text"};
+const sharedNode32 = {"kind":"Field","name":sharedNode31};
+const sharedNode33 = {"kind":"Name","value":"emoji"};
+const sharedNode34 = {"kind":"Field","name":sharedNode33};
+const sharedNode35 = {"kind":"Name","value":"weightedVotesCount"};
+const sharedNode36 = {"kind":"Field","name":sharedNode35};
+const sharedNode37 = {"kind":"Name","value":"createdAt"};
+const sharedNode38 = {"kind":"Field","name":sharedNode37};
+const sharedNode39 = {"kind":"Name","value":"updatedAt"};
+const sharedNode40 = {"kind":"Field","name":sharedNode39};
+const sharedNode41 = {"kind":"Name","value":"textLastEdited"};
+const sharedNode42 = {"kind":"Field","name":sharedNode41};
+const sharedNode43 = {"kind":"Name","value":"archived"};
+const sharedNode44 = {"kind":"Field","name":sharedNode43};
+const sharedNode45 = {"kind":"Name","value":"isSticky"};
+const sharedNode46 = {"kind":"Field","name":sharedNode45};
+const sharedNode47 = {"kind":"Name","value":"stickyAt"};
+const sharedNode48 = {"kind":"Field","name":sharedNode47};
+const sharedNode49 = {"kind":"Name","value":"stickyByUsername"};
+const sharedNode50 = {"kind":"Field","name":sharedNode49};
+const sharedNode51 = {"kind":"Name","value":"isFavoritedByUser"};
+const sharedNode52 = {"kind":"Field","name":sharedNode51};
+const sharedNode53 = {"kind":"Name","value":"CommentAuthor"};
+const sharedNode54 = {"kind":"Name","value":"ModerationProfile"};
+const sharedNode55 = {"kind":"NamedType","name":sharedNode54};
+const sharedNode56 = {"kind":"Name","value":"displayName"};
+const sharedNode57 = {"kind":"Field","name":sharedNode56};
+const sharedNode58 = [sharedNode57];
+const sharedNode59 = {"kind":"SelectionSet","selections":sharedNode58};
+const sharedNode60 = {"kind":"InlineFragment","typeCondition":sharedNode55,"selectionSet":sharedNode59};
+const sharedNode61 = {"kind":"Name","value":"User"};
+const sharedNode62 = {"kind":"NamedType","name":sharedNode61};
+const sharedNode63 = {"kind":"Name","value":"profilePicURL"};
+const sharedNode64 = {"kind":"Field","name":sharedNode63};
+const sharedNode65 = {"kind":"Name","value":"discussionKarma"};
+const sharedNode66 = {"kind":"Field","name":sharedNode65};
+const sharedNode67 = {"kind":"Name","value":"commentKarma"};
+const sharedNode68 = {"kind":"Field","name":sharedNode67};
+const sharedNode69 = {"kind":"Name","value":"isBot"};
+const sharedNode70 = {"kind":"Field","name":sharedNode69};
+const sharedNode71 = [sharedNode5,sharedNode64,sharedNode38,sharedNode66,sharedNode68,sharedNode70];
+const sharedNode72 = {"kind":"SelectionSet","selections":sharedNode71};
+const sharedNode73 = {"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":sharedNode72};
+const sharedNode74 = [sharedNode60,sharedNode73];
+const sharedNode75 = {"kind":"SelectionSet","selections":sharedNode74};
+const sharedNode76 = {"kind":"Field","name":sharedNode53,"selectionSet":sharedNode75};
+const sharedNode77 = {"kind":"Name","value":"ChildCommentsConnection"};
+const sharedNode78 = {"kind":"Field","name":sharedNode77,"selectionSet":sharedNode21};
+const sharedNode79 = {"kind":"Name","value":"ParentComment"};
+const sharedNode80 = [sharedNode30];
+const sharedNode81 = {"kind":"SelectionSet","selections":sharedNode80};
+const sharedNode82 = {"kind":"Field","name":sharedNode79,"selectionSet":sharedNode81};
+const sharedNode83 = {"kind":"Name","value":"PastVersions"};
+const sharedNode84 = {"kind":"Name","value":"body"};
+const sharedNode85 = {"kind":"Field","name":sharedNode84};
+const sharedNode86 = {"kind":"Name","value":"editReason"};
+const sharedNode87 = {"kind":"Field","name":sharedNode86};
+const sharedNode88 = {"kind":"Name","value":"Author"};
+const sharedNode89 = {"kind":"Field","name":sharedNode88,"selectionSet":sharedNode7};
+const sharedNode90 = [sharedNode30,sharedNode85,sharedNode87,sharedNode38,sharedNode89];
+const sharedNode91 = {"kind":"SelectionSet","selections":sharedNode90};
+const sharedNode92 = {"kind":"Field","name":sharedNode83,"selectionSet":sharedNode91};
+const sharedNode93 = {"kind":"Name","value":"SubscribedToNotifications"};
+const sharedNode94 = {"kind":"Field","name":sharedNode93,"selectionSet":sharedNode7};
+const sharedNode95 = {"kind":"Name","value":"Event"};
+const sharedNode96 = {"kind":"Field","name":sharedNode95,"selectionSet":sharedNode81};
+const sharedNode97 = {"kind":"Name","value":"DiscussionChannel"};
+const sharedNode98 = {"kind":"Name","value":"channelUniqueName"};
+const sharedNode99 = {"kind":"Field","name":sharedNode98};
+const sharedNode100 = {"kind":"Name","value":"discussionId"};
+const sharedNode101 = {"kind":"Field","name":sharedNode100};
+const sharedNode102 = [sharedNode30,sharedNode99,sharedNode101];
+const sharedNode103 = {"kind":"SelectionSet","selections":sharedNode102};
+const sharedNode104 = {"kind":"Field","name":sharedNode97,"selectionSet":sharedNode103};
+const sharedNode105 = {"kind":"FragmentSpread","name":sharedNode0};
+const sharedNode106 = [sharedNode30,sharedNode32,sharedNode34,sharedNode36,sharedNode38,sharedNode40,sharedNode42,sharedNode44,sharedNode46,sharedNode48,sharedNode50,sharedNode52,sharedNode76,sharedNode78,sharedNode82,sharedNode92,sharedNode94,sharedNode96,sharedNode104,sharedNode105];
+const sharedNode107 = {"kind":"SelectionSet","selections":sharedNode106};
+const sharedNode108 = {"kind":"FragmentDefinition","name":sharedNode28,"typeCondition":sharedNode2,"selectionSet":sharedNode107};
+const sharedNode109 = {"kind":"Name","value":"AuthorFields"};
+const sharedNode110 = [sharedNode5,sharedNode57,sharedNode64,sharedNode38,sharedNode66,sharedNode68];
+const sharedNode111 = {"kind":"SelectionSet","selections":sharedNode110};
+const sharedNode112 = {"kind":"FragmentDefinition","name":sharedNode109,"typeCondition":sharedNode62,"selectionSet":sharedNode111};
+const sharedNode113 = {"kind":"Name","value":"DiscussionFlairFields"};
+const sharedNode114 = {"kind":"Name","value":"DiscussionFlair"};
+const sharedNode115 = {"kind":"NamedType","name":sharedNode114};
+const sharedNode116 = {"kind":"Name","value":"color"};
+const sharedNode117 = {"kind":"Field","name":sharedNode116};
+const sharedNode118 = {"kind":"Name","value":"order"};
+const sharedNode119 = {"kind":"Field","name":sharedNode118};
+const sharedNode120 = [sharedNode30,sharedNode99,sharedNode57,sharedNode117,sharedNode119,sharedNode44];
+const sharedNode121 = {"kind":"SelectionSet","selections":sharedNode120};
+const sharedNode122 = {"kind":"FragmentDefinition","name":sharedNode113,"typeCondition":sharedNode115,"selectionSet":sharedNode121};
+const sharedNode123 = {"kind":"Name","value":"CrosspostPreviewFields"};
+const sharedNode124 = {"kind":"Name","value":"Discussion"};
+const sharedNode125 = {"kind":"NamedType","name":sharedNode124};
+const sharedNode126 = {"kind":"Name","value":"title"};
+const sharedNode127 = {"kind":"Field","name":sharedNode126};
+const sharedNode128 = {"kind":"Name","value":"Album"};
+const sharedNode129 = {"kind":"Name","value":"imageOrder"};
+const sharedNode130 = {"kind":"Field","name":sharedNode129};
+const sharedNode131 = {"kind":"Name","value":"Images"};
+const sharedNode132 = {"kind":"Name","value":"where"};
+const sharedNode133 = {"kind":"Name","value":"NOT"};
+const sharedNode134 = {"kind":"Name","value":"eq"};
+const sharedNode135 = {"kind":"BooleanValue","value":true};
+const sharedNode136 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode135};
+const sharedNode137 = [sharedNode136];
+const sharedNode138 = {"kind":"ObjectValue","fields":sharedNode137};
+const sharedNode139 = {"kind":"ObjectField","name":sharedNode43,"value":sharedNode138};
+const sharedNode140 = {"kind":"Name","value":"permanentlyRemoved"};
+const sharedNode141 = {"kind":"ObjectField","name":sharedNode140,"value":sharedNode138};
+const sharedNode142 = [sharedNode139,sharedNode141];
+const sharedNode143 = {"kind":"ObjectValue","fields":sharedNode142};
+const sharedNode144 = {"kind":"ObjectField","name":sharedNode133,"value":sharedNode143};
+const sharedNode145 = [sharedNode144];
+const sharedNode146 = {"kind":"ObjectValue","fields":sharedNode145};
+const sharedNode147 = {"kind":"Argument","name":sharedNode132,"value":sharedNode146};
+const sharedNode148 = [sharedNode147];
+const sharedNode149 = {"kind":"Name","value":"url"};
+const sharedNode150 = {"kind":"Field","name":sharedNode149};
+const sharedNode151 = {"kind":"Name","value":"alt"};
+const sharedNode152 = {"kind":"Field","name":sharedNode151};
+const sharedNode153 = {"kind":"Name","value":"caption"};
+const sharedNode154 = {"kind":"Field","name":sharedNode153};
+const sharedNode155 = {"kind":"Name","value":"copyright"};
+const sharedNode156 = {"kind":"Field","name":sharedNode155};
+const sharedNode157 = {"kind":"Name","value":"Uploader"};
+const sharedNode158 = [sharedNode5,sharedNode57];
+const sharedNode159 = {"kind":"SelectionSet","selections":sharedNode158};
+const sharedNode160 = {"kind":"Field","name":sharedNode157,"selectionSet":sharedNode159};
+const sharedNode161 = [sharedNode30,sharedNode150,sharedNode152,sharedNode154,sharedNode156,sharedNode160];
+const sharedNode162 = {"kind":"SelectionSet","selections":sharedNode161};
+const sharedNode163 = {"kind":"Field","name":sharedNode131,"arguments":sharedNode148,"selectionSet":sharedNode162};
+const sharedNode164 = [sharedNode30,sharedNode130,sharedNode163];
+const sharedNode165 = {"kind":"SelectionSet","selections":sharedNode164};
+const sharedNode166 = {"kind":"Field","name":sharedNode128,"selectionSet":sharedNode165};
+const sharedNode167 = [sharedNode5,sharedNode57,sharedNode64];
+const sharedNode168 = {"kind":"SelectionSet","selections":sharedNode167};
+const sharedNode169 = {"kind":"Field","name":sharedNode88,"selectionSet":sharedNode168};
+const sharedNode170 = {"kind":"Name","value":"DiscussionChannels"};
+const sharedNode171 = {"kind":"Name","value":"Channel"};
+const sharedNode172 = {"kind":"Name","value":"uniqueName"};
+const sharedNode173 = {"kind":"Field","name":sharedNode172};
+const sharedNode174 = [sharedNode173,sharedNode57];
+const sharedNode175 = {"kind":"SelectionSet","selections":sharedNode174};
+const sharedNode176 = {"kind":"Field","name":sharedNode171,"selectionSet":sharedNode175};
+const sharedNode177 = [sharedNode99,sharedNode176];
+const sharedNode178 = {"kind":"SelectionSet","selections":sharedNode177};
+const sharedNode179 = {"kind":"Field","name":sharedNode170,"selectionSet":sharedNode178};
+const sharedNode180 = [sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode166,sharedNode169,sharedNode179];
+const sharedNode181 = {"kind":"SelectionSet","selections":sharedNode180};
+const sharedNode182 = {"kind":"FragmentDefinition","name":sharedNode123,"typeCondition":sharedNode125,"selectionSet":sharedNode181};
+const sharedNode183 = {"kind":"Name","value":"SharedCollectionPreviewFields"};
+const sharedNode184 = {"kind":"Name","value":"Collection"};
+const sharedNode185 = {"kind":"NamedType","name":sharedNode184};
+const sharedNode186 = {"kind":"Name","value":"name"};
+const sharedNode187 = {"kind":"Field","name":sharedNode186};
+const sharedNode188 = {"kind":"Name","value":"description"};
+const sharedNode189 = {"kind":"Field","name":sharedNode188};
+const sharedNode190 = {"kind":"Name","value":"collectionType"};
+const sharedNode191 = {"kind":"Field","name":sharedNode190};
+const sharedNode192 = {"kind":"Name","value":"visibility"};
+const sharedNode193 = {"kind":"Field","name":sharedNode192};
+const sharedNode194 = {"kind":"Name","value":"itemCount"};
+const sharedNode195 = {"kind":"Field","name":sharedNode194};
+const sharedNode196 = {"kind":"Name","value":"CreatedBy"};
+const sharedNode197 = {"kind":"Field","name":sharedNode196,"selectionSet":sharedNode168};
+const sharedNode198 = [sharedNode30,sharedNode187,sharedNode189,sharedNode191,sharedNode193,sharedNode195,sharedNode197];
+const sharedNode199 = {"kind":"SelectionSet","selections":sharedNode198};
+const sharedNode200 = {"kind":"FragmentDefinition","name":sharedNode183,"typeCondition":sharedNode185,"selectionSet":sharedNode199};
+const sharedNode201 = {"kind":"Name","value":"DiscussionDetailFields"};
+const sharedNode202 = {"kind":"Name","value":"hasDownload"};
+const sharedNode203 = {"kind":"Field","name":sharedNode202};
+const sharedNode204 = {"kind":"Name","value":"hasSensitiveContent"};
+const sharedNode205 = {"kind":"Field","name":sharedNode204};
+const sharedNode206 = {"kind":"FragmentSpread","name":sharedNode109};
+const sharedNode207 = [sharedNode206];
+const sharedNode208 = {"kind":"SelectionSet","selections":sharedNode207};
+const sharedNode209 = {"kind":"Field","name":sharedNode88,"selectionSet":sharedNode208};
+const sharedNode210 = {"kind":"Name","value":"detailImagesPageInfo"};
+const sharedNode211 = {"kind":"Name","value":"endCursor"};
+const sharedNode212 = {"kind":"Field","name":sharedNode211};
+const sharedNode213 = {"kind":"Name","value":"hasNextPage"};
+const sharedNode214 = {"kind":"Field","name":sharedNode213};
+const sharedNode215 = [sharedNode212,sharedNode214];
+const sharedNode216 = {"kind":"SelectionSet","selections":sharedNode215};
+const sharedNode217 = {"kind":"Field","name":sharedNode210,"selectionSet":sharedNode216};
+const sharedNode218 = [sharedNode30,sharedNode130,sharedNode217,sharedNode163];
+const sharedNode219 = {"kind":"SelectionSet","selections":sharedNode218};
+const sharedNode220 = {"kind":"Field","name":sharedNode128,"selectionSet":sharedNode219};
+const sharedNode221 = {"kind":"Name","value":"answered"};
+const sharedNode222 = {"kind":"Field","name":sharedNode221};
+const sharedNode223 = {"kind":"Name","value":"locked"};
+const sharedNode224 = {"kind":"Field","name":sharedNode223};
+const sharedNode225 = {"kind":"Name","value":"Flairs"};
+const sharedNode226 = {"kind":"FragmentSpread","name":sharedNode113};
+const sharedNode227 = [sharedNode226];
+const sharedNode228 = {"kind":"SelectionSet","selections":sharedNode227};
+const sharedNode229 = {"kind":"Field","name":sharedNode225,"selectionSet":sharedNode228};
+const sharedNode230 = {"kind":"Name","value":"channelIconURL"};
+const sharedNode231 = {"kind":"Field","name":sharedNode230};
+const sharedNode232 = {"kind":"Name","value":"feedbackEnabled"};
+const sharedNode233 = {"kind":"Field","name":sharedNode232};
+const sharedNode234 = {"kind":"Name","value":"imageUploadsEnabled"};
+const sharedNode235 = {"kind":"Field","name":sharedNode234};
+const sharedNode236 = {"kind":"Name","value":"markdownImagesEnabled"};
+const sharedNode237 = {"kind":"Field","name":sharedNode236};
+const sharedNode238 = {"kind":"Name","value":"emojiEnabled"};
+const sharedNode239 = {"kind":"Field","name":sharedNode238};
+const sharedNode240 = [sharedNode173,sharedNode231,sharedNode57,sharedNode233,sharedNode235,sharedNode237,sharedNode239];
+const sharedNode241 = {"kind":"SelectionSet","selections":sharedNode240};
+const sharedNode242 = {"kind":"Field","name":sharedNode171,"selectionSet":sharedNode241};
+const sharedNode243 = {"kind":"Field","name":sharedNode124,"selectionSet":sharedNode81};
+const sharedNode244 = {"kind":"Name","value":"CommentsConnection"};
+const sharedNode245 = {"kind":"Name","value":"node"};
+const sharedNode246 = {"kind":"Name","value":"isFeedbackComment"};
+const sharedNode247 = {"kind":"BooleanValue","value":false};
+const sharedNode248 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode247};
+const sharedNode249 = [sharedNode248];
+const sharedNode250 = {"kind":"ObjectValue","fields":sharedNode249};
+const sharedNode251 = {"kind":"ObjectField","name":sharedNode246,"value":sharedNode250};
+const sharedNode252 = [sharedNode251];
+const sharedNode253 = {"kind":"ObjectValue","fields":sharedNode252};
+const sharedNode254 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode253};
+const sharedNode255 = [sharedNode254];
+const sharedNode256 = {"kind":"ObjectValue","fields":sharedNode255};
+const sharedNode257 = {"kind":"Argument","name":sharedNode132,"value":sharedNode256};
+const sharedNode258 = [sharedNode257];
+const sharedNode259 = {"kind":"Field","name":sharedNode244,"arguments":sharedNode258,"selectionSet":sharedNode21};
+const sharedNode260 = {"kind":"Name","value":"Answers"};
+const sharedNode261 = {"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":sharedNode159};
+const sharedNode262 = [sharedNode261,sharedNode60];
+const sharedNode263 = {"kind":"SelectionSet","selections":sharedNode262};
+const sharedNode264 = {"kind":"Field","name":sharedNode53,"selectionSet":sharedNode263};
+const sharedNode265 = [sharedNode30,sharedNode32,sharedNode38,sharedNode264];
+const sharedNode266 = {"kind":"SelectionSet","selections":sharedNode265};
+const sharedNode267 = {"kind":"Field","name":sharedNode260,"selectionSet":sharedNode266};
+const sharedNode268 = {"kind":"Name","value":"detailAnswersPageInfo"};
+const sharedNode269 = {"kind":"Field","name":sharedNode268,"selectionSet":sharedNode216};
+const sharedNode270 = [sharedNode30,sharedNode101,sharedNode99,sharedNode36,sharedNode44,sharedNode222,sharedNode224,sharedNode229,sharedNode8,sharedNode22,sharedNode24,sharedNode242,sharedNode243,sharedNode259,sharedNode267,sharedNode269];
+const sharedNode271 = {"kind":"SelectionSet","selections":sharedNode270};
+const sharedNode272 = {"kind":"Field","name":sharedNode170,"selectionSet":sharedNode271};
+const sharedNode273 = {"kind":"Name","value":"Tags"};
+const sharedNode274 = [sharedNode32];
+const sharedNode275 = {"kind":"SelectionSet","selections":sharedNode274};
+const sharedNode276 = {"kind":"Field","name":sharedNode273,"selectionSet":sharedNode275};
+const sharedNode277 = {"kind":"Name","value":"DownloadableFiles"};
+const sharedNode278 = [sharedNode141];
+const sharedNode279 = {"kind":"ObjectValue","fields":sharedNode278};
+const sharedNode280 = {"kind":"ObjectField","name":sharedNode133,"value":sharedNode279};
+const sharedNode281 = [sharedNode280];
+const sharedNode282 = {"kind":"ObjectValue","fields":sharedNode281};
+const sharedNode283 = {"kind":"Argument","name":sharedNode132,"value":sharedNode282};
+const sharedNode284 = [sharedNode283];
+const sharedNode285 = {"kind":"Name","value":"fileName"};
+const sharedNode286 = {"kind":"Field","name":sharedNode285};
+const sharedNode287 = {"kind":"Name","value":"kind"};
+const sharedNode288 = {"kind":"Field","name":sharedNode287};
+const sharedNode289 = {"kind":"Name","value":"size"};
+const sharedNode290 = {"kind":"Field","name":sharedNode289};
+const sharedNode291 = {"kind":"Name","value":"priceModel"};
+const sharedNode292 = {"kind":"Field","name":sharedNode291};
+const sharedNode293 = {"kind":"Name","value":"priceCents"};
+const sharedNode294 = {"kind":"Field","name":sharedNode293};
+const sharedNode295 = {"kind":"Name","value":"priceCurrency"};
+const sharedNode296 = {"kind":"Field","name":sharedNode295};
+const sharedNode297 = {"kind":"Name","value":"downloadCountTotal"};
+const sharedNode298 = {"kind":"Field","name":sharedNode297};
+const sharedNode299 = {"kind":"Name","value":"downloadCountUnique"};
+const sharedNode300 = {"kind":"Field","name":sharedNode299};
+const sharedNode301 = {"kind":"Name","value":"attributionOverride"};
+const sharedNode302 = {"kind":"Field","name":sharedNode301};
+const sharedNode303 = {"kind":"Name","value":"supportPatreonUrl"};
+const sharedNode304 = {"kind":"Field","name":sharedNode303};
+const sharedNode305 = {"kind":"Name","value":"supportBuyMeACoffeeUrl"};
+const sharedNode306 = {"kind":"Field","name":sharedNode305};
+const sharedNode307 = {"kind":"Name","value":"supportKoFiUrl"};
+const sharedNode308 = {"kind":"Field","name":sharedNode307};
+const sharedNode309 = {"kind":"Name","value":"supportPayPalMeUrl"};
+const sharedNode310 = {"kind":"Field","name":sharedNode309};
+const sharedNode311 = {"kind":"Name","value":"scanStatus"};
+const sharedNode312 = {"kind":"Field","name":sharedNode311};
+const sharedNode313 = {"kind":"Name","value":"scanCheckedAt"};
+const sharedNode314 = {"kind":"Field","name":sharedNode313};
+const sharedNode315 = {"kind":"Name","value":"scanReason"};
+const sharedNode316 = {"kind":"Field","name":sharedNode315};
+const sharedNode317 = {"kind":"Name","value":"uploadedByUsername"};
+const sharedNode318 = {"kind":"Field","name":sharedNode317};
+const sharedNode319 = {"kind":"Name","value":"license"};
+const sharedNode320 = [sharedNode30,sharedNode187];
+const sharedNode321 = {"kind":"SelectionSet","selections":sharedNode320};
+const sharedNode322 = {"kind":"Field","name":sharedNode319,"selectionSet":sharedNode321};
+const sharedNode323 = [sharedNode30,sharedNode286,sharedNode150,sharedNode288,sharedNode290,sharedNode292,sharedNode294,sharedNode296,sharedNode298,sharedNode300,sharedNode302,sharedNode304,sharedNode306,sharedNode308,sharedNode310,sharedNode312,sharedNode314,sharedNode316,sharedNode318,sharedNode322];
+const sharedNode324 = {"kind":"SelectionSet","selections":sharedNode323};
+const sharedNode325 = {"kind":"Field","name":sharedNode277,"arguments":sharedNode284,"selectionSet":sharedNode324};
+const sharedNode326 = {"kind":"Name","value":"detailFilesPageInfo"};
+const sharedNode327 = {"kind":"Field","name":sharedNode326,"selectionSet":sharedNode216};
+const sharedNode328 = {"kind":"Name","value":"FeedbackCommentsConnection"};
+const sharedNode329 = {"kind":"Field","name":sharedNode328,"selectionSet":sharedNode21};
+const sharedNode330 = {"kind":"Name","value":"FeedbackComments"};
+const sharedNode331 = {"kind":"Name","value":"CommentAuthorConnection"};
+const sharedNode332 = {"kind":"Name","value":"loggedInModName"};
+const sharedNode333 = {"kind":"Variable","name":sharedNode332};
+const sharedNode334 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode333};
+const sharedNode335 = [sharedNode334];
+const sharedNode336 = {"kind":"ObjectValue","fields":sharedNode335};
+const sharedNode337 = {"kind":"ObjectField","name":sharedNode56,"value":sharedNode336};
+const sharedNode338 = [sharedNode337];
+const sharedNode339 = {"kind":"ObjectValue","fields":sharedNode338};
+const sharedNode340 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode339};
+const sharedNode341 = [sharedNode340];
+const sharedNode342 = {"kind":"ObjectValue","fields":sharedNode341};
+const sharedNode343 = {"kind":"ObjectField","name":sharedNode54,"value":sharedNode342};
+const sharedNode344 = [sharedNode343];
+const sharedNode345 = {"kind":"ObjectValue","fields":sharedNode344};
+const sharedNode346 = {"kind":"ObjectField","name":sharedNode331,"value":sharedNode345};
+const sharedNode347 = [sharedNode346];
+const sharedNode348 = {"kind":"ObjectValue","fields":sharedNode347};
+const sharedNode349 = {"kind":"Argument","name":sharedNode132,"value":sharedNode348};
+const sharedNode350 = [sharedNode349];
+const sharedNode351 = {"kind":"Field","name":sharedNode330,"arguments":sharedNode350,"selectionSet":sharedNode81};
+const sharedNode352 = {"kind":"Name","value":"CrosspostedDiscussion"};
+const sharedNode353 = {"kind":"FragmentSpread","name":sharedNode123};
+const sharedNode354 = [sharedNode353];
+const sharedNode355 = {"kind":"SelectionSet","selections":sharedNode354};
+const sharedNode356 = {"kind":"Field","name":sharedNode352,"selectionSet":sharedNode355};
+const sharedNode357 = {"kind":"Name","value":"SharedCollection"};
+const sharedNode358 = {"kind":"FragmentSpread","name":sharedNode183};
+const sharedNode359 = [sharedNode358];
+const sharedNode360 = {"kind":"SelectionSet","selections":sharedNode359};
+const sharedNode361 = {"kind":"Field","name":sharedNode357,"selectionSet":sharedNode360};
+const sharedNode362 = [sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode203,sharedNode205,sharedNode209,sharedNode220,sharedNode272,sharedNode276,sharedNode325,sharedNode327,sharedNode329,sharedNode351,sharedNode356,sharedNode361];
+const sharedNode363 = {"kind":"SelectionSet","selections":sharedNode362};
+const sharedNode364 = {"kind":"FragmentDefinition","name":sharedNode201,"typeCondition":sharedNode125,"selectionSet":sharedNode363};
+const sharedNode365 = {"kind":"Variable","name":sharedNode29};
+const sharedNode366 = {"kind":"Name","value":"ID"};
+const sharedNode367 = {"kind":"NamedType","name":sharedNode366};
+const sharedNode368 = {"kind":"NonNullType","type":sharedNode367};
+const sharedNode369 = {"kind":"VariableDefinition","variable":sharedNode365,"type":sharedNode368};
+const sharedNode370 = [sharedNode369];
+const sharedNode371 = {"kind":"Name","value":"comments"};
+const sharedNode372 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode365};
+const sharedNode373 = [sharedNode372];
+const sharedNode374 = {"kind":"ObjectValue","fields":sharedNode373};
+const sharedNode375 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode374};
+const sharedNode376 = [sharedNode375];
+const sharedNode377 = {"kind":"ObjectValue","fields":sharedNode376};
+const sharedNode378 = {"kind":"Argument","name":sharedNode132,"value":sharedNode377};
+const sharedNode379 = [sharedNode378];
+const sharedNode380 = {"kind":"FragmentSpread","name":sharedNode28};
+const sharedNode381 = [sharedNode99,sharedNode101];
+const sharedNode382 = {"kind":"SelectionSet","selections":sharedNode381};
+const sharedNode383 = {"kind":"Field","name":sharedNode97,"selectionSet":sharedNode382};
+const sharedNode384 = [sharedNode173];
+const sharedNode385 = {"kind":"SelectionSet","selections":sharedNode384};
+const sharedNode386 = {"kind":"Field","name":sharedNode171,"selectionSet":sharedNode385};
+const sharedNode387 = {"kind":"Variable","name":sharedNode98};
+const sharedNode388 = {"kind":"Name","value":"String"};
+const sharedNode389 = {"kind":"NamedType","name":sharedNode388};
+const sharedNode390 = {"kind":"NonNullType","type":sharedNode389};
+const sharedNode391 = {"kind":"VariableDefinition","variable":sharedNode387,"type":sharedNode390};
+const sharedNode392 = {"kind":"Variable","name":sharedNode100};
+const sharedNode393 = {"kind":"VariableDefinition","variable":sharedNode392,"type":sharedNode368};
+const sharedNode394 = {"kind":"Name","value":"modName"};
+const sharedNode395 = {"kind":"Variable","name":sharedNode394};
+const sharedNode396 = {"kind":"VariableDefinition","variable":sharedNode395,"type":sharedNode389};
+const sharedNode397 = {"kind":"Name","value":"offset"};
+const sharedNode398 = {"kind":"Variable","name":sharedNode397};
+const sharedNode399 = {"kind":"Name","value":"Int"};
+const sharedNode400 = {"kind":"NamedType","name":sharedNode399};
+const sharedNode401 = {"kind":"VariableDefinition","variable":sharedNode398,"type":sharedNode400};
+const sharedNode402 = {"kind":"Name","value":"limit"};
+const sharedNode403 = {"kind":"Variable","name":sharedNode402};
+const sharedNode404 = {"kind":"VariableDefinition","variable":sharedNode403,"type":sharedNode400};
+const sharedNode405 = {"kind":"Name","value":"sort"};
+const sharedNode406 = {"kind":"Variable","name":sharedNode405};
+const sharedNode407 = {"kind":"Argument","name":sharedNode98,"value":sharedNode387};
+const sharedNode408 = {"kind":"Argument","name":sharedNode100,"value":sharedNode392};
+const sharedNode409 = {"kind":"Argument","name":sharedNode394,"value":sharedNode395};
+const sharedNode410 = {"kind":"Argument","name":sharedNode397,"value":sharedNode398};
+const sharedNode411 = {"kind":"Argument","name":sharedNode402,"value":sharedNode403};
+const sharedNode412 = {"kind":"Argument","name":sharedNode405,"value":sharedNode406};
+const sharedNode413 = {"kind":"Name","value":"OR"};
+const sharedNode414 = {"kind":"NullValue"};
+const sharedNode415 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode414};
+const sharedNode416 = [sharedNode415];
+const sharedNode417 = {"kind":"ObjectValue","fields":sharedNode416};
+const sharedNode418 = {"kind":"ObjectField","name":sharedNode246,"value":sharedNode417};
+const sharedNode419 = [sharedNode418];
+const sharedNode420 = {"kind":"ObjectValue","fields":sharedNode419};
+const sharedNode421 = [sharedNode420,sharedNode253];
+const sharedNode422 = {"kind":"ListValue","values":sharedNode421};
+const sharedNode423 = {"kind":"ObjectField","name":sharedNode413,"value":sharedNode422};
+const sharedNode424 = [sharedNode423];
+const sharedNode425 = {"kind":"ObjectValue","fields":sharedNode424};
+const sharedNode426 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode425};
+const sharedNode427 = [sharedNode426];
+const sharedNode428 = {"kind":"ObjectValue","fields":sharedNode427};
+const sharedNode429 = {"kind":"Argument","name":sharedNode132,"value":sharedNode428};
+const sharedNode430 = [sharedNode429];
+const sharedNode431 = {"kind":"Field","name":sharedNode244,"arguments":sharedNode430,"selectionSet":sharedNode21};
+const sharedNode432 = {"kind":"ObjectField","name":{"kind":"Name","value":"isRootComment"},"value":sharedNode138};
+const sharedNode433 = [sharedNode432,sharedNode423];
+const sharedNode434 = {"kind":"ObjectValue","fields":sharedNode433};
+const sharedNode435 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode434};
+const sharedNode436 = [sharedNode435];
+const sharedNode437 = {"kind":"ObjectValue","fields":sharedNode436};
+const sharedNode438 = {"kind":"Argument","name":sharedNode132,"value":sharedNode437};
+const sharedNode439 = [sharedNode438];
+const sharedNode440 = {"kind":"Field","name":sharedNode330,"selectionSet":sharedNode81};
+const sharedNode441 = [sharedNode391,sharedNode393];
+const sharedNode442 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode387};
+const sharedNode443 = [sharedNode442];
+const sharedNode444 = {"kind":"ObjectValue","fields":sharedNode443};
+const sharedNode445 = {"kind":"ObjectField","name":sharedNode98,"value":sharedNode444};
+const sharedNode446 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode392};
+const sharedNode447 = [sharedNode446];
+const sharedNode448 = {"kind":"ObjectValue","fields":sharedNode447};
+const sharedNode449 = {"kind":"ObjectField","name":sharedNode100,"value":sharedNode448};
+const sharedNode450 = [sharedNode445,sharedNode449];
+const sharedNode451 = {"kind":"ObjectValue","fields":sharedNode450};
+const sharedNode452 = {"kind":"Argument","name":sharedNode132,"value":sharedNode451};
+const sharedNode453 = [sharedNode452];
+const sharedNode454 = {"kind":"Name","value":"getDiscussionDetail"};
+const sharedNode455 = {"kind":"VariableDefinition","variable":sharedNode333,"type":sharedNode389};
+const sharedNode456 = {"kind":"Name","value":"discussions"};
+const sharedNode457 = {"kind":"Argument","name":sharedNode100,"value":sharedNode365};
+const sharedNode458 = [sharedNode457,sharedNode407];
+const sharedNode459 = {"kind":"FragmentSpread","name":sharedNode201};
+const sharedNode460 = {"kind":"Name","value":"loggedInUsername"};
+const sharedNode461 = {"kind":"Variable","name":sharedNode460};
+const sharedNode462 = {"kind":"VariableDefinition","variable":sharedNode461,"type":sharedNode389};
+const sharedNode463 = [sharedNode369,sharedNode455,sharedNode462,sharedNode391];
+const sharedNode464 = {"kind":"Argument","name":sharedNode4,"value":sharedNode461};
+const sharedNode465 = [sharedNode464];
+const sharedNode466 = {"kind":"Field","name":{"kind":"Name","value":"isFavorited"},"arguments":sharedNode465};
+const sharedNode467 = [sharedNode30,{"kind":"Field","name":{"kind":"Name","value":"key"}},sharedNode57];
+const sharedNode468 = {"kind":"SelectionSet","selections":sharedNode467};
+const sharedNode469 = {"kind":"Field","name":{"kind":"Name","value":"group"},"selectionSet":sharedNode468};
+const sharedNode470 = [sharedNode30,{"kind":"Field","name":{"kind":"Name","value":"value"}},sharedNode57,sharedNode119,sharedNode469];
+const sharedNode471 = {"kind":"SelectionSet","selections":sharedNode470};
+const sharedNode472 = {"kind":"Field","name":{"kind":"Name","value":"LabelOptions"},"selectionSet":sharedNode471};
+const sharedNode473 = {"kind":"EnumValue","value":"DESC"};
+const sharedNode474 = {"kind":"ObjectField","name":sharedNode37,"value":sharedNode473};
+const sharedNode475 = [sharedNode474];
+const sharedNode476 = {"kind":"ObjectValue","fields":sharedNode475};
+const sharedNode477 = [sharedNode476];
+const sharedNode478 = {"kind":"ListValue","values":sharedNode477};
+const sharedNode479 = {"kind":"Argument","name":sharedNode405,"value":sharedNode478};
+const sharedNode480 = [sharedNode479];
+const sharedNode481 = [sharedNode30,sharedNode89,sharedNode85,sharedNode87,sharedNode38];
+const sharedNode482 = {"kind":"SelectionSet","selections":sharedNode481};
+const sharedNode483 = {"kind":"Name","value":"after"};
+const sharedNode484 = {"kind":"Variable","name":{"kind":"Name","value":"createCommentInput"}};
+const sharedNode485 = {"kind":"SelectionSet","selections":[sharedNode187]};
+const sharedNode486 = {"kind":"Name","value":"ChildComments"};
+const sharedNode487 = {"kind":"Variable","name":sharedNode4};
+const sharedNode488 = {"kind":"VariableDefinition","variable":sharedNode487,"type":sharedNode390};
+const sharedNode489 = [sharedNode488];
+const sharedNode490 = {"kind":"Argument","name":sharedNode4,"value":sharedNode487};
+const sharedNode491 = [sharedNode490];
+const sharedNode492 = {"kind":"Field","name":{"kind":"Name","value":"getUserWikiEditsCount"},"arguments":sharedNode491};
+const sharedNode493 = {"kind":"Name","value":"users"};
+const sharedNode494 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode487};
+const sharedNode495 = [sharedNode494];
+const sharedNode496 = {"kind":"ObjectValue","fields":sharedNode495};
+const sharedNode497 = {"kind":"ObjectField","name":sharedNode4,"value":sharedNode496};
+const sharedNode498 = [sharedNode497];
+const sharedNode499 = {"kind":"ObjectValue","fields":sharedNode498};
+const sharedNode500 = {"kind":"Argument","name":sharedNode132,"value":sharedNode499};
+const sharedNode501 = [sharedNode500];
+const sharedNode502 = {"kind":"Name","value":"bio"};
+const sharedNode503 = {"kind":"Field","name":sharedNode502};
+const sharedNode504 = [sharedNode139];
+const sharedNode505 = {"kind":"ObjectValue","fields":sharedNode504};
+const sharedNode506 = {"kind":"ObjectField","name":sharedNode133,"value":sharedNode505};
+const sharedNode507 = [sharedNode506];
+const sharedNode508 = {"kind":"ObjectValue","fields":sharedNode507};
+const sharedNode509 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode508};
+const sharedNode510 = [sharedNode509];
+const sharedNode511 = {"kind":"ObjectValue","fields":sharedNode510};
+const sharedNode512 = {"kind":"Argument","name":sharedNode132,"value":sharedNode511};
+const sharedNode513 = [sharedNode512];
+const sharedNode514 = {"kind":"Field","name":sharedNode244,"arguments":sharedNode513,"selectionSet":sharedNode21};
+const sharedNode515 = {"kind":"Name","value":"DiscussionsConnection"};
+const sharedNode516 = {"kind":"ObjectField","name":sharedNode202,"value":sharedNode250};
+const sharedNode517 = [sharedNode516];
+const sharedNode518 = {"kind":"ObjectValue","fields":sharedNode517};
+const sharedNode519 = {"kind":"ObjectField","name":sharedNode202,"value":sharedNode417};
+const sharedNode520 = [sharedNode519];
+const sharedNode521 = {"kind":"ObjectValue","fields":sharedNode520};
+const sharedNode522 = [sharedNode518,sharedNode521];
+const sharedNode523 = {"kind":"ListValue","values":sharedNode522};
+const sharedNode524 = {"kind":"ObjectField","name":sharedNode413,"value":sharedNode523};
+const sharedNode525 = [sharedNode524];
+const sharedNode526 = {"kind":"ObjectValue","fields":sharedNode525};
+const sharedNode527 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode526};
+const sharedNode528 = [sharedNode527];
+const sharedNode529 = {"kind":"ObjectValue","fields":sharedNode528};
+const sharedNode530 = {"kind":"Argument","name":sharedNode132,"value":sharedNode529};
+const sharedNode531 = [sharedNode530];
+const sharedNode532 = {"kind":"Field","name":sharedNode515,"arguments":sharedNode531,"selectionSet":sharedNode21};
+const sharedNode533 = {"kind":"ObjectField","name":sharedNode202,"value":sharedNode138};
+const sharedNode534 = [sharedNode533];
+const sharedNode535 = {"kind":"ObjectValue","fields":sharedNode534};
+const sharedNode536 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode535};
+const sharedNode537 = [sharedNode536];
+const sharedNode538 = {"kind":"ObjectValue","fields":sharedNode537};
+const sharedNode539 = {"kind":"Argument","name":sharedNode132,"value":sharedNode538};
+const sharedNode540 = [sharedNode539];
+const sharedNode541 = {"kind":"Field","alias":{"kind":"Name","value":"DownloadsConnection"},"name":sharedNode515,"arguments":sharedNode540,"selectionSet":sharedNode21};
+const sharedNode542 = {"kind":"Field","name":{"kind":"Name","value":"EventsConnection"},"selectionSet":sharedNode21};
+const sharedNode543 = {"kind":"Field","name":{"kind":"Name","value":"ImagesConnection"},"selectionSet":sharedNode21};
+const sharedNode544 = {"kind":"Field","name":{"kind":"Name","value":"AlbumsConnection"},"selectionSet":sharedNode21};
+const sharedNode545 = {"kind":"Name","value":"AuthoredWikiPageVersionsConnection"};
+const sharedNode546 = {"kind":"Field","name":sharedNode545,"selectionSet":sharedNode21};
+const sharedNode547 = {"kind":"Field","name":{"kind":"Name","value":"AdminOfChannelsConnection"},"selectionSet":sharedNode21};
+const sharedNode548 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToCommentByDefault"}};
+const sharedNode549 = {"kind":"Name","value":"notifyOnReplyToDiscussionByDefault"};
+const sharedNode550 = {"kind":"Field","name":sharedNode549};
+const sharedNode551 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToEventByDefault"}};
+const sharedNode552 = {"kind":"Field","name":{"kind":"Name","value":"notifyWhenTagged"}};
+const sharedNode553 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnSubscribedIssueUpdates"}};
+const sharedNode554 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnFeedback"}};
+const sharedNode555 = {"kind":"Field","name":{"kind":"Name","value":"notificationBundleInterval"}};
+const sharedNode556 = {"kind":"Field","name":{"kind":"Name","value":"notificationBundleEnabled"}};
+const sharedNode557 = {"kind":"Field","name":{"kind":"Name","value":"notificationBundleContent"}};
+const sharedNode558 = {"kind":"Field","name":{"kind":"Name","value":"enableSensitiveContentByDefault"}};
+const sharedNode559 = {"kind":"Name","value":"update"};
+const sharedNode560 = {"kind":"Name","value":"commentId"};
+const sharedNode561 = {"kind":"Variable","name":sharedNode560};
+const sharedNode562 = {"kind":"VariableDefinition","variable":sharedNode561,"type":sharedNode368};
+const sharedNode563 = [sharedNode562];
+const sharedNode564 = {"kind":"Argument","name":sharedNode560,"value":sharedNode561};
+const sharedNode565 = [sharedNode564];
+const sharedNode566 = [sharedNode30,sharedNode94];
+const sharedNode567 = {"kind":"SelectionSet","selections":sharedNode566};
+const sharedNode568 = [sharedNode30,sharedNode46,sharedNode48,sharedNode50];
+const sharedNode569 = {"kind":"SelectionSet","selections":sharedNode568};
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-export const AuthorFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AuthorFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"profilePicURL"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"discussionKarma"}},{"kind":"Field","name":{"kind":"Name","value":"commentKarma"}}]}}]} as unknown as DocumentNode<AuthorFieldsFragment, unknown>;
-export const CommentVoteFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommentVoteFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"UpvotedByUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"UpvotedByUsersConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"SuperUpvotedByUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]} as unknown as DocumentNode<CommentVoteFieldsFragment, unknown>;
-export const CommentFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommentFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"emoji"}},{"kind":"Field","name":{"kind":"Name","value":"weightedVotesCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"textLastEdited"}},{"kind":"Field","name":{"kind":"Name","value":"archived"}},{"kind":"Field","name":{"kind":"Name","value":"isSticky"}},{"kind":"Field","name":{"kind":"Name","value":"stickyAt"}},{"kind":"Field","name":{"kind":"Name","value":"stickyByUsername"}},{"kind":"Field","name":{"kind":"Name","value":"isFavoritedByUser"}},{"kind":"Field","name":{"kind":"Name","value":"CommentAuthor"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ModerationProfile"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"displayName"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"profilePicURL"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"discussionKarma"}},{"kind":"Field","name":{"kind":"Name","value":"commentKarma"}},{"kind":"Field","name":{"kind":"Name","value":"isBot"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"ChildCommentsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"ParentComment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"PastVersions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"editReason"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"Author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"SubscribedToNotifications"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"Event"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"DiscussionChannel"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"channelUniqueName"}},{"kind":"Field","name":{"kind":"Name","value":"discussionId"}}]}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"CommentVoteFields"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommentVoteFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"UpvotedByUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"UpvotedByUsersConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"SuperUpvotedByUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]} as unknown as DocumentNode<CommentFieldsFragment, unknown>;
-export const GetPublicUserProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPublicUserProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getUserWikiEditsCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}}]},{"kind":"Field","name":{"kind":"Name","value":"users"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"username"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AuthorFields"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"pronouns"}},{"kind":"Field","name":{"kind":"Name","value":"bio"}},{"kind":"Field","name":{"kind":"Name","value":"CommentsConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"node"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"NOT"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"archived"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"BooleanValue","value":true}}]}}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"DiscussionsConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"node"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"OR"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hasDownload"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"BooleanValue","value":false}}]}}]},{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hasDownload"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"NullValue"}}]}}]}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","alias":{"kind":"Name","value":"DownloadsConnection"},"name":{"kind":"Name","value":"DiscussionsConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"node"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hasDownload"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"BooleanValue","value":true}}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"EventsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"ImagesConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"AlbumsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"AuthoredWikiPageVersionsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"AdminOfChannelsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"ModOfChannelsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AuthorFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"profilePicURL"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"discussionKarma"}},{"kind":"Field","name":{"kind":"Name","value":"commentKarma"}}]}}]} as unknown as DocumentNode<GetPublicUserProfileQuery, GetPublicUserProfileQueryVariables>;
-export const GetBasicUserInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getBasicUserInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"username"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getUserWikiEditsCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"username"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}}]},{"kind":"Field","name":{"kind":"Name","value":"users"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"username"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"username"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AuthorFields"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"pronouns"}},{"kind":"Field","name":{"kind":"Name","value":"bio"}},{"kind":"Field","name":{"kind":"Name","value":"Email"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"address"}}]}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToCommentByDefault"}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToDiscussionByDefault"}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToEventByDefault"}},{"kind":"Field","name":{"kind":"Name","value":"notifyWhenTagged"}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnSubscribedIssueUpdates"}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnFeedback"}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnSuspensionBlocks"}},{"kind":"Field","name":{"kind":"Name","value":"notificationBundleInterval"}},{"kind":"Field","name":{"kind":"Name","value":"notificationBundleEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"notificationBundleContent"}},{"kind":"Field","name":{"kind":"Name","value":"enableSensitiveContentByDefault"}},{"kind":"Field","name":{"kind":"Name","value":"NotificationsConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"node"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"read"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"BooleanValue","value":false}}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"CommentsConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"node"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"NOT"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"archived"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"BooleanValue","value":true}}]}}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"DiscussionsConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"node"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"OR"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hasDownload"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"BooleanValue","value":false}}]}}]},{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hasDownload"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"NullValue"}}]}}]}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","alias":{"kind":"Name","value":"DownloadsConnection"},"name":{"kind":"Name","value":"DiscussionsConnection"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"node"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"hasDownload"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"BooleanValue","value":true}}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"EventsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"ImagesConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"AlbumsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"AuthoredWikiPageVersionsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"AdminOfChannelsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AuthorFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"profilePicURL"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"discussionKarma"}},{"kind":"Field","name":{"kind":"Name","value":"commentKarma"}}]}}]} as unknown as DocumentNode<GetBasicUserInfoQuery, GetBasicUserInfoQueryVariables>;
-export const UpdateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhere"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"update"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserUpdateInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUsers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}},{"kind":"Argument","name":{"kind":"Name","value":"update"},"value":{"kind":"Variable","name":{"kind":"Name","value":"update"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"bio"}},{"kind":"Field","name":{"kind":"Name","value":"profilePicURL"}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToCommentByDefault"}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToDiscussionByDefault"}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToEventByDefault"}},{"kind":"Field","name":{"kind":"Name","value":"notifyWhenTagged"}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnSubscribedIssueUpdates"}},{"kind":"Field","name":{"kind":"Name","value":"notifyOnFeedback"}},{"kind":"Field","name":{"kind":"Name","value":"notificationBundleInterval"}},{"kind":"Field","name":{"kind":"Name","value":"notificationBundleEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"notificationBundleContent"}},{"kind":"Field","name":{"kind":"Name","value":"enableSensitiveContentByDefault"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
-export const GetCommentIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentIssue"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"RelatedIssues"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"issueNumber"}}]}}]}}]}}]} as unknown as DocumentNode<GetCommentIssueQuery, GetCommentIssueQueryVariables>;
-export const GetCommentWithRepliesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentWithReplies"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"modName"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"offset"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sort"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"SortType"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCommentReplies"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"commentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}},{"kind":"Argument","name":{"kind":"Name","value":"modName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"modName"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"offset"},"value":{"kind":"Variable","name":{"kind":"Name","value":"offset"}}},{"kind":"Argument","name":{"kind":"Name","value":"sort"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sort"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregateChildCommentCount"}},{"kind":"Field","name":{"kind":"Name","value":"ChildComments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CommentFields"}},{"kind":"Field","name":{"kind":"Name","value":"FeedbackComments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommentFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"emoji"}},{"kind":"Field","name":{"kind":"Name","value":"weightedVotesCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"textLastEdited"}},{"kind":"Field","name":{"kind":"Name","value":"archived"}},{"kind":"Field","name":{"kind":"Name","value":"isSticky"}},{"kind":"Field","name":{"kind":"Name","value":"stickyAt"}},{"kind":"Field","name":{"kind":"Name","value":"stickyByUsername"}},{"kind":"Field","name":{"kind":"Name","value":"isFavoritedByUser"}},{"kind":"Field","name":{"kind":"Name","value":"CommentAuthor"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ModerationProfile"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"displayName"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"profilePicURL"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"discussionKarma"}},{"kind":"Field","name":{"kind":"Name","value":"commentKarma"}},{"kind":"Field","name":{"kind":"Name","value":"isBot"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"ChildCommentsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"ParentComment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"PastVersions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"editReason"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"Author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"SubscribedToNotifications"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"Event"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"DiscussionChannel"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"channelUniqueName"}},{"kind":"Field","name":{"kind":"Name","value":"discussionId"}}]}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"CommentVoteFields"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommentVoteFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"UpvotedByUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"UpvotedByUsersConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"SuperUpvotedByUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]} as unknown as DocumentNode<GetCommentWithRepliesQuery, GetCommentWithRepliesQueryVariables>;
-export const GetPermalinkedCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPermalinkedComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"comments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CommentFields"}},{"kind":"Field","name":{"kind":"Name","value":"ChildComments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CommentFields"}}]}},{"kind":"Field","name":{"kind":"Name","value":"FeedbackComments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommentFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"emoji"}},{"kind":"Field","name":{"kind":"Name","value":"weightedVotesCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"textLastEdited"}},{"kind":"Field","name":{"kind":"Name","value":"archived"}},{"kind":"Field","name":{"kind":"Name","value":"isSticky"}},{"kind":"Field","name":{"kind":"Name","value":"stickyAt"}},{"kind":"Field","name":{"kind":"Name","value":"stickyByUsername"}},{"kind":"Field","name":{"kind":"Name","value":"isFavoritedByUser"}},{"kind":"Field","name":{"kind":"Name","value":"CommentAuthor"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ModerationProfile"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"displayName"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"profilePicURL"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"discussionKarma"}},{"kind":"Field","name":{"kind":"Name","value":"commentKarma"}},{"kind":"Field","name":{"kind":"Name","value":"isBot"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"ChildCommentsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"ParentComment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"PastVersions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"editReason"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"Author"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"SubscribedToNotifications"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"Event"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"DiscussionChannel"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"channelUniqueName"}},{"kind":"Field","name":{"kind":"Name","value":"discussionId"}}]}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"CommentVoteFields"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CommentVoteFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Comment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"UpvotedByUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}},{"kind":"Field","name":{"kind":"Name","value":"UpvotedByUsersConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregate"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"count"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"SuperUpvotedByUsers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]} as unknown as DocumentNode<GetPermalinkedCommentQuery, GetPermalinkedCommentQueryVariables>;
-export const SubscribeToCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"subscribeToComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subscribeToComment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"commentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"SubscribedToNotifications"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]} as unknown as DocumentNode<SubscribeToCommentMutation, SubscribeToCommentMutationVariables>;
-export const UnsubscribeFromCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unsubscribeFromComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unsubscribeFromComment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"commentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"SubscribedToNotifications"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]} as unknown as DocumentNode<UnsubscribeFromCommentMutation, UnsubscribeFromCommentMutationVariables>;
-export const StickyCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"stickyComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stickyComment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"commentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"isSticky"}},{"kind":"Field","name":{"kind":"Name","value":"stickyAt"}},{"kind":"Field","name":{"kind":"Name","value":"stickyByUsername"}}]}}]}}]} as unknown as DocumentNode<StickyCommentMutation, StickyCommentMutationVariables>;
-export const UnstickyCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unstickyComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unstickyComment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"commentId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"commentId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"isSticky"}},{"kind":"Field","name":{"kind":"Name","value":"stickyAt"}},{"kind":"Field","name":{"kind":"Name","value":"stickyByUsername"}}]}}]}}]} as unknown as DocumentNode<UnstickyCommentMutation, UnstickyCommentMutationVariables>;
+export const CommentVoteFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode27]} as unknown as DocumentNode<CommentVoteFieldsFragment, unknown>;
+export const CommentFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode108,sharedNode27]} as unknown as DocumentNode<CommentFieldsFragment, unknown>;
+export const AuthorFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode112]} as unknown as DocumentNode<AuthorFieldsFragment, unknown>;
+export const DiscussionFlairFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode122]} as unknown as DocumentNode<DiscussionFlairFieldsFragment, unknown>;
+export const CrosspostPreviewFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode182]} as unknown as DocumentNode<CrosspostPreviewFieldsFragment, unknown>;
+export const SharedCollectionPreviewFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode200]} as unknown as DocumentNode<SharedCollectionPreviewFieldsFragment, unknown>;
+export const DiscussionDetailFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode364,sharedNode112,sharedNode182,sharedNode200,sharedNode122]} as unknown as DocumentNode<DiscussionDetailFieldsFragment, unknown>;
+export const GetCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getComment"},"variableDefinitions":sharedNode370,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode371,"arguments":sharedNode379,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode380,{"kind":"Field","name":{"kind":"Name","value":"GivesFeedbackOnComment"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode383,sharedNode96]}},{"kind":"Field","name":{"kind":"Name","value":"GivesFeedbackOnDiscussion"},"selectionSet":sharedNode81},{"kind":"Field","name":{"kind":"Name","value":"GivesFeedbackOnEvent"},"selectionSet":sharedNode81},sharedNode383,sharedNode96,sharedNode386]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetCommentQuery, GetCommentQueryVariables>;
+export const GetCommentSectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentSection"},"variableDefinitions":[sharedNode391,sharedNode393,sharedNode396,sharedNode401,sharedNode404,{"kind":"VariableDefinition","variable":sharedNode406,"type":sharedNode389}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCommentSection"},"arguments":[sharedNode407,sharedNode408,sharedNode409,sharedNode410,sharedNode411,sharedNode412],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode97,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode36,sharedNode101,sharedNode99,sharedNode34,sharedNode44,sharedNode224,sharedNode222,sharedNode8,sharedNode22,sharedNode24,{"kind":"Field","name":sharedNode171,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode233,sharedNode235,sharedNode237,sharedNode239,{"kind":"Field","name":{"kind":"Name","value":"Bots"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode57,{"kind":"Field","name":{"kind":"Name","value":"botProfileId"}},{"kind":"Field","name":{"kind":"Name","value":"isDeprecated"}}]}},{"kind":"Field","name":{"kind":"Name","value":"Moderators"},"selectionSet":sharedNode59}]}},{"kind":"Field","name":sharedNode124,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode209]}},sharedNode431,{"kind":"Field","alias":{"kind":"Name","value":"RootCommentsConnection"},"name":sharedNode244,"arguments":sharedNode439,"selectionSet":sharedNode21},sharedNode94,sharedNode267,sharedNode269]}},{"kind":"Field","name":{"kind":"Name","value":"Comments"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode34,sharedNode36,sharedNode38,sharedNode40,sharedNode42,sharedNode44,sharedNode46,sharedNode48,sharedNode50,sharedNode52,{"kind":"Field","name":sharedNode53,"selectionSet":sharedNode208},sharedNode78,sharedNode82,sharedNode440,{"kind":"Field","name":sharedNode83,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode85,sharedNode38,sharedNode89]}},sharedNode94,sharedNode105]}}]}}]}},sharedNode27,sharedNode112]} as unknown as DocumentNode<GetCommentSectionQuery, GetCommentSectionQueryVariables>;
+export const GetDiscussionChannelCommentAggregateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionChannelCommentAggregate"},"variableDefinitions":sharedNode441,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"discussionChannels"},"arguments":sharedNode453,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode44,sharedNode222,sharedNode224,sharedNode431]}}]}}]} as unknown as DocumentNode<GetDiscussionChannelCommentAggregateQuery, GetDiscussionChannelCommentAggregateQueryVariables>;
+export const GetDiscussionChannelRootCommentAggregateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionChannelRootCommentAggregate"},"variableDefinitions":sharedNode441,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"discussionChannels"},"arguments":sharedNode453,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode44,sharedNode222,sharedNode224,{"kind":"Field","name":sharedNode244,"arguments":sharedNode439,"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetDiscussionChannelRootCommentAggregateQuery, GetDiscussionChannelRootCommentAggregateQueryVariables>;
+export const GetDiscussionDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":sharedNode454,"variableDefinitions":[sharedNode369,sharedNode455,sharedNode391],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":sharedNode456,"name":sharedNode454,"arguments":sharedNode458,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode459]}}]}},sharedNode112,sharedNode364,sharedNode182,sharedNode200,sharedNode122]} as unknown as DocumentNode<GetDiscussionDetailQuery, GetDiscussionDetailQueryVariables>;
+export const GetDownloadDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDownloadDetail"},"variableDefinitions":sharedNode463,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":sharedNode456,"name":sharedNode454,"arguments":sharedNode458,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode203,sharedNode205,sharedNode466,sharedNode209,sharedNode220,{"kind":"Field","name":sharedNode170,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode445]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode44,sharedNode222,sharedNode224,sharedNode229,sharedNode8,sharedNode22,sharedNode24,sharedNode242,sharedNode259,sharedNode472]}},sharedNode276,sharedNode325,sharedNode327,sharedNode329,sharedNode351,sharedNode356]}}]}},sharedNode112,sharedNode182,sharedNode122]} as unknown as DocumentNode<GetDownloadDetailQuery, GetDownloadDetailQueryVariables>;
+export const GetDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussion"},"variableDefinitions":sharedNode463,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode456,"arguments":sharedNode379,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode459,sharedNode466,sharedNode87,{"kind":"Field","name":{"kind":"Name","value":"authorIsChannelModerator"},"arguments":[sharedNode407]},{"kind":"Field","name":sharedNode170,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode472,{"kind":"Field","name":{"kind":"Name","value":"LabelChangeHistory"},"arguments":sharedNode480,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode38,{"kind":"Field","name":{"kind":"Name","value":"actionType"}},{"kind":"Field","name":{"kind":"Name","value":"labelDisplayName"}},{"kind":"Field","name":{"kind":"Name","value":"labelValue"}},{"kind":"Field","name":{"kind":"Name","value":"ActorUser"},"selectionSet":sharedNode159},{"kind":"Field","name":{"kind":"Name","value":"ActorMod"},"selectionSet":sharedNode59}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"PastTitleVersions"},"arguments":sharedNode480,"selectionSet":sharedNode482},{"kind":"Field","name":{"kind":"Name","value":"PastBodyVersions"},"arguments":sharedNode480,"selectionSet":sharedNode482},{"kind":"Field","name":{"kind":"Name","value":"BodyLastEditedBy"},"selectionSet":sharedNode7}]}}]}},sharedNode112,sharedNode364,sharedNode182,sharedNode200,sharedNode122]} as unknown as DocumentNode<GetDiscussionQuery, GetDiscussionQueryVariables>;
+export const GetDiscussionDetailAnswersPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionDetailAnswersPage"},"variableDefinitions":[sharedNode393,sharedNode391,{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode483},"type":sharedNode389}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDiscussionDetailAnswers"},"arguments":[sharedNode408,sharedNode407,{"kind":"Argument","name":sharedNode483,"value":{"kind":"Variable","name":sharedNode483}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"answers"},"selectionSet":sharedNode266},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":sharedNode216}]}}]}}]} as unknown as DocumentNode<GetDiscussionDetailAnswersPageQuery, GetDiscussionDetailAnswersPageQueryVariables>;
+export const CreateCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode484,"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OwnedCommentCreateInput"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCommentWithOwnedConnections"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":sharedNode484}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode371,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode380,sharedNode386,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,{"kind":"Field","name":{"kind":"Name","value":"ChannelRoles"},"selectionSet":sharedNode485},{"kind":"Field","name":{"kind":"Name","value":"ServerRoles"},"selectionSet":sharedNode485}]}},{"kind":"InlineFragment","typeCondition":sharedNode55,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode38]}}]}},sharedNode440,{"kind":"Field","name":sharedNode486,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32]}}]}}]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<CreateCommentMutation, CreateCommentMutationVariables>;
+export const GetPublicUserProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPublicUserProfile"},"variableDefinitions":sharedNode489,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode492,{"kind":"Field","name":sharedNode493,"arguments":sharedNode501,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode206,{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"pronouns"}},sharedNode503,sharedNode514,sharedNode532,sharedNode541,sharedNode542,sharedNode543,sharedNode544,sharedNode546,sharedNode547,{"kind":"Field","name":{"kind":"Name","value":"ModOfChannelsConnection"},"selectionSet":sharedNode21}]}}]}},sharedNode112]} as unknown as DocumentNode<GetPublicUserProfileQuery, GetPublicUserProfileQueryVariables>;
+export const GetBasicUserInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getBasicUserInfo"},"variableDefinitions":sharedNode489,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode492,{"kind":"Field","name":sharedNode493,"arguments":sharedNode501,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode206,{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"pronouns"}},sharedNode503,{"kind":"Field","name":{"kind":"Name","value":"Email"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"address"}}]}},sharedNode548,sharedNode550,sharedNode551,sharedNode552,sharedNode553,sharedNode554,{"kind":"Field","name":{"kind":"Name","value":"notifyOnSuspensionBlocks"}},sharedNode555,sharedNode556,sharedNode557,sharedNode558,{"kind":"Field","name":{"kind":"Name","value":"NotificationsConnection"},"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"read"},"value":sharedNode250}]}}]}}],"selectionSet":sharedNode21},sharedNode514,sharedNode532,sharedNode541,sharedNode542,sharedNode543,sharedNode544,sharedNode546,sharedNode547]}}]}},sharedNode112]} as unknown as DocumentNode<GetBasicUserInfoQuery, GetBasicUserInfoQueryVariables>;
+export const UpdateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode132},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhere"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode559},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserUpdateInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUsers"},"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"Variable","name":sharedNode132}},{"kind":"Argument","name":sharedNode559,"value":{"kind":"Variable","name":sharedNode559}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode493,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode57,sharedNode503,sharedNode64,sharedNode548,sharedNode550,sharedNode551,sharedNode552,sharedNode553,sharedNode554,sharedNode555,sharedNode556,sharedNode557,sharedNode558]}}]}}]}}]} as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
+export const GetCommentIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentIssue"},"variableDefinitions":sharedNode563,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode371,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode134,"value":sharedNode561}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":{"kind":"Name","value":"RelatedIssues"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":{"kind":"Name","value":"issueNumber"}}]}}]}}]}}]} as unknown as DocumentNode<GetCommentIssueQuery, GetCommentIssueQueryVariables>;
+export const GetCommentWithRepliesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentWithReplies"},"variableDefinitions":[sharedNode562,sharedNode396,sharedNode404,sharedNode401,{"kind":"VariableDefinition","variable":sharedNode406,"type":{"kind":"NamedType","name":{"kind":"Name","value":"SortType"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCommentReplies"},"arguments":[sharedNode564,sharedNode409,sharedNode411,sharedNode410,sharedNode412],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregateChildCommentCount"}},{"kind":"Field","name":sharedNode486,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode380,sharedNode440]}}]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetCommentWithRepliesQuery, GetCommentWithRepliesQueryVariables>;
+export const GetPermalinkedCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPermalinkedComment"},"variableDefinitions":sharedNode370,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode371,"arguments":sharedNode379,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode380,{"kind":"Field","name":sharedNode486,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode380]}},sharedNode440]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetPermalinkedCommentQuery, GetPermalinkedCommentQueryVariables>;
+export const SubscribeToCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"subscribeToComment"},"variableDefinitions":sharedNode563,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subscribeToComment"},"arguments":sharedNode565,"selectionSet":sharedNode567}]}}]} as unknown as DocumentNode<SubscribeToCommentMutation, SubscribeToCommentMutationVariables>;
+export const UnsubscribeFromCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unsubscribeFromComment"},"variableDefinitions":sharedNode563,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unsubscribeFromComment"},"arguments":sharedNode565,"selectionSet":sharedNode567}]}}]} as unknown as DocumentNode<UnsubscribeFromCommentMutation, UnsubscribeFromCommentMutationVariables>;
+export const StickyCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"stickyComment"},"variableDefinitions":sharedNode563,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stickyComment"},"arguments":sharedNode565,"selectionSet":sharedNode569}]}}]} as unknown as DocumentNode<StickyCommentMutation, StickyCommentMutationVariables>;
+export const UnstickyCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unstickyComment"},"variableDefinitions":sharedNode563,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unstickyComment"},"arguments":sharedNode565,"selectionSet":sharedNode569}]}}]} as unknown as DocumentNode<UnstickyCommentMutation, UnstickyCommentMutationVariables>;

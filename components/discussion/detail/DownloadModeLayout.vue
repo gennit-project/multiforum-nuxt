@@ -1,6 +1,10 @@
 <script lang="ts" setup>
+import type {
+  DiscussionPresentation as Discussion,
+  CommentChannelView as DiscussionChannel,
+} from '@/types/DiscussionPresentation';
 import { computed, defineAsyncComponent } from 'vue';
-import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
+
 import DiscussionBody from '@/components/discussion/detail/DiscussionBody.vue';
 import DiscussionVotes from '@/components/discussion/vote/DiscussionVotes.vue';
 import MarkAsAnsweredButton from '@/components/discussion/detail/MarkAsAnsweredButton.vue';
@@ -88,7 +92,11 @@ const markdownImagesEnabled = computed(
         :discussion="discussion"
         :discussion-channel-id="activeDiscussionChannel?.id"
         :download-mode="true"
-        :emoji-json="activeDiscussionChannel?.emoji"
+        :emoji-json="
+          typeof activeDiscussionChannel?.emoji === 'string'
+            ? activeDiscussionChannel.emoji
+            : undefined
+        "
         :show-emoji-button="false"
         :allow-images="markdownImagesEnabled"
       >

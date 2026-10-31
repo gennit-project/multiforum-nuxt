@@ -98,6 +98,21 @@ const createDownloadHandlers = ({
   getDownloadDetail: () => ({
     data: { discussions: [buildDownload({ withActivity })] },
   }),
+  getDiscussionChannelCommentAggregate: () => ({
+    data: {
+      discussionChannels: [
+        {
+          id: DISCUSSION_CHANNEL_ID,
+          discussionId: DISCUSSION_ID,
+          channelUniqueName: TEST_CHANNEL,
+          archived: false,
+          answered: false,
+          locked: false,
+          CommentsConnection: { aggregate: { count: { nodes: 0 } } },
+        },
+      ],
+    },
+  }),
   getDiscussionChannelRootCommentAggregate: () => ({
     data: {
       discussionChannels: [

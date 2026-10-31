@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Collection } from '@/__generated__/graphql';
+import type { DiscussionPresentation } from '@/types/DiscussionPresentation';
 import { getCollectionTypeLabel } from '@/utils/collectionItemUtils';
 
 const props = defineProps<{
-  collection: Partial<Collection> | null;
+  collection: DiscussionPresentation['SharedCollection'];
   showEmbedNotice?: boolean;
 }>();
 
@@ -29,7 +29,7 @@ const typeLabel = computed(() =>
   >
     <div class="mb-2 flex items-center justify-between">
       <p
-        class="font-semibold text-xs uppercase text-gray-500 dark:text-gray-400"
+        class="text-xs font-semibold text-gray-500 uppercase dark:text-gray-400"
       >
         Shared Collection
       </p>
@@ -43,11 +43,11 @@ const typeLabel = computed(() =>
       <nuxt-link
         v-if="collectionLink"
         :to="collectionLink"
-        class="font-semibold block text-lg text-gray-900 hover:underline dark:text-white"
+        class="block text-lg font-semibold text-gray-900 hover:underline dark:text-white"
       >
         {{ collection?.name }}
       </nuxt-link>
-      <p v-else class="font-semibold text-lg text-gray-900 dark:text-white">
+      <p v-else class="text-lg font-semibold text-gray-900 dark:text-white">
         {{ collection?.name }}
       </p>
       <p class="text-sm text-gray-600 dark:text-gray-300">
@@ -66,7 +66,7 @@ const typeLabel = computed(() =>
     </div>
     <p
       v-if="showEmbedNotice"
-      class="bg-gray-50 mt-3 rounded-md px-3 py-2 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-200"
+      class="mt-3 rounded-md bg-gray-50 px-3 py-2 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-200"
     >
       This public collection will be embedded with your discussion. Readers can
       open the collection from the published post.

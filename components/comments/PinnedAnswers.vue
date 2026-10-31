@@ -1,16 +1,31 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import type { Comment as CommentType } from '@/__generated__/graphql';
+import type { AnswerSummary } from '@/types/DiscussionPresentation';
+import HydratedAnswer from './HydratedAnswer.vue';
 import type { BotSuggestion } from '@/utils/botMentions';
 import type { ModSuggestion } from '@/utils/modMentions';
 import type { ApolloError } from '@apollo/client/core';
 import Comment from './Comment.vue';
 import LoadMore from '../LoadMore.vue';
 
+type InteractionProps = Pick<
+  InstanceType<typeof Comment>['$props'],
+  | 'replyFormOpenAtCommentID'
+  | 'editFormOpenAtCommentID'
+  | 'commentInProcess'
+  | 'lengthOfCommentInProgress'
+  | 'modProfileName'
+  | 'editCommentError'
+  | 'enableEmoji'
+>;
 const props = defineProps({
+  interactionProps: {
+    type: Object as PropType<InteractionProps>,
+    default: () => ({}),
+  },
   answers: {
-    type: Array as PropType<CommentType[]>,
+    type: Array as PropType<AnswerSummary[]>,
     default: () => [],
   },
   hasNextPage: {
@@ -116,6 +131,7 @@ const hasAnswers = computed(() => {
 // Context props forwarded unchanged to each answer's <Comment>. Grouped here so
 // the tag binds them with a single v-bind instead of ~13 repeated lines.
 const answerPassThroughProps = computed(() => ({
+  ...props.interactionProps,
   enableFeedback: props.enableFeedback,
   locked: props.locked || props.archived,
   originalPoster: props.originalPoster,
@@ -139,7 +155,7 @@ const answerPassThroughProps = computed(() => ({
   >
     <div class="mb-4 border-b border-gray-300 pb-2 dark:border-gray-600">
       <h3
-        class="font-semibold flex items-center gap-2 text-lg text-gray-900 dark:text-gray-100"
+        class="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100"
       >
         <div class="h-5 w-5 rounded-full bg-green-500" />
         Best {{ answers.length === 1 ? 'Answer' : 'Answers' }}
@@ -152,47 +168,53 @@ const answerPassThroughProps = computed(() => ({
 
     <div class="space-y-4">
       <div v-for="answer in answers" :key="answer.id">
-        <Comment
-          :comment-data="answer"
-          :depth="1"
-          :show-comment-buttons="true"
-          :show-header="true"
-          v-bind="answerPassThroughProps"
-          @create-comment="emit('createComment', $event)"
-          @delete-comment="emit('delete-comment', $event)"
-          @click-edit-comment="emit('click-edit-comment', $event)"
-          @open-edit-comment-editor="emit('openEditCommentEditor', $event)"
-          @update-edit-comment-input="emit('updateEditCommentInput', $event)"
-          @update-create-reply-comment-input="
-            emit('updateCreateReplyCommentInput', $event)
-          "
-          @show-copied-link-notification="
-            emit('showCopiedLinkNotification', $event)
-          "
-          @show-marked-as-best-answer-notification="
-            emit('showMarkedAsBestAnswerNotification', $event)
-          "
-          @show-unmarked-as-best-answer-notification="
-            emit('showUnmarkedAsBestAnswerNotification', $event)
-          "
-          @click-report="emit('clickReport', $event)"
-          @click-feedback="emit('clickFeedback', $event)"
-          @click-undo-feedback="emit('clickUndoFeedback', $event)"
-          @click-edit-feedback="emit('clickEditFeedback', $event)"
-          @handle-view-feedback="emit('handleViewFeedback', $event)"
-          @start-comment-save="emit('startCommentSave', $event)"
-          @open-reply-editor="emit('openReplyEditor', $event)"
-          @hide-reply-editor="emit('hideReplyEditor')"
-          @hide-edit-comment-editor="emit('hideEditCommentEditor')"
-          @save-edit="emit('saveEdit')"
-          @open-mod-profile="emit('openModProfile')"
-          @scroll-to-top="emit('scrollToTop')"
-          @handle-click-archive="emit('handleClickArchive', $event)"
-          @handle-click-archive-and-suspend="
-            emit('handleClickArchiveAndSuspend', $event)
-          "
-          @handle-click-unarchive="emit('handleClickUnarchive', $event)"
-        />
+        <HydratedAnswer :answer="answer">
+          <template #default="{ commentData }">
+            <Comment
+              :comment-data="commentData"
+              :depth="1"
+              :show-comment-buttons="true"
+              :show-header="true"
+              v-bind="answerPassThroughProps"
+              @create-comment="emit('createComment', $event)"
+              @delete-comment="emit('delete-comment', $event)"
+              @click-edit-comment="emit('click-edit-comment', $event)"
+              @open-edit-comment-editor="emit('openEditCommentEditor', $event)"
+              @update-edit-comment-input="
+                emit('updateEditCommentInput', $event)
+              "
+              @update-create-reply-comment-input="
+                emit('updateCreateReplyCommentInput', $event)
+              "
+              @show-copied-link-notification="
+                emit('showCopiedLinkNotification', $event)
+              "
+              @show-marked-as-best-answer-notification="
+                emit('showMarkedAsBestAnswerNotification', $event)
+              "
+              @show-unmarked-as-best-answer-notification="
+                emit('showUnmarkedAsBestAnswerNotification', $event)
+              "
+              @click-report="emit('clickReport', $event)"
+              @click-feedback="emit('clickFeedback', $event)"
+              @click-undo-feedback="emit('clickUndoFeedback', $event)"
+              @click-edit-feedback="emit('clickEditFeedback', $event)"
+              @handle-view-feedback="emit('handleViewFeedback', $event)"
+              @start-comment-save="emit('startCommentSave', $event)"
+              @open-reply-editor="emit('openReplyEditor', $event)"
+              @hide-reply-editor="emit('hideReplyEditor')"
+              @hide-edit-comment-editor="emit('hideEditCommentEditor')"
+              @save-edit="emit('saveEdit')"
+              @open-mod-profile="emit('openModProfile')"
+              @scroll-to-top="emit('scrollToTop')"
+              @handle-click-archive="emit('handleClickArchive', $event)"
+              @handle-click-archive-and-suspend="
+                emit('handleClickArchiveAndSuspend', $event)
+              "
+              @handle-click-unarchive="emit('handleClickUnarchive', $event)"
+            />
+          </template>
+        </HydratedAnswer>
       </div>
     </div>
     <LoadMore

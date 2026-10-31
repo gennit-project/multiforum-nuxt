@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { GetDownloadDetailDocument as GET_DOWNLOAD_DETAIL } from '@/__generated__/operations';
 import { config } from '@/config';
 import { ref, computed, watchEffect } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
@@ -7,7 +8,7 @@ import 'md-editor-v3/lib/style.css';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DOWNLOAD_DETAIL } from '@/graphQLData/discussion/queries';
+
 import type { HeadObject } from '@/utils/seoHead';
 
 const modProfileNameVar = useModProfileName();
@@ -34,12 +35,12 @@ watchEffect(() => {
   discussionId.value = updateDiscussionId();
 });
 
-const { result: discussionResult } = useQuery(GET_DOWNLOAD_DETAIL, {
-  id: discussionId,
+const { result: discussionResult } = useQuery(GET_DOWNLOAD_DETAIL, () => ({
+  id: discussionId.value,
   loggedInModName: modProfileNameVar.value,
   loggedInUsername: usernameVar.value || null,
   channelUniqueName: channelId.value,
-});
+}));
 
 const metaData = computed<HeadObject>(() => {
   try {
@@ -76,7 +77,7 @@ const metaData = computed<HeadObject>(() => {
       : `View this download on ${config.serverDisplayName}`;
     const baseUrl = import.meta.env.VITE_BASE_URL;
     const serverName = config.serverDisplayName;
-    const imageUrl = download.coverImageURL || '';
+    const imageUrl = download.Album?.Images?.[0]?.url || '';
     const url = `${baseUrl}/forums/${channelId.value}/downloads/${discussionId.value}`;
 
     return {

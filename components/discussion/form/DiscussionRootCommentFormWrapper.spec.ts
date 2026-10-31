@@ -1,9 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref, h as createElement } from 'vue';
 import { mount } from '@vue/test-utils';
-import type { DiscussionChannel } from '@/__generated__/graphql';
+import {
+  makeRootSection,
+  makeCreatedComment,
+} from '@/tests/utils/rootCommentFixtures';
 
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
+const mockInsert = vi.hoisted(() => vi.fn());
+vi.mock('@/utils/rootCommentCache', () => ({ insertRootComment: mockInsert }));
 
 const hh = vi.hoisted(() => ({
   username: null as unknown,
@@ -16,7 +21,10 @@ const hh = vi.hoisted(() => ({
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: () => ({ result: hh.getUserResult }),
-  useMutation: (_doc: unknown, optionsFactory: () => Record<string, unknown>) => {
+  useMutation: (
+    _doc: unknown,
+    optionsFactory: () => Record<string, unknown>
+  ) => {
     hh.mutationOptions = optionsFactory;
     return {
       mutate: hh.createComment,
@@ -31,18 +39,17 @@ vi.mock('nuxt/app', () => ({
   useRoute: () => ({ query: {} }),
   useRouter: () => ({ push: vi.fn() }),
 }));
-vi.mock('@/composables/useAuthState', () => ({ useUsername: () => hh.username }));
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => hh.username,
+}));
 vi.mock('@/composables/useSuspensionNotice', () => ({
   useChannelSuspensionNotice: () => hh.suspension,
 }));
 
-const discussionChannel = () =>
-  ({
-    id: 'dc1',
-    channelUniqueName: 'cats',
-    discussionId: 'd1',
-    Channel: { imageUploadsEnabled: true },
-  }) as unknown as DiscussionChannel;
+const discussionChannel = () => ({
+  ...makeRootSection().DiscussionChannel!,
+  id: 'dc1',
+});
 
 // Captured slot props from the most recent render, so tests can read exposed
 // state and invoke the exposed methods.
@@ -50,7 +57,11 @@ let slotProps: Record<string, unknown> = {};
 
 const mountWrapper = (props: Record<string, unknown> = {}) =>
   mount(DiscussionRootCommentFormWrapper, {
-    props: { previousOffset: 0, discussionChannel: discussionChannel(), ...props },
+    props: {
+      previousOffset: 0,
+      discussionChannel: discussionChannel(),
+      ...props,
+    },
     slots: {
       default: (p: Record<string, unknown>) => {
         slotProps = p;
@@ -61,7 +72,8 @@ const mountWrapper = (props: Record<string, unknown> = {}) =>
           }),
           createElement('button', {
             class: 'update',
-            onClick: () => (p.handleUpdateComment as (s: string) => void)('typed'),
+            onClick: () =>
+              (p.handleUpdateComment as (s: string) => void)('typed'),
           }),
           createElement('button', {
             class: 'open',
@@ -75,7 +87,9 @@ const mountWrapper = (props: Record<string, unknown> = {}) =>
 beforeEach(() => {
   slotProps = {};
   hh.username = ref('alice');
-  hh.getUserResult = ref({ users: [{ notifyOnReplyToCommentByDefault: false }] });
+  hh.getUserResult = ref({
+    users: [{ notifyOnReplyToCommentByDefault: false }],
+  });
   hh.createComment = vi.fn();
   hh.mutationOptions = undefined;
   hh.onDone = undefined;
@@ -117,9 +131,11 @@ describe('DiscussionRootCommentFormWrapper createCommentInput', () => {
   it('omits the subscription when the user opts out by default', () => {
     mountWrapper();
 
-    const input = (hh.mutationOptions?.().variables as {
-      createCommentInput: { SubscribedToNotifications?: unknown }[];
-    }).createCommentInput[0];
+    const input = (
+      hh.mutationOptions?.().variables as {
+        createCommentInput: { SubscribedToNotifications?: unknown }[];
+      }
+    ).createCommentInput[0];
     expect(input.SubscribedToNotifications).toBeUndefined();
   });
 
@@ -129,9 +145,11 @@ describe('DiscussionRootCommentFormWrapper createCommentInput', () => {
     };
     mountWrapper();
 
-    const input = (hh.mutationOptions?.().variables as {
-      createCommentInput: { SubscribedToNotifications?: unknown }[];
-    }).createCommentInput[0];
+    const input = (
+      hh.mutationOptions?.().variables as {
+        createCommentInput: { SubscribedToNotifications?: unknown }[];
+      }
+    ).createCommentInput[0];
     expect(input.SubscribedToNotifications).toBeDefined();
   });
 });
@@ -165,7 +183,8 @@ describe('DiscussionRootCommentFormWrapper handleCreateComment', () => {
 
 describe('DiscussionRootCommentFormWrapper suspension notice', () => {
   it('surfaces the suspension issue after a submit attempt', async () => {
-    (hh.suspension as { issueNumber: { value: number } }).issueNumber.value = 42;
+    (hh.suspension as { issueNumber: { value: number } }).issueNumber.value =
+      42;
     const wrapper = mountWrapper();
 
     await wrapper.get('.create').trigger('click');
@@ -179,7 +198,12 @@ describe('DiscussionRootCommentFormWrapper onDone', () => {
     const wrapper = mountWrapper();
     await wrapper.get('.open').trigger('click');
 
-    hh.onDone?.({ errors: [] });
+    hh.onDone?.({
+      data: {
+        createCommentWithOwnedConnections: { comments: [makeCreatedComment()] },
+      },
+      errors: [],
+    });
     await wrapper.vm.$nextTick();
 
     expect(slotProps.showSavedNotice).toBe(true);
@@ -196,41 +220,47 @@ describe('DiscussionRootCommentFormWrapper onDone', () => {
   });
 });
 
-describe('DiscussionRootCommentFormWrapper cache update', () => {
-  const newComment = { id: 'c1', text: 'hi', CommentAuthor: {} };
-  const result = {
-    data: { createCommentWithOwnedConnections: { comments: [newComment] } },
-  };
-
-  const makeCache = (queryResult: unknown) => ({
-    writeFragment: vi.fn(() => ({ __ref: 'Comment:c1' })),
-    readQuery: vi.fn(() => queryResult),
-    writeQuery: vi.fn(),
-    modify: vi.fn(),
-    identify: vi.fn(() => 'id'),
-  });
-
-  it('prepends the new comment via writeQuery when the section is cached', () => {
-    mountWrapper();
-    const cache = makeCache({ getCommentSection: { Comments: [] } });
-
-    (hh.mutationOptions?.().update as (c: unknown, r: unknown) => void)(
-      cache,
-      result
+describe('DiscussionRootCommentFormWrapper submission scope', () => {
+  it('captures the original conversation before navigation', async () => {
+    const wrapper = mountWrapper();
+    const update = hh.mutationOptions?.().update as (
+      cache: unknown,
+      result: unknown
+    ) => void;
+    await wrapper.setProps({
+      discussionChannel: {
+        ...discussionChannel(),
+        id: 'other',
+        channelUniqueName: 'dogs',
+      },
+    });
+    update(
+      {},
+      {
+        data: {
+          createCommentWithOwnedConnections: {
+            comments: [makeCreatedComment()],
+          },
+        },
+      }
     );
-
-    expect(cache.writeQuery).toHaveBeenCalled();
+    expect(mockInsert.mock.calls.at(-1)?.[2]).toMatchObject({
+      discussionId: 'd1',
+      channelUniqueName: 'cats',
+    });
   });
-
-  it('falls back to cache.modify when the section is not cached', () => {
-    mountWrapper();
-    const cache = makeCache(null);
-
-    (hh.mutationOptions?.().update as (c: unknown, r: unknown) => void)(
-      cache,
-      result
-    );
-
-    expect(cache.modify).toHaveBeenCalled();
+  it('does not close a new editor for a response from the previous conversation', async () => {
+    const wrapper = mountWrapper();
+    await wrapper.get('.open').trigger('click');
+    await wrapper.setProps({
+      discussionChannel: { ...discussionChannel(), id: 'other' },
+    });
+    hh.onDone?.({
+      data: {
+        createCommentWithOwnedConnections: { comments: [makeCreatedComment()] },
+      },
+    });
+    await wrapper.vm.$nextTick();
+    expect(slotProps.commentEditorOpen).toBe(true);
   });
 });

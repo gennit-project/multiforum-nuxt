@@ -1,3 +1,4 @@
+import { makeCreatedComment } from '@/tests/utils/rootCommentFixtures';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
@@ -35,7 +36,15 @@ vi.mock('@vue/apollo-composable', async () => {
       const onErr: Array<(p: unknown) => void> = [];
       return {
         mutate: vi.fn(() => {
-          done.forEach((cb) => cb({ data: {} }));
+          done.forEach((cb) =>
+            cb({
+              data: {
+                createCommentWithOwnedConnections: {
+                  comments: [makeCreatedComment()],
+                },
+              },
+            })
+          );
           return Promise.resolve({ data: {} });
         }),
         onDone: (cb: (p: unknown) => void) => done.push(cb),

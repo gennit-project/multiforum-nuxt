@@ -1,7 +1,11 @@
 <script lang="ts" setup>
+import type {
+  DiscussionPresentation as Discussion,
+  CommentChannelView as DiscussionChannel,
+} from '@/types/DiscussionPresentation';
 import { computed, toRef } from 'vue';
 import { useRoute } from 'nuxt/app';
-import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
+
 import DownloadModeLayout from './DownloadModeLayout.vue';
 import RegularDiscussionLayout from './RegularDiscussionLayout.vue';
 import DownloadTabNavigation from './DownloadTabNavigation.vue';

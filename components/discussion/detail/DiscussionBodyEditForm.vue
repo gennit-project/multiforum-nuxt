@@ -1,10 +1,8 @@
 <script lang="ts" setup>
+import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
 import { ref } from 'vue';
 import type { PropType } from 'vue';
-import type {
-  Discussion,
-  DiscussionUpdateInput,
-} from '@/__generated__/graphql';
+import type { DiscussionUpdateInput } from '@/__generated__/graphql';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import { useMutation } from '@vue/apollo-composable';
@@ -58,7 +56,7 @@ onDone(() => {
 
 <template>
   <div class="w-full">
-    <div class="mb-3 mt-3 flex w-full flex-col">
+    <div class="mt-3 mb-3 flex w-full flex-col">
       <TextEditor
         class="mb-3"
         :test-id="'body-input'"

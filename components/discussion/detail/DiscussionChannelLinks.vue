@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { CommentChannelView as DiscussionChannel } from '@/types/DiscussionPresentation';
 import { computed } from 'vue';
 import DiscussionChannelLink from './DiscussionChannelLink.vue';
-import type { DiscussionChannel } from '@/__generated__/graphql';
 
 interface Props {
   channelId?: string;

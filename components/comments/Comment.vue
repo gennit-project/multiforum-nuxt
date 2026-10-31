@@ -190,7 +190,7 @@ const props = defineProps({
     default: false,
   },
   answers: {
-    type: Array as PropType<Comment[]>,
+    type: Array as PropType<Pick<Comment, 'id'>[]>,
     default: () => [],
   },
 });

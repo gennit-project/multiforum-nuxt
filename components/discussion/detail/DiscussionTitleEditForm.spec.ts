@@ -1,3 +1,7 @@
+import {
+  GetDiscussionDetailDocument,
+  GetDownloadDetailDocument,
+} from '@/__generated__/operations';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
@@ -138,14 +142,14 @@ describe('DiscussionTitleEditForm display', () => {
   it('uses the focused detail query on discussion routes', () => {
     mountForm();
 
-    expect(h.queryDocument).toBe('GET_DISCUSSION_DETAIL');
+    expect(h.queryDocument).toBe(GetDiscussionDetailDocument);
   });
 
   it('uses the download query on download routes', () => {
     h.route.name = 'forums-forumId-downloads-discussionId';
     mountForm();
 
-    expect(h.queryDocument).toBe('GET_DOWNLOAD_DETAIL');
+    expect(h.queryDocument).toBe(GetDownloadDetailDocument);
   });
 
   it('shows skeletons while loading', () => {

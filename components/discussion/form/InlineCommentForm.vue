@@ -1,25 +1,16 @@
 <script lang="ts" setup>
+import { CreateCommentDocument as CREATE_COMMENT } from '@/__generated__/operations';
 import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import type {
-  Comment,
-  DiscussionChannel,
-  OwnedCommentCreateInput,
-  CommentSectionFormat,
-} from '@/__generated__/graphql';
-import type {
-  NormalizedCacheObject,
-  ApolloCache,
-  FetchResult,
-} from '@apollo/client/core';
-import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
-import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
+import type { OwnedCommentCreateInput } from '@/__generated__/graphql';
+
 import { GET_USER } from '@/graphQLData/user/queries';
 import { useUsername } from '@/composables/useAuthState';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
-import { gql } from '@apollo/client/core';
+import { insertRootComment } from '@/utils/rootCommentCache';
+import type { CommentChannelView as DiscussionChannel } from '@/types/DiscussionPresentation';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
@@ -38,8 +29,6 @@ import {
 } from '@/utils/modMentions';
 
 const usernameVar = useUsername();
-
-const COMMENT_LIMIT = 50;
 
 const props = defineProps({
   discussionChannel: {
@@ -164,140 +153,33 @@ const {
   loading: createCommentLoading,
   error: createCommentError,
   onDone,
-} = useMutation(CREATE_COMMENT, () => ({
-  errorPolicy: 'none',
-  variables: {
-    createCommentInput: createCommentInput.value,
-  },
-  update: (cache: ApolloCache<NormalizedCacheObject>, result: FetchResult) => {
-    try {
-      const newComment: Comment =
+} = useMutation(CREATE_COMMENT, () => {
+  const scope = {
+    discussionId: props.discussionChannel?.discussionId || '',
+    channelUniqueName: props.discussionChannel?.channelUniqueName || '',
+    modName: props.modName,
+    sort: getSortFromQuery(route.query),
+  };
+  return {
+    errorPolicy: 'none',
+    variables: { createCommentInput: createCommentInput.value },
+    update: (cache, result) => {
+      const comment =
         result.data?.createCommentWithOwnedConnections?.comments?.[0];
-      if (!newComment) {
-        console.error(
-          'No new comment returned from createCommentWithOwnedConnections mutation'
-        );
-        return;
-      }
-
-      // First, make sure the full comment data is written to the cache
-      const commentRef = cache.writeFragment({
-        data: newComment,
-        fragment: gql`
-          fragment NewCommentWithDetails on Comment {
-            id
-            text
-            emoji
-            weightedVotesCount
-            createdAt
-            updatedAt
-            archived
-            CommentAuthor {
-              __typename
-              ... on User {
-                username
-                profilePicURL
-              }
-              ... on ModerationProfile {
-                displayName
-              }
-            }
-            ChildCommentsConnection {
-              aggregate { count { nodes } }
-            }
-            UpvotedByUsers {
-              username
-            }
-            UpvotedByUsersConnection {
-              aggregate { count { nodes } }
-            }
-          }
-        `,
-      });
-
-      // Read the current query result from the cache
-      const commentSectionQueryVariables = {
-        discussionId: props.discussionChannel.discussionId,
-        channelUniqueName: props.discussionChannel.channelUniqueName,
-        modName: props.modName,
-        limit: COMMENT_LIMIT,
-        offset: props.previousOffset,
-        sort: getSortFromQuery(route.query),
-      };
-
-      const queryResult = cache.readQuery({
-        query: GET_DISCUSSION_COMMENTS,
-        variables: commentSectionQueryVariables,
-      }) as { getCommentSection: CommentSectionFormat } | null;
-
-      if (queryResult?.getCommentSection) {
-        // Update the Comments array within getCommentSection
-        cache.writeQuery({
-          query: GET_DISCUSSION_COMMENTS,
-          variables: commentSectionQueryVariables,
-          data: {
-            ...queryResult,
-            getCommentSection: {
-              ...queryResult.getCommentSection,
-              Comments: [newComment, ...queryResult.getCommentSection.Comments],
-            },
-          },
-        });
-      } else {
-        console.warn(
-          'Could not read query result from cache, falling back to direct modification'
-        );
-
-        // Fallback: try to modify the ROOT_QUERY directly
-        const queryId = cache.identify({
-          __typename: 'Query',
-        });
-
-        cache.modify({
-          id: queryId,
-          fields: {
-            getCommentSection(existingSection = {}, { readField }) {
-              if (!existingSection) return existingSection;
-
-              const existingComments =
-                (readField('Comments', existingSection) as Comment[]) || [];
-              return {
-                ...existingSection,
-                Comments: [commentRef, ...existingComments],
-              };
-            },
-          },
-        });
-      }
-
-      if (props.discussionChannel?.id) {
-        cache.modify({
-          id: cache.identify({
-            __typename: 'DiscussionChannel',
-            id: props.discussionChannel.id,
-          }),
-          fields: {
-            CommentsConnection(existing) {
-              const nodes = existing?.aggregate?.count?.nodes || 0;
-              return {
-                ...existing,
-                aggregate: {
-                  ...existing?.aggregate,
-                  count: { ...existing?.aggregate?.count, nodes: nodes + 1 },
-                },
-              };
-            },
-          },
-        });
-      }
-    } catch (error) {
-      console.error('Error updating cache after creating comment:', error);
-    }
-  },
-}));
+      if (comment) insertRootComment(cache, comment, scope);
+    },
+  };
+});
 
 onDone((result) => {
-  if (result?.errors?.length) {
+  const channel =
+    result.data?.createCommentWithOwnedConnections?.comments?.[0]
+      ?.DiscussionChannel;
+  if (
+    !channel ||
+    channel.id !== props.discussionChannel?.id ||
+    result?.errors?.length
+  ) {
     return;
   }
   submitAttempted.value = false;

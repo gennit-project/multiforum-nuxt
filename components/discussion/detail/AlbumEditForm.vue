@@ -1,10 +1,8 @@
 <script lang="ts" setup>
+import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
 import { ref, computed, onMounted } from 'vue';
 import type { PropType } from 'vue';
-import type {
-  Discussion,
-  DiscussionUpdateInput,
-} from '@/__generated__/graphql';
+import type { DiscussionUpdateInput } from '@/__generated__/graphql';
 import {
   mapAlbumImagesToForm,
   getInitialImageOrder,

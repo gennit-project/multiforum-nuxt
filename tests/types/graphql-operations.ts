@@ -20,6 +20,19 @@ import {
 // Replies expose only the composed selection, including nullable custom results.
 import type { ReplyComment, CommentView } from '../../types/Comment';
 
+import {
+  GetCommentDocument,
+  GetCommentSectionDocument,
+  GetDiscussionDetailAnswersPageDocument,
+  CreateCommentDocument,
+  GetDiscussionChannelCommentAggregateDocument,
+  GetDiscussionChannelRootCommentAggregateDocument,
+} from '../../__generated__/operations';
+import type {
+  RootComment,
+  AnswerSummary,
+} from '../../types/DiscussionPresentation';
+
 export function checkApolloInference() {
   const profile = useQuery(GetPublicUserProfileDocument, { username: 'alice' });
   const issue = useQuery(GetCommentIssueDocument, { commentId: 'c1' });
@@ -128,4 +141,57 @@ export function checkCommentSubscriptionInference(
     void result.subscribeToComment.text;
     return { usernames, missing };
   }
+}
+export function checkRootCommentInference(
+  root: RootComment,
+  summary: AnswerSummary
+) {
+  const roots = useQuery(GetCommentSectionDocument, {
+    discussionId: 'd1',
+    channelUniqueName: 'cats',
+    limit: 20,
+  });
+  const answers = useQuery(GetDiscussionDetailAnswersPageDocument, {
+    discussionId: 'd1',
+    channelUniqueName: 'cats',
+  });
+  const create = useMutation(CreateCommentDocument);
+  // @ts-expect-error limit is an Int
+  roots.refetch({ discussionId: 'd1', channelUniqueName: 'cats', limit: '20' });
+  // @ts-expect-error a cursor is a String
+  answers.refetch({ discussionId: 'd1', channelUniqueName: 'cats', after: 12 });
+  // @ts-expect-error create input must be objects, not strings
+  create.mutate({ createCommentInput: ['text'] });
+  // @ts-expect-error all-comment aggregate requires a forum
+  useQuery(GetDiscussionChannelCommentAggregateDocument, {
+    discussionId: 'd1',
+  });
+  useQuery(GetDiscussionChannelRootCommentAggregateDocument, {
+    // @ts-expect-error root count cannot receive an array ID
+    discussionId: ['d1'],
+    channelUniqueName: 'cats',
+  });
+  // @ts-expect-error root query's custom section may be null
+  void roots.result.value?.getCommentSection.Comments;
+  create.onDone(
+    ({ data }) =>
+      // @ts-expect-error mutation does not select the full schema entity
+      data?.createCommentWithOwnedConnections.comments[0]?.isRootComment
+  );
+  // @ts-expect-error root query does not select a full schema entity
+  void root.CommentAuthorConnection;
+  // @ts-expect-error summary-only answers must hydrate before interactive rendering
+  const premature: CommentView = summary;
+  // @ts-expect-error text is nullable
+  const text: string = root.text;
+  const view: CommentView = root;
+  return { roots, answers, create, premature, text, view };
+}
+
+export function checkAnswerHydrationSelection() {
+  const answer = useQuery(GetCommentDocument, { id: 'a1' });
+  // @ts-expect-error hydration deliberately does not fetch the unbounded child list
+  void answer.result.value?.comments[0]?.ChildComments;
+  const view: CommentView | undefined = answer.result.value?.comments[0];
+  return view;
 }

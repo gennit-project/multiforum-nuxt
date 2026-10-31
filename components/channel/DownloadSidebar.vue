@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
 import type { PropType } from 'vue';
-import type { Discussion } from '@/__generated__/graphql';
+
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import DownloadNowButton from '@/components/channel/DownloadNowButton.vue';
 import FunctionalDownloadNow from '@/components/channel/FunctionalDownloadNow.vue';

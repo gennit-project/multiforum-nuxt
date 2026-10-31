@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { CreateCommentDocument as CREATE_COMMENT } from '@/__generated__/operations';
 import { ref, computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import CreateRootCommentForm from '@/components/comments/CreateRootCommentForm.vue';
-import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
+
 import { GET_EVENT_COMMENTS } from '@/graphQLData/comment/queries';
 import { GET_USER } from '@/graphQLData/user/queries';
 import ErrorBanner from '@/components/ErrorBanner.vue';
@@ -128,9 +129,9 @@ const {
   loading: createCommentLoading,
   error: createCommentError,
   onDone,
-} = useMutation(CREATE_COMMENT, {
+} = useMutation(CREATE_COMMENT, () => ({
   errorPolicy: 'all',
-  refetchQueries: () => [
+  refetchQueries: [
     {
       query: GET_EVENT_COMMENTS,
       variables: {
@@ -142,7 +143,7 @@ const {
     },
   ],
   awaitRefetchQueries: true,
-});
+}));
 
 // After mutation completion
 onDone((result) => {
@@ -152,6 +153,11 @@ onDone((result) => {
       result.errors[0]?.message || 'Unknown error';
     return;
   }
+  if (
+    result.data?.createCommentWithOwnedConnections?.comments?.[0]?.Event?.id !==
+    props.event?.id
+  )
+    return;
   submitAttempted.value = false;
   createFormValues.value = createCommentDefaultValues;
   commentEditorOpen.value = false;
@@ -206,13 +212,13 @@ function handleUpdateComment(event: string) {
       :create-comment-error="createCommentError"
       :allow-bot-mentions="false"
       :suspension-issue-number="
-        showSuspensionNotice ? suspensionIssueNumber ?? undefined : undefined
+        showSuspensionNotice ? (suspensionIssueNumber ?? undefined) : undefined
       "
       :suspension-channel-id="
-        showSuspensionNotice ? suspensionChannelId ?? undefined : undefined
+        showSuspensionNotice ? (suspensionChannelId ?? undefined) : undefined
       "
       :suspension-until="
-        showSuspensionNotice ? suspensionUntil ?? undefined : undefined
+        showSuspensionNotice ? (suspensionUntil ?? undefined) : undefined
       "
       :suspension-indefinitely="
         showSuspensionNotice ? suspensionIndefinitely : false

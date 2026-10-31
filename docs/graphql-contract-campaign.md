@@ -232,14 +232,14 @@ retains the current page; a valid next page can replace a null previous page.
 
 ### Slice call-site and consumer inventory
 
-| Boundary                                                                                                                              | Migrated contract / operation                                                                                                            | Remaining work                                                         |
-| ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `ChildComments.vue`: `useQuery`, `fetchMore`, slot                                                                                    | Generated `GetCommentWithRepliesDocument` and exact query result                                                                         | None for this read                                                     |
-| `Comment.vue` recursive props and forwarded interaction payloads                                                                      | `CommentView`, derived from generated `CommentFieldsFragment`; `ReplyComment` is the exact selected reply                                | Other producers below still supply legacy context                      |
-| `CommentHeader`, `CommentButtons`, `VoteButtons`, `ReplyButton`, `CommentEditsDropdown`                                               | Selected comment fields; revision pairs use selected `PastVersions`; author unions narrow by available fields, no full-entity assertions | Vote/reaction/revision/favorite mutations remain separate slices       |
-| `useCommentPermalink`, `useCommentSubscription`, `useCommentStickyMutations`, `useBestAnswerMutations`                                | Selected view or minimal `Pick` inputs; pin/unpin documents remain typed from phase 3                                                    | Subscription migrated in slice 3; best-answer operations/cache fragments remain legacy  |
-| `useCommentFormState`, `useCommentSectionModals`, `useCommentFeedbackMutation`, `BrokenRulesModal`, `ConfirmUndoCommentFeedbackModal` | Reply edit/report/feedback inputs accept the selected view; cache eviction identifies `Comment` by id                                    | Their write operations and new-feedback response are not migrated here |
-| `commentDisplay`, `commentPermalink`, `routerUtils`                                                                                   | Structural display helpers accept only the fields they inspect; feedback route input requires ids rather than complete entities          | Shared context operation migration below                               |
+| Boundary                                                                                                                              | Migrated contract / operation                                                                                                            | Remaining work                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `ChildComments.vue`: `useQuery`, `fetchMore`, slot                                                                                    | Generated `GetCommentWithRepliesDocument` and exact query result                                                                         | None for this read                                                                     |
+| `Comment.vue` recursive props and forwarded interaction payloads                                                                      | `CommentView`, derived from generated `CommentFieldsFragment`; `ReplyComment` is the exact selected reply                                | Other producers below still supply legacy context                                      |
+| `CommentHeader`, `CommentButtons`, `VoteButtons`, `ReplyButton`, `CommentEditsDropdown`                                               | Selected comment fields; revision pairs use selected `PastVersions`; author unions narrow by available fields, no full-entity assertions | Vote/reaction/revision/favorite mutations remain separate slices                       |
+| `useCommentPermalink`, `useCommentSubscription`, `useCommentStickyMutations`, `useBestAnswerMutations`                                | Selected view or minimal `Pick` inputs; pin/unpin documents remain typed from phase 3                                                    | Subscription migrated in slice 3; best-answer operations/cache fragments remain legacy |
+| `useCommentFormState`, `useCommentSectionModals`, `useCommentFeedbackMutation`, `BrokenRulesModal`, `ConfirmUndoCommentFeedbackModal` | Reply edit/report/feedback inputs accept the selected view; cache eviction identifies `Comment` by id                                    | Their write operations and new-feedback response are not migrated here                 |
+| `commentDisplay`, `commentPermalink`, `routerUtils`                                                                                   | Structural display helpers accept only the fields they inspect; feedback route input requires ids rather than complete entities          | Shared context operation migration below                                               |
 
 ### Reviewed compatibility exceptions (owner: frontend, follow-up #700)
 
@@ -283,10 +283,10 @@ its former collision with the recursive `getCommentWithReplies` operation. The
 exported source constant and composed `CommentFields`/`CommentVoteFields`
 selections are unchanged. Operation-name mocks must distinguish these two reads.
 
-| Boundary | Contract | Remaining work |
-| --- | --- | --- |
-| `PermalinkedComment.vue` query and named slot | `GetPermalinkedCommentDocument`; exact `GetPermalinkedCommentQuery['comments'][number]` slot payload | None for this read |
-| Discussion and event `comments/[commentId].vue` pages | Inferred slot payload passes directly to the existing `CommentView` renderer | Existing interaction operations remain separate slices |
+| Boundary                                              | Contract                                                                                             | Remaining work                                         |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `PermalinkedComment.vue` query and named slot         | `GetPermalinkedCommentDocument`; exact `GetPermalinkedCommentQuery['comments'][number]` slot payload | None for this read                                     |
+| Discussion and event `comments/[commentId].vue` pages | Inferred slot payload passes directly to the existing `CommentView` renderer                         | Existing interaction operations remain separate slices |
 
 The component is the single route-ID source; the wrappers no longer snapshot or
 pass an undeclared `comment-id` attribute. A reactive variables getter accepts
@@ -339,6 +339,54 @@ existing presentation compatibility exceptions remain frontend-owned #700 work.
 Discussion/event/issue subscription operations and the shared auto-unsubscribe
 lifecycle are unchanged by this slice.
 
+## Phase 5, slice 4: discussion/download root comments and creation (#700)
+
+Eight coordinated operations plus the existing single-comment hydration read are
+generated (nineteen total):
+`GET_DISCUSSION_COMMENTS`, both discussion-channel comment aggregates,
+`GET_DISCUSSION_DETAIL`, `GET_DOWNLOAD_DETAIL`, `GET_DISCUSSION`,
+`GET_DISCUSSION_DETAIL_ANSWERS_PAGE`, `CREATE_COMMENT`, and `GET_COMMENT`. Import their documents
+and exact selections from `@/__generated__/operations`; `pnpm compile` generates
+offline and `pnpm operations:check` checks freshness against the pinned schema.
+The all-comment aggregate is named `getDiscussionChannelCommentAggregate`; the
+root-filtered aggregate retains `getDiscussionChannelRootCommentAggregate`.
+Mocks must distinguish their filters. No backend schema or projection changed.
+
+| Boundary                                                                                       | Migrated contract                                                                                                  | Explicit remaining exception                                                                                                    |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `DiscussionDetailContent.vue` root reads, fallback and pagination                              | Generated documents and exact root/answer selections; matching conversation and pagination-scope guards            | Activity and media-page operations remain raw; their local responses use the matching selected subsets, not full entities       |
+| Download comments page and discussion/download metadata/title callers                          | Generated detail/fallback/count documents and reactive scalar variables                                            | Event root reads and profile producers remain separate                                                                          |
+| `DiscussionCommentsWrapper`, `CommentSection`, detail header/layout/body/album/feedback inputs | `DiscussionPresentation` / `CommentChannelView`, derived from selected operations                                  | These presentation-only contracts allow documented optional fields for legacy callers; they are never Apollo result/cache types |
+| Root and inline forms, event create form, `useCommentCrudMutations` create branch              | All four `CREATE_COMMENT` callers infer their selected results and variables                                       | Other mutations and event read/cache contracts remain unmigrated                                                                |
+| `PinnedAnswers` / `HydratedAnswer`                                                             | Exact answer summaries; existing single-comment operation hydrates each visible answer before interactive controls | Backend summary projections remain unchanged                                                                                    |
+
+Pinned answers keep summary text during loading/error and offer retry. Matching-ID
+and query-state guards hide stale controls. Cache-first loading reuses complete
+cached selections; only visible/paginated answers mount queries. The single-comment operation does
+not fetch child reply lists; those retain their existing pagination. Reply/edit state
+is forwarded from the shared section to the hydrated renderer. Nullable data is
+preserved. Summary fields alone are deliberately insufficient for `CommentView`.
+
+Root creation updates only existing first-page cache entries matching the captured
+forum/discussion/sort/moderator scope, across the actual 20/50 page sizes. It uses
+the mutation's normalized comment reference rather than claiming its selection is
+a root-query result. Cache misses do not fabricate sections or modify unrelated
+lists. Duplicate results do not duplicate list items or increment counts twice;
+only the count predicates selected by the root operation are incremented.
+Completion after navigation cannot close another conversation's editor. Root and
+answer page merges reject stale conversations and retain null guards.
+
+Contract coverage includes source/document equivalence, invalid variables,
+selected-field/nullability guarantees, summary-vs-renderer incompatibility,
+normalized-cache isolation/counts, answer hydration/retry/navigation and forwarded
+interactions. Browser scenarios cover immediate discussion/download creation and
+pinned-answer recovery/reply controls, alongside existing nested-reply/event flows.
+
+This is a partial #700 migration, not completion of the issue. Event root reads,
+profiles/mod/library producers, the remaining comment mutations/cache writes and
+backend/#701 work are still out of scope. The comprehensive call-site checklist
+is maintained in issue #700; this table inventories only this slice.
+
 ## Next milestones
 
 1. **Phase 2:** fix the recorded compatibility debt and remove the temporary
@@ -353,3 +401,8 @@ lifecycle are unchanged by this slice.
 
 Phase 1 verifies and consumes a pinned schema. None of these later guarantees
 should be inferred from the phase-1 CI check passing.
+
+Generated documents share identical precompiled AST node constants to keep route
+bundles within existing budgets. Every exported document still contains its complete
+fragment definitions; generation does not add runtime GraphQL parsing. Source/document
+equivalence tests cover the shared output as well as the migrated operations.
