@@ -2,12 +2,13 @@ import { computed, type Ref, type ComputedRef } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import type { Reference } from '@apollo/client/core';
-import type { Comment } from '@/__generated__/graphql';
+import type { CommentFieldsFragment } from '@/__generated__/operations';
 import {
   MARK_AS_ANSWERED_BY_COMMENT,
   UNMARK_COMMENT_AS_ANSWER,
 } from '@/graphQLData/discussion/mutations';
 import { useUsername } from '@/composables/useAuthState';
+type Comment = Pick<CommentFieldsFragment, 'id'>;
 
 type UseBestAnswerMutationsParams = {
   commentId: Ref<string> | ComputedRef<string>;

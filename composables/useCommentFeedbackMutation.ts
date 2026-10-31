@@ -1,17 +1,18 @@
 import type { Ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import type { Comment } from '@/__generated__/graphql';
+import type { CommentView } from '@/types/Comment';
 import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from '@/graphQLData/comment/mutations';
 
 type CacheUpdateParams = {
   cache: unknown;
-  commentToAddFeedbackTo: Comment | null;
+  commentToAddFeedbackTo: CommentView | null;
   newFeedbackComment: Comment;
 };
 
 type UseCommentFeedbackMutationParams = {
   parentIdOfCommentToGiveFeedbackOn: Ref<string>;
-  commentToGiveFeedbackOn: Ref<Comment | null>;
+  commentToGiveFeedbackOn: Ref<CommentView | null>;
   onFeedbackAdded?: () => void;
   onUpdateQueryResult?: (params: CacheUpdateParams) => void;
 };

@@ -3,11 +3,15 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 import {
   GetPublicUserProfileDocument,
   GetCommentIssueDocument,
+  GetCommentWithRepliesDocument,
   StickyCommentDocument,
   UpdateUserDocument,
   type GetPublicUserProfileQuery,
   type StickyCommentMutation,
 } from '../../__generated__/operations';
+
+// Replies expose only the composed selection, including nullable custom results.
+import type { ReplyComment, CommentView } from '../../types/Comment';
 
 export function checkApolloInference() {
   const profile = useQuery(GetPublicUserProfileDocument, { username: 'alice' });
@@ -44,4 +48,28 @@ export function checkSelectedFieldsAndNullability(
   // @ts-expect-error custom mutation response is nullable
   void mutation.stickyComment.id;
   return { username, nullableBio, bio };
+}
+export function checkReplyInference(reply: ReplyComment) {
+  const query = useQuery(GetCommentWithRepliesDocument, {
+    commentId: 'parent',
+    limit: 5,
+  });
+  // @ts-expect-error Boolean is not an Int
+  query.refetch({ commentId: 'parent', limit: true });
+  // @ts-expect-error reply query does not select the full schema entity
+  void reply.isRootComment;
+  // @ts-expect-error legacy Channel context is not in the reply selection
+  void reply.Channel;
+  // @ts-expect-error custom reply result may be null
+  void query.result.value?.getCommentReplies.ChildComments;
+  // @ts-expect-error text is nullable
+  const text: string = reply.text;
+  // @ts-expect-error shared UI compatibility still requires non-null selected fields
+  const incompleteView: CommentView = { id: 'reply' };
+  // @ts-expect-error JSON must be narrowed at the rendering boundary
+  const emoji: string = reply.emoji;
+  const view: CommentView = reply;
+  const voteCount: number =
+    reply.UpvotedByUsersConnection.aggregate.count.nodes;
+  return { view, voteCount, text, incompleteView, emoji };
 }

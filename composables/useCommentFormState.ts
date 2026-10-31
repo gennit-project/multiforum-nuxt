@@ -1,6 +1,6 @@
 import { ref } from 'vue';
-import type { Comment as CommentType } from '@/__generated__/graphql';
-import type { CreateEditCommentFormValues } from '@/types/Comment';
+import type { CommentView, CreateEditCommentFormValues } from '@/types/Comment';
+type CommentType = Pick<CommentView, 'id' | 'text' | 'ParentComment'>;
 
 const emptyFormValues = (): CreateEditCommentFormValues => ({
   text: '',

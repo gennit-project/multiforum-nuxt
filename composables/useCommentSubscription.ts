@@ -1,6 +1,6 @@
 import { computed, type ComputedRef, type Ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import type { Comment } from '@/__generated__/graphql';
+import type { CommentView } from '@/types/Comment';
 import { useUsername } from '@/composables/useAuthState';
 import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { isCommentSubscribedByUser } from '@/utils/commentDisplay';
@@ -8,6 +8,7 @@ import {
   SUBSCRIBE_TO_COMMENT,
   UNSUBSCRIBE_FROM_COMMENT,
 } from '@/graphQLData/comment/mutations';
+type Comment = Pick<CommentView, 'id' | 'SubscribedToNotifications'>;
 
 /**
  * Reply-notification subscription for a single comment: the subscribe /

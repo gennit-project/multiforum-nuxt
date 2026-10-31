@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'nuxt/app';
 import type { PropType } from 'vue';
-import type { Comment, ModerationProfile, User } from '@/__generated__/graphql';
+import type { CommentView as Comment } from '@/types/Comment';
 import type { ApolloError } from '@apollo/client/core';
 import type { BotSuggestion } from '@/utils/botMentions';
 import type { ModSuggestion } from '@/utils/modMentions';
@@ -145,8 +145,7 @@ const loggedInUserIsAuthor = computed(() => {
   if (!props.commentData) {
     return false;
   }
-  const author: User | ModerationProfile | undefined | null =
-    props.commentData.CommentAuthor;
+  const author = props.commentData.CommentAuthor;
   if (!author) {
     return false;
   }
@@ -155,12 +154,16 @@ const loggedInUserIsAuthor = computed(() => {
     return modProfileNameVar.value === author.displayName;
   }
 
-  if (author.__typename === 'User') {
+  if (author.__typename === 'User' && 'username' in author) {
     return usernameVar.value === author.username;
   }
 
   return false;
 });
+
+const emojiJson = computed(() =>
+  typeof props.commentData.emoji === 'string' ? props.commentData.emoji : ''
+);
 
 const showEmojiPicker = ref(false);
 const showReactionSuspensionNotice = ref(false);
@@ -191,10 +194,10 @@ function handleBlockedReaction() {
   <div class="-mt-3 mb-4 w-full">
     <EmojiButtons
       v-if="enableEmoji && !locked"
-      :key="commentData.emoji"
+      :key="emojiJson"
       class="mb-1"
       :comment-id="commentData.id"
-      :emoji-json="commentData.emoji"
+      :emoji-json="emojiJson"
       :is-permalinked="isPermalinked"
       :interaction-disabled="hasReactionSuspension"
       @toggle-emoji-picker="toggleEmojiPicker"

@@ -1,12 +1,14 @@
 import type { ComputedRef, Ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
-import type { Comment } from '@/__generated__/graphql';
 import {
   StickyCommentDocument as STICKY_COMMENT,
   UnstickyCommentDocument as UNSTICKY_COMMENT,
   type StickyCommentMutation,
+  type CommentFieldsFragment,
 } from '@/__generated__/operations';
+
+type Comment = Pick<CommentFieldsFragment, 'id'>;
 
 /**
  * Sticky / unsticky mutations for a single comment. Each writes the sticky
