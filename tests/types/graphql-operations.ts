@@ -23,7 +23,7 @@ export function checkApolloInference() {
   // @ts-expect-error username filters require an operator
   update.mutate({ where: { username: 'alice' } });
   // @ts-expect-error unselected private field must not leak into a public result
-  void profile.result.value?.users[0]?.email;
+  void profile.result.value?.users[0]?.Email;
   // @ts-expect-error the comment issue query does not select text
   void issue.result.value?.comments[0]?.text;
   // @ts-expect-error mutation results retain nullable custom resolver result
@@ -40,7 +40,7 @@ export function checkSelectedFieldsAndNullability(
   // @ts-expect-error nullable bio cannot be assigned to string
   const bio: string = profile.users[0]!.bio;
   // @ts-expect-error unselected fields are not full schema entities
-  void profile.users[0]!.email;
+  void profile.users[0]!.Email;
   // @ts-expect-error custom mutation response is nullable
   void mutation.stickyComment.id;
   return { username, nullableBio, bio };

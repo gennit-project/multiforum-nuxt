@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildSchema, print, validate } from 'graphql';
+import { buildSchema, validate } from 'graphql';
 import { combineDocuments } from './generate-graphql-operations.mjs';
 
 const schema = buildSchema(
@@ -46,7 +46,10 @@ test('invalid selected fields remain validation failures in composed documents',
 
 test('invalid variable declarations remain validation failures', () => {
   const [{ document }] = combineDocuments([
-    'query Profile($name: Int!) { user(name: $name) { id } }',
+    'query Profile($name: ID!) { user(name: $name) { id } }',
   ]);
-  assert.ok(validate(schema, document).length > 0, print(document));
+  assert.match(
+    validate(schema, document)[0].message,
+    /Variable "\$name" of type "ID!" used in position expecting type "String!"/
+  );
 });

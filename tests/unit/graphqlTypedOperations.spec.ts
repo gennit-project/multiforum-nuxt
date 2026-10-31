@@ -44,6 +44,53 @@ describe('generated operation runtime contracts', () => {
     expect(names).toEqual(['AuthorFields']);
   });
 
+  it.each([
+    ['an archived comment without an issue', []],
+    [
+      'an archived comment with an issue',
+      [{ __typename: 'Issue', id: 'i1', issueNumber: 8 }],
+    ],
+  ])(
+    'executes the typed read for %s through Apollo',
+    async (_name, relatedIssues) => {
+      const client = new ApolloClient({
+        cache: new InMemoryCache(),
+        link: new MockLink([
+          {
+            request: {
+              query: GetCommentIssueDocument,
+              variables: { commentId: 'c1' },
+            },
+            result: {
+              data: {
+                comments: [
+                  {
+                    __typename: 'Comment',
+                    id: 'c1',
+                    RelatedIssues: relatedIssues,
+                  },
+                ],
+              },
+            },
+          },
+        ]),
+      });
+      try {
+        const result = await client.query({
+          query: GetCommentIssueDocument,
+          variables: { commentId: 'c1' },
+        });
+        expect(
+          result.data.comments[0]?.RelatedIssues.map(
+            (issue) => issue.issueNumber
+          )
+        ).toEqual(relatedIssues.map((issue) => issue.issueNumber));
+      } finally {
+        client.stop();
+      }
+    }
+  );
+
   it('executes and normalizes a typed comment mutation with nullable fields', async () => {
     const client = new ApolloClient({
       cache: new InMemoryCache(),
