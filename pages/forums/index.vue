@@ -84,6 +84,9 @@ watchEffect(() => {
   }
 });
 
+// Capture one rounded timestamp for this page query; keep it out of the document.
+const now = new Date(Math.floor(Date.now() / 10_000) * 10_000).toISOString();
+
 // Query for channels with discussion counts
 const {
   result: channelResult,
@@ -93,6 +96,7 @@ const {
 } = useQuery(
   GET_CHANNELS_DISCUSSIONS,
   {
+    now,
     limit: 25,
     offset: 0,
     tags: selectedTags,

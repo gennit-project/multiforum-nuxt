@@ -250,6 +250,2895 @@ export type GetEventChannelIdQueryVariables = Exact<{
 
 export type GetEventChannelIdQuery = { eventChannels: Array<{ id: string, archived: boolean | null }> };
 
+export type GetUserFavoriteImageQueryVariables = Exact<{
+  username: string;
+  imageId: string | number;
+}>;
+
+
+export type GetUserFavoriteImageQuery = { users: Array<{ username: string, FavoriteImages: Array<{ id: string, url: string | null }> }> };
+
+export type GetUserFavoritesQueryVariables = Exact<{
+  username: string;
+  channelUniqueName: string;
+}>;
+
+
+export type GetUserFavoritesQuery = { users: Array<{ username: string, FavoriteChannels: Array<{ uniqueName: string }> }> };
+
+export type GetUserFavoriteCommentQueryVariables = Exact<{
+  commentId: string | number;
+}>;
+
+
+export type GetUserFavoriteCommentQuery = { getUserFavoriteComment: boolean | null };
+
+export type GetUserFavoriteDiscussionQueryVariables = Exact<{
+  username: string;
+  discussionId: string | number;
+}>;
+
+
+export type GetUserFavoriteDiscussionQuery = { users: Array<{ username: string, FavoriteDiscussions: Array<{ id: string, title: string }> }> };
+
+export type UpdatedAnswersFragment = { id: string, answered: boolean | null, Answers: Array<{ id: string, text: string | null, CommentAuthor:
+      | { username: string }
+      | { displayName: string | null }
+     | null }> };
+
+export type UpdateServerConfigMutationVariables = Exact<{
+  serverName: string;
+  input?: Types.ServerConfigUpdateInput | null | undefined;
+}>;
+
+
+export type UpdateServerConfigMutation = { updateServerConfigs: { serverConfigs: Array<{ serverName: string | null, serverIconURL: string | null, serverDescription: string | null, rules: unknown, enableDownloads: boolean | null, enableEvents: boolean | null, accountAgeGateEnabled: boolean | null, minimumAccountAge: number | null, sensitiveContentAgeGateEnabled: boolean | null, minimumSensitiveContentAge: number | null, allowedFileTypes: Array<string> | null, pluginRegistries: Array<string> | null, brandingLogoDarkURL: string | null, brandingLogoAlt: string | null, brandingFaviconURL: string | null, brandingPrimaryColor: string | null, brandingProductName: string | null, brandingDocsURL: string | null, brandingSourceURL: string | null, brandingIssuesURL: string | null, brandingSupportEmail: string | null, brandingShowUpstreamLinks: boolean | null, brandingCustomFooterLinks: unknown }> } };
+
+export type SetFeaturedWikiPagesMutationVariables = Exact<{
+  serverName: string;
+  wikiPageIds: Array<string | number> | string | number;
+}>;
+
+
+export type SetFeaturedWikiPagesMutation = { setFeaturedWikiPages: { serverName: string | null, featuredWikiPageIds: Array<string> | null } };
+
+export type RefreshPluginsMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RefreshPluginsMutation = { refreshPlugins: Array<{ id: string, name: string, Versions: Array<{ version: string }> }> };
+
+export type AllowPluginMutationVariables = Exact<{
+  pluginId: string | number;
+  serverName: string;
+}>;
+
+
+export type AllowPluginMutation = { updateServerConfigs: { serverConfigs: Array<{ serverName: string | null, AllowedPlugins: Array<{ id: string, name: string }> }> } };
+
+export type DisallowPluginMutationVariables = Exact<{
+  pluginId: string | number;
+  serverName: string;
+}>;
+
+
+export type DisallowPluginMutation = { updateServerConfigs: { serverConfigs: Array<{ serverName: string | null, AllowedPlugins: Array<{ id: string, name: string }> }> } };
+
+export type InstallPluginVersionMutationVariables = Exact<{
+  pluginId: string;
+  version: string;
+  carrySettings?: boolean | null | undefined;
+}>;
+
+
+export type InstallPluginVersionMutation = { installPluginVersion: { version: string, scope: string, enabled: boolean, settingsJson: unknown, carryOverReport: unknown, plugin: { id: string, name: string } } };
+
+export type EnableServerPluginMutationVariables = Exact<{
+  pluginId: string;
+  version: string;
+  enabled: boolean;
+  settingsJson?: unknown;
+}>;
+
+
+export type EnableServerPluginMutation = { enableServerPlugin: { version: string, scope: string, enabled: boolean, settingsJson: unknown, plugin: { id: string, name: string } } };
+
+export type SetServerPluginSecretMutationVariables = Exact<{
+  pluginId: string;
+  key: string;
+  value: string;
+}>;
+
+
+export type SetServerPluginSecretMutation = { setServerPluginSecret: boolean };
+
+export type CreatePluginPipelineCampaignMutationVariables = Exact<{
+  policyId: string | number;
+  concurrency: number;
+  rateLimitPerMinute: number;
+}>;
+
+
+export type CreatePluginPipelineCampaignMutation = { createPluginPipelineCampaign: { id: string, status: Types.PluginPipelineCampaignStatus } };
+
+export type PausePluginPipelineCampaignMutationVariables = Exact<{
+  campaignId: string | number;
+}>;
+
+
+export type PausePluginPipelineCampaignMutation = { pausePluginPipelineCampaign: { id: string, status: Types.PluginPipelineCampaignStatus, pausedAt: string | null } };
+
+export type ResumePluginPipelineCampaignMutationVariables = Exact<{
+  campaignId: string | number;
+}>;
+
+
+export type ResumePluginPipelineCampaignMutation = { resumePluginPipelineCampaign: { id: string, status: Types.PluginPipelineCampaignStatus, pausedAt: string | null } };
+
+export type UpdateModChannelRoleMutationVariables = Exact<{
+  name: string;
+  input: Types.ModChannelRoleUpdateInput;
+}>;
+
+
+export type UpdateModChannelRoleMutation = { updateModChannelRoles: { modChannelRoles: Array<{ name: string, description: string | null, channelUniqueName: string, canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null }> } };
+
+export type UpdateServerRoleMutationVariables = Exact<{
+  name: string;
+  input: Types.ServerRoleUpdateInput;
+}>;
+
+
+export type UpdateServerRoleMutation = { updateServerRoles: { serverRoles: Array<{ name: string | null, description: string | null, canCreateChannel: boolean | null, canCreateDiscussion: boolean | null, canCreateEvent: boolean | null, canCreateComment: boolean | null, canUpvoteDiscussion: boolean | null, canUpvoteComment: boolean | null, canUploadFile: boolean | null, canGiveFeedback: boolean | null }> } };
+
+export type AddServerAdminMutationVariables = Exact<{
+  serverName: string;
+  username: string;
+}>;
+
+
+export type AddServerAdminMutation = { updateServerConfigs: { serverConfigs: Array<{ serverName: string | null, Admins: Array<{ username: string, displayName: string | null }> }> } };
+
+export type RemoveServerAdminMutationVariables = Exact<{
+  serverName: string;
+  username: string;
+}>;
+
+
+export type RemoveServerAdminMutation = { updateServerConfigs: { serverConfigs: Array<{ serverName: string | null, Admins: Array<{ username: string, displayName: string | null }> }> } };
+
+export type AddServerModeratorMutationVariables = Exact<{
+  serverName: string;
+  displayName: string;
+}>;
+
+
+export type AddServerModeratorMutation = { updateServerConfigs: { serverConfigs: Array<{ serverName: string | null, Moderators: Array<{ displayName: string | null }> }> } };
+
+export type RemoveServerModeratorMutationVariables = Exact<{
+  serverName: string;
+  displayName: string;
+}>;
+
+
+export type RemoveServerModeratorMutation = { updateServerConfigs: { serverConfigs: Array<{ serverName: string | null, Moderators: Array<{ displayName: string | null }> }> } };
+
+export type InviteServerAdminMutationVariables = Exact<{
+  serverName: string;
+  inviteeUsername: string;
+}>;
+
+
+export type InviteServerAdminMutation = { inviteServerAdmin: boolean | null };
+
+export type CancelInviteServerAdminMutationVariables = Exact<{
+  serverName: string;
+  inviteeUsername: string;
+}>;
+
+
+export type CancelInviteServerAdminMutation = { cancelInviteServerAdmin: boolean | null };
+
+export type AcceptServerAdminInviteMutationVariables = Exact<{
+  serverName: string;
+}>;
+
+
+export type AcceptServerAdminInviteMutation = { acceptServerAdminInvite: boolean | null };
+
+export type InviteServerModMutationVariables = Exact<{
+  serverName: string;
+  inviteeUsername: string;
+}>;
+
+
+export type InviteServerModMutation = { inviteServerMod: boolean | null };
+
+export type CancelInviteServerModMutationVariables = Exact<{
+  serverName: string;
+  inviteeUsername: string;
+}>;
+
+
+export type CancelInviteServerModMutation = { cancelInviteServerMod: boolean | null };
+
+export type AcceptServerModInviteMutationVariables = Exact<{
+  serverName: string;
+}>;
+
+
+export type AcceptServerModInviteMutation = { acceptServerModInvite: boolean | null };
+
+export type UpdateModServerRoleMutationVariables = Exact<{
+  name: string;
+  input: Types.ModServerRoleUpdateInput;
+}>;
+
+
+export type UpdateModServerRoleMutation = { updateModServerRoles: { modServerRoles: Array<{ name: string | null, description: string | null, canLockChannel: boolean | null, canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null }> } };
+
+export type UpdatePluginPipelinesMutationVariables = Exact<{
+  pipelines: Array<Types.EventPipelineInput> | Types.EventPipelineInput;
+}>;
+
+
+export type UpdatePluginPipelinesMutation = { updatePluginPipelines: unknown };
+
+export type StartPluginPipelineMutationVariables = Exact<{
+  targetId: string | number;
+  targetType: string;
+  eventType: string;
+  channelId?: string | null | undefined;
+}>;
+
+
+export type StartPluginPipelineMutation = { startPluginPipeline: { pipelineId: string, targetId: string, targetType: string, eventType: string, scope: string, channelId: string | null, status: Types.PluginPipelineRunStatus, trigger: Types.PluginPipelineRunTrigger, initiatedByUsername: string | null, attemptNumber: number, queuedAt: string | null, startedAt: string | null, heartbeatAt: string | null, timeoutAt: string | null, finishedAt: string | null, createdAt: string, updatedAt: string } };
+
+export type RerunPluginPipelineMutationVariables = Exact<{
+  pipelineRunId: string | number;
+}>;
+
+
+export type RerunPluginPipelineMutation = { rerunPluginPipeline: { pipelineId: string, targetId: string, targetType: string, eventType: string, scope: string, channelId: string | null, status: Types.PluginPipelineRunStatus, trigger: Types.PluginPipelineRunTrigger, initiatedByUsername: string | null, retryOfPipelineRunId: string | null, attemptNumber: number, queuedAt: string | null, startedAt: string | null, heartbeatAt: string | null, timeoutAt: string | null, finishedAt: string | null, createdAt: string, updatedAt: string } };
+
+export type GetInstanceSetupStatusQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetInstanceSetupStatusQuery = { getInstanceSetupStatus: { auth: { configured: boolean, enabled: boolean, requiredEnvVarsMissing: Array<string>, setupUrl: string, docsPath: string }, mail: { configured: boolean, enabled: boolean, requiredEnvVarsMissing: Array<string>, setupUrl: string, docsPath: string }, maps: { configured: boolean, enabled: boolean, requiredEnvVarsMissing: Array<string>, setupUrl: string, docsPath: string }, geocoding: { configured: boolean, enabled: boolean, requiredEnvVarsMissing: Array<string>, setupUrl: string, docsPath: string }, uploads: { configured: boolean, enabled: boolean, requiredEnvVarsMissing: Array<string>, setupUrl: string, docsPath: string }, downloads: { configured: boolean, enabled: boolean, requiredEnvVarsMissing: Array<string>, setupUrl: string, docsPath: string }, events: { configured: boolean, enabled: boolean, requiredEnvVarsMissing: Array<string>, setupUrl: string, docsPath: string }, plugins: { configured: boolean, enabled: boolean, requiredEnvVarsMissing: Array<string>, setupUrl: string, docsPath: string } } };
+
+export type GetServerBrandingQueryVariables = Exact<{
+  serverName: string;
+}>;
+
+
+export type GetServerBrandingQuery = { serverConfigs: Array<{ serverName: string | null, serverIconURL: string | null, brandingLogoDarkURL: string | null, brandingLogoAlt: string | null, brandingFaviconURL: string | null, brandingPrimaryColor: string | null, brandingProductName: string | null, brandingDocsURL: string | null, brandingSourceURL: string | null, brandingIssuesURL: string | null, brandingSupportEmail: string | null, brandingShowUpstreamLinks: boolean | null, brandingCustomFooterLinks: unknown }> };
+
+export type GetServerConfigQueryVariables = Exact<{
+  serverName: string;
+}>;
+
+
+export type GetServerConfigQuery = { serverConfigs: Array<{ serverName: string | null, serverIconURL: string | null, serverDescription: string | null, featuredWikiPageIds: Array<string> | null, brandingLogoDarkURL: string | null, brandingLogoAlt: string | null, brandingFaviconURL: string | null, brandingPrimaryColor: string | null, brandingProductName: string | null, brandingDocsURL: string | null, brandingSourceURL: string | null, brandingIssuesURL: string | null, brandingSupportEmail: string | null, brandingShowUpstreamLinks: boolean | null, brandingCustomFooterLinks: unknown, rules: unknown, allowedFileTypes: Array<string> | null, enableDownloads: boolean | null, enableEvents: boolean | null, accountAgeGateEnabled: boolean | null, minimumAccountAge: number | null, sensitiveContentAgeGateEnabled: boolean | null, minimumSensitiveContentAge: number | null, pluginRegistries: Array<string> | null, Admins: Array<{ username: string }>, Moderators: Array<{ displayName: string | null }>, PendingAdminInvites: Array<{ username: string }>, PendingModInvites: Array<{ username: string }>, DefaultServerRole: { name: string | null, description: string | null, canCreateComment: boolean | null, canCreateDiscussion: boolean | null, canCreateEvent: boolean | null, canCreateChannel: boolean | null, canUploadFile: boolean | null, canUpvoteComment: boolean | null, canUpvoteDiscussion: boolean | null } | null, DefaultModRole: { name: string | null, description: string | null, canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canLockChannel: boolean | null, canDeleteWiki: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null, canPermanentlyRemoveImage: boolean | null } | null, DefaultElevatedModRole: { name: string | null, description: string | null, canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canLockChannel: boolean | null, canDeleteWiki: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null, canPermanentlyRemoveImage: boolean | null } | null, DefaultSuspendedRole: { name: string | null, description: string | null, canCreateComment: boolean | null, canCreateDiscussion: boolean | null, canCreateEvent: boolean | null, canCreateChannel: boolean | null, canUploadFile: boolean | null, canUpvoteComment: boolean | null, canUpvoteDiscussion: boolean | null } | null, DefaultSuspendedModRole: { name: string | null, description: string | null, canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canLockChannel: boolean | null, canDeleteWiki: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null } | null }> };
+
+export type GetServerHealthDashboardQueryVariables = Exact<{
+  startDate?: string | null | undefined;
+  endDate?: string | null | undefined;
+  channelUniqueNames?: Array<string> | string | null | undefined;
+  limit?: number | null | undefined;
+  sortBy?: string | null | undefined;
+  sortDirection?: string | null | undefined;
+}>;
+
+
+export type GetServerHealthDashboardQuery = { getServerHealthDashboard: { startDate: string, endDate: string, generatedAt: string, summary: { activeChannelCount: number, discussionCount: number, commentCount: number, eventCount: number, downloadCount: number, voteCount: number, openIssueCount: number, issueOpenedCount: number, issueClosedCount: number, moderationActionCount: number, archivedContentCount: number, lockedContentCount: number, suspensionCount: number, failedDownloadScanCount: number, queuedPluginJobCount: number, runningPluginJobCount: number, pluginTimeoutCount24h: number, pluginTimeoutRate24h: number, repeatedPluginFailureCount24h: number, pluginRetryAttemptCount1h: number, pluginRetryStormCount1h: number, oldestQueuedPluginJobAgeSeconds: number, medianOpenIssueAgeDays: number | null }, timeSeries: Array<{ date: string, discussions: number, comments: number, events: number, downloads: number, issuesOpened: number, moderationActions: number }>, channelHealth: Array<{ id: string, channelUniqueName: string, displayName: string | null, channelIconURL: string | null, discussionCount: number, commentCount: number, eventCount: number, downloadCount: number, voteCount: number, uniqueContributorCount: number, openIssueCount: number, issueOpenedCount: number, moderationActionCount: number, archivedContentCount: number, lockedContentCount: number, oldestOpenIssueAgeDays: number | null, issuesPerHundredContributions: number | null, activityScore: number, healthLabel: string }>, issueAging: Array<{ label: string, minDays: number, maxDays: number | null, count: number }>, attentionItems: Array<{ severity: string, title: string, description: string, channelUniqueName: string | null, issueNumber: number | null, metric: string | null, value: number | null }> } };
+
+export type GetDownloadScanReviewQueueQueryVariables = Exact<{
+  limit?: number | null | undefined;
+}>;
+
+
+export type GetDownloadScanReviewQueueQuery = { getDownloadScanReviewQueue: Array<{ downloadableFileId: string, fileName: string, scanStatus: Types.ScanStatus, scanReason: string | null, scanCheckedAt: string | null, reviewRequestedAt: string | null, reviewRequestReason: string | null, uploaderUsername: string | null, discussionId: string, discussionTitle: string | null, channelUniqueName: string | null }> };
+
+export type GetServerHealthDashboardOverviewQueryVariables = Exact<{
+  startDate?: string | null | undefined;
+  endDate?: string | null | undefined;
+  channelUniqueNames?: Array<string> | string | null | undefined;
+}>;
+
+
+export type GetServerHealthDashboardOverviewQuery = { getServerHealthDashboard: { startDate: string, endDate: string, generatedAt: string, summary: { activeChannelCount: number, discussionCount: number, commentCount: number, eventCount: number, downloadCount: number, voteCount: number, openIssueCount: number, issueOpenedCount: number, issueClosedCount: number, moderationActionCount: number, archivedContentCount: number, lockedContentCount: number, suspensionCount: number, failedDownloadScanCount: number, queuedPluginJobCount: number, runningPluginJobCount: number, pluginTimeoutCount24h: number, pluginTimeoutRate24h: number, repeatedPluginFailureCount24h: number, pluginRetryAttemptCount1h: number, pluginRetryStormCount1h: number, oldestQueuedPluginJobAgeSeconds: number, medianOpenIssueAgeDays: number | null }, timeSeries: Array<{ date: string, discussions: number, comments: number, events: number, downloads: number, issuesOpened: number, moderationActions: number }>, issueAging: Array<{ label: string, minDays: number, maxDays: number | null, count: number }> } };
+
+export type GetServerHealthChannelHealthQueryVariables = Exact<{
+  startDate?: string | null | undefined;
+  endDate?: string | null | undefined;
+  channelUniqueNames?: Array<string> | string | null | undefined;
+  limit?: number | null | undefined;
+  sortBy?: string | null | undefined;
+  sortDirection?: string | null | undefined;
+}>;
+
+
+export type GetServerHealthChannelHealthQuery = { getServerHealthDashboard: { startDate: string, endDate: string, generatedAt: string, channelHealth: Array<{ id: string, channelUniqueName: string, displayName: string | null, channelIconURL: string | null, discussionCount: number, commentCount: number, eventCount: number, downloadCount: number, voteCount: number, uniqueContributorCount: number, openIssueCount: number, issueOpenedCount: number, moderationActionCount: number, archivedContentCount: number, lockedContentCount: number, oldestOpenIssueAgeDays: number | null, issuesPerHundredContributions: number | null, activityScore: number, healthLabel: string }> } };
+
+export type GetServerConfigSource8a6aa06bf0QueryVariables = Exact<{
+  serverName: string;
+}>;
+
+
+export type GetServerConfigSource8a6aa06bf0Query = { serverConfigs: Array<{ serverName: string | null, SuperAdmins: Array<{ username: string }>, Admins: Array<{ username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string }>, Moderators: Array<{ displayName: string | null }>, PendingAdminInvites: Array<{ username: string, displayName: string | null, profilePicURL: string | null }>, PendingModInvites: Array<{ username: string, displayName: string | null, profilePicURL: string | null }>, DefaultModRole: { name: string | null, description: string | null, canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canLockChannel: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null } | null, DefaultElevatedModRole: { name: string | null, description: string | null, canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canLockChannel: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null } | null, DefaultSuspendedModRole: { name: string | null, description: string | null, canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canLockChannel: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null } | null, DefaultServerRole: { name: string | null, description: string | null, canUpvoteDiscussion: boolean | null, canUpvoteComment: boolean | null, canUploadFile: boolean | null, canGiveFeedback: boolean | null, canCreateEvent: boolean | null, canCreateDiscussion: boolean | null, canCreateComment: boolean | null, canCreateChannel: boolean | null } | null, DefaultSuspendedRole: { name: string | null, description: string | null, canUpvoteDiscussion: boolean | null, canUpvoteComment: boolean | null, canUploadFile: boolean | null, canGiveFeedback: boolean | null, canCreateEvent: boolean | null, canCreateDiscussion: boolean | null, canCreateComment: boolean | null, canCreateChannel: boolean | null } | null }> };
+
+export type GetServerSuspendedUsersQueryVariables = Exact<{
+  serverName: string;
+}>;
+
+
+export type GetServerSuspendedUsersQuery = { serverConfigs: Array<{ serverName: string | null, SuspendedUsersConnection: { aggregate: { count: { nodes: number } } }, SuspendedUsers: Array<{ id: string, username: string | null, createdAt: string, suspendedUntil: string | null, suspendedIndefinitely: boolean | null, SuspendedUser: { username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string, isBot: boolean | null } | null, RelatedIssue: { id: string, issueNumber: number } | null }> }> };
+
+export type GetServerSuspendedModsQueryVariables = Exact<{
+  serverName: string;
+}>;
+
+
+export type GetServerSuspendedModsQuery = { serverConfigs: Array<{ serverName: string | null, SuspendedModsConnection: { aggregate: { count: { nodes: number } } }, SuspendedMods: Array<{ id: string, modProfileName: string | null, username: string | null, createdAt: string, suspendedUntil: string | null, suspendedIndefinitely: boolean | null, SuspendedMod: { displayName: string | null } | null, RelatedIssue: { id: string, issueNumber: number } | null }> }> };
+
+export type GetServerRulesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetServerRulesQuery = { serverConfigs: Array<{ serverName: string | null, rules: unknown }> };
+
+export type GetModChannelRolesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetModChannelRolesQuery = { modChannelRoles: Array<{ name: string, description: string | null, channelUniqueName: string, canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null }> };
+
+export type GetPluginsQueryVariables = Exact<{
+  serverName: string;
+}>;
+
+
+export type GetPluginsQuery = { serverConfigs: Array<{ AllowedPlugins: Array<{ id: string, name: string }>, InstalledVersions: Array<{ id: string, version: string, repoUrl: string, entryPath: string }> }> };
+
+export type GetPluginByIdQueryVariables = Exact<{
+  serverName: string;
+  pluginId: string | number;
+}>;
+
+
+export type GetPluginByIdQuery = { serverConfigs: Array<{ AllowedPlugins: Array<{ id: string, name: string }>, InstalledVersions: Array<{ id: string, version: string, repoUrl: string, entryPath: string }> }> };
+
+export type GetPluginsSource6c031b0d8aQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetPluginsSource6c031b0d8aQuery = { plugins: Array<{ id: string, name: string, displayName: string | null, description: string | null, authorName: string | null, authorUrl: string | null, homepage: string | null, license: string | null, tags: Array<string> | null, Versions: Array<{ id: string, version: string, registryUrl: string | null, releaseNotesUrl: string | null, sourceRepoUrl: string | null, sourceCommit: string | null, minServerVersion: string | null, apiVersion: string | null }> }> };
+
+export type GetInstalledPluginsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetInstalledPluginsQuery = { getInstalledPlugins: Array<{ version: string, scope: string, enabled: boolean, settingsJson: unknown, readmeMarkdown: string | null, registryUrl: string | null, releaseNotesUrl: string | null, sourceRepoUrl: string | null, sourceCommit: string | null, minServerVersion: string | null, apiVersion: string | null, manifest: unknown, hasUpdate: boolean | null, latestVersion: string | null, availableVersions: Array<string> | null, plugin: { id: string, name: string, displayName: string | null, description: string | null, authorName: string | null, authorUrl: string | null, homepage: string | null, license: string | null, tags: Array<string> | null } }> };
+
+export type GetServerPluginSecretsQueryVariables = Exact<{
+  pluginId: string;
+}>;
+
+
+export type GetServerPluginSecretsQuery = { getServerPluginSecrets: Array<{ key: string, status: Types.SecretValidationStatus, lastValidatedAt: string | null, validationError: string | null }> };
+
+export type GetPluginConfigStatusQueryVariables = Exact<{
+  pluginId: string;
+  version: string;
+  scope?: string | null | undefined;
+}>;
+
+
+export type GetPluginConfigStatusQuery = { getPluginConfigStatus: { isFullyConfigured: boolean, fields: Array<{ key: string, label: string, scope: string, kind: string, required: boolean, isSet: boolean, isValid: boolean, message: string | null }> } };
+
+export type GetPluginManagementDataQueryVariables = Exact<{
+  serverName: string;
+}>;
+
+
+export type GetPluginManagementDataQuery = { plugins: Array<{ id: string, name: string, displayName: string | null, description: string | null, authorName: string | null, authorUrl: string | null, homepage: string | null, license: string | null, tags: Array<string> | null, Versions: Array<{ id: string, version: string, repoUrl: string, entryPath: string, registryUrl: string | null, releaseNotesUrl: string | null, sourceRepoUrl: string | null, sourceCommit: string | null, minServerVersion: string | null, apiVersion: string | null }> }>, serverConfigs: Array<{ serverName: string | null, pluginRegistries: Array<string> | null, AllowedPlugins: Array<{ id: string, name: string, displayName: string | null, description: string | null, authorName: string | null, authorUrl: string | null, homepage: string | null, license: string | null, tags: Array<string> | null }>, InstalledVersions: Array<{ id: string, version: string, repoUrl: string, entryPath: string, Plugin: { id: string, name: string, displayName: string | null, description: string | null } | null }> }>, getInstalledPlugins: Array<{ version: string, scope: string, enabled: boolean, settingsJson: unknown, readmeMarkdown: string | null, registryUrl: string | null, releaseNotesUrl: string | null, sourceRepoUrl: string | null, sourceCommit: string | null, minServerVersion: string | null, apiVersion: string | null, manifest: unknown, hasUpdate: boolean | null, latestVersion: string | null, availableVersions: Array<string> | null, plugin: { id: string, name: string, displayName: string | null, description: string | null, authorName: string | null, authorUrl: string | null, homepage: string | null, license: string | null, tags: Array<string> | null } }> };
+
+export type GetPluginDetailQueryVariables = Exact<{
+  pluginId: string | number;
+}>;
+
+
+export type GetPluginDetailQuery = { plugins: Array<{ id: string, name: string, displayName: string | null, description: string | null, authorName: string | null, authorUrl: string | null, homepage: string | null, license: string | null, tags: Array<string> | null, Versions: Array<{ id: string, version: string, repoUrl: string, entryPath: string, readmeMarkdown: string | null, registryUrl: string | null, releaseNotesUrl: string | null, sourceRepoUrl: string | null, sourceCommit: string | null, minServerVersion: string | null, apiVersion: string | null, manifest: unknown }> }> };
+
+export type PipelinePageFieldsFragment = { displayStatus: Types.PluginRunStatus, hasActiveWork: boolean, jobsPageInfo: { hasNextPage: boolean, endCursor: string | null }, run: { id: string, pipelineId: string, targetId: string, targetType: string, eventType: string, scope: string, channelId: string | null, status: Types.PluginPipelineRunStatus, trigger: Types.PluginPipelineRunTrigger, initiatedByUsername: string | null, retryOfPipelineRunId: string | null, attemptNumber: number, applicability: Types.PipelineApplicability | null, policyEffectiveAt: string | null, policyId: string | null, campaignId: string | null, queuedAt: string, startedAt: string | null, heartbeatAt: string | null, timeoutAt: string | null, finishedAt: string | null, createdAt: string, updatedAt: string, jobs: Array<{ id: string, pluginId: string, pluginName: string, version: string, scope: string, channelId: string | null, eventType: string, status: Types.PluginRunStatus, message: string | null, durationMs: number | null, executionOrder: number, skippedReason: string | null, queuedAt: string, startedAt: string | null, heartbeatAt: string | null, timeoutAt: string | null, finishedAt: string | null, createdAt: string, updatedAt: string, diagnostics: Array<{ level: Types.PublicPluginDiagnosticLevel, code: string, message: string, details: unknown, helpUrl: string | null }> }> } };
+
+export type GetPipelineSummaryPageQueryVariables = Exact<{
+  targetId: string | number;
+  targetType: string;
+  first?: number | null | undefined;
+  after?: string | null | undefined;
+  eventType?: string | null | undefined;
+  scope?: string | null | undefined;
+  channelId?: string | null | undefined;
+}>;
+
+
+export type GetPipelineSummaryPageQuery = { getPipelineSummaryPage: { targetId: string, targetType: string, hasActiveWork: boolean, hasFailedWork: boolean, pageInfo: { hasNextPage: boolean, endCursor: string | null }, attempts: Array<{ displayStatus: Types.PluginRunStatus, hasActiveWork: boolean, jobsPageInfo: { hasNextPage: boolean, endCursor: string | null }, run: { id: string, pipelineId: string, targetId: string, targetType: string, eventType: string, scope: string, channelId: string | null, status: Types.PluginPipelineRunStatus, trigger: Types.PluginPipelineRunTrigger, initiatedByUsername: string | null, retryOfPipelineRunId: string | null, attemptNumber: number, applicability: Types.PipelineApplicability | null, policyEffectiveAt: string | null, policyId: string | null, campaignId: string | null, queuedAt: string, startedAt: string | null, heartbeatAt: string | null, timeoutAt: string | null, finishedAt: string | null, createdAt: string, updatedAt: string, jobs: Array<{ id: string, pluginId: string, pluginName: string, version: string, scope: string, channelId: string | null, eventType: string, status: Types.PluginRunStatus, message: string | null, durationMs: number | null, executionOrder: number, skippedReason: string | null, queuedAt: string, startedAt: string | null, heartbeatAt: string | null, timeoutAt: string | null, finishedAt: string | null, createdAt: string, updatedAt: string, diagnostics: Array<{ level: Types.PublicPluginDiagnosticLevel, code: string, message: string, details: unknown, helpUrl: string | null }> }> } }> } };
+
+export type GetPipelineRunPageQueryVariables = Exact<{
+  pipelineRunId: string | number;
+  after?: string | null | undefined;
+}>;
+
+
+export type GetPipelineRunPageQuery = { getPipelineRunPage: { displayStatus: Types.PluginRunStatus, hasActiveWork: boolean, jobsPageInfo: { hasNextPage: boolean, endCursor: string | null }, run: { id: string, pipelineId: string, targetId: string, targetType: string, eventType: string, scope: string, channelId: string | null, status: Types.PluginPipelineRunStatus, trigger: Types.PluginPipelineRunTrigger, initiatedByUsername: string | null, retryOfPipelineRunId: string | null, attemptNumber: number, applicability: Types.PipelineApplicability | null, policyEffectiveAt: string | null, policyId: string | null, campaignId: string | null, queuedAt: string, startedAt: string | null, heartbeatAt: string | null, timeoutAt: string | null, finishedAt: string | null, createdAt: string, updatedAt: string, jobs: Array<{ id: string, pluginId: string, pluginName: string, version: string, scope: string, channelId: string | null, eventType: string, status: Types.PluginRunStatus, message: string | null, durationMs: number | null, executionOrder: number, skippedReason: string | null, queuedAt: string, startedAt: string | null, heartbeatAt: string | null, timeoutAt: string | null, finishedAt: string | null, createdAt: string, updatedAt: string, diagnostics: Array<{ level: Types.PublicPluginDiagnosticLevel, code: string, message: string, details: unknown, helpUrl: string | null }> }> } } | null };
+
+export type GetInternalPluginPipelineRunQueryVariables = Exact<{
+  pipelineRunId: string | number;
+}>;
+
+
+export type GetInternalPluginPipelineRunQuery = { getInternalPluginPipelineRun: { attempt: { id: string, pipelineId: string, status: Types.PluginPipelineRunStatus, queuedAt: string | null, startedAt: string | null, heartbeatAt: string | null, timeoutAt: string | null, finishedAt: string | null, updatedAt: string }, jobs: Array<{ id: string, pluginId: string, pluginName: string | null, version: string, status: string, message: string | null, durationMs: number | null, payload: unknown, executionOrder: number | null, skippedReason: string | null, leaseId: string | null, queuedAt: string | null, startedAt: string | null, heartbeatAt: string | null, timeoutAt: string | null, finishedAt: string | null, updatedAt: string }> } | null };
+
+export type GetDownloadPipelineOverviewQueryVariables = Exact<{
+  downloadableFileId: string | number;
+  discussionId: string | number;
+  channelUniqueName: string;
+}>;
+
+
+export type GetDownloadPipelineOverviewQuery = { serverApplicable: { targetId: string, targetType: string, eventType: string, scope: string, channelId: string | null, configured: boolean, applicability: Types.PipelineApplicability, effectiveAt: string | null, policyId: string | null, required: boolean, reason: string, expectedJobs: Array<{ pluginId: string, pluginName: string, version: string, order: number, condition: Types.PipelineCondition, continueOnError: boolean }> }, channelApplicable: { targetId: string, targetType: string, eventType: string, scope: string, channelId: string | null, configured: boolean, applicability: Types.PipelineApplicability, effectiveAt: string | null, required: boolean, reason: string, expectedJobs: Array<{ pluginId: string, pluginName: string, version: string, order: number, condition: Types.PipelineCondition, continueOnError: boolean }> } };
+
+export type GetPluginPipelineCampaignsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetPluginPipelineCampaignsQuery = { getPluginPipelineCampaigns: Array<{ id: string, policyId: string, eventType: string, scope: string, applicability: Types.PipelineApplicability, enforcementBehavior: string, status: Types.PluginPipelineCampaignStatus, concurrency: number, rateLimitPerMinute: number, affectedFileCount: number, accessibleFileCount: number, unavailableFileCount: number, estimatedProviderRuns: number, completedCount: number, runningCount: number, failedCount: number, timedOutCount: number, createdByUsername: string, createdAt: string, startedAt: string | null, pausedAt: string | null, finishedAt: string | null }> };
+
+export type PreviewPluginPipelineCampaignQueryVariables = Exact<{
+  policyId: string | number;
+}>;
+
+
+export type PreviewPluginPipelineCampaignQuery = { previewPluginPipelineCampaign: { policyId: string, eventType: string, applicability: Types.PipelineApplicability, enforcementBehavior: string, affectedFileCount: number, accessibleFileCount: number, unavailableFileCount: number, estimatedProviderRuns: number } };
+
+export type GetPluginPipelineCampaignFailuresQueryVariables = Exact<{
+  campaignId: string | number;
+}>;
+
+
+export type GetPluginPipelineCampaignFailuresQuery = { getPluginPipelineCampaignFailures: Array<{ pipelineId: string, targetId: string, discussionId: string, channelId: string, status: Types.PluginPipelineRunStatus, attemptNumber: number }> };
+
+export type GetPluginPipelinesQueryVariables = Exact<{
+  serverName: string;
+}>;
+
+
+export type GetPluginPipelinesQuery = { serverConfigs: Array<{ serverName: string | null, pluginPipelines: unknown }> };
+
+export type SetMyBirthdayMutationVariables = Exact<{
+  birthday: string;
+}>;
+
+
+export type SetMyBirthdayMutation = { setMyBirthday: { birthday: string | null, meetsAccountMinimumAge: boolean | null, mayAccessSensitiveContent: boolean } };
+
+export type GetAgePolicyQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAgePolicyQuery = { getAgePolicy: { accountAgeGateEnabled: boolean, minimumAccountAge: number, sensitiveContentAgeGateEnabled: boolean, minimumSensitiveContentAge: number } };
+
+export type GetDiscussionAgeGateCheckQueryVariables = Exact<{
+  discussionId: string | number;
+}>;
+
+
+export type GetDiscussionAgeGateCheckQuery = { getDiscussionAgeGateCheck: { requiresAgeCheck: boolean, status: Types.AgeGateCheckStatus, minimumAge: number | null } };
+
+export type SetChannelDiscussionFlairConfigMutationVariables = Exact<{
+  channelUniqueName: string;
+  flairRequired: boolean;
+  flairs: Array<Types.DiscussionFlairConfigInput> | Types.DiscussionFlairConfigInput;
+}>;
+
+
+export type SetChannelDiscussionFlairConfigMutation = { setChannelDiscussionFlairConfig: { channelUniqueName: string, flairRequired: boolean, flairs: Array<{ id: string, channelUniqueName: string, displayName: string, color: string | null, order: number, archived: boolean }> } };
+
+export type CreateChannelMutationVariables = Exact<{
+  createChannelInput: Array<Types.ChannelCreateInput> | Types.ChannelCreateInput;
+}>;
+
+
+export type CreateChannelMutation = { createChannels: { channels: Array<{ uniqueName: string, description: string | null, channelIconURL: string | null, channelBannerURL: string | null, createdAt: string, Admins: Array<{ username: string }>, Tags: Array<{ text: string }> }> } };
+
+export type UpdateChannelMutationVariables = Exact<{
+  where?: Types.ChannelWhere | null | undefined;
+  update?: Types.ChannelUpdateInput | null | undefined;
+}>;
+
+
+export type UpdateChannelMutation = { updateChannels: { channels: Array<{ uniqueName: string, displayName: string | null, description: string | null, channelIconURL: string | null, channelBannerURL: string | null, wikiEnabled: boolean | null, eventsEnabled: boolean | null, feedbackEnabled: boolean | null, imageUploadsEnabled: boolean | null, markdownImagesEnabled: boolean | null, emojiEnabled: boolean | null, downloadsEnabled: boolean | null, allowedFileTypes: Array<string> | null, createdAt: string, rules: unknown, Admins: Array<{ username: string }>, Tags: Array<{ text: string }>, WikiHomePage: { id: string, title: string, body: string | null, editReason: string | null, slug: string, createdAt: string, updatedAt: string | null, VersionAuthor: { username: string } | null, PastVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }> } | null }> } };
+
+export type PermanentlyDeleteChannelBannerMutationVariables = Exact<{
+  channelUniqueName: string;
+  imageUrl: string;
+}>;
+
+
+export type PermanentlyDeleteChannelBannerMutation = { permanentlyDeleteChannelBanner: { uniqueName: string, channelBannerURL: string | null } | null };
+
+export type SetChannelIconMutationVariables = Exact<{
+  channelUniqueName: string;
+  imageUrl: string;
+}>;
+
+
+export type SetChannelIconMutation = { setChannelIcon: { uniqueName: string, channelIconURL: string | null } | null };
+
+export type CreateWikiPageMutationVariables = Exact<{
+  where: Types.ChannelWhere;
+  update: Types.ChannelUpdateInput;
+}>;
+
+
+export type CreateWikiPageMutation = { updateChannels: { channels: Array<{ uniqueName: string, wikiEnabled: boolean | null, WikiHomePage: { id: string, title: string, body: string | null, editReason: string | null, slug: string, createdAt: string, updatedAt: string | null, VersionAuthor: { username: string } | null, PastVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }> } | null }> } };
+
+export type UpdateWikiPageMutationVariables = Exact<{
+  where: Types.WikiPageWhere;
+  update: Types.WikiPageUpdateInput;
+}>;
+
+
+export type UpdateWikiPageMutation = { updateWikiPages: { wikiPages: Array<{ id: string, title: string, body: string | null, editReason: string | null, slug: string, channelUniqueName: string, createdAt: string, updatedAt: string | null, VersionAuthor: { username: string } | null }> } };
+
+export type CreateChildWikiPageMutationVariables = Exact<{
+  where: Types.WikiPageWhere;
+  update: Types.WikiPageUpdateInput;
+}>;
+
+
+export type CreateChildWikiPageMutation = { updateWikiPages: { wikiPages: Array<{ id: string, title: string, body: string | null, slug: string, channelUniqueName: string, createdAt: string, updatedAt: string | null, VersionAuthor: { username: string } | null, ChildPages: Array<{ id: string, title: string, body: string | null, editReason: string | null, slug: string, createdAt: string, updatedAt: string | null, VersionAuthor: { username: string } | null }> }> } };
+
+export type PinWikiPageToChannelMutationVariables = Exact<{
+  channelUniqueName: string;
+  wikiPageId: string | number;
+}>;
+
+
+export type PinWikiPageToChannelMutation = { pinWikiPageToChannel: boolean };
+
+export type UnpinWikiPageFromChannelMutationVariables = Exact<{
+  channelUniqueName: string;
+  wikiPageId: string | number;
+}>;
+
+
+export type UnpinWikiPageFromChannelMutation = { unpinWikiPageFromChannel: boolean };
+
+export type LockWikiPageMutationVariables = Exact<{
+  channelUniqueName: string;
+  wikiPageId: string | number;
+  reason: string;
+}>;
+
+
+export type LockWikiPageMutation = { lockWikiPage: { id: string, locked: boolean | null, lockedAt: string | null, lockReason: string | null, lockedByUsername: string | null } };
+
+export type UnlockWikiPageMutationVariables = Exact<{
+  channelUniqueName: string;
+  wikiPageId: string | number;
+}>;
+
+
+export type UnlockWikiPageMutation = { unlockWikiPage: { id: string, locked: boolean | null, lockedAt: string | null, lockReason: string | null, lockedByUsername: string | null } };
+
+export type BecomeChannelAdminMutationVariables = Exact<{
+  channelUniqueName: string;
+}>;
+
+
+export type BecomeChannelAdminMutation = { becomeForumAdmin: boolean | null };
+
+export type UpdateChannelPluginPipelinesMutationVariables = Exact<{
+  channelUniqueName: string;
+  pipelines: Array<Types.EventPipelineInput> | Types.EventPipelineInput;
+}>;
+
+
+export type UpdateChannelPluginPipelinesMutation = { updateChannelPluginPipelines: unknown };
+
+export type UpdateChannelEnabledPluginsMutationVariables = Exact<{
+  channelUniqueName: string;
+  enabledPlugins: Array<Types.ChannelEnabledPluginsUpdateFieldInput> | Types.ChannelEnabledPluginsUpdateFieldInput;
+}>;
+
+
+export type UpdateChannelEnabledPluginsMutation = { updateChannels: { channels: Array<{ uniqueName: string }> } };
+
+export type ReportChannelMutationVariables = Exact<{
+  channelUniqueName: string;
+  reportText: string;
+  selectedServerRules: Array<string> | string;
+}>;
+
+
+export type ReportChannelMutation = { reportChannel: { id: string, issueNumber: number, relatedChannelUniqueName: string | null } | null };
+
+export type LockChannelMutationVariables = Exact<{
+  channelUniqueName: string;
+  reason: string;
+  issueId?: string | number | null | undefined;
+}>;
+
+
+export type LockChannelMutation = { lockChannel: { uniqueName: string, displayName: string | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, LockedBy: { displayName: string | null } | null } | null };
+
+export type UnlockChannelMutationVariables = Exact<{
+  channelUniqueName: string;
+  reason?: string | null | undefined;
+}>;
+
+
+export type UnlockChannelMutation = { unlockChannel: { uniqueName: string, displayName: string | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, LockedBy: { displayName: string | null } | null } | null };
+
+export type ReportChannelImageMutationVariables = Exact<{
+  channelUniqueName: string;
+  imageType: Types.ChannelImageType;
+  reportText: string;
+  selectedServerRules: Array<string> | string;
+}>;
+
+
+export type ReportChannelImageMutation = { reportChannelImage: { id: string, issueNumber: number } | null };
+
+export type GetChannelNamesQueryVariables = Exact<{
+  channelWhere?: Types.ChannelWhere | null | undefined;
+}>;
+
+
+export type GetChannelNamesQuery = { channels: Array<{ uniqueName: string, displayName: string | null, description: string | null, eventsEnabled: boolean | null, channelIconURL: string | null }> };
+
+export type ChannelIconFieldsFragment = { channelIconURL: string | null };
+
+export type GetChannelDiscussionFlairConfigQueryVariables = Exact<{
+  channelUniqueName: string;
+  includeArchived?: boolean | null | undefined;
+}>;
+
+
+export type GetChannelDiscussionFlairConfigQuery = { getChannelDiscussionFlairConfig: { channelUniqueName: string, flairRequired: boolean, flairs: Array<{ id: string, channelUniqueName: string, displayName: string, color: string | null, order: number, archived: boolean }> } };
+
+export type GetWikiPageQueryVariables = Exact<{
+  channelUniqueName: string;
+  slug: string;
+}>;
+
+
+export type GetWikiPageQuery = { wikiPages: Array<{ id: string, title: string, body: string | null, editReason: string | null, slug: string, createdAt: string, updatedAt: string | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, lockedByUsername: string | null, VersionAuthor: { username: string } | null, ChildPages: Array<{ id: string, title: string, editReason: string | null, slug: string, createdAt: string, updatedAt: string | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, lockedByUsername: string | null, VersionAuthor: { username: string } | null }>, PastVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }> }> };
+
+export type GetChannelQueryVariables = Exact<{
+  uniqueName: string;
+  now?: string | null | undefined;
+  loggedInUsername?: string | null | undefined;
+}>;
+
+
+export type GetChannelQuery = { channels: Array<{ uniqueName: string, displayName: string | null, description: string | null, channelBannerURL: string | null, isFavorited: boolean | null, rules: unknown, locked: boolean | null, lockedAt: string | null, lockReason: string | null, wikiEnabled: boolean | null, eventsEnabled: boolean | null, feedbackEnabled: boolean | null, imageUploadsEnabled: boolean | null, markdownImagesEnabled: boolean | null, emojiEnabled: boolean | null, downloadsEnabled: boolean | null, allowedFileTypes: Array<string> | null, channelIconURL: string | null, LockedBy: { displayName: string | null } | null, WikiHomePage: { id: string, title: string, body: string | null, editReason: string | null, slug: string, createdAt: string, updatedAt: string | null, VersionAuthor: { username: string } | null } | null, PinnedWikiPages: Array<{ id: string, title: string, slug: string, updatedAt: string | null }>, Tags: Array<{ text: string }>, Admins: Array<{ username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null }>, Bots: Array<{ username: string, displayName: string | null, botProfileId: string | null, isDeprecated: boolean | null, SuspensionsConnection: { aggregate: { count: { nodes: number } } } }>, Moderators: Array<{ displayName: string | null }>, SuspendedMods: Array<{ modProfileName: string | null }>, SuspendedUsers: Array<{ username: string | null }>, DiscussionChannelsConnection: { aggregate: { count: { nodes: number } } }, IssuesConnection: { aggregate: { count: { nodes: number } } }, EventChannelsConnection: { aggregate: { count: { nodes: number } } }, DefaultModRole: { canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canDeleteWiki: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null } | null, ElevatedModRole: { canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canDeleteWiki: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null } | null, SuspendedModRole: { canHideComment: boolean | null, canHideEvent: boolean | null, canHideDiscussion: boolean | null, canDeleteWiki: boolean | null, canEditComments: boolean | null, canEditDiscussions: boolean | null, canEditEvents: boolean | null, canGiveFeedback: boolean | null, canOpenSupportTickets: boolean | null, canCloseSupportTickets: boolean | null, canReport: boolean | null, canSuspendUser: boolean | null } | null, DefaultChannelRole: { canCreateComment: boolean | null, canCreateDiscussion: boolean | null, canCreateEvent: boolean | null, canUpdateChannel: boolean | null, canUploadFile: boolean | null, canUpvoteComment: boolean | null, canUpvoteDiscussion: boolean | null, channelUniqueName: string } | null, ElevatedChannelRole: { canCreateComment: boolean | null, canCreateDiscussion: boolean | null, canCreateEvent: boolean | null, canUpdateChannel: boolean | null, canUploadFile: boolean | null, canUpvoteComment: boolean | null, canUpvoteDiscussion: boolean | null, channelUniqueName: string } | null, SuspendedRole: { canCreateComment: boolean | null, canCreateDiscussion: boolean | null, canCreateEvent: boolean | null, canUpdateChannel: boolean | null, canUploadFile: boolean | null, canUpvoteComment: boolean | null, canUpvoteDiscussion: boolean | null, channelUniqueName: string } | null, FilterGroups: Array<{ id: string, key: string, displayName: string, mode: Types.FilterMode, uploadSelection: Types.FilterSelection, order: number, options: Array<{ id: string, value: string, displayName: string, order: number }> }> }> };
+
+export type GetChannelRulesQueryVariables = Exact<{
+  uniqueName: string;
+}>;
+
+
+export type GetChannelRulesQuery = { channels: Array<{ uniqueName: string, rules: unknown }> };
+
+export type GetEventsQueryVariables = Exact<{
+  uniqueName: string;
+  now?: string | null | undefined;
+}>;
+
+
+export type GetEventsQuery = { events: Array<{ id: string, title: string, startTime: string, endTime: string, isAllDay: boolean | null, virtualEventUrl: string | null }> };
+
+export type GetChannelDownloadCountQueryVariables = Exact<{
+  uniqueName: string;
+}>;
+
+
+export type GetChannelDownloadCountQuery = { channels: Array<{ uniqueName: string, DiscussionChannelsConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetSortedChannelsDiscussionsQueryVariables = Exact<{
+  offset?: number | null | undefined;
+  limit?: number | null | undefined;
+  tags?: Array<string | null | undefined> | string | null | undefined;
+  searchInput?: string | null | undefined;
+  loggedInUsername?: string | null | undefined;
+  now: string;
+}>;
+
+
+export type GetSortedChannelsDiscussionsQuery = { getSortedChannels: { aggregateChannelCount: number | null, channels: Array<{ uniqueName: string, displayName: string | null, channelIconURL: string | null, description: string | null, isFavorited: boolean | null, Tags: Array<{ text: string }>, EventChannelsConnection: { aggregate: { count: { nodes: number } } }, DiscussionChannelsConnection: { aggregate: { count: { nodes: number } } } } | null> | null } | null };
+
+export type GetSortedChannelsDownloadsQueryVariables = Exact<{
+  offset?: number | null | undefined;
+  limit?: number | null | undefined;
+  tags?: Array<string | null | undefined> | string | null | undefined;
+  searchInput?: string | null | undefined;
+}>;
+
+
+export type GetSortedChannelsDownloadsQuery = { getSortedChannels: { channels: Array<{ uniqueName: string, DiscussionChannelsConnection: { aggregate: { count: { nodes: number } } } } | null> | null } | null };
+
+export type GetChannelContributionsQueryVariables = Exact<{
+  channelUniqueName: string;
+  startDate?: string | null | undefined;
+  endDate?: string | null | undefined;
+  year?: number | null | undefined;
+  limit?: number | null | undefined;
+}>;
+
+
+export type GetChannelContributionsQuery = { getChannelContributions: Array<{ username: string, displayName: string | null, profilePicURL: string | null, totalContributions: number, dayData: Array<{ date: string, count: number, activities: Array<{ id: string, type: string, description: string, Comments: Array<{ id: string, text: string | null, createdAt: string | null, Channel: { uniqueName: string | null, displayName: string | null, description: string | null, channelIconURL: string | null } | null, CommentAuthor: { username: string, profilePicURL: string | null } | null, DiscussionChannel: { id: string | null, discussionId: string | null, channelUniqueName: string | null } | null }>, Discussions: Array<{ id: string | null, title: string | null, createdAt: string | null, Author: { username: string, profilePicURL: string | null } | null, DiscussionChannels: Array<{ id: string | null, channelUniqueName: string | null, discussionId: string | null } | null> | null }> }> }> }> };
+
+export type GetUserFavoriteChannelsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUserFavoriteChannelsQuery = { users: Array<{ username: string, FavoriteChannels: Array<{ displayName: string | null, uniqueName: string, channelIconURL: string | null, eventsEnabled: boolean | null }> }> };
+
+export type GetChannelPluginPipelinesQueryVariables = Exact<{
+  channelUniqueName: string;
+}>;
+
+
+export type GetChannelPluginPipelinesQuery = { channels: Array<{ uniqueName: string, displayName: string | null, pluginPipelines: unknown, Admins: Array<{ username: string }> }> };
+
+export type GetChannelPluginSettingsQueryVariables = Exact<{
+  channelUniqueName: string;
+  now?: string | null | undefined;
+}>;
+
+
+export type GetChannelPluginSettingsQuery = { channels: Array<{ uniqueName: string, displayName: string | null, Bots: Array<{ username: string, displayName: string | null, botProfileId: string | null, isDeprecated: boolean | null, SuspensionsConnection: { aggregate: { count: { nodes: number } } } }>, EnabledPluginsConnection: { edges: Array<{ node: { id: string, version: string, Plugin: { id: string, name: string, displayName: string | null, description: string | null, tags: Array<string> | null } | null }, properties: { settingsJson: unknown } }> } }> };
+
+export type CreateCollectionMutationVariables = Exact<{
+  name: string;
+  description?: string | null | undefined;
+  collectionType: Types.CollectionType;
+  visibility: Types.CollectionVisibility;
+  updatedAt: string;
+}>;
+
+
+export type CreateCollectionMutation = { createCollections: { collections: Array<{ id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, createdAt: string, updatedAt: string }> } };
+
+export type AddDiscussionToCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+}>;
+
+
+export type AddDiscussionToCollectionMutation = { addToCollection: boolean };
+
+export type AddCommentToCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+}>;
+
+
+export type AddCommentToCollectionMutation = { addToCollection: boolean };
+
+export type AddImageToCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+}>;
+
+
+export type AddImageToCollectionMutation = { addToCollection: boolean };
+
+export type AddChannelToCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+}>;
+
+
+export type AddChannelToCollectionMutation = { addToCollection: boolean };
+
+export type RemoveDiscussionFromCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+}>;
+
+
+export type RemoveDiscussionFromCollectionMutation = { removeFromCollection: boolean };
+
+export type RemoveCommentFromCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+}>;
+
+
+export type RemoveCommentFromCollectionMutation = { removeFromCollection: boolean };
+
+export type RemoveImageFromCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+}>;
+
+
+export type RemoveImageFromCollectionMutation = { removeFromCollection: boolean };
+
+export type RemoveChannelFromCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+}>;
+
+
+export type RemoveChannelFromCollectionMutation = { removeFromCollection: boolean };
+
+export type AddDownloadToCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+}>;
+
+
+export type AddDownloadToCollectionMutation = { addToCollection: boolean };
+
+export type RemoveDownloadFromCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+}>;
+
+
+export type RemoveDownloadFromCollectionMutation = { removeFromCollection: boolean };
+
+export type UpdateCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+  update: Types.CollectionUpdateInput;
+}>;
+
+
+export type UpdateCollectionMutation = { updateCollections: { collections: Array<{ id: string, name: string, description: string | null, visibility: Types.CollectionVisibility, updatedAt: string }> } };
+
+export type DeleteCollectionMutationVariables = Exact<{
+  collectionId: string | number;
+}>;
+
+
+export type DeleteCollectionMutation = { deleteCollections: { nodesDeleted: number } };
+
+export type ReorderCollectionItemMutationVariables = Exact<{
+  collectionId: string | number;
+  itemId: string | number;
+  newPosition: number;
+}>;
+
+
+export type ReorderCollectionItemMutation = { reorderCollectionItem: boolean };
+
+export type ShareCollectionAsDiscussionMutationVariables = Exact<{
+  collectionId: string | number;
+  serverId: string | number;
+  title: string;
+  shareMessage?: string | null | undefined;
+}>;
+
+
+export type ShareCollectionAsDiscussionMutation = { shareCollectionAsDiscussion: { id: string, title: string, DiscussionChannels: Array<{ channelUniqueName: string }> } };
+
+export type GetUserCollectionsDiscussionsQueryVariables = Exact<{
+  username: string;
+  searchTerm?: string | null | undefined;
+}>;
+
+
+export type GetUserCollectionsDiscussionsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, createdAt: string, updatedAt: string }>, FavoriteDiscussions: Array<{ id: string, title: string }> }> };
+
+export type GetUserCollectionsCommentsQueryVariables = Exact<{
+  username: string;
+  searchTerm?: string | null | undefined;
+}>;
+
+
+export type GetUserCollectionsCommentsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, createdAt: string, updatedAt: string }>, FavoriteComments: Array<{ id: string, text: string | null }> }> };
+
+export type GetUserCollectionsImagesQueryVariables = Exact<{
+  username: string;
+  searchTerm?: string | null | undefined;
+}>;
+
+
+export type GetUserCollectionsImagesQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, createdAt: string, updatedAt: string }>, FavoriteImages: Array<{ id: string, url: string | null, alt: string | null, caption: string | null }> }> };
+
+export type GetUserCollectionsChannelsQueryVariables = Exact<{
+  username: string;
+  searchTerm?: string | null | undefined;
+}>;
+
+
+export type GetUserCollectionsChannelsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, createdAt: string, updatedAt: string }>, FavoriteChannels: Array<{ displayName: string | null, uniqueName: string }> }> };
+
+export type GetUserCollectionsDownloadsQueryVariables = Exact<{
+  username: string;
+  searchTerm?: string | null | undefined;
+}>;
+
+
+export type GetUserCollectionsDownloadsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, createdAt: string, updatedAt: string }>, FavoriteDiscussions: Array<{ id: string, title: string }> }> };
+
+export type GetCollectionItemsQueryVariables = Exact<{
+  collectionId: string | number;
+  loggedInUsername?: string | null | undefined;
+}>;
+
+
+export type GetCollectionItemsQuery = { collections: Array<{ id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, itemOrder: Array<string>, Discussions: Array<{ id: string, title: string, body: string | null, createdAt: string, hasDownload: boolean | null, hasSensitiveContent: boolean | null, isFavorited: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string } | null, DiscussionChannels: Array<{ id: string, channelUniqueName: string, archived: boolean | null, answered: boolean | null, CommentsConnection: { aggregate: { count: { nodes: number } } } }>, Tags: Array<{ text: string }>, Album: { id: string, Images: Array<{ id: string, url: string | null, caption: string | null }> } | null }>, Comments: Array<{ id: string, text: string | null, createdAt: string, CommentAuthor:
+        | { username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string }
+        | Record<PropertyKey, never>
+       | null, DiscussionChannel: { id: string, channelUniqueName: string, Discussion: { id: string, title: string } | null, Channel: { uniqueName: string, displayName: string | null } | null } | null }>, Downloads: Array<{ id: string, title: string, body: string | null, createdAt: string, hasDownload: boolean | null, hasSensitiveContent: boolean | null, isFavorited: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string } | null, DiscussionChannels: Array<{ id: string, channelUniqueName: string, archived: boolean | null, answered: boolean | null, CommentsConnection: { aggregate: { count: { nodes: number } } } }>, Tags: Array<{ text: string }>, Album: { id: string, Images: Array<{ id: string, url: string | null, caption: string | null }> } | null }>, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, createdAt: string | null, Uploader: { username: string } | null }>, Channels: Array<{ displayName: string | null, uniqueName: string, description: string | null, channelIconURL: string | null, createdAt: string, Tags: Array<{ text: string }> }> }> };
+
+export type GetPublicCollectionsForDownloadQueryVariables = Exact<{
+  downloadId: string | number;
+}>;
+
+
+export type GetPublicCollectionsForDownloadQuery = { publicCollectionsContaining: Array<{ id: string, name: string, description: string | null, visibility: Types.CollectionVisibility, collectionType: Types.CollectionType, itemCount: number, createdAt: string, CreatedBy: { username: string, displayName: string | null, profilePicURL: string | null } | null, Downloads: Array<{ id: string, title: string, createdAt: string, hasSensitiveContent: boolean | null, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, caption: string | null }> } | null, DiscussionChannels: Array<{ id: string, channelUniqueName: string, CommentsConnection: { aggregate: { count: { nodes: number } } }, Channel: { uniqueName: string, displayName: string | null } | null }>, Tags: Array<{ text: string }>, Author: { username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string } | null }> }> };
+
+export type GetPublicCollectionByIdQueryVariables = Exact<{
+  collectionId: string | number;
+  downloadLimit?: number | null | undefined;
+  downloadOffset?: number | null | undefined;
+}>;
+
+
+export type GetPublicCollectionByIdQuery = { collections: Array<{ id: string, name: string, description: string | null, visibility: Types.CollectionVisibility, collectionType: Types.CollectionType, itemCount: number, createdAt: string, CreatedBy: { username: string, displayName: string | null, profilePicURL: string | null } | null, DownloadsConnection: { aggregate: { count: { nodes: number } } }, Downloads: Array<{ id: string, title: string, createdAt: string, hasSensitiveContent: boolean | null, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, caption: string | null }> } | null, DiscussionChannels: Array<{ id: string, channelUniqueName: string }>, Tags: Array<{ text: string }> }> }> };
+
+export type CheckDiscussionInCollectionsQueryVariables = Exact<{
+  username: string;
+  itemId: string | number;
+  collectionType: Types.CollectionType;
+}>;
+
+
+export type CheckDiscussionInCollectionsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, collectionType: Types.CollectionType }> }> };
+
+export type CheckCommentInCollectionsQueryVariables = Exact<{
+  username: string;
+  itemId: string | number;
+  collectionType: Types.CollectionType;
+}>;
+
+
+export type CheckCommentInCollectionsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, collectionType: Types.CollectionType }> }> };
+
+export type CheckDownloadInCollectionsQueryVariables = Exact<{
+  username: string;
+  itemId: string | number;
+  collectionType: Types.CollectionType;
+}>;
+
+
+export type CheckDownloadInCollectionsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, collectionType: Types.CollectionType }> }> };
+
+export type CheckImageInCollectionsQueryVariables = Exact<{
+  username: string;
+  itemId: string | number;
+  collectionType: Types.CollectionType;
+}>;
+
+
+export type CheckImageInCollectionsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, collectionType: Types.CollectionType }> }> };
+
+export type CheckChannelInCollectionsQueryVariables = Exact<{
+  username: string;
+  itemId: string;
+  collectionType: Types.CollectionType;
+}>;
+
+
+export type CheckChannelInCollectionsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, collectionType: Types.CollectionType }> }> };
+
+export type GetAllUserCollectionsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetAllUserCollectionsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, description: string | null, collectionType: Types.CollectionType, visibility: Types.CollectionVisibility, itemCount: number, createdAt: string, updatedAt: string }> }> };
+
+export type GetUserChannelCollectionsWithChannelsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUserChannelCollectionsWithChannelsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, itemCount: number, Channels: Array<{ uniqueName: string, displayName: string | null, channelIconURL: string | null, eventsEnabled: boolean | null }> }> }> };
+
+export type AddEmojiToCommentMutationVariables = Exact<{
+  commentId: string | number;
+  emojiLabel: string;
+  unicode: string;
+  username: string;
+}>;
+
+
+export type AddEmojiToCommentMutation = { addEmojiToComment: { id: string, emoji: unknown } | null };
+
+export type RemoveEmojiFromCommentMutationVariables = Exact<{
+  commentId: string | number;
+  emojiLabel: string;
+  username: string;
+}>;
+
+
+export type RemoveEmojiFromCommentMutation = { removeEmojiFromComment: { id: string, emoji: unknown } | null };
+
+export type UpvoteCommentMutationVariables = Exact<{
+  id: string | number;
+  username: string;
+}>;
+
+
+export type UpvoteCommentMutation = { upvoteComment: { id: string, weightedVotesCount: number | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null };
+
+export type UndoUpvoteCommentMutationVariables = Exact<{
+  id: string | number;
+  username: string;
+}>;
+
+
+export type UndoUpvoteCommentMutation = { undoUpvoteComment: { id: string, weightedVotesCount: number | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null };
+
+export type UpdateCommentMutationVariables = Exact<{
+  updateCommentInput?: Types.CommentUpdateInput | null | undefined;
+  commentWhere?: Types.CommentWhere | null | undefined;
+}>;
+
+
+export type UpdateCommentMutation = { updateComments: { comments: Array<{ id: string, text: string | null, createdAt: string, updatedAt: string | null, emoji: unknown, weightedVotesCount: number | null, CommentAuthor:
+        | { username: string }
+        | { displayName: string | null }
+       | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, FeedbackComments: Array<{ id: string, CommentAuthor:
+          | { username: string }
+          | { displayName: string | null }
+         | null }>, FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } } }> } };
+
+export type SoftDeleteCommentMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type SoftDeleteCommentMutation = { softDeleteComment: { comments: Array<{ id: string, text: string | null, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, CommentAuthor:
+        | { username: string }
+        | Record<PropertyKey, never>
+       | null }> } };
+
+export type DeleteCommentMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteCommentMutation = { deleteComments: { nodesDeleted: number, relationshipsDeleted: number } };
+
+export type AddFeedbackCommentToCommentMutationVariables = Exact<{
+  modProfileName: string;
+  text: string;
+  commentId: string | number;
+  channelId: string;
+}>;
+
+
+export type AddFeedbackCommentToCommentMutation = { createCommentWithOwnedConnections: { comments: Array<{ id: string, isRootComment: boolean, isFeedbackComment: boolean | null, createdAt: string, text: string | null, CommentAuthor:
+        | { username: string, createdAt: string }
+        | { displayName: string | null, createdAt: string }
+       | null, FeedbackComments: Array<{ id: string }> }> } };
+
+export type DeleteCommentRevisionMutationVariables = Exact<{
+  textVersionId: string | number;
+}>;
+
+
+export type DeleteCommentRevisionMutation = { deleteCommentRevision: { id: string, body: string | null, editReason: string | null, createdAt: string, updatedAt: string | null, Author: { username: string } | null } | null };
+
+export type SearchCommentFieldsFragment = { id: string, text: string | null, createdAt: string, updatedAt: string | null, textLastEdited: string | null, archived: boolean | null, CommentAuthor:
+    | { username: string, profilePicURL: string | null, displayName: string | null }
+    | { displayName: string | null }
+   | null, Channel: { uniqueName: string, displayName: string | null } | null, DiscussionChannel: { id: string, channelUniqueName: string, discussionId: string, Discussion: { id: string, title: string } | null } | null, Event: { id: string, title: string, EventChannels: Array<{ channelUniqueName: string }> } | null };
+
+export type SearchCommentsQueryVariables = Exact<{
+  where?: Types.CommentWhere | null | undefined;
+  sort?: Array<Types.CommentSort> | Types.CommentSort | null | undefined;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
+}>;
+
+
+export type SearchCommentsQuery = { comments: Array<{ id: string, text: string | null, createdAt: string, updatedAt: string | null, textLastEdited: string | null, archived: boolean | null, CommentAuthor:
+      | { username: string, profilePicURL: string | null, displayName: string | null }
+      | { displayName: string | null }
+     | null, Channel: { uniqueName: string, displayName: string | null } | null, DiscussionChannel: { id: string, channelUniqueName: string, discussionId: string, Discussion: { id: string, title: string } | null } | null, Event: { id: string, title: string, EventChannels: Array<{ channelUniqueName: string }> } | null }>, commentsConnection: { aggregate: { count: { nodes: number } } } };
+
+export type GetFeedbackCommentQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetFeedbackCommentQuery = { comments: Array<{ id: string, text: string | null, createdAt: string, archived: boolean | null, CommentAuthor:
+      | { username: string, profilePicURL: string | null, displayName: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string }
+      | { displayName: string | null }
+     | null, GivesFeedbackOnComment: { id: string } | null, GivesFeedbackOnDiscussion: { id: string } | null, GivesFeedbackOnEvent: { id: string } | null }> };
+
+export type GetActivityFeedCommentQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetActivityFeedCommentQuery = { __typename: 'Query', comments: Array<{ __typename: 'Comment', id: string, ModerationAction: Array<{ id: string, actionType: string | null, actionDescription: string | null, createdAt: string, ModerationProfile: { __typename: 'ModerationProfile', displayName: string | null, createdAt: string } | null, Comment: { __typename: 'Comment', id: string, text: string | null, createdAt: string, CommentAuthor:
+          | { __typename: 'User', username: string }
+          | { __typename: 'ModerationProfile', displayName: string | null }
+         | null, Issue: { __typename: 'Issue', id: string, issueNumber: number } | null, Channel: { __typename: 'Channel', uniqueName: string } | null } | null }> }> };
+
+export type GetCommentSource06938535b8QueryVariables = Exact<{
+  commentId: string | number;
+}>;
+
+
+export type GetCommentSource06938535b8Query = { comments: Array<{ id: string, archived: boolean | null }> };
+
+export type GetFeedbackOnCommentQueryVariables = Exact<{
+  commentId: string | number;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
+  loggedInModName?: string | null | undefined;
+}>;
+
+
+export type GetFeedbackOnCommentQuery = { comments: Array<{ id: string, createdAt: string, text: string | null, archived: boolean | null, CommentAuthor:
+      | { username: string, profilePicURL: string | null, displayName: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string }
+      | { displayName: string | null, createdAt: string }
+     | null, FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } }, GivesFeedbackOnComment: { id: string } | null, GivesFeedbackOnDiscussion: { id: string } | null, GivesFeedbackOnEvent: { id: string } | null, FeedbackComments: Array<{ id: string, text: string | null, archived: boolean | null, createdAt: string, Channel: { uniqueName: string } | null, CommentAuthor:
+        | { username: string, profilePicURL: string | null, displayName: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string }
+        | { createdAt: string, displayName: string | null }
+       | null, FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } }, FeedbackComments: Array<{ id: string }>, GivesFeedbackOnComment: { id: string } | null }> }> };
+
+export type GetSpecificCommentFeedbackQueryVariables = Exact<{
+  commentId?: string | number | null | undefined;
+  modName?: string | null | undefined;
+}>;
+
+
+export type GetSpecificCommentFeedbackQuery = { comments: Array<{ id: string, text: string | null, createdAt: string, archived: boolean | null, Channel: { uniqueName: string } | null, CommentAuthor:
+      | { username: string, profilePicURL: string | null, displayName: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string }
+      | { displayName: string | null }
+     | null }> };
+
+export type CreateSignedUrlMutationVariables = Exact<{
+  filename: string;
+  contentType: string;
+  channelConnections?: Array<string> | string | null | undefined;
+  uploadTarget?: Types.StorageUploadTarget | null | undefined;
+}>;
+
+
+export type CreateSignedUrlMutation = { createSignedStorageURL: { url: string | null, storageObjectName: string | null, storageUrl: string | null } | null };
+
+export type CreateImageMutationVariables = Exact<{
+  url?: string | null | undefined;
+  alt?: string | null | undefined;
+  caption?: string | null | undefined;
+  copyright?: string | null | undefined;
+  albumId?: string | number | null | undefined;
+  storageObjectName?: string | null | undefined;
+}>;
+
+
+export type CreateImageMutation = { createImageWithUploader: { id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string } | null } };
+
+export type CreateDownloadableFileMutationVariables = Exact<{
+  fileName: string;
+  url: string;
+  kind: Types.FileKind;
+  size?: number | null | undefined;
+  priceModel: Types.PriceModel;
+  priceCents?: number | null | undefined;
+  priceCurrency?: string | null | undefined;
+  storageObjectName?: string | null | undefined;
+}>;
+
+
+export type CreateDownloadableFileMutation = { createDownloadableFiles: { downloadableFiles: Array<{ id: string, fileName: string, url: string, kind: Types.FileKind, size: number | null, priceModel: Types.PriceModel, priceCents: number | null, priceCurrency: string | null, license: { id: string, name: string } | null }> } };
+
+export type PrepareDownloadMutationVariables = Exact<{
+  downloadableFileId: string | number;
+  discussionId: string | number;
+}>;
+
+
+export type PrepareDownloadMutation = { prepareDownload: { ready: boolean, url: string | null, scanStatus: Types.ScanStatus, scanReason: string | null, scanCheckedAt: string | null, reviewAccess: boolean, message: string } };
+
+export type RetryDownloadableFileScanMutationVariables = Exact<{
+  downloadableFileId: string | number;
+}>;
+
+
+export type RetryDownloadableFileScanMutation = { retryDownloadableFileScan: Array<{ id: string, status: string }> };
+
+export type RequestDownloadableFileReviewMutationVariables = Exact<{
+  downloadableFileId: string | number;
+  reason?: string | null | undefined;
+}>;
+
+
+export type RequestDownloadableFileReviewMutation = { requestDownloadableFileReview: { id: string, scanStatus: Types.ScanStatus } };
+
+export type ClearDownloadableFileScanMutationVariables = Exact<{
+  downloadableFileId: string | number;
+  reason?: string | null | undefined;
+}>;
+
+
+export type ClearDownloadableFileScanMutation = { clearDownloadableFileScan: { id: string, scanStatus: Types.ScanStatus, scanReason: string | null, scanCheckedAt: string | null } };
+
+export type PermanentlyDeleteImageMutationVariables = Exact<{
+  imageId: string | number;
+}>;
+
+
+export type PermanentlyDeleteImageMutation = { permanentlyDeleteImage: { id: string, permanentlyRemoved: boolean | null, permanentlyRemovedAt: string | null } | null };
+
+export type PermanentlyDeleteDownloadableFileMutationVariables = Exact<{
+  downloadableFileId: string | number;
+}>;
+
+
+export type PermanentlyDeleteDownloadableFileMutation = { permanentlyDeleteDownloadableFile: { id: string, permanentlyRemoved: boolean | null, permanentlyRemovedAt: string | null } | null };
+
+export type UpdateDownloadableFileSupportSettingsMutationVariables = Exact<{
+  downloadableFileId: string | number;
+  discussionId: string | number;
+  input: Types.DownloadSupportSettingsInput;
+}>;
+
+
+export type UpdateDownloadableFileSupportSettingsMutation = { updateDownloadableFileSupportSettings: boolean };
+
+export type AddEmojiToDiscussionChannelMutationVariables = Exact<{
+  discussionChannelId: string | number;
+  emojiLabel: string;
+  unicode: string;
+  username: string;
+}>;
+
+
+export type AddEmojiToDiscussionChannelMutation = { addEmojiToDiscussionChannel: { id: string, emoji: unknown } | null };
+
+export type RemoveEmojiFromDiscussionChannelMutationVariables = Exact<{
+  discussionChannelId: string | number;
+  emojiLabel: string;
+  username: string;
+}>;
+
+
+export type RemoveEmojiFromDiscussionChannelMutation = { removeEmojiFromDiscussionChannel: { id: string, emoji: unknown } | null };
+
+export type CreateDiscussionMutationVariables = Exact<{
+  input: Array<Types.DiscussionCreateInputWithChannels> | Types.DiscussionCreateInputWithChannels;
+}>;
+
+
+export type CreateDiscussionMutation = { createDiscussionWithChannelConnections: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, DiscussionChannels: Array<{ id: string, archived: boolean | null, answered: boolean | null, locked: boolean | null, discussionId: string, channelUniqueName: string, weightedVotesCount: number | null, createdAt: string, CommentsConnection: { aggregate: { count: { nodes: number } } }, Channel: { uniqueName: string } | null, Discussion: { id: string } | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } } }>, Author: { username: string } | null, Tags: Array<{ text: string }> }> };
+
+export type UpdateDiscussionMutationVariables = Exact<{
+  where: Types.DiscussionWhere;
+  updateDiscussionInput: Types.DiscussionUpdateInput;
+}>;
+
+
+export type UpdateDiscussionMutation = { updateDiscussions: { discussions: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, caption: string | null, copyright: string | null }> } | null, PastTitleVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, PastBodyVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }> }> } };
+
+export type UpdateDiscussionWithChannelConnectionsMutationVariables = Exact<{
+  updateDiscussionInput: Types.DiscussionUpdateInput;
+  where: Types.DiscussionWhere;
+  channelConnections?: Array<string> | string | null | undefined;
+  channelDisconnections?: Array<string> | string | null | undefined;
+  albumImageDisconnections?: Array<string | number> | string | number | null | undefined;
+  channelFlairSelections?: Array<Types.DiscussionChannelFlairSelectionInput> | Types.DiscussionChannelFlairSelectionInput | null | undefined;
+}>;
+
+
+export type UpdateDiscussionWithChannelConnectionsMutation = { updateDiscussionWithChannelConnections: { id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, DiscussionChannels: Array<{ id: string, channelUniqueName: string, discussionId: string, archived: boolean | null, answered: boolean | null, locked: boolean | null, Flairs: Array<{ id: string, channelUniqueName: string, displayName: string, color: string | null, order: number, archived: boolean }>, Channel: { uniqueName: string } | null }>, Tags: Array<{ text: string }> } | null };
+
+export type DeleteDiscussionMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteDiscussionMutation = { deleteDiscussions: { nodesDeleted: number, relationshipsDeleted: number } };
+
+export type UpvoteDiscussionChannelMutationVariables = Exact<{
+  id: string | number;
+  username: string;
+}>;
+
+
+export type UpvoteDiscussionChannelMutation = { upvoteDiscussionChannel: { id: string, weightedVotesCount: number | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null };
+
+export type UndoUpvoteDiscussionChannelMutationVariables = Exact<{
+  id: string | number;
+  username: string;
+}>;
+
+
+export type UndoUpvoteDiscussionChannelMutation = { undoUpvoteDiscussionChannel: { id: string, weightedVotesCount: number | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null };
+
+export type AddFeedbackCommentToDiscussionMutationVariables = Exact<{
+  modProfileName: string;
+  text: string;
+  discussionId: string | number;
+  channelId: string;
+  discussionChannelId: string | number;
+}>;
+
+
+export type AddFeedbackCommentToDiscussionMutation = { createCommentWithOwnedConnections: { comments: Array<{ id: string, isRootComment: boolean, isFeedbackComment: boolean | null, createdAt: string, text: string | null, Channel: { uniqueName: string } | null, CommentAuthor:
+        | { username: string }
+        | { displayName: string | null }
+       | null, GivesFeedbackOnDiscussion: { id: string } | null }> } };
+
+export type MarkAsAnsweredMutationVariables = Exact<{
+  channelId: string;
+  discussionId: string | number;
+}>;
+
+
+export type MarkAsAnsweredMutation = { updateDiscussionChannels: { discussionChannels: Array<{ id: string, answered: boolean | null, Answers: Array<{ id: string, text: string | null, CommentAuthor:
+          | { username: string }
+          | { displayName: string | null }
+         | null }> }> } };
+
+export type MarkAsAnsweredSource68ece8b51cMutationVariables = Exact<{
+  commentId: string | number;
+  channelId: string;
+  discussionId: string | number;
+}>;
+
+
+export type MarkAsAnsweredSource68ece8b51cMutation = { updateDiscussionChannels: { discussionChannels: Array<{ id: string, answered: boolean | null, Answers: Array<{ id: string, text: string | null, CommentAuthor:
+          | { username: string }
+          | { displayName: string | null }
+         | null }> }> } };
+
+export type MarkAsUnAnsweredMutationVariables = Exact<{
+  channelId: string;
+  discussionId: string | number;
+}>;
+
+
+export type MarkAsUnAnsweredMutation = { updateDiscussionChannels: { discussionChannels: Array<{ id: string, answered: boolean | null, Answers: Array<{ id: string, text: string | null, CommentAuthor:
+          | { username: string }
+          | Record<PropertyKey, never>
+         | null }> }> } };
+
+export type UnmarkCommentAsAnswerMutationVariables = Exact<{
+  commentId: string | number;
+  channelId: string;
+  discussionId: string | number;
+}>;
+
+
+export type UnmarkCommentAsAnswerMutation = { updateDiscussionChannels: { discussionChannels: Array<{ id: string, answered: boolean | null, Answers: Array<{ id: string, text: string | null, CommentAuthor:
+          | { username: string }
+          | { displayName: string | null }
+         | null }> }> } };
+
+export type UpdateImageMutationVariables = Exact<{
+  imageId: string | number;
+  caption?: string | null | undefined;
+  alt?: string | null | undefined;
+}>;
+
+
+export type UpdateImageMutation = { updateImages: { images: Array<{ id: string, caption: string | null, alt: string | null, url: string | null }> } };
+
+export type UpdateImageMetadataMutationVariables = Exact<{
+  imageId: string | number;
+  alt?: string | null | undefined;
+  caption?: string | null | undefined;
+  copyright?: string | null | undefined;
+}>;
+
+
+export type UpdateImageMetadataMutation = { updateImages: { images: Array<{ id: string, alt: string | null, caption: string | null, copyright: string | null }> } };
+
+export type DeleteDiscussionBodyRevisionMutationVariables = Exact<{
+  textVersionId: string | number;
+}>;
+
+
+export type DeleteDiscussionBodyRevisionMutation = { deleteDiscussionBodyRevision: { id: string, body: string | null, editReason: string | null, createdAt: string, updatedAt: string | null, Author: { username: string } | null } | null };
+
+export type DeleteWikiRevisionMutationVariables = Exact<{
+  textVersionId: string | number;
+}>;
+
+
+export type DeleteWikiRevisionMutation = { deleteWikiRevision: { id: string, body: string | null, editReason: string | null, createdAt: string, updatedAt: string | null, Author: { username: string } | null } | null };
+
+export type SubscribeToDiscussionChannelMutationVariables = Exact<{
+  discussionChannelId: string | number;
+}>;
+
+
+export type SubscribeToDiscussionChannelMutation = { subscribeToDiscussionChannel: { id: string, SubscribedToNotifications: Array<{ username: string }> } | null };
+
+export type UnsubscribeFromDiscussionChannelMutationVariables = Exact<{
+  discussionChannelId: string | number;
+}>;
+
+
+export type UnsubscribeFromDiscussionChannelMutation = { unsubscribeFromDiscussionChannel: { id: string, SubscribedToNotifications: Array<{ username: string }> } | null };
+
+export type UpdateDiscussionSensitiveContentMutationVariables = Exact<{
+  discussionId: string | number;
+  hasSensitiveContent: boolean;
+}>;
+
+
+export type UpdateDiscussionSensitiveContentMutation = { updateDiscussions: { discussions: Array<{ id: string, hasSensitiveContent: boolean | null }> } };
+
+export type UpdateDiscussionChannelLabelsMutationVariables = Exact<{
+  channelUniqueName: string;
+  discussionId: string | number;
+  labelOptionIds: Array<string | number> | string | number;
+}>;
+
+
+export type UpdateDiscussionChannelLabelsMutation = { updateDiscussionChannels: { discussionChannels: Array<{ id: string, LabelOptions: Array<{ id: string, value: string, displayName: string, order: number, group: { id: string, key: string, displayName: string } | null }> }> } };
+
+export type UpdateDownloadLabelsMutationVariables = Exact<{
+  discussionId: string | number;
+  channelUniqueName: string;
+  labelOptionIds: Array<string | number> | string | number;
+}>;
+
+
+export type UpdateDownloadLabelsMutation = { updateDownloadLabels: { id: string, LabelOptions: Array<{ id: string, value: string, displayName: string, order: number, group: { id: string, key: string, displayName: string } | null }> } | null };
+
+export type GetDiscussionsInChannelQueryVariables = Exact<{
+  channelUniqueName: string;
+  searchInput: string;
+  selectedTags?: Array<string> | string | null | undefined;
+  showArchived: boolean;
+  showUnanswered?: boolean | null | undefined;
+  options?: Types.DiscussionListOptions | null | undefined;
+  hasDownload?: boolean | null | undefined;
+  labelFilters?: Array<Types.LabelFilterInput> | Types.LabelFilterInput | null | undefined;
+}>;
+
+
+export type GetDiscussionsInChannelQuery = { getDiscussionsInChannel: { aggregateDiscussionChannelsCount: number, discussionChannels: Array<{ id: string, discussionId: string, channelUniqueName: string, isFavorited: boolean | null, weightedVotesCount: number | null, createdAt: string, locked: boolean | null, archived: boolean | null, answered: boolean | null, Flairs: Array<{ id: string, channelUniqueName: string, displayName: string, color: string | null, order: number, archived: boolean }>, CommentsAggregate: { count: number | null } | null, Channel: { uniqueName: string } | null, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersAggregate: { count: number | null } | null, SuperUpvotedByUsers: Array<{ username: string }>, Discussion: { id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, hasSensitiveContent: boolean | null, authorIsChannelModerator: boolean | null, Author: { displayName: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null, username: string, profilePicURL: string | null } | null, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, Tags: Array<{ text: string }>, DownloadableFiles: Array<{ id: string, scanStatus: Types.ScanStatus }> } | null }> } | null };
+
+export type GetSiteWideDiscussionListQueryVariables = Exact<{
+  searchInput: string;
+  selectedChannels?: Array<string> | string | null | undefined;
+  selectedTags?: Array<string> | string | null | undefined;
+  showArchived: boolean;
+  options?: Types.DiscussionListOptions | null | undefined;
+  hasDownload?: boolean | null | undefined;
+  loggedInUsername?: string | null | undefined;
+}>;
+
+
+export type GetSiteWideDiscussionListQuery = { getSiteWideDiscussionList: { aggregateDiscussionCount: number, pageInfo: { endCursor: string | null, hasNextPage: boolean }, discussions: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, hasSensitiveContent: boolean | null, isFavorited: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null } | null, DiscussionChannels: Array<{ id: string, createdAt: string, channelUniqueName: string, discussionId: string, weightedVotesCount: number | null, archived: boolean | null, answered: boolean | null, locked: boolean | null, Flairs: Array<{ id: string, channelUniqueName: string, displayName: string, color: string | null, order: number, archived: boolean }>, UpvotedByUsers: Array<{ username: string }>, SuperUpvotedByUsers: Array<{ username: string }>, CommentsConnection: { aggregate: { count: { nodes: number } } }, Channel: { uniqueName: string, displayName: string | null, channelIconURL: string | null } | null }>, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, Tags: Array<{ text: string }>, DownloadableFiles: Array<{ id: string, scanStatus: Types.ScanStatus }> }> } | null };
+
+export type IsDiscussionAnsweredQueryVariables = Exact<{
+  channelUniqueName: string;
+  discussionId: string | number;
+}>;
+
+
+export type IsDiscussionAnsweredQuery = { discussionChannels: Array<{ id: string, discussionId: string, channelUniqueName: string, weightedVotesCount: number | null, archived: boolean | null, answered: boolean | null, locked: boolean | null, Channel: { uniqueName: string } | null }> };
+
+export type GetDiscussionDetailImagesPageQueryVariables = Exact<{
+  discussionId: string | number;
+  channelUniqueName: string;
+  after?: string | null | undefined;
+}>;
+
+
+export type GetDiscussionDetailImagesPageQuery = { getDiscussionDetailImages: { images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }>, pageInfo: { endCursor: string | null, hasNextPage: boolean } } };
+
+export type GetDiscussionDetailFilesPageQueryVariables = Exact<{
+  discussionId: string | number;
+  channelUniqueName: string;
+  after?: string | null | undefined;
+}>;
+
+
+export type GetDiscussionDetailFilesPageQuery = { getDiscussionDetailFiles: { files: Array<{ id: string, fileName: string, url: string, kind: Types.FileKind, size: number | null, priceModel: Types.PriceModel, priceCents: number | null, priceCurrency: string | null, downloadCountTotal: number | null, downloadCountUnique: number | null, attributionOverride: string | null, supportPatreonUrl: string | null, supportBuyMeACoffeeUrl: string | null, supportKoFiUrl: string | null, supportPayPalMeUrl: string | null, scanStatus: Types.ScanStatus, scanCheckedAt: string | null, scanReason: string | null, uploadedByUsername: string | null, license: { id: string, name: string } | null }>, pageInfo: { endCursor: string | null, hasNextPage: boolean } } };
+
+export type GetDiscussionActivityQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetDiscussionActivityQuery = { discussions: Array<{ id: string, PastTitleVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }>, PastBodyVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }>, BodyLastEditedBy: { username: string } | null }> };
+
+export type GetIssueRelatedDiscussionQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetIssueRelatedDiscussionQuery = { discussions: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, editReason: string | null, hasDownload: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null } | null, DiscussionChannels: Array<{ channelUniqueName: string }>, DownloadableFiles: Array<{ id: string, fileName: string, url: string, kind: Types.FileKind, size: number | null, license: { id: string, name: string } | null }> }> };
+
+export type GetDownloadActivityQueryVariables = Exact<{
+  id: string | number;
+  channelUniqueName: string;
+}>;
+
+
+export type GetDownloadActivityQuery = { discussions: Array<{ id: string, DownloadableFiles: Array<{ id: string }>, DiscussionChannels: Array<{ id: string, channelUniqueName: string, LabelChangeHistory: Array<{ id: string, createdAt: string, actionType: string, labelDisplayName: string, labelValue: string, ActorUser: { username: string, displayName: string | null } | null, ActorMod: { displayName: string | null } | null }> }>, PastTitleVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string } | null }> }> };
+
+export type GetCrosspostPreviewQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type GetCrosspostPreviewQuery = { discussions: Array<{ id: string, title: string, body: string | null, createdAt: string, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, DiscussionChannels: Array<{ channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null } | null }> }> };
+
+export type GetDiscussionFeedbackQueryVariables = Exact<{
+  id: string | number;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
+  loggedInModName: string;
+}>;
+
+
+export type GetDiscussionFeedbackQuery = { discussions: Array<{ id: string, title: string, body: string | null, hasSensitiveContent: boolean | null, Author: { username: string } | null, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, DownloadableFiles: Array<{ id: string, fileName: string, url: string, downloadCountTotal: number | null, downloadCountUnique: number | null, attributionOverride: string | null, supportPatreonUrl: string | null, supportBuyMeACoffeeUrl: string | null, supportKoFiUrl: string | null, supportPayPalMeUrl: string | null, scanStatus: Types.ScanStatus, scanCheckedAt: string | null, scanReason: string | null, uploadedByUsername: string | null }>, CrosspostedDiscussion: { id: string, title: string, body: string | null, createdAt: string, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, Uploader: { username: string, displayName: string | null } | null }> } | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, DiscussionChannels: Array<{ channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null } | null }> } | null, FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } }, FeedbackComments: Array<{ id: string, text: string | null, archived: boolean | null, createdAt: string, Channel: { uniqueName: string } | null, CommentAuthor:
+        | { username: string, createdAt: string }
+        | { createdAt: string, displayName: string | null }
+       | null, FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } }, FeedbackComments: Array<{ id: string }>, GivesFeedbackOnDiscussion: { id: string } | null }> }> };
+
+export type GetSpecificDiscussionFeedbackQueryVariables = Exact<{
+  discussionId?: string | number | null | undefined;
+  modName?: string | null | undefined;
+}>;
+
+
+export type GetSpecificDiscussionFeedbackQuery = { comments: Array<{ id: string, text: string | null, createdAt: string, archived: boolean | null, Channel: { uniqueName: string } | null, CommentAuthor:
+      | { username: string }
+      | { displayName: string | null }
+     | null }> };
+
+export type GetDownloadLabelsQueryVariables = Exact<{
+  discussionId: string | number;
+  channelUniqueName: string;
+}>;
+
+
+export type GetDownloadLabelsQuery = { discussions: Array<{ id: string, DiscussionChannels: Array<{ channelUniqueName: string, LabelOptions: Array<{ id: string, value: string, displayName: string, order: number, group: { id: string, key: string, displayName: string } | null }> }> }> };
+
+export type CreateEmailAndUserMutationVariables = Exact<{
+  emailAddress: string;
+  username: string;
+  birthday?: string | null | undefined;
+}>;
+
+
+export type CreateEmailAndUserMutation = { createEmailAndUser: { username: string, Email: { address: string } | null, ModerationProfile: { displayName: string | null } | null } | null };
+
+export type SendBugReportMutationVariables = Exact<{
+  contactEmail: string;
+  username?: string | null | undefined;
+  text: string;
+  subject: string;
+}>;
+
+
+export type SendBugReportMutation = { sendBugReport: boolean | null };
+
+export type GetOwnEmailQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetOwnEmailQuery = { getOwnEmail: { address: string, username: string | null, profilePicURL: string | null, modProfileName: string | null, unreadNotificationCount: number | null } | null };
+
+export type CreateEventMutationVariables = Exact<{
+  input: Array<Types.EventCreateInputWithChannels> | Types.EventCreateInputWithChannels;
+}>;
+
+
+export type CreateEventMutation = { createEventWithChannelConnections: Array<{ id: string, title: string, description: string | null, startTime: string, endTime: string, locationName: string | null, address: string | null, virtualEventUrl: string | null, startTimeDayOfWeek: string | null, startTimeHourOfDay: number | null, canceled: boolean, isHostedByOP: boolean | null, isAllDay: boolean | null, coverImageURL: string | null, createdAt: string, updatedAt: string | null, free: boolean | null, isInPrivateResidence: boolean | null, occurrenceIndex: number | null, cost: string | null, EventChannels: Array<{ id: string, eventId: string, channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null, channelIconURL: string | null } | null }>, Poster: { username: string } | null, Tags: Array<{ text: string }>, RecurringEvent: { id: string, repeatEvery: { count: number | null, unit: Types.RepeatUnit | null } | null, repeatEnds: { type: string | null, count: number | null, until: string | null } | null } | null, EventSeries: { id: string, title: string, repeatPattern: { type: Types.RepeatPatternType, count: number | null, daysOfWeek: Array<number> | null, endType: Types.RepeatEndType, endCount: number | null, endDate: string | null } | null, Occurrences: Array<{ id: string, startTime: string, endTime: string, canceled: boolean }> } | null, location: { latitude: number, longitude: number } | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, SubscribedToNotifications: Array<{ username: string }>, SubscribedToEventUpdates: Array<{ username: string }> }> };
+
+export type CreateEventSeriesMutationVariables = Exact<{
+  input: Types.CreateEventSeriesInput;
+}>;
+
+
+export type CreateEventSeriesMutation = { createEventSeriesWithChannelConnections: { id: string, title: string, description: string | null, locationName: string | null, address: string | null, virtualEventUrl: string | null, cost: string | null, free: boolean | null, isHostedByOP: boolean | null, coverImageURL: string | null, canceled: boolean | null, createdAt: string, updatedAt: string | null, repeatPattern: { type: Types.RepeatPatternType, count: number | null, daysOfWeek: Array<number> | null, endType: Types.RepeatEndType, endCount: number | null, endDate: string | null } | null, Poster: { username: string } | null, Tags: Array<{ text: string }>, Occurrences: Array<{ id: string, title: string, startTime: string, endTime: string, canceled: boolean, occurrenceIndex: number | null, EventChannels: Array<{ id: string, channelUniqueName: string, Channel: { uniqueName: string } | null }> }>, EventChannels: Array<{ id: string, channelUniqueName: string, Channel: { uniqueName: string } | null }> } | null };
+
+export type UpdateEventsMutationVariables = Exact<{
+  updateEventInput: Types.EventUpdateInput;
+  where: Types.EventWhere;
+  channelConnections: Array<string> | string;
+  channelDisconnections: Array<string> | string;
+}>;
+
+
+export type UpdateEventsMutation = { updateEventWithChannelConnections: { id: string, title: string, description: string | null, startTime: string, endTime: string, locationName: string | null, address: string | null, virtualEventUrl: string | null, startTimeDayOfWeek: string | null, startTimeHourOfDay: number | null, canceled: boolean, isHostedByOP: boolean | null, isAllDay: boolean | null, coverImageURL: string | null, createdAt: string, updatedAt: string | null, free: boolean | null, isInPrivateResidence: boolean | null, occurrenceIndex: number | null, cost: string | null, EventChannels: Array<{ id: string, eventId: string, channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null, channelIconURL: string | null } | null }>, Poster: { username: string } | null, Tags: Array<{ text: string }>, RecurringEvent: { id: string, repeatEvery: { count: number | null, unit: Types.RepeatUnit | null } | null, repeatEnds: { type: string | null, count: number | null, until: string | null } | null } | null, EventSeries: { id: string, title: string, repeatPattern: { type: Types.RepeatPatternType, count: number | null, daysOfWeek: Array<number> | null, endType: Types.RepeatEndType, endCount: number | null, endDate: string | null } | null, Occurrences: Array<{ id: string, startTime: string, endTime: string, canceled: boolean }> } | null, location: { latitude: number, longitude: number } | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, SubscribedToNotifications: Array<{ username: string }>, SubscribedToEventUpdates: Array<{ username: string }> } | null };
+
+export type UpdateEventInSeriesMutationVariables = Exact<{
+  eventId: string | number;
+  scope: Types.EventEditScope;
+  eventUpdateInput: Types.EventUpdateInput;
+  channelConnections: Array<string> | string;
+  channelDisconnections: Array<string> | string;
+}>;
+
+
+export type UpdateEventInSeriesMutation = { updateEventInSeries: { id: string, title: string, description: string | null, startTime: string, endTime: string, locationName: string | null, address: string | null, virtualEventUrl: string | null, startTimeDayOfWeek: string | null, startTimeHourOfDay: number | null, canceled: boolean, isHostedByOP: boolean | null, isAllDay: boolean | null, coverImageURL: string | null, createdAt: string, updatedAt: string | null, free: boolean | null, isInPrivateResidence: boolean | null, occurrenceIndex: number | null, cost: string | null, EventChannels: Array<{ id: string, eventId: string, channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null, channelIconURL: string | null } | null }>, Poster: { username: string } | null, Tags: Array<{ text: string }>, RecurringEvent: { id: string, repeatEvery: { count: number | null, unit: Types.RepeatUnit | null } | null, repeatEnds: { type: string | null, count: number | null, until: string | null } | null } | null, EventSeries: { id: string, title: string, repeatPattern: { type: Types.RepeatPatternType, count: number | null, daysOfWeek: Array<number> | null, endType: Types.RepeatEndType, endCount: number | null, endDate: string | null } | null, Occurrences: Array<{ id: string, startTime: string, endTime: string, canceled: boolean }> } | null, location: { latitude: number, longitude: number } | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, SubscribedToNotifications: Array<{ username: string }>, SubscribedToEventUpdates: Array<{ username: string }> } | null };
+
+export type CancelEventMutationVariables = Exact<{
+  updateEventInput: Types.EventUpdateInput;
+  eventWhere: Types.EventWhere;
+  channelConnections: Array<string> | string;
+  channelDisconnections: Array<string> | string;
+}>;
+
+
+export type CancelEventMutation = { updateEventWithChannelConnections: { id: string, canceled: boolean } | null };
+
+export type DeleteEventMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteEventMutation = { deleteEvents: { nodesDeleted: number, relationshipsDeleted: number } };
+
+export type DeleteEventInSeriesMutationVariables = Exact<{
+  eventId: string | number;
+  scope: Types.EventEditScope;
+}>;
+
+
+export type DeleteEventInSeriesMutation = { deleteEventInSeries: { success: boolean, deletedCount: number, message: string | null } | null };
+
+export type AddFeedbackCommentToEventMutationVariables = Exact<{
+  modProfileName: string;
+  text: string;
+  eventId: string | number;
+  channelId: string;
+}>;
+
+
+export type AddFeedbackCommentToEventMutation = { createCommentWithOwnedConnections: { comments: Array<{ id: string, isRootComment: boolean, isFeedbackComment: boolean | null, createdAt: string, text: string | null, Channel: { uniqueName: string } | null, CommentAuthor:
+        | { username: string }
+        | { displayName: string | null }
+       | null }> } };
+
+export type SubscribeToEventMutationVariables = Exact<{
+  eventId: string | number;
+}>;
+
+
+export type SubscribeToEventMutation = { subscribeToEvent: { id: string, SubscribedToNotifications: Array<{ username: string }> } | null };
+
+export type UnsubscribeFromEventMutationVariables = Exact<{
+  eventId: string | number;
+}>;
+
+
+export type UnsubscribeFromEventMutation = { unsubscribeFromEvent: { id: string, SubscribedToNotifications: Array<{ username: string }> } | null };
+
+export type SubscribeToEventUpdatesMutationVariables = Exact<{
+  eventId: string | number;
+}>;
+
+
+export type SubscribeToEventUpdatesMutation = { subscribeToEventUpdates: { id: string, SubscribedToEventUpdates: Array<{ username: string }> } | null };
+
+export type UnsubscribeFromEventUpdatesMutationVariables = Exact<{
+  eventId: string | number;
+}>;
+
+
+export type UnsubscribeFromEventUpdatesMutation = { unsubscribeFromEventUpdates: { id: string, SubscribedToEventUpdates: Array<{ username: string }> } | null };
+
+export type DeleteEventDescriptionRevisionMutationVariables = Exact<{
+  textVersionId: string | number;
+}>;
+
+
+export type DeleteEventDescriptionRevisionMutation = { deleteEventDescriptionRevision: { id: string, body: string | null, editReason: string | null, createdAt: string, updatedAt: string | null, Author: { username: string } | null } | null };
+
+export type GetEventsSourcef3f666cbeeQueryVariables = Exact<{
+  where?: Types.EventWhere | null | undefined;
+  sort?: Array<Types.EventSort> | Types.EventSort | null | undefined;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
+}>;
+
+
+export type GetEventsSourcef3f666cbeeQuery = { eventsConnection: { aggregate: { count: { nodes: number } } }, events: Array<{ cost: string | null, id: string, title: string, description: string | null, startTime: string, endTime: string, locationName: string | null, address: string | null, virtualEventUrl: string | null, startTimeDayOfWeek: string | null, startTimeHourOfDay: number | null, canceled: boolean, isHostedByOP: boolean | null, isAllDay: boolean | null, coverImageURL: string | null, createdAt: string, updatedAt: string | null, free: boolean | null, isInPrivateResidence: boolean | null, occurrenceIndex: number | null, Poster: { username: string, displayName: string | null, profilePicURL: string | null, createdAt: string, discussionKarma: number | null, commentKarma: number | null } | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, EventChannels: Array<{ id: string, eventId: string, channelUniqueName: string, archived: boolean | null, Channel: { uniqueName: string, displayName: string | null, channelIconURL: string | null } | null }>, RecurringEvent: { id: string, repeatEvery: { count: number | null, unit: Types.RepeatUnit | null } | null, repeatEnds: { type: string | null, count: number | null, until: string | null } | null } | null, EventSeries: { id: string, title: string, repeatPattern: { type: Types.RepeatPatternType, count: number | null, daysOfWeek: Array<number> | null, endType: Types.RepeatEndType, endCount: number | null, endDate: string | null } | null, Occurrences: Array<{ id: string, startTime: string, endTime: string, canceled: boolean }> } | null, location: { latitude: number, longitude: number } | null, Tags: Array<{ text: string }>, SubscribedToNotifications: Array<{ username: string }>, SubscribedToEventUpdates: Array<{ username: string }> }> };
+
+export type GetEventFeedbackQueryVariables = Exact<{
+  id: string | number;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
+}>;
+
+
+export type GetEventFeedbackQuery = { events: Array<{ id: string, title: string, startTime: string, endTime: string, cost: string | null, free: boolean | null, FeedbackCommentsConnection: { aggregate: { count: { nodes: number } } }, FeedbackComments: Array<{ id: string, text: string | null, createdAt: string, archived: boolean | null, Channel: { uniqueName: string } | null, CommentAuthor:
+        | { username: string }
+        | { displayName: string | null }
+       | null, GivesFeedbackOnEvent: { id: string } | null }> }> };
+
+export type AddImageToAlbumMutationVariables = Exact<{
+  albumId: string | number;
+  imageId: string | number;
+  position?: number | null | undefined;
+}>;
+
+
+export type AddImageToAlbumMutation = { addImageToAlbum: boolean };
+
+export type RemoveImageFromAlbumMutationVariables = Exact<{
+  albumId: string | number;
+  imageId: string | number;
+}>;
+
+
+export type RemoveImageFromAlbumMutation = { removeImageFromAlbum: boolean };
+
+export type GetImageDetailsQueryVariables = Exact<{
+  imageId: string | number;
+}>;
+
+
+export type GetImageDetailsQuery = { images: Array<{ id: string, archived: boolean | null, url: string | null, alt: string | null, caption: string | null, copyright: string | null, longDescription: string | null, hasSensitiveContent: boolean | null, hasSpoiler: boolean | null, createdAt: string | null, scanCheckedAt: string | null, Uploader: { username: string, displayName: string | null, profilePicURL: string | null } | null }> };
+
+export type GetAlbumDetailsQueryVariables = Exact<{
+  albumId: string | number;
+}>;
+
+
+export type GetAlbumDetailsQuery = { albums: Array<{ id: string, imageOrder: Array<string> | null, Owner: { username: string, displayName: string | null } | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, createdAt: string | null, Uploader: { username: string, displayName: string | null } | null }>, Discussions: Array<{ id: string, title: string, createdAt: string, Author: { username: string, displayName: string | null } | null, DiscussionChannels: Array<{ id: string, channelUniqueName: string }> }> }> };
+
+export type GetUserAlbumsQueryVariables = Exact<{
+  where?: Types.AlbumWhere | null | undefined;
+}>;
+
+
+export type GetUserAlbumsQuery = { albums: Array<{ id: string, imageOrder: Array<string> | null, Owner: { username: string, displayName: string | null } | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, createdAt: string | null, Uploader: { username: string } | null }>, ImagesConnection: { aggregate: { count: { nodes: number } } }, Discussions: Array<{ id: string, title: string, createdAt: string, DiscussionChannels: Array<{ id: string, channelUniqueName: string }> }> }> };
+
+export type GetUserAlbumsForImageSaveQueryVariables = Exact<{
+  username: string;
+  imageId: string | number;
+}>;
+
+
+export type GetUserAlbumsForImageSaveQuery = { albums: Array<{ id: string, Owner: { username: string, displayName: string | null } | null, matchingImages: Array<{ id: string }>, ImagesConnection: { aggregate: { count: { nodes: number } } }, Discussions: Array<{ id: string, title: string }> }> };
+
+export type GetUserImagesQueryVariables = Exact<{
+  username: string;
+  loggedInUsername?: string | null | undefined;
+  offset: number;
+  limit: number;
+  where?: Types.ImageWhere | null | undefined;
+}>;
+
+
+export type GetUserImagesQuery = { users: Array<{ username: string, displayName: string | null, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, longDescription: string | null, hasSensitiveContent: boolean | null, hasSpoiler: boolean | null, createdAt: string | null, isFavorited: boolean | null, Uploader: { username: string, displayName: string | null } | null }>, ImagesConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetReusableUserImagesQueryVariables = Exact<{
+  username: string;
+  where?: Types.ImageWhere | null | undefined;
+  offset: number;
+  limit: number;
+}>;
+
+
+export type GetReusableUserImagesQuery = { users: Array<{ username: string, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, createdAt: string | null, Uploader: { username: string, displayName: string | null } | null }>, ImagesConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetReusableFavoriteImagesQueryVariables = Exact<{
+  username: string;
+  where?: Types.ImageWhere | null | undefined;
+  offset: number;
+  limit: number;
+}>;
+
+
+export type GetReusableFavoriteImagesQuery = { users: Array<{ username: string, FavoriteImages: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, createdAt: string | null, Uploader: { username: string, displayName: string | null } | null }>, FavoriteImagesConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetReusableImageCollectionsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetReusableImageCollectionsQuery = { users: Array<{ username: string, Collections: Array<{ id: string, name: string, itemCount: number }> }> };
+
+export type GetReusableCollectionImagesQueryVariables = Exact<{
+  collectionId: string | number;
+  where?: Types.ImageWhere | null | undefined;
+  offset: number;
+  limit: number;
+}>;
+
+
+export type GetReusableCollectionImagesQuery = { collections: Array<{ id: string, name: string, Images: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, createdAt: string | null, Uploader: { username: string, displayName: string | null } | null }>, ImagesConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type CreateIssueMutationVariables = Exact<{
+  input: Types.IssueCreateInput;
+}>;
+
+
+export type CreateIssueMutation = { createIssue: { id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, flaggedServerRuleViolation: boolean | null, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, channelUniqueName: string | null, Channel: { uniqueName: string } | null, Author:
+      | { __typename: 'User', username: string }
+      | { __typename: 'ModerationProfile', displayName: string | null }
+     | null } | null };
+
+export type CloseIssueMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type CloseIssueMutation = { updateIssues: { issues: Array<{ id: string, issueNumber: number, title: string | null, isOpen: boolean }> } };
+
+export type ReopenIssueMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ReopenIssueMutation = { updateIssues: { issues: Array<{ id: string, issueNumber: number, title: string | null, isOpen: boolean }> } };
+
+export type UpdateIssueMutationVariables = Exact<{
+  issueWhere: Types.IssueWhere;
+  updateIssueInput: Types.IssueUpdateInput;
+}>;
+
+
+export type UpdateIssueMutation = { updateIssues: { issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedChannelUniqueName: string | null, relatedModProfileName: string | null, channelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, ActivityFeed: Array<{ id: string, actionDescription: string | null, actionType: string | null, createdAt: string, recommendedAction: Types.ModerationRecommendedAction | null, recommendationConfidence: number | null, recommendationRationale: string | null, ModerationProfile: { displayName: string | null, User: { isBot: boolean | null } | null } | null, User: { username: string, isBot: boolean | null } | null, Revision: { id: string, body: string | null, createdAt: string, Author: { username: string } | null } | null, Comment: { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, editReason: string | null, Issue: { id: string } | null, CommentAuthor:
+            | { username: string }
+            | { displayName: string | null }
+           | null, Channel: { uniqueName: string } | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null }>, ActivityFeedConnection: { aggregate: { count: { nodes: number } } }, Author:
+        | { __typename: 'User', username: string }
+        | { __typename: 'ModerationProfile', displayName: string | null }
+       | null, SubscribedToNotifications: Array<{ username: string }>, LockedBy: { displayName: string | null } | null }> } };
+
+export type IssueFieldsFragment = { id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedChannelUniqueName: string | null, relatedModProfileName: string | null, channelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, ActivityFeed: Array<{ id: string, actionDescription: string | null, actionType: string | null, createdAt: string, recommendedAction: Types.ModerationRecommendedAction | null, recommendationConfidence: number | null, recommendationRationale: string | null, ModerationProfile: { displayName: string | null, User: { isBot: boolean | null } | null } | null, User: { username: string, isBot: boolean | null } | null, Revision: { id: string, body: string | null, createdAt: string, Author: { username: string } | null } | null, Comment: { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, editReason: string | null, Issue: { id: string } | null, CommentAuthor:
+        | { username: string }
+        | { displayName: string | null }
+       | null, Channel: { uniqueName: string } | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null }>, ActivityFeedConnection: { aggregate: { count: { nodes: number } } }, Author:
+    | { __typename: 'User', username: string }
+    | { __typename: 'ModerationProfile', displayName: string | null }
+   | null, SubscribedToNotifications: Array<{ username: string }>, LockedBy: { displayName: string | null } | null };
+
+export type IssueBaseFieldsFragment = { id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedChannelUniqueName: string | null, relatedModProfileName: string | null, channelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, Author:
+    | { __typename: 'User', username: string }
+    | { __typename: 'ModerationProfile', displayName: string | null }
+   | null, SubscribedToNotifications: Array<{ username: string }>, LockedBy: { displayName: string | null } | null };
+
+export type SubscribeToIssueMutationVariables = Exact<{
+  issueId: string | number;
+}>;
+
+
+export type SubscribeToIssueMutation = { subscribeToIssue: { id: string, issueNumber: number, channelUniqueName: string | null, SubscribedToNotifications: Array<{ username: string }> } | null };
+
+export type UnsubscribeFromIssueMutationVariables = Exact<{
+  issueId: string | number;
+}>;
+
+
+export type UnsubscribeFromIssueMutation = { unsubscribeFromIssue: { id: string, issueNumber: number, channelUniqueName: string | null, SubscribedToNotifications: Array<{ username: string }> } | null };
+
+export type AddIssueActivityFeedItemMutationVariables = Exact<{
+  issueId: string | number;
+  actionDescription: string;
+  actionType: string;
+  displayName: string;
+}>;
+
+
+export type AddIssueActivityFeedItemMutation = { addIssueActivityFeedItem: { issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedChannelUniqueName: string | null, relatedModProfileName: string | null, channelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, ActivityFeed: Array<{ id: string, actionDescription: string | null, actionType: string | null, createdAt: string, recommendedAction: Types.ModerationRecommendedAction | null, recommendationConfidence: number | null, recommendationRationale: string | null, ModerationProfile: { displayName: string | null, User: { isBot: boolean | null } | null } | null, User: { username: string, isBot: boolean | null } | null, Revision: { id: string, body: string | null, createdAt: string, Author: { username: string } | null } | null, Comment: { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, editReason: string | null, Issue: { id: string } | null, CommentAuthor:
+            | { username: string }
+            | { displayName: string | null }
+           | null, Channel: { uniqueName: string } | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null }>, ActivityFeedConnection: { aggregate: { count: { nodes: number } } }, Author:
+        | { __typename: 'User', username: string }
+        | { __typename: 'ModerationProfile', displayName: string | null }
+       | null, SubscribedToNotifications: Array<{ username: string }>, LockedBy: { displayName: string | null } | null }> } };
+
+export type AddIssueActivityFeedItemWithCommentAsModMutationVariables = Exact<{
+  issueId: string | number;
+  actionDescription: string;
+  actionType: string;
+  displayName: string;
+  commentText: string;
+  channelUniqueName: string;
+  flaggedServerRuleViolation?: boolean | null | undefined;
+}>;
+
+
+export type AddIssueActivityFeedItemWithCommentAsModMutation = { addIssueActivityFeedItem: { issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedChannelUniqueName: string | null, relatedModProfileName: string | null, channelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, ActivityFeed: Array<{ id: string, actionDescription: string | null, actionType: string | null, createdAt: string, recommendedAction: Types.ModerationRecommendedAction | null, recommendationConfidence: number | null, recommendationRationale: string | null, ModerationProfile: { displayName: string | null, User: { isBot: boolean | null } | null } | null, User: { username: string, isBot: boolean | null } | null, Revision: { id: string, body: string | null, createdAt: string, Author: { username: string } | null } | null, Comment: { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, editReason: string | null, Issue: { id: string } | null, CommentAuthor:
+            | { username: string }
+            | { displayName: string | null }
+           | null, Channel: { uniqueName: string } | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null }>, ActivityFeedConnection: { aggregate: { count: { nodes: number } } }, Author:
+        | { __typename: 'User', username: string }
+        | { __typename: 'ModerationProfile', displayName: string | null }
+       | null, SubscribedToNotifications: Array<{ username: string }>, LockedBy: { displayName: string | null } | null }> } };
+
+export type AddIssueActivityFeedItemWithCommentAsUserMutationVariables = Exact<{
+  issueId: string | number;
+  actionDescription: string;
+  actionType: string;
+  username: string;
+  commentText: string;
+  channelUniqueName: string;
+  flaggedServerRuleViolation?: boolean | null | undefined;
+}>;
+
+
+export type AddIssueActivityFeedItemWithCommentAsUserMutation = { addIssueActivityFeedItem: { issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedChannelUniqueName: string | null, relatedModProfileName: string | null, channelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, ActivityFeed: Array<{ id: string, actionDescription: string | null, actionType: string | null, createdAt: string, recommendedAction: Types.ModerationRecommendedAction | null, recommendationConfidence: number | null, recommendationRationale: string | null, ModerationProfile: { displayName: string | null, User: { isBot: boolean | null } | null } | null, User: { username: string, isBot: boolean | null } | null, Revision: { id: string, body: string | null, createdAt: string, Author: { username: string } | null } | null, Comment: { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, editReason: string | null, Issue: { id: string } | null, CommentAuthor:
+            | { username: string }
+            | { displayName: string | null }
+           | null, Channel: { uniqueName: string } | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null }>, ActivityFeedConnection: { aggregate: { count: { nodes: number } } }, Author:
+        | { __typename: 'User', username: string }
+        | { __typename: 'ModerationProfile', displayName: string | null }
+       | null, SubscribedToNotifications: Array<{ username: string }>, LockedBy: { displayName: string | null } | null }> } };
+
+export type ReportDiscussionMutationVariables = Exact<{
+  discussionId: string | number;
+  reportText: string;
+  selectedForumRules: Array<string> | string;
+  selectedServerRules: Array<string> | string;
+  channelUniqueName: string;
+}>;
+
+
+export type ReportDiscussionMutation = { reportDiscussion: { id: string, issueNumber: number } | null };
+
+export type ArchiveDiscussionMutationVariables = Exact<{
+  discussionId: string | number;
+  selectedForumRules: Array<string> | string;
+  selectedServerRules: Array<string> | string;
+  reportText: string;
+  channelUniqueName: string;
+}>;
+
+
+export type ArchiveDiscussionMutation = { archiveDiscussion: { id: string, issueNumber: number } | null };
+
+export type UnarchiveDiscussionMutationVariables = Exact<{
+  discussionId: string | number;
+  channelUniqueName: string;
+  explanation: string;
+}>;
+
+
+export type UnarchiveDiscussionMutation = { unarchiveDiscussion: { id: string, issueNumber: number } | null };
+
+export type ReportEventMutationVariables = Exact<{
+  eventId: string | number;
+  reportText: string;
+  selectedForumRules: Array<string> | string;
+  selectedServerRules: Array<string> | string;
+  channelUniqueName: string;
+}>;
+
+
+export type ReportEventMutation = { reportEvent: { id: string, issueNumber: number } | null };
+
+export type UnarchiveEventMutationVariables = Exact<{
+  eventId: string | number;
+  channelUniqueName: string;
+  explanation: string;
+}>;
+
+
+export type UnarchiveEventMutation = { unarchiveEvent: { id: string, issueNumber: number } | null };
+
+export type ArchiveEventMutationVariables = Exact<{
+  eventId: string | number;
+  selectedForumRules: Array<string> | string;
+  selectedServerRules: Array<string> | string;
+  reportText: string;
+  channelUniqueName: string;
+}>;
+
+
+export type ArchiveEventMutation = { archiveEvent: { id: string, issueNumber: number } | null };
+
+export type ReportCommentMutationVariables = Exact<{
+  commentId: string | number;
+  reportText: string;
+  selectedForumRules: Array<string> | string;
+  selectedServerRules: Array<string> | string;
+  channelUniqueName: string;
+}>;
+
+
+export type ReportCommentMutation = { reportComment: { id: string, issueNumber: number } | null };
+
+export type ReportWikiEditMutationVariables = Exact<{
+  wikiPageId: string | number;
+  wikiRevisionId?: string | number | null | undefined;
+  reportText: string;
+  selectedForumRules: Array<string> | string;
+  selectedServerRules: Array<string> | string;
+  channelUniqueName: string;
+}>;
+
+
+export type ReportWikiEditMutation = { reportWikiEdit: { id: string, issueNumber: number } | null };
+
+export type ArchiveCommentMutationVariables = Exact<{
+  commentId: string | number;
+  selectedForumRules: Array<string> | string;
+  selectedServerRules: Array<string> | string;
+  reportText: string;
+}>;
+
+
+export type ArchiveCommentMutation = { archiveComment: { id: string, issueNumber: number } | null };
+
+export type UnarchiveCommentMutationVariables = Exact<{
+  commentId: string | number;
+  explanation: string;
+}>;
+
+
+export type UnarchiveCommentMutation = { unarchiveComment: { id: string, issueNumber: number } | null };
+
+export type LockIssueMutationVariables = Exact<{
+  issueId: string | number;
+  reason: string;
+}>;
+
+
+export type LockIssueMutation = { lockIssue: { id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedChannelUniqueName: string | null, relatedModProfileName: string | null, channelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, ActivityFeed: Array<{ id: string, actionDescription: string | null, actionType: string | null, createdAt: string, recommendedAction: Types.ModerationRecommendedAction | null, recommendationConfidence: number | null, recommendationRationale: string | null, ModerationProfile: { displayName: string | null, User: { isBot: boolean | null } | null } | null, User: { username: string, isBot: boolean | null } | null, Revision: { id: string, body: string | null, createdAt: string, Author: { username: string } | null } | null, Comment: { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, editReason: string | null, Issue: { id: string } | null, CommentAuthor:
+          | { username: string }
+          | { displayName: string | null }
+         | null, Channel: { uniqueName: string } | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null }>, ActivityFeedConnection: { aggregate: { count: { nodes: number } } }, Author:
+      | { __typename: 'User', username: string }
+      | { __typename: 'ModerationProfile', displayName: string | null }
+     | null, SubscribedToNotifications: Array<{ username: string }>, LockedBy: { displayName: string | null } | null } | null };
+
+export type UnlockIssueMutationVariables = Exact<{
+  issueId: string | number;
+  reason?: string | null | undefined;
+}>;
+
+
+export type UnlockIssueMutation = { unlockIssue: { id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedChannelUniqueName: string | null, relatedModProfileName: string | null, channelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, ActivityFeed: Array<{ id: string, actionDescription: string | null, actionType: string | null, createdAt: string, recommendedAction: Types.ModerationRecommendedAction | null, recommendationConfidence: number | null, recommendationRationale: string | null, ModerationProfile: { displayName: string | null, User: { isBot: boolean | null } | null } | null, User: { username: string, isBot: boolean | null } | null, Revision: { id: string, body: string | null, createdAt: string, Author: { username: string } | null } | null, Comment: { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, editReason: string | null, Issue: { id: string } | null, CommentAuthor:
+          | { username: string }
+          | { displayName: string | null }
+         | null, Channel: { uniqueName: string } | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null }>, ActivityFeedConnection: { aggregate: { count: { nodes: number } } }, Author:
+      | { __typename: 'User', username: string }
+      | { __typename: 'ModerationProfile', displayName: string | null }
+     | null, SubscribedToNotifications: Array<{ username: string }>, LockedBy: { displayName: string | null } | null } | null };
+
+export type ReportImageMutationVariables = Exact<{
+  imageId: string | number;
+  reportText: string;
+  selectedForumRules: Array<string> | string;
+  selectedServerRules: Array<string> | string;
+  channelUniqueName?: string | null | undefined;
+}>;
+
+
+export type ReportImageMutation = { reportImage: { id: string, issueNumber: number } | null };
+
+export type ReportProfilePictureMutationVariables = Exact<{
+  username: string;
+  reportText: string;
+  selectedServerRules: Array<string> | string;
+}>;
+
+
+export type ReportProfilePictureMutation = { reportProfilePicture: { id: string, issueNumber: number } | null };
+
+export type ArchiveImageMutationVariables = Exact<{
+  imageId: string | number;
+  selectedForumRules: Array<string> | string;
+  selectedServerRules: Array<string> | string;
+  reportText: string;
+  channelUniqueName?: string | null | undefined;
+}>;
+
+
+export type ArchiveImageMutation = { archiveImage: { id: string, issueNumber: number } | null };
+
+export type UnarchiveImageMutationVariables = Exact<{
+  imageId: string | number;
+  explanation?: string | null | undefined;
+  channelUniqueName?: string | null | undefined;
+}>;
+
+
+export type UnarchiveImageMutation = { unarchiveImage: { id: string, issueNumber: number } | null };
+
+export type PermanentlyRemoveImageMutationVariables = Exact<{
+  imageId: string | number;
+  explanation?: string | null | undefined;
+}>;
+
+
+export type PermanentlyRemoveImageMutation = { permanentlyRemoveImage: { id: string, issueNumber: number } | null };
+
+export type GetIssueQueryVariables = Exact<{
+  channelUniqueName: string;
+  issueNumber: number;
+}>;
+
+
+export type GetIssueQuery = { issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedChannelUniqueName: string | null, relatedModProfileName: string | null, channelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, Author:
+      | { __typename: 'User', username: string }
+      | { __typename: 'ModerationProfile', displayName: string | null }
+     | null, SubscribedToNotifications: Array<{ username: string }>, LockedBy: { displayName: string | null } | null }> };
+
+export type GetIssueActivityQueryVariables = Exact<{
+  channelUniqueName: string;
+  issueNumber: number;
+  activityFeedLimit?: number | null | undefined;
+  activityFeedOffset?: number | null | undefined;
+}>;
+
+
+export type GetIssueActivityQuery = { issues: Array<{ id: string, ActivityFeed: Array<{ id: string, actionDescription: string | null, actionType: string | null, createdAt: string, recommendedAction: Types.ModerationRecommendedAction | null, recommendationConfidence: number | null, recommendationRationale: string | null, ModerationProfile: { displayName: string | null, User: { isBot: boolean | null } | null } | null, User: { username: string, isBot: boolean | null } | null, Revision: { id: string, body: string | null, createdAt: string, Author: { username: string } | null } | null, Comment: { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, editReason: string | null, Issue: { id: string } | null, CommentAuthor:
+          | { username: string }
+          | { displayName: string | null }
+         | null, Channel: { uniqueName: string } | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null }>, ActivityFeedConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetIssueSource3f1ebf796bQueryVariables = Exact<{
+  discussionId: string | number;
+  channelUniqueName: string;
+}>;
+
+
+export type GetIssueSource3f1ebf796bQuery = { issues: Array<{ id: string, issueNumber: number, flaggedServerRuleViolation: boolean | null }> };
+
+export type GetIssueSource003ac8783fQueryVariables = Exact<{
+  eventId: string | number;
+  channelUniqueName: string;
+}>;
+
+
+export type GetIssueSource003ac8783fQuery = { issues: Array<{ id: string, issueNumber: number, flaggedServerRuleViolation: boolean | null }> };
+
+export type GetDiscussionCommentIssueQueryVariables = Exact<{
+  discussionId: string | number;
+  channelUniqueName: string;
+}>;
+
+
+export type GetDiscussionCommentIssueQuery = { discussionChannels: Array<{ id: string, Comments: Array<{ id: string, RelatedIssues: Array<{ issueNumber: number }> }> }> };
+
+export type GetIssuesQueryVariables = Exact<{
+  issueWhere?: Types.IssueWhere | null | undefined;
+}>;
+
+
+export type GetIssuesQuery = { issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedUsername: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, LockedBy: { displayName: string | null } | null, Channel: { uniqueName: string, channelIconURL: string | null } | null, Author:
+      | { __typename: 'User', username: string }
+      | { __typename: 'ModerationProfile', displayName: string | null }
+     | null, ActivityFeedConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetSiteWideIssueListQueryVariables = Exact<{
+  searchInput?: string | null | undefined;
+  selectedChannels?: Array<string> | string | null | undefined;
+  startDate?: string | null | undefined;
+  endDate?: string | null | undefined;
+  showOnlyServerRuleViolations?: boolean | null | undefined;
+  isOpen: boolean;
+  filterCreatedByMe?: boolean | null | undefined;
+  filterIAmOP?: boolean | null | undefined;
+  filterIReported?: boolean | null | undefined;
+  options?: Types.IssueListOptions | null | undefined;
+}>;
+
+
+export type GetSiteWideIssueListQuery = { getSiteWideIssueList: { aggregateIssueCount: number, issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedUsername: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockReason: string | null, channelUniqueName: string | null, channelIconURL: string | null, authorName: string | null, reportCount: number }> } | null };
+
+export type GetClosedIssuesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetClosedIssuesQuery = { issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, channelUniqueName: string | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, Channel: { uniqueName: string, channelIconURL: string | null } | null, LockedBy: { displayName: string | null } | null, Author:
+      | { __typename: 'User', username: string }
+      | { __typename: 'ModerationProfile', displayName: string | null }
+     | null, ActivityFeedConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetChannelReportsQueryVariables = Exact<{
+  isOpen?: boolean | null | undefined;
+}>;
+
+
+export type GetChannelReportsQuery = { issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedChannelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, LockedBy: { displayName: string | null } | null, Author:
+      | { __typename: 'User', username: string }
+      | { __typename: 'ModerationProfile', displayName: string | null }
+     | null, ActivityFeedConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetImageReportsQueryVariables = Exact<{
+  isOpen?: boolean | null | undefined;
+}>;
+
+
+export type GetImageReportsQuery = { issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, channelUniqueName: string | null, relatedImageId: string | null, relatedAlbumId: string | null, relatedProfilePicUserId: string | null, relatedChannelIconName: string | null, relatedChannelBannerName: string | null, relatedChannelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, Author:
+      | { __typename: 'User', username: string }
+      | { __typename: 'ModerationProfile', displayName: string | null }
+     | null, ActivityFeedConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetServerIssueQueryVariables = Exact<{
+  issueNumber: number;
+  activityFeedLimit?: number | null | undefined;
+  activityFeedOffset?: number | null | undefined;
+}>;
+
+
+export type GetServerIssueQuery = { issues: Array<{ id: string, issueNumber: number, title: string | null, body: string | null, isOpen: boolean, createdAt: string, updatedAt: string | null, relatedCommentId: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedImageId: string | null, relatedWikiPageId: string | null, relatedWikiRevisionId: string | null, relatedChannelUniqueName: string | null, relatedModProfileName: string | null, channelUniqueName: string | null, flaggedServerRuleViolation: boolean | null, locked: boolean | null, lockedAt: string | null, lockReason: string | null, ActivityFeed: Array<{ id: string, actionDescription: string | null, actionType: string | null, createdAt: string, ModerationProfile: { displayName: string | null } | null, User: { username: string } | null, Revision: { id: string, body: string | null, createdAt: string, Author: { username: string } | null } | null, Comment: { id: string, text: string | null, emoji: unknown, weightedVotesCount: number | null, createdAt: string, updatedAt: string | null, editReason: string | null, Issue: { id: string } | null, CommentAuthor:
+          | { username: string }
+          | { displayName: string | null }
+         | null, Channel: { uniqueName: string } | null, ChildCommentsConnection: { aggregate: { count: { nodes: number } } }, ParentComment: { id: string } | null, PastVersions: Array<{ id: string, body: string | null, createdAt: string, Author: { username: string } | null }>, UpvotedByUsers: Array<{ username: string }>, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, SuperUpvotedByUsers: Array<{ username: string }> } | null }>, ActivityFeedConnection: { aggregate: { count: { nodes: number } } }, Author:
+      | { __typename: 'User', username: string }
+      | { __typename: 'ModerationProfile', displayName: string | null }
+     | null, SubscribedToNotifications: Array<{ username: string }>, LockedBy: { displayName: string | null } | null }> };
+
+export type GetUserFavoriteCommentsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUserFavoriteCommentsQuery = { users: Array<{ username: string, FavoriteComments: Array<{ id: string, text: string | null, createdAt: string, updatedAt: string | null, CommentAuthor:
+        | { __typename: 'User', username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string }
+        | { __typename: 'ModerationProfile', displayName: string | null }
+       | null, DiscussionChannel: { id: string, discussionId: string, channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null } | null, Discussion: { id: string, title: string, hasDownload: boolean | null } | null } | null, Channel: { uniqueName: string, displayName: string | null } | null, Event: { id: string, title: string } | null }> }> };
+
+export type GetUserFavoriteDiscussionsNoDownloadsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUserFavoriteDiscussionsNoDownloadsQuery = { users: Array<{ username: string, FavoriteDiscussions: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, hasDownload: boolean | null, hasSensitiveContent: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string } | null, DiscussionChannels: Array<{ id: string, channelUniqueName: string, archived: boolean | null, answered: boolean | null, locked: boolean | null, weightedVotesCount: number | null, Channel: { uniqueName: string, displayName: string | null } | null, CommentsConnection: { aggregate: { count: { nodes: number } } } }>, Tags: Array<{ text: string }>, Album: { id: string, Images: Array<{ id: string, url: string | null, caption: string | null }> } | null }> }> };
+
+export type GetUserFavoriteDownloadsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUserFavoriteDownloadsQuery = { users: Array<{ username: string, FavoriteDiscussions: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, hasDownload: boolean | null, hasSensitiveContent: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string } | null, DiscussionChannels: Array<{ id: string, channelUniqueName: string, archived: boolean | null, answered: boolean | null, locked: boolean | null, weightedVotesCount: number | null, Channel: { uniqueName: string, displayName: string | null } | null, CommentsConnection: { aggregate: { count: { nodes: number } } } }>, Tags: Array<{ text: string }>, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, caption: string | null }> } | null }> }> };
+
+export type GetUserFavoriteImagesQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUserFavoriteImagesQuery = { users: Array<{ username: string, FavoriteImages: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, copyright: string | null, longDescription: string | null, hasSensitiveContent: boolean | null, hasSpoiler: boolean | null, createdAt: string | null, Uploader: { username: string, displayName: string | null, profilePicURL: string | null } | null }> }> };
+
+export type GetUnifiedLibraryFavoritesQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUnifiedLibraryFavoritesQuery = { users: Array<{ username: string, FavoriteDiscussions: Array<{ id: string, title: string, body: string | null, createdAt: string, hasDownload: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, DiscussionChannels: Array<{ channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null, channelIconURL: string | null } | null }>, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null }> } | null }>, FavoriteImages: Array<{ id: string, url: string | null, alt: string | null, caption: string | null, createdAt: string | null, Uploader: { username: string, displayName: string | null, profilePicURL: string | null } | null, Albums: Array<{ id: string, Discussions: Array<{ id: string, DiscussionChannels: Array<{ channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null, channelIconURL: string | null } | null }> }> }> }>, FavoriteComments: Array<{ id: string, text: string | null, createdAt: string, CommentAuthor:
+        | { username: string, displayName: string | null, profilePicURL: string | null }
+        | { displayName: string | null }
+       | null, DiscussionChannel: { discussionId: string, channelUniqueName: string, Channel: { uniqueName: string, displayName: string | null, channelIconURL: string | null } | null, Discussion: { id: string, title: string, hasDownload: boolean | null } | null } | null, Channel: { uniqueName: string, displayName: string | null, channelIconURL: string | null } | null }>, FavoriteChannels: Array<{ uniqueName: string, displayName: string | null, description: string | null, channelIconURL: string | null, createdAt: string, Admins: Array<{ username: string, displayName: string | null, profilePicURL: string | null }> }> }> };
+
+export type InviteForumOwnerMutationVariables = Exact<{
+  inviteeUsername: string;
+  channelUniqueName: string;
+}>;
+
+
+export type InviteForumOwnerMutation = { inviteForumOwner: boolean | null };
+
+export type InviteForumModMutationVariables = Exact<{
+  inviteeUsername: string;
+  channelUniqueName: string;
+}>;
+
+
+export type InviteForumModMutation = { inviteForumMod: boolean | null };
+
+export type CancelInviteForumOwnerMutationVariables = Exact<{
+  inviteeUsername: string;
+  channelUniqueName: string;
+}>;
+
+
+export type CancelInviteForumOwnerMutation = { cancelInviteForumOwner: boolean | null };
+
+export type CancelInviteForumModMutationVariables = Exact<{
+  inviteeUsername: string;
+  channelUniqueName: string;
+}>;
+
+
+export type CancelInviteForumModMutation = { cancelInviteForumMod: boolean | null };
+
+export type RemoveForumOwnerMutationVariables = Exact<{
+  username: string;
+  channelUniqueName: string;
+}>;
+
+
+export type RemoveForumOwnerMutation = { removeForumOwner: boolean | null };
+
+export type RemoveForumModMutationVariables = Exact<{
+  modProfileName: string;
+  channelUniqueName: string;
+}>;
+
+
+export type RemoveForumModMutation = { removeForumMod: boolean | null };
+
+export type AcceptInviteForumOwnerMutationVariables = Exact<{
+  channelId: string;
+}>;
+
+
+export type AcceptInviteForumOwnerMutation = { acceptForumOwnerInvite: boolean | null };
+
+export type AcceptInviteForumModMutationVariables = Exact<{
+  channelId: string;
+}>;
+
+
+export type AcceptInviteForumModMutation = { acceptForumModInvite: boolean | null };
+
+export type SuspendUserMutationVariables = Exact<{
+  issueID: string | number;
+  suspendUntil?: string | null | undefined;
+  suspendIndefinitely?: boolean | null | undefined;
+  explanation?: string | null | undefined;
+}>;
+
+
+export type SuspendUserMutation = { suspendUser: { id: string } | null };
+
+export type SuspendModMutationVariables = Exact<{
+  issueID: string | number;
+  suspendUntil?: string | null | undefined;
+  suspendIndefinitely?: boolean | null | undefined;
+  explanation?: string | null | undefined;
+}>;
+
+
+export type SuspendModMutation = { suspendMod: { id: string } | null };
+
+export type UnsuspendUserMutationVariables = Exact<{
+  issueId: string | number;
+  explanation?: string | null | undefined;
+}>;
+
+
+export type UnsuspendUserMutation = { unsuspendUser: { id: string } | null };
+
+export type UnsuspendModMutationVariables = Exact<{
+  issueId: string | number;
+  explanation?: string | null | undefined;
+}>;
+
+
+export type UnsuspendModMutation = { unsuspendMod: { id: string } | null };
+
+export type CountOpenIssuesQueryVariables = Exact<{
+  channelUniqueName: string;
+}>;
+
+
+export type CountOpenIssuesQuery = { issuesConnection: { aggregate: { count: { nodes: number } } } };
+
+export type CountIssuesByServerQueryVariables = Exact<{
+  issueWhere?: Types.IssueWhere | null | undefined;
+}>;
+
+
+export type CountIssuesByServerQuery = { issuesConnection: { aggregate: { count: { nodes: number } } } };
+
+export type CountClosedIssuesQueryVariables = Exact<{
+  channelUniqueName: string;
+}>;
+
+
+export type CountClosedIssuesQuery = { issuesConnection: { aggregate: { count: { nodes: number } } } };
+
+export type CountClosedIssuesByServerQueryVariables = Exact<{
+  issueWhere?: Types.IssueWhere | null | undefined;
+}>;
+
+
+export type CountClosedIssuesByServerQuery = { issuesConnection: { aggregate: { count: { nodes: number } } } };
+
+export type GetModQueryVariables = Exact<{
+  displayName: string;
+}>;
+
+
+export type GetModQuery = { moderationProfiles: Array<{ displayName: string | null, createdAt: string, AuthoredCommentsConnection: { aggregate: { count: { nodes: number } } }, AuthoredIssuesConnection: { aggregate: { count: { nodes: number } } }, ActivityFeedConnection: { aggregate: { count: { nodes: number } } }, AuthoredComments: Array<{ id: string, text: string | null, createdAt: string, updatedAt: string | null, deleted: boolean | null, archived: boolean | null, CommentAuthor:
+        | { username: string }
+        | { displayName: string | null }
+       | null, DiscussionChannel: { id: string, discussionId: string, channelUniqueName: string, Channel: { uniqueName: string } | null } | null, Channel: { uniqueName: string } | null, GivesFeedbackOnDiscussion: { id: string } | null, GivesFeedbackOnEvent: { id: string } | null, GivesFeedbackOnComment: { id: string } | null, Issue: { id: string } | null }>, AuthoredIssues: Array<{ id: string, issueNumber: number, title: string | null, createdAt: string, updatedAt: string | null, isOpen: boolean, Author:
+        | { username: string }
+        | { displayName: string | null }
+       | null, Channel: { uniqueName: string } | null }> }> };
+
+export type GetModCommentsQueryVariables = Exact<{
+  displayName: string;
+  offset: number;
+  limit: number;
+}>;
+
+
+export type GetModCommentsQuery = { moderationProfiles: Array<{ displayName: string | null, AuthoredComments: Array<{ id: string, text: string | null, createdAt: string, updatedAt: string | null, deleted: boolean | null, archived: boolean | null, CommentAuthor:
+        | { username: string }
+        | { displayName: string | null }
+       | null, DiscussionChannel: { id: string, discussionId: string, channelUniqueName: string, Channel: { uniqueName: string } | null } | null, Channel: { uniqueName: string } | null, GivesFeedbackOnDiscussion: { id: string } | null, GivesFeedbackOnEvent: { id: string } | null, GivesFeedbackOnComment: { id: string } | null, Issue: { id: string } | null }> }> };
+
+export type GetModIssuesQueryVariables = Exact<{
+  displayName: string;
+  offset: number;
+  limit: number;
+}>;
+
+
+export type GetModIssuesQuery = { moderationProfiles: Array<{ displayName: string | null, AuthoredIssues: Array<{ id: string, issueNumber: number, title: string | null, createdAt: string, updatedAt: string | null, isOpen: boolean, Author:
+        | { username: string }
+        | { displayName: string | null }
+       | null, Channel: { uniqueName: string } | null }> }> };
+
+export type GetModContributionsQueryVariables = Exact<{
+  displayName: string;
+  year?: number | null | undefined;
+}>;
+
+
+export type GetModContributionsQuery = { getModContributions: Array<{ date: string, count: number, activities: Array<{ id: string, actionType: string | null, actionDescription: string | null, createdAt: string | null, Issue: { id: string | null, issueNumber: number | null, channelUniqueName: string | null, relatedDiscussionId: string | null, relatedEventId: string | null, relatedCommentId: string | null, title: string | null, isOpen: boolean | null } | null, Comment: { id: string, text: string | null, createdAt: string | null } | null, RelatedDiscussion: { id: string | null, title: string | null, createdAt: string | null, DiscussionChannels: Array<{ id: string | null, discussionId: string | null, channelUniqueName: string | null } | null> | null } | null, RelatedEvent: { id: string | null, title: string | null, createdAt: string | null, EventChannels: Array<{ id: string | null, eventId: string | null, channelUniqueName: string | null } | null> | null } | null, RelatedComment: { id: string, text: string | null, createdAt: string | null, DiscussionChannel: { id: string | null, discussionId: string | null, channelUniqueName: string | null } | null, Event: { id: string | null, title: string | null, createdAt: string | null, EventChannels: Array<{ id: string | null, eventId: string | null, channelUniqueName: string | null } | null> | null } | null } | null }> }> };
+
+export type GetModsByChannelQueryVariables = Exact<{
+  channelUniqueName: string;
+}>;
+
+
+export type GetModsByChannelQuery = { channels: Array<{ uniqueName: string, SuspendedModsConnection: { aggregate: { count: { nodes: number } } }, SuspendedMods: Array<{ id: string, username: string | null, createdAt: string, suspendedUntil: string | null, suspendedIndefinitely: boolean | null, SuspendedMod: { displayName: string | null } | null, RelatedIssue: { id: string, issueNumber: number } | null }> }> };
+
+export type GetModsByChannelSource31c1e8fd16QueryVariables = Exact<{
+  channelUniqueName: string;
+}>;
+
+
+export type GetModsByChannelSource31c1e8fd16Query = { channels: Array<{ uniqueName: string, Admins: Array<{ username: string, createdAt: string, displayName: string | null, profilePicURL: string | null }>, Moderators: Array<{ displayName: string | null, createdAt: string, ModChannelRoles: Array<{ name: string, description: string | null }> }> }> };
+
+export type GetChannelOwnersByChannelQueryVariables = Exact<{
+  channelUniqueName: string;
+}>;
+
+
+export type GetChannelOwnersByChannelQuery = { channels: Array<{ uniqueName: string, Admins: Array<{ username: string, displayName: string | null, createdAt: string, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null }> }> };
+
+export type GetPendingChannelOwnersByChannelQueryVariables = Exact<{
+  channelUniqueName: string;
+}>;
+
+
+export type GetPendingChannelOwnersByChannelQuery = { channels: Array<{ uniqueName: string, PendingOwnerInvites: Array<{ username: string, displayName: string | null, createdAt: string, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null }> }> };
+
+export type GetPendingChannelModsByChannelQueryVariables = Exact<{
+  channelUniqueName: string;
+}>;
+
+
+export type GetPendingChannelModsByChannelQuery = { channels: Array<{ uniqueName: string, PendingModInvites: Array<{ username: string, displayName: string | null, createdAt: string }> }> };
+
+export type PendingInviteExistsQueryVariables = Exact<{
+  channelId: string;
+  username: string;
+}>;
+
+
+export type PendingInviteExistsQuery = { channels: Array<{ uniqueName: string, PendingOwnerInvites: Array<{ username: string }> }> };
+
+export type PendingModInviteExistsQueryVariables = Exact<{
+  channelId: string;
+  username: string;
+}>;
+
+
+export type PendingModInviteExistsQuery = { channels: Array<{ uniqueName: string, PendingModInvites: Array<{ username: string }> }> };
+
+export type GetDiscussionChannelIdQueryVariables = Exact<{
+  discussionId: string | number;
+  channelUniqueName: string;
+}>;
+
+
+export type GetDiscussionChannelIdQuery = { discussionChannels: Array<{ id: string, archived: boolean | null }> };
+
+export type GetDiscussionChannelsQueryVariables = Exact<{
+  discussionChannelId: string | number;
+}>;
+
+
+export type GetDiscussionChannelsQuery = { discussionChannels: Array<{ id: string, RelatedIssues: Array<{ id: string, issueNumber: number }> }> };
+
+export type GetEventChannelsQueryVariables = Exact<{
+  eventChannelId: string | number;
+}>;
+
+
+export type GetEventChannelsQuery = { eventChannels: Array<{ id: string, RelatedIssues: Array<{ id: string, issueNumber: number }> }> };
+
+export type GetSuspensionQueryVariables = Exact<{
+  issueId: string;
+}>;
+
+
+export type GetSuspensionQuery = { isOriginalPosterSuspended: boolean | null };
+
+export type GetChannelSource26d7fbbb05QueryVariables = Exact<{
+  channelUniqueName: string;
+}>;
+
+
+export type GetChannelSource26d7fbbb05Query = { channels: Array<{ uniqueName: string, SuspendedUsersConnection: { aggregate: { count: { nodes: number } } }, SuspendedUsers: Array<{ id: string, username: string | null, createdAt: string, suspendedUntil: string | null, suspendedIndefinitely: boolean | null, SuspendedUser: { username: string } | null, RelatedIssue: { id: string, issueNumber: number } | null }> }> };
+
+export type GetNotificationsQueryVariables = Exact<{
+  username: string;
+  sort?: Array<Types.NotificationSort> | Types.NotificationSort | null | undefined;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
+}>;
+
+
+export type GetNotificationsQuery = { users: Array<{ username: string, profilePicURL: string | null, Notifications: Array<{ id: string, createdAt: string, read: boolean | null, text: string | null, notificationType: string | null, link: string | null, ScratchpadEntry: { id: string, isPublic: boolean } | null }>, NotificationsAggregate: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetFeedbackNotificationsQueryVariables = Exact<{
+  username: string;
+  sort?: Array<Types.NotificationSort> | Types.NotificationSort | null | undefined;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
+}>;
+
+
+export type GetFeedbackNotificationsQuery = { users: Array<{ username: string, Notifications: Array<{ id: string, createdAt: string, read: boolean | null, text: string | null, notificationType: string | null, link: string | null }>, NotificationsAggregate: { aggregate: { count: { nodes: number } } }, totalNotificationsAggregate: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetGeneralNotificationsQueryVariables = Exact<{
+  username: string;
+  sort?: Array<Types.NotificationSort> | Types.NotificationSort | null | undefined;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
+}>;
+
+
+export type GetGeneralNotificationsQuery = { users: Array<{ username: string, Notifications: Array<{ id: string, createdAt: string, read: boolean | null, text: string | null, notificationType: string | null, link: string | null, ScratchpadEntry: { id: string, isPublic: boolean } | null }>, NotificationsAggregate: { aggregate: { count: { nodes: number } } }, totalNotificationsAggregate: { aggregate: { count: { nodes: number } } } }> };
+
+export type CreateScratchpadEntryMutationVariables = Exact<{
+  recipientUsername: string;
+  text: string;
+  sourceType: string;
+  sourceId: string;
+  sourceChannelUniqueName?: string | null | undefined;
+}>;
+
+
+export type CreateScratchpadEntryMutation = { createScratchpadEntry: { id: string, createdAt: string, text: string, isPublic: boolean, sourceType: string, sourceId: string, sourceChannelUniqueName: string | null, discussionId: string | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, Recipient: { username: string } | null, superUpvotedByUsers: Array<{ username: string }> | null } | null };
+
+export type UpdateScratchpadEntryVisibilityMutationVariables = Exact<{
+  scratchpadEntryId: string | number;
+  isPublic: boolean;
+}>;
+
+
+export type UpdateScratchpadEntryVisibilityMutation = { updateScratchpadEntryVisibility: { id: string, isPublic: boolean, text: string, sourceType: string, sourceId: string, sourceChannelUniqueName: string | null, discussionId: string | null, createdAt: string, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, Recipient: { username: string } | null } | null };
+
+export type DeleteScratchpadEntryMutationVariables = Exact<{
+  scratchpadEntryId: string | number;
+}>;
+
+
+export type DeleteScratchpadEntryMutation = { deleteScratchpadEntry: boolean | null };
+
+export type UndoSuperUpvoteMutationVariables = Exact<{
+  sourceType: string;
+  sourceId: string;
+}>;
+
+
+export type UndoSuperUpvoteMutation = { undoSuperUpvote: { success: boolean, message: string | null, sourceId: string | null, sourceType: string | null, superUpvotedByUsers: Array<{ username: string }> | null } | null };
+
+export type GetPublicScratchpadEntriesQueryVariables = Exact<{
+  username: string;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
+}>;
+
+
+export type GetPublicScratchpadEntriesQuery = { scratchpadEntriesConnection: { aggregate: { count: { nodes: number } } }, scratchpadEntries: Array<{ id: string, createdAt: string, text: string, isPublic: boolean, sourceType: string, sourceId: string, sourceChannelUniqueName: string | null, discussionId: string | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, Recipient: { username: string } | null }> };
+
+export type GetPendingScratchpadEntriesQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetPendingScratchpadEntriesQuery = { scratchpadEntries: Array<{ id: string, createdAt: string, text: string, isPublic: boolean, sourceType: string, sourceId: string, sourceChannelUniqueName: string | null, discussionId: string | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, Recipient: { username: string } | null }> };
+
+export type GetAllScratchpadEntriesQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetAllScratchpadEntriesQuery = { scratchpadEntries: Array<{ id: string, createdAt: string, text: string, isPublic: boolean, sourceType: string, sourceId: string, sourceChannelUniqueName: string | null, discussionId: string | null, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null, Recipient: { username: string } | null }> };
+
+export type GetSuperUpvoteCountQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetSuperUpvoteCountQuery = { scratchpadEntriesConnection: { aggregate: { count: { nodes: number } } } };
+
+export type GetOwnEmailSource3c35564c1eQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetOwnEmailSource3c35564c1eQuery = { getOwnEmail: { username: string | null, profilePicURL: string | null, modProfileName: string | null, unreadNotificationCount: number | null } | null };
+
+export type GetOwnEmailNotificationCountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetOwnEmailNotificationCountQuery = { getOwnEmail: { unreadNotificationCount: number | null } | null };
+
+export type NewTagFragment = { text: string };
+
+export type CreateTagMutationVariables = Exact<{
+  input: Array<Types.TagCreateInput> | Types.TagCreateInput;
+}>;
+
+
+export type CreateTagMutation = { createTags: { tags: Array<{ text: string }> } };
+
+export type GetTagsQueryVariables = Exact<{
+  where?: Types.TagWhere | null | undefined;
+}>;
+
+
+export type GetTagsQuery = { tags: Array<{ text: string }> };
+
+export type PermanentlyDeleteProfileImageMutationVariables = Exact<{
+  username: string;
+  imageUrl: string;
+}>;
+
+
+export type PermanentlyDeleteProfileImageMutation = { permanentlyDeleteProfileImage: { username: string, profilePicURL: string | null } | null };
+
+export type MarkNotificationsAsReadMutationVariables = Exact<{
+  username: string;
+}>;
+
+
+export type MarkNotificationsAsReadMutation = { updateUsers: { users: Array<{ username: string, Notifications: Array<{ text: string | null, read: boolean | null, createdAt: string }> }> } };
+
+export type MarkNotificationAsReadMutationVariables = Exact<{
+  username: string;
+  notificationId: string | number;
+}>;
+
+
+export type MarkNotificationAsReadMutation = { updateUsers: { users: Array<{ username: string, Notifications: Array<{ id: string, read: boolean | null }> }> } };
+
+export type AddFavoriteChannelMutationVariables = Exact<{
+  channel: string;
+  username: string;
+}>;
+
+
+export type AddFavoriteChannelMutation = { updateUsers: { users: Array<{ username: string, FavoriteChannels: Array<{ uniqueName: string }> }> } };
+
+export type RemoveFavoriteChannelMutationVariables = Exact<{
+  channel: string;
+  username: string;
+}>;
+
+
+export type RemoveFavoriteChannelMutation = { updateUsers: { users: Array<{ username: string, FavoriteChannels: Array<{ uniqueName: string }> }> } };
+
+export type AddFavoriteDiscussionMutationVariables = Exact<{
+  discussionId: string | number;
+  username: string;
+}>;
+
+
+export type AddFavoriteDiscussionMutation = { updateUsers: { users: Array<{ username: string, FavoriteDiscussions: Array<{ id: string, title: string }> }> } };
+
+export type RemoveFavoriteDiscussionMutationVariables = Exact<{
+  discussionId: string | number;
+  username: string;
+}>;
+
+
+export type RemoveFavoriteDiscussionMutation = { updateUsers: { users: Array<{ username: string, FavoriteDiscussions: Array<{ id: string, title: string }> }> } };
+
+export type AddFavoriteCommentMutationVariables = Exact<{
+  commentId: string | number;
+  username: string;
+}>;
+
+
+export type AddFavoriteCommentMutation = { updateUsers: { users: Array<{ username: string, FavoriteComments: Array<{ id: string }> }> } };
+
+export type RemoveFavoriteCommentMutationVariables = Exact<{
+  commentId: string | number;
+  username: string;
+}>;
+
+
+export type RemoveFavoriteCommentMutation = { updateUsers: { users: Array<{ username: string, FavoriteComments: Array<{ id: string }> }> } };
+
+export type AddFavoriteImageMutationVariables = Exact<{
+  imageId: string | number;
+  username: string;
+}>;
+
+
+export type AddFavoriteImageMutation = { updateUsers: { users: Array<{ username: string, FavoriteImages: Array<{ id: string, url: string | null }> }> } };
+
+export type RemoveFavoriteImageMutationVariables = Exact<{
+  imageId: string | number;
+  username: string;
+}>;
+
+
+export type RemoveFavoriteImageMutation = { updateUsers: { users: Array<{ username: string, FavoriteImages: Array<{ id: string, url: string | null }> }> } };
+
+export type GetUserCommentsQueryVariables = Exact<{
+  username: string;
+  offset: number;
+  limit: number;
+  where?: Types.CommentWhere | null | undefined;
+}>;
+
+
+export type GetUserCommentsQuery = { users: Array<{ username: string, profilePicURL: string | null, CommentsConnection: { aggregate: { count: { nodes: number } } }, Comments: Array<{ id: string, text: string | null, createdAt: string, updatedAt: string | null, deleted: boolean | null, archived: boolean | null, weightedVotesCount: number | null, ParentComment: { id: string } | null, CommentAuthor:
+        | { username: string, profilePicURL: string | null }
+        | { displayName: string | null }
+       | null, DiscussionChannel: { id: string, discussionId: string, channelUniqueName: string, Channel: { uniqueName: string } | null } | null, Event: { id: string, title: string, EventChannels: Array<{ channelUniqueName: string }> } | null, Channel: { uniqueName: string } | null, UpvotedByUsersConnection: { aggregate: { count: { nodes: number } } }, UpvotedByUsers: Array<{ username: string }> }> }> };
+
+export type GetUserDiscussionsQueryVariables = Exact<{
+  username: string;
+  where?: Types.DiscussionWhere | null | undefined;
+}>;
+
+
+export type GetUserDiscussionsQuery = { users: Array<{ username: string, profilePicURL: string | null, Discussions: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, deleted: boolean | null, hasDownload: boolean | null, Author: { username: string, commentKarma: number | null, discussionKarma: number | null, createdAt: string } | null, DiscussionChannels: Array<{ archived: boolean | null, answered: boolean | null, locked: boolean | null, weightedVotesCount: number | null, id: string, discussionId: string, channelUniqueName: string, Channel: { uniqueName: string } | null }>, Tags: Array<{ text: string }> }> }> };
+
+export type GetUserDownloadsQueryVariables = Exact<{
+  username: string;
+  where?: Types.DiscussionWhere | null | undefined;
+}>;
+
+
+export type GetUserDownloadsQuery = { users: Array<{ username: string, profilePicURL: string | null, Discussions: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, deleted: boolean | null, hasDownload: boolean | null, hasSensitiveContent: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string } | null, DiscussionChannels: Array<{ archived: boolean | null, answered: boolean | null, locked: boolean | null, weightedVotesCount: number | null, id: string, discussionId: string, channelUniqueName: string, Channel: { uniqueName: string } | null, CommentsConnection: { aggregate: { count: { nodes: number } } } }>, Tags: Array<{ text: string }>, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, caption: string | null }> } | null }> }> };
+
+export type GetUserOwnedDownloadsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUserOwnedDownloadsQuery = { users: Array<{ username: string, OwnedDownloads: Array<{ id: string, title: string, body: string | null, createdAt: string, updatedAt: string | null, hasDownload: boolean | null, isFavorited: boolean | null, hasSensitiveContent: boolean | null, Author: { username: string, displayName: string | null, profilePicURL: string | null, commentKarma: number | null, discussionKarma: number | null, createdAt: string } | null, DiscussionChannels: Array<{ id: string, channelUniqueName: string, archived: boolean | null, answered: boolean | null, locked: boolean | null, weightedVotesCount: number | null, Channel: { uniqueName: string, displayName: string | null } | null, CommentsConnection: { aggregate: { count: { nodes: number } } } }>, Tags: Array<{ text: string }>, Album: { id: string, imageOrder: Array<string> | null, Images: Array<{ id: string, url: string | null, caption: string | null }> } | null }> }> };
+
+export type GetUserOwnedDownloadsCountQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUserOwnedDownloadsCountQuery = { users: Array<{ username: string, OwnedDownloadsConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetUploadedDownloadableFilesQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUploadedDownloadableFilesQuery = { getUploadedDownloadableFiles: Array<{ discussion: { id: string, title: string, createdAt: string | null, updatedAt: string | null, channelUniqueNames: Array<string> }, files: Array<{ id: string, fileName: string, kind: Types.FileKind, size: number | null, url: string, uploadedAt: string | null, createdAt: string }> }> };
+
+export type GetUserEventsQueryVariables = Exact<{
+  username: string;
+  where?: Types.EventWhere | null | undefined;
+}>;
+
+
+export type GetUserEventsQuery = { users: Array<{ username: string, profilePicURL: string | null, Events: Array<{ id: string, title: string, startTime: string, endTime: string, locationName: string | null, address: string | null, virtualEventUrl: string | null, createdAt: string, updatedAt: string | null, deleted: boolean | null, location: { latitude: number, longitude: number } | null, Poster: { username: string } | null, Tags: Array<{ text: string }>, EventChannels: Array<{ channelUniqueName: string, Channel: { uniqueName: string } | null }> }> }> };
+
+export type GetUserWikiEditsQueryVariables = Exact<{
+  where?: Types.WikiPageWhere | null | undefined;
+  versionWhere?: Types.TextVersionWhere | null | undefined;
+}>;
+
+
+export type GetUserWikiEditsQuery = { wikiPages: Array<{ id: string, title: string, body: string | null, editReason: string | null, slug: string, createdAt: string, updatedAt: string | null, channelUniqueName: string, VersionAuthor: { username: string, displayName: string | null, profilePicURL: string | null } | null, PastVersions: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string, Author: { username: string, displayName: string | null, profilePicURL: string | null } | null }> }> };
+
+export type DoesUserExistQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type DoesUserExistQuery = { users: Array<{ username: string, profilePicURL: string | null, Email: { address: string } | null }> };
+
+export type GetUserFavoriteChannelsSource1187297d18QueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUserFavoriteChannelsSource1187297d18Query = { users: Array<{ username: string, FavoriteChannels: Array<{ uniqueName: string, displayName: string | null, description: string | null, channelIconURL: string | null, Tags: Array<{ text: string }> }> }> };
+
+export type GetModdedChannelsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetModdedChannelsQuery = { users: Array<{ username: string, profilePicURL: string | null, ModOfChannels: Array<{ uniqueName: string, description: string | null, channelIconURL: string | null, Tags: Array<{ text: string }>, EventChannelsConnection: { aggregate: { count: { nodes: number } } }, DiscussionChannelsConnection: { aggregate: { count: { nodes: number } } } }>, AdminOfChannelsConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetOwnedChannelsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetOwnedChannelsQuery = { users: Array<{ username: string, profilePicURL: string | null, AdminOfChannels: Array<{ uniqueName: string, description: string | null, channelIconURL: string | null, Tags: Array<{ text: string }>, EventChannelsConnection: { aggregate: { count: { nodes: number } } }, DiscussionChannelsConnection: { aggregate: { count: { nodes: number } } } }>, AdminOfChannelsConnection: { aggregate: { count: { nodes: number } } } }> };
+
+export type GetUserContributionsQueryVariables = Exact<{
+  username: string;
+  year?: number | null | undefined;
+}>;
+
+
+export type GetUserContributionsQuery = { getUserContributions: Array<{ count: number, date: string, activities: Array<{ id: string, description: string, type: string, Comments: Array<{ id: string, text: string | null, createdAt: string | null, CommentAuthor: { profilePicURL: string | null, username: string } | null, Channel: { uniqueName: string | null } | null, DiscussionChannel: { id: string | null, discussionId: string | null, channelUniqueName: string | null } | null, Event: { id: string | null } | null }>, Discussions: Array<{ id: string | null, title: string | null, createdAt: string | null, Author: { username: string, profilePicURL: string | null } | null, DiscussionChannels: Array<{ id: string | null, channelUniqueName: string | null, discussionId: string | null } | null> | null }>, Events: Array<{ id: string | null, title: string | null, createdAt: string | null, Poster: { username: string } | null, EventChannels: Array<{ id: string | null, channelUniqueName: string | null, eventId: string | null } | null> | null }>, WikiEdits: Array<{ id: string, body: string | null, editReason: string | null, createdAt: string | null, Author: { username: string, profilePicURL: string | null } | null, WikiPage: { id: string | null, title: string | null, slug: string | null, channelUniqueName: string | null } | null }> }> }> };
+
+export type UserIsModInChannelQueryVariables = Exact<{
+  modDisplayName: string;
+  username: string;
+  channelUniqueName: string;
+}>;
+
+
+export type UserIsModInChannelQuery = { channels: Array<{ uniqueName: string, Admins: Array<{ username: string }>, SuspendedUsers: Array<{ username: string | null }>, Moderators: Array<{ displayName: string | null }>, SuspendedMods: Array<{ modProfileName: string | null }> }> };
+
+export type GetUserSuspensionInChannelQueryVariables = Exact<{
+  channelUniqueName: string;
+  username: string;
+}>;
+
+
+export type GetUserSuspensionInChannelQuery = { channels: Array<{ uniqueName: string, SuspendedUsers: Array<{ id: string, suspendedUntil: string | null, suspendedIndefinitely: boolean | null, RelatedIssue: { issueNumber: number } | null }> }> };
+
+export type GetUserActiveSuspensionsQueryVariables = Exact<{
+  username: string;
+  now: string;
+}>;
+
+
+export type GetUserActiveSuspensionsQuery = { users: Array<{ username: string, Suspensions: Array<{ id: string, channelUniqueName: string | null, suspendedUntil: string | null, suspendedIndefinitely: boolean | null, RelatedIssue: { issueNumber: number } | null }> }> };
+
+export type GetUserFavoriteCountsQueryVariables = Exact<{
+  username: string;
+}>;
+
+
+export type GetUserFavoriteCountsQuery = { users: Array<{ username: string, FavoriteChannelsConnection: { totalCount: number }, FavoriteImagesConnection: { totalCount: number }, FavoriteCommentsConnection: { totalCount: number }, FavoriteDiscussionsConnection: { totalCount: number }, FavoriteDownloadsConnection: { totalCount: number } }> };
+
+export type GetSiteWideWikiListQueryVariables = Exact<{
+  searchInput: string;
+  selectedChannels?: Array<string> | string | null | undefined;
+  options?: Types.WikiListOptions | null | undefined;
+}>;
+
+
+export type GetSiteWideWikiListQuery = { getSiteWideWikiList: { aggregateWikiPageCount: number, featuredWikiPages: Array<{ id: string, title: string, body: string | null, slug: string, channelUniqueName: string, createdAt: string, updatedAt: string | null, VersionAuthor: { username: string, displayName: string | null, profilePicURL: string | null } | null }>, wikiPages: Array<{ id: string, title: string, body: string | null, slug: string, channelUniqueName: string, createdAt: string, updatedAt: string | null, VersionAuthor: { username: string, displayName: string | null, profilePicURL: string | null } | null }> } | null };
+
+export type GetWikiPinChannelsQueryVariables = Exact<{
+  uniqueNames: Array<string> | string;
+}>;
+
+
+export type GetWikiPinChannelsQuery = { channels: Array<{ uniqueName: string, Admins: Array<{ username: string }>, SuspendedUsers: Array<{ username: string | null }>, DefaultChannelRole: { canUpdateChannel: boolean | null } | null, ElevatedChannelRole: { canUpdateChannel: boolean | null } | null, PinnedWikiPages: Array<{ id: string, title: string, slug: string }> }> };
+
+export type GetWikiPagesByIdsQueryVariables = Exact<{
+  ids: Array<string | number> | string | number;
+}>;
+
+
+export type GetWikiPagesByIdsQuery = { wikiPages: Array<{ id: string, title: string, body: string | null, slug: string, channelUniqueName: string, createdAt: string, updatedAt: string | null, VersionAuthor: { username: string, displayName: string | null, profilePicURL: string | null } | null }> };
+
+export type NewChannelFragment = { __typename: 'Channel', uniqueName: string, description: string | null, channelIconURL: string | null, channelBannerURL: string | null, Admins: Array<{ username: string }>, Tags: Array<{ text: string }> };
+
 const sharedNode0 = {"kind":"Name","value":"CommentVoteFields"};
 const sharedNode1 = {"kind":"Name","value":"Comment"};
 const sharedNode2 = {"kind":"NamedType","name":sharedNode1};
@@ -616,308 +3505,2140 @@ const sharedNode362 = [sharedNode30,sharedNode127,sharedNode85,sharedNode38,shar
 const sharedNode363 = {"kind":"SelectionSet","selections":sharedNode362};
 const sharedNode364 = {"kind":"FragmentDefinition","name":sharedNode201,"typeCondition":sharedNode125,"selectionSet":sharedNode363};
 const sharedNode365 = {"kind":"Name","value":"EventFields"};
-const sharedNode366 = {"kind":"Name","value":"startTime"};
-const sharedNode367 = {"kind":"Field","name":sharedNode366};
-const sharedNode368 = {"kind":"Name","value":"endTime"};
-const sharedNode369 = {"kind":"Field","name":sharedNode368};
-const sharedNode370 = {"kind":"Name","value":"locationName"};
-const sharedNode371 = {"kind":"Field","name":sharedNode370};
-const sharedNode372 = {"kind":"Name","value":"address"};
-const sharedNode373 = {"kind":"Field","name":sharedNode372};
-const sharedNode374 = {"kind":"Name","value":"virtualEventUrl"};
-const sharedNode375 = {"kind":"Field","name":sharedNode374};
-const sharedNode376 = {"kind":"Name","value":"startTimeDayOfWeek"};
-const sharedNode377 = {"kind":"Field","name":sharedNode376};
-const sharedNode378 = {"kind":"Name","value":"startTimeHourOfDay"};
-const sharedNode379 = {"kind":"Field","name":sharedNode378};
-const sharedNode380 = {"kind":"Name","value":"canceled"};
-const sharedNode381 = {"kind":"Field","name":sharedNode380};
-const sharedNode382 = {"kind":"Name","value":"isHostedByOP"};
-const sharedNode383 = {"kind":"Field","name":sharedNode382};
-const sharedNode384 = {"kind":"Name","value":"isAllDay"};
-const sharedNode385 = {"kind":"Field","name":sharedNode384};
-const sharedNode386 = {"kind":"Name","value":"coverImageURL"};
-const sharedNode387 = {"kind":"Field","name":sharedNode386};
-const sharedNode388 = {"kind":"Name","value":"isInPrivateResidence"};
-const sharedNode389 = {"kind":"Field","name":sharedNode388};
-const sharedNode390 = {"kind":"Field","name":sharedNode11};
-const sharedNode391 = [sharedNode390,{"kind":"Field","name":{"kind":"Name","value":"unit"}}];
-const sharedNode392 = {"kind":"SelectionSet","selections":sharedNode391};
-const sharedNode393 = {"kind":"Field","name":{"kind":"Name","value":"repeatEvery"},"selectionSet":sharedNode392};
-const sharedNode394 = {"kind":"Name","value":"type"};
-const sharedNode395 = {"kind":"Field","name":sharedNode394};
-const sharedNode396 = [sharedNode395,sharedNode390,{"kind":"Field","name":{"kind":"Name","value":"until"}}];
-const sharedNode397 = {"kind":"SelectionSet","selections":sharedNode396};
-const sharedNode398 = {"kind":"Field","name":{"kind":"Name","value":"repeatEnds"},"selectionSet":sharedNode397};
-const sharedNode399 = [sharedNode30,sharedNode393,sharedNode398];
-const sharedNode400 = {"kind":"SelectionSet","selections":sharedNode399};
-const sharedNode401 = {"kind":"Field","name":{"kind":"Name","value":"RecurringEvent"},"selectionSet":sharedNode400};
-const sharedNode402 = {"kind":"Field","name":{"kind":"Name","value":"occurrenceIndex"}};
-const sharedNode403 = {"kind":"Field","name":{"kind":"Name","value":"daysOfWeek"}};
-const sharedNode404 = [sharedNode395,sharedNode390,sharedNode403,{"kind":"Field","name":{"kind":"Name","value":"endType"}},{"kind":"Field","name":{"kind":"Name","value":"endCount"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}}];
-const sharedNode405 = {"kind":"SelectionSet","selections":sharedNode404};
-const sharedNode406 = {"kind":"Field","name":{"kind":"Name","value":"repeatPattern"},"selectionSet":sharedNode405};
-const sharedNode407 = {"kind":"Name","value":"sort"};
-const sharedNode408 = {"kind":"ObjectField","name":sharedNode366,"value":{"kind":"EnumValue","value":"ASC"}};
-const sharedNode409 = [sharedNode408];
-const sharedNode410 = {"kind":"ObjectValue","fields":sharedNode409};
-const sharedNode411 = [sharedNode410];
-const sharedNode412 = {"kind":"ListValue","values":sharedNode411};
-const sharedNode413 = {"kind":"Argument","name":sharedNode407,"value":sharedNode412};
-const sharedNode414 = {"kind":"Name","value":"limit"};
-const sharedNode415 = {"kind":"Argument","name":sharedNode414,"value":{"kind":"IntValue","value":"20"}};
-const sharedNode416 = [sharedNode413,sharedNode415];
-const sharedNode417 = [sharedNode30,sharedNode367,sharedNode369,sharedNode381];
-const sharedNode418 = {"kind":"SelectionSet","selections":sharedNode417};
-const sharedNode419 = {"kind":"Field","name":{"kind":"Name","value":"Occurrences"},"arguments":sharedNode416,"selectionSet":sharedNode418};
-const sharedNode420 = [sharedNode30,sharedNode127,sharedNode406,sharedNode419];
-const sharedNode421 = {"kind":"SelectionSet","selections":sharedNode420};
-const sharedNode422 = {"kind":"Field","name":{"kind":"Name","value":"EventSeries"},"selectionSet":sharedNode421};
-const sharedNode423 = {"kind":"Name","value":"location"};
-const sharedNode424 = {"kind":"Name","value":"latitude"};
-const sharedNode425 = {"kind":"Field","name":sharedNode424};
-const sharedNode426 = {"kind":"Name","value":"longitude"};
-const sharedNode427 = {"kind":"Field","name":sharedNode426};
-const sharedNode428 = [sharedNode425,sharedNode427];
-const sharedNode429 = {"kind":"SelectionSet","selections":sharedNode428};
-const sharedNode430 = {"kind":"Field","name":sharedNode423,"selectionSet":sharedNode429};
-const sharedNode431 = {"kind":"Name","value":"cost"};
-const sharedNode432 = {"kind":"Field","name":sharedNode431};
-const sharedNode433 = {"kind":"Field","name":sharedNode244,"selectionSet":sharedNode21};
-const sharedNode434 = {"kind":"Name","value":"EventChannels"};
-const sharedNode435 = {"kind":"Name","value":"eventId"};
-const sharedNode436 = {"kind":"Field","name":sharedNode435};
-const sharedNode437 = [sharedNode173,sharedNode57,sharedNode231];
-const sharedNode438 = {"kind":"SelectionSet","selections":sharedNode437};
-const sharedNode439 = {"kind":"Field","name":sharedNode171,"selectionSet":sharedNode438};
-const sharedNode440 = [sharedNode30,sharedNode436,sharedNode99,sharedNode439];
+const sharedNode366 = {"kind":"NamedType","name":sharedNode95};
+const sharedNode367 = {"kind":"Name","value":"startTime"};
+const sharedNode368 = {"kind":"Field","name":sharedNode367};
+const sharedNode369 = {"kind":"Name","value":"endTime"};
+const sharedNode370 = {"kind":"Field","name":sharedNode369};
+const sharedNode371 = {"kind":"Name","value":"locationName"};
+const sharedNode372 = {"kind":"Field","name":sharedNode371};
+const sharedNode373 = {"kind":"Name","value":"address"};
+const sharedNode374 = {"kind":"Field","name":sharedNode373};
+const sharedNode375 = {"kind":"Name","value":"virtualEventUrl"};
+const sharedNode376 = {"kind":"Field","name":sharedNode375};
+const sharedNode377 = {"kind":"Name","value":"startTimeDayOfWeek"};
+const sharedNode378 = {"kind":"Field","name":sharedNode377};
+const sharedNode379 = {"kind":"Name","value":"startTimeHourOfDay"};
+const sharedNode380 = {"kind":"Field","name":sharedNode379};
+const sharedNode381 = {"kind":"Name","value":"canceled"};
+const sharedNode382 = {"kind":"Field","name":sharedNode381};
+const sharedNode383 = {"kind":"Name","value":"isHostedByOP"};
+const sharedNode384 = {"kind":"Field","name":sharedNode383};
+const sharedNode385 = {"kind":"Name","value":"isAllDay"};
+const sharedNode386 = {"kind":"Field","name":sharedNode385};
+const sharedNode387 = {"kind":"Name","value":"coverImageURL"};
+const sharedNode388 = {"kind":"Field","name":sharedNode387};
+const sharedNode389 = {"kind":"Name","value":"free"};
+const sharedNode390 = {"kind":"Field","name":sharedNode389};
+const sharedNode391 = {"kind":"Name","value":"isInPrivateResidence"};
+const sharedNode392 = {"kind":"Field","name":sharedNode391};
+const sharedNode393 = {"kind":"Name","value":"RecurringEvent"};
+const sharedNode394 = {"kind":"Name","value":"repeatEvery"};
+const sharedNode395 = {"kind":"Field","name":sharedNode11};
+const sharedNode396 = {"kind":"Name","value":"unit"};
+const sharedNode397 = {"kind":"Field","name":sharedNode396};
+const sharedNode398 = [sharedNode395,sharedNode397];
+const sharedNode399 = {"kind":"SelectionSet","selections":sharedNode398};
+const sharedNode400 = {"kind":"Field","name":sharedNode394,"selectionSet":sharedNode399};
+const sharedNode401 = {"kind":"Name","value":"repeatEnds"};
+const sharedNode402 = {"kind":"Name","value":"type"};
+const sharedNode403 = {"kind":"Field","name":sharedNode402};
+const sharedNode404 = {"kind":"Name","value":"until"};
+const sharedNode405 = {"kind":"Field","name":sharedNode404};
+const sharedNode406 = [sharedNode403,sharedNode395,sharedNode405];
+const sharedNode407 = {"kind":"SelectionSet","selections":sharedNode406};
+const sharedNode408 = {"kind":"Field","name":sharedNode401,"selectionSet":sharedNode407};
+const sharedNode409 = [sharedNode30,sharedNode400,sharedNode408];
+const sharedNode410 = {"kind":"SelectionSet","selections":sharedNode409};
+const sharedNode411 = {"kind":"Field","name":sharedNode393,"selectionSet":sharedNode410};
+const sharedNode412 = {"kind":"Name","value":"occurrenceIndex"};
+const sharedNode413 = {"kind":"Field","name":sharedNode412};
+const sharedNode414 = {"kind":"Name","value":"EventSeries"};
+const sharedNode415 = {"kind":"Name","value":"repeatPattern"};
+const sharedNode416 = {"kind":"Name","value":"daysOfWeek"};
+const sharedNode417 = {"kind":"Field","name":sharedNode416};
+const sharedNode418 = {"kind":"Name","value":"endType"};
+const sharedNode419 = {"kind":"Field","name":sharedNode418};
+const sharedNode420 = {"kind":"Name","value":"endCount"};
+const sharedNode421 = {"kind":"Field","name":sharedNode420};
+const sharedNode422 = {"kind":"Name","value":"endDate"};
+const sharedNode423 = {"kind":"Field","name":sharedNode422};
+const sharedNode424 = [sharedNode403,sharedNode395,sharedNode417,sharedNode419,sharedNode421,sharedNode423];
+const sharedNode425 = {"kind":"SelectionSet","selections":sharedNode424};
+const sharedNode426 = {"kind":"Field","name":sharedNode415,"selectionSet":sharedNode425};
+const sharedNode427 = {"kind":"Name","value":"Occurrences"};
+const sharedNode428 = {"kind":"Name","value":"sort"};
+const sharedNode429 = {"kind":"EnumValue","value":"ASC"};
+const sharedNode430 = {"kind":"ObjectField","name":sharedNode367,"value":sharedNode429};
+const sharedNode431 = [sharedNode430];
+const sharedNode432 = {"kind":"ObjectValue","fields":sharedNode431};
+const sharedNode433 = [sharedNode432];
+const sharedNode434 = {"kind":"ListValue","values":sharedNode433};
+const sharedNode435 = {"kind":"Argument","name":sharedNode428,"value":sharedNode434};
+const sharedNode436 = {"kind":"Name","value":"limit"};
+const sharedNode437 = {"kind":"IntValue","value":"20"};
+const sharedNode438 = {"kind":"Argument","name":sharedNode436,"value":sharedNode437};
+const sharedNode439 = [sharedNode435,sharedNode438];
+const sharedNode440 = [sharedNode30,sharedNode368,sharedNode370,sharedNode382];
 const sharedNode441 = {"kind":"SelectionSet","selections":sharedNode440};
-const sharedNode442 = {"kind":"Field","name":sharedNode434,"selectionSet":sharedNode441};
-const sharedNode443 = {"kind":"Name","value":"SubscribedToEventUpdates"};
-const sharedNode444 = {"kind":"Field","name":sharedNode443,"selectionSet":sharedNode7};
-const sharedNode445 = [sharedNode30,sharedNode127,sharedNode189,sharedNode367,sharedNode369,sharedNode371,sharedNode373,sharedNode375,sharedNode377,sharedNode379,sharedNode381,sharedNode383,sharedNode385,sharedNode387,sharedNode38,sharedNode40,{"kind":"Field","name":{"kind":"Name","value":"free"}},sharedNode389,sharedNode401,sharedNode402,sharedNode422,sharedNode430,sharedNode432,sharedNode276,sharedNode433,sharedNode442,sharedNode94,sharedNode444];
-const sharedNode446 = {"kind":"SelectionSet","selections":sharedNode445};
-const sharedNode447 = {"kind":"FragmentDefinition","name":sharedNode365,"typeCondition":{"kind":"NamedType","name":sharedNode95},"selectionSet":sharedNode446};
-const sharedNode448 = {"kind":"Variable","name":sharedNode29};
-const sharedNode449 = {"kind":"Name","value":"ID"};
-const sharedNode450 = {"kind":"NamedType","name":sharedNode449};
-const sharedNode451 = {"kind":"NonNullType","type":sharedNode450};
-const sharedNode452 = {"kind":"VariableDefinition","variable":sharedNode448,"type":sharedNode451};
-const sharedNode453 = [sharedNode452];
-const sharedNode454 = {"kind":"Name","value":"comments"};
-const sharedNode455 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode448};
-const sharedNode456 = [sharedNode455];
-const sharedNode457 = {"kind":"ObjectValue","fields":sharedNode456};
-const sharedNode458 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode457};
-const sharedNode459 = [sharedNode458];
-const sharedNode460 = {"kind":"ObjectValue","fields":sharedNode459};
-const sharedNode461 = {"kind":"Argument","name":sharedNode132,"value":sharedNode460};
-const sharedNode462 = [sharedNode461];
-const sharedNode463 = {"kind":"FragmentSpread","name":sharedNode28};
-const sharedNode464 = [sharedNode99,sharedNode101];
-const sharedNode465 = {"kind":"SelectionSet","selections":sharedNode464};
-const sharedNode466 = {"kind":"Field","name":sharedNode97,"selectionSet":sharedNode465};
-const sharedNode467 = [sharedNode173];
-const sharedNode468 = {"kind":"SelectionSet","selections":sharedNode467};
-const sharedNode469 = {"kind":"Field","name":sharedNode171,"selectionSet":sharedNode468};
-const sharedNode470 = {"kind":"Variable","name":sharedNode98};
-const sharedNode471 = {"kind":"Name","value":"String"};
-const sharedNode472 = {"kind":"NamedType","name":sharedNode471};
-const sharedNode473 = {"kind":"NonNullType","type":sharedNode472};
-const sharedNode474 = {"kind":"VariableDefinition","variable":sharedNode470,"type":sharedNode473};
-const sharedNode475 = {"kind":"Variable","name":sharedNode100};
-const sharedNode476 = {"kind":"VariableDefinition","variable":sharedNode475,"type":sharedNode451};
-const sharedNode477 = {"kind":"Name","value":"modName"};
-const sharedNode478 = {"kind":"Variable","name":sharedNode477};
-const sharedNode479 = {"kind":"VariableDefinition","variable":sharedNode478,"type":sharedNode472};
-const sharedNode480 = {"kind":"Name","value":"offset"};
-const sharedNode481 = {"kind":"Variable","name":sharedNode480};
-const sharedNode482 = {"kind":"Name","value":"Int"};
-const sharedNode483 = {"kind":"NamedType","name":sharedNode482};
-const sharedNode484 = {"kind":"VariableDefinition","variable":sharedNode481,"type":sharedNode483};
-const sharedNode485 = {"kind":"Variable","name":sharedNode414};
-const sharedNode486 = {"kind":"VariableDefinition","variable":sharedNode485,"type":sharedNode483};
-const sharedNode487 = {"kind":"Variable","name":sharedNode407};
-const sharedNode488 = {"kind":"Argument","name":sharedNode98,"value":sharedNode470};
-const sharedNode489 = {"kind":"Argument","name":sharedNode100,"value":sharedNode475};
-const sharedNode490 = {"kind":"Argument","name":sharedNode477,"value":sharedNode478};
-const sharedNode491 = {"kind":"Argument","name":sharedNode480,"value":sharedNode481};
-const sharedNode492 = {"kind":"Argument","name":sharedNode414,"value":sharedNode485};
-const sharedNode493 = {"kind":"Argument","name":sharedNode407,"value":sharedNode487};
-const sharedNode494 = {"kind":"Name","value":"OR"};
-const sharedNode495 = {"kind":"NullValue"};
-const sharedNode496 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode495};
-const sharedNode497 = [sharedNode496];
-const sharedNode498 = {"kind":"ObjectValue","fields":sharedNode497};
-const sharedNode499 = {"kind":"ObjectField","name":sharedNode246,"value":sharedNode498};
-const sharedNode500 = [sharedNode499];
-const sharedNode501 = {"kind":"ObjectValue","fields":sharedNode500};
-const sharedNode502 = [sharedNode501,sharedNode253];
-const sharedNode503 = {"kind":"ListValue","values":sharedNode502};
-const sharedNode504 = {"kind":"ObjectField","name":sharedNode494,"value":sharedNode503};
-const sharedNode505 = [sharedNode504];
-const sharedNode506 = {"kind":"ObjectValue","fields":sharedNode505};
-const sharedNode507 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode506};
-const sharedNode508 = [sharedNode507];
-const sharedNode509 = {"kind":"ObjectValue","fields":sharedNode508};
-const sharedNode510 = {"kind":"Argument","name":sharedNode132,"value":sharedNode509};
-const sharedNode511 = [sharedNode510];
-const sharedNode512 = {"kind":"Field","name":sharedNode244,"arguments":sharedNode511,"selectionSet":sharedNode21};
-const sharedNode513 = {"kind":"Name","value":"isRootComment"};
-const sharedNode514 = {"kind":"ObjectField","name":sharedNode513,"value":sharedNode138};
-const sharedNode515 = [sharedNode514,sharedNode504];
-const sharedNode516 = {"kind":"ObjectValue","fields":sharedNode515};
-const sharedNode517 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode516};
-const sharedNode518 = [sharedNode517];
-const sharedNode519 = {"kind":"ObjectValue","fields":sharedNode518};
-const sharedNode520 = {"kind":"Argument","name":sharedNode132,"value":sharedNode519};
-const sharedNode521 = [sharedNode520];
-const sharedNode522 = {"kind":"Field","name":sharedNode330,"selectionSet":sharedNode81};
-const sharedNode523 = [sharedNode474,sharedNode476];
-const sharedNode524 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode470};
-const sharedNode525 = [sharedNode524];
-const sharedNode526 = {"kind":"ObjectValue","fields":sharedNode525};
-const sharedNode527 = {"kind":"ObjectField","name":sharedNode98,"value":sharedNode526};
-const sharedNode528 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode475};
-const sharedNode529 = [sharedNode528];
-const sharedNode530 = {"kind":"ObjectValue","fields":sharedNode529};
-const sharedNode531 = {"kind":"ObjectField","name":sharedNode100,"value":sharedNode530};
-const sharedNode532 = [sharedNode527,sharedNode531];
-const sharedNode533 = {"kind":"ObjectValue","fields":sharedNode532};
-const sharedNode534 = {"kind":"Argument","name":sharedNode132,"value":sharedNode533};
-const sharedNode535 = [sharedNode534];
-const sharedNode536 = {"kind":"Name","value":"getDiscussionDetail"};
-const sharedNode537 = {"kind":"VariableDefinition","variable":sharedNode333,"type":sharedNode472};
-const sharedNode538 = {"kind":"Name","value":"discussions"};
-const sharedNode539 = {"kind":"Argument","name":sharedNode100,"value":sharedNode448};
-const sharedNode540 = [sharedNode539,sharedNode488];
-const sharedNode541 = {"kind":"FragmentSpread","name":sharedNode201};
-const sharedNode542 = {"kind":"Name","value":"loggedInUsername"};
-const sharedNode543 = {"kind":"Variable","name":sharedNode542};
-const sharedNode544 = {"kind":"VariableDefinition","variable":sharedNode543,"type":sharedNode472};
-const sharedNode545 = [sharedNode452,sharedNode537,sharedNode544,sharedNode474];
-const sharedNode546 = {"kind":"Argument","name":sharedNode4,"value":sharedNode543};
-const sharedNode547 = [sharedNode546];
-const sharedNode548 = {"kind":"Field","name":{"kind":"Name","value":"isFavorited"},"arguments":sharedNode547};
-const sharedNode549 = [sharedNode30,{"kind":"Field","name":{"kind":"Name","value":"key"}},sharedNode57];
-const sharedNode550 = {"kind":"SelectionSet","selections":sharedNode549};
-const sharedNode551 = {"kind":"Field","name":{"kind":"Name","value":"group"},"selectionSet":sharedNode550};
-const sharedNode552 = [sharedNode30,{"kind":"Field","name":{"kind":"Name","value":"value"}},sharedNode57,sharedNode119,sharedNode551];
-const sharedNode553 = {"kind":"SelectionSet","selections":sharedNode552};
-const sharedNode554 = {"kind":"Field","name":{"kind":"Name","value":"LabelOptions"},"selectionSet":sharedNode553};
-const sharedNode555 = [sharedNode488];
-const sharedNode556 = {"kind":"Field","name":{"kind":"Name","value":"authorIsChannelModerator"},"arguments":sharedNode555};
-const sharedNode557 = {"kind":"EnumValue","value":"DESC"};
-const sharedNode558 = {"kind":"ObjectField","name":sharedNode37,"value":sharedNode557};
-const sharedNode559 = [sharedNode558];
-const sharedNode560 = {"kind":"ObjectValue","fields":sharedNode559};
-const sharedNode561 = [sharedNode560];
-const sharedNode562 = {"kind":"ListValue","values":sharedNode561};
-const sharedNode563 = {"kind":"Argument","name":sharedNode407,"value":sharedNode562};
-const sharedNode564 = [sharedNode563];
-const sharedNode565 = [sharedNode30,sharedNode89,sharedNode85,sharedNode87,sharedNode38];
+const sharedNode442 = {"kind":"Field","name":sharedNode427,"arguments":sharedNode439,"selectionSet":sharedNode441};
+const sharedNode443 = [sharedNode30,sharedNode127,sharedNode426,sharedNode442];
+const sharedNode444 = {"kind":"SelectionSet","selections":sharedNode443};
+const sharedNode445 = {"kind":"Field","name":sharedNode414,"selectionSet":sharedNode444};
+const sharedNode446 = {"kind":"Name","value":"location"};
+const sharedNode447 = {"kind":"Name","value":"latitude"};
+const sharedNode448 = {"kind":"Field","name":sharedNode447};
+const sharedNode449 = {"kind":"Name","value":"longitude"};
+const sharedNode450 = {"kind":"Field","name":sharedNode449};
+const sharedNode451 = [sharedNode448,sharedNode450];
+const sharedNode452 = {"kind":"SelectionSet","selections":sharedNode451};
+const sharedNode453 = {"kind":"Field","name":sharedNode446,"selectionSet":sharedNode452};
+const sharedNode454 = {"kind":"Name","value":"cost"};
+const sharedNode455 = {"kind":"Field","name":sharedNode454};
+const sharedNode456 = {"kind":"Field","name":sharedNode244,"selectionSet":sharedNode21};
+const sharedNode457 = {"kind":"Name","value":"EventChannels"};
+const sharedNode458 = {"kind":"Name","value":"eventId"};
+const sharedNode459 = {"kind":"Field","name":sharedNode458};
+const sharedNode460 = [sharedNode173,sharedNode57,sharedNode231];
+const sharedNode461 = {"kind":"SelectionSet","selections":sharedNode460};
+const sharedNode462 = {"kind":"Field","name":sharedNode171,"selectionSet":sharedNode461};
+const sharedNode463 = [sharedNode30,sharedNode459,sharedNode99,sharedNode462];
+const sharedNode464 = {"kind":"SelectionSet","selections":sharedNode463};
+const sharedNode465 = {"kind":"Field","name":sharedNode457,"selectionSet":sharedNode464};
+const sharedNode466 = {"kind":"Name","value":"SubscribedToEventUpdates"};
+const sharedNode467 = {"kind":"Field","name":sharedNode466,"selectionSet":sharedNode7};
+const sharedNode468 = [sharedNode30,sharedNode127,sharedNode189,sharedNode368,sharedNode370,sharedNode372,sharedNode374,sharedNode376,sharedNode378,sharedNode380,sharedNode382,sharedNode384,sharedNode386,sharedNode388,sharedNode38,sharedNode40,sharedNode390,sharedNode392,sharedNode411,sharedNode413,sharedNode445,sharedNode453,sharedNode455,sharedNode276,sharedNode456,sharedNode465,sharedNode94,sharedNode467];
+const sharedNode469 = {"kind":"SelectionSet","selections":sharedNode468};
+const sharedNode470 = {"kind":"FragmentDefinition","name":sharedNode365,"typeCondition":sharedNode366,"selectionSet":sharedNode469};
+const sharedNode471 = {"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":sharedNode7};
+const sharedNode472 = [sharedNode471,sharedNode60];
+const sharedNode473 = {"kind":"SelectionSet","selections":sharedNode472};
+const sharedNode474 = {"kind":"Field","name":sharedNode53,"selectionSet":sharedNode473};
+const sharedNode475 = [sharedNode30,sharedNode32,sharedNode474];
+const sharedNode476 = {"kind":"SelectionSet","selections":sharedNode475};
+const sharedNode477 = {"kind":"Field","name":sharedNode260,"selectionSet":sharedNode476};
+const sharedNode478 = [sharedNode30,sharedNode222,sharedNode477];
+const sharedNode479 = {"kind":"SelectionSet","selections":sharedNode478};
+const sharedNode480 = {"kind":"Name","value":"PipelinePageFields"};
+const sharedNode481 = {"kind":"Name","value":"PublicPluginPipelineRunPage"};
+const sharedNode482 = {"kind":"NamedType","name":sharedNode481};
+const sharedNode483 = {"kind":"Name","value":"displayStatus"};
+const sharedNode484 = {"kind":"Field","name":sharedNode483};
+const sharedNode485 = {"kind":"Name","value":"hasActiveWork"};
+const sharedNode486 = {"kind":"Field","name":sharedNode485};
+const sharedNode487 = {"kind":"Name","value":"jobsPageInfo"};
+const sharedNode488 = [sharedNode214,sharedNode212];
+const sharedNode489 = {"kind":"SelectionSet","selections":sharedNode488};
+const sharedNode490 = {"kind":"Field","name":sharedNode487,"selectionSet":sharedNode489};
+const sharedNode491 = {"kind":"Name","value":"run"};
+const sharedNode492 = {"kind":"Name","value":"pipelineId"};
+const sharedNode493 = {"kind":"Field","name":sharedNode492};
+const sharedNode494 = {"kind":"Name","value":"targetId"};
+const sharedNode495 = {"kind":"Field","name":sharedNode494};
+const sharedNode496 = {"kind":"Name","value":"targetType"};
+const sharedNode497 = {"kind":"Field","name":sharedNode496};
+const sharedNode498 = {"kind":"Name","value":"eventType"};
+const sharedNode499 = {"kind":"Field","name":sharedNode498};
+const sharedNode500 = {"kind":"Name","value":"scope"};
+const sharedNode501 = {"kind":"Field","name":sharedNode500};
+const sharedNode502 = {"kind":"Name","value":"channelId"};
+const sharedNode503 = {"kind":"Field","name":sharedNode502};
+const sharedNode504 = {"kind":"Name","value":"status"};
+const sharedNode505 = {"kind":"Field","name":sharedNode504};
+const sharedNode506 = {"kind":"Name","value":"trigger"};
+const sharedNode507 = {"kind":"Field","name":sharedNode506};
+const sharedNode508 = {"kind":"Name","value":"initiatedByUsername"};
+const sharedNode509 = {"kind":"Field","name":sharedNode508};
+const sharedNode510 = {"kind":"Name","value":"retryOfPipelineRunId"};
+const sharedNode511 = {"kind":"Field","name":sharedNode510};
+const sharedNode512 = {"kind":"Name","value":"attemptNumber"};
+const sharedNode513 = {"kind":"Field","name":sharedNode512};
+const sharedNode514 = {"kind":"Name","value":"applicability"};
+const sharedNode515 = {"kind":"Field","name":sharedNode514};
+const sharedNode516 = {"kind":"Name","value":"policyEffectiveAt"};
+const sharedNode517 = {"kind":"Field","name":sharedNode516};
+const sharedNode518 = {"kind":"Name","value":"policyId"};
+const sharedNode519 = {"kind":"Field","name":sharedNode518};
+const sharedNode520 = {"kind":"Name","value":"campaignId"};
+const sharedNode521 = {"kind":"Field","name":sharedNode520};
+const sharedNode522 = {"kind":"Name","value":"queuedAt"};
+const sharedNode523 = {"kind":"Field","name":sharedNode522};
+const sharedNode524 = {"kind":"Name","value":"startedAt"};
+const sharedNode525 = {"kind":"Field","name":sharedNode524};
+const sharedNode526 = {"kind":"Name","value":"heartbeatAt"};
+const sharedNode527 = {"kind":"Field","name":sharedNode526};
+const sharedNode528 = {"kind":"Name","value":"timeoutAt"};
+const sharedNode529 = {"kind":"Field","name":sharedNode528};
+const sharedNode530 = {"kind":"Name","value":"finishedAt"};
+const sharedNode531 = {"kind":"Field","name":sharedNode530};
+const sharedNode532 = {"kind":"Name","value":"jobs"};
+const sharedNode533 = {"kind":"Name","value":"pluginId"};
+const sharedNode534 = {"kind":"Field","name":sharedNode533};
+const sharedNode535 = {"kind":"Name","value":"pluginName"};
+const sharedNode536 = {"kind":"Field","name":sharedNode535};
+const sharedNode537 = {"kind":"Name","value":"version"};
+const sharedNode538 = {"kind":"Field","name":sharedNode537};
+const sharedNode539 = {"kind":"Name","value":"message"};
+const sharedNode540 = {"kind":"Field","name":sharedNode539};
+const sharedNode541 = {"kind":"Name","value":"durationMs"};
+const sharedNode542 = {"kind":"Field","name":sharedNode541};
+const sharedNode543 = {"kind":"Name","value":"executionOrder"};
+const sharedNode544 = {"kind":"Field","name":sharedNode543};
+const sharedNode545 = {"kind":"Name","value":"skippedReason"};
+const sharedNode546 = {"kind":"Field","name":sharedNode545};
+const sharedNode547 = {"kind":"Name","value":"diagnostics"};
+const sharedNode548 = {"kind":"Name","value":"level"};
+const sharedNode549 = {"kind":"Field","name":sharedNode548};
+const sharedNode550 = {"kind":"Name","value":"code"};
+const sharedNode551 = {"kind":"Field","name":sharedNode550};
+const sharedNode552 = {"kind":"Name","value":"details"};
+const sharedNode553 = {"kind":"Field","name":sharedNode552};
+const sharedNode554 = {"kind":"Name","value":"helpUrl"};
+const sharedNode555 = {"kind":"Field","name":sharedNode554};
+const sharedNode556 = [sharedNode549,sharedNode551,sharedNode540,sharedNode553,sharedNode555];
+const sharedNode557 = {"kind":"SelectionSet","selections":sharedNode556};
+const sharedNode558 = {"kind":"Field","name":sharedNode547,"selectionSet":sharedNode557};
+const sharedNode559 = [sharedNode30,sharedNode534,sharedNode536,sharedNode538,sharedNode501,sharedNode503,sharedNode499,sharedNode505,sharedNode540,sharedNode542,sharedNode544,sharedNode546,sharedNode523,sharedNode525,sharedNode527,sharedNode529,sharedNode531,sharedNode38,sharedNode40,sharedNode558];
+const sharedNode560 = {"kind":"SelectionSet","selections":sharedNode559};
+const sharedNode561 = {"kind":"Field","name":sharedNode532,"selectionSet":sharedNode560};
+const sharedNode562 = [sharedNode30,sharedNode493,sharedNode495,sharedNode497,sharedNode499,sharedNode501,sharedNode503,sharedNode505,sharedNode507,sharedNode509,sharedNode511,sharedNode513,sharedNode515,sharedNode517,sharedNode519,sharedNode521,sharedNode523,sharedNode525,sharedNode527,sharedNode529,sharedNode531,sharedNode38,sharedNode40,sharedNode561];
+const sharedNode563 = {"kind":"SelectionSet","selections":sharedNode562};
+const sharedNode564 = {"kind":"Field","name":sharedNode491,"selectionSet":sharedNode563};
+const sharedNode565 = [sharedNode484,sharedNode486,sharedNode490,sharedNode564];
 const sharedNode566 = {"kind":"SelectionSet","selections":sharedNode565};
-const sharedNode567 = {"kind":"Field","name":{"kind":"Name","value":"PastTitleVersions"},"arguments":sharedNode564,"selectionSet":sharedNode566};
-const sharedNode568 = {"kind":"Name","value":"after"};
-const sharedNode569 = {"kind":"Variable","name":{"kind":"Name","value":"createCommentInput"}};
-const sharedNode570 = {"kind":"SelectionSet","selections":[sharedNode187]};
-const sharedNode571 = {"kind":"Name","value":"ChildComments"};
-const sharedNode572 = [sharedNode30,sharedNode32];
-const sharedNode573 = {"kind":"SelectionSet","selections":sharedNode572};
-const sharedNode574 = {"kind":"Field","name":sharedNode571,"selectionSet":sharedNode573};
-const sharedNode575 = {"kind":"Variable","name":sharedNode4};
-const sharedNode576 = {"kind":"VariableDefinition","variable":sharedNode575,"type":sharedNode473};
-const sharedNode577 = [sharedNode576];
-const sharedNode578 = {"kind":"Argument","name":sharedNode4,"value":sharedNode575};
-const sharedNode579 = [sharedNode578];
-const sharedNode580 = {"kind":"Field","name":{"kind":"Name","value":"getUserWikiEditsCount"},"arguments":sharedNode579};
-const sharedNode581 = {"kind":"Name","value":"users"};
-const sharedNode582 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode575};
-const sharedNode583 = [sharedNode582];
-const sharedNode584 = {"kind":"ObjectValue","fields":sharedNode583};
-const sharedNode585 = {"kind":"ObjectField","name":sharedNode4,"value":sharedNode584};
-const sharedNode586 = [sharedNode585];
-const sharedNode587 = {"kind":"ObjectValue","fields":sharedNode586};
-const sharedNode588 = {"kind":"Argument","name":sharedNode132,"value":sharedNode587};
-const sharedNode589 = [sharedNode588];
-const sharedNode590 = {"kind":"Name","value":"bio"};
-const sharedNode591 = {"kind":"Field","name":sharedNode590};
-const sharedNode592 = [sharedNode139];
-const sharedNode593 = {"kind":"ObjectValue","fields":sharedNode592};
-const sharedNode594 = {"kind":"ObjectField","name":sharedNode133,"value":sharedNode593};
-const sharedNode595 = [sharedNode594];
-const sharedNode596 = {"kind":"ObjectValue","fields":sharedNode595};
-const sharedNode597 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode596};
-const sharedNode598 = [sharedNode597];
-const sharedNode599 = {"kind":"ObjectValue","fields":sharedNode598};
-const sharedNode600 = {"kind":"Argument","name":sharedNode132,"value":sharedNode599};
-const sharedNode601 = [sharedNode600];
-const sharedNode602 = {"kind":"Field","name":sharedNode244,"arguments":sharedNode601,"selectionSet":sharedNode21};
-const sharedNode603 = {"kind":"Name","value":"DiscussionsConnection"};
-const sharedNode604 = {"kind":"ObjectField","name":sharedNode202,"value":sharedNode250};
-const sharedNode605 = [sharedNode604];
-const sharedNode606 = {"kind":"ObjectValue","fields":sharedNode605};
-const sharedNode607 = {"kind":"ObjectField","name":sharedNode202,"value":sharedNode498};
-const sharedNode608 = [sharedNode607];
-const sharedNode609 = {"kind":"ObjectValue","fields":sharedNode608};
-const sharedNode610 = [sharedNode606,sharedNode609];
-const sharedNode611 = {"kind":"ListValue","values":sharedNode610};
-const sharedNode612 = {"kind":"ObjectField","name":sharedNode494,"value":sharedNode611};
-const sharedNode613 = [sharedNode612];
-const sharedNode614 = {"kind":"ObjectValue","fields":sharedNode613};
-const sharedNode615 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode614};
-const sharedNode616 = [sharedNode615];
-const sharedNode617 = {"kind":"ObjectValue","fields":sharedNode616};
-const sharedNode618 = {"kind":"Argument","name":sharedNode132,"value":sharedNode617};
-const sharedNode619 = [sharedNode618];
-const sharedNode620 = {"kind":"Field","name":sharedNode603,"arguments":sharedNode619,"selectionSet":sharedNode21};
-const sharedNode621 = {"kind":"ObjectField","name":sharedNode202,"value":sharedNode138};
-const sharedNode622 = [sharedNode621];
-const sharedNode623 = {"kind":"ObjectValue","fields":sharedNode622};
-const sharedNode624 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode623};
-const sharedNode625 = [sharedNode624];
-const sharedNode626 = {"kind":"ObjectValue","fields":sharedNode625};
-const sharedNode627 = {"kind":"Argument","name":sharedNode132,"value":sharedNode626};
-const sharedNode628 = [sharedNode627];
-const sharedNode629 = {"kind":"Field","alias":{"kind":"Name","value":"DownloadsConnection"},"name":sharedNode603,"arguments":sharedNode628,"selectionSet":sharedNode21};
-const sharedNode630 = {"kind":"Field","name":{"kind":"Name","value":"EventsConnection"},"selectionSet":sharedNode21};
-const sharedNode631 = {"kind":"Field","name":{"kind":"Name","value":"ImagesConnection"},"selectionSet":sharedNode21};
-const sharedNode632 = {"kind":"Field","name":{"kind":"Name","value":"AlbumsConnection"},"selectionSet":sharedNode21};
-const sharedNode633 = {"kind":"Name","value":"AuthoredWikiPageVersionsConnection"};
-const sharedNode634 = {"kind":"Field","name":sharedNode633,"selectionSet":sharedNode21};
-const sharedNode635 = {"kind":"Field","name":{"kind":"Name","value":"AdminOfChannelsConnection"},"selectionSet":sharedNode21};
-const sharedNode636 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToCommentByDefault"}};
-const sharedNode637 = {"kind":"Name","value":"notifyOnReplyToDiscussionByDefault"};
-const sharedNode638 = {"kind":"Field","name":sharedNode637};
-const sharedNode639 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToEventByDefault"}};
-const sharedNode640 = {"kind":"Field","name":{"kind":"Name","value":"notifyWhenTagged"}};
-const sharedNode641 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnSubscribedIssueUpdates"}};
-const sharedNode642 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnFeedback"}};
-const sharedNode643 = {"kind":"Field","name":{"kind":"Name","value":"notificationBundleInterval"}};
-const sharedNode644 = {"kind":"Field","name":{"kind":"Name","value":"notificationBundleEnabled"}};
-const sharedNode645 = {"kind":"Field","name":{"kind":"Name","value":"notificationBundleContent"}};
-const sharedNode646 = {"kind":"Field","name":{"kind":"Name","value":"enableSensitiveContentByDefault"}};
-const sharedNode647 = {"kind":"Name","value":"update"};
-const sharedNode648 = {"kind":"Name","value":"commentId"};
-const sharedNode649 = {"kind":"Variable","name":sharedNode648};
-const sharedNode650 = {"kind":"VariableDefinition","variable":sharedNode649,"type":sharedNode451};
-const sharedNode651 = [sharedNode650];
-const sharedNode652 = {"kind":"NamedType","name":{"kind":"Name","value":"SortType"}};
-const sharedNode653 = {"kind":"VariableDefinition","variable":sharedNode487,"type":sharedNode652};
-const sharedNode654 = {"kind":"Argument","name":sharedNode648,"value":sharedNode649};
-const sharedNode655 = [sharedNode654];
-const sharedNode656 = [sharedNode30,sharedNode94];
-const sharedNode657 = {"kind":"SelectionSet","selections":sharedNode656};
-const sharedNode658 = [sharedNode30,sharedNode46,sharedNode48,sharedNode50];
+const sharedNode567 = {"kind":"FragmentDefinition","name":sharedNode480,"typeCondition":sharedNode482,"selectionSet":sharedNode566};
+const sharedNode568 = {"kind":"Name","value":"ChannelIconFields"};
+const sharedNode569 = {"kind":"NamedType","name":sharedNode171};
+const sharedNode570 = [sharedNode231];
+const sharedNode571 = {"kind":"SelectionSet","selections":sharedNode570};
+const sharedNode572 = {"kind":"FragmentDefinition","name":sharedNode568,"typeCondition":sharedNode569,"selectionSet":sharedNode571};
+const sharedNode573 = {"kind":"Name","value":"SearchCommentFields"};
+const sharedNode574 = [sharedNode5,sharedNode64,sharedNode57];
+const sharedNode575 = {"kind":"SelectionSet","selections":sharedNode574};
+const sharedNode576 = {"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":sharedNode575};
+const sharedNode577 = [sharedNode60,sharedNode576];
+const sharedNode578 = {"kind":"SelectionSet","selections":sharedNode577};
+const sharedNode579 = {"kind":"Field","name":sharedNode53,"selectionSet":sharedNode578};
+const sharedNode580 = [sharedNode30,sharedNode127];
+const sharedNode581 = {"kind":"SelectionSet","selections":sharedNode580};
+const sharedNode582 = {"kind":"Field","name":sharedNode124,"selectionSet":sharedNode581};
+const sharedNode583 = [sharedNode30,sharedNode99,sharedNode101,sharedNode582];
+const sharedNode584 = {"kind":"SelectionSet","selections":sharedNode583};
+const sharedNode585 = {"kind":"Field","name":sharedNode97,"selectionSet":sharedNode584};
+const sharedNode586 = [sharedNode99];
+const sharedNode587 = {"kind":"SelectionSet","selections":sharedNode586};
+const sharedNode588 = {"kind":"Field","name":sharedNode457,"selectionSet":sharedNode587};
+const sharedNode589 = [sharedNode30,sharedNode127,sharedNode588];
+const sharedNode590 = {"kind":"SelectionSet","selections":sharedNode589};
+const sharedNode591 = {"kind":"Field","name":sharedNode95,"selectionSet":sharedNode590};
+const sharedNode592 = [sharedNode30,sharedNode32,sharedNode38,sharedNode40,sharedNode42,sharedNode44,sharedNode579,sharedNode176,sharedNode585,sharedNode591];
+const sharedNode593 = {"kind":"SelectionSet","selections":sharedNode592};
+const sharedNode594 = {"kind":"FragmentDefinition","name":sharedNode573,"typeCondition":sharedNode2,"selectionSet":sharedNode593};
+const sharedNode595 = {"kind":"Name","value":"IssueBaseFields"};
+const sharedNode596 = {"kind":"Name","value":"Issue"};
+const sharedNode597 = {"kind":"NamedType","name":sharedNode596};
+const sharedNode598 = {"kind":"Name","value":"issueNumber"};
+const sharedNode599 = {"kind":"Field","name":sharedNode598};
+const sharedNode600 = {"kind":"Name","value":"isOpen"};
+const sharedNode601 = {"kind":"Field","name":sharedNode600};
+const sharedNode602 = {"kind":"Name","value":"relatedCommentId"};
+const sharedNode603 = {"kind":"Field","name":sharedNode602};
+const sharedNode604 = {"kind":"Name","value":"relatedDiscussionId"};
+const sharedNode605 = {"kind":"Field","name":sharedNode604};
+const sharedNode606 = {"kind":"Name","value":"relatedEventId"};
+const sharedNode607 = {"kind":"Field","name":sharedNode606};
+const sharedNode608 = {"kind":"Name","value":"relatedImageId"};
+const sharedNode609 = {"kind":"Field","name":sharedNode608};
+const sharedNode610 = {"kind":"Name","value":"relatedWikiPageId"};
+const sharedNode611 = {"kind":"Field","name":sharedNode610};
+const sharedNode612 = {"kind":"Name","value":"relatedWikiRevisionId"};
+const sharedNode613 = {"kind":"Field","name":sharedNode612};
+const sharedNode614 = {"kind":"Name","value":"relatedChannelUniqueName"};
+const sharedNode615 = {"kind":"Field","name":sharedNode614};
+const sharedNode616 = {"kind":"Name","value":"relatedModProfileName"};
+const sharedNode617 = {"kind":"Field","name":sharedNode616};
+const sharedNode618 = {"kind":"Name","value":"__typename"};
+const sharedNode619 = {"kind":"Field","name":sharedNode618};
+const sharedNode620 = [sharedNode619,sharedNode60,sharedNode471];
+const sharedNode621 = {"kind":"SelectionSet","selections":sharedNode620};
+const sharedNode622 = {"kind":"Field","name":sharedNode88,"selectionSet":sharedNode621};
+const sharedNode623 = {"kind":"Name","value":"flaggedServerRuleViolation"};
+const sharedNode624 = {"kind":"Field","name":sharedNode623};
+const sharedNode625 = {"kind":"Name","value":"lockedAt"};
+const sharedNode626 = {"kind":"Field","name":sharedNode625};
+const sharedNode627 = {"kind":"Name","value":"lockReason"};
+const sharedNode628 = {"kind":"Field","name":sharedNode627};
+const sharedNode629 = {"kind":"Name","value":"LockedBy"};
+const sharedNode630 = {"kind":"Field","name":sharedNode629,"selectionSet":sharedNode59};
+const sharedNode631 = [sharedNode30,sharedNode599,sharedNode127,sharedNode85,sharedNode601,sharedNode38,sharedNode40,sharedNode603,sharedNode605,sharedNode607,sharedNode609,sharedNode611,sharedNode613,sharedNode615,sharedNode617,sharedNode99,sharedNode622,sharedNode624,sharedNode94,sharedNode224,sharedNode626,sharedNode628,sharedNode630];
+const sharedNode632 = {"kind":"SelectionSet","selections":sharedNode631};
+const sharedNode633 = {"kind":"FragmentDefinition","name":sharedNode595,"typeCondition":sharedNode597,"selectionSet":sharedNode632};
+const sharedNode634 = {"kind":"Name","value":"IssueFields"};
+const sharedNode635 = {"kind":"FragmentSpread","name":sharedNode595};
+const sharedNode636 = {"kind":"Name","value":"ActivityFeed"};
+const sharedNode637 = {"kind":"EnumValue","value":"DESC"};
+const sharedNode638 = {"kind":"ObjectField","name":sharedNode37,"value":sharedNode637};
+const sharedNode639 = [sharedNode638];
+const sharedNode640 = {"kind":"ObjectValue","fields":sharedNode639};
+const sharedNode641 = {"kind":"Argument","name":sharedNode428,"value":sharedNode640};
+const sharedNode642 = [sharedNode641];
+const sharedNode643 = {"kind":"Name","value":"ModerationAction"};
+const sharedNode644 = {"kind":"NamedType","name":sharedNode643};
+const sharedNode645 = {"kind":"Name","value":"actionDescription"};
+const sharedNode646 = {"kind":"Field","name":sharedNode645};
+const sharedNode647 = {"kind":"Name","value":"actionType"};
+const sharedNode648 = {"kind":"Field","name":sharedNode647};
+const sharedNode649 = {"kind":"Name","value":"recommendedAction"};
+const sharedNode650 = {"kind":"Field","name":sharedNode649};
+const sharedNode651 = {"kind":"Name","value":"recommendationConfidence"};
+const sharedNode652 = {"kind":"Field","name":sharedNode651};
+const sharedNode653 = {"kind":"Name","value":"recommendationRationale"};
+const sharedNode654 = {"kind":"Field","name":sharedNode653};
+const sharedNode655 = [sharedNode70];
+const sharedNode656 = {"kind":"SelectionSet","selections":sharedNode655};
+const sharedNode657 = {"kind":"Field","name":sharedNode61,"selectionSet":sharedNode656};
+const sharedNode658 = [sharedNode57,sharedNode657];
 const sharedNode659 = {"kind":"SelectionSet","selections":sharedNode658};
-const sharedNode660 = [sharedNode5,sharedNode38,sharedNode66,sharedNode68];
-const sharedNode661 = {"kind":"SelectionSet","selections":sharedNode660};
-const sharedNode662 = {"kind":"Field","name":{"kind":"Name","value":"Poster"},"selectionSet":sharedNode661};
-const sharedNode663 = {"kind":"Variable","name":sharedNode435};
-const sharedNode664 = {"kind":"VariableDefinition","variable":sharedNode663,"type":sharedNode451};
-const sharedNode665 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode663};
-const sharedNode666 = [sharedNode665];
-const sharedNode667 = {"kind":"ObjectValue","fields":sharedNode666};
+const sharedNode660 = {"kind":"Field","name":sharedNode54,"selectionSet":sharedNode659};
+const sharedNode661 = [sharedNode5,sharedNode70];
+const sharedNode662 = {"kind":"SelectionSet","selections":sharedNode661};
+const sharedNode663 = {"kind":"Field","name":sharedNode61,"selectionSet":sharedNode662};
+const sharedNode664 = {"kind":"Name","value":"Revision"};
+const sharedNode665 = [sharedNode30,sharedNode85,sharedNode38,sharedNode89];
+const sharedNode666 = {"kind":"SelectionSet","selections":sharedNode665};
+const sharedNode667 = {"kind":"Field","name":sharedNode664,"selectionSet":sharedNode666};
+const sharedNode668 = {"kind":"Field","name":sharedNode596,"selectionSet":sharedNode81};
+const sharedNode669 = [sharedNode60,sharedNode471];
+const sharedNode670 = {"kind":"SelectionSet","selections":sharedNode669};
+const sharedNode671 = {"kind":"Field","name":sharedNode53,"selectionSet":sharedNode670};
+const sharedNode672 = [sharedNode173];
+const sharedNode673 = {"kind":"SelectionSet","selections":sharedNode672};
+const sharedNode674 = {"kind":"Field","name":sharedNode171,"selectionSet":sharedNode673};
+const sharedNode675 = [sharedNode640];
+const sharedNode676 = {"kind":"ListValue","values":sharedNode675};
+const sharedNode677 = {"kind":"Argument","name":sharedNode428,"value":sharedNode676};
+const sharedNode678 = [sharedNode677];
+const sharedNode679 = {"kind":"Field","name":sharedNode83,"arguments":sharedNode678,"selectionSet":sharedNode666};
+const sharedNode680 = [sharedNode30,sharedNode32,sharedNode34,sharedNode36,sharedNode38,sharedNode40,sharedNode668,sharedNode671,sharedNode674,sharedNode78,sharedNode82,sharedNode87,sharedNode679,sharedNode105];
+const sharedNode681 = {"kind":"SelectionSet","selections":sharedNode680};
+const sharedNode682 = {"kind":"Field","name":sharedNode1,"selectionSet":sharedNode681};
+const sharedNode683 = [sharedNode30,sharedNode646,sharedNode648,sharedNode38,sharedNode650,sharedNode652,sharedNode654,sharedNode660,sharedNode663,sharedNode667,sharedNode682];
+const sharedNode684 = {"kind":"SelectionSet","selections":sharedNode683};
+const sharedNode685 = {"kind":"InlineFragment","typeCondition":sharedNode644,"selectionSet":sharedNode684};
+const sharedNode686 = [sharedNode685];
+const sharedNode687 = {"kind":"SelectionSet","selections":sharedNode686};
+const sharedNode688 = {"kind":"Field","name":sharedNode636,"arguments":sharedNode642,"selectionSet":sharedNode687};
+const sharedNode689 = {"kind":"Name","value":"ActivityFeedConnection"};
+const sharedNode690 = {"kind":"StringValue","value":"report","block":false};
+const sharedNode691 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode690};
+const sharedNode692 = [sharedNode691];
+const sharedNode693 = {"kind":"ObjectValue","fields":sharedNode692};
+const sharedNode694 = {"kind":"ObjectField","name":sharedNode647,"value":sharedNode693};
+const sharedNode695 = [sharedNode694];
+const sharedNode696 = {"kind":"ObjectValue","fields":sharedNode695};
+const sharedNode697 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode696};
+const sharedNode698 = [sharedNode697];
+const sharedNode699 = {"kind":"ObjectValue","fields":sharedNode698};
+const sharedNode700 = {"kind":"Argument","name":sharedNode132,"value":sharedNode699};
+const sharedNode701 = [sharedNode700];
+const sharedNode702 = {"kind":"Field","name":sharedNode689,"arguments":sharedNode701,"selectionSet":sharedNode21};
+const sharedNode703 = [sharedNode635,sharedNode688,sharedNode702];
+const sharedNode704 = {"kind":"SelectionSet","selections":sharedNode703};
+const sharedNode705 = {"kind":"FragmentDefinition","name":sharedNode634,"typeCondition":sharedNode597,"selectionSet":sharedNode704};
+const sharedNode706 = {"kind":"Name","value":"channelBannerURL"};
+const sharedNode707 = {"kind":"Field","name":sharedNode706};
+const sharedNode708 = {"kind":"Name","value":"Admins"};
+const sharedNode709 = {"kind":"Field","name":sharedNode708,"selectionSet":sharedNode7};
+const sharedNode710 = {"kind":"Variable","name":sharedNode29};
+const sharedNode711 = {"kind":"Name","value":"ID"};
+const sharedNode712 = {"kind":"NamedType","name":sharedNode711};
+const sharedNode713 = {"kind":"NonNullType","type":sharedNode712};
+const sharedNode714 = {"kind":"VariableDefinition","variable":sharedNode710,"type":sharedNode713};
+const sharedNode715 = [sharedNode714];
+const sharedNode716 = {"kind":"Name","value":"comments"};
+const sharedNode717 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode710};
+const sharedNode718 = [sharedNode717];
+const sharedNode719 = {"kind":"ObjectValue","fields":sharedNode718};
+const sharedNode720 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode719};
+const sharedNode721 = [sharedNode720];
+const sharedNode722 = {"kind":"ObjectValue","fields":sharedNode721};
+const sharedNode723 = {"kind":"Argument","name":sharedNode132,"value":sharedNode722};
+const sharedNode724 = [sharedNode723];
+const sharedNode725 = {"kind":"FragmentSpread","name":sharedNode28};
+const sharedNode726 = {"kind":"Name","value":"GivesFeedbackOnComment"};
+const sharedNode727 = [sharedNode99,sharedNode101];
+const sharedNode728 = {"kind":"SelectionSet","selections":sharedNode727};
+const sharedNode729 = {"kind":"Field","name":sharedNode97,"selectionSet":sharedNode728};
+const sharedNode730 = {"kind":"Name","value":"GivesFeedbackOnDiscussion"};
+const sharedNode731 = {"kind":"Field","name":sharedNode730,"selectionSet":sharedNode81};
+const sharedNode732 = {"kind":"Name","value":"GivesFeedbackOnEvent"};
+const sharedNode733 = {"kind":"Field","name":sharedNode732,"selectionSet":sharedNode81};
+const sharedNode734 = {"kind":"Variable","name":sharedNode98};
+const sharedNode735 = {"kind":"Name","value":"String"};
+const sharedNode736 = {"kind":"NamedType","name":sharedNode735};
+const sharedNode737 = {"kind":"NonNullType","type":sharedNode736};
+const sharedNode738 = {"kind":"VariableDefinition","variable":sharedNode734,"type":sharedNode737};
+const sharedNode739 = {"kind":"Variable","name":sharedNode100};
+const sharedNode740 = {"kind":"VariableDefinition","variable":sharedNode739,"type":sharedNode713};
+const sharedNode741 = {"kind":"Name","value":"modName"};
+const sharedNode742 = {"kind":"Variable","name":sharedNode741};
+const sharedNode743 = {"kind":"VariableDefinition","variable":sharedNode742,"type":sharedNode736};
+const sharedNode744 = {"kind":"Name","value":"offset"};
+const sharedNode745 = {"kind":"Variable","name":sharedNode744};
+const sharedNode746 = {"kind":"Name","value":"Int"};
+const sharedNode747 = {"kind":"NamedType","name":sharedNode746};
+const sharedNode748 = {"kind":"VariableDefinition","variable":sharedNode745,"type":sharedNode747};
+const sharedNode749 = {"kind":"Variable","name":sharedNode436};
+const sharedNode750 = {"kind":"VariableDefinition","variable":sharedNode749,"type":sharedNode747};
+const sharedNode751 = {"kind":"Variable","name":sharedNode428};
+const sharedNode752 = {"kind":"Argument","name":sharedNode98,"value":sharedNode734};
+const sharedNode753 = {"kind":"Argument","name":sharedNode100,"value":sharedNode739};
+const sharedNode754 = {"kind":"Argument","name":sharedNode741,"value":sharedNode742};
+const sharedNode755 = {"kind":"Argument","name":sharedNode744,"value":sharedNode745};
+const sharedNode756 = {"kind":"Argument","name":sharedNode436,"value":sharedNode749};
+const sharedNode757 = {"kind":"Argument","name":sharedNode428,"value":sharedNode751};
+const sharedNode758 = {"kind":"Name","value":"Bots"};
+const sharedNode759 = {"kind":"Name","value":"botProfileId"};
+const sharedNode760 = {"kind":"Field","name":sharedNode759};
+const sharedNode761 = {"kind":"Name","value":"isDeprecated"};
+const sharedNode762 = {"kind":"Field","name":sharedNode761};
+const sharedNode763 = {"kind":"Name","value":"Moderators"};
+const sharedNode764 = {"kind":"Field","name":sharedNode763,"selectionSet":sharedNode59};
+const sharedNode765 = {"kind":"Name","value":"OR"};
+const sharedNode766 = {"kind":"NullValue"};
+const sharedNode767 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode766};
+const sharedNode768 = [sharedNode767];
+const sharedNode769 = {"kind":"ObjectValue","fields":sharedNode768};
+const sharedNode770 = {"kind":"ObjectField","name":sharedNode246,"value":sharedNode769};
+const sharedNode771 = [sharedNode770];
+const sharedNode772 = {"kind":"ObjectValue","fields":sharedNode771};
+const sharedNode773 = [sharedNode772,sharedNode253];
+const sharedNode774 = {"kind":"ListValue","values":sharedNode773};
+const sharedNode775 = {"kind":"ObjectField","name":sharedNode765,"value":sharedNode774};
+const sharedNode776 = [sharedNode775];
+const sharedNode777 = {"kind":"ObjectValue","fields":sharedNode776};
+const sharedNode778 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode777};
+const sharedNode779 = [sharedNode778];
+const sharedNode780 = {"kind":"ObjectValue","fields":sharedNode779};
+const sharedNode781 = {"kind":"Argument","name":sharedNode132,"value":sharedNode780};
+const sharedNode782 = [sharedNode781];
+const sharedNode783 = {"kind":"Field","name":sharedNode244,"arguments":sharedNode782,"selectionSet":sharedNode21};
+const sharedNode784 = {"kind":"Name","value":"isRootComment"};
+const sharedNode785 = {"kind":"ObjectField","name":sharedNode784,"value":sharedNode138};
+const sharedNode786 = [sharedNode785,sharedNode775];
+const sharedNode787 = {"kind":"ObjectValue","fields":sharedNode786};
+const sharedNode788 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode787};
+const sharedNode789 = [sharedNode788];
+const sharedNode790 = {"kind":"ObjectValue","fields":sharedNode789};
+const sharedNode791 = {"kind":"Argument","name":sharedNode132,"value":sharedNode790};
+const sharedNode792 = [sharedNode791];
+const sharedNode793 = {"kind":"Name","value":"Comments"};
+const sharedNode794 = {"kind":"Field","name":sharedNode330,"selectionSet":sharedNode81};
+const sharedNode795 = [sharedNode738,sharedNode740];
+const sharedNode796 = {"kind":"Name","value":"discussionChannels"};
+const sharedNode797 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode734};
+const sharedNode798 = [sharedNode797];
+const sharedNode799 = {"kind":"ObjectValue","fields":sharedNode798};
+const sharedNode800 = {"kind":"ObjectField","name":sharedNode98,"value":sharedNode799};
+const sharedNode801 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode739};
+const sharedNode802 = [sharedNode801];
+const sharedNode803 = {"kind":"ObjectValue","fields":sharedNode802};
+const sharedNode804 = {"kind":"ObjectField","name":sharedNode100,"value":sharedNode803};
+const sharedNode805 = [sharedNode800,sharedNode804];
+const sharedNode806 = {"kind":"ObjectValue","fields":sharedNode805};
+const sharedNode807 = {"kind":"Argument","name":sharedNode132,"value":sharedNode806};
+const sharedNode808 = [sharedNode807];
+const sharedNode809 = {"kind":"Name","value":"getDiscussionDetail"};
+const sharedNode810 = {"kind":"VariableDefinition","variable":sharedNode333,"type":sharedNode736};
+const sharedNode811 = {"kind":"Name","value":"discussions"};
+const sharedNode812 = {"kind":"Argument","name":sharedNode100,"value":sharedNode710};
+const sharedNode813 = [sharedNode812,sharedNode752];
+const sharedNode814 = {"kind":"FragmentSpread","name":sharedNode201};
+const sharedNode815 = {"kind":"Name","value":"loggedInUsername"};
+const sharedNode816 = {"kind":"Variable","name":sharedNode815};
+const sharedNode817 = {"kind":"VariableDefinition","variable":sharedNode816,"type":sharedNode736};
+const sharedNode818 = [sharedNode714,sharedNode810,sharedNode817,sharedNode738];
+const sharedNode819 = {"kind":"Name","value":"isFavorited"};
+const sharedNode820 = {"kind":"Argument","name":sharedNode4,"value":sharedNode816};
+const sharedNode821 = [sharedNode820];
+const sharedNode822 = {"kind":"Field","name":sharedNode819,"arguments":sharedNode821};
+const sharedNode823 = [sharedNode800];
+const sharedNode824 = {"kind":"ObjectValue","fields":sharedNode823};
+const sharedNode825 = {"kind":"Argument","name":sharedNode132,"value":sharedNode824};
+const sharedNode826 = [sharedNode825];
+const sharedNode827 = {"kind":"Name","value":"LabelOptions"};
+const sharedNode828 = {"kind":"Name","value":"value"};
+const sharedNode829 = {"kind":"Field","name":sharedNode828};
+const sharedNode830 = {"kind":"Name","value":"group"};
+const sharedNode831 = {"kind":"Name","value":"key"};
+const sharedNode832 = {"kind":"Field","name":sharedNode831};
+const sharedNode833 = [sharedNode30,sharedNode832,sharedNode57];
+const sharedNode834 = {"kind":"SelectionSet","selections":sharedNode833};
+const sharedNode835 = {"kind":"Field","name":sharedNode830,"selectionSet":sharedNode834};
+const sharedNode836 = [sharedNode30,sharedNode829,sharedNode57,sharedNode119,sharedNode835];
+const sharedNode837 = {"kind":"SelectionSet","selections":sharedNode836};
+const sharedNode838 = {"kind":"Field","name":sharedNode827,"selectionSet":sharedNode837};
+const sharedNode839 = {"kind":"Name","value":"authorIsChannelModerator"};
+const sharedNode840 = [sharedNode752];
+const sharedNode841 = {"kind":"Field","name":sharedNode839,"arguments":sharedNode840};
+const sharedNode842 = {"kind":"Field","name":{"kind":"Name","value":"labelDisplayName"}};
+const sharedNode843 = {"kind":"Field","name":{"kind":"Name","value":"labelValue"}};
+const sharedNode844 = {"kind":"Field","name":{"kind":"Name","value":"ActorUser"},"selectionSet":sharedNode159};
+const sharedNode845 = {"kind":"Field","name":{"kind":"Name","value":"ActorMod"},"selectionSet":sharedNode59};
+const sharedNode846 = [sharedNode30,sharedNode38,sharedNode648,sharedNode842,sharedNode843,sharedNode844,sharedNode845];
+const sharedNode847 = {"kind":"SelectionSet","selections":sharedNode846};
+const sharedNode848 = {"kind":"Field","name":{"kind":"Name","value":"LabelChangeHistory"},"arguments":sharedNode678,"selectionSet":sharedNode847};
+const sharedNode849 = {"kind":"Name","value":"PastTitleVersions"};
+const sharedNode850 = [sharedNode30,sharedNode89,sharedNode85,sharedNode87,sharedNode38];
+const sharedNode851 = {"kind":"SelectionSet","selections":sharedNode850};
+const sharedNode852 = {"kind":"Field","name":sharedNode849,"arguments":sharedNode678,"selectionSet":sharedNode851};
+const sharedNode853 = {"kind":"Name","value":"PastBodyVersions"};
+const sharedNode854 = {"kind":"Field","name":sharedNode853,"arguments":sharedNode678,"selectionSet":sharedNode851};
+const sharedNode855 = {"kind":"Field","name":{"kind":"Name","value":"BodyLastEditedBy"},"selectionSet":sharedNode7};
+const sharedNode856 = {"kind":"Name","value":"after"};
+const sharedNode857 = {"kind":"Variable","name":sharedNode856};
+const sharedNode858 = {"kind":"VariableDefinition","variable":sharedNode857,"type":sharedNode736};
+const sharedNode859 = [sharedNode740,sharedNode738,sharedNode858];
+const sharedNode860 = {"kind":"Argument","name":sharedNode856,"value":sharedNode857};
+const sharedNode861 = [sharedNode753,sharedNode752,sharedNode860];
+const sharedNode862 = {"kind":"Name","value":"pageInfo"};
+const sharedNode863 = {"kind":"Field","name":sharedNode862,"selectionSet":sharedNode216};
+const sharedNode864 = {"kind":"Variable","name":{"kind":"Name","value":"createCommentInput"}};
+const sharedNode865 = {"kind":"Name","value":"createCommentWithOwnedConnections"};
+const sharedNode866 = {"kind":"Name","value":"input"};
+const sharedNode867 = {"kind":"SelectionSet","selections":[sharedNode187]};
+const sharedNode868 = {"kind":"Name","value":"ChildComments"};
+const sharedNode869 = [sharedNode30,sharedNode32];
+const sharedNode870 = {"kind":"SelectionSet","selections":sharedNode869};
+const sharedNode871 = {"kind":"Field","name":sharedNode868,"selectionSet":sharedNode870};
+const sharedNode872 = {"kind":"Variable","name":sharedNode4};
+const sharedNode873 = {"kind":"VariableDefinition","variable":sharedNode872,"type":sharedNode737};
+const sharedNode874 = [sharedNode873];
+const sharedNode875 = {"kind":"Argument","name":sharedNode4,"value":sharedNode872};
+const sharedNode876 = [sharedNode875];
+const sharedNode877 = {"kind":"Field","name":{"kind":"Name","value":"getUserWikiEditsCount"},"arguments":sharedNode876};
+const sharedNode878 = {"kind":"Name","value":"users"};
+const sharedNode879 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode872};
+const sharedNode880 = [sharedNode879];
+const sharedNode881 = {"kind":"ObjectValue","fields":sharedNode880};
+const sharedNode882 = {"kind":"ObjectField","name":sharedNode4,"value":sharedNode881};
+const sharedNode883 = [sharedNode882];
+const sharedNode884 = {"kind":"ObjectValue","fields":sharedNode883};
+const sharedNode885 = {"kind":"Argument","name":sharedNode132,"value":sharedNode884};
+const sharedNode886 = [sharedNode885];
+const sharedNode887 = {"kind":"Name","value":"bio"};
+const sharedNode888 = {"kind":"Field","name":sharedNode887};
+const sharedNode889 = [sharedNode139];
+const sharedNode890 = {"kind":"ObjectValue","fields":sharedNode889};
+const sharedNode891 = {"kind":"ObjectField","name":sharedNode133,"value":sharedNode890};
+const sharedNode892 = [sharedNode891];
+const sharedNode893 = {"kind":"ObjectValue","fields":sharedNode892};
+const sharedNode894 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode893};
+const sharedNode895 = [sharedNode894];
+const sharedNode896 = {"kind":"ObjectValue","fields":sharedNode895};
+const sharedNode897 = {"kind":"Argument","name":sharedNode132,"value":sharedNode896};
+const sharedNode898 = [sharedNode897];
+const sharedNode899 = {"kind":"Field","name":sharedNode244,"arguments":sharedNode898,"selectionSet":sharedNode21};
+const sharedNode900 = {"kind":"Name","value":"DiscussionsConnection"};
+const sharedNode901 = {"kind":"ObjectField","name":sharedNode202,"value":sharedNode250};
+const sharedNode902 = [sharedNode901];
+const sharedNode903 = {"kind":"ObjectValue","fields":sharedNode902};
+const sharedNode904 = {"kind":"ObjectField","name":sharedNode202,"value":sharedNode769};
+const sharedNode905 = [sharedNode904];
+const sharedNode906 = {"kind":"ObjectValue","fields":sharedNode905};
+const sharedNode907 = [sharedNode903,sharedNode906];
+const sharedNode908 = {"kind":"ListValue","values":sharedNode907};
+const sharedNode909 = {"kind":"ObjectField","name":sharedNode765,"value":sharedNode908};
+const sharedNode910 = [sharedNode909];
+const sharedNode911 = {"kind":"ObjectValue","fields":sharedNode910};
+const sharedNode912 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode911};
+const sharedNode913 = [sharedNode912];
+const sharedNode914 = {"kind":"ObjectValue","fields":sharedNode913};
+const sharedNode915 = {"kind":"Argument","name":sharedNode132,"value":sharedNode914};
+const sharedNode916 = [sharedNode915];
+const sharedNode917 = {"kind":"Field","name":sharedNode900,"arguments":sharedNode916,"selectionSet":sharedNode21};
+const sharedNode918 = {"kind":"Name","value":"DownloadsConnection"};
+const sharedNode919 = {"kind":"ObjectField","name":sharedNode202,"value":sharedNode138};
+const sharedNode920 = [sharedNode919];
+const sharedNode921 = {"kind":"ObjectValue","fields":sharedNode920};
+const sharedNode922 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode921};
+const sharedNode923 = [sharedNode922];
+const sharedNode924 = {"kind":"ObjectValue","fields":sharedNode923};
+const sharedNode925 = {"kind":"Argument","name":sharedNode132,"value":sharedNode924};
+const sharedNode926 = [sharedNode925];
+const sharedNode927 = {"kind":"Field","alias":sharedNode918,"name":sharedNode900,"arguments":sharedNode926,"selectionSet":sharedNode21};
+const sharedNode928 = {"kind":"Field","name":{"kind":"Name","value":"EventsConnection"},"selectionSet":sharedNode21};
+const sharedNode929 = {"kind":"Name","value":"ImagesConnection"};
+const sharedNode930 = {"kind":"Field","name":sharedNode929,"selectionSet":sharedNode21};
+const sharedNode931 = {"kind":"Field","name":{"kind":"Name","value":"AlbumsConnection"},"selectionSet":sharedNode21};
+const sharedNode932 = {"kind":"Name","value":"AuthoredWikiPageVersionsConnection"};
+const sharedNode933 = {"kind":"Field","name":sharedNode932,"selectionSet":sharedNode21};
+const sharedNode934 = {"kind":"Name","value":"AdminOfChannelsConnection"};
+const sharedNode935 = {"kind":"Field","name":sharedNode934,"selectionSet":sharedNode21};
+const sharedNode936 = {"kind":"Name","value":"Email"};
+const sharedNode937 = [sharedNode374];
+const sharedNode938 = {"kind":"SelectionSet","selections":sharedNode937};
+const sharedNode939 = {"kind":"Field","name":sharedNode936,"selectionSet":sharedNode938};
+const sharedNode940 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToCommentByDefault"}};
+const sharedNode941 = {"kind":"Name","value":"notifyOnReplyToDiscussionByDefault"};
+const sharedNode942 = {"kind":"Field","name":sharedNode941};
+const sharedNode943 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnReplyToEventByDefault"}};
+const sharedNode944 = {"kind":"Field","name":{"kind":"Name","value":"notifyWhenTagged"}};
+const sharedNode945 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnSubscribedIssueUpdates"}};
+const sharedNode946 = {"kind":"Field","name":{"kind":"Name","value":"notifyOnFeedback"}};
+const sharedNode947 = {"kind":"Field","name":{"kind":"Name","value":"notificationBundleInterval"}};
+const sharedNode948 = {"kind":"Field","name":{"kind":"Name","value":"notificationBundleEnabled"}};
+const sharedNode949 = {"kind":"Field","name":{"kind":"Name","value":"notificationBundleContent"}};
+const sharedNode950 = {"kind":"Field","name":{"kind":"Name","value":"enableSensitiveContentByDefault"}};
+const sharedNode951 = {"kind":"Name","value":"NotificationsConnection"};
+const sharedNode952 = {"kind":"Name","value":"read"};
+const sharedNode953 = {"kind":"ObjectField","name":sharedNode952,"value":sharedNode250};
+const sharedNode954 = [sharedNode953];
+const sharedNode955 = {"kind":"ObjectValue","fields":sharedNode954};
+const sharedNode956 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode955};
+const sharedNode957 = [sharedNode956];
+const sharedNode958 = {"kind":"ObjectValue","fields":sharedNode957};
+const sharedNode959 = {"kind":"Argument","name":sharedNode132,"value":sharedNode958};
+const sharedNode960 = [sharedNode959];
+const sharedNode961 = {"kind":"Variable","name":sharedNode132};
+const sharedNode962 = {"kind":"Name","value":"update"};
+const sharedNode963 = {"kind":"Variable","name":sharedNode962};
+const sharedNode964 = {"kind":"Name","value":"updateUsers"};
+const sharedNode965 = {"kind":"Argument","name":sharedNode132,"value":sharedNode961};
+const sharedNode966 = {"kind":"Argument","name":sharedNode962,"value":sharedNode963};
+const sharedNode967 = [sharedNode965,sharedNode966];
+const sharedNode968 = {"kind":"Name","value":"commentId"};
+const sharedNode969 = {"kind":"Variable","name":sharedNode968};
+const sharedNode970 = {"kind":"VariableDefinition","variable":sharedNode969,"type":sharedNode713};
+const sharedNode971 = [sharedNode970];
+const sharedNode972 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode969};
+const sharedNode973 = [sharedNode972];
+const sharedNode974 = {"kind":"ObjectValue","fields":sharedNode973};
+const sharedNode975 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode974};
+const sharedNode976 = [sharedNode975];
+const sharedNode977 = {"kind":"ObjectValue","fields":sharedNode976};
+const sharedNode978 = {"kind":"Argument","name":sharedNode132,"value":sharedNode977};
+const sharedNode979 = [sharedNode978];
+const sharedNode980 = {"kind":"Name","value":"RelatedIssues"};
+const sharedNode981 = [sharedNode30,sharedNode599];
+const sharedNode982 = {"kind":"SelectionSet","selections":sharedNode981};
+const sharedNode983 = {"kind":"Field","name":sharedNode980,"selectionSet":sharedNode982};
+const sharedNode984 = [sharedNode30,sharedNode983];
+const sharedNode985 = {"kind":"SelectionSet","selections":sharedNode984};
+const sharedNode986 = {"kind":"NamedType","name":{"kind":"Name","value":"SortType"}};
+const sharedNode987 = {"kind":"VariableDefinition","variable":sharedNode751,"type":sharedNode986};
+const sharedNode988 = {"kind":"Argument","name":sharedNode968,"value":sharedNode969};
+const sharedNode989 = [sharedNode988];
+const sharedNode990 = [sharedNode30,sharedNode94];
+const sharedNode991 = {"kind":"SelectionSet","selections":sharedNode990};
+const sharedNode992 = [sharedNode30,sharedNode46,sharedNode48,sharedNode50];
+const sharedNode993 = {"kind":"SelectionSet","selections":sharedNode992};
+const sharedNode994 = {"kind":"Name","value":"events"};
+const sharedNode995 = {"kind":"FragmentSpread","name":sharedNode365};
+const sharedNode996 = {"kind":"Name","value":"Poster"};
+const sharedNode997 = [sharedNode5,sharedNode38,sharedNode66,sharedNode68];
+const sharedNode998 = {"kind":"SelectionSet","selections":sharedNode997};
+const sharedNode999 = {"kind":"Field","name":sharedNode996,"selectionSet":sharedNode998};
+const sharedNode1000 = {"kind":"Variable","name":sharedNode458};
+const sharedNode1001 = {"kind":"VariableDefinition","variable":sharedNode1000,"type":sharedNode713};
+const sharedNode1002 = {"kind":"Argument","name":sharedNode458,"value":sharedNode1000};
+const sharedNode1003 = [sharedNode1001];
+const sharedNode1004 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1000};
+const sharedNode1005 = [sharedNode1004];
+const sharedNode1006 = {"kind":"ObjectValue","fields":sharedNode1005};
+const sharedNode1007 = [sharedNode1001,sharedNode738];
+const sharedNode1008 = [sharedNode30,sharedNode44];
+const sharedNode1009 = {"kind":"SelectionSet","selections":sharedNode1008};
+const sharedNode1010 = {"kind":"Name","value":"imageId"};
+const sharedNode1011 = {"kind":"Variable","name":sharedNode1010};
+const sharedNode1012 = {"kind":"VariableDefinition","variable":sharedNode1011,"type":sharedNode713};
+const sharedNode1013 = [sharedNode873,sharedNode1012];
+const sharedNode1014 = {"kind":"Name","value":"FavoriteImages"};
+const sharedNode1015 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1011};
+const sharedNode1016 = [sharedNode1015];
+const sharedNode1017 = {"kind":"ObjectValue","fields":sharedNode1016};
+const sharedNode1018 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode1017};
+const sharedNode1019 = [sharedNode1018];
+const sharedNode1020 = {"kind":"ObjectValue","fields":sharedNode1019};
+const sharedNode1021 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1020};
+const sharedNode1022 = [sharedNode1021];
+const sharedNode1023 = [sharedNode30,sharedNode150];
+const sharedNode1024 = {"kind":"SelectionSet","selections":sharedNode1023};
+const sharedNode1025 = [sharedNode873,sharedNode738];
+const sharedNode1026 = {"kind":"Name","value":"FavoriteChannels"};
+const sharedNode1027 = {"kind":"ObjectField","name":sharedNode172,"value":sharedNode799};
+const sharedNode1028 = [sharedNode1027];
+const sharedNode1029 = {"kind":"ObjectValue","fields":sharedNode1028};
+const sharedNode1030 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1029};
+const sharedNode1031 = [sharedNode1030];
+const sharedNode1032 = {"kind":"Name","value":"FavoriteDiscussions"};
+const sharedNode1033 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode803};
+const sharedNode1034 = [sharedNode1033];
+const sharedNode1035 = {"kind":"ObjectValue","fields":sharedNode1034};
+const sharedNode1036 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1035};
+const sharedNode1037 = [sharedNode1036];
+const sharedNode1038 = {"kind":"Name","value":"serverName"};
+const sharedNode1039 = {"kind":"Variable","name":sharedNode1038};
+const sharedNode1040 = {"kind":"VariableDefinition","variable":sharedNode1039,"type":sharedNode737};
+const sharedNode1041 = {"kind":"Variable","name":sharedNode866};
+const sharedNode1042 = {"kind":"Name","value":"updateServerConfigs"};
+const sharedNode1043 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1039};
+const sharedNode1044 = [sharedNode1043];
+const sharedNode1045 = {"kind":"ObjectValue","fields":sharedNode1044};
+const sharedNode1046 = {"kind":"ObjectField","name":sharedNode1038,"value":sharedNode1045};
+const sharedNode1047 = [sharedNode1046];
+const sharedNode1048 = {"kind":"ObjectValue","fields":sharedNode1047};
+const sharedNode1049 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1048};
+const sharedNode1050 = {"kind":"Argument","name":sharedNode962,"value":sharedNode1041};
+const sharedNode1051 = {"kind":"Name","value":"serverConfigs"};
+const sharedNode1052 = {"kind":"Field","name":sharedNode1038};
+const sharedNode1053 = {"kind":"Name","value":"serverIconURL"};
+const sharedNode1054 = {"kind":"Field","name":sharedNode1053};
+const sharedNode1055 = {"kind":"Field","name":{"kind":"Name","value":"serverDescription"}};
+const sharedNode1056 = {"kind":"Name","value":"rules"};
+const sharedNode1057 = {"kind":"Field","name":sharedNode1056};
+const sharedNode1058 = {"kind":"Field","name":{"kind":"Name","value":"enableDownloads"}};
+const sharedNode1059 = {"kind":"Field","name":{"kind":"Name","value":"enableEvents"}};
+const sharedNode1060 = {"kind":"Name","value":"accountAgeGateEnabled"};
+const sharedNode1061 = {"kind":"Field","name":sharedNode1060};
+const sharedNode1062 = {"kind":"Name","value":"minimumAccountAge"};
+const sharedNode1063 = {"kind":"Field","name":sharedNode1062};
+const sharedNode1064 = {"kind":"Name","value":"sensitiveContentAgeGateEnabled"};
+const sharedNode1065 = {"kind":"Field","name":sharedNode1064};
+const sharedNode1066 = {"kind":"Name","value":"minimumSensitiveContentAge"};
+const sharedNode1067 = {"kind":"Field","name":sharedNode1066};
+const sharedNode1068 = {"kind":"Name","value":"allowedFileTypes"};
+const sharedNode1069 = {"kind":"Field","name":sharedNode1068};
+const sharedNode1070 = {"kind":"Name","value":"pluginRegistries"};
+const sharedNode1071 = {"kind":"Field","name":sharedNode1070};
+const sharedNode1072 = {"kind":"Name","value":"brandingLogoDarkURL"};
+const sharedNode1073 = {"kind":"Field","name":sharedNode1072};
+const sharedNode1074 = {"kind":"Name","value":"brandingLogoAlt"};
+const sharedNode1075 = {"kind":"Field","name":sharedNode1074};
+const sharedNode1076 = {"kind":"Name","value":"brandingFaviconURL"};
+const sharedNode1077 = {"kind":"Field","name":sharedNode1076};
+const sharedNode1078 = {"kind":"Name","value":"brandingPrimaryColor"};
+const sharedNode1079 = {"kind":"Field","name":sharedNode1078};
+const sharedNode1080 = {"kind":"Name","value":"brandingProductName"};
+const sharedNode1081 = {"kind":"Field","name":sharedNode1080};
+const sharedNode1082 = {"kind":"Name","value":"brandingDocsURL"};
+const sharedNode1083 = {"kind":"Field","name":sharedNode1082};
+const sharedNode1084 = {"kind":"Name","value":"brandingSourceURL"};
+const sharedNode1085 = {"kind":"Field","name":sharedNode1084};
+const sharedNode1086 = {"kind":"Name","value":"brandingIssuesURL"};
+const sharedNode1087 = {"kind":"Field","name":sharedNode1086};
+const sharedNode1088 = {"kind":"Name","value":"brandingSupportEmail"};
+const sharedNode1089 = {"kind":"Field","name":sharedNode1088};
+const sharedNode1090 = {"kind":"Name","value":"brandingShowUpstreamLinks"};
+const sharedNode1091 = {"kind":"Field","name":sharedNode1090};
+const sharedNode1092 = {"kind":"Name","value":"brandingCustomFooterLinks"};
+const sharedNode1093 = {"kind":"Field","name":sharedNode1092};
+const sharedNode1094 = {"kind":"Name","value":"wikiPageIds"};
+const sharedNode1095 = {"kind":"Variable","name":sharedNode1094};
+const sharedNode1096 = {"kind":"ListType","type":sharedNode713};
+const sharedNode1097 = {"kind":"NonNullType","type":sharedNode1096};
+const sharedNode1098 = {"kind":"Argument","name":sharedNode1038,"value":sharedNode1039};
+const sharedNode1099 = {"kind":"Field","name":{"kind":"Name","value":"featuredWikiPageIds"}};
+const sharedNode1100 = {"kind":"Name","value":"Versions"};
+const sharedNode1101 = {"kind":"Variable","name":sharedNode533};
+const sharedNode1102 = {"kind":"VariableDefinition","variable":sharedNode1101,"type":sharedNode713};
+const sharedNode1103 = [sharedNode1102,sharedNode1040];
+const sharedNode1104 = {"kind":"Name","value":"AllowedPlugins"};
+const sharedNode1105 = {"kind":"Name","value":"connect"};
+const sharedNode1106 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1101};
+const sharedNode1107 = [sharedNode1106];
+const sharedNode1108 = {"kind":"ObjectValue","fields":sharedNode1107};
+const sharedNode1109 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode1108};
+const sharedNode1110 = [sharedNode1109];
+const sharedNode1111 = {"kind":"ObjectValue","fields":sharedNode1110};
+const sharedNode1112 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode1111};
+const sharedNode1113 = [sharedNode1112];
+const sharedNode1114 = {"kind":"ObjectValue","fields":sharedNode1113};
+const sharedNode1115 = {"kind":"ObjectField","name":sharedNode132,"value":sharedNode1114};
+const sharedNode1116 = [sharedNode1115];
+const sharedNode1117 = {"kind":"ObjectValue","fields":sharedNode1116};
+const sharedNode1118 = [sharedNode1117];
+const sharedNode1119 = {"kind":"ListValue","values":sharedNode1118};
+const sharedNode1120 = {"kind":"Field","name":sharedNode1104,"selectionSet":sharedNode321};
+const sharedNode1121 = [sharedNode1052,sharedNode1120];
+const sharedNode1122 = {"kind":"SelectionSet","selections":sharedNode1121};
+const sharedNode1123 = {"kind":"Field","name":sharedNode1051,"selectionSet":sharedNode1122};
+const sharedNode1124 = [sharedNode1123];
+const sharedNode1125 = {"kind":"SelectionSet","selections":sharedNode1124};
+const sharedNode1126 = {"kind":"Name","value":"disconnect"};
+const sharedNode1127 = {"kind":"VariableDefinition","variable":sharedNode1101,"type":sharedNode737};
+const sharedNode1128 = {"kind":"Variable","name":sharedNode537};
+const sharedNode1129 = {"kind":"VariableDefinition","variable":sharedNode1128,"type":sharedNode737};
+const sharedNode1130 = {"kind":"Name","value":"carrySettings"};
+const sharedNode1131 = {"kind":"Variable","name":sharedNode1130};
+const sharedNode1132 = {"kind":"Name","value":"Boolean"};
+const sharedNode1133 = {"kind":"NamedType","name":sharedNode1132};
+const sharedNode1134 = {"kind":"Argument","name":sharedNode533,"value":sharedNode1101};
+const sharedNode1135 = {"kind":"Argument","name":sharedNode537,"value":sharedNode1128};
+const sharedNode1136 = {"kind":"Name","value":"plugin"};
+const sharedNode1137 = {"kind":"Field","name":sharedNode1136,"selectionSet":sharedNode321};
+const sharedNode1138 = {"kind":"Name","value":"enabled"};
+const sharedNode1139 = {"kind":"Field","name":sharedNode1138};
+const sharedNode1140 = {"kind":"Name","value":"settingsJson"};
+const sharedNode1141 = {"kind":"Field","name":sharedNode1140};
+const sharedNode1142 = {"kind":"Variable","name":sharedNode1138};
+const sharedNode1143 = {"kind":"NonNullType","type":sharedNode1133};
+const sharedNode1144 = {"kind":"Variable","name":sharedNode1140};
+const sharedNode1145 = {"kind":"Variable","name":sharedNode518};
+const sharedNode1146 = {"kind":"VariableDefinition","variable":sharedNode1145,"type":sharedNode713};
+const sharedNode1147 = {"kind":"Name","value":"concurrency"};
+const sharedNode1148 = {"kind":"Variable","name":sharedNode1147};
+const sharedNode1149 = {"kind":"NonNullType","type":sharedNode747};
+const sharedNode1150 = {"kind":"Name","value":"rateLimitPerMinute"};
+const sharedNode1151 = {"kind":"Variable","name":sharedNode1150};
+const sharedNode1152 = {"kind":"Argument","name":sharedNode518,"value":sharedNode1145};
+const sharedNode1153 = [sharedNode30,sharedNode505];
+const sharedNode1154 = {"kind":"SelectionSet","selections":sharedNode1153};
+const sharedNode1155 = {"kind":"Variable","name":sharedNode520};
+const sharedNode1156 = {"kind":"VariableDefinition","variable":sharedNode1155,"type":sharedNode713};
+const sharedNode1157 = [sharedNode1156];
+const sharedNode1158 = {"kind":"Argument","name":sharedNode520,"value":sharedNode1155};
+const sharedNode1159 = [sharedNode1158];
+const sharedNode1160 = {"kind":"Name","value":"pausedAt"};
+const sharedNode1161 = {"kind":"Field","name":sharedNode1160};
+const sharedNode1162 = [sharedNode30,sharedNode505,sharedNode1161];
+const sharedNode1163 = {"kind":"SelectionSet","selections":sharedNode1162};
+const sharedNode1164 = {"kind":"Variable","name":sharedNode186};
+const sharedNode1165 = {"kind":"VariableDefinition","variable":sharedNode1164,"type":sharedNode737};
+const sharedNode1166 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1164};
+const sharedNode1167 = [sharedNode1166];
+const sharedNode1168 = {"kind":"ObjectValue","fields":sharedNode1167};
+const sharedNode1169 = {"kind":"ObjectField","name":sharedNode186,"value":sharedNode1168};
+const sharedNode1170 = [sharedNode1169];
+const sharedNode1171 = {"kind":"ObjectValue","fields":sharedNode1170};
+const sharedNode1172 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1171};
+const sharedNode1173 = [sharedNode1172,sharedNode1050];
+const sharedNode1174 = {"kind":"Name","value":"canHideComment"};
+const sharedNode1175 = {"kind":"Field","name":sharedNode1174};
+const sharedNode1176 = {"kind":"Name","value":"canHideEvent"};
+const sharedNode1177 = {"kind":"Field","name":sharedNode1176};
+const sharedNode1178 = {"kind":"Name","value":"canHideDiscussion"};
+const sharedNode1179 = {"kind":"Field","name":sharedNode1178};
+const sharedNode1180 = {"kind":"Name","value":"canEditComments"};
+const sharedNode1181 = {"kind":"Field","name":sharedNode1180};
+const sharedNode1182 = {"kind":"Name","value":"canEditDiscussions"};
+const sharedNode1183 = {"kind":"Field","name":sharedNode1182};
+const sharedNode1184 = {"kind":"Name","value":"canEditEvents"};
+const sharedNode1185 = {"kind":"Field","name":sharedNode1184};
+const sharedNode1186 = {"kind":"Name","value":"canGiveFeedback"};
+const sharedNode1187 = {"kind":"Field","name":sharedNode1186};
+const sharedNode1188 = {"kind":"Name","value":"canOpenSupportTickets"};
+const sharedNode1189 = {"kind":"Field","name":sharedNode1188};
+const sharedNode1190 = {"kind":"Name","value":"canCloseSupportTickets"};
+const sharedNode1191 = {"kind":"Field","name":sharedNode1190};
+const sharedNode1192 = {"kind":"Name","value":"canReport"};
+const sharedNode1193 = {"kind":"Field","name":sharedNode1192};
+const sharedNode1194 = {"kind":"Name","value":"canSuspendUser"};
+const sharedNode1195 = {"kind":"Field","name":sharedNode1194};
+const sharedNode1196 = [sharedNode187,sharedNode189,sharedNode99,sharedNode1175,sharedNode1177,sharedNode1179,sharedNode1181,sharedNode1183,sharedNode1185,sharedNode1187,sharedNode1189,sharedNode1191,sharedNode1193,sharedNode1195];
+const sharedNode1197 = {"kind":"SelectionSet","selections":sharedNode1196};
+const sharedNode1198 = {"kind":"Field","name":{"kind":"Name","value":"modChannelRoles"},"selectionSet":sharedNode1197};
+const sharedNode1199 = [sharedNode1198];
+const sharedNode1200 = {"kind":"SelectionSet","selections":sharedNode1199};
+const sharedNode1201 = {"kind":"Name","value":"canCreateChannel"};
+const sharedNode1202 = {"kind":"Field","name":sharedNode1201};
+const sharedNode1203 = {"kind":"Name","value":"canCreateDiscussion"};
+const sharedNode1204 = {"kind":"Field","name":sharedNode1203};
+const sharedNode1205 = {"kind":"Name","value":"canCreateEvent"};
+const sharedNode1206 = {"kind":"Field","name":sharedNode1205};
+const sharedNode1207 = {"kind":"Name","value":"canCreateComment"};
+const sharedNode1208 = {"kind":"Field","name":sharedNode1207};
+const sharedNode1209 = {"kind":"Name","value":"canUpvoteDiscussion"};
+const sharedNode1210 = {"kind":"Field","name":sharedNode1209};
+const sharedNode1211 = {"kind":"Name","value":"canUpvoteComment"};
+const sharedNode1212 = {"kind":"Field","name":sharedNode1211};
+const sharedNode1213 = {"kind":"Name","value":"canUploadFile"};
+const sharedNode1214 = {"kind":"Field","name":sharedNode1213};
+const sharedNode1215 = [sharedNode1040,sharedNode873];
+const sharedNode1216 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode884};
+const sharedNode1217 = [sharedNode1216];
+const sharedNode1218 = {"kind":"ObjectValue","fields":sharedNode1217};
+const sharedNode1219 = {"kind":"ObjectField","name":sharedNode132,"value":sharedNode1218};
+const sharedNode1220 = [sharedNode1219];
+const sharedNode1221 = {"kind":"ObjectValue","fields":sharedNode1220};
+const sharedNode1222 = [sharedNode1221];
+const sharedNode1223 = {"kind":"ListValue","values":sharedNode1222};
+const sharedNode1224 = {"kind":"Field","name":sharedNode708,"selectionSet":sharedNode159};
+const sharedNode1225 = [sharedNode1052,sharedNode1224];
+const sharedNode1226 = {"kind":"SelectionSet","selections":sharedNode1225};
+const sharedNode1227 = {"kind":"Field","name":sharedNode1051,"selectionSet":sharedNode1226};
+const sharedNode1228 = [sharedNode1227];
+const sharedNode1229 = {"kind":"SelectionSet","selections":sharedNode1228};
+const sharedNode1230 = {"kind":"Variable","name":sharedNode56};
+const sharedNode1231 = {"kind":"VariableDefinition","variable":sharedNode1230,"type":sharedNode737};
+const sharedNode1232 = [sharedNode1040,sharedNode1231];
+const sharedNode1233 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1230};
+const sharedNode1234 = [sharedNode1233];
+const sharedNode1235 = {"kind":"ObjectValue","fields":sharedNode1234};
+const sharedNode1236 = {"kind":"ObjectField","name":sharedNode56,"value":sharedNode1235};
+const sharedNode1237 = [sharedNode1236];
+const sharedNode1238 = {"kind":"ObjectValue","fields":sharedNode1237};
+const sharedNode1239 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode1238};
+const sharedNode1240 = [sharedNode1239];
+const sharedNode1241 = {"kind":"ObjectValue","fields":sharedNode1240};
+const sharedNode1242 = {"kind":"ObjectField","name":sharedNode132,"value":sharedNode1241};
+const sharedNode1243 = [sharedNode1242];
+const sharedNode1244 = {"kind":"ObjectValue","fields":sharedNode1243};
+const sharedNode1245 = [sharedNode1244];
+const sharedNode1246 = {"kind":"ListValue","values":sharedNode1245};
+const sharedNode1247 = [sharedNode1052,sharedNode764];
+const sharedNode1248 = {"kind":"SelectionSet","selections":sharedNode1247};
+const sharedNode1249 = {"kind":"Field","name":sharedNode1051,"selectionSet":sharedNode1248};
+const sharedNode1250 = [sharedNode1249];
+const sharedNode1251 = {"kind":"SelectionSet","selections":sharedNode1250};
+const sharedNode1252 = {"kind":"Name","value":"inviteeUsername"};
+const sharedNode1253 = {"kind":"Variable","name":sharedNode1252};
+const sharedNode1254 = {"kind":"VariableDefinition","variable":sharedNode1253,"type":sharedNode737};
+const sharedNode1255 = [sharedNode1040,sharedNode1254];
+const sharedNode1256 = {"kind":"Argument","name":sharedNode1252,"value":sharedNode1253};
+const sharedNode1257 = [sharedNode1098,sharedNode1256];
+const sharedNode1258 = [sharedNode1040];
+const sharedNode1259 = [sharedNode1098];
+const sharedNode1260 = {"kind":"Name","value":"canLockChannel"};
+const sharedNode1261 = {"kind":"Field","name":sharedNode1260};
+const sharedNode1262 = {"kind":"Name","value":"pipelines"};
+const sharedNode1263 = {"kind":"Variable","name":sharedNode1262};
+const sharedNode1264 = {"kind":"NamedType","name":{"kind":"Name","value":"EventPipelineInput"}};
+const sharedNode1265 = {"kind":"NonNullType","type":sharedNode1264};
+const sharedNode1266 = {"kind":"ListType","type":sharedNode1265};
+const sharedNode1267 = {"kind":"NonNullType","type":sharedNode1266};
+const sharedNode1268 = {"kind":"VariableDefinition","variable":sharedNode1263,"type":sharedNode1267};
+const sharedNode1269 = {"kind":"Argument","name":sharedNode1262,"value":sharedNode1263};
+const sharedNode1270 = {"kind":"Variable","name":sharedNode494};
+const sharedNode1271 = {"kind":"VariableDefinition","variable":sharedNode1270,"type":sharedNode713};
+const sharedNode1272 = {"kind":"Variable","name":sharedNode496};
+const sharedNode1273 = {"kind":"VariableDefinition","variable":sharedNode1272,"type":sharedNode737};
+const sharedNode1274 = {"kind":"Variable","name":sharedNode498};
+const sharedNode1275 = {"kind":"Variable","name":sharedNode502};
+const sharedNode1276 = {"kind":"VariableDefinition","variable":sharedNode1275,"type":sharedNode736};
+const sharedNode1277 = {"kind":"Argument","name":sharedNode494,"value":sharedNode1270};
+const sharedNode1278 = {"kind":"Argument","name":sharedNode496,"value":sharedNode1272};
+const sharedNode1279 = {"kind":"Argument","name":sharedNode498,"value":sharedNode1274};
+const sharedNode1280 = {"kind":"Argument","name":sharedNode502,"value":sharedNode1275};
+const sharedNode1281 = {"kind":"Name","value":"pipelineRunId"};
+const sharedNode1282 = {"kind":"Variable","name":sharedNode1281};
+const sharedNode1283 = {"kind":"VariableDefinition","variable":sharedNode1282,"type":sharedNode713};
+const sharedNode1284 = [sharedNode1283];
+const sharedNode1285 = {"kind":"Argument","name":sharedNode1281,"value":sharedNode1282};
+const sharedNode1286 = [sharedNode1285];
+const sharedNode1287 = {"kind":"Name","value":"configured"};
+const sharedNode1288 = {"kind":"Field","name":sharedNode1287};
+const sharedNode1289 = {"kind":"Name","value":"requiredEnvVarsMissing"};
+const sharedNode1290 = {"kind":"Field","name":sharedNode1289};
+const sharedNode1291 = {"kind":"Name","value":"setupUrl"};
+const sharedNode1292 = {"kind":"Field","name":sharedNode1291};
+const sharedNode1293 = {"kind":"Name","value":"docsPath"};
+const sharedNode1294 = {"kind":"Field","name":sharedNode1293};
+const sharedNode1295 = [sharedNode1288,sharedNode1139,sharedNode1290,sharedNode1292,sharedNode1294];
+const sharedNode1296 = {"kind":"SelectionSet","selections":sharedNode1295};
+const sharedNode1297 = {"kind":"Name","value":"downloads"};
+const sharedNode1298 = {"kind":"Name","value":"plugins"};
+const sharedNode1299 = [sharedNode1049];
+const sharedNode1300 = {"kind":"Name","value":"PendingModInvites"};
+const sharedNode1301 = [sharedNode187,sharedNode189,sharedNode1208,sharedNode1204,sharedNode1206,sharedNode1202,sharedNode1214,sharedNode1212,sharedNode1210];
+const sharedNode1302 = {"kind":"SelectionSet","selections":sharedNode1301};
+const sharedNode1303 = {"kind":"Name","value":"DefaultModRole"};
+const sharedNode1304 = {"kind":"Name","value":"canDeleteWiki"};
+const sharedNode1305 = {"kind":"Field","name":sharedNode1304};
+const sharedNode1306 = {"kind":"Field","name":{"kind":"Name","value":"canPermanentlyRemoveImage"}};
+const sharedNode1307 = [sharedNode187,sharedNode189,sharedNode1175,sharedNode1177,sharedNode1179,sharedNode1261,sharedNode1305,sharedNode1181,sharedNode1183,sharedNode1185,sharedNode1187,sharedNode1189,sharedNode1191,sharedNode1193,sharedNode1195,sharedNode1306];
+const sharedNode1308 = {"kind":"SelectionSet","selections":sharedNode1307};
+const sharedNode1309 = {"kind":"Name","value":"getServerHealthDashboard"};
+const sharedNode1310 = {"kind":"Name","value":"startDate"};
+const sharedNode1311 = {"kind":"Variable","name":sharedNode1310};
+const sharedNode1312 = {"kind":"VariableDefinition","variable":sharedNode1311,"type":sharedNode736};
+const sharedNode1313 = {"kind":"Variable","name":sharedNode422};
+const sharedNode1314 = {"kind":"VariableDefinition","variable":sharedNode1313,"type":sharedNode736};
+const sharedNode1315 = {"kind":"Name","value":"channelUniqueNames"};
+const sharedNode1316 = {"kind":"Variable","name":sharedNode1315};
+const sharedNode1317 = {"kind":"ListType","type":sharedNode737};
+const sharedNode1318 = {"kind":"VariableDefinition","variable":sharedNode1316,"type":sharedNode1317};
+const sharedNode1319 = {"kind":"Name","value":"sortBy"};
+const sharedNode1320 = {"kind":"Variable","name":sharedNode1319};
+const sharedNode1321 = {"kind":"VariableDefinition","variable":sharedNode1320,"type":sharedNode736};
+const sharedNode1322 = {"kind":"Name","value":"sortDirection"};
+const sharedNode1323 = {"kind":"Variable","name":sharedNode1322};
+const sharedNode1324 = {"kind":"VariableDefinition","variable":sharedNode1323,"type":sharedNode736};
+const sharedNode1325 = [sharedNode1312,sharedNode1314,sharedNode1318,sharedNode750,sharedNode1321,sharedNode1324];
+const sharedNode1326 = {"kind":"Argument","name":sharedNode1310,"value":sharedNode1311};
+const sharedNode1327 = {"kind":"Argument","name":sharedNode422,"value":sharedNode1313};
+const sharedNode1328 = {"kind":"Argument","name":sharedNode1315,"value":sharedNode1316};
+const sharedNode1329 = {"kind":"Argument","name":sharedNode1319,"value":sharedNode1320};
+const sharedNode1330 = {"kind":"Argument","name":sharedNode1322,"value":sharedNode1323};
+const sharedNode1331 = [sharedNode1326,sharedNode1327,sharedNode1328,sharedNode756,sharedNode1329,sharedNode1330];
+const sharedNode1332 = {"kind":"Field","name":sharedNode1310};
+const sharedNode1333 = {"kind":"Name","value":"generatedAt"};
+const sharedNode1334 = {"kind":"Field","name":sharedNode1333};
+const sharedNode1335 = {"kind":"Field","name":{"kind":"Name","value":"activeChannelCount"}};
+const sharedNode1336 = {"kind":"Name","value":"discussionCount"};
+const sharedNode1337 = {"kind":"Field","name":sharedNode1336};
+const sharedNode1338 = {"kind":"Name","value":"commentCount"};
+const sharedNode1339 = {"kind":"Field","name":sharedNode1338};
+const sharedNode1340 = {"kind":"Name","value":"eventCount"};
+const sharedNode1341 = {"kind":"Field","name":sharedNode1340};
+const sharedNode1342 = {"kind":"Name","value":"downloadCount"};
+const sharedNode1343 = {"kind":"Field","name":sharedNode1342};
+const sharedNode1344 = {"kind":"Name","value":"voteCount"};
+const sharedNode1345 = {"kind":"Field","name":sharedNode1344};
+const sharedNode1346 = {"kind":"Name","value":"openIssueCount"};
+const sharedNode1347 = {"kind":"Field","name":sharedNode1346};
+const sharedNode1348 = {"kind":"Name","value":"issueOpenedCount"};
+const sharedNode1349 = {"kind":"Field","name":sharedNode1348};
+const sharedNode1350 = {"kind":"Field","name":{"kind":"Name","value":"issueClosedCount"}};
+const sharedNode1351 = {"kind":"Name","value":"moderationActionCount"};
+const sharedNode1352 = {"kind":"Field","name":sharedNode1351};
+const sharedNode1353 = {"kind":"Name","value":"archivedContentCount"};
+const sharedNode1354 = {"kind":"Field","name":sharedNode1353};
+const sharedNode1355 = {"kind":"Name","value":"lockedContentCount"};
+const sharedNode1356 = {"kind":"Field","name":sharedNode1355};
+const sharedNode1357 = {"kind":"Field","name":{"kind":"Name","value":"suspensionCount"}};
+const sharedNode1358 = {"kind":"Field","name":{"kind":"Name","value":"failedDownloadScanCount"}};
+const sharedNode1359 = {"kind":"Field","name":{"kind":"Name","value":"queuedPluginJobCount"}};
+const sharedNode1360 = {"kind":"Field","name":{"kind":"Name","value":"runningPluginJobCount"}};
+const sharedNode1361 = {"kind":"Field","name":{"kind":"Name","value":"pluginTimeoutCount24h"}};
+const sharedNode1362 = {"kind":"Field","name":{"kind":"Name","value":"pluginTimeoutRate24h"}};
+const sharedNode1363 = {"kind":"Field","name":{"kind":"Name","value":"repeatedPluginFailureCount24h"}};
+const sharedNode1364 = {"kind":"Field","name":{"kind":"Name","value":"pluginRetryAttemptCount1h"}};
+const sharedNode1365 = {"kind":"Field","name":{"kind":"Name","value":"pluginRetryStormCount1h"}};
+const sharedNode1366 = {"kind":"Field","name":{"kind":"Name","value":"oldestQueuedPluginJobAgeSeconds"}};
+const sharedNode1367 = {"kind":"Field","name":{"kind":"Name","value":"medianOpenIssueAgeDays"}};
+const sharedNode1368 = [sharedNode1335,sharedNode1337,sharedNode1339,sharedNode1341,sharedNode1343,sharedNode1345,sharedNode1347,sharedNode1349,sharedNode1350,sharedNode1352,sharedNode1354,sharedNode1356,sharedNode1357,sharedNode1358,sharedNode1359,sharedNode1360,sharedNode1361,sharedNode1362,sharedNode1363,sharedNode1364,sharedNode1365,sharedNode1366,sharedNode1367];
+const sharedNode1369 = {"kind":"SelectionSet","selections":sharedNode1368};
+const sharedNode1370 = {"kind":"Field","name":{"kind":"Name","value":"summary"},"selectionSet":sharedNode1369};
+const sharedNode1371 = {"kind":"Name","value":"date"};
+const sharedNode1372 = {"kind":"Field","name":sharedNode1371};
+const sharedNode1373 = {"kind":"Field","name":sharedNode811};
+const sharedNode1374 = {"kind":"Field","name":{"kind":"Name","value":"issuesOpened"}};
+const sharedNode1375 = {"kind":"Field","name":{"kind":"Name","value":"moderationActions"}};
+const sharedNode1376 = [sharedNode1372,sharedNode1373,{"kind":"Field","name":sharedNode716},{"kind":"Field","name":sharedNode994},{"kind":"Field","name":sharedNode1297},sharedNode1374,sharedNode1375];
+const sharedNode1377 = {"kind":"SelectionSet","selections":sharedNode1376};
+const sharedNode1378 = {"kind":"Field","name":{"kind":"Name","value":"timeSeries"},"selectionSet":sharedNode1377};
+const sharedNode1379 = {"kind":"Field","name":{"kind":"Name","value":"uniqueContributorCount"}};
+const sharedNode1380 = {"kind":"Field","name":{"kind":"Name","value":"oldestOpenIssueAgeDays"}};
+const sharedNode1381 = {"kind":"Field","name":{"kind":"Name","value":"issuesPerHundredContributions"}};
+const sharedNode1382 = {"kind":"Field","name":{"kind":"Name","value":"activityScore"}};
+const sharedNode1383 = {"kind":"Field","name":{"kind":"Name","value":"healthLabel"}};
+const sharedNode1384 = [sharedNode30,sharedNode99,sharedNode57,sharedNode231,sharedNode1337,sharedNode1339,sharedNode1341,sharedNode1343,sharedNode1345,sharedNode1379,sharedNode1347,sharedNode1349,sharedNode1352,sharedNode1354,sharedNode1356,sharedNode1380,sharedNode1381,sharedNode1382,sharedNode1383];
+const sharedNode1385 = {"kind":"SelectionSet","selections":sharedNode1384};
+const sharedNode1386 = {"kind":"Field","name":{"kind":"Name","value":"channelHealth"},"selectionSet":sharedNode1385};
+const sharedNode1387 = {"kind":"Name","value":"label"};
+const sharedNode1388 = {"kind":"Field","name":sharedNode1387};
+const sharedNode1389 = [sharedNode1388,{"kind":"Field","name":{"kind":"Name","value":"minDays"}},{"kind":"Field","name":{"kind":"Name","value":"maxDays"}},sharedNode395];
+const sharedNode1390 = {"kind":"SelectionSet","selections":sharedNode1389};
+const sharedNode1391 = {"kind":"Field","name":{"kind":"Name","value":"issueAging"},"selectionSet":sharedNode1390};
+const sharedNode1392 = {"kind":"Name","value":"downloadableFileId"};
+const sharedNode1393 = [sharedNode5,sharedNode57,sharedNode64,sharedNode68,sharedNode66,sharedNode38];
+const sharedNode1394 = {"kind":"SelectionSet","selections":sharedNode1393};
+const sharedNode1395 = [sharedNode187,sharedNode189,sharedNode1175,sharedNode1177,sharedNode1179,sharedNode1261,sharedNode1181,sharedNode1183,sharedNode1185,sharedNode1187,sharedNode1189,sharedNode1191,sharedNode1193,sharedNode1195];
+const sharedNode1396 = {"kind":"SelectionSet","selections":sharedNode1395};
+const sharedNode1397 = [sharedNode187,sharedNode189,sharedNode1210,sharedNode1212,sharedNode1214,sharedNode1187,sharedNode1206,sharedNode1204,sharedNode1208,sharedNode1202];
+const sharedNode1398 = {"kind":"SelectionSet","selections":sharedNode1397};
+const sharedNode1399 = {"kind":"Field","name":{"kind":"Name","value":"SuspendedUsersConnection"},"selectionSet":sharedNode21};
+const sharedNode1400 = {"kind":"Name","value":"SuspendedUsers"};
+const sharedNode1401 = {"kind":"Name","value":"suspendedUntil"};
+const sharedNode1402 = {"kind":"Field","name":sharedNode1401};
+const sharedNode1403 = {"kind":"Name","value":"suspendedIndefinitely"};
+const sharedNode1404 = {"kind":"Field","name":sharedNode1403};
+const sharedNode1405 = {"kind":"Name","value":"RelatedIssue"};
+const sharedNode1406 = {"kind":"Field","name":sharedNode1405,"selectionSet":sharedNode982};
+const sharedNode1407 = {"kind":"Field","name":{"kind":"Name","value":"SuspendedModsConnection"},"selectionSet":sharedNode21};
+const sharedNode1408 = {"kind":"Name","value":"SuspendedMods"};
+const sharedNode1409 = {"kind":"Name","value":"modProfileName"};
+const sharedNode1410 = {"kind":"Field","name":sharedNode1409};
+const sharedNode1411 = {"kind":"Field","name":{"kind":"Name","value":"SuspendedMod"},"selectionSet":sharedNode59};
+const sharedNode1412 = {"kind":"Name","value":"InstalledVersions"};
+const sharedNode1413 = {"kind":"Name","value":"repoUrl"};
+const sharedNode1414 = {"kind":"Field","name":sharedNode1413};
+const sharedNode1415 = {"kind":"Name","value":"entryPath"};
+const sharedNode1416 = {"kind":"Field","name":sharedNode1415};
+const sharedNode1417 = [sharedNode30,sharedNode538,sharedNode1414,sharedNode1416];
+const sharedNode1418 = {"kind":"SelectionSet","selections":sharedNode1417};
+const sharedNode1419 = {"kind":"Field","name":sharedNode1412,"selectionSet":sharedNode1418};
+const sharedNode1420 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1111};
+const sharedNode1421 = [sharedNode1420];
+const sharedNode1422 = {"kind":"Name","value":"authorName"};
+const sharedNode1423 = {"kind":"Field","name":sharedNode1422};
+const sharedNode1424 = {"kind":"Name","value":"authorUrl"};
+const sharedNode1425 = {"kind":"Field","name":sharedNode1424};
+const sharedNode1426 = {"kind":"Name","value":"homepage"};
+const sharedNode1427 = {"kind":"Field","name":sharedNode1426};
+const sharedNode1428 = {"kind":"Field","name":sharedNode319};
+const sharedNode1429 = {"kind":"Name","value":"tags"};
+const sharedNode1430 = {"kind":"Field","name":sharedNode1429};
+const sharedNode1431 = {"kind":"Name","value":"registryUrl"};
+const sharedNode1432 = {"kind":"Field","name":sharedNode1431};
+const sharedNode1433 = {"kind":"Name","value":"releaseNotesUrl"};
+const sharedNode1434 = {"kind":"Field","name":sharedNode1433};
+const sharedNode1435 = {"kind":"Name","value":"sourceRepoUrl"};
+const sharedNode1436 = {"kind":"Field","name":sharedNode1435};
+const sharedNode1437 = {"kind":"Name","value":"sourceCommit"};
+const sharedNode1438 = {"kind":"Field","name":sharedNode1437};
+const sharedNode1439 = {"kind":"Name","value":"minServerVersion"};
+const sharedNode1440 = {"kind":"Field","name":sharedNode1439};
+const sharedNode1441 = {"kind":"Name","value":"apiVersion"};
+const sharedNode1442 = {"kind":"Field","name":sharedNode1441};
+const sharedNode1443 = [sharedNode30,sharedNode187,sharedNode57,sharedNode189,sharedNode1423,sharedNode1425,sharedNode1427,sharedNode1428,sharedNode1430];
+const sharedNode1444 = {"kind":"SelectionSet","selections":sharedNode1443};
+const sharedNode1445 = {"kind":"Field","name":sharedNode1136,"selectionSet":sharedNode1444};
+const sharedNode1446 = {"kind":"Name","value":"readmeMarkdown"};
+const sharedNode1447 = {"kind":"Field","name":sharedNode1446};
+const sharedNode1448 = {"kind":"Name","value":"manifest"};
+const sharedNode1449 = {"kind":"Field","name":sharedNode1448};
+const sharedNode1450 = {"kind":"Field","name":{"kind":"Name","value":"latestVersion"}};
+const sharedNode1451 = {"kind":"Field","name":{"kind":"Name","value":"availableVersions"}};
+const sharedNode1452 = [sharedNode1445,sharedNode538,sharedNode501,sharedNode1139,sharedNode1141,sharedNode1447,sharedNode1432,sharedNode1434,sharedNode1436,sharedNode1438,sharedNode1440,sharedNode1442,sharedNode1449,{"kind":"Field","name":{"kind":"Name","value":"hasUpdate"}},sharedNode1450,sharedNode1451];
+const sharedNode1453 = {"kind":"SelectionSet","selections":sharedNode1452};
+const sharedNode1454 = {"kind":"Field","name":{"kind":"Name","value":"getInstalledPlugins"},"selectionSet":sharedNode1453};
+const sharedNode1455 = {"kind":"Variable","name":sharedNode500};
+const sharedNode1456 = {"kind":"VariableDefinition","variable":sharedNode1455,"type":sharedNode736};
+const sharedNode1457 = {"kind":"Argument","name":sharedNode500,"value":sharedNode1455};
+const sharedNode1458 = {"kind":"Name","value":"required"};
+const sharedNode1459 = {"kind":"Field","name":sharedNode1458};
+const sharedNode1460 = {"kind":"Name","value":"first"};
+const sharedNode1461 = {"kind":"IntValue","value":"10"};
+const sharedNode1462 = {"kind":"FragmentSpread","name":sharedNode480};
+const sharedNode1463 = [sharedNode1462];
+const sharedNode1464 = {"kind":"SelectionSet","selections":sharedNode1463};
+const sharedNode1465 = {"kind":"Variable","name":sharedNode1392};
+const sharedNode1466 = {"kind":"VariableDefinition","variable":sharedNode1465,"type":sharedNode713};
+const sharedNode1467 = {"kind":"Argument","name":sharedNode1392,"value":sharedNode1465};
+const sharedNode1468 = {"kind":"Field","name":{"kind":"Name","value":"effectiveAt"}};
+const sharedNode1469 = {"kind":"Name","value":"reason"};
+const sharedNode1470 = {"kind":"Field","name":{"kind":"Name","value":"continueOnError"}};
+const sharedNode1471 = [sharedNode534,sharedNode536,sharedNode538,sharedNode119,{"kind":"Field","name":{"kind":"Name","value":"condition"}},sharedNode1470];
+const sharedNode1472 = {"kind":"SelectionSet","selections":sharedNode1471};
+const sharedNode1473 = {"kind":"Field","name":{"kind":"Name","value":"expectedJobs"},"selectionSet":sharedNode1472};
+const sharedNode1474 = {"kind":"Field","name":{"kind":"Name","value":"enforcementBehavior"}};
+const sharedNode1475 = {"kind":"Field","name":{"kind":"Name","value":"affectedFileCount"}};
+const sharedNode1476 = {"kind":"Field","name":{"kind":"Name","value":"accessibleFileCount"}};
+const sharedNode1477 = {"kind":"Field","name":{"kind":"Name","value":"unavailableFileCount"}};
+const sharedNode1478 = {"kind":"Field","name":{"kind":"Name","value":"estimatedProviderRuns"}};
+const sharedNode1479 = {"kind":"Field","name":{"kind":"Name","value":"pluginPipelines"}};
+const sharedNode1480 = {"kind":"Name","value":"birthday"};
+const sharedNode1481 = {"kind":"Variable","name":sharedNode1480};
+const sharedNode1482 = {"kind":"Argument","name":sharedNode1480,"value":sharedNode1481};
+const sharedNode1483 = {"kind":"Name","value":"flairRequired"};
+const sharedNode1484 = {"kind":"Variable","name":sharedNode1483};
+const sharedNode1485 = {"kind":"Name","value":"flairs"};
+const sharedNode1486 = {"kind":"Field","name":sharedNode1483};
+const sharedNode1487 = {"kind":"Field","name":sharedNode1485,"selectionSet":sharedNode121};
+const sharedNode1488 = [sharedNode99,sharedNode1486,sharedNode1487];
+const sharedNode1489 = {"kind":"SelectionSet","selections":sharedNode1488};
+const sharedNode1490 = {"kind":"Variable","name":{"kind":"Name","value":"createChannelInput"}};
+const sharedNode1491 = {"kind":"Name","value":"channels"};
+const sharedNode1492 = {"kind":"Name","value":"ChannelWhere"};
+const sharedNode1493 = {"kind":"NamedType","name":sharedNode1492};
+const sharedNode1494 = {"kind":"NamedType","name":{"kind":"Name","value":"ChannelUpdateInput"}};
+const sharedNode1495 = {"kind":"Name","value":"updateChannels"};
+const sharedNode1496 = {"kind":"Name","value":"wikiEnabled"};
+const sharedNode1497 = {"kind":"Field","name":sharedNode1496};
+const sharedNode1498 = {"kind":"Name","value":"eventsEnabled"};
+const sharedNode1499 = {"kind":"Field","name":sharedNode1498};
+const sharedNode1500 = {"kind":"Field","name":{"kind":"Name","value":"downloadsEnabled"}};
+const sharedNode1501 = {"kind":"Name","value":"WikiHomePage"};
+const sharedNode1502 = {"kind":"Name","value":"slug"};
+const sharedNode1503 = {"kind":"Field","name":sharedNode1502};
+const sharedNode1504 = {"kind":"Name","value":"VersionAuthor"};
+const sharedNode1505 = {"kind":"Field","name":sharedNode1504,"selectionSet":sharedNode7};
+const sharedNode1506 = {"kind":"Field","name":sharedNode83,"arguments":sharedNode678,"selectionSet":sharedNode91};
+const sharedNode1507 = [sharedNode30,sharedNode127,sharedNode85,sharedNode87,sharedNode1503,sharedNode38,sharedNode40,sharedNode1505,sharedNode1506];
+const sharedNode1508 = {"kind":"SelectionSet","selections":sharedNode1507};
+const sharedNode1509 = {"kind":"Field","name":sharedNode1501,"selectionSet":sharedNode1508};
+const sharedNode1510 = {"kind":"Name","value":"imageUrl"};
+const sharedNode1511 = {"kind":"Variable","name":sharedNode1510};
+const sharedNode1512 = {"kind":"VariableDefinition","variable":sharedNode1511,"type":sharedNode737};
+const sharedNode1513 = [sharedNode738,sharedNode1512];
+const sharedNode1514 = {"kind":"Argument","name":sharedNode1510,"value":sharedNode1511};
+const sharedNode1515 = [sharedNode752,sharedNode1514];
+const sharedNode1516 = [sharedNode173,sharedNode231];
+const sharedNode1517 = {"kind":"SelectionSet","selections":sharedNode1516};
+const sharedNode1518 = {"kind":"Name","value":"WikiPageWhere"};
+const sharedNode1519 = {"kind":"NamedType","name":sharedNode1518};
+const sharedNode1520 = {"kind":"NonNullType","type":sharedNode1519};
+const sharedNode1521 = {"kind":"VariableDefinition","variable":sharedNode961,"type":sharedNode1520};
+const sharedNode1522 = {"kind":"NamedType","name":{"kind":"Name","value":"WikiPageUpdateInput"}};
+const sharedNode1523 = {"kind":"NonNullType","type":sharedNode1522};
+const sharedNode1524 = {"kind":"VariableDefinition","variable":sharedNode963,"type":sharedNode1523};
+const sharedNode1525 = [sharedNode1521,sharedNode1524];
+const sharedNode1526 = {"kind":"Name","value":"wikiPages"};
+const sharedNode1527 = [sharedNode30,sharedNode127,sharedNode85,sharedNode87,sharedNode1503,sharedNode38,sharedNode40,sharedNode1505];
+const sharedNode1528 = {"kind":"SelectionSet","selections":sharedNode1527};
+const sharedNode1529 = {"kind":"Name","value":"wikiPageId"};
+const sharedNode1530 = {"kind":"Variable","name":sharedNode1529};
+const sharedNode1531 = {"kind":"VariableDefinition","variable":sharedNode1530,"type":sharedNode713};
+const sharedNode1532 = [sharedNode738,sharedNode1531];
+const sharedNode1533 = {"kind":"Argument","name":sharedNode1529,"value":sharedNode1530};
+const sharedNode1534 = [sharedNode752,sharedNode1533];
+const sharedNode1535 = {"kind":"Variable","name":sharedNode1469};
+const sharedNode1536 = {"kind":"VariableDefinition","variable":sharedNode1535,"type":sharedNode737};
+const sharedNode1537 = {"kind":"Argument","name":sharedNode1469,"value":sharedNode1535};
+const sharedNode1538 = {"kind":"Name","value":"lockedByUsername"};
+const sharedNode1539 = {"kind":"Field","name":sharedNode1538};
+const sharedNode1540 = [sharedNode30,sharedNode224,sharedNode626,sharedNode628,sharedNode1539];
+const sharedNode1541 = {"kind":"SelectionSet","selections":sharedNode1540};
+const sharedNode1542 = [sharedNode738];
+const sharedNode1543 = {"kind":"Variable","name":{"kind":"Name","value":"enabledPlugins"}};
+const sharedNode1544 = {"kind":"Name","value":"reportText"};
+const sharedNode1545 = {"kind":"Variable","name":sharedNode1544};
+const sharedNode1546 = {"kind":"VariableDefinition","variable":sharedNode1545,"type":sharedNode737};
+const sharedNode1547 = {"kind":"Name","value":"selectedServerRules"};
+const sharedNode1548 = {"kind":"Variable","name":sharedNode1547};
+const sharedNode1549 = {"kind":"NonNullType","type":sharedNode1317};
+const sharedNode1550 = {"kind":"VariableDefinition","variable":sharedNode1548,"type":sharedNode1549};
+const sharedNode1551 = {"kind":"Argument","name":sharedNode1544,"value":sharedNode1545};
+const sharedNode1552 = {"kind":"Argument","name":sharedNode1547,"value":sharedNode1548};
+const sharedNode1553 = {"kind":"Name","value":"issueId"};
+const sharedNode1554 = {"kind":"Variable","name":sharedNode1553};
+const sharedNode1555 = {"kind":"Argument","name":sharedNode1553,"value":sharedNode1554};
+const sharedNode1556 = [sharedNode173,sharedNode57,sharedNode224,sharedNode626,sharedNode628,sharedNode630];
+const sharedNode1557 = {"kind":"SelectionSet","selections":sharedNode1556};
+const sharedNode1558 = {"kind":"VariableDefinition","variable":sharedNode1535,"type":sharedNode736};
+const sharedNode1559 = {"kind":"Name","value":"imageType"};
+const sharedNode1560 = {"kind":"Variable","name":sharedNode1559};
+const sharedNode1561 = {"kind":"Variable","name":{"kind":"Name","value":"channelWhere"}};
+const sharedNode1562 = {"kind":"Argument","name":sharedNode436,"value":sharedNode1461};
+const sharedNode1563 = {"kind":"FragmentSpread","name":sharedNode568};
+const sharedNode1564 = {"kind":"Name","value":"includeArchived"};
+const sharedNode1565 = {"kind":"Variable","name":sharedNode1564};
+const sharedNode1566 = {"kind":"Variable","name":sharedNode172};
+const sharedNode1567 = {"kind":"VariableDefinition","variable":sharedNode1566,"type":sharedNode737};
+const sharedNode1568 = {"kind":"Name","value":"now"};
+const sharedNode1569 = {"kind":"Variable","name":sharedNode1568};
+const sharedNode1570 = {"kind":"Name","value":"DateTime"};
+const sharedNode1571 = {"kind":"NamedType","name":sharedNode1570};
+const sharedNode1572 = {"kind":"VariableDefinition","variable":sharedNode1569,"type":sharedNode1571};
+const sharedNode1573 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1566};
+const sharedNode1574 = [sharedNode1573];
+const sharedNode1575 = {"kind":"ObjectValue","fields":sharedNode1574};
+const sharedNode1576 = {"kind":"ObjectField","name":sharedNode172,"value":sharedNode1575};
+const sharedNode1577 = [sharedNode1576];
+const sharedNode1578 = {"kind":"ObjectValue","fields":sharedNode1577};
+const sharedNode1579 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1578};
+const sharedNode1580 = [sharedNode1579];
+const sharedNode1581 = {"kind":"ObjectField","name":sharedNode39,"value":sharedNode637};
+const sharedNode1582 = [sharedNode1581];
+const sharedNode1583 = {"kind":"ObjectValue","fields":sharedNode1582};
+const sharedNode1584 = [sharedNode1583];
+const sharedNode1585 = {"kind":"ListValue","values":sharedNode1584};
+const sharedNode1586 = {"kind":"Argument","name":sharedNode428,"value":sharedNode1585};
+const sharedNode1587 = {"kind":"ObjectField","name":sharedNode1403,"value":sharedNode138};
+const sharedNode1588 = [sharedNode1587];
+const sharedNode1589 = {"kind":"ObjectValue","fields":sharedNode1588};
+const sharedNode1590 = {"kind":"Name","value":"suspendedUntil_GT"};
+const sharedNode1591 = {"kind":"ObjectField","name":sharedNode1590,"value":sharedNode1569};
+const sharedNode1592 = [sharedNode1591];
+const sharedNode1593 = {"kind":"ObjectValue","fields":sharedNode1592};
+const sharedNode1594 = [sharedNode1589,sharedNode1593];
+const sharedNode1595 = {"kind":"ListValue","values":sharedNode1594};
+const sharedNode1596 = {"kind":"ObjectField","name":sharedNode765,"value":sharedNode1595};
+const sharedNode1597 = [sharedNode1596];
+const sharedNode1598 = {"kind":"ObjectValue","fields":sharedNode1597};
+const sharedNode1599 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode1598};
+const sharedNode1600 = [sharedNode1599];
+const sharedNode1601 = {"kind":"ObjectValue","fields":sharedNode1600};
+const sharedNode1602 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1601};
+const sharedNode1603 = [sharedNode1602];
+const sharedNode1604 = {"kind":"Field","name":{"kind":"Name","value":"SuspensionsConnection"},"arguments":sharedNode1603,"selectionSet":sharedNode21};
+const sharedNode1605 = [sharedNode5,sharedNode57,sharedNode760,sharedNode762,sharedNode1604];
+const sharedNode1606 = {"kind":"SelectionSet","selections":sharedNode1605};
+const sharedNode1607 = {"kind":"Field","name":sharedNode758,"selectionSet":sharedNode1606};
+const sharedNode1608 = [sharedNode1410];
+const sharedNode1609 = {"kind":"SelectionSet","selections":sharedNode1608};
+const sharedNode1610 = {"kind":"Field","name":sharedNode1400,"selectionSet":sharedNode7};
+const sharedNode1611 = {"kind":"Name","value":"DiscussionChannelsConnection"};
+const sharedNode1612 = {"kind":"Name","value":"AND"};
+const sharedNode1613 = {"kind":"ObjectField","name":sharedNode124,"value":sharedNode766};
+const sharedNode1614 = [sharedNode1613];
+const sharedNode1615 = {"kind":"ObjectValue","fields":sharedNode1614};
+const sharedNode1616 = {"kind":"ObjectField","name":sharedNode133,"value":sharedNode1615};
+const sharedNode1617 = [sharedNode1616];
+const sharedNode1618 = {"kind":"ObjectValue","fields":sharedNode1617};
+const sharedNode1619 = {"kind":"ObjectField","name":sharedNode124,"value":sharedNode921};
+const sharedNode1620 = [sharedNode1619];
+const sharedNode1621 = {"kind":"ObjectValue","fields":sharedNode1620};
+const sharedNode1622 = {"kind":"ObjectField","name":sharedNode133,"value":sharedNode1621};
+const sharedNode1623 = [sharedNode1622];
+const sharedNode1624 = {"kind":"ObjectValue","fields":sharedNode1623};
+const sharedNode1625 = {"kind":"ObjectField","name":sharedNode600,"value":sharedNode138};
+const sharedNode1626 = {"kind":"Name","value":"EventChannelsConnection"};
+const sharedNode1627 = {"kind":"ObjectField","name":sharedNode95,"value":sharedNode766};
+const sharedNode1628 = [sharedNode139,sharedNode1627];
+const sharedNode1629 = {"kind":"ObjectValue","fields":sharedNode1628};
+const sharedNode1630 = {"kind":"ObjectField","name":sharedNode133,"value":sharedNode1629};
+const sharedNode1631 = {"kind":"ObjectField","name":sharedNode381,"value":sharedNode250};
+const sharedNode1632 = {"kind":"Name","value":"endTime_GT"};
+const sharedNode1633 = {"kind":"ObjectField","name":sharedNode1632,"value":sharedNode1569};
+const sharedNode1634 = [sharedNode1631,sharedNode1633];
+const sharedNode1635 = {"kind":"ObjectValue","fields":sharedNode1634};
+const sharedNode1636 = {"kind":"ObjectField","name":sharedNode95,"value":sharedNode1635};
+const sharedNode1637 = [sharedNode1630,sharedNode1636];
+const sharedNode1638 = {"kind":"ObjectValue","fields":sharedNode1637};
+const sharedNode1639 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode1638};
+const sharedNode1640 = [sharedNode1639];
+const sharedNode1641 = {"kind":"ObjectValue","fields":sharedNode1640};
+const sharedNode1642 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1641};
+const sharedNode1643 = [sharedNode1642];
+const sharedNode1644 = {"kind":"Field","name":sharedNode1626,"arguments":sharedNode1643,"selectionSet":sharedNode21};
+const sharedNode1645 = [sharedNode1175,sharedNode1177,sharedNode1179,sharedNode1305,sharedNode1181,sharedNode1183,sharedNode1185,sharedNode1187,sharedNode1189,sharedNode1191,sharedNode1193,sharedNode1195];
+const sharedNode1646 = {"kind":"SelectionSet","selections":sharedNode1645};
+const sharedNode1647 = {"kind":"Name","value":"canUpdateChannel"};
+const sharedNode1648 = {"kind":"Field","name":sharedNode1647};
+const sharedNode1649 = [sharedNode1208,sharedNode1204,sharedNode1206,sharedNode1648,sharedNode1214,sharedNode1212,sharedNode1210,sharedNode99];
+const sharedNode1650 = {"kind":"SelectionSet","selections":sharedNode1649};
+const sharedNode1651 = {"kind":"ObjectField","name":sharedNode118,"value":sharedNode429};
+const sharedNode1652 = [sharedNode1651];
+const sharedNode1653 = {"kind":"ObjectValue","fields":sharedNode1652};
+const sharedNode1654 = [sharedNode1653];
+const sharedNode1655 = {"kind":"ListValue","values":sharedNode1654};
+const sharedNode1656 = {"kind":"Argument","name":sharedNode428,"value":sharedNode1655};
+const sharedNode1657 = [sharedNode1656];
+const sharedNode1658 = {"kind":"Name","value":"options"};
+const sharedNode1659 = [sharedNode1567];
+const sharedNode1660 = {"kind":"Argument","name":sharedNode436,"value":{"kind":"IntValue","value":"4"}};
+const sharedNode1661 = {"kind":"ObjectField","name":sharedNode43,"value":sharedNode250};
+const sharedNode1662 = {"kind":"Variable","name":sharedNode1429};
+const sharedNode1663 = {"kind":"ListType","type":sharedNode736};
+const sharedNode1664 = {"kind":"VariableDefinition","variable":sharedNode1662,"type":sharedNode1663};
+const sharedNode1665 = {"kind":"Name","value":"searchInput"};
+const sharedNode1666 = {"kind":"Variable","name":sharedNode1665};
+const sharedNode1667 = {"kind":"VariableDefinition","variable":sharedNode1666,"type":sharedNode736};
+const sharedNode1668 = {"kind":"NonNullType","type":sharedNode1571};
+const sharedNode1669 = {"kind":"VariableDefinition","variable":sharedNode1569,"type":sharedNode1668};
+const sharedNode1670 = {"kind":"Argument","name":sharedNode1429,"value":sharedNode1662};
+const sharedNode1671 = {"kind":"Argument","name":sharedNode1665,"value":sharedNode1666};
+const sharedNode1672 = {"kind":"Name","value":"year"};
+const sharedNode1673 = {"kind":"Variable","name":sharedNode1672};
+const sharedNode1674 = {"kind":"VariableDefinition","variable":sharedNode1673,"type":sharedNode747};
+const sharedNode1675 = {"kind":"Argument","name":sharedNode1672,"value":sharedNode1673};
+const sharedNode1676 = {"kind":"Name","value":"activities"};
+const sharedNode1677 = [sharedNode5,sharedNode64];
+const sharedNode1678 = {"kind":"SelectionSet","selections":sharedNode1677};
+const sharedNode1679 = [sharedNode30,sharedNode101,sharedNode99];
+const sharedNode1680 = {"kind":"SelectionSet","selections":sharedNode1679};
+const sharedNode1681 = {"kind":"Field","name":sharedNode97,"selectionSet":sharedNode1680};
+const sharedNode1682 = {"kind":"Name","value":"Discussions"};
+const sharedNode1683 = {"kind":"Field","name":sharedNode88,"selectionSet":sharedNode1678};
+const sharedNode1684 = {"kind":"Field","name":sharedNode170,"selectionSet":sharedNode103};
+const sharedNode1685 = [sharedNode30,sharedNode127,sharedNode38,sharedNode1683,sharedNode1684];
+const sharedNode1686 = {"kind":"SelectionSet","selections":sharedNode1685};
+const sharedNode1687 = {"kind":"Field","name":sharedNode1682,"selectionSet":sharedNode1686};
+const sharedNode1688 = {"kind":"Variable","name":sharedNode188};
+const sharedNode1689 = {"kind":"Variable","name":sharedNode190};
+const sharedNode1690 = {"kind":"Name","value":"CollectionType"};
+const sharedNode1691 = {"kind":"NamedType","name":sharedNode1690};
+const sharedNode1692 = {"kind":"NonNullType","type":sharedNode1691};
+const sharedNode1693 = {"kind":"VariableDefinition","variable":sharedNode1689,"type":sharedNode1692};
+const sharedNode1694 = {"kind":"Variable","name":sharedNode192};
+const sharedNode1695 = {"kind":"Variable","name":sharedNode39};
+const sharedNode1696 = [];
+const sharedNode1697 = {"kind":"Name","value":"collections"};
+const sharedNode1698 = [sharedNode30,sharedNode187,sharedNode189,sharedNode191,sharedNode193,sharedNode195,sharedNode38,sharedNode40];
+const sharedNode1699 = {"kind":"SelectionSet","selections":sharedNode1698};
+const sharedNode1700 = {"kind":"Name","value":"collectionId"};
+const sharedNode1701 = {"kind":"Variable","name":sharedNode1700};
+const sharedNode1702 = {"kind":"VariableDefinition","variable":sharedNode1701,"type":sharedNode713};
+const sharedNode1703 = {"kind":"Name","value":"itemId"};
+const sharedNode1704 = {"kind":"Variable","name":sharedNode1703};
+const sharedNode1705 = {"kind":"VariableDefinition","variable":sharedNode1704,"type":sharedNode713};
+const sharedNode1706 = [sharedNode1702,sharedNode1705];
+const sharedNode1707 = {"kind":"Name","value":"addToCollection"};
+const sharedNode1708 = {"kind":"ObjectField","name":sharedNode1700,"value":sharedNode1701};
+const sharedNode1709 = {"kind":"ObjectField","name":sharedNode1703,"value":sharedNode1704};
+const sharedNode1710 = {"kind":"Name","value":"itemType"};
+const sharedNode1711 = {"kind":"Name","value":"removeFromCollection"};
+const sharedNode1712 = {"kind":"Argument","name":sharedNode1700,"value":sharedNode1701};
+const sharedNode1713 = {"kind":"Argument","name":sharedNode1703,"value":sharedNode1704};
+const sharedNode1714 = {"kind":"EnumValue","value":"DOWNLOAD"};
+const sharedNode1715 = {"kind":"Argument","name":sharedNode1710,"value":sharedNode1714};
+const sharedNode1716 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1701};
+const sharedNode1717 = [sharedNode1716];
+const sharedNode1718 = {"kind":"ObjectValue","fields":sharedNode1717};
+const sharedNode1719 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode1718};
+const sharedNode1720 = [sharedNode1719];
+const sharedNode1721 = {"kind":"ObjectValue","fields":sharedNode1720};
+const sharedNode1722 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1721};
+const sharedNode1723 = [sharedNode1722];
+const sharedNode1724 = {"kind":"Name","value":"nodesDeleted"};
+const sharedNode1725 = {"kind":"Field","name":sharedNode1724};
+const sharedNode1726 = {"kind":"Name","value":"newPosition"};
+const sharedNode1727 = {"kind":"Variable","name":sharedNode1726};
+const sharedNode1728 = {"kind":"Name","value":"serverId"};
+const sharedNode1729 = {"kind":"Variable","name":sharedNode1728};
+const sharedNode1730 = {"kind":"Name","value":"shareMessage"};
+const sharedNode1731 = {"kind":"Variable","name":sharedNode1730};
+const sharedNode1732 = {"kind":"Field","name":sharedNode170,"selectionSet":sharedNode587};
+const sharedNode1733 = {"kind":"Name","value":"searchTerm"};
+const sharedNode1734 = {"kind":"Variable","name":sharedNode1733};
+const sharedNode1735 = {"kind":"VariableDefinition","variable":sharedNode1734,"type":sharedNode736};
+const sharedNode1736 = [sharedNode873,sharedNode1735];
+const sharedNode1737 = {"kind":"Name","value":"Collections"};
+const sharedNode1738 = {"kind":"Name","value":"name_CONTAINS"};
+const sharedNode1739 = {"kind":"ObjectField","name":sharedNode1738,"value":sharedNode1734};
+const sharedNode1740 = {"kind":"Field","name":sharedNode1032,"selectionSet":sharedNode581};
+const sharedNode1741 = {"kind":"Name","value":"FavoriteComments"};
+const sharedNode1742 = {"kind":"ObjectField","name":sharedNode134,"value":{"kind":"EnumValue","value":"IMAGES"}};
+const sharedNode1743 = [sharedNode1742];
+const sharedNode1744 = {"kind":"ObjectValue","fields":sharedNode1743};
+const sharedNode1745 = {"kind":"ObjectField","name":sharedNode190,"value":sharedNode1744};
+const sharedNode1746 = {"kind":"ObjectField","name":sharedNode134,"value":{"kind":"EnumValue","value":"CHANNELS"}};
+const sharedNode1747 = [sharedNode1746];
+const sharedNode1748 = {"kind":"ObjectValue","fields":sharedNode1747};
+const sharedNode1749 = {"kind":"ObjectField","name":sharedNode190,"value":sharedNode1748};
+const sharedNode1750 = {"kind":"Argument","name":sharedNode132,"value":sharedNode921};
+const sharedNode1751 = {"kind":"Field","name":sharedNode88,"selectionSet":sharedNode1394};
+const sharedNode1752 = [sharedNode30,sharedNode99,sharedNode44,sharedNode222,sharedNode456];
+const sharedNode1753 = {"kind":"SelectionSet","selections":sharedNode1752};
+const sharedNode1754 = {"kind":"Field","name":sharedNode170,"selectionSet":sharedNode1753};
+const sharedNode1755 = [sharedNode30,sharedNode150,sharedNode154];
+const sharedNode1756 = {"kind":"SelectionSet","selections":sharedNode1755};
+const sharedNode1757 = {"kind":"Field","name":sharedNode131,"selectionSet":sharedNode1756};
+const sharedNode1758 = [sharedNode30,sharedNode1757];
+const sharedNode1759 = {"kind":"SelectionSet","selections":sharedNode1758};
+const sharedNode1760 = {"kind":"Field","name":sharedNode128,"selectionSet":sharedNode1759};
+const sharedNode1761 = [sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode203,sharedNode205,sharedNode822,sharedNode1751,sharedNode1754,sharedNode276,sharedNode1760];
+const sharedNode1762 = {"kind":"SelectionSet","selections":sharedNode1761};
+const sharedNode1763 = {"kind":"Name","value":"Downloads"};
+const sharedNode1764 = {"kind":"Field","name":sharedNode157,"selectionSet":sharedNode7};
+const sharedNode1765 = [sharedNode30,sharedNode150,sharedNode152,sharedNode154,sharedNode38,sharedNode1764];
+const sharedNode1766 = {"kind":"SelectionSet","selections":sharedNode1765};
+const sharedNode1767 = {"kind":"Variable","name":{"kind":"Name","value":"downloadId"}};
+const sharedNode1768 = [sharedNode30,sharedNode130,sharedNode1757];
+const sharedNode1769 = {"kind":"SelectionSet","selections":sharedNode1768};
+const sharedNode1770 = {"kind":"Field","name":sharedNode128,"selectionSet":sharedNode1769};
+const sharedNode1771 = {"kind":"Variable","name":{"kind":"Name","value":"downloadLimit"}};
+const sharedNode1772 = {"kind":"Variable","name":{"kind":"Name","value":"downloadOffset"}};
+const sharedNode1773 = {"kind":"IntValue","value":"0"};
+const sharedNode1774 = [sharedNode30,sharedNode99];
+const sharedNode1775 = {"kind":"SelectionSet","selections":sharedNode1774};
+const sharedNode1776 = {"kind":"Field","name":sharedNode170,"selectionSet":sharedNode1775};
+const sharedNode1777 = [sharedNode873,sharedNode1705,sharedNode1693];
+const sharedNode1778 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1689};
+const sharedNode1779 = [sharedNode1778];
+const sharedNode1780 = {"kind":"ObjectValue","fields":sharedNode1779};
+const sharedNode1781 = {"kind":"ObjectField","name":sharedNode190,"value":sharedNode1780};
+const sharedNode1782 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1704};
+const sharedNode1783 = [sharedNode1782];
+const sharedNode1784 = {"kind":"ObjectValue","fields":sharedNode1783};
+const sharedNode1785 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode1784};
+const sharedNode1786 = [sharedNode1785];
+const sharedNode1787 = {"kind":"ObjectValue","fields":sharedNode1786};
+const sharedNode1788 = [sharedNode30,sharedNode187,sharedNode191];
+const sharedNode1789 = {"kind":"SelectionSet","selections":sharedNode1788};
+const sharedNode1790 = {"kind":"Name","value":"emojiLabel"};
+const sharedNode1791 = {"kind":"Variable","name":sharedNode1790};
+const sharedNode1792 = {"kind":"VariableDefinition","variable":sharedNode1791,"type":sharedNode737};
+const sharedNode1793 = {"kind":"Name","value":"unicode"};
+const sharedNode1794 = {"kind":"Variable","name":sharedNode1793};
+const sharedNode1795 = {"kind":"VariableDefinition","variable":sharedNode1794,"type":sharedNode737};
+const sharedNode1796 = {"kind":"Argument","name":sharedNode1790,"value":sharedNode1791};
+const sharedNode1797 = {"kind":"Argument","name":sharedNode1793,"value":sharedNode1794};
+const sharedNode1798 = [sharedNode30,sharedNode34];
+const sharedNode1799 = {"kind":"SelectionSet","selections":sharedNode1798};
+const sharedNode1800 = [sharedNode714,sharedNode873];
+const sharedNode1801 = {"kind":"Argument","name":sharedNode968,"value":sharedNode710};
+const sharedNode1802 = [sharedNode1801,sharedNode875];
+const sharedNode1803 = [sharedNode30,sharedNode36,sharedNode8,sharedNode22,sharedNode24];
+const sharedNode1804 = {"kind":"SelectionSet","selections":sharedNode1803};
+const sharedNode1805 = {"kind":"Variable","name":{"kind":"Name","value":"updateCommentInput"}};
+const sharedNode1806 = {"kind":"Variable","name":{"kind":"Name","value":"commentWhere"}};
+const sharedNode1807 = {"kind":"Name","value":"CommentWhere"};
+const sharedNode1808 = {"kind":"NamedType","name":sharedNode1807};
+const sharedNode1809 = [sharedNode471];
+const sharedNode1810 = {"kind":"SelectionSet","selections":sharedNode1809};
+const sharedNode1811 = {"kind":"Field","name":sharedNode53,"selectionSet":sharedNode1810};
+const sharedNode1812 = {"kind":"Name","value":"relationshipsDeleted"};
+const sharedNode1813 = {"kind":"Field","name":sharedNode1812};
+const sharedNode1814 = [sharedNode1725,sharedNode1813];
+const sharedNode1815 = {"kind":"SelectionSet","selections":sharedNode1814};
+const sharedNode1816 = {"kind":"Variable","name":sharedNode1409};
+const sharedNode1817 = {"kind":"VariableDefinition","variable":sharedNode1816,"type":sharedNode737};
+const sharedNode1818 = {"kind":"Variable","name":sharedNode31};
+const sharedNode1819 = {"kind":"VariableDefinition","variable":sharedNode1818,"type":sharedNode737};
+const sharedNode1820 = {"kind":"VariableDefinition","variable":sharedNode1275,"type":sharedNode737};
+const sharedNode1821 = {"kind":"ObjectField","name":sharedNode784,"value":sharedNode135};
+const sharedNode1822 = {"kind":"ObjectField","name":sharedNode246,"value":sharedNode135};
+const sharedNode1823 = {"kind":"ObjectField","name":sharedNode31,"value":sharedNode1818};
+const sharedNode1824 = {"kind":"ObjectField","name":sharedNode56,"value":sharedNode1816};
+const sharedNode1825 = [sharedNode1824];
+const sharedNode1826 = {"kind":"ObjectValue","fields":sharedNode1825};
+const sharedNode1827 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode1826};
+const sharedNode1828 = [sharedNode1827];
+const sharedNode1829 = {"kind":"ObjectValue","fields":sharedNode1828};
+const sharedNode1830 = {"kind":"ObjectField","name":sharedNode132,"value":sharedNode1829};
+const sharedNode1831 = [sharedNode1830];
+const sharedNode1832 = {"kind":"ObjectValue","fields":sharedNode1831};
+const sharedNode1833 = {"kind":"ObjectField","name":sharedNode1105,"value":sharedNode1832};
+const sharedNode1834 = [sharedNode1833];
+const sharedNode1835 = {"kind":"ObjectValue","fields":sharedNode1834};
+const sharedNode1836 = {"kind":"ObjectField","name":sharedNode54,"value":sharedNode1835};
+const sharedNode1837 = [sharedNode1836];
+const sharedNode1838 = {"kind":"ObjectValue","fields":sharedNode1837};
+const sharedNode1839 = {"kind":"ObjectField","name":sharedNode53,"value":sharedNode1838};
+const sharedNode1840 = {"kind":"ObjectField","name":sharedNode172,"value":sharedNode1275};
+const sharedNode1841 = [sharedNode1840];
+const sharedNode1842 = {"kind":"ObjectValue","fields":sharedNode1841};
+const sharedNode1843 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode1842};
+const sharedNode1844 = [sharedNode1843];
+const sharedNode1845 = {"kind":"ObjectValue","fields":sharedNode1844};
+const sharedNode1846 = {"kind":"ObjectField","name":sharedNode132,"value":sharedNode1845};
+const sharedNode1847 = [sharedNode1846];
+const sharedNode1848 = {"kind":"ObjectValue","fields":sharedNode1847};
+const sharedNode1849 = {"kind":"ObjectField","name":sharedNode1105,"value":sharedNode1848};
+const sharedNode1850 = [sharedNode1849];
+const sharedNode1851 = {"kind":"ObjectValue","fields":sharedNode1850};
+const sharedNode1852 = {"kind":"ObjectField","name":sharedNode171,"value":sharedNode1851};
+const sharedNode1853 = {"kind":"Field","name":sharedNode784};
+const sharedNode1854 = {"kind":"Field","name":sharedNode246};
+const sharedNode1855 = [sharedNode57,sharedNode38];
+const sharedNode1856 = {"kind":"SelectionSet","selections":sharedNode1855};
+const sharedNode1857 = {"kind":"InlineFragment","typeCondition":sharedNode55,"selectionSet":sharedNode1856};
+const sharedNode1858 = [sharedNode5,sharedNode38];
+const sharedNode1859 = {"kind":"SelectionSet","selections":sharedNode1858};
+const sharedNode1860 = {"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":sharedNode1859};
+const sharedNode1861 = {"kind":"Name","value":"textVersionId"};
+const sharedNode1862 = {"kind":"Variable","name":sharedNode1861};
+const sharedNode1863 = {"kind":"VariableDefinition","variable":sharedNode1862,"type":sharedNode713};
+const sharedNode1864 = [sharedNode1863];
+const sharedNode1865 = {"kind":"Argument","name":sharedNode1861,"value":sharedNode1862};
+const sharedNode1866 = [sharedNode1865];
+const sharedNode1867 = [sharedNode30,sharedNode85,sharedNode87,sharedNode38,sharedNode40,sharedNode89];
+const sharedNode1868 = {"kind":"SelectionSet","selections":sharedNode1867};
+const sharedNode1869 = {"kind":"VariableDefinition","variable":sharedNode961,"type":sharedNode1808};
+const sharedNode1870 = [sharedNode965,sharedNode757,sharedNode756,sharedNode755];
+const sharedNode1871 = [sharedNode965];
+const sharedNode1872 = [sharedNode5,sharedNode64,sharedNode57,sharedNode68,sharedNode66,sharedNode38];
+const sharedNode1873 = {"kind":"SelectionSet","selections":sharedNode1872};
+const sharedNode1874 = {"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":sharedNode1873};
+const sharedNode1875 = [sharedNode60,sharedNode1874];
+const sharedNode1876 = {"kind":"SelectionSet","selections":sharedNode1875};
+const sharedNode1877 = {"kind":"Field","name":sharedNode53,"selectionSet":sharedNode1876};
+const sharedNode1878 = {"kind":"Field","name":sharedNode726,"selectionSet":sharedNode81};
+const sharedNode1879 = [sharedNode756,sharedNode755];
+const sharedNode1880 = [sharedNode38,sharedNode57];
+const sharedNode1881 = {"kind":"SelectionSet","selections":sharedNode1880};
+const sharedNode1882 = {"kind":"InlineFragment","typeCondition":sharedNode55,"selectionSet":sharedNode1881};
+const sharedNode1883 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode348};
+const sharedNode1884 = [sharedNode1883];
+const sharedNode1885 = {"kind":"ObjectValue","fields":sharedNode1884};
+const sharedNode1886 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1885};
+const sharedNode1887 = [sharedNode1886];
+const sharedNode1888 = {"kind":"Field","name":sharedNode328,"arguments":sharedNode1887,"selectionSet":sharedNode21};
+const sharedNode1889 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode742};
+const sharedNode1890 = [sharedNode1889];
+const sharedNode1891 = {"kind":"ObjectValue","fields":sharedNode1890};
+const sharedNode1892 = {"kind":"ObjectField","name":sharedNode56,"value":sharedNode1891};
+const sharedNode1893 = [sharedNode1892];
+const sharedNode1894 = {"kind":"ObjectValue","fields":sharedNode1893};
+const sharedNode1895 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode1894};
+const sharedNode1896 = [sharedNode1895];
+const sharedNode1897 = {"kind":"ObjectValue","fields":sharedNode1896};
+const sharedNode1898 = {"kind":"ObjectField","name":sharedNode54,"value":sharedNode1897};
+const sharedNode1899 = [sharedNode1898];
+const sharedNode1900 = {"kind":"ObjectValue","fields":sharedNode1899};
+const sharedNode1901 = {"kind":"ObjectField","name":sharedNode331,"value":sharedNode1900};
+const sharedNode1902 = {"kind":"Name","value":"filename"};
+const sharedNode1903 = {"kind":"Variable","name":sharedNode1902};
+const sharedNode1904 = {"kind":"Name","value":"contentType"};
+const sharedNode1905 = {"kind":"Variable","name":sharedNode1904};
+const sharedNode1906 = {"kind":"Name","value":"channelConnections"};
+const sharedNode1907 = {"kind":"Variable","name":sharedNode1906};
+const sharedNode1908 = {"kind":"VariableDefinition","variable":sharedNode1907,"type":sharedNode1317};
+const sharedNode1909 = {"kind":"Name","value":"uploadTarget"};
+const sharedNode1910 = {"kind":"Variable","name":sharedNode1909};
+const sharedNode1911 = {"kind":"Argument","name":sharedNode1906,"value":sharedNode1907};
+const sharedNode1912 = {"kind":"Name","value":"storageObjectName"};
+const sharedNode1913 = {"kind":"Variable","name":sharedNode149};
+const sharedNode1914 = {"kind":"Variable","name":sharedNode151};
+const sharedNode1915 = {"kind":"VariableDefinition","variable":sharedNode1914,"type":sharedNode736};
+const sharedNode1916 = {"kind":"Variable","name":sharedNode153};
+const sharedNode1917 = {"kind":"VariableDefinition","variable":sharedNode1916,"type":sharedNode736};
+const sharedNode1918 = {"kind":"Variable","name":sharedNode155};
+const sharedNode1919 = {"kind":"VariableDefinition","variable":sharedNode1918,"type":sharedNode736};
+const sharedNode1920 = {"kind":"Name","value":"albumId"};
+const sharedNode1921 = {"kind":"Variable","name":sharedNode1920};
+const sharedNode1922 = {"kind":"Variable","name":sharedNode1912};
+const sharedNode1923 = {"kind":"VariableDefinition","variable":sharedNode1922,"type":sharedNode736};
+const sharedNode1924 = {"kind":"ObjectField","name":sharedNode149,"value":sharedNode1913};
+const sharedNode1925 = {"kind":"ObjectField","name":sharedNode1912,"value":sharedNode1922};
+const sharedNode1926 = {"kind":"Variable","name":sharedNode285};
+const sharedNode1927 = {"kind":"Variable","name":sharedNode291};
+const sharedNode1928 = {"kind":"Variable","name":sharedNode293};
+const sharedNode1929 = {"kind":"Variable","name":sharedNode295};
+const sharedNode1930 = [sharedNode1466];
+const sharedNode1931 = [sharedNode1467];
+const sharedNode1932 = [sharedNode1466,sharedNode1558];
+const sharedNode1933 = [sharedNode1467,sharedNode1537];
+const sharedNode1934 = [sharedNode30,sharedNode312];
+const sharedNode1935 = {"kind":"SelectionSet","selections":sharedNode1934};
+const sharedNode1936 = [sharedNode1012];
+const sharedNode1937 = {"kind":"Argument","name":sharedNode1010,"value":sharedNode1011};
+const sharedNode1938 = {"kind":"Field","name":sharedNode140};
+const sharedNode1939 = {"kind":"Field","name":{"kind":"Name","value":"permanentlyRemovedAt"}};
+const sharedNode1940 = [sharedNode30,sharedNode1938,sharedNode1939];
+const sharedNode1941 = {"kind":"SelectionSet","selections":sharedNode1940};
+const sharedNode1942 = {"kind":"Name","value":"updateDownloadableFileSupportSettings"};
+const sharedNode1943 = {"kind":"Argument","name":sharedNode866,"value":sharedNode1041};
+const sharedNode1944 = {"kind":"Name","value":"discussionChannelId"};
+const sharedNode1945 = {"kind":"Variable","name":sharedNode1944};
+const sharedNode1946 = {"kind":"VariableDefinition","variable":sharedNode1945,"type":sharedNode713};
+const sharedNode1947 = {"kind":"Argument","name":sharedNode1944,"value":sharedNode1945};
+const sharedNode1948 = [sharedNode1943];
+const sharedNode1949 = {"kind":"Name","value":"DiscussionWhere"};
+const sharedNode1950 = {"kind":"NamedType","name":sharedNode1949};
+const sharedNode1951 = {"kind":"NonNullType","type":sharedNode1950};
+const sharedNode1952 = {"kind":"VariableDefinition","variable":sharedNode961,"type":sharedNode1951};
+const sharedNode1953 = {"kind":"Name","value":"updateDiscussionInput"};
+const sharedNode1954 = {"kind":"Variable","name":sharedNode1953};
+const sharedNode1955 = {"kind":"NamedType","name":{"kind":"Name","value":"DiscussionUpdateInput"}};
+const sharedNode1956 = {"kind":"NonNullType","type":sharedNode1955};
+const sharedNode1957 = {"kind":"VariableDefinition","variable":sharedNode1954,"type":sharedNode1956};
+const sharedNode1958 = [sharedNode30,sharedNode89,sharedNode85,sharedNode38];
+const sharedNode1959 = {"kind":"SelectionSet","selections":sharedNode1958};
+const sharedNode1960 = {"kind":"Name","value":"updateDiscussionWithChannelConnections"};
+const sharedNode1961 = {"kind":"Name","value":"channelDisconnections"};
+const sharedNode1962 = {"kind":"Variable","name":sharedNode1961};
+const sharedNode1963 = {"kind":"Name","value":"albumImageDisconnections"};
+const sharedNode1964 = {"kind":"Variable","name":sharedNode1963};
+const sharedNode1965 = {"kind":"Name","value":"channelFlairSelections"};
+const sharedNode1966 = {"kind":"Variable","name":sharedNode1965};
+const sharedNode1967 = {"kind":"Argument","name":sharedNode1961,"value":sharedNode1962};
+const sharedNode1968 = {"kind":"Argument","name":sharedNode1944,"value":sharedNode710};
+const sharedNode1969 = [sharedNode1968,sharedNode875];
+const sharedNode1970 = [sharedNode1820,sharedNode740];
+const sharedNode1971 = {"kind":"Name","value":"updateDiscussionChannels"};
+const sharedNode1972 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1275};
+const sharedNode1973 = [sharedNode1972];
+const sharedNode1974 = {"kind":"ObjectValue","fields":sharedNode1973};
+const sharedNode1975 = {"kind":"ObjectField","name":sharedNode98,"value":sharedNode1974};
+const sharedNode1976 = [sharedNode1975,sharedNode804];
+const sharedNode1977 = {"kind":"ObjectValue","fields":sharedNode1976};
+const sharedNode1978 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1977};
+const sharedNode1979 = {"kind":"Name","value":"set"};
+const sharedNode1980 = {"kind":"ObjectField","name":sharedNode1979,"value":sharedNode135};
+const sharedNode1981 = [sharedNode1980];
+const sharedNode1982 = {"kind":"ObjectValue","fields":sharedNode1981};
+const sharedNode1983 = {"kind":"ObjectField","name":sharedNode221,"value":sharedNode1982};
+const sharedNode1984 = {"kind":"Field","name":sharedNode796,"selectionSet":sharedNode479};
+const sharedNode1985 = [sharedNode1984];
+const sharedNode1986 = {"kind":"SelectionSet","selections":sharedNode1985};
+const sharedNode1987 = [sharedNode970,sharedNode1820,sharedNode740];
+const sharedNode1988 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode977};
+const sharedNode1989 = [sharedNode1988];
+const sharedNode1990 = {"kind":"ObjectValue","fields":sharedNode1989};
+const sharedNode1991 = {"kind":"ObjectField","name":sharedNode132,"value":sharedNode1990};
+const sharedNode1992 = [sharedNode1991];
+const sharedNode1993 = {"kind":"ObjectValue","fields":sharedNode1992};
+const sharedNode1994 = [sharedNode1993];
+const sharedNode1995 = {"kind":"ListValue","values":sharedNode1994};
+const sharedNode1996 = {"kind":"ObjectField","name":sharedNode1105,"value":sharedNode1995};
+const sharedNode1997 = [sharedNode1996];
+const sharedNode1998 = {"kind":"ObjectValue","fields":sharedNode1997};
+const sharedNode1999 = {"kind":"ObjectField","name":sharedNode1126,"value":sharedNode1995};
+const sharedNode2000 = [sharedNode1999];
+const sharedNode2001 = {"kind":"ObjectValue","fields":sharedNode2000};
+const sharedNode2002 = {"kind":"ObjectField","name":sharedNode1979,"value":sharedNode1916};
+const sharedNode2003 = [sharedNode2002];
+const sharedNode2004 = {"kind":"ObjectValue","fields":sharedNode2003};
+const sharedNode2005 = {"kind":"ObjectField","name":sharedNode153,"value":sharedNode2004};
+const sharedNode2006 = {"kind":"ObjectField","name":sharedNode1979,"value":sharedNode1914};
+const sharedNode2007 = [sharedNode2006];
+const sharedNode2008 = {"kind":"ObjectValue","fields":sharedNode2007};
+const sharedNode2009 = {"kind":"ObjectField","name":sharedNode151,"value":sharedNode2008};
+const sharedNode2010 = {"kind":"Name","value":"images"};
+const sharedNode2011 = [sharedNode1946];
+const sharedNode2012 = [sharedNode1947];
+const sharedNode2013 = {"kind":"Variable","name":sharedNode204};
+const sharedNode2014 = {"kind":"Name","value":"labelOptionIds"};
+const sharedNode2015 = {"kind":"Variable","name":sharedNode2014};
+const sharedNode2016 = {"kind":"VariableDefinition","variable":sharedNode2015,"type":sharedNode1097};
+const sharedNode2017 = {"kind":"Name","value":"id_IN"};
+const sharedNode2018 = {"kind":"ObjectField","name":sharedNode2017,"value":sharedNode2015};
+const sharedNode2019 = [sharedNode2018];
+const sharedNode2020 = {"kind":"ObjectValue","fields":sharedNode2019};
+const sharedNode2021 = [sharedNode30,sharedNode838];
+const sharedNode2022 = {"kind":"SelectionSet","selections":sharedNode2021};
+const sharedNode2023 = {"kind":"VariableDefinition","variable":sharedNode1666,"type":sharedNode737};
+const sharedNode2024 = {"kind":"Name","value":"selectedTags"};
+const sharedNode2025 = {"kind":"Variable","name":sharedNode2024};
+const sharedNode2026 = {"kind":"VariableDefinition","variable":sharedNode2025,"type":sharedNode1317};
+const sharedNode2027 = {"kind":"Name","value":"showArchived"};
+const sharedNode2028 = {"kind":"Variable","name":sharedNode2027};
+const sharedNode2029 = {"kind":"VariableDefinition","variable":sharedNode2028,"type":sharedNode1143};
+const sharedNode2030 = {"kind":"Name","value":"showUnanswered"};
+const sharedNode2031 = {"kind":"Variable","name":sharedNode2030};
+const sharedNode2032 = {"kind":"Variable","name":sharedNode1658};
+const sharedNode2033 = {"kind":"NamedType","name":{"kind":"Name","value":"DiscussionListOptions"}};
+const sharedNode2034 = {"kind":"VariableDefinition","variable":sharedNode2032,"type":sharedNode2033};
+const sharedNode2035 = {"kind":"Variable","name":sharedNode202};
+const sharedNode2036 = {"kind":"VariableDefinition","variable":sharedNode2035,"type":sharedNode1133};
+const sharedNode2037 = {"kind":"Name","value":"labelFilters"};
+const sharedNode2038 = {"kind":"Variable","name":sharedNode2037};
+const sharedNode2039 = {"kind":"Argument","name":sharedNode1658,"value":sharedNode2032};
+const sharedNode2040 = {"kind":"Argument","name":sharedNode2024,"value":sharedNode2025};
+const sharedNode2041 = {"kind":"Argument","name":sharedNode2027,"value":sharedNode2028};
+const sharedNode2042 = {"kind":"Argument","name":sharedNode202,"value":sharedNode2035};
+const sharedNode2043 = {"kind":"Field","name":sharedNode819};
+const sharedNode2044 = {"kind":"SelectionSet","selections":[sharedNode395]};
+const sharedNode2045 = [sharedNode30,sharedNode150,sharedNode152,sharedNode154,sharedNode160];
+const sharedNode2046 = {"kind":"SelectionSet","selections":sharedNode2045};
+const sharedNode2047 = {"kind":"Field","name":sharedNode131,"arguments":sharedNode148,"selectionSet":sharedNode2046};
+const sharedNode2048 = [sharedNode30,sharedNode130,sharedNode2047];
+const sharedNode2049 = {"kind":"SelectionSet","selections":sharedNode2048};
+const sharedNode2050 = {"kind":"Field","name":sharedNode128,"selectionSet":sharedNode2049};
+const sharedNode2051 = {"kind":"Field","name":sharedNode277,"arguments":sharedNode284,"selectionSet":sharedNode1935};
+const sharedNode2052 = {"kind":"Name","value":"selectedChannels"};
+const sharedNode2053 = {"kind":"Variable","name":sharedNode2052};
+const sharedNode2054 = {"kind":"VariableDefinition","variable":sharedNode2053,"type":sharedNode1317};
+const sharedNode2055 = {"kind":"Argument","name":sharedNode2052,"value":sharedNode2053};
+const sharedNode2056 = [sharedNode740,sharedNode738];
+const sharedNode2057 = {"kind":"Name","value":"emailAddress"};
+const sharedNode2058 = {"kind":"Variable","name":sharedNode2057};
+const sharedNode2059 = {"kind":"Field","name":sharedNode54,"selectionSet":sharedNode59};
+const sharedNode2060 = {"kind":"Name","value":"contactEmail"};
+const sharedNode2061 = {"kind":"Variable","name":sharedNode2060};
+const sharedNode2062 = {"kind":"Name","value":"subject"};
+const sharedNode2063 = {"kind":"Variable","name":sharedNode2062};
+const sharedNode2064 = {"kind":"Argument","name":sharedNode31,"value":sharedNode1818};
+const sharedNode2065 = {"kind":"Name","value":"getOwnEmail"};
+const sharedNode2066 = {"kind":"Name","value":"unreadNotificationCount"};
+const sharedNode2067 = {"kind":"Field","name":sharedNode2066};
+const sharedNode2068 = {"kind":"Field","name":sharedNode996,"selectionSet":sharedNode7};
+const sharedNode2069 = [sharedNode30,sharedNode99,sharedNode674];
+const sharedNode2070 = {"kind":"SelectionSet","selections":sharedNode2069};
+const sharedNode2071 = {"kind":"Field","name":sharedNode457,"selectionSet":sharedNode2070};
+const sharedNode2072 = {"kind":"Name","value":"updateEventInput"};
+const sharedNode2073 = {"kind":"Variable","name":sharedNode2072};
+const sharedNode2074 = {"kind":"Name","value":"EventUpdateInput"};
+const sharedNode2075 = {"kind":"NamedType","name":sharedNode2074};
+const sharedNode2076 = {"kind":"NonNullType","type":sharedNode2075};
+const sharedNode2077 = {"kind":"VariableDefinition","variable":sharedNode2073,"type":sharedNode2076};
+const sharedNode2078 = {"kind":"Name","value":"EventWhere"};
+const sharedNode2079 = {"kind":"NamedType","name":sharedNode2078};
+const sharedNode2080 = {"kind":"NonNullType","type":sharedNode2079};
+const sharedNode2081 = {"kind":"VariableDefinition","variable":sharedNode1907,"type":sharedNode1549};
+const sharedNode2082 = {"kind":"VariableDefinition","variable":sharedNode1962,"type":sharedNode1549};
+const sharedNode2083 = {"kind":"Name","value":"eventUpdateInput"};
+const sharedNode2084 = {"kind":"Argument","name":sharedNode2083,"value":sharedNode2073};
+const sharedNode2085 = [sharedNode30,sharedNode99,sharedNode459,sharedNode674];
+const sharedNode2086 = {"kind":"SelectionSet","selections":sharedNode2085};
+const sharedNode2087 = {"kind":"Field","name":sharedNode457,"selectionSet":sharedNode2086};
+const sharedNode2088 = [sharedNode995,sharedNode2087,sharedNode2068,sharedNode276];
+const sharedNode2089 = {"kind":"SelectionSet","selections":sharedNode2088};
+const sharedNode2090 = {"kind":"NamedType","name":{"kind":"Name","value":"EventEditScope"}};
+const sharedNode2091 = {"kind":"NonNullType","type":sharedNode2090};
+const sharedNode2092 = {"kind":"VariableDefinition","variable":sharedNode1455,"type":sharedNode2091};
+const sharedNode2093 = {"kind":"Variable","name":sharedNode2083};
+const sharedNode2094 = {"kind":"Variable","name":{"kind":"Name","value":"eventWhere"}};
+const sharedNode2095 = [sharedNode1002];
+const sharedNode2096 = [sharedNode30,sharedNode467];
+const sharedNode2097 = {"kind":"SelectionSet","selections":sharedNode2096};
+const sharedNode2098 = {"kind":"VariableDefinition","variable":sharedNode961,"type":sharedNode2079};
+const sharedNode2099 = {"kind":"VariableDefinition","variable":sharedNode1921,"type":sharedNode713};
+const sharedNode2100 = {"kind":"Name","value":"position"};
+const sharedNode2101 = {"kind":"Variable","name":sharedNode2100};
+const sharedNode2102 = {"kind":"Argument","name":sharedNode1920,"value":sharedNode1921};
+const sharedNode2103 = {"kind":"Name","value":"longDescription"};
+const sharedNode2104 = {"kind":"Field","name":sharedNode2103};
+const sharedNode2105 = {"kind":"Name","value":"hasSpoiler"};
+const sharedNode2106 = {"kind":"Field","name":sharedNode2105};
+const sharedNode2107 = {"kind":"Field","name":sharedNode157,"selectionSet":sharedNode168};
+const sharedNode2108 = {"kind":"Name","value":"albums"};
+const sharedNode2109 = {"kind":"Name","value":"Owner"};
+const sharedNode2110 = {"kind":"Field","name":sharedNode2109,"selectionSet":sharedNode159};
+const sharedNode2111 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode146};
+const sharedNode2112 = [sharedNode2111];
+const sharedNode2113 = {"kind":"ObjectValue","fields":sharedNode2112};
+const sharedNode2114 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2113};
+const sharedNode2115 = [sharedNode2114];
+const sharedNode2116 = {"kind":"Field","name":sharedNode929,"arguments":sharedNode2115,"selectionSet":sharedNode21};
+const sharedNode2117 = {"kind":"VariableDefinition","variable":sharedNode745,"type":sharedNode1149};
+const sharedNode2118 = {"kind":"VariableDefinition","variable":sharedNode749,"type":sharedNode1149};
+const sharedNode2119 = {"kind":"Name","value":"ImageWhere"};
+const sharedNode2120 = {"kind":"NamedType","name":sharedNode2119};
+const sharedNode2121 = {"kind":"VariableDefinition","variable":sharedNode961,"type":sharedNode2120};
+const sharedNode2122 = [sharedNode965,sharedNode756,sharedNode755,sharedNode641];
+const sharedNode2123 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode961};
+const sharedNode2124 = [sharedNode2123];
+const sharedNode2125 = {"kind":"ObjectValue","fields":sharedNode2124};
+const sharedNode2126 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2125};
+const sharedNode2127 = [sharedNode2126];
+const sharedNode2128 = {"kind":"Field","name":sharedNode929,"arguments":sharedNode2127,"selectionSet":sharedNode21};
+const sharedNode2129 = [sharedNode873,sharedNode2121,sharedNode2117,sharedNode2118];
+const sharedNode2130 = [sharedNode30,sharedNode150,sharedNode152,sharedNode154,sharedNode156,sharedNode38,sharedNode160];
+const sharedNode2131 = {"kind":"SelectionSet","selections":sharedNode2130};
+const sharedNode2132 = {"kind":"Field","name":sharedNode131,"arguments":sharedNode2122,"selectionSet":sharedNode2131};
+const sharedNode2133 = {"kind":"Name","value":"updateIssues"};
+const sharedNode2134 = {"kind":"Name","value":"issues"};
+const sharedNode2135 = [sharedNode30,sharedNode599,sharedNode127,sharedNode601];
+const sharedNode2136 = {"kind":"SelectionSet","selections":sharedNode2135};
+const sharedNode2137 = {"kind":"Field","name":sharedNode2134,"selectionSet":sharedNode2136};
+const sharedNode2138 = [sharedNode2137];
+const sharedNode2139 = {"kind":"SelectionSet","selections":sharedNode2138};
+const sharedNode2140 = {"kind":"Name","value":"issueWhere"};
+const sharedNode2141 = {"kind":"Variable","name":sharedNode2140};
+const sharedNode2142 = {"kind":"Name","value":"IssueWhere"};
+const sharedNode2143 = {"kind":"NamedType","name":sharedNode2142};
+const sharedNode2144 = {"kind":"Variable","name":{"kind":"Name","value":"updateIssueInput"}};
+const sharedNode2145 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2141};
+const sharedNode2146 = {"kind":"FragmentSpread","name":sharedNode634};
+const sharedNode2147 = [sharedNode2146];
+const sharedNode2148 = {"kind":"SelectionSet","selections":sharedNode2147};
+const sharedNode2149 = {"kind":"Field","name":sharedNode2134,"selectionSet":sharedNode2148};
+const sharedNode2150 = [sharedNode2149];
+const sharedNode2151 = {"kind":"SelectionSet","selections":sharedNode2150};
+const sharedNode2152 = {"kind":"VariableDefinition","variable":sharedNode1554,"type":sharedNode713};
+const sharedNode2153 = [sharedNode2152];
+const sharedNode2154 = [sharedNode1555];
+const sharedNode2155 = [sharedNode30,sharedNode599,sharedNode99,sharedNode94];
+const sharedNode2156 = {"kind":"SelectionSet","selections":sharedNode2155};
+const sharedNode2157 = {"kind":"Name","value":"addIssueActivityFeedItem"};
+const sharedNode2158 = {"kind":"Variable","name":sharedNode645};
+const sharedNode2159 = {"kind":"VariableDefinition","variable":sharedNode2158,"type":sharedNode737};
+const sharedNode2160 = {"kind":"Variable","name":sharedNode647};
+const sharedNode2161 = {"kind":"VariableDefinition","variable":sharedNode2160,"type":sharedNode737};
+const sharedNode2162 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode1554};
+const sharedNode2163 = [sharedNode2162];
+const sharedNode2164 = {"kind":"ObjectValue","fields":sharedNode2163};
+const sharedNode2165 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode2164};
+const sharedNode2166 = [sharedNode2165];
+const sharedNode2167 = {"kind":"ObjectValue","fields":sharedNode2166};
+const sharedNode2168 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2167};
+const sharedNode2169 = {"kind":"Argument","name":sharedNode647,"value":sharedNode2160};
+const sharedNode2170 = {"kind":"Argument","name":sharedNode645,"value":sharedNode2158};
+const sharedNode2171 = {"kind":"Argument","name":sharedNode56,"value":sharedNode1230};
+const sharedNode2172 = {"kind":"Name","value":"commentText"};
+const sharedNode2173 = {"kind":"Variable","name":sharedNode2172};
+const sharedNode2174 = {"kind":"VariableDefinition","variable":sharedNode2173,"type":sharedNode737};
+const sharedNode2175 = {"kind":"Variable","name":sharedNode623};
+const sharedNode2176 = {"kind":"VariableDefinition","variable":sharedNode2175,"type":sharedNode1133};
+const sharedNode2177 = {"kind":"Argument","name":sharedNode2172,"value":sharedNode2173};
+const sharedNode2178 = {"kind":"Argument","name":sharedNode623,"value":sharedNode2175};
+const sharedNode2179 = {"kind":"Name","value":"selectedForumRules"};
+const sharedNode2180 = {"kind":"Variable","name":sharedNode2179};
+const sharedNode2181 = {"kind":"VariableDefinition","variable":sharedNode2180,"type":sharedNode1549};
+const sharedNode2182 = {"kind":"Argument","name":sharedNode2179,"value":sharedNode2180};
+const sharedNode2183 = [sharedNode753,sharedNode1551,sharedNode2182,sharedNode1552,sharedNode752];
+const sharedNode2184 = {"kind":"Name","value":"explanation"};
+const sharedNode2185 = {"kind":"Variable","name":sharedNode2184};
+const sharedNode2186 = {"kind":"VariableDefinition","variable":sharedNode2185,"type":sharedNode737};
+const sharedNode2187 = {"kind":"Argument","name":sharedNode2184,"value":sharedNode2185};
+const sharedNode2188 = [sharedNode1002,sharedNode1551,sharedNode2182,sharedNode1552,sharedNode752];
+const sharedNode2189 = {"kind":"Name","value":"wikiRevisionId"};
+const sharedNode2190 = {"kind":"Variable","name":sharedNode2189};
+const sharedNode2191 = [sharedNode1555,sharedNode1537];
+const sharedNode2192 = {"kind":"VariableDefinition","variable":sharedNode734,"type":sharedNode736};
+const sharedNode2193 = [sharedNode1937,sharedNode1551,sharedNode2182,sharedNode1552,sharedNode752];
+const sharedNode2194 = {"kind":"VariableDefinition","variable":sharedNode2185,"type":sharedNode736};
+const sharedNode2195 = {"kind":"Name","value":"getIssue"};
+const sharedNode2196 = {"kind":"Variable","name":sharedNode598};
+const sharedNode2197 = {"kind":"VariableDefinition","variable":sharedNode2196,"type":sharedNode1149};
+const sharedNode2198 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode2196};
+const sharedNode2199 = [sharedNode2198];
+const sharedNode2200 = {"kind":"ObjectValue","fields":sharedNode2199};
+const sharedNode2201 = {"kind":"ObjectField","name":sharedNode598,"value":sharedNode2200};
+const sharedNode2202 = [sharedNode800,sharedNode2201];
+const sharedNode2203 = {"kind":"ObjectValue","fields":sharedNode2202};
+const sharedNode2204 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2203};
+const sharedNode2205 = [sharedNode2204];
+const sharedNode2206 = {"kind":"Name","value":"activityFeedLimit"};
+const sharedNode2207 = {"kind":"Variable","name":sharedNode2206};
+const sharedNode2208 = {"kind":"VariableDefinition","variable":sharedNode2207,"type":sharedNode747};
+const sharedNode2209 = {"kind":"Name","value":"activityFeedOffset"};
+const sharedNode2210 = {"kind":"Variable","name":sharedNode2209};
+const sharedNode2211 = {"kind":"VariableDefinition","variable":sharedNode2210,"type":sharedNode747};
+const sharedNode2212 = {"kind":"Argument","name":sharedNode436,"value":sharedNode2207};
+const sharedNode2213 = {"kind":"Argument","name":sharedNode744,"value":sharedNode2210};
+const sharedNode2214 = [sharedNode641,sharedNode2212,sharedNode2213];
+const sharedNode2215 = [sharedNode30,sharedNode599,sharedNode624];
+const sharedNode2216 = {"kind":"SelectionSet","selections":sharedNode2215};
+const sharedNode2217 = [sharedNode804,sharedNode800];
+const sharedNode2218 = {"kind":"ObjectValue","fields":sharedNode2217};
+const sharedNode2219 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2218};
+const sharedNode2220 = [sharedNode2219];
+const sharedNode2221 = {"kind":"IntValue","value":"1"};
+const sharedNode2222 = {"kind":"Argument","name":sharedNode436,"value":sharedNode2221};
+const sharedNode2223 = [sharedNode599];
+const sharedNode2224 = {"kind":"SelectionSet","selections":sharedNode2223};
+const sharedNode2225 = {"kind":"VariableDefinition","variable":sharedNode2141,"type":sharedNode2143};
+const sharedNode2226 = [sharedNode2225];
+const sharedNode2227 = {"kind":"Field","name":{"kind":"Name","value":"relatedUsername"}};
+const sharedNode2228 = {"kind":"Field","name":sharedNode171,"selectionSet":sharedNode1517};
+const sharedNode2229 = {"kind":"Name","value":"showOnlyServerRuleViolations"};
+const sharedNode2230 = {"kind":"Variable","name":sharedNode2229};
+const sharedNode2231 = {"kind":"Variable","name":sharedNode600};
+const sharedNode2232 = {"kind":"Name","value":"filterCreatedByMe"};
+const sharedNode2233 = {"kind":"Variable","name":sharedNode2232};
+const sharedNode2234 = {"kind":"Name","value":"filterIAmOP"};
+const sharedNode2235 = {"kind":"Variable","name":sharedNode2234};
+const sharedNode2236 = {"kind":"Name","value":"filterIReported"};
+const sharedNode2237 = {"kind":"Variable","name":sharedNode2236};
+const sharedNode2238 = {"kind":"ObjectField","name":sharedNode600,"value":sharedNode250};
+const sharedNode2239 = {"kind":"VariableDefinition","variable":sharedNode2231,"type":sharedNode1133};
+const sharedNode2240 = [sharedNode2239];
+const sharedNode2241 = {"kind":"ObjectField","name":sharedNode98,"value":sharedNode769};
+const sharedNode2242 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode2231};
+const sharedNode2243 = [sharedNode2242];
+const sharedNode2244 = {"kind":"ObjectValue","fields":sharedNode2243};
+const sharedNode2245 = {"kind":"ObjectField","name":sharedNode600,"value":sharedNode2244};
+const sharedNode2246 = [sharedNode30,sharedNode127,sharedNode203];
+const sharedNode2247 = {"kind":"SelectionSet","selections":sharedNode2246};
+const sharedNode2248 = {"kind":"Field","name":sharedNode124,"selectionSet":sharedNode2247};
+const sharedNode2249 = [sharedNode30,sharedNode99,sharedNode44,sharedNode222,sharedNode224,sharedNode36,sharedNode176,sharedNode456];
+const sharedNode2250 = {"kind":"SelectionSet","selections":sharedNode2249};
+const sharedNode2251 = {"kind":"Field","name":sharedNode170,"selectionSet":sharedNode2250};
+const sharedNode2252 = {"kind":"IntValue","value":"50"};
+const sharedNode2253 = {"kind":"Argument","name":sharedNode436,"value":sharedNode2252};
+const sharedNode2254 = [sharedNode677,sharedNode2253];
+const sharedNode2255 = [sharedNode99,sharedNode462];
+const sharedNode2256 = {"kind":"SelectionSet","selections":sharedNode2255};
+const sharedNode2257 = {"kind":"Field","name":sharedNode170,"selectionSet":sharedNode2256};
+const sharedNode2258 = [sharedNode2222];
+const sharedNode2259 = [sharedNode1254,sharedNode738];
+const sharedNode2260 = [sharedNode1256,sharedNode752];
+const sharedNode2261 = [sharedNode1820];
+const sharedNode2262 = {"kind":"Argument","name":sharedNode98,"value":sharedNode1275};
+const sharedNode2263 = [sharedNode2262];
+const sharedNode2264 = {"kind":"Name","value":"issueID"};
+const sharedNode2265 = {"kind":"Variable","name":sharedNode2264};
+const sharedNode2266 = {"kind":"VariableDefinition","variable":sharedNode2265,"type":sharedNode713};
+const sharedNode2267 = {"kind":"Name","value":"suspendUntil"};
+const sharedNode2268 = {"kind":"Variable","name":sharedNode2267};
+const sharedNode2269 = {"kind":"VariableDefinition","variable":sharedNode2268,"type":sharedNode1571};
+const sharedNode2270 = {"kind":"Name","value":"suspendIndefinitely"};
+const sharedNode2271 = {"kind":"Variable","name":sharedNode2270};
+const sharedNode2272 = {"kind":"VariableDefinition","variable":sharedNode2271,"type":sharedNode1133};
+const sharedNode2273 = [sharedNode2266,sharedNode2269,sharedNode2272,sharedNode2194];
+const sharedNode2274 = {"kind":"Argument","name":sharedNode1553,"value":sharedNode2265};
+const sharedNode2275 = {"kind":"Argument","name":sharedNode2267,"value":sharedNode2268};
+const sharedNode2276 = {"kind":"Argument","name":sharedNode2270,"value":sharedNode2271};
+const sharedNode2277 = [sharedNode2274,sharedNode2275,sharedNode2276,sharedNode2187];
+const sharedNode2278 = [sharedNode2152,sharedNode2194];
+const sharedNode2279 = [sharedNode1555,sharedNode2187];
+const sharedNode2280 = {"kind":"Name","value":"issuesConnection"};
+const sharedNode2281 = [sharedNode2145];
+const sharedNode2282 = {"kind":"Field","name":sharedNode2280,"arguments":sharedNode2281,"selectionSet":sharedNode21};
+const sharedNode2283 = [sharedNode2282];
+const sharedNode2284 = {"kind":"SelectionSet","selections":sharedNode2283};
+const sharedNode2285 = {"kind":"Name","value":"moderationProfiles"};
+const sharedNode2286 = {"kind":"Argument","name":sharedNode132,"value":sharedNode1238};
+const sharedNode2287 = [sharedNode2286];
+const sharedNode2288 = {"kind":"Argument","name":sharedNode436,"value":{"kind":"IntValue","value":"25"}};
+const sharedNode2289 = {"kind":"Argument","name":sharedNode744,"value":sharedNode1773};
+const sharedNode2290 = [sharedNode2288,sharedNode2289,sharedNode641];
+const sharedNode2291 = {"kind":"Name","value":"deleted"};
+const sharedNode2292 = {"kind":"Field","name":sharedNode2291};
+const sharedNode2293 = [sharedNode30,sharedNode674,sharedNode101,sharedNode99];
+const sharedNode2294 = {"kind":"SelectionSet","selections":sharedNode2293};
+const sharedNode2295 = {"kind":"Field","name":sharedNode97,"selectionSet":sharedNode2294};
+const sharedNode2296 = [sharedNode30,sharedNode32,sharedNode38,sharedNode40,sharedNode2292,sharedNode44,sharedNode671,sharedNode2295,sharedNode674,sharedNode731,sharedNode733,sharedNode1878,sharedNode668];
+const sharedNode2297 = {"kind":"SelectionSet","selections":sharedNode2296};
+const sharedNode2298 = {"kind":"Field","name":sharedNode88,"selectionSet":sharedNode670};
+const sharedNode2299 = [sharedNode30,sharedNode599,sharedNode127,sharedNode38,sharedNode40,sharedNode601,sharedNode2298,sharedNode674];
+const sharedNode2300 = {"kind":"SelectionSet","selections":sharedNode2299};
+const sharedNode2301 = [sharedNode1231,sharedNode2117,sharedNode2118];
+const sharedNode2302 = [sharedNode756,sharedNode755,sharedNode641];
+const sharedNode2303 = [sharedNode30,sharedNode459,sharedNode99];
+const sharedNode2304 = {"kind":"SelectionSet","selections":sharedNode2303};
+const sharedNode2305 = {"kind":"Field","name":sharedNode457,"selectionSet":sharedNode2304};
+const sharedNode2306 = [sharedNode30,sharedNode127,sharedNode38,sharedNode2305];
+const sharedNode2307 = {"kind":"SelectionSet","selections":sharedNode2306};
+const sharedNode2308 = [sharedNode5,sharedNode57,sharedNode38,sharedNode64,sharedNode68,sharedNode66];
+const sharedNode2309 = {"kind":"SelectionSet","selections":sharedNode2308};
+const sharedNode2310 = [sharedNode1820,sharedNode873];
+const sharedNode2311 = {"kind":"ObjectField","name":sharedNode172,"value":sharedNode1974};
+const sharedNode2312 = [sharedNode2311];
+const sharedNode2313 = {"kind":"ObjectValue","fields":sharedNode2312};
+const sharedNode2314 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2313};
+const sharedNode2315 = [sharedNode2314];
+const sharedNode2316 = {"kind":"Variable","name":{"kind":"Name","value":"eventChannelId"}};
+const sharedNode2317 = {"kind":"Name","value":"NotificationSort"};
+const sharedNode2318 = {"kind":"NamedType","name":sharedNode2317};
+const sharedNode2319 = {"kind":"NonNullType","type":sharedNode2318};
+const sharedNode2320 = {"kind":"ListType","type":sharedNode2319};
+const sharedNode2321 = {"kind":"VariableDefinition","variable":sharedNode751,"type":sharedNode2320};
+const sharedNode2322 = [sharedNode873,sharedNode2321,sharedNode750,sharedNode748];
+const sharedNode2323 = {"kind":"Name","value":"Notifications"};
+const sharedNode2324 = {"kind":"Field","name":sharedNode952};
+const sharedNode2325 = {"kind":"Name","value":"notificationType"};
+const sharedNode2326 = {"kind":"Field","name":sharedNode2325};
+const sharedNode2327 = {"kind":"Name","value":"link"};
+const sharedNode2328 = {"kind":"Field","name":sharedNode2327};
+const sharedNode2329 = {"kind":"Name","value":"isPublic"};
+const sharedNode2330 = {"kind":"Field","name":sharedNode2329};
+const sharedNode2331 = [sharedNode30,sharedNode2330];
+const sharedNode2332 = {"kind":"SelectionSet","selections":sharedNode2331};
+const sharedNode2333 = {"kind":"Field","name":{"kind":"Name","value":"ScratchpadEntry"},"selectionSet":sharedNode2332};
+const sharedNode2334 = [sharedNode30,sharedNode38,sharedNode2324,sharedNode32,sharedNode2326,sharedNode2328,sharedNode2333];
+const sharedNode2335 = {"kind":"SelectionSet","selections":sharedNode2334};
+const sharedNode2336 = {"kind":"Name","value":"NotificationsAggregate"};
+const sharedNode2337 = {"kind":"StringValue","value":"feedback","block":false};
+const sharedNode2338 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode2337};
+const sharedNode2339 = [sharedNode2338];
+const sharedNode2340 = {"kind":"ObjectValue","fields":sharedNode2339};
+const sharedNode2341 = {"kind":"ObjectField","name":sharedNode2325,"value":sharedNode2340};
+const sharedNode2342 = [sharedNode2341];
+const sharedNode2343 = {"kind":"ObjectValue","fields":sharedNode2342};
+const sharedNode2344 = {"kind":"ObjectField","name":sharedNode2325,"value":sharedNode769};
+const sharedNode2345 = [sharedNode2344];
+const sharedNode2346 = {"kind":"ObjectValue","fields":sharedNode2345};
+const sharedNode2347 = {"kind":"ObjectField","name":sharedNode133,"value":sharedNode2343};
+const sharedNode2348 = [sharedNode2347];
+const sharedNode2349 = {"kind":"ObjectValue","fields":sharedNode2348};
+const sharedNode2350 = [sharedNode2346,sharedNode2349];
+const sharedNode2351 = {"kind":"ListValue","values":sharedNode2350};
+const sharedNode2352 = {"kind":"ObjectField","name":sharedNode765,"value":sharedNode2351};
+const sharedNode2353 = [sharedNode2352];
+const sharedNode2354 = {"kind":"ObjectValue","fields":sharedNode2353};
+const sharedNode2355 = {"kind":"Name","value":"recipientUsername"};
+const sharedNode2356 = {"kind":"Variable","name":sharedNode2355};
+const sharedNode2357 = {"kind":"Name","value":"sourceType"};
+const sharedNode2358 = {"kind":"Variable","name":sharedNode2357};
+const sharedNode2359 = {"kind":"VariableDefinition","variable":sharedNode2358,"type":sharedNode737};
+const sharedNode2360 = {"kind":"Name","value":"sourceId"};
+const sharedNode2361 = {"kind":"Variable","name":sharedNode2360};
+const sharedNode2362 = {"kind":"VariableDefinition","variable":sharedNode2361,"type":sharedNode737};
+const sharedNode2363 = {"kind":"Name","value":"sourceChannelUniqueName"};
+const sharedNode2364 = {"kind":"Variable","name":sharedNode2363};
+const sharedNode2365 = {"kind":"Argument","name":sharedNode2357,"value":sharedNode2358};
+const sharedNode2366 = {"kind":"Argument","name":sharedNode2360,"value":sharedNode2361};
+const sharedNode2367 = {"kind":"Field","name":sharedNode2357};
+const sharedNode2368 = {"kind":"Field","name":sharedNode2360};
+const sharedNode2369 = {"kind":"Field","name":sharedNode2363};
+const sharedNode2370 = {"kind":"Name","value":"Recipient"};
+const sharedNode2371 = {"kind":"Field","name":sharedNode2370,"selectionSet":sharedNode7};
+const sharedNode2372 = {"kind":"Field","name":{"kind":"Name","value":"superUpvotedByUsers"},"selectionSet":sharedNode7};
+const sharedNode2373 = {"kind":"Name","value":"scratchpadEntryId"};
+const sharedNode2374 = {"kind":"Variable","name":sharedNode2373};
+const sharedNode2375 = {"kind":"VariableDefinition","variable":sharedNode2374,"type":sharedNode713};
+const sharedNode2376 = {"kind":"Variable","name":sharedNode2329};
+const sharedNode2377 = {"kind":"Argument","name":sharedNode2373,"value":sharedNode2374};
+const sharedNode2378 = {"kind":"ObjectField","name":sharedNode2370,"value":sharedNode884};
+const sharedNode2379 = {"kind":"ObjectField","name":sharedNode2329,"value":sharedNode138};
+const sharedNode2380 = [sharedNode2378,sharedNode2379];
+const sharedNode2381 = {"kind":"ObjectValue","fields":sharedNode2380};
+const sharedNode2382 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2381};
+const sharedNode2383 = {"kind":"Name","value":"scratchpadEntries"};
+const sharedNode2384 = [sharedNode30,sharedNode38,sharedNode32,sharedNode2330,sharedNode2367,sharedNode2368,sharedNode2369,sharedNode101,sharedNode169,sharedNode2371];
+const sharedNode2385 = {"kind":"SelectionSet","selections":sharedNode2384};
+const sharedNode2386 = [sharedNode2378];
+const sharedNode2387 = {"kind":"ObjectValue","fields":sharedNode2386};
+const sharedNode2388 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2387};
+const sharedNode2389 = {"kind":"ObjectField","name":sharedNode952,"value":sharedNode1982};
+const sharedNode2390 = [sharedNode2389];
+const sharedNode2391 = {"kind":"ObjectValue","fields":sharedNode2390};
+const sharedNode2392 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode2391};
+const sharedNode2393 = {"kind":"Name","value":"notificationId"};
+const sharedNode2394 = {"kind":"Variable","name":sharedNode2393};
+const sharedNode2395 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode2394};
+const sharedNode2396 = [sharedNode2395];
+const sharedNode2397 = {"kind":"ObjectValue","fields":sharedNode2396};
+const sharedNode2398 = {"kind":"ObjectField","name":sharedNode29,"value":sharedNode2397};
+const sharedNode2399 = [sharedNode2398];
+const sharedNode2400 = {"kind":"ObjectValue","fields":sharedNode2399};
+const sharedNode2401 = {"kind":"Name","value":"channel"};
+const sharedNode2402 = {"kind":"Variable","name":sharedNode2401};
+const sharedNode2403 = {"kind":"VariableDefinition","variable":sharedNode2402,"type":sharedNode737};
+const sharedNode2404 = [sharedNode2403,sharedNode873];
+const sharedNode2405 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode2402};
+const sharedNode2406 = [sharedNode2405];
+const sharedNode2407 = {"kind":"ObjectValue","fields":sharedNode2406};
+const sharedNode2408 = {"kind":"ObjectField","name":sharedNode172,"value":sharedNode2407};
+const sharedNode2409 = [sharedNode2408];
+const sharedNode2410 = {"kind":"ObjectValue","fields":sharedNode2409};
+const sharedNode2411 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode2410};
+const sharedNode2412 = [sharedNode2411];
+const sharedNode2413 = {"kind":"ObjectValue","fields":sharedNode2412};
+const sharedNode2414 = {"kind":"ObjectField","name":sharedNode132,"value":sharedNode2413};
+const sharedNode2415 = [sharedNode2414];
+const sharedNode2416 = {"kind":"ObjectValue","fields":sharedNode2415};
+const sharedNode2417 = [sharedNode2416];
+const sharedNode2418 = {"kind":"ListValue","values":sharedNode2417};
+const sharedNode2419 = {"kind":"Field","name":sharedNode1026,"selectionSet":sharedNode673};
+const sharedNode2420 = [sharedNode5,sharedNode2419];
+const sharedNode2421 = {"kind":"SelectionSet","selections":sharedNode2420};
+const sharedNode2422 = {"kind":"Field","name":sharedNode878,"selectionSet":sharedNode2421};
+const sharedNode2423 = [sharedNode2422];
+const sharedNode2424 = {"kind":"SelectionSet","selections":sharedNode2423};
+const sharedNode2425 = [sharedNode740,sharedNode873];
+const sharedNode2426 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode1035};
+const sharedNode2427 = [sharedNode2426];
+const sharedNode2428 = {"kind":"ObjectValue","fields":sharedNode2427};
+const sharedNode2429 = {"kind":"ObjectField","name":sharedNode132,"value":sharedNode2428};
+const sharedNode2430 = [sharedNode2429];
+const sharedNode2431 = {"kind":"ObjectValue","fields":sharedNode2430};
+const sharedNode2432 = [sharedNode2431];
+const sharedNode2433 = {"kind":"ListValue","values":sharedNode2432};
+const sharedNode2434 = [sharedNode5,sharedNode1740];
+const sharedNode2435 = {"kind":"SelectionSet","selections":sharedNode2434};
+const sharedNode2436 = {"kind":"Field","name":sharedNode878,"selectionSet":sharedNode2435};
+const sharedNode2437 = [sharedNode2436];
+const sharedNode2438 = {"kind":"SelectionSet","selections":sharedNode2437};
+const sharedNode2439 = [sharedNode970,sharedNode873];
+const sharedNode2440 = {"kind":"Field","name":sharedNode1741,"selectionSet":sharedNode81};
+const sharedNode2441 = [sharedNode5,sharedNode2440];
+const sharedNode2442 = {"kind":"SelectionSet","selections":sharedNode2441};
+const sharedNode2443 = {"kind":"Field","name":sharedNode878,"selectionSet":sharedNode2442};
+const sharedNode2444 = [sharedNode2443];
+const sharedNode2445 = {"kind":"SelectionSet","selections":sharedNode2444};
+const sharedNode2446 = [sharedNode1012,sharedNode873];
+const sharedNode2447 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode1020};
+const sharedNode2448 = [sharedNode2447];
+const sharedNode2449 = {"kind":"ObjectValue","fields":sharedNode2448};
+const sharedNode2450 = {"kind":"ObjectField","name":sharedNode132,"value":sharedNode2449};
+const sharedNode2451 = [sharedNode2450];
+const sharedNode2452 = {"kind":"ObjectValue","fields":sharedNode2451};
+const sharedNode2453 = [sharedNode2452];
+const sharedNode2454 = {"kind":"ListValue","values":sharedNode2453};
+const sharedNode2455 = {"kind":"Field","name":sharedNode1014,"selectionSet":sharedNode1024};
+const sharedNode2456 = [sharedNode5,sharedNode2455];
+const sharedNode2457 = {"kind":"SelectionSet","selections":sharedNode2456};
+const sharedNode2458 = {"kind":"Field","name":sharedNode878,"selectionSet":sharedNode2457};
+const sharedNode2459 = [sharedNode2458];
+const sharedNode2460 = {"kind":"SelectionSet","selections":sharedNode2459};
+const sharedNode2461 = {"kind":"VariableDefinition","variable":sharedNode961,"type":sharedNode1950};
+const sharedNode2462 = [sharedNode873,sharedNode2461];
+const sharedNode2463 = [sharedNode965,sharedNode641];
+const sharedNode2464 = {"kind":"Variable","name":{"kind":"Name","value":"versionWhere"}};
+const sharedNode2465 = {"kind":"Field","name":sharedNode1504,"selectionSet":sharedNode168};
+const sharedNode2466 = [sharedNode1627];
+const sharedNode2467 = {"kind":"ObjectValue","fields":sharedNode2466};
+const sharedNode2468 = {"kind":"ObjectField","name":sharedNode133,"value":sharedNode2467};
+const sharedNode2469 = [sharedNode2468];
+const sharedNode2470 = {"kind":"ObjectValue","fields":sharedNode2469};
+const sharedNode2471 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode2470};
+const sharedNode2472 = [sharedNode2471];
+const sharedNode2473 = {"kind":"ObjectValue","fields":sharedNode2472};
+const sharedNode2474 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2473};
+const sharedNode2475 = [sharedNode2474];
+const sharedNode2476 = {"kind":"Field","name":sharedNode1626,"arguments":sharedNode2475,"selectionSet":sharedNode21};
+const sharedNode2477 = {"kind":"ObjectField","name":sharedNode245,"value":sharedNode1618};
+const sharedNode2478 = [sharedNode2477];
+const sharedNode2479 = {"kind":"ObjectValue","fields":sharedNode2478};
+const sharedNode2480 = {"kind":"Argument","name":sharedNode132,"value":sharedNode2479};
+const sharedNode2481 = [sharedNode2480];
+const sharedNode2482 = {"kind":"Field","name":sharedNode1611,"arguments":sharedNode2481,"selectionSet":sharedNode21};
+const sharedNode2483 = [sharedNode173,sharedNode189,sharedNode1563,sharedNode276,sharedNode2476,sharedNode2482];
+const sharedNode2484 = {"kind":"SelectionSet","selections":sharedNode2483};
+const sharedNode2485 = {"kind":"Name","value":"modDisplayName"};
+const sharedNode2486 = {"kind":"Variable","name":sharedNode2485};
+const sharedNode2487 = {"kind":"ObjectField","name":sharedNode134,"value":sharedNode2486};
+const sharedNode2488 = [sharedNode2487];
+const sharedNode2489 = {"kind":"ObjectValue","fields":sharedNode2488};
+const sharedNode2490 = {"kind":"Field","name":sharedNode1405,"selectionSet":sharedNode2224};
+const sharedNode2491 = {"kind":"Name","value":"totalCount"};
+const sharedNode2492 = {"kind":"Field","name":sharedNode2491};
+const sharedNode2493 = [sharedNode2492];
+const sharedNode2494 = {"kind":"SelectionSet","selections":sharedNode2493};
+const sharedNode2495 = [sharedNode30,sharedNode127,sharedNode85,sharedNode1503,sharedNode99,sharedNode38,sharedNode40,sharedNode2465];
+const sharedNode2496 = {"kind":"SelectionSet","selections":sharedNode2495};
+const sharedNode2497 = {"kind":"Variable","name":{"kind":"Name","value":"uniqueNames"}};
+const sharedNode2498 = [sharedNode1648];
+const sharedNode2499 = {"kind":"SelectionSet","selections":sharedNode2498};
 import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export const CommentVoteFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode27]} as unknown as DocumentNode<CommentVoteFieldsFragment, unknown>;
 export const CommentFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode108,sharedNode27]} as unknown as DocumentNode<CommentFieldsFragment, unknown>;
@@ -926,27 +5647,367 @@ export const DiscussionFlairFieldsFragmentDoc = {"kind":"Document","definitions"
 export const CrosspostPreviewFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode182]} as unknown as DocumentNode<CrosspostPreviewFieldsFragment, unknown>;
 export const SharedCollectionPreviewFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode200]} as unknown as DocumentNode<SharedCollectionPreviewFieldsFragment, unknown>;
 export const DiscussionDetailFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode364,sharedNode112,sharedNode182,sharedNode200,sharedNode122]} as unknown as DocumentNode<DiscussionDetailFieldsFragment, unknown>;
-export const EventFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode447]} as unknown as DocumentNode<EventFieldsFragment, unknown>;
-export const GetCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getComment"},"variableDefinitions":sharedNode453,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode454,"arguments":sharedNode462,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode463,{"kind":"Field","name":{"kind":"Name","value":"GivesFeedbackOnComment"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode466,sharedNode96]}},{"kind":"Field","name":{"kind":"Name","value":"GivesFeedbackOnDiscussion"},"selectionSet":sharedNode81},{"kind":"Field","name":{"kind":"Name","value":"GivesFeedbackOnEvent"},"selectionSet":sharedNode81},sharedNode466,sharedNode96,sharedNode469]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetCommentQuery, GetCommentQueryVariables>;
-export const GetCommentSectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentSection"},"variableDefinitions":[sharedNode474,sharedNode476,sharedNode479,sharedNode484,sharedNode486,{"kind":"VariableDefinition","variable":sharedNode487,"type":sharedNode472}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCommentSection"},"arguments":[sharedNode488,sharedNode489,sharedNode490,sharedNode491,sharedNode492,sharedNode493],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode97,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode36,sharedNode101,sharedNode99,sharedNode34,sharedNode44,sharedNode224,sharedNode222,sharedNode8,sharedNode22,sharedNode24,{"kind":"Field","name":sharedNode171,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode233,sharedNode235,sharedNode237,sharedNode239,{"kind":"Field","name":{"kind":"Name","value":"Bots"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode57,{"kind":"Field","name":{"kind":"Name","value":"botProfileId"}},{"kind":"Field","name":{"kind":"Name","value":"isDeprecated"}}]}},{"kind":"Field","name":{"kind":"Name","value":"Moderators"},"selectionSet":sharedNode59}]}},{"kind":"Field","name":sharedNode124,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode209]}},sharedNode512,{"kind":"Field","alias":{"kind":"Name","value":"RootCommentsConnection"},"name":sharedNode244,"arguments":sharedNode521,"selectionSet":sharedNode21},sharedNode94,sharedNode267,sharedNode269]}},{"kind":"Field","name":{"kind":"Name","value":"Comments"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode34,sharedNode36,sharedNode38,sharedNode40,sharedNode42,sharedNode44,sharedNode46,sharedNode48,sharedNode50,sharedNode52,{"kind":"Field","name":sharedNode53,"selectionSet":sharedNode208},sharedNode78,sharedNode82,sharedNode522,{"kind":"Field","name":sharedNode83,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode85,sharedNode38,sharedNode89]}},sharedNode94,sharedNode105]}}]}}]}},sharedNode27,sharedNode112]} as unknown as DocumentNode<GetCommentSectionQuery, GetCommentSectionQueryVariables>;
-export const GetDiscussionChannelCommentAggregateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionChannelCommentAggregate"},"variableDefinitions":sharedNode523,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"discussionChannels"},"arguments":sharedNode535,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode44,sharedNode222,sharedNode224,sharedNode512]}}]}}]} as unknown as DocumentNode<GetDiscussionChannelCommentAggregateQuery, GetDiscussionChannelCommentAggregateQueryVariables>;
-export const GetDiscussionChannelRootCommentAggregateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionChannelRootCommentAggregate"},"variableDefinitions":sharedNode523,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"discussionChannels"},"arguments":sharedNode535,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode44,sharedNode222,sharedNode224,{"kind":"Field","name":sharedNode244,"arguments":sharedNode521,"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetDiscussionChannelRootCommentAggregateQuery, GetDiscussionChannelRootCommentAggregateQueryVariables>;
-export const GetDiscussionDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":sharedNode536,"variableDefinitions":[sharedNode452,sharedNode537,sharedNode474],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":sharedNode538,"name":sharedNode536,"arguments":sharedNode540,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode541]}}]}},sharedNode112,sharedNode364,sharedNode182,sharedNode200,sharedNode122]} as unknown as DocumentNode<GetDiscussionDetailQuery, GetDiscussionDetailQueryVariables>;
-export const GetDownloadDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDownloadDetail"},"variableDefinitions":sharedNode545,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":sharedNode538,"name":sharedNode536,"arguments":sharedNode540,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode203,sharedNode205,sharedNode548,sharedNode209,sharedNode220,{"kind":"Field","name":sharedNode170,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode527]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode44,sharedNode222,sharedNode224,sharedNode229,sharedNode8,sharedNode22,sharedNode24,sharedNode242,sharedNode259,sharedNode554]}},sharedNode276,sharedNode325,sharedNode327,sharedNode329,sharedNode351,sharedNode356]}}]}},sharedNode112,sharedNode182,sharedNode122]} as unknown as DocumentNode<GetDownloadDetailQuery, GetDownloadDetailQueryVariables>;
-export const GetDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussion"},"variableDefinitions":sharedNode545,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode538,"arguments":sharedNode462,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode541,sharedNode548,sharedNode87,sharedNode556,{"kind":"Field","name":sharedNode170,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode554,{"kind":"Field","name":{"kind":"Name","value":"LabelChangeHistory"},"arguments":sharedNode564,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode38,{"kind":"Field","name":{"kind":"Name","value":"actionType"}},{"kind":"Field","name":{"kind":"Name","value":"labelDisplayName"}},{"kind":"Field","name":{"kind":"Name","value":"labelValue"}},{"kind":"Field","name":{"kind":"Name","value":"ActorUser"},"selectionSet":sharedNode159},{"kind":"Field","name":{"kind":"Name","value":"ActorMod"},"selectionSet":sharedNode59}]}}]}},sharedNode567,{"kind":"Field","name":{"kind":"Name","value":"PastBodyVersions"},"arguments":sharedNode564,"selectionSet":sharedNode566},{"kind":"Field","name":{"kind":"Name","value":"BodyLastEditedBy"},"selectionSet":sharedNode7}]}}]}},sharedNode112,sharedNode364,sharedNode182,sharedNode200,sharedNode122]} as unknown as DocumentNode<GetDiscussionQuery, GetDiscussionQueryVariables>;
-export const GetDiscussionDetailAnswersPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionDetailAnswersPage"},"variableDefinitions":[sharedNode476,sharedNode474,{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode568},"type":sharedNode472}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDiscussionDetailAnswers"},"arguments":[sharedNode489,sharedNode488,{"kind":"Argument","name":sharedNode568,"value":{"kind":"Variable","name":sharedNode568}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"answers"},"selectionSet":sharedNode266},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":sharedNode216}]}}]}}]} as unknown as DocumentNode<GetDiscussionDetailAnswersPageQuery, GetDiscussionDetailAnswersPageQueryVariables>;
-export const CreateCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode569,"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OwnedCommentCreateInput"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCommentWithOwnedConnections"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":sharedNode569}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode454,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode463,sharedNode469,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,{"kind":"Field","name":{"kind":"Name","value":"ChannelRoles"},"selectionSet":sharedNode570},{"kind":"Field","name":{"kind":"Name","value":"ServerRoles"},"selectionSet":sharedNode570}]}},{"kind":"InlineFragment","typeCondition":sharedNode55,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode38]}}]}},sharedNode522,sharedNode574]}}]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<CreateCommentMutation, CreateCommentMutationVariables>;
-export const GetPublicUserProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPublicUserProfile"},"variableDefinitions":sharedNode577,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode580,{"kind":"Field","name":sharedNode581,"arguments":sharedNode589,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode206,{"kind":"Field","name":sharedNode423},{"kind":"Field","name":{"kind":"Name","value":"pronouns"}},sharedNode591,sharedNode602,sharedNode620,sharedNode629,sharedNode630,sharedNode631,sharedNode632,sharedNode634,sharedNode635,{"kind":"Field","name":{"kind":"Name","value":"ModOfChannelsConnection"},"selectionSet":sharedNode21}]}}]}},sharedNode112]} as unknown as DocumentNode<GetPublicUserProfileQuery, GetPublicUserProfileQueryVariables>;
-export const GetBasicUserInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getBasicUserInfo"},"variableDefinitions":sharedNode577,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode580,{"kind":"Field","name":sharedNode581,"arguments":sharedNode589,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode206,{"kind":"Field","name":sharedNode423},{"kind":"Field","name":{"kind":"Name","value":"pronouns"}},sharedNode591,{"kind":"Field","name":{"kind":"Name","value":"Email"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode373]}},sharedNode636,sharedNode638,sharedNode639,sharedNode640,sharedNode641,sharedNode642,{"kind":"Field","name":{"kind":"Name","value":"notifyOnSuspensionBlocks"}},sharedNode643,sharedNode644,sharedNode645,sharedNode646,{"kind":"Field","name":{"kind":"Name","value":"NotificationsConnection"},"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"read"},"value":sharedNode250}]}}]}}],"selectionSet":sharedNode21},sharedNode602,sharedNode620,sharedNode629,sharedNode630,sharedNode631,sharedNode632,sharedNode634,sharedNode635]}}]}},sharedNode112]} as unknown as DocumentNode<GetBasicUserInfoQuery, GetBasicUserInfoQueryVariables>;
-export const UpdateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode132},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhere"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode647},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserUpdateInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUsers"},"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"Variable","name":sharedNode132}},{"kind":"Argument","name":sharedNode647,"value":{"kind":"Variable","name":sharedNode647}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode581,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode57,sharedNode591,sharedNode64,sharedNode636,sharedNode638,sharedNode639,sharedNode640,sharedNode641,sharedNode642,sharedNode643,sharedNode644,sharedNode645,sharedNode646]}}]}}]}}]} as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
-export const GetCommentIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentIssue"},"variableDefinitions":sharedNode651,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode454,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode134,"value":sharedNode649}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":{"kind":"Name","value":"RelatedIssues"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":{"kind":"Name","value":"issueNumber"}}]}}]}}]}}]} as unknown as DocumentNode<GetCommentIssueQuery, GetCommentIssueQueryVariables>;
-export const GetCommentWithRepliesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentWithReplies"},"variableDefinitions":[sharedNode650,sharedNode479,sharedNode486,sharedNode484,sharedNode653],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCommentReplies"},"arguments":[sharedNode654,sharedNode490,sharedNode492,sharedNode491,sharedNode493],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregateChildCommentCount"}},{"kind":"Field","name":sharedNode571,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode463,sharedNode522]}}]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetCommentWithRepliesQuery, GetCommentWithRepliesQueryVariables>;
-export const GetPermalinkedCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPermalinkedComment"},"variableDefinitions":sharedNode453,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode454,"arguments":sharedNode462,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode463,{"kind":"Field","name":sharedNode571,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode463]}},sharedNode522]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetPermalinkedCommentQuery, GetPermalinkedCommentQueryVariables>;
-export const SubscribeToCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"subscribeToComment"},"variableDefinitions":sharedNode651,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subscribeToComment"},"arguments":sharedNode655,"selectionSet":sharedNode657}]}}]} as unknown as DocumentNode<SubscribeToCommentMutation, SubscribeToCommentMutationVariables>;
-export const UnsubscribeFromCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unsubscribeFromComment"},"variableDefinitions":sharedNode651,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unsubscribeFromComment"},"arguments":sharedNode655,"selectionSet":sharedNode657}]}}]} as unknown as DocumentNode<UnsubscribeFromCommentMutation, UnsubscribeFromCommentMutationVariables>;
-export const StickyCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"stickyComment"},"variableDefinitions":sharedNode651,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stickyComment"},"arguments":sharedNode655,"selectionSet":sharedNode659}]}}]} as unknown as DocumentNode<StickyCommentMutation, StickyCommentMutationVariables>;
-export const UnstickyCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unstickyComment"},"variableDefinitions":sharedNode651,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unstickyComment"},"arguments":sharedNode655,"selectionSet":sharedNode659}]}}]} as unknown as DocumentNode<UnstickyCommentMutation, UnstickyCommentMutationVariables>;
-export const GetEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEvent"},"variableDefinitions":[sharedNode452,sharedNode474,sharedNode537],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"events"},"arguments":sharedNode462,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":sharedNode365},sharedNode329,sharedNode351,sharedNode556,sharedNode662,sharedNode567,{"kind":"Field","name":{"kind":"Name","value":"PastDescriptionVersions"},"arguments":sharedNode564,"selectionSet":sharedNode566},{"kind":"Field","name":{"kind":"Name","value":"DescriptionLastEditedBy"},"selectionSet":sharedNode7}]}}]}},sharedNode447]} as unknown as DocumentNode<GetEventQuery, GetEventQueryVariables>;
-export const GetEventCommentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEventComments"},"variableDefinitions":[sharedNode664,sharedNode484,sharedNode486,sharedNode653],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getEventComments"},"arguments":[{"kind":"Argument","name":sharedNode435,"value":sharedNode663},sharedNode491,sharedNode492,sharedNode493],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode95,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode189,sharedNode367,sharedNode369,sharedNode371,sharedNode373,sharedNode375,sharedNode377,sharedNode379,sharedNode381,sharedNode383,sharedNode385,sharedNode387,sharedNode38,sharedNode40,sharedNode389,sharedNode430,sharedNode432,sharedNode276,sharedNode442,sharedNode94,sharedNode444,sharedNode662]}},{"kind":"Field","name":{"kind":"Name","value":"Comments"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode463,sharedNode574]}}]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetEventCommentsQuery, GetEventCommentsQueryVariables>;
-export const GetEventRootCommentAggregateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEventRootCommentAggregate"},"variableDefinitions":[sharedNode664],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"events"},"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":sharedNode667}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode244,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[sharedNode514]}}]}}],"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetEventRootCommentAggregateQuery, GetEventRootCommentAggregateQueryVariables>;
-export const GetEventChannelIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEventChannelID"},"variableDefinitions":[sharedNode664,sharedNode474],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"eventChannels"},"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode435,"value":sharedNode667},sharedNode527]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode44]}}]}}]} as unknown as DocumentNode<GetEventChannelIdQuery, GetEventChannelIdQueryVariables>;
+export const EventFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode470]} as unknown as DocumentNode<EventFieldsFragment, unknown>;
+export const UpdatedAnswersFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UpdatedAnswers"},"typeCondition":{"kind":"NamedType","name":sharedNode97},"selectionSet":sharedNode479}]} as unknown as DocumentNode<UpdatedAnswersFragment, unknown>;
+export const PipelinePageFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode567]} as unknown as DocumentNode<PipelinePageFieldsFragment, unknown>;
+export const ChannelIconFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode572]} as unknown as DocumentNode<ChannelIconFieldsFragment, unknown>;
+export const SearchCommentFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode594]} as unknown as DocumentNode<SearchCommentFieldsFragment, unknown>;
+export const IssueBaseFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode633]} as unknown as DocumentNode<IssueBaseFieldsFragment, unknown>;
+export const IssueFieldsFragmentDoc = {"kind":"Document","definitions":[sharedNode705,sharedNode27,sharedNode633]} as unknown as DocumentNode<IssueFieldsFragment, unknown>;
+export const NewTagFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NewTag"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Tag"}},"selectionSet":sharedNode275}]} as unknown as DocumentNode<NewTagFragment, unknown>;
+export const NewChannelFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NewChannel"},"typeCondition":sharedNode569,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode619,sharedNode173,sharedNode189,sharedNode231,sharedNode707,sharedNode709,sharedNode276]}}]} as unknown as DocumentNode<NewChannelFragment, unknown>;
+export const GetCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getComment"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode725,{"kind":"Field","name":sharedNode726,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode729,sharedNode96]}},sharedNode731,sharedNode733,sharedNode729,sharedNode96,sharedNode674]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetCommentQuery, GetCommentQueryVariables>;
+export const GetCommentSectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentSection"},"variableDefinitions":[sharedNode738,sharedNode740,sharedNode743,sharedNode748,sharedNode750,{"kind":"VariableDefinition","variable":sharedNode751,"type":sharedNode736}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCommentSection"},"arguments":[sharedNode752,sharedNode753,sharedNode754,sharedNode755,sharedNode756,sharedNode757],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode97,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode36,sharedNode101,sharedNode99,sharedNode34,sharedNode44,sharedNode224,sharedNode222,sharedNode8,sharedNode22,sharedNode24,{"kind":"Field","name":sharedNode171,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode233,sharedNode235,sharedNode237,sharedNode239,{"kind":"Field","name":sharedNode758,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode57,sharedNode760,sharedNode762]}},sharedNode764]}},{"kind":"Field","name":sharedNode124,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode209]}},sharedNode783,{"kind":"Field","alias":{"kind":"Name","value":"RootCommentsConnection"},"name":sharedNode244,"arguments":sharedNode792,"selectionSet":sharedNode21},sharedNode94,sharedNode267,sharedNode269]}},{"kind":"Field","name":sharedNode793,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode34,sharedNode36,sharedNode38,sharedNode40,sharedNode42,sharedNode44,sharedNode46,sharedNode48,sharedNode50,sharedNode52,{"kind":"Field","name":sharedNode53,"selectionSet":sharedNode208},sharedNode78,sharedNode82,sharedNode794,{"kind":"Field","name":sharedNode83,"selectionSet":sharedNode666},sharedNode94,sharedNode105]}}]}}]}},sharedNode27,sharedNode112]} as unknown as DocumentNode<GetCommentSectionQuery, GetCommentSectionQueryVariables>;
+export const GetDiscussionChannelCommentAggregateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionChannelCommentAggregate"},"variableDefinitions":sharedNode795,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode796,"arguments":sharedNode808,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode44,sharedNode222,sharedNode224,sharedNode783]}}]}}]} as unknown as DocumentNode<GetDiscussionChannelCommentAggregateQuery, GetDiscussionChannelCommentAggregateQueryVariables>;
+export const GetDiscussionChannelRootCommentAggregateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionChannelRootCommentAggregate"},"variableDefinitions":sharedNode795,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode796,"arguments":sharedNode808,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode44,sharedNode222,sharedNode224,{"kind":"Field","name":sharedNode244,"arguments":sharedNode792,"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetDiscussionChannelRootCommentAggregateQuery, GetDiscussionChannelRootCommentAggregateQueryVariables>;
+export const GetDiscussionDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":sharedNode809,"variableDefinitions":[sharedNode714,sharedNode810,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":sharedNode811,"name":sharedNode809,"arguments":sharedNode813,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode814]}}]}},sharedNode112,sharedNode364,sharedNode182,sharedNode200,sharedNode122]} as unknown as DocumentNode<GetDiscussionDetailQuery, GetDiscussionDetailQueryVariables>;
+export const GetDownloadDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDownloadDetail"},"variableDefinitions":sharedNode818,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":sharedNode811,"name":sharedNode809,"arguments":sharedNode813,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode203,sharedNode205,sharedNode822,sharedNode209,sharedNode220,{"kind":"Field","name":sharedNode170,"arguments":sharedNode826,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode44,sharedNode222,sharedNode224,sharedNode229,sharedNode8,sharedNode22,sharedNode24,sharedNode242,sharedNode259,sharedNode838]}},sharedNode276,sharedNode325,sharedNode327,sharedNode329,sharedNode351,sharedNode356]}}]}},sharedNode112,sharedNode182,sharedNode122]} as unknown as DocumentNode<GetDownloadDetailQuery, GetDownloadDetailQueryVariables>;
+export const GetDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussion"},"variableDefinitions":sharedNode818,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode811,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode814,sharedNode822,sharedNode87,sharedNode841,{"kind":"Field","name":sharedNode170,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode838,sharedNode848]}},sharedNode852,sharedNode854,sharedNode855]}}]}},sharedNode112,sharedNode364,sharedNode182,sharedNode200,sharedNode122]} as unknown as DocumentNode<GetDiscussionQuery, GetDiscussionQueryVariables>;
+export const GetDiscussionDetailAnswersPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionDetailAnswersPage"},"variableDefinitions":sharedNode859,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDiscussionDetailAnswers"},"arguments":sharedNode861,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"answers"},"selectionSet":sharedNode266},sharedNode863]}}]}}]} as unknown as DocumentNode<GetDiscussionDetailAnswersPageQuery, GetDiscussionDetailAnswersPageQueryVariables>;
+export const CreateCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode864,"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"OwnedCommentCreateInput"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode865,"arguments":[{"kind":"Argument","name":sharedNode866,"value":sharedNode864}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode725,sharedNode674,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,{"kind":"Field","name":{"kind":"Name","value":"ChannelRoles"},"selectionSet":sharedNode867},{"kind":"Field","name":{"kind":"Name","value":"ServerRoles"},"selectionSet":sharedNode867}]}},{"kind":"InlineFragment","typeCondition":sharedNode55,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode38]}}]}},sharedNode794,sharedNode871]}}]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<CreateCommentMutation, CreateCommentMutationVariables>;
+export const GetPublicUserProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPublicUserProfile"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode877,{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode206,{"kind":"Field","name":sharedNode446},{"kind":"Field","name":{"kind":"Name","value":"pronouns"}},sharedNode888,sharedNode899,sharedNode917,sharedNode927,sharedNode928,sharedNode930,sharedNode931,sharedNode933,sharedNode935,{"kind":"Field","name":{"kind":"Name","value":"ModOfChannelsConnection"},"selectionSet":sharedNode21}]}}]}},sharedNode112]} as unknown as DocumentNode<GetPublicUserProfileQuery, GetPublicUserProfileQueryVariables>;
+export const GetBasicUserInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getBasicUserInfo"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode877,{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode206,{"kind":"Field","name":sharedNode446},{"kind":"Field","name":{"kind":"Name","value":"pronouns"}},sharedNode888,sharedNode939,sharedNode940,sharedNode942,sharedNode943,sharedNode944,sharedNode945,sharedNode946,{"kind":"Field","name":{"kind":"Name","value":"notifyOnSuspensionBlocks"}},sharedNode947,sharedNode948,sharedNode949,sharedNode950,{"kind":"Field","name":sharedNode951,"arguments":sharedNode960,"selectionSet":sharedNode21},sharedNode899,sharedNode917,sharedNode927,sharedNode928,sharedNode930,sharedNode931,sharedNode933,sharedNode935]}}]}},sharedNode112]} as unknown as DocumentNode<GetBasicUserInfoQuery, GetBasicUserInfoQueryVariables>;
+export const UpdateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode961,"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserWhere"}}},{"kind":"VariableDefinition","variable":sharedNode963,"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserUpdateInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":sharedNode967,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode57,sharedNode888,sharedNode64,sharedNode940,sharedNode942,sharedNode943,sharedNode944,sharedNode945,sharedNode946,sharedNode947,sharedNode948,sharedNode949,sharedNode950]}}]}}]}}]} as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
+export const GetCommentIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentIssue"},"variableDefinitions":sharedNode971,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"arguments":sharedNode979,"selectionSet":sharedNode985}]}}]} as unknown as DocumentNode<GetCommentIssueQuery, GetCommentIssueQueryVariables>;
+export const GetCommentWithRepliesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCommentWithReplies"},"variableDefinitions":[sharedNode970,sharedNode743,sharedNode750,sharedNode748,sharedNode987],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getCommentReplies"},"arguments":[sharedNode988,sharedNode754,sharedNode756,sharedNode755,sharedNode757],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregateChildCommentCount"}},{"kind":"Field","name":sharedNode868,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode725,sharedNode794]}}]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetCommentWithRepliesQuery, GetCommentWithRepliesQueryVariables>;
+export const GetPermalinkedCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPermalinkedComment"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode725,{"kind":"Field","name":sharedNode868,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode725]}},sharedNode794]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetPermalinkedCommentQuery, GetPermalinkedCommentQueryVariables>;
+export const SubscribeToCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"subscribeToComment"},"variableDefinitions":sharedNode971,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subscribeToComment"},"arguments":sharedNode989,"selectionSet":sharedNode991}]}}]} as unknown as DocumentNode<SubscribeToCommentMutation, SubscribeToCommentMutationVariables>;
+export const UnsubscribeFromCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unsubscribeFromComment"},"variableDefinitions":sharedNode971,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unsubscribeFromComment"},"arguments":sharedNode989,"selectionSet":sharedNode991}]}}]} as unknown as DocumentNode<UnsubscribeFromCommentMutation, UnsubscribeFromCommentMutationVariables>;
+export const StickyCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"stickyComment"},"variableDefinitions":sharedNode971,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stickyComment"},"arguments":sharedNode989,"selectionSet":sharedNode993}]}}]} as unknown as DocumentNode<StickyCommentMutation, StickyCommentMutationVariables>;
+export const UnstickyCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unstickyComment"},"variableDefinitions":sharedNode971,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unstickyComment"},"arguments":sharedNode989,"selectionSet":sharedNode993}]}}]} as unknown as DocumentNode<UnstickyCommentMutation, UnstickyCommentMutationVariables>;
+export const GetEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEvent"},"variableDefinitions":[sharedNode714,sharedNode738,sharedNode810],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode994,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode995,sharedNode329,sharedNode351,sharedNode841,sharedNode999,sharedNode852,{"kind":"Field","name":{"kind":"Name","value":"PastDescriptionVersions"},"arguments":sharedNode678,"selectionSet":sharedNode851},{"kind":"Field","name":{"kind":"Name","value":"DescriptionLastEditedBy"},"selectionSet":sharedNode7}]}}]}},sharedNode470]} as unknown as DocumentNode<GetEventQuery, GetEventQueryVariables>;
+export const GetEventCommentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEventComments"},"variableDefinitions":[sharedNode1001,sharedNode748,sharedNode750,sharedNode987],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getEventComments"},"arguments":[sharedNode1002,sharedNode755,sharedNode756,sharedNode757],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode95,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode189,sharedNode368,sharedNode370,sharedNode372,sharedNode374,sharedNode376,sharedNode378,sharedNode380,sharedNode382,sharedNode384,sharedNode386,sharedNode388,sharedNode38,sharedNode40,sharedNode392,sharedNode453,sharedNode455,sharedNode276,sharedNode465,sharedNode94,sharedNode467,sharedNode999]}},{"kind":"Field","name":sharedNode793,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode725,sharedNode871]}}]}}]}},sharedNode108,sharedNode27]} as unknown as DocumentNode<GetEventCommentsQuery, GetEventCommentsQueryVariables>;
+export const GetEventRootCommentAggregateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEventRootCommentAggregate"},"variableDefinitions":sharedNode1003,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode994,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":sharedNode1006}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode244,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[sharedNode785]}}]}}],"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetEventRootCommentAggregateQuery, GetEventRootCommentAggregateQueryVariables>;
+export const GetEventChannelIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEventChannelID"},"variableDefinitions":sharedNode1007,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"eventChannels"},"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode458,"value":sharedNode1006},sharedNode800]}}],"selectionSet":sharedNode1009}]}}]} as unknown as DocumentNode<GetEventChannelIdQuery, GetEventChannelIdQueryVariables>;
+export const GetUserFavoriteImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserFavoriteImage"},"variableDefinitions":sharedNode1013,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1014,"arguments":sharedNode1022,"selectionSet":sharedNode1024}]}}]}}]} as unknown as DocumentNode<GetUserFavoriteImageQuery, GetUserFavoriteImageQueryVariables>;
+export const GetUserFavoritesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserFavorites"},"variableDefinitions":sharedNode1025,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1026,"arguments":sharedNode1031,"selectionSet":sharedNode673}]}}]}}]} as unknown as DocumentNode<GetUserFavoritesQuery, GetUserFavoritesQueryVariables>;
+export const GetUserFavoriteCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserFavoriteComment"},"variableDefinitions":sharedNode971,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getUserFavoriteComment"},"arguments":sharedNode989}]}}]} as unknown as DocumentNode<GetUserFavoriteCommentQuery, GetUserFavoriteCommentQueryVariables>;
+export const GetUserFavoriteDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserFavoriteDiscussion"},"variableDefinitions":[sharedNode873,sharedNode740],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1032,"arguments":sharedNode1037,"selectionSet":sharedNode581}]}}]}}]} as unknown as DocumentNode<GetUserFavoriteDiscussionQuery, GetUserFavoriteDiscussionQueryVariables>;
+export const UpdateServerConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateServerConfig"},"variableDefinitions":[sharedNode1040,{"kind":"VariableDefinition","variable":sharedNode1041,"type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerConfigUpdateInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1042,"arguments":[sharedNode1049,sharedNode1050],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1051,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1052,sharedNode1054,sharedNode1055,sharedNode1057,sharedNode1058,sharedNode1059,sharedNode1061,sharedNode1063,sharedNode1065,sharedNode1067,sharedNode1069,sharedNode1071,sharedNode1073,sharedNode1075,sharedNode1077,sharedNode1079,sharedNode1081,sharedNode1083,sharedNode1085,sharedNode1087,sharedNode1089,sharedNode1091,sharedNode1093]}}]}}]}}]} as unknown as DocumentNode<UpdateServerConfigMutation, UpdateServerConfigMutationVariables>;
+export const SetFeaturedWikiPagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"setFeaturedWikiPages"},"variableDefinitions":[sharedNode1040,{"kind":"VariableDefinition","variable":sharedNode1095,"type":sharedNode1097}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setFeaturedWikiPages"},"arguments":[sharedNode1098,{"kind":"Argument","name":sharedNode1094,"value":sharedNode1095}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1052,sharedNode1099]}}]}}]} as unknown as DocumentNode<SetFeaturedWikiPagesMutation, SetFeaturedWikiPagesMutationVariables>;
+export const RefreshPluginsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RefreshPlugins"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"refreshPlugins"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,{"kind":"Field","name":sharedNode1100,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode538]}}]}}]}}]} as unknown as DocumentNode<RefreshPluginsMutation, RefreshPluginsMutationVariables>;
+export const AllowPluginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AllowPlugin"},"variableDefinitions":sharedNode1103,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1042,"arguments":[sharedNode1049,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1104,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":sharedNode1119}]}]}}]}}],"selectionSet":sharedNode1125}]}}]} as unknown as DocumentNode<AllowPluginMutation, AllowPluginMutationVariables>;
+export const DisallowPluginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DisallowPlugin"},"variableDefinitions":sharedNode1103,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1042,"arguments":[sharedNode1049,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1104,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1126,"value":sharedNode1119}]}]}}]}}],"selectionSet":sharedNode1125}]}}]} as unknown as DocumentNode<DisallowPluginMutation, DisallowPluginMutationVariables>;
+export const InstallPluginVersionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InstallPluginVersion"},"variableDefinitions":[sharedNode1127,sharedNode1129,{"kind":"VariableDefinition","variable":sharedNode1131,"type":sharedNode1133}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"installPluginVersion"},"arguments":[sharedNode1134,sharedNode1135,{"kind":"Argument","name":sharedNode1130,"value":sharedNode1131}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1137,sharedNode538,sharedNode501,sharedNode1139,sharedNode1141,{"kind":"Field","name":{"kind":"Name","value":"carryOverReport"}}]}}]}}]} as unknown as DocumentNode<InstallPluginVersionMutation, InstallPluginVersionMutationVariables>;
+export const EnableServerPluginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"EnableServerPlugin"},"variableDefinitions":[sharedNode1127,sharedNode1129,{"kind":"VariableDefinition","variable":sharedNode1142,"type":sharedNode1143},{"kind":"VariableDefinition","variable":sharedNode1144,"type":{"kind":"NamedType","name":{"kind":"Name","value":"JSON"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enableServerPlugin"},"arguments":[sharedNode1134,sharedNode1135,{"kind":"Argument","name":sharedNode1138,"value":sharedNode1142},{"kind":"Argument","name":sharedNode1140,"value":sharedNode1144}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1137,sharedNode538,sharedNode501,sharedNode1139,sharedNode1141]}}]}}]} as unknown as DocumentNode<EnableServerPluginMutation, EnableServerPluginMutationVariables>;
+export const SetServerPluginSecretDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetServerPluginSecret"},"variableDefinitions":[sharedNode1127,{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode831},"type":sharedNode737},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode828},"type":sharedNode737}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setServerPluginSecret"},"arguments":[sharedNode1134,{"kind":"Argument","name":sharedNode831,"value":{"kind":"Variable","name":sharedNode831}},{"kind":"Argument","name":sharedNode828,"value":{"kind":"Variable","name":sharedNode828}}]}]}}]} as unknown as DocumentNode<SetServerPluginSecretMutation, SetServerPluginSecretMutationVariables>;
+export const CreatePluginPipelineCampaignDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreatePluginPipelineCampaign"},"variableDefinitions":[sharedNode1146,{"kind":"VariableDefinition","variable":sharedNode1148,"type":sharedNode1149},{"kind":"VariableDefinition","variable":sharedNode1151,"type":sharedNode1149}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createPluginPipelineCampaign"},"arguments":[sharedNode1152,{"kind":"Argument","name":sharedNode1147,"value":sharedNode1148},{"kind":"Argument","name":sharedNode1150,"value":sharedNode1151}],"selectionSet":sharedNode1154}]}}]} as unknown as DocumentNode<CreatePluginPipelineCampaignMutation, CreatePluginPipelineCampaignMutationVariables>;
+export const PausePluginPipelineCampaignDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"PausePluginPipelineCampaign"},"variableDefinitions":sharedNode1157,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pausePluginPipelineCampaign"},"arguments":sharedNode1159,"selectionSet":sharedNode1163}]}}]} as unknown as DocumentNode<PausePluginPipelineCampaignMutation, PausePluginPipelineCampaignMutationVariables>;
+export const ResumePluginPipelineCampaignDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResumePluginPipelineCampaign"},"variableDefinitions":sharedNode1157,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resumePluginPipelineCampaign"},"arguments":sharedNode1159,"selectionSet":sharedNode1163}]}}]} as unknown as DocumentNode<ResumePluginPipelineCampaignMutation, ResumePluginPipelineCampaignMutationVariables>;
+export const UpdateModChannelRoleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateModChannelRole"},"variableDefinitions":[sharedNode1165,{"kind":"VariableDefinition","variable":sharedNode1041,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ModChannelRoleUpdateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateModChannelRoles"},"arguments":sharedNode1173,"selectionSet":sharedNode1200}]}}]} as unknown as DocumentNode<UpdateModChannelRoleMutation, UpdateModChannelRoleMutationVariables>;
+export const UpdateServerRoleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateServerRole"},"variableDefinitions":[sharedNode1165,{"kind":"VariableDefinition","variable":sharedNode1041,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ServerRoleUpdateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateServerRoles"},"arguments":sharedNode1173,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"serverRoles"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode187,sharedNode189,sharedNode1202,sharedNode1204,sharedNode1206,sharedNode1208,sharedNode1210,sharedNode1212,sharedNode1214,sharedNode1187]}}]}}]}}]} as unknown as DocumentNode<UpdateServerRoleMutation, UpdateServerRoleMutationVariables>;
+export const AddServerAdminDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddServerAdmin"},"variableDefinitions":sharedNode1215,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1042,"arguments":[sharedNode1049,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode708,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":sharedNode1223}]}]}}]}}],"selectionSet":sharedNode1229}]}}]} as unknown as DocumentNode<AddServerAdminMutation, AddServerAdminMutationVariables>;
+export const RemoveServerAdminDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveServerAdmin"},"variableDefinitions":sharedNode1215,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1042,"arguments":[sharedNode1049,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode708,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1126,"value":sharedNode1223}]}]}}]}}],"selectionSet":sharedNode1229}]}}]} as unknown as DocumentNode<RemoveServerAdminMutation, RemoveServerAdminMutationVariables>;
+export const AddServerModeratorDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddServerModerator"},"variableDefinitions":sharedNode1232,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1042,"arguments":[sharedNode1049,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode763,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":sharedNode1246}]}]}}]}}],"selectionSet":sharedNode1251}]}}]} as unknown as DocumentNode<AddServerModeratorMutation, AddServerModeratorMutationVariables>;
+export const RemoveServerModeratorDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveServerModerator"},"variableDefinitions":sharedNode1232,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1042,"arguments":[sharedNode1049,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode763,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1126,"value":sharedNode1246}]}]}}]}}],"selectionSet":sharedNode1251}]}}]} as unknown as DocumentNode<RemoveServerModeratorMutation, RemoveServerModeratorMutationVariables>;
+export const InviteServerAdminDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InviteServerAdmin"},"variableDefinitions":sharedNode1255,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inviteServerAdmin"},"arguments":sharedNode1257}]}}]} as unknown as DocumentNode<InviteServerAdminMutation, InviteServerAdminMutationVariables>;
+export const CancelInviteServerAdminDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CancelInviteServerAdmin"},"variableDefinitions":sharedNode1255,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cancelInviteServerAdmin"},"arguments":sharedNode1257}]}}]} as unknown as DocumentNode<CancelInviteServerAdminMutation, CancelInviteServerAdminMutationVariables>;
+export const AcceptServerAdminInviteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AcceptServerAdminInvite"},"variableDefinitions":sharedNode1258,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"acceptServerAdminInvite"},"arguments":sharedNode1259}]}}]} as unknown as DocumentNode<AcceptServerAdminInviteMutation, AcceptServerAdminInviteMutationVariables>;
+export const InviteServerModDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"InviteServerMod"},"variableDefinitions":sharedNode1255,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inviteServerMod"},"arguments":sharedNode1257}]}}]} as unknown as DocumentNode<InviteServerModMutation, InviteServerModMutationVariables>;
+export const CancelInviteServerModDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CancelInviteServerMod"},"variableDefinitions":sharedNode1255,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cancelInviteServerMod"},"arguments":sharedNode1257}]}}]} as unknown as DocumentNode<CancelInviteServerModMutation, CancelInviteServerModMutationVariables>;
+export const AcceptServerModInviteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AcceptServerModInvite"},"variableDefinitions":sharedNode1258,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"acceptServerModInvite"},"arguments":sharedNode1259}]}}]} as unknown as DocumentNode<AcceptServerModInviteMutation, AcceptServerModInviteMutationVariables>;
+export const UpdateModServerRoleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateModServerRole"},"variableDefinitions":[sharedNode1165,{"kind":"VariableDefinition","variable":sharedNode1041,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ModServerRoleUpdateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateModServerRoles"},"arguments":sharedNode1173,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"modServerRoles"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode187,sharedNode189,sharedNode1261,sharedNode1175,sharedNode1177,sharedNode1179,sharedNode1181,sharedNode1183,sharedNode1185,sharedNode1187,sharedNode1189,sharedNode1191,sharedNode1193,sharedNode1195]}}]}}]}}]} as unknown as DocumentNode<UpdateModServerRoleMutation, UpdateModServerRoleMutationVariables>;
+export const UpdatePluginPipelinesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdatePluginPipelines"},"variableDefinitions":[sharedNode1268],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updatePluginPipelines"},"arguments":[sharedNode1269]}]}}]} as unknown as DocumentNode<UpdatePluginPipelinesMutation, UpdatePluginPipelinesMutationVariables>;
+export const StartPluginPipelineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"StartPluginPipeline"},"variableDefinitions":[sharedNode1271,sharedNode1273,{"kind":"VariableDefinition","variable":sharedNode1274,"type":sharedNode737},sharedNode1276],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startPluginPipeline"},"arguments":[sharedNode1277,sharedNode1278,sharedNode1279,sharedNode1280],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode493,sharedNode495,sharedNode497,sharedNode499,sharedNode501,sharedNode503,sharedNode505,sharedNode507,sharedNode509,sharedNode513,sharedNode523,sharedNode525,sharedNode527,sharedNode529,sharedNode531,sharedNode38,sharedNode40]}}]}}]} as unknown as DocumentNode<StartPluginPipelineMutation, StartPluginPipelineMutationVariables>;
+export const RerunPluginPipelineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RerunPluginPipeline"},"variableDefinitions":sharedNode1284,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"rerunPluginPipeline"},"arguments":sharedNode1286,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode493,sharedNode495,sharedNode497,sharedNode499,sharedNode501,sharedNode503,sharedNode505,sharedNode507,sharedNode509,sharedNode511,sharedNode513,sharedNode523,sharedNode525,sharedNode527,sharedNode529,sharedNode531,sharedNode38,sharedNode40]}}]}}]} as unknown as DocumentNode<RerunPluginPipelineMutation, RerunPluginPipelineMutationVariables>;
+export const GetInstanceSetupStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetInstanceSetupStatus"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getInstanceSetupStatus"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"auth"},"selectionSet":sharedNode1296},{"kind":"Field","name":{"kind":"Name","value":"mail"},"selectionSet":sharedNode1296},{"kind":"Field","name":{"kind":"Name","value":"maps"},"selectionSet":sharedNode1296},{"kind":"Field","name":{"kind":"Name","value":"geocoding"},"selectionSet":sharedNode1296},{"kind":"Field","name":{"kind":"Name","value":"uploads"},"selectionSet":sharedNode1296},{"kind":"Field","name":sharedNode1297,"selectionSet":sharedNode1296},{"kind":"Field","name":sharedNode994,"selectionSet":sharedNode1296},{"kind":"Field","name":sharedNode1298,"selectionSet":sharedNode1296}]}}]}}]} as unknown as DocumentNode<GetInstanceSetupStatusQuery, GetInstanceSetupStatusQueryVariables>;
+export const GetServerBrandingDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getServerBranding"},"variableDefinitions":sharedNode1258,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1051,"arguments":sharedNode1299,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1052,sharedNode1054,sharedNode1073,sharedNode1075,sharedNode1077,sharedNode1079,sharedNode1081,sharedNode1083,sharedNode1085,sharedNode1087,sharedNode1089,sharedNode1091,sharedNode1093]}}]}}]} as unknown as DocumentNode<GetServerBrandingQuery, GetServerBrandingQueryVariables>;
+export const GetServerConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getServerConfig"},"variableDefinitions":sharedNode1258,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1051,"arguments":sharedNode1299,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1052,sharedNode1054,sharedNode1055,sharedNode1099,sharedNode1073,sharedNode1075,sharedNode1077,sharedNode1079,sharedNode1081,sharedNode1083,sharedNode1085,sharedNode1087,sharedNode1089,sharedNode1091,sharedNode1093,sharedNode709,sharedNode764,{"kind":"Field","name":{"kind":"Name","value":"PendingAdminInvites"},"selectionSet":sharedNode7},{"kind":"Field","name":sharedNode1300,"selectionSet":sharedNode7},{"kind":"Field","name":{"kind":"Name","value":"DefaultServerRole"},"selectionSet":sharedNode1302},{"kind":"Field","name":sharedNode1303,"selectionSet":sharedNode1308},{"kind":"Field","name":{"kind":"Name","value":"DefaultElevatedModRole"},"selectionSet":sharedNode1308},{"kind":"Field","name":{"kind":"Name","value":"DefaultSuspendedRole"},"selectionSet":sharedNode1302},{"kind":"Field","name":{"kind":"Name","value":"DefaultSuspendedModRole"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode187,sharedNode189,sharedNode1175,sharedNode1177,sharedNode1179,sharedNode1261,sharedNode1305,sharedNode1181,sharedNode1183,sharedNode1185,sharedNode1187,sharedNode1189,sharedNode1191,sharedNode1193,sharedNode1195]}},sharedNode1057,sharedNode1069,sharedNode1058,sharedNode1059,sharedNode1061,sharedNode1063,sharedNode1065,sharedNode1067,sharedNode1071]}}]}}]} as unknown as DocumentNode<GetServerConfigQuery, GetServerConfigQueryVariables>;
+export const GetServerHealthDashboardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":sharedNode1309,"variableDefinitions":sharedNode1325,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1309,"arguments":sharedNode1331,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1332,sharedNode423,sharedNode1334,sharedNode1370,sharedNode1378,sharedNode1386,sharedNode1391,{"kind":"Field","name":{"kind":"Name","value":"attentionItems"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"severity"}},sharedNode127,sharedNode189,sharedNode99,sharedNode599,{"kind":"Field","name":{"kind":"Name","value":"metric"}},sharedNode829]}}]}}]}}]} as unknown as DocumentNode<GetServerHealthDashboardQuery, GetServerHealthDashboardQueryVariables>;
+export const GetDownloadScanReviewQueueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDownloadScanReviewQueue"},"variableDefinitions":[sharedNode750],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDownloadScanReviewQueue"},"arguments":[sharedNode756],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1392},sharedNode286,sharedNode312,sharedNode316,sharedNode314,{"kind":"Field","name":{"kind":"Name","value":"reviewRequestedAt"}},{"kind":"Field","name":{"kind":"Name","value":"reviewRequestReason"}},{"kind":"Field","name":{"kind":"Name","value":"uploaderUsername"}},sharedNode101,{"kind":"Field","name":{"kind":"Name","value":"discussionTitle"}},sharedNode99]}}]}}]} as unknown as DocumentNode<GetDownloadScanReviewQueueQuery, GetDownloadScanReviewQueueQueryVariables>;
+export const GetServerHealthDashboardOverviewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getServerHealthDashboardOverview"},"variableDefinitions":[sharedNode1312,sharedNode1314,sharedNode1318],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1309,"arguments":[sharedNode1326,sharedNode1327,sharedNode1328],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1332,sharedNode423,sharedNode1334,sharedNode1370,sharedNode1378,sharedNode1391]}}]}}]} as unknown as DocumentNode<GetServerHealthDashboardOverviewQuery, GetServerHealthDashboardOverviewQueryVariables>;
+export const GetServerHealthChannelHealthDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getServerHealthChannelHealth"},"variableDefinitions":sharedNode1325,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1309,"arguments":sharedNode1331,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1332,sharedNode423,sharedNode1334,sharedNode1386]}}]}}]} as unknown as DocumentNode<GetServerHealthChannelHealthQuery, GetServerHealthChannelHealthQueryVariables>;
+export const GetServerConfigSource8a6aa06bf0Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getServerConfig"},"variableDefinitions":sharedNode1258,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1051,"arguments":sharedNode1299,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1052,{"kind":"Field","name":{"kind":"Name","value":"SuperAdmins"},"selectionSet":sharedNode7},{"kind":"Field","name":sharedNode708,"selectionSet":sharedNode1394},sharedNode764,{"kind":"Field","name":{"kind":"Name","value":"PendingAdminInvites"},"selectionSet":sharedNode168},{"kind":"Field","name":sharedNode1300,"selectionSet":sharedNode168},{"kind":"Field","name":sharedNode1303,"selectionSet":sharedNode1396},{"kind":"Field","name":{"kind":"Name","value":"DefaultElevatedModRole"},"selectionSet":sharedNode1396},{"kind":"Field","name":{"kind":"Name","value":"DefaultSuspendedModRole"},"selectionSet":sharedNode1396},{"kind":"Field","name":{"kind":"Name","value":"DefaultServerRole"},"selectionSet":sharedNode1398},{"kind":"Field","name":{"kind":"Name","value":"DefaultSuspendedRole"},"selectionSet":sharedNode1398}]}}]}}]} as unknown as DocumentNode<GetServerConfigSource8a6aa06bf0Query, GetServerConfigSource8a6aa06bf0QueryVariables>;
+export const GetServerSuspendedUsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getServerSuspendedUsers"},"variableDefinitions":sharedNode1258,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1051,"arguments":sharedNode1299,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1052,sharedNode1399,{"kind":"Field","name":sharedNode1400,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode5,sharedNode38,sharedNode1402,sharedNode1404,{"kind":"Field","name":{"kind":"Name","value":"SuspendedUser"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode57,sharedNode64,sharedNode68,sharedNode66,sharedNode38,sharedNode70]}},sharedNode1406]}}]}}]}}]} as unknown as DocumentNode<GetServerSuspendedUsersQuery, GetServerSuspendedUsersQueryVariables>;
+export const GetServerSuspendedModsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getServerSuspendedMods"},"variableDefinitions":sharedNode1258,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1051,"arguments":sharedNode1299,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1052,sharedNode1407,{"kind":"Field","name":sharedNode1408,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode1410,sharedNode5,sharedNode38,sharedNode1402,sharedNode1404,sharedNode1411,sharedNode1406]}}]}}]}}]} as unknown as DocumentNode<GetServerSuspendedModsQuery, GetServerSuspendedModsQueryVariables>;
+export const GetServerRulesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getServerRules"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1051,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1052,sharedNode1057]}}]}}]} as unknown as DocumentNode<GetServerRulesQuery, GetServerRulesQueryVariables>;
+export const GetModChannelRolesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetModChannelRoles"},"selectionSet":sharedNode1200}]} as unknown as DocumentNode<GetModChannelRolesQuery, GetModChannelRolesQueryVariables>;
+export const GetPluginsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPlugins"},"variableDefinitions":sharedNode1258,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1051,"arguments":sharedNode1299,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1120,sharedNode1419]}}]}}]} as unknown as DocumentNode<GetPluginsQuery, GetPluginsQueryVariables>;
+export const GetPluginByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPluginById"},"variableDefinitions":[sharedNode1040,sharedNode1102],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1051,"arguments":sharedNode1299,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1104,"arguments":sharedNode1421,"selectionSet":sharedNode321},sharedNode1419]}}]}}]} as unknown as DocumentNode<GetPluginByIdQuery, GetPluginByIdQueryVariables>;
+export const GetPluginsSource6c031b0d8aDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPlugins"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1298,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode57,sharedNode189,sharedNode1423,sharedNode1425,sharedNode1427,sharedNode1428,sharedNode1430,{"kind":"Field","name":sharedNode1100,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode538,sharedNode1432,sharedNode1434,sharedNode1436,sharedNode1438,sharedNode1440,sharedNode1442]}}]}}]}}]} as unknown as DocumentNode<GetPluginsSource6c031b0d8aQuery, GetPluginsSource6c031b0d8aQueryVariables>;
+export const GetInstalledPluginsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetInstalledPlugins"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1454]}}]} as unknown as DocumentNode<GetInstalledPluginsQuery, GetInstalledPluginsQueryVariables>;
+export const GetServerPluginSecretsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetServerPluginSecrets"},"variableDefinitions":[sharedNode1127],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getServerPluginSecrets"},"arguments":[sharedNode1134],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode832,sharedNode505,{"kind":"Field","name":{"kind":"Name","value":"lastValidatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"validationError"}}]}}]}}]} as unknown as DocumentNode<GetServerPluginSecretsQuery, GetServerPluginSecretsQueryVariables>;
+export const GetPluginConfigStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPluginConfigStatus"},"variableDefinitions":[sharedNode1127,sharedNode1129,sharedNode1456],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPluginConfigStatus"},"arguments":[sharedNode1134,sharedNode1135,sharedNode1457],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"isFullyConfigured"}},{"kind":"Field","name":{"kind":"Name","value":"fields"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode832,sharedNode1388,sharedNode501,sharedNode288,sharedNode1459,{"kind":"Field","name":{"kind":"Name","value":"isSet"}},{"kind":"Field","name":{"kind":"Name","value":"isValid"}},sharedNode540]}}]}}]}}]} as unknown as DocumentNode<GetPluginConfigStatusQuery, GetPluginConfigStatusQueryVariables>;
+export const GetPluginManagementDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPluginManagementData"},"variableDefinitions":sharedNode1258,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1298,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode57,sharedNode189,sharedNode1423,sharedNode1425,sharedNode1427,sharedNode1428,sharedNode1430,{"kind":"Field","name":sharedNode1100,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode538,sharedNode1414,sharedNode1416,sharedNode1432,sharedNode1434,sharedNode1436,sharedNode1438,sharedNode1440,sharedNode1442]}}]}},{"kind":"Field","name":sharedNode1051,"arguments":sharedNode1299,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1052,sharedNode1071,{"kind":"Field","name":sharedNode1104,"selectionSet":sharedNode1444},{"kind":"Field","name":sharedNode1412,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode538,sharedNode1414,sharedNode1416,{"kind":"Field","name":{"kind":"Name","value":"Plugin"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode57,sharedNode189]}}]}}]}},sharedNode1454]}}]} as unknown as DocumentNode<GetPluginManagementDataQuery, GetPluginManagementDataQueryVariables>;
+export const GetPluginDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPluginDetail"},"variableDefinitions":[sharedNode1102],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1298,"arguments":sharedNode1421,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode57,sharedNode189,sharedNode1423,sharedNode1425,sharedNode1427,sharedNode1428,sharedNode1430,{"kind":"Field","name":sharedNode1100,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode538,sharedNode1414,sharedNode1416,sharedNode1447,sharedNode1432,sharedNode1434,sharedNode1436,sharedNode1438,sharedNode1440,sharedNode1442,sharedNode1449]}}]}}]}}]} as unknown as DocumentNode<GetPluginDetailQuery, GetPluginDetailQueryVariables>;
+export const GetPipelineSummaryPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPipelineSummaryPage"},"variableDefinitions":[sharedNode1271,sharedNode1273,{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode1460},"type":sharedNode747,"defaultValue":sharedNode1461},sharedNode858,{"kind":"VariableDefinition","variable":sharedNode1274,"type":sharedNode736},sharedNode1456,sharedNode1276],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPipelineSummaryPage"},"arguments":[sharedNode1277,sharedNode1278,{"kind":"Argument","name":sharedNode1460,"value":{"kind":"Variable","name":sharedNode1460}},sharedNode860,{"kind":"Argument","name":{"kind":"Name","value":"jobsFirst"},"value":sharedNode437},sharedNode1279,sharedNode1457,sharedNode1280],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode495,sharedNode497,sharedNode486,{"kind":"Field","name":{"kind":"Name","value":"hasFailedWork"}},{"kind":"Field","name":sharedNode862,"selectionSet":sharedNode489},{"kind":"Field","name":{"kind":"Name","value":"attempts"},"selectionSet":sharedNode1464}]}}]}},sharedNode567]} as unknown as DocumentNode<GetPipelineSummaryPageQuery, GetPipelineSummaryPageQueryVariables>;
+export const GetPipelineRunPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPipelineRunPage"},"variableDefinitions":[sharedNode1283,sharedNode858],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPipelineRunPage"},"arguments":[sharedNode1285,{"kind":"Argument","name":sharedNode1460,"value":sharedNode437},sharedNode860],"selectionSet":sharedNode1464}]}},sharedNode567]} as unknown as DocumentNode<GetPipelineRunPageQuery, GetPipelineRunPageQueryVariables>;
+export const GetInternalPluginPipelineRunDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetInternalPluginPipelineRun"},"variableDefinitions":sharedNode1284,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getInternalPluginPipelineRun"},"arguments":sharedNode1286,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"attempt"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode493,sharedNode505,sharedNode523,sharedNode525,sharedNode527,sharedNode529,sharedNode531,sharedNode40]}},{"kind":"Field","name":sharedNode532,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode534,sharedNode536,sharedNode538,sharedNode505,sharedNode540,sharedNode542,{"kind":"Field","name":{"kind":"Name","value":"payload"}},sharedNode544,sharedNode546,{"kind":"Field","name":{"kind":"Name","value":"leaseId"}},sharedNode523,sharedNode525,sharedNode527,sharedNode529,sharedNode531,sharedNode40]}}]}}]}}]} as unknown as DocumentNode<GetInternalPluginPipelineRunQuery, GetInternalPluginPipelineRunQueryVariables>;
+export const GetDownloadPipelineOverviewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDownloadPipelineOverview"},"variableDefinitions":[sharedNode1466,sharedNode740,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"serverApplicable"},"name":{"kind":"Name","value":"getApplicablePluginPipeline"},"arguments":[sharedNode1467,{"kind":"Argument","name":sharedNode498,"value":{"kind":"StringValue","value":"downloadableFile.created","block":false}},{"kind":"Argument","name":sharedNode500,"value":{"kind":"StringValue","value":"SERVER","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode495,sharedNode497,sharedNode499,sharedNode501,sharedNode503,sharedNode1288,sharedNode515,sharedNode1468,sharedNode519,sharedNode1459,{"kind":"Field","name":sharedNode1469},sharedNode1473]}},{"kind":"Field","alias":{"kind":"Name","value":"channelApplicable"},"name":{"kind":"Name","value":"getApplicablePluginPipeline"},"arguments":[sharedNode1467,sharedNode753,sharedNode752,{"kind":"Argument","name":sharedNode498,"value":{"kind":"StringValue","value":"discussionChannel.created","block":false}},{"kind":"Argument","name":sharedNode500,"value":{"kind":"StringValue","value":"CHANNEL","block":false}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode495,sharedNode497,sharedNode499,sharedNode501,sharedNode503,sharedNode1288,sharedNode515,sharedNode1468,sharedNode1459,{"kind":"Field","name":sharedNode1469},sharedNode1473]}}]}}]} as unknown as DocumentNode<GetDownloadPipelineOverviewQuery, GetDownloadPipelineOverviewQueryVariables>;
+export const GetPluginPipelineCampaignsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPluginPipelineCampaigns"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPluginPipelineCampaigns"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode519,sharedNode499,sharedNode501,sharedNode515,sharedNode1474,sharedNode505,{"kind":"Field","name":sharedNode1147},{"kind":"Field","name":sharedNode1150},sharedNode1475,sharedNode1476,sharedNode1477,sharedNode1478,{"kind":"Field","name":{"kind":"Name","value":"completedCount"}},{"kind":"Field","name":{"kind":"Name","value":"runningCount"}},{"kind":"Field","name":{"kind":"Name","value":"failedCount"}},{"kind":"Field","name":{"kind":"Name","value":"timedOutCount"}},{"kind":"Field","name":{"kind":"Name","value":"createdByUsername"}},sharedNode38,sharedNode525,sharedNode1161,sharedNode531]}}]}}]} as unknown as DocumentNode<GetPluginPipelineCampaignsQuery, GetPluginPipelineCampaignsQueryVariables>;
+export const PreviewPluginPipelineCampaignDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PreviewPluginPipelineCampaign"},"variableDefinitions":[sharedNode1146],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"previewPluginPipelineCampaign"},"arguments":[sharedNode1152],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode519,sharedNode499,sharedNode515,sharedNode1474,sharedNode1475,sharedNode1476,sharedNode1477,sharedNode1478]}}]}}]} as unknown as DocumentNode<PreviewPluginPipelineCampaignQuery, PreviewPluginPipelineCampaignQueryVariables>;
+export const GetPluginPipelineCampaignFailuresDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPluginPipelineCampaignFailures"},"variableDefinitions":sharedNode1157,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getPluginPipelineCampaignFailures"},"arguments":sharedNode1159,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode493,sharedNode495,sharedNode101,sharedNode503,sharedNode505,sharedNode513]}}]}}]} as unknown as DocumentNode<GetPluginPipelineCampaignFailuresQuery, GetPluginPipelineCampaignFailuresQueryVariables>;
+export const GetPluginPipelinesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPluginPipelines"},"variableDefinitions":sharedNode1258,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1051,"arguments":sharedNode1299,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1052,sharedNode1479]}}]}}]} as unknown as DocumentNode<GetPluginPipelinesQuery, GetPluginPipelinesQueryVariables>;
+export const SetMyBirthdayDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"setMyBirthday"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1481,"type":sharedNode737}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setMyBirthday"},"arguments":[sharedNode1482],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1480},{"kind":"Field","name":{"kind":"Name","value":"meetsAccountMinimumAge"}},{"kind":"Field","name":{"kind":"Name","value":"mayAccessSensitiveContent"}}]}}]}}]} as unknown as DocumentNode<SetMyBirthdayMutation, SetMyBirthdayMutationVariables>;
+export const GetAgePolicyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAgePolicy"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getAgePolicy"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1061,sharedNode1063,sharedNode1065,sharedNode1067]}}]}}]} as unknown as DocumentNode<GetAgePolicyQuery, GetAgePolicyQueryVariables>;
+export const GetDiscussionAgeGateCheckDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionAgeGateCheck"},"variableDefinitions":[sharedNode740],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDiscussionAgeGateCheck"},"arguments":[sharedNode753],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"requiresAgeCheck"}},sharedNode505,{"kind":"Field","name":{"kind":"Name","value":"minimumAge"}}]}}]}}]} as unknown as DocumentNode<GetDiscussionAgeGateCheckQuery, GetDiscussionAgeGateCheckQueryVariables>;
+export const SetChannelDiscussionFlairConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"setChannelDiscussionFlairConfig"},"variableDefinitions":[sharedNode738,{"kind":"VariableDefinition","variable":sharedNode1484,"type":sharedNode1143},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode1485},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DiscussionFlairConfigInput"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setChannelDiscussionFlairConfig"},"arguments":[sharedNode752,{"kind":"Argument","name":sharedNode1483,"value":sharedNode1484},{"kind":"Argument","name":sharedNode1485,"value":{"kind":"Variable","name":sharedNode1485}}],"selectionSet":sharedNode1489}]}}]} as unknown as DocumentNode<SetChannelDiscussionFlairConfigMutation, SetChannelDiscussionFlairConfigMutationVariables>;
+export const CreateChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createChannel"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1490,"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChannelCreateInput"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createChannels"},"arguments":[{"kind":"Argument","name":sharedNode866,"value":sharedNode1490}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode189,sharedNode231,sharedNode707,sharedNode709,sharedNode38,sharedNode276]}}]}}]}}]} as unknown as DocumentNode<CreateChannelMutation, CreateChannelMutationVariables>;
+export const UpdateChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateChannel"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode961,"type":sharedNode1493},{"kind":"VariableDefinition","variable":sharedNode963,"type":sharedNode1494}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1495,"arguments":sharedNode967,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode57,sharedNode189,sharedNode231,sharedNode707,sharedNode1497,sharedNode1499,sharedNode233,sharedNode235,sharedNode237,sharedNode239,sharedNode1500,sharedNode1069,sharedNode709,sharedNode38,sharedNode276,sharedNode1509,sharedNode1057]}}]}}]}}]} as unknown as DocumentNode<UpdateChannelMutation, UpdateChannelMutationVariables>;
+export const PermanentlyDeleteChannelBannerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"permanentlyDeleteChannelBanner"},"variableDefinitions":sharedNode1513,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"permanentlyDeleteChannelBanner"},"arguments":sharedNode1515,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode707]}}]}}]} as unknown as DocumentNode<PermanentlyDeleteChannelBannerMutation, PermanentlyDeleteChannelBannerMutationVariables>;
+export const SetChannelIconDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"setChannelIcon"},"variableDefinitions":sharedNode1513,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setChannelIcon"},"arguments":sharedNode1515,"selectionSet":sharedNode1517}]}}]} as unknown as DocumentNode<SetChannelIconMutation, SetChannelIconMutationVariables>;
+export const CreateWikiPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createWikiPage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode961,"type":{"kind":"NonNullType","type":sharedNode1493}},{"kind":"VariableDefinition","variable":sharedNode963,"type":{"kind":"NonNullType","type":sharedNode1494}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1495,"arguments":sharedNode967,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode1497,sharedNode1509]}}]}}]}}]} as unknown as DocumentNode<CreateWikiPageMutation, CreateWikiPageMutationVariables>;
+export const UpdateWikiPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateWikiPage"},"variableDefinitions":sharedNode1525,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateWikiPages"},"arguments":sharedNode967,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1526,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode87,sharedNode1503,sharedNode99,sharedNode38,sharedNode40,sharedNode1505]}}]}}]}}]} as unknown as DocumentNode<UpdateWikiPageMutation, UpdateWikiPageMutationVariables>;
+export const CreateChildWikiPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createChildWikiPage"},"variableDefinitions":sharedNode1525,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateWikiPages"},"arguments":sharedNode967,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1526,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode1503,sharedNode99,sharedNode38,sharedNode40,sharedNode1505,{"kind":"Field","name":{"kind":"Name","value":"ChildPages"},"selectionSet":sharedNode1528}]}}]}}]}}]} as unknown as DocumentNode<CreateChildWikiPageMutation, CreateChildWikiPageMutationVariables>;
+export const PinWikiPageToChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"pinWikiPageToChannel"},"variableDefinitions":sharedNode1532,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pinWikiPageToChannel"},"arguments":sharedNode1534}]}}]} as unknown as DocumentNode<PinWikiPageToChannelMutation, PinWikiPageToChannelMutationVariables>;
+export const UnpinWikiPageFromChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unpinWikiPageFromChannel"},"variableDefinitions":sharedNode1532,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unpinWikiPageFromChannel"},"arguments":sharedNode1534}]}}]} as unknown as DocumentNode<UnpinWikiPageFromChannelMutation, UnpinWikiPageFromChannelMutationVariables>;
+export const LockWikiPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"lockWikiPage"},"variableDefinitions":[sharedNode738,sharedNode1531,sharedNode1536],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"lockWikiPage"},"arguments":[sharedNode752,sharedNode1533,sharedNode1537],"selectionSet":sharedNode1541}]}}]} as unknown as DocumentNode<LockWikiPageMutation, LockWikiPageMutationVariables>;
+export const UnlockWikiPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unlockWikiPage"},"variableDefinitions":sharedNode1532,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unlockWikiPage"},"arguments":sharedNode1534,"selectionSet":sharedNode1541}]}}]} as unknown as DocumentNode<UnlockWikiPageMutation, UnlockWikiPageMutationVariables>;
+export const BecomeChannelAdminDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"becomeChannelAdmin"},"variableDefinitions":sharedNode1542,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"becomeForumAdmin"},"arguments":sharedNode840}]}}]} as unknown as DocumentNode<BecomeChannelAdminMutation, BecomeChannelAdminMutationVariables>;
+export const UpdateChannelPluginPipelinesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateChannelPluginPipelines"},"variableDefinitions":[sharedNode738,sharedNode1268],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateChannelPluginPipelines"},"arguments":[sharedNode752,sharedNode1269]}]}}]} as unknown as DocumentNode<UpdateChannelPluginPipelinesMutation, UpdateChannelPluginPipelinesMutationVariables>;
+export const UpdateChannelEnabledPluginsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateChannelEnabledPlugins"},"variableDefinitions":[sharedNode738,{"kind":"VariableDefinition","variable":sharedNode1543,"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChannelEnabledPluginsUpdateFieldInput"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1495,"arguments":[sharedNode1030,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"EnabledPlugins"},"value":sharedNode1543}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"selectionSet":sharedNode673}]}}]}}]} as unknown as DocumentNode<UpdateChannelEnabledPluginsMutation, UpdateChannelEnabledPluginsMutationVariables>;
+export const ReportChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"reportChannel"},"variableDefinitions":[sharedNode738,sharedNode1546,sharedNode1550],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reportChannel"},"arguments":[sharedNode752,sharedNode1551,sharedNode1552],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode599,sharedNode615]}}]}}]} as unknown as DocumentNode<ReportChannelMutation, ReportChannelMutationVariables>;
+export const LockChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"lockChannel"},"variableDefinitions":[sharedNode738,sharedNode1536,{"kind":"VariableDefinition","variable":sharedNode1554,"type":sharedNode712}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"lockChannel"},"arguments":[sharedNode752,sharedNode1537,sharedNode1555],"selectionSet":sharedNode1557}]}}]} as unknown as DocumentNode<LockChannelMutation, LockChannelMutationVariables>;
+export const UnlockChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unlockChannel"},"variableDefinitions":[sharedNode738,sharedNode1558],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unlockChannel"},"arguments":[sharedNode752,sharedNode1537],"selectionSet":sharedNode1557}]}}]} as unknown as DocumentNode<UnlockChannelMutation, UnlockChannelMutationVariables>;
+export const ReportChannelImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"reportChannelImage"},"variableDefinitions":[sharedNode738,{"kind":"VariableDefinition","variable":sharedNode1560,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChannelImageType"}}}},sharedNode1546,sharedNode1550],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reportChannelImage"},"arguments":[sharedNode752,{"kind":"Argument","name":sharedNode1559,"value":sharedNode1560},sharedNode1551,sharedNode1552],"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ReportChannelImageMutation, ReportChannelImageMutationVariables>;
+export const GetChannelNamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChannelNames"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1561,"type":sharedNode1493}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":[{"kind":"Argument","name":sharedNode132,"value":sharedNode1561},sharedNode1562],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode57,sharedNode1563,sharedNode189,sharedNode1499]}}]}},sharedNode572]} as unknown as DocumentNode<GetChannelNamesQuery, GetChannelNamesQueryVariables>;
+export const GetChannelDiscussionFlairConfigDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChannelDiscussionFlairConfig"},"variableDefinitions":[sharedNode738,{"kind":"VariableDefinition","variable":sharedNode1565,"type":sharedNode1133,"defaultValue":sharedNode247}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getChannelDiscussionFlairConfig"},"arguments":[sharedNode752,{"kind":"Argument","name":sharedNode1564,"value":sharedNode1565}],"selectionSet":sharedNode1489}]}}]} as unknown as DocumentNode<GetChannelDiscussionFlairConfigQuery, GetChannelDiscussionFlairConfigQueryVariables>;
+export const GetWikiPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getWikiPage"},"variableDefinitions":[sharedNode738,{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode1502},"type":sharedNode737}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1526,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode800,{"kind":"ObjectField","name":sharedNode1502,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode134,"value":{"kind":"Variable","name":sharedNode1502}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode87,sharedNode1503,sharedNode38,sharedNode40,sharedNode224,sharedNode626,sharedNode628,sharedNode1539,sharedNode1505,{"kind":"Field","name":{"kind":"Name","value":"ChildPages"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode87,sharedNode1503,sharedNode38,sharedNode40,sharedNode224,sharedNode626,sharedNode628,sharedNode1539,sharedNode1505]}},sharedNode1506]}}]}}]} as unknown as DocumentNode<GetWikiPageQuery, GetWikiPageQueryVariables>;
+export const GetChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChannel"},"variableDefinitions":[sharedNode1567,sharedNode1572,sharedNode817],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1580,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode57,sharedNode189,sharedNode1563,sharedNode707,sharedNode822,sharedNode1057,sharedNode224,sharedNode626,sharedNode628,sharedNode630,sharedNode1497,sharedNode1499,sharedNode233,sharedNode235,sharedNode237,sharedNode239,sharedNode1500,sharedNode1069,{"kind":"Field","name":sharedNode1501,"selectionSet":sharedNode1528},{"kind":"Field","name":{"kind":"Name","value":"PinnedWikiPages"},"arguments":[sharedNode1586],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode1503,sharedNode40]}},sharedNode276,{"kind":"Field","name":sharedNode708,"selectionSet":sharedNode208},sharedNode1607,sharedNode764,{"kind":"Field","name":sharedNode1408,"selectionSet":sharedNode1609},sharedNode1610,{"kind":"Field","name":sharedNode1611,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1612,"value":{"kind":"ListValue","values":[sharedNode1618,sharedNode1624]}}]}}]}}],"selectionSet":sharedNode21},{"kind":"Field","name":{"kind":"Name","value":"IssuesConnection"},"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[sharedNode1625]}}]}}],"selectionSet":sharedNode21},sharedNode1644,{"kind":"Field","name":sharedNode1303,"selectionSet":sharedNode1646},{"kind":"Field","name":{"kind":"Name","value":"ElevatedModRole"},"selectionSet":sharedNode1646},{"kind":"Field","name":{"kind":"Name","value":"SuspendedModRole"},"selectionSet":sharedNode1646},{"kind":"Field","name":{"kind":"Name","value":"DefaultChannelRole"},"selectionSet":sharedNode1650},{"kind":"Field","name":{"kind":"Name","value":"ElevatedChannelRole"},"selectionSet":sharedNode1650},{"kind":"Field","name":{"kind":"Name","value":"SuspendedRole"},"selectionSet":sharedNode1650},{"kind":"Field","name":{"kind":"Name","value":"FilterGroups"},"arguments":sharedNode1657,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode832,sharedNode57,{"kind":"Field","name":{"kind":"Name","value":"mode"}},{"kind":"Field","name":{"kind":"Name","value":"uploadSelection"}},sharedNode119,{"kind":"Field","name":sharedNode1658,"arguments":sharedNode1657,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode829,sharedNode57,sharedNode119]}}]}}]}}]}},sharedNode112,sharedNode572]} as unknown as DocumentNode<GetChannelQuery, GetChannelQueryVariables>;
+export const GetChannelRulesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChannelRules"},"variableDefinitions":sharedNode1659,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1580,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode1057]}}]}}]} as unknown as DocumentNode<GetChannelRulesQuery, GetChannelRulesQueryVariables>;
+export const GetEventsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEvents"},"variableDefinitions":[sharedNode1567,sharedNode1572],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode994,"arguments":[sharedNode1660,sharedNode435,{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1612,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"EventChannels_SOME"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode98,"value":sharedNode1575},sharedNode1661]}}]},{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode765,"value":{"kind":"ListValue","values":[sharedNode1635,{"kind":"ObjectValue","fields":[sharedNode1631,{"kind":"ObjectField","name":{"kind":"Name","value":"startTime_LT"},"value":sharedNode1569},sharedNode1633]}]}}]}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode368,sharedNode370,sharedNode386,sharedNode376]}}]}}]} as unknown as DocumentNode<GetEventsQuery, GetEventsQueryVariables>;
+export const GetChannelDownloadCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChannelDownloadCount"},"variableDefinitions":sharedNode1659,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1580,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,{"kind":"Field","name":sharedNode1611,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1612,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode765,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[sharedNode1661]},{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode43,"value":sharedNode769}]}]}}]},sharedNode1618,sharedNode1621]}}]}}]}}],"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetChannelDownloadCountQuery, GetChannelDownloadCountQueryVariables>;
+export const GetSortedChannelsDiscussionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getSortedChannelsDiscussions"},"variableDefinitions":[sharedNode748,sharedNode750,sharedNode1664,sharedNode1667,sharedNode817,sharedNode1669],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getSortedChannels"},"arguments":[sharedNode755,sharedNode756,sharedNode1670,sharedNode1671,{"kind":"Argument","name":{"kind":"Name","value":"countDownloads"},"value":sharedNode247}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode57,sharedNode231,sharedNode189,sharedNode822,sharedNode276,sharedNode1644,{"kind":"Field","name":sharedNode1611,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1612,"value":{"kind":"ListValue","values":[sharedNode893,sharedNode1618,sharedNode1624]}}]}}]}}],"selectionSet":sharedNode21}]}},{"kind":"Field","name":{"kind":"Name","value":"aggregateChannelCount"}}]}}]}}]} as unknown as DocumentNode<GetSortedChannelsDiscussionsQuery, GetSortedChannelsDiscussionsQueryVariables>;
+export const GetSortedChannelsDownloadsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getSortedChannelsDownloads"},"variableDefinitions":[sharedNode748,sharedNode750,sharedNode1664,sharedNode1667],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getSortedChannels"},"arguments":[sharedNode755,sharedNode756,sharedNode1670,sharedNode1671,{"kind":"Argument","name":{"kind":"Name","value":"countDownloads"},"value":sharedNode135}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,{"kind":"Field","name":sharedNode1611,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1612,"value":{"kind":"ListValue","values":[sharedNode893,sharedNode1618,sharedNode1621]}}]}}]}}],"selectionSet":sharedNode21}]}}]}}]}}]} as unknown as DocumentNode<GetSortedChannelsDownloadsQuery, GetSortedChannelsDownloadsQueryVariables>;
+export const GetChannelContributionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChannelContributions"},"variableDefinitions":[sharedNode738,sharedNode1312,sharedNode1314,sharedNode1674,sharedNode750],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getChannelContributions"},"arguments":[sharedNode752,sharedNode1326,sharedNode1327,sharedNode1675,sharedNode756],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode57,sharedNode64,{"kind":"Field","name":{"kind":"Name","value":"totalContributions"}},{"kind":"Field","name":{"kind":"Name","value":"dayData"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1372,sharedNode395,{"kind":"Field","name":sharedNode1676,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode403,sharedNode189,{"kind":"Field","name":sharedNode793,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,{"kind":"Field","name":sharedNode171,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode57,sharedNode189,sharedNode231]}},{"kind":"Field","name":sharedNode53,"selectionSet":sharedNode1678},sharedNode1681]}},sharedNode1687]}}]}}]}}]}}]} as unknown as DocumentNode<GetChannelContributionsQuery, GetChannelContributionsQueryVariables>;
+export const GetUserFavoriteChannelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserFavoriteChannels"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1026,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,sharedNode173,sharedNode231,sharedNode1499]}}]}}]}}]} as unknown as DocumentNode<GetUserFavoriteChannelsQuery, GetUserFavoriteChannelsQueryVariables>;
+export const GetChannelPluginPipelinesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetChannelPluginPipelines"},"variableDefinitions":sharedNode1542,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1031,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode57,sharedNode1479,sharedNode709]}}]}}]} as unknown as DocumentNode<GetChannelPluginPipelinesQuery, GetChannelPluginPipelinesQueryVariables>;
+export const GetChannelPluginSettingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetChannelPluginSettings"},"variableDefinitions":[sharedNode738,sharedNode1572],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1031,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode57,sharedNode1607,{"kind":"Field","name":{"kind":"Name","value":"EnabledPluginsConnection"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode245,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode538,{"kind":"Field","name":{"kind":"Name","value":"Plugin"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode57,sharedNode189,sharedNode1430]}}]}},{"kind":"Field","name":{"kind":"Name","value":"properties"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1141]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetChannelPluginSettingsQuery, GetChannelPluginSettingsQueryVariables>;
+export const CreateCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCollection"},"variableDefinitions":[sharedNode1165,{"kind":"VariableDefinition","variable":sharedNode1688,"type":sharedNode736},sharedNode1693,{"kind":"VariableDefinition","variable":sharedNode1694,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CollectionVisibility"}}}},{"kind":"VariableDefinition","variable":sharedNode1695,"type":sharedNode1668}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCollections"},"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode186,"value":sharedNode1164},{"kind":"ObjectField","name":sharedNode188,"value":sharedNode1688},{"kind":"ObjectField","name":sharedNode190,"value":sharedNode1689},{"kind":"ObjectField","name":sharedNode192,"value":sharedNode1694},{"kind":"ObjectField","name":{"kind":"Name","value":"itemOrder"},"value":{"kind":"ListValue","values":sharedNode1696}},{"kind":"ObjectField","name":sharedNode39,"value":sharedNode1695}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1697,"selectionSet":sharedNode1699}]}}]}}]} as unknown as DocumentNode<CreateCollectionMutation, CreateCollectionMutationVariables>;
+export const AddDiscussionToCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddDiscussionToCollection"},"variableDefinitions":sharedNode1706,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1707,"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ObjectValue","fields":[sharedNode1708,sharedNode1709,{"kind":"ObjectField","name":sharedNode1710,"value":{"kind":"EnumValue","value":"DISCUSSION"}}]}}]}]}}]} as unknown as DocumentNode<AddDiscussionToCollectionMutation, AddDiscussionToCollectionMutationVariables>;
+export const AddCommentToCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddCommentToCollection"},"variableDefinitions":sharedNode1706,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1707,"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ObjectValue","fields":[sharedNode1708,sharedNode1709,{"kind":"ObjectField","name":sharedNode1710,"value":{"kind":"EnumValue","value":"COMMENT"}}]}}]}]}}]} as unknown as DocumentNode<AddCommentToCollectionMutation, AddCommentToCollectionMutationVariables>;
+export const AddImageToCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddImageToCollection"},"variableDefinitions":sharedNode1706,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1707,"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ObjectValue","fields":[sharedNode1708,sharedNode1709,{"kind":"ObjectField","name":sharedNode1710,"value":{"kind":"EnumValue","value":"IMAGE"}}]}}]}]}}]} as unknown as DocumentNode<AddImageToCollectionMutation, AddImageToCollectionMutationVariables>;
+export const AddChannelToCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddChannelToCollection"},"variableDefinitions":sharedNode1706,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1707,"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ObjectValue","fields":[sharedNode1708,sharedNode1709,{"kind":"ObjectField","name":sharedNode1710,"value":{"kind":"EnumValue","value":"CHANNEL"}}]}}]}]}}]} as unknown as DocumentNode<AddChannelToCollectionMutation, AddChannelToCollectionMutationVariables>;
+export const RemoveDiscussionFromCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveDiscussionFromCollection"},"variableDefinitions":sharedNode1706,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1711,"arguments":[sharedNode1712,sharedNode1713,{"kind":"Argument","name":sharedNode1710,"value":{"kind":"EnumValue","value":"DISCUSSION"}}]}]}}]} as unknown as DocumentNode<RemoveDiscussionFromCollectionMutation, RemoveDiscussionFromCollectionMutationVariables>;
+export const RemoveCommentFromCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveCommentFromCollection"},"variableDefinitions":sharedNode1706,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1711,"arguments":[sharedNode1712,sharedNode1713,{"kind":"Argument","name":sharedNode1710,"value":{"kind":"EnumValue","value":"COMMENT"}}]}]}}]} as unknown as DocumentNode<RemoveCommentFromCollectionMutation, RemoveCommentFromCollectionMutationVariables>;
+export const RemoveImageFromCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveImageFromCollection"},"variableDefinitions":sharedNode1706,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1711,"arguments":[sharedNode1712,sharedNode1713,{"kind":"Argument","name":sharedNode1710,"value":{"kind":"EnumValue","value":"IMAGE"}}]}]}}]} as unknown as DocumentNode<RemoveImageFromCollectionMutation, RemoveImageFromCollectionMutationVariables>;
+export const RemoveChannelFromCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveChannelFromCollection"},"variableDefinitions":sharedNode1706,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1711,"arguments":[sharedNode1712,sharedNode1713,{"kind":"Argument","name":sharedNode1710,"value":{"kind":"EnumValue","value":"CHANNEL"}}]}]}}]} as unknown as DocumentNode<RemoveChannelFromCollectionMutation, RemoveChannelFromCollectionMutationVariables>;
+export const AddDownloadToCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddDownloadToCollection"},"variableDefinitions":sharedNode1706,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1707,"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ObjectValue","fields":[sharedNode1708,sharedNode1709,{"kind":"ObjectField","name":sharedNode1710,"value":sharedNode1714}]}}]}]}}]} as unknown as DocumentNode<AddDownloadToCollectionMutation, AddDownloadToCollectionMutationVariables>;
+export const RemoveDownloadFromCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveDownloadFromCollection"},"variableDefinitions":sharedNode1706,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1711,"arguments":[sharedNode1712,sharedNode1713,sharedNode1715]}]}}]} as unknown as DocumentNode<RemoveDownloadFromCollectionMutation, RemoveDownloadFromCollectionMutationVariables>;
+export const UpdateCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCollection"},"variableDefinitions":[sharedNode1702,{"kind":"VariableDefinition","variable":sharedNode963,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CollectionUpdateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCollections"},"arguments":[sharedNode1722,sharedNode966],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1697,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode189,sharedNode193,sharedNode40]}}]}}]}}]} as unknown as DocumentNode<UpdateCollectionMutation, UpdateCollectionMutationVariables>;
+export const DeleteCollectionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteCollection"},"variableDefinitions":[sharedNode1702],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteCollections"},"arguments":sharedNode1723,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1725]}}]}}]} as unknown as DocumentNode<DeleteCollectionMutation, DeleteCollectionMutationVariables>;
+export const ReorderCollectionItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ReorderCollectionItem"},"variableDefinitions":[sharedNode1702,sharedNode1705,{"kind":"VariableDefinition","variable":sharedNode1727,"type":sharedNode1149}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reorderCollectionItem"},"arguments":[sharedNode1712,sharedNode1713,{"kind":"Argument","name":sharedNode1726,"value":sharedNode1727}]}]}}]} as unknown as DocumentNode<ReorderCollectionItemMutation, ReorderCollectionItemMutationVariables>;
+export const ShareCollectionAsDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ShareCollectionAsDiscussion"},"variableDefinitions":[sharedNode1702,{"kind":"VariableDefinition","variable":sharedNode1729,"type":sharedNode713},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode126},"type":sharedNode737},{"kind":"VariableDefinition","variable":sharedNode1731,"type":sharedNode736}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shareCollectionAsDiscussion"},"arguments":[sharedNode1712,{"kind":"Argument","name":sharedNode1728,"value":sharedNode1729},{"kind":"Argument","name":sharedNode126,"value":{"kind":"Variable","name":sharedNode126}},{"kind":"Argument","name":sharedNode1730,"value":sharedNode1731}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode1732]}}]}}]} as unknown as DocumentNode<ShareCollectionAsDiscussionMutation, ShareCollectionAsDiscussionMutationVariables>;
+export const GetUserCollectionsDiscussionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserCollectionsDiscussions"},"variableDefinitions":sharedNode1736,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode190,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode134,"value":{"kind":"EnumValue","value":"DISCUSSIONS"}}]}},sharedNode1739]}},sharedNode677],"selectionSet":sharedNode1699},sharedNode1740]}}]}}]} as unknown as DocumentNode<GetUserCollectionsDiscussionsQuery, GetUserCollectionsDiscussionsQueryVariables>;
+export const GetUserCollectionsCommentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserCollectionsComments"},"variableDefinitions":sharedNode1736,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode190,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode134,"value":{"kind":"EnumValue","value":"COMMENTS"}}]}},sharedNode1739]}},sharedNode677],"selectionSet":sharedNode1699},{"kind":"Field","name":sharedNode1741,"selectionSet":sharedNode870}]}}]}}]} as unknown as DocumentNode<GetUserCollectionsCommentsQuery, GetUserCollectionsCommentsQueryVariables>;
+export const GetUserCollectionsImagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserCollectionsImages"},"variableDefinitions":sharedNode1736,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode1745,sharedNode1739]}},sharedNode677],"selectionSet":sharedNode1699},{"kind":"Field","name":sharedNode1014,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode150,sharedNode152,sharedNode154]}}]}}]}}]} as unknown as DocumentNode<GetUserCollectionsImagesQuery, GetUserCollectionsImagesQueryVariables>;
+export const GetUserCollectionsChannelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserCollectionsChannels"},"variableDefinitions":sharedNode1736,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode1749,sharedNode1739]}},sharedNode677],"selectionSet":sharedNode1699},{"kind":"Field","name":sharedNode1026,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,sharedNode173]}}]}}]}}]} as unknown as DocumentNode<GetUserCollectionsChannelsQuery, GetUserCollectionsChannelsQueryVariables>;
+export const GetUserCollectionsDownloadsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserCollectionsDownloads"},"variableDefinitions":sharedNode1736,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode190,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode134,"value":{"kind":"EnumValue","value":"DOWNLOADS"}}]}},sharedNode1739]}},sharedNode677],"selectionSet":sharedNode1699},{"kind":"Field","name":sharedNode1032,"arguments":[sharedNode1750],"selectionSet":sharedNode581}]}}]}}]} as unknown as DocumentNode<GetUserCollectionsDownloadsQuery, GetUserCollectionsDownloadsQueryVariables>;
+export const GetCollectionItemsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCollectionItems"},"variableDefinitions":[sharedNode1702,sharedNode817],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1697,"arguments":sharedNode1723,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode189,sharedNode191,sharedNode193,sharedNode195,{"kind":"Field","name":{"kind":"Name","value":"itemOrder"}},{"kind":"Field","name":sharedNode1682,"selectionSet":sharedNode1762},{"kind":"Field","name":sharedNode793,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":sharedNode1394}]}},{"kind":"Field","name":sharedNode97,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode99,sharedNode582,sharedNode176]}}]}},{"kind":"Field","name":sharedNode1763,"selectionSet":sharedNode1762},{"kind":"Field","name":sharedNode131,"selectionSet":sharedNode1766},{"kind":"Field","name":{"kind":"Name","value":"Channels"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,sharedNode173,sharedNode189,sharedNode231,sharedNode38,sharedNode276]}}]}}]}}]} as unknown as DocumentNode<GetCollectionItemsQuery, GetCollectionItemsQueryVariables>;
+export const GetPublicCollectionsForDownloadDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicCollectionsForDownload"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1767,"type":sharedNode713}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"publicCollectionsContaining"},"arguments":[{"kind":"Argument","name":sharedNode1703,"value":sharedNode1767},sharedNode1715],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode189,sharedNode193,sharedNode191,sharedNode195,sharedNode38,sharedNode197,{"kind":"Field","name":sharedNode1763,"arguments":[{"kind":"Argument","name":sharedNode436,"value":{"kind":"IntValue","value":"5"}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode38,sharedNode205,sharedNode1770,{"kind":"Field","name":sharedNode170,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode99,sharedNode456,sharedNode176]}},sharedNode276,sharedNode1751]}}]}}]}}]} as unknown as DocumentNode<GetPublicCollectionsForDownloadQuery, GetPublicCollectionsForDownloadQueryVariables>;
+export const GetPublicCollectionByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPublicCollectionById"},"variableDefinitions":[sharedNode1702,{"kind":"VariableDefinition","variable":sharedNode1771,"type":sharedNode747,"defaultValue":sharedNode437},{"kind":"VariableDefinition","variable":sharedNode1772,"type":sharedNode747,"defaultValue":sharedNode1773}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1697,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode1719,{"kind":"ObjectField","name":sharedNode192,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode134,"value":{"kind":"EnumValue","value":"PUBLIC"}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode189,sharedNode193,sharedNode191,sharedNode195,sharedNode38,sharedNode197,{"kind":"Field","name":sharedNode918,"selectionSet":sharedNode21},{"kind":"Field","name":sharedNode1763,"arguments":[{"kind":"Argument","name":sharedNode436,"value":sharedNode1771},{"kind":"Argument","name":sharedNode744,"value":sharedNode1772},sharedNode677],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode38,sharedNode205,sharedNode1770,sharedNode1776,sharedNode276]}}]}}]}}]} as unknown as DocumentNode<GetPublicCollectionByIdQuery, GetPublicCollectionByIdQueryVariables>;
+export const CheckDiscussionInCollectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CheckDiscussionInCollections"},"variableDefinitions":sharedNode1777,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode1781,{"kind":"ObjectField","name":{"kind":"Name","value":"Discussions_SOME"},"value":sharedNode1787}]}}],"selectionSet":sharedNode1789}]}}]}}]} as unknown as DocumentNode<CheckDiscussionInCollectionsQuery, CheckDiscussionInCollectionsQueryVariables>;
+export const CheckCommentInCollectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CheckCommentInCollections"},"variableDefinitions":sharedNode1777,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode1781,{"kind":"ObjectField","name":{"kind":"Name","value":"Comments_SOME"},"value":sharedNode1787}]}}],"selectionSet":sharedNode1789}]}}]}}]} as unknown as DocumentNode<CheckCommentInCollectionsQuery, CheckCommentInCollectionsQueryVariables>;
+export const CheckDownloadInCollectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CheckDownloadInCollections"},"variableDefinitions":sharedNode1777,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode1781,{"kind":"ObjectField","name":{"kind":"Name","value":"Downloads_SOME"},"value":sharedNode1787}]}}],"selectionSet":sharedNode1789}]}}]}}]} as unknown as DocumentNode<CheckDownloadInCollectionsQuery, CheckDownloadInCollectionsQueryVariables>;
+export const CheckImageInCollectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CheckImageInCollections"},"variableDefinitions":sharedNode1777,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode1781,{"kind":"ObjectField","name":{"kind":"Name","value":"Images_SOME"},"value":sharedNode1787}]}}],"selectionSet":sharedNode1789}]}}]}}]} as unknown as DocumentNode<CheckImageInCollectionsQuery, CheckImageInCollectionsQueryVariables>;
+export const CheckChannelInCollectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CheckChannelInCollections"},"variableDefinitions":[sharedNode873,{"kind":"VariableDefinition","variable":sharedNode1704,"type":sharedNode737},sharedNode1693],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode1781,{"kind":"ObjectField","name":{"kind":"Name","value":"Channels_SOME"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode172,"value":sharedNode1784}]}}]}}],"selectionSet":sharedNode1789}]}}]}}]} as unknown as DocumentNode<CheckChannelInCollectionsQuery, CheckChannelInCollectionsQueryVariables>;
+export const GetAllUserCollectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAllUserCollections"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":sharedNode678,"selectionSet":sharedNode1699}]}}]}}]} as unknown as DocumentNode<GetAllUserCollectionsQuery, GetAllUserCollectionsQueryVariables>;
+export const GetUserChannelCollectionsWithChannelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserChannelCollectionsWithChannels"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode1749]}},sharedNode677],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode195,{"kind":"Field","name":{"kind":"Name","value":"Channels"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode57,sharedNode231,sharedNode1499]}}]}}]}}]}}]} as unknown as DocumentNode<GetUserChannelCollectionsWithChannelsQuery, GetUserChannelCollectionsWithChannelsQueryVariables>;
+export const AddEmojiToCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addEmojiToComment"},"variableDefinitions":[sharedNode970,sharedNode1792,sharedNode1795,sharedNode873],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addEmojiToComment"},"arguments":[sharedNode988,sharedNode1796,sharedNode1797,sharedNode875],"selectionSet":sharedNode1799}]}}]} as unknown as DocumentNode<AddEmojiToCommentMutation, AddEmojiToCommentMutationVariables>;
+export const RemoveEmojiFromCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"removeEmojiFromComment"},"variableDefinitions":[sharedNode970,sharedNode1792,sharedNode873],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeEmojiFromComment"},"arguments":[sharedNode988,sharedNode1796,sharedNode875],"selectionSet":sharedNode1799}]}}]} as unknown as DocumentNode<RemoveEmojiFromCommentMutation, RemoveEmojiFromCommentMutationVariables>;
+export const UpvoteCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"upvoteComment"},"variableDefinitions":sharedNode1800,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upvoteComment"},"arguments":sharedNode1802,"selectionSet":sharedNode1804}]}}]} as unknown as DocumentNode<UpvoteCommentMutation, UpvoteCommentMutationVariables>;
+export const UndoUpvoteCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"undoUpvoteComment"},"variableDefinitions":sharedNode1800,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"undoUpvoteComment"},"arguments":sharedNode1802,"selectionSet":sharedNode1804}]}}]} as unknown as DocumentNode<UndoUpvoteCommentMutation, UndoUpvoteCommentMutationVariables>;
+export const UpdateCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateComment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1805,"type":{"kind":"NamedType","name":{"kind":"Name","value":"CommentUpdateInput"}}},{"kind":"VariableDefinition","variable":sharedNode1806,"type":sharedNode1808}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateComments"},"arguments":[{"kind":"Argument","name":sharedNode962,"value":sharedNode1805},{"kind":"Argument","name":sharedNode132,"value":sharedNode1806}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode474,sharedNode38,sharedNode40,sharedNode34,sharedNode36,sharedNode8,sharedNode22,{"kind":"Field","name":sharedNode330,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode671]}},sharedNode329]}}]}}]}}]} as unknown as DocumentNode<UpdateCommentMutation, UpdateCommentMutationVariables>;
+export const SoftDeleteCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"softDeleteComment"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"softDeleteComment"},"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode1811,sharedNode36,sharedNode38,sharedNode40]}}]}}]}}]} as unknown as DocumentNode<SoftDeleteCommentMutation, SoftDeleteCommentMutationVariables>;
+export const DeleteCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteComment"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteComments"},"arguments":sharedNode724,"selectionSet":sharedNode1815}]}}]} as unknown as DocumentNode<DeleteCommentMutation, DeleteCommentMutationVariables>;
+export const AddFeedbackCommentToCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addFeedbackCommentToComment"},"variableDefinitions":[sharedNode1817,sharedNode1819,sharedNode970,sharedNode1820],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode865,"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[sharedNode1821,sharedNode1822,sharedNode1823,sharedNode1839,sharedNode1852,{"kind":"ObjectField","name":sharedNode726,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":sharedNode969}]}}]}}]}}]}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode1853,sharedNode1854,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1857,sharedNode1860]}},sharedNode38,sharedNode32,sharedNode794]}}]}}]}}]} as unknown as DocumentNode<AddFeedbackCommentToCommentMutation, AddFeedbackCommentToCommentMutationVariables>;
+export const DeleteCommentRevisionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteCommentRevision"},"variableDefinitions":sharedNode1864,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteCommentRevision"},"arguments":sharedNode1866,"selectionSet":sharedNode1868}]}}]} as unknown as DocumentNode<DeleteCommentRevisionMutation, DeleteCommentRevisionMutationVariables>;
+export const SearchCommentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"searchComments"},"variableDefinitions":[sharedNode1869,{"kind":"VariableDefinition","variable":sharedNode751,"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CommentSort"}}}}},sharedNode750,sharedNode748],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"arguments":sharedNode1870,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":sharedNode573}]}},{"kind":"Field","name":{"kind":"Name","value":"commentsConnection"},"arguments":sharedNode1871,"selectionSet":sharedNode21}]}},sharedNode594]} as unknown as DocumentNode<SearchCommentsQuery, SearchCommentsQueryVariables>;
+export const GetFeedbackCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getFeedbackComment"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,sharedNode44,sharedNode1877,sharedNode1878,sharedNode731,sharedNode733]}}]}}]} as unknown as DocumentNode<GetFeedbackCommentQuery, GetFeedbackCommentQueryVariables>;
+export const GetActivityFeedCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getActivityFeedComment"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode643,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode648,sharedNode646,sharedNode38,{"kind":"Field","name":sharedNode54,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,sharedNode38,sharedNode619]}},{"kind":"Field","name":sharedNode1,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":sharedNode55,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,sharedNode619]}},{"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode619]}},sharedNode619]}},{"kind":"Field","name":sharedNode596,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode599,sharedNode619]}},{"kind":"Field","name":sharedNode171,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode619]}},sharedNode619]}}]}},sharedNode619]}},sharedNode619]}}]} as unknown as DocumentNode<GetActivityFeedCommentQuery, GetActivityFeedCommentQueryVariables>;
+export const GetCommentSource06938535b8Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getComment"},"variableDefinitions":sharedNode971,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"arguments":sharedNode979,"selectionSet":sharedNode1009}]}}]} as unknown as DocumentNode<GetCommentSource06938535b8Query, GetCommentSource06938535b8QueryVariables>;
+export const GetFeedbackOnCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getFeedbackOnComment"},"variableDefinitions":[sharedNode970,sharedNode750,sharedNode748,sharedNode810],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"arguments":sharedNode979,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1874,sharedNode1857]}},sharedNode38,sharedNode32,sharedNode44,sharedNode329,sharedNode1878,sharedNode731,sharedNode733,{"kind":"Field","name":sharedNode330,"arguments":sharedNode1879,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode44,sharedNode674,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1882,sharedNode1874]}},sharedNode38,sharedNode1888,sharedNode351,sharedNode1878]}}]}}]}}]} as unknown as DocumentNode<GetFeedbackOnCommentQuery, GetFeedbackOnCommentQueryVariables>;
+export const GetSpecificCommentFeedbackDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getSpecificCommentFeedback"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode969,"type":sharedNode712},sharedNode743],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode726,"value":sharedNode977},sharedNode1901]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,sharedNode44,sharedNode674,sharedNode1877]}}]}}]} as unknown as DocumentNode<GetSpecificCommentFeedbackQuery, GetSpecificCommentFeedbackQueryVariables>;
+export const CreateSignedUrlDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createSignedURL"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1903,"type":sharedNode737},{"kind":"VariableDefinition","variable":sharedNode1905,"type":sharedNode737},sharedNode1908,{"kind":"VariableDefinition","variable":sharedNode1910,"type":{"kind":"NamedType","name":{"kind":"Name","value":"StorageUploadTarget"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createSignedStorageURL"},"arguments":[{"kind":"Argument","name":sharedNode1902,"value":sharedNode1903},{"kind":"Argument","name":sharedNode1904,"value":sharedNode1905},sharedNode1911,{"kind":"Argument","name":sharedNode1909,"value":sharedNode1910}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode150,{"kind":"Field","name":sharedNode1912},{"kind":"Field","name":{"kind":"Name","value":"storageUrl"}}]}}]}}]} as unknown as DocumentNode<CreateSignedUrlMutation, CreateSignedUrlMutationVariables>;
+export const CreateImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createImage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1913,"type":sharedNode736},sharedNode1915,sharedNode1917,sharedNode1919,{"kind":"VariableDefinition","variable":sharedNode1921,"type":sharedNode712},sharedNode1923],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createImageWithUploader"},"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ObjectValue","fields":[sharedNode1924,{"kind":"ObjectField","name":sharedNode151,"value":sharedNode1914},{"kind":"ObjectField","name":sharedNode153,"value":sharedNode1916},{"kind":"ObjectField","name":sharedNode155,"value":sharedNode1918},{"kind":"ObjectField","name":sharedNode1920,"value":sharedNode1921},sharedNode1925]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode150,sharedNode152,sharedNode154,sharedNode156,sharedNode1764]}}]}}]} as unknown as DocumentNode<CreateImageMutation, CreateImageMutationVariables>;
+export const CreateDownloadableFileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createDownloadableFile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1926,"type":sharedNode737},{"kind":"VariableDefinition","variable":sharedNode1913,"type":sharedNode737},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode287},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"FileKind"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":sharedNode289},"type":sharedNode747},{"kind":"VariableDefinition","variable":sharedNode1927,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PriceModel"}}}},{"kind":"VariableDefinition","variable":sharedNode1928,"type":sharedNode747},{"kind":"VariableDefinition","variable":sharedNode1929,"type":sharedNode736},sharedNode1923],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createDownloadableFiles"},"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode285,"value":sharedNode1926},sharedNode1924,{"kind":"ObjectField","name":sharedNode287,"value":{"kind":"Variable","name":sharedNode287}},{"kind":"ObjectField","name":sharedNode289,"value":{"kind":"Variable","name":sharedNode289}},{"kind":"ObjectField","name":sharedNode291,"value":sharedNode1927},{"kind":"ObjectField","name":sharedNode293,"value":sharedNode1928},{"kind":"ObjectField","name":sharedNode295,"value":sharedNode1929},sharedNode1925]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"downloadableFiles"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode286,sharedNode150,sharedNode288,sharedNode290,sharedNode292,sharedNode294,sharedNode296,sharedNode322]}}]}}]}}]} as unknown as DocumentNode<CreateDownloadableFileMutation, CreateDownloadableFileMutationVariables>;
+export const PrepareDownloadDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"prepareDownload"},"variableDefinitions":[sharedNode1466,sharedNode740],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"prepareDownload"},"arguments":[sharedNode1467,sharedNode753],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ready"}},sharedNode150,sharedNode312,sharedNode316,sharedNode314,{"kind":"Field","name":{"kind":"Name","value":"reviewAccess"}},sharedNode540]}}]}}]} as unknown as DocumentNode<PrepareDownloadMutation, PrepareDownloadMutationVariables>;
+export const RetryDownloadableFileScanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"retryDownloadableFileScan"},"variableDefinitions":sharedNode1930,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"retryDownloadableFileScan"},"arguments":sharedNode1931,"selectionSet":sharedNode1154}]}}]} as unknown as DocumentNode<RetryDownloadableFileScanMutation, RetryDownloadableFileScanMutationVariables>;
+export const RequestDownloadableFileReviewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"requestDownloadableFileReview"},"variableDefinitions":sharedNode1932,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"requestDownloadableFileReview"},"arguments":sharedNode1933,"selectionSet":sharedNode1935}]}}]} as unknown as DocumentNode<RequestDownloadableFileReviewMutation, RequestDownloadableFileReviewMutationVariables>;
+export const ClearDownloadableFileScanDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"clearDownloadableFileScan"},"variableDefinitions":sharedNode1932,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"clearDownloadableFileScan"},"arguments":sharedNode1933,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode312,sharedNode316,sharedNode314]}}]}}]} as unknown as DocumentNode<ClearDownloadableFileScanMutation, ClearDownloadableFileScanMutationVariables>;
+export const PermanentlyDeleteImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"permanentlyDeleteImage"},"variableDefinitions":sharedNode1936,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"permanentlyDeleteImage"},"arguments":[sharedNode1937],"selectionSet":sharedNode1941}]}}]} as unknown as DocumentNode<PermanentlyDeleteImageMutation, PermanentlyDeleteImageMutationVariables>;
+export const PermanentlyDeleteDownloadableFileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"permanentlyDeleteDownloadableFile"},"variableDefinitions":sharedNode1930,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"permanentlyDeleteDownloadableFile"},"arguments":sharedNode1931,"selectionSet":sharedNode1941}]}}]} as unknown as DocumentNode<PermanentlyDeleteDownloadableFileMutation, PermanentlyDeleteDownloadableFileMutationVariables>;
+export const UpdateDownloadableFileSupportSettingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":sharedNode1942,"variableDefinitions":[sharedNode1466,sharedNode740,{"kind":"VariableDefinition","variable":sharedNode1041,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DownloadSupportSettingsInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1942,"arguments":[sharedNode1467,sharedNode753,sharedNode1943]}]}}]} as unknown as DocumentNode<UpdateDownloadableFileSupportSettingsMutation, UpdateDownloadableFileSupportSettingsMutationVariables>;
+export const AddEmojiToDiscussionChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addEmojiToDiscussionChannel"},"variableDefinitions":[sharedNode1946,sharedNode1792,sharedNode1795,sharedNode873],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addEmojiToDiscussionChannel"},"arguments":[sharedNode1947,sharedNode1796,sharedNode1797,sharedNode875],"selectionSet":sharedNode1799}]}}]} as unknown as DocumentNode<AddEmojiToDiscussionChannelMutation, AddEmojiToDiscussionChannelMutationVariables>;
+export const RemoveEmojiFromDiscussionChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"removeEmojiFromDiscussionChannel"},"variableDefinitions":[sharedNode1946,sharedNode1792,sharedNode873],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeEmojiFromDiscussionChannel"},"arguments":[sharedNode1947,sharedNode1796,sharedNode875],"selectionSet":sharedNode1799}]}}]} as unknown as DocumentNode<RemoveEmojiFromDiscussionChannelMutation, RemoveEmojiFromDiscussionChannelMutationVariables>;
+export const CreateDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createDiscussion"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1041,"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DiscussionCreateInputWithChannels"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createDiscussionWithChannelConnections"},"arguments":sharedNode1948,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,{"kind":"Field","name":sharedNode170,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode44,sharedNode222,sharedNode224,sharedNode101,sharedNode99,sharedNode456,sharedNode36,sharedNode38,sharedNode674,sharedNode243,sharedNode8,sharedNode22]}},sharedNode89,sharedNode38,sharedNode40,sharedNode276]}}]}}]} as unknown as DocumentNode<CreateDiscussionMutation, CreateDiscussionMutationVariables>;
+export const UpdateDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateDiscussion"},"variableDefinitions":[sharedNode1952,sharedNode1957],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateDiscussions"},"arguments":[sharedNode965,{"kind":"Argument","name":sharedNode962,"value":sharedNode1954}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode811,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,{"kind":"Field","name":sharedNode128,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode130,{"kind":"Field","name":sharedNode131,"arguments":sharedNode148,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode150,sharedNode154,sharedNode156]}}]}},{"kind":"Field","name":sharedNode849,"arguments":sharedNode678,"selectionSet":sharedNode1959},{"kind":"Field","name":sharedNode853,"arguments":sharedNode678,"selectionSet":sharedNode1959}]}}]}}]}}]} as unknown as DocumentNode<UpdateDiscussionMutation, UpdateDiscussionMutationVariables>;
+export const UpdateDiscussionWithChannelConnectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":sharedNode1960,"variableDefinitions":[sharedNode1957,sharedNode1952,sharedNode1908,{"kind":"VariableDefinition","variable":sharedNode1962,"type":sharedNode1317},{"kind":"VariableDefinition","variable":sharedNode1964,"type":sharedNode1096},{"kind":"VariableDefinition","variable":sharedNode1966,"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DiscussionChannelFlairSelectionInput"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1960,"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"discussionUpdateInput"},"value":sharedNode1954},sharedNode965,sharedNode1911,sharedNode1967,{"kind":"Argument","name":sharedNode1963,"value":sharedNode1964},{"kind":"Argument","name":sharedNode1965,"value":sharedNode1966}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,{"kind":"Field","name":sharedNode170,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode99,sharedNode101,{"kind":"Field","name":sharedNode225,"selectionSet":sharedNode121},sharedNode674,sharedNode44,sharedNode222,sharedNode224]}},sharedNode38,sharedNode40,sharedNode276]}}]}}]} as unknown as DocumentNode<UpdateDiscussionWithChannelConnectionsMutation, UpdateDiscussionWithChannelConnectionsMutationVariables>;
+export const DeleteDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteDiscussion"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteDiscussions"},"arguments":sharedNode724,"selectionSet":sharedNode1815}]}}]} as unknown as DocumentNode<DeleteDiscussionMutation, DeleteDiscussionMutationVariables>;
+export const UpvoteDiscussionChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"upvoteDiscussionChannel"},"variableDefinitions":sharedNode1800,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"upvoteDiscussionChannel"},"arguments":sharedNode1969,"selectionSet":sharedNode1804}]}}]} as unknown as DocumentNode<UpvoteDiscussionChannelMutation, UpvoteDiscussionChannelMutationVariables>;
+export const UndoUpvoteDiscussionChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"undoUpvoteDiscussionChannel"},"variableDefinitions":sharedNode1800,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"undoUpvoteDiscussionChannel"},"arguments":sharedNode1969,"selectionSet":sharedNode1804}]}}]} as unknown as DocumentNode<UndoUpvoteDiscussionChannelMutation, UndoUpvoteDiscussionChannelMutationVariables>;
+export const AddFeedbackCommentToDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addFeedbackCommentToDiscussion"},"variableDefinitions":[sharedNode1817,sharedNode1819,sharedNode740,sharedNode1820,sharedNode1946],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode865,"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[sharedNode1821,sharedNode1822,sharedNode1823,sharedNode1852,{"kind":"ObjectField","name":sharedNode97,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":sharedNode1945}]}}]}}]}}]}},sharedNode1839,{"kind":"ObjectField","name":sharedNode730,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":sharedNode739}]}}]}}]}}]}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode1853,sharedNode1854,sharedNode38,sharedNode674,sharedNode671,sharedNode38,sharedNode32,sharedNode731]}}]}}]}}]} as unknown as DocumentNode<AddFeedbackCommentToDiscussionMutation, AddFeedbackCommentToDiscussionMutationVariables>;
+export const MarkAsAnsweredDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"markAsAnswered"},"variableDefinitions":sharedNode1970,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1971,"arguments":[sharedNode1978,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[sharedNode1983]}}],"selectionSet":sharedNode1986}]}}]} as unknown as DocumentNode<MarkAsAnsweredMutation, MarkAsAnsweredMutationVariables>;
+export const MarkAsAnsweredSource68ece8b51cDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"markAsAnswered"},"variableDefinitions":sharedNode1987,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1971,"arguments":[sharedNode1978,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[sharedNode1983,{"kind":"ObjectField","name":sharedNode260,"value":sharedNode1998}]}}],"selectionSet":sharedNode1986}]}}]} as unknown as DocumentNode<MarkAsAnsweredSource68ece8b51cMutation, MarkAsAnsweredSource68ece8b51cMutationVariables>;
+export const MarkAsUnAnsweredDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"markAsUnAnswered"},"variableDefinitions":sharedNode1970,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1971,"arguments":[sharedNode1978,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode260,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1126,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":sharedNode1696}}]}}]}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode796,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode222,{"kind":"Field","name":sharedNode260,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode1811]}}]}}]}}]}}]} as unknown as DocumentNode<MarkAsUnAnsweredMutation, MarkAsUnAnsweredMutationVariables>;
+export const UnmarkCommentAsAnswerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unmarkCommentAsAnswer"},"variableDefinitions":sharedNode1987,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1971,"arguments":[sharedNode1978,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode260,"value":sharedNode2001}]}}],"selectionSet":sharedNode1986}]}}]} as unknown as DocumentNode<UnmarkCommentAsAnswerMutation, UnmarkCommentAsAnswerMutationVariables>;
+export const UpdateImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateImage"},"variableDefinitions":[sharedNode1012,sharedNode1917,sharedNode1915],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateImages"},"arguments":[sharedNode1021,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[sharedNode2005,sharedNode2009]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2010,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode154,sharedNode152,sharedNode150]}}]}}]}}]} as unknown as DocumentNode<UpdateImageMutation, UpdateImageMutationVariables>;
+export const UpdateImageMetadataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateImageMetadata"},"variableDefinitions":[sharedNode1012,sharedNode1915,sharedNode1917,sharedNode1919],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateImages"},"arguments":[sharedNode1021,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[sharedNode2009,sharedNode2005,{"kind":"ObjectField","name":sharedNode155,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1979,"value":sharedNode1918}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2010,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode152,sharedNode154,sharedNode156]}}]}}]}}]} as unknown as DocumentNode<UpdateImageMetadataMutation, UpdateImageMetadataMutationVariables>;
+export const DeleteDiscussionBodyRevisionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteDiscussionBodyRevision"},"variableDefinitions":sharedNode1864,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteDiscussionBodyRevision"},"arguments":sharedNode1866,"selectionSet":sharedNode1868}]}}]} as unknown as DocumentNode<DeleteDiscussionBodyRevisionMutation, DeleteDiscussionBodyRevisionMutationVariables>;
+export const DeleteWikiRevisionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteWikiRevision"},"variableDefinitions":sharedNode1864,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteWikiRevision"},"arguments":sharedNode1866,"selectionSet":sharedNode1868}]}}]} as unknown as DocumentNode<DeleteWikiRevisionMutation, DeleteWikiRevisionMutationVariables>;
+export const SubscribeToDiscussionChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"subscribeToDiscussionChannel"},"variableDefinitions":sharedNode2011,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subscribeToDiscussionChannel"},"arguments":sharedNode2012,"selectionSet":sharedNode991}]}}]} as unknown as DocumentNode<SubscribeToDiscussionChannelMutation, SubscribeToDiscussionChannelMutationVariables>;
+export const UnsubscribeFromDiscussionChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unsubscribeFromDiscussionChannel"},"variableDefinitions":sharedNode2011,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unsubscribeFromDiscussionChannel"},"arguments":sharedNode2012,"selectionSet":sharedNode991}]}}]} as unknown as DocumentNode<UnsubscribeFromDiscussionChannelMutation, UnsubscribeFromDiscussionChannelMutationVariables>;
+export const UpdateDiscussionSensitiveContentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateDiscussionSensitiveContent"},"variableDefinitions":[sharedNode740,{"kind":"VariableDefinition","variable":sharedNode2013,"type":sharedNode1143}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateDiscussions"},"arguments":[sharedNode1036,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode204,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1979,"value":sharedNode2013}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode811,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode205]}}]}}]}}]} as unknown as DocumentNode<UpdateDiscussionSensitiveContentMutation, UpdateDiscussionSensitiveContentMutationVariables>;
+export const UpdateDiscussionChannelLabelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateDiscussionChannelLabels"},"variableDefinitions":[sharedNode738,sharedNode740,sharedNode2016],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1971,"arguments":[sharedNode807,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode827,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":sharedNode2020}]}}]}},{"kind":"ObjectField","name":sharedNode1126,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode133,"value":sharedNode2020}]}}]}}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode796,"selectionSet":sharedNode2022}]}}]}}]} as unknown as DocumentNode<UpdateDiscussionChannelLabelsMutation, UpdateDiscussionChannelLabelsMutationVariables>;
+export const UpdateDownloadLabelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateDownloadLabels"},"variableDefinitions":[sharedNode740,sharedNode738,sharedNode2016],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateDownloadLabels"},"arguments":[sharedNode753,sharedNode752,{"kind":"Argument","name":sharedNode2014,"value":sharedNode2015}],"selectionSet":sharedNode2022}]}}]} as unknown as DocumentNode<UpdateDownloadLabelsMutation, UpdateDownloadLabelsMutationVariables>;
+export const GetDiscussionsInChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionsInChannel"},"variableDefinitions":[sharedNode738,sharedNode2023,sharedNode2026,sharedNode2029,{"kind":"VariableDefinition","variable":sharedNode2031,"type":sharedNode1133},sharedNode2034,sharedNode2036,{"kind":"VariableDefinition","variable":sharedNode2038,"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LabelFilterInput"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDiscussionsInChannel"},"arguments":[sharedNode752,sharedNode2039,sharedNode2040,sharedNode1671,sharedNode2041,{"kind":"Argument","name":sharedNode2030,"value":sharedNode2031},sharedNode2042,{"kind":"Argument","name":sharedNode2037,"value":sharedNode2038}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregateDiscussionChannelsCount"}},{"kind":"Field","name":sharedNode796,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode2043,sharedNode229,{"kind":"Field","name":{"kind":"Name","value":"CommentsAggregate"},"selectionSet":sharedNode2044},sharedNode36,sharedNode38,sharedNode674,sharedNode8,{"kind":"Field","name":{"kind":"Name","value":"UpvotedByUsersAggregate"},"selectionSet":sharedNode2044},sharedNode24,sharedNode224,sharedNode44,sharedNode222,{"kind":"Field","name":sharedNode124,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode205,sharedNode841,{"kind":"Field","name":sharedNode88,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,sharedNode38,sharedNode66,sharedNode68,sharedNode5,sharedNode64]}}]}},sharedNode2050,sharedNode276,sharedNode2051]}}]}}]}}]}},sharedNode122]} as unknown as DocumentNode<GetDiscussionsInChannelQuery, GetDiscussionsInChannelQueryVariables>;
+export const GetSiteWideDiscussionListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getSiteWideDiscussionList"},"variableDefinitions":[sharedNode2023,sharedNode2054,sharedNode2026,sharedNode2029,sharedNode2034,sharedNode2036,sharedNode817],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getSiteWideDiscussionList"},"arguments":[sharedNode1671,sharedNode2055,sharedNode2040,sharedNode2041,sharedNode2039,sharedNode2042,{"kind":"Argument","name":sharedNode815,"value":sharedNode816}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregateDiscussionCount"}},sharedNode863,{"kind":"Field","name":sharedNode811,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode205,sharedNode2043,sharedNode209,{"kind":"Field","name":sharedNode170,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode38,sharedNode99,sharedNode101,sharedNode36,sharedNode44,sharedNode222,sharedNode224,sharedNode229,sharedNode8,sharedNode24,sharedNode783,sharedNode462]}},sharedNode2050,sharedNode276,sharedNode2051]}}]}}]}},sharedNode112,sharedNode122]} as unknown as DocumentNode<GetSiteWideDiscussionListQuery, GetSiteWideDiscussionListQueryVariables>;
+export const IsDiscussionAnsweredDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"isDiscussionAnswered"},"variableDefinitions":sharedNode795,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode796,"arguments":sharedNode808,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode36,sharedNode44,sharedNode222,sharedNode224,sharedNode674]}}]}}]} as unknown as DocumentNode<IsDiscussionAnsweredQuery, IsDiscussionAnsweredQueryVariables>;
+export const GetDiscussionDetailImagesPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionDetailImagesPage"},"variableDefinitions":sharedNode859,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDiscussionDetailImages"},"arguments":sharedNode861,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2010,"selectionSet":sharedNode162},sharedNode863]}}]}}]} as unknown as DocumentNode<GetDiscussionDetailImagesPageQuery, GetDiscussionDetailImagesPageQueryVariables>;
+export const GetDiscussionDetailFilesPageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionDetailFilesPage"},"variableDefinitions":sharedNode859,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getDiscussionDetailFiles"},"arguments":sharedNode861,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"files"},"selectionSet":sharedNode324},sharedNode863]}}]}}]} as unknown as DocumentNode<GetDiscussionDetailFilesPageQuery, GetDiscussionDetailFilesPageQueryVariables>;
+export const GetDiscussionActivityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionActivity"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode811,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode852,sharedNode854,sharedNode855]}}]}}]} as unknown as DocumentNode<GetDiscussionActivityQuery, GetDiscussionActivityQueryVariables>;
+export const GetIssueRelatedDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getIssueRelatedDiscussion"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode811,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode87,sharedNode203,sharedNode209,sharedNode1732,{"kind":"Field","name":sharedNode277,"arguments":sharedNode284,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode286,sharedNode150,sharedNode288,sharedNode290,sharedNode322]}}]}}]}},sharedNode112]} as unknown as DocumentNode<GetIssueRelatedDiscussionQuery, GetIssueRelatedDiscussionQueryVariables>;
+export const GetDownloadActivityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDownloadActivity"},"variableDefinitions":[sharedNode714,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode811,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode277,"arguments":sharedNode284,"selectionSet":sharedNode81},{"kind":"Field","name":sharedNode170,"arguments":sharedNode826,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode99,sharedNode848]}},sharedNode852]}}]}}]} as unknown as DocumentNode<GetDownloadActivityQuery, GetDownloadActivityQueryVariables>;
+export const GetCrosspostPreviewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getCrosspostPreview"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode811,"arguments":sharedNode724,"selectionSet":sharedNode355}]}},sharedNode182]} as unknown as DocumentNode<GetCrosspostPreviewQuery, GetCrosspostPreviewQueryVariables>;
+export const GetDiscussionFeedbackDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionFeedback"},"variableDefinitions":[sharedNode714,sharedNode750,sharedNode748,{"kind":"VariableDefinition","variable":sharedNode333,"type":sharedNode737}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode811,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode205,sharedNode89,sharedNode166,{"kind":"Field","name":sharedNode277,"arguments":sharedNode284,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode286,sharedNode150,sharedNode298,sharedNode300,sharedNode302,sharedNode304,sharedNode306,sharedNode308,sharedNode310,sharedNode312,sharedNode314,sharedNode316,sharedNode318]}},sharedNode356,sharedNode329,{"kind":"Field","name":sharedNode330,"arguments":sharedNode1879,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode44,sharedNode674,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1882,sharedNode1860]}},sharedNode38,sharedNode1888,sharedNode351,sharedNode731]}}]}}]}},sharedNode182]} as unknown as DocumentNode<GetDiscussionFeedbackQuery, GetDiscussionFeedbackQueryVariables>;
+export const GetSpecificDiscussionFeedbackDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getSpecificDiscussionFeedback"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode739,"type":sharedNode712},sharedNode743],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode730,"value":sharedNode1035},sharedNode1901]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,sharedNode44,sharedNode674,sharedNode671]}}]}}]} as unknown as DocumentNode<GetSpecificDiscussionFeedbackQuery, GetSpecificDiscussionFeedbackQueryVariables>;
+export const GetDownloadLabelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDownloadLabels"},"variableDefinitions":sharedNode2056,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode811,"arguments":sharedNode1037,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode170,"arguments":sharedNode826,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode99,sharedNode838]}}]}}]}}]} as unknown as DocumentNode<GetDownloadLabelsQuery, GetDownloadLabelsQueryVariables>;
+export const CreateEmailAndUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createEmailAndUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode2058,"type":sharedNode737},sharedNode873,{"kind":"VariableDefinition","variable":sharedNode1481,"type":sharedNode736}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEmailAndUser"},"arguments":[{"kind":"Argument","name":sharedNode2057,"value":sharedNode2058},sharedNode875,sharedNode1482],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode939,sharedNode2059]}}]}}]} as unknown as DocumentNode<CreateEmailAndUserMutation, CreateEmailAndUserMutationVariables>;
+export const SendBugReportDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"sendBugReport"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode2061,"type":sharedNode737},{"kind":"VariableDefinition","variable":sharedNode872,"type":sharedNode736},sharedNode1819,{"kind":"VariableDefinition","variable":sharedNode2063,"type":sharedNode737}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendBugReport"},"arguments":[{"kind":"Argument","name":sharedNode2060,"value":sharedNode2061},sharedNode875,sharedNode2064,{"kind":"Argument","name":sharedNode2062,"value":sharedNode2063}]}]}}]} as unknown as DocumentNode<SendBugReportMutation, SendBugReportMutationVariables>;
+export const GetOwnEmailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":sharedNode2065,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2065,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode374,sharedNode5,sharedNode64,sharedNode1410,sharedNode2067]}}]}}]} as unknown as DocumentNode<GetOwnEmailQuery, GetOwnEmailQueryVariables>;
+export const CreateEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createEvent"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1041,"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"EventCreateInputWithChannels"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEventWithChannelConnections"},"arguments":sharedNode1948,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode995,{"kind":"Field","name":sharedNode457,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode674]}},sharedNode2068,sharedNode276]}}]}},sharedNode470]} as unknown as DocumentNode<CreateEventMutation, CreateEventMutationVariables>;
+export const CreateEventSeriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createEventSeries"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1041,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateEventSeriesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEventSeriesWithChannelConnections"},"arguments":sharedNode1948,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode189,sharedNode372,sharedNode374,sharedNode376,sharedNode455,sharedNode390,sharedNode384,sharedNode388,sharedNode382,sharedNode38,sharedNode40,sharedNode426,sharedNode2068,sharedNode276,{"kind":"Field","name":sharedNode427,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode368,sharedNode370,sharedNode382,sharedNode413,sharedNode2071]}},sharedNode2071]}}]}}]} as unknown as DocumentNode<CreateEventSeriesMutation, CreateEventSeriesMutationVariables>;
+export const UpdateEventsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateEvents"},"variableDefinitions":[sharedNode2077,{"kind":"VariableDefinition","variable":sharedNode961,"type":sharedNode2080},sharedNode2081,sharedNode2082],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateEventWithChannelConnections"},"arguments":[sharedNode2084,sharedNode965,sharedNode1911,sharedNode1967],"selectionSet":sharedNode2089}]}},sharedNode470]} as unknown as DocumentNode<UpdateEventsMutation, UpdateEventsMutationVariables>;
+export const UpdateEventInSeriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateEventInSeries"},"variableDefinitions":[sharedNode1001,sharedNode2092,{"kind":"VariableDefinition","variable":sharedNode2093,"type":sharedNode2076},sharedNode2081,sharedNode2082],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateEventInSeries"},"arguments":[sharedNode1002,sharedNode1457,{"kind":"Argument","name":sharedNode2083,"value":sharedNode2093},sharedNode1911,sharedNode1967],"selectionSet":sharedNode2089}]}},sharedNode470]} as unknown as DocumentNode<UpdateEventInSeriesMutation, UpdateEventInSeriesMutationVariables>;
+export const CancelEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"cancelEvent"},"variableDefinitions":[sharedNode2077,{"kind":"VariableDefinition","variable":sharedNode2094,"type":sharedNode2080},sharedNode2081,sharedNode2082],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateEventWithChannelConnections"},"arguments":[sharedNode2084,{"kind":"Argument","name":sharedNode132,"value":sharedNode2094},sharedNode1911,sharedNode1967],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode382]}}]}}]} as unknown as DocumentNode<CancelEventMutation, CancelEventMutationVariables>;
+export const DeleteEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteEvent"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteEvents"},"arguments":sharedNode724,"selectionSet":sharedNode1815}]}}]} as unknown as DocumentNode<DeleteEventMutation, DeleteEventMutationVariables>;
+export const DeleteEventInSeriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteEventInSeries"},"variableDefinitions":[sharedNode1001,sharedNode2092],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteEventInSeries"},"arguments":[sharedNode1002,sharedNode1457],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"deletedCount"}},sharedNode540]}}]}}]} as unknown as DocumentNode<DeleteEventInSeriesMutation, DeleteEventInSeriesMutationVariables>;
+export const AddFeedbackCommentToEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addFeedbackCommentToEvent"},"variableDefinitions":[sharedNode1817,sharedNode1819,sharedNode1001,sharedNode1820],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode865,"arguments":[{"kind":"Argument","name":sharedNode866,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[sharedNode1821,sharedNode1822,sharedNode1823,sharedNode1852,sharedNode1839,{"kind":"ObjectField","name":sharedNode732,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":sharedNode1000}]}}]}}]}}]}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode716,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode1853,sharedNode1854,sharedNode38,sharedNode674,sharedNode671,sharedNode38,sharedNode32]}}]}}]}}]} as unknown as DocumentNode<AddFeedbackCommentToEventMutation, AddFeedbackCommentToEventMutationVariables>;
+export const SubscribeToEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"subscribeToEvent"},"variableDefinitions":sharedNode1003,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subscribeToEvent"},"arguments":sharedNode2095,"selectionSet":sharedNode991}]}}]} as unknown as DocumentNode<SubscribeToEventMutation, SubscribeToEventMutationVariables>;
+export const UnsubscribeFromEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unsubscribeFromEvent"},"variableDefinitions":sharedNode1003,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unsubscribeFromEvent"},"arguments":sharedNode2095,"selectionSet":sharedNode991}]}}]} as unknown as DocumentNode<UnsubscribeFromEventMutation, UnsubscribeFromEventMutationVariables>;
+export const SubscribeToEventUpdatesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"subscribeToEventUpdates"},"variableDefinitions":sharedNode1003,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subscribeToEventUpdates"},"arguments":sharedNode2095,"selectionSet":sharedNode2097}]}}]} as unknown as DocumentNode<SubscribeToEventUpdatesMutation, SubscribeToEventUpdatesMutationVariables>;
+export const UnsubscribeFromEventUpdatesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unsubscribeFromEventUpdates"},"variableDefinitions":sharedNode1003,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unsubscribeFromEventUpdates"},"arguments":sharedNode2095,"selectionSet":sharedNode2097}]}}]} as unknown as DocumentNode<UnsubscribeFromEventUpdatesMutation, UnsubscribeFromEventUpdatesMutationVariables>;
+export const DeleteEventDescriptionRevisionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteEventDescriptionRevision"},"variableDefinitions":sharedNode1864,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteEventDescriptionRevision"},"arguments":sharedNode1866,"selectionSet":sharedNode1868}]}}]} as unknown as DocumentNode<DeleteEventDescriptionRevisionMutation, DeleteEventDescriptionRevisionMutationVariables>;
+export const GetEventsSourcef3f666cbeeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEvents"},"variableDefinitions":[sharedNode2098,{"kind":"VariableDefinition","variable":sharedNode751,"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"EventSort"}}}}},sharedNode750,sharedNode748],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"eventsConnection"},"arguments":sharedNode1871,"selectionSet":sharedNode21},{"kind":"Field","name":sharedNode994,"arguments":sharedNode1870,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode995,sharedNode455,{"kind":"Field","name":sharedNode996,"selectionSet":sharedNode208},sharedNode456,{"kind":"Field","name":sharedNode457,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode459,sharedNode99,sharedNode44]}}]}}]}},sharedNode112,sharedNode470]} as unknown as DocumentNode<GetEventsSourcef3f666cbeeQuery, GetEventsSourcef3f666cbeeQueryVariables>;
+export const GetEventFeedbackDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEventFeedback"},"variableDefinitions":[sharedNode714,sharedNode750,sharedNode748],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode994,"arguments":sharedNode724,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode368,sharedNode370,sharedNode455,sharedNode390,sharedNode329,{"kind":"Field","name":sharedNode330,"arguments":sharedNode1879,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,sharedNode44,sharedNode674,sharedNode671,sharedNode733]}}]}}]}}]} as unknown as DocumentNode<GetEventFeedbackQuery, GetEventFeedbackQueryVariables>;
+export const AddImageToAlbumDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddImageToAlbum"},"variableDefinitions":[sharedNode2099,sharedNode1012,{"kind":"VariableDefinition","variable":sharedNode2101,"type":sharedNode747}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addImageToAlbum"},"arguments":[sharedNode2102,sharedNode1937,{"kind":"Argument","name":sharedNode2100,"value":sharedNode2101}]}]}}]} as unknown as DocumentNode<AddImageToAlbumMutation, AddImageToAlbumMutationVariables>;
+export const RemoveImageFromAlbumDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveImageFromAlbum"},"variableDefinitions":[sharedNode2099,sharedNode1012],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeImageFromAlbum"},"arguments":[sharedNode2102,sharedNode1937]}]}}]} as unknown as DocumentNode<RemoveImageFromAlbumMutation, RemoveImageFromAlbumMutationVariables>;
+export const GetImageDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetImageDetails"},"variableDefinitions":sharedNode1936,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2010,"arguments":sharedNode1022,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode44,sharedNode150,sharedNode152,sharedNode154,sharedNode156,sharedNode2104,sharedNode205,sharedNode2106,sharedNode38,sharedNode314,sharedNode2107]}}]}}]} as unknown as DocumentNode<GetImageDetailsQuery, GetImageDetailsQueryVariables>;
+export const GetAlbumDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAlbumDetails"},"variableDefinitions":[sharedNode2099],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2108,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode134,"value":sharedNode1921}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode130,sharedNode2110,{"kind":"Field","name":sharedNode131,"arguments":sharedNode148,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode150,sharedNode152,sharedNode154,sharedNode38,sharedNode160]}},{"kind":"Field","name":sharedNode1682,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode38,{"kind":"Field","name":sharedNode88,"selectionSet":sharedNode159},sharedNode1776]}}]}}]}}]} as unknown as DocumentNode<GetAlbumDetailsQuery, GetAlbumDetailsQueryVariables>;
+export const GetUserAlbumsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserAlbums"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode961,"type":{"kind":"NamedType","name":{"kind":"Name","value":"AlbumWhere"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2108,"arguments":sharedNode1871,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode130,sharedNode2110,{"kind":"Field","name":sharedNode131,"arguments":[sharedNode147,sharedNode1660,sharedNode641],"selectionSet":sharedNode1766},sharedNode2116,{"kind":"Field","name":sharedNode1682,"arguments":sharedNode642,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode38,sharedNode1776]}}]}}]}}]} as unknown as DocumentNode<GetUserAlbumsQuery, GetUserAlbumsQueryVariables>;
+export const GetUserAlbumsForImageSaveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserAlbumsForImageSave"},"variableDefinitions":sharedNode1013,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2108,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode2109,"value":sharedNode884}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode2110,{"kind":"Field","alias":{"kind":"Name","value":"matchingImages"},"name":sharedNode131,"arguments":sharedNode1022,"selectionSet":sharedNode81},sharedNode2116,{"kind":"Field","name":sharedNode1682,"arguments":sharedNode642,"selectionSet":sharedNode581}]}}]}}]} as unknown as DocumentNode<GetUserAlbumsForImageSaveQuery, GetUserAlbumsForImageSaveQueryVariables>;
+export const GetUserImagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUserImages"},"variableDefinitions":[sharedNode873,sharedNode817,sharedNode2117,sharedNode2118,sharedNode2121],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode57,{"kind":"Field","name":sharedNode131,"arguments":sharedNode2122,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode150,sharedNode152,sharedNode154,sharedNode156,sharedNode2104,sharedNode205,sharedNode2106,sharedNode38,sharedNode822,sharedNode160]}},sharedNode2128]}}]}}]} as unknown as DocumentNode<GetUserImagesQuery, GetUserImagesQueryVariables>;
+export const GetReusableUserImagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetReusableUserImages"},"variableDefinitions":sharedNode2129,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode2132,sharedNode2128]}}]}}]} as unknown as DocumentNode<GetReusableUserImagesQuery, GetReusableUserImagesQueryVariables>;
+export const GetReusableFavoriteImagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetReusableFavoriteImages"},"variableDefinitions":sharedNode2129,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1014,"arguments":sharedNode2122,"selectionSet":sharedNode2131},{"kind":"Field","name":{"kind":"Name","value":"FavoriteImagesConnection"},"arguments":sharedNode2127,"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetReusableFavoriteImagesQuery, GetReusableFavoriteImagesQueryVariables>;
+export const GetReusableImageCollectionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetReusableImageCollections"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1737,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode1745]}},sharedNode1586],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode195]}}]}}]}}]} as unknown as DocumentNode<GetReusableImageCollectionsQuery, GetReusableImageCollectionsQueryVariables>;
+export const GetReusableCollectionImagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetReusableCollectionImages"},"variableDefinitions":[sharedNode1702,sharedNode2121,sharedNode2117,sharedNode2118],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1697,"arguments":sharedNode1723,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode187,sharedNode2132,sharedNode2128]}}]}}]} as unknown as DocumentNode<GetReusableCollectionImagesQuery, GetReusableCollectionImagesQueryVariables>;
+export const CreateIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createIssue"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1041,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"IssueCreateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createIssue"},"arguments":sharedNode1948,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode599,sharedNode127,sharedNode85,sharedNode601,sharedNode624,sharedNode38,sharedNode40,sharedNode603,sharedNode605,sharedNode607,sharedNode99,sharedNode674,sharedNode622]}}]}}]} as unknown as DocumentNode<CreateIssueMutation, CreateIssueMutationVariables>;
+export const CloseIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"closeIssue"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2133,"arguments":[sharedNode723,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode600,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1979,"value":sharedNode247}]}}]}}],"selectionSet":sharedNode2139}]}}]} as unknown as DocumentNode<CloseIssueMutation, CloseIssueMutationVariables>;
+export const ReopenIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"reopenIssue"},"variableDefinitions":sharedNode715,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2133,"arguments":[sharedNode723,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode600,"value":sharedNode1982}]}}],"selectionSet":sharedNode2139}]}}]} as unknown as DocumentNode<ReopenIssueMutation, ReopenIssueMutationVariables>;
+export const UpdateIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateIssue"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode2141,"type":{"kind":"NonNullType","type":sharedNode2143}},{"kind":"VariableDefinition","variable":sharedNode2144,"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"IssueUpdateInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2133,"arguments":[sharedNode2145,{"kind":"Argument","name":sharedNode962,"value":sharedNode2144}],"selectionSet":sharedNode2151}]}},sharedNode27,sharedNode705,sharedNode633]} as unknown as DocumentNode<UpdateIssueMutation, UpdateIssueMutationVariables>;
+export const SubscribeToIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"subscribeToIssue"},"variableDefinitions":sharedNode2153,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"subscribeToIssue"},"arguments":sharedNode2154,"selectionSet":sharedNode2156}]}}]} as unknown as DocumentNode<SubscribeToIssueMutation, SubscribeToIssueMutationVariables>;
+export const UnsubscribeFromIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unsubscribeFromIssue"},"variableDefinitions":sharedNode2153,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unsubscribeFromIssue"},"arguments":sharedNode2154,"selectionSet":sharedNode2156}]}}]} as unknown as DocumentNode<UnsubscribeFromIssueMutation, UnsubscribeFromIssueMutationVariables>;
+export const AddIssueActivityFeedItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":sharedNode2157,"variableDefinitions":[sharedNode2152,sharedNode2159,sharedNode2161,sharedNode1231],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2157,"arguments":[sharedNode2168,sharedNode2169,sharedNode2170,sharedNode2171],"selectionSet":sharedNode2151}]}},sharedNode27,sharedNode705,sharedNode633]} as unknown as DocumentNode<AddIssueActivityFeedItemMutation, AddIssueActivityFeedItemMutationVariables>;
+export const AddIssueActivityFeedItemWithCommentAsModDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addIssueActivityFeedItemWithCommentAsMod"},"variableDefinitions":[sharedNode2152,sharedNode2159,sharedNode2161,sharedNode1231,sharedNode2174,sharedNode738,sharedNode2176],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2157,"arguments":[sharedNode2168,sharedNode2169,sharedNode2170,sharedNode2171,sharedNode2177,sharedNode752,sharedNode2178],"selectionSet":sharedNode2151}]}},sharedNode27,sharedNode705,sharedNode633]} as unknown as DocumentNode<AddIssueActivityFeedItemWithCommentAsModMutation, AddIssueActivityFeedItemWithCommentAsModMutationVariables>;
+export const AddIssueActivityFeedItemWithCommentAsUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addIssueActivityFeedItemWithCommentAsUser"},"variableDefinitions":[sharedNode2152,sharedNode2159,sharedNode2161,sharedNode873,sharedNode2174,sharedNode738,sharedNode2176],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2157,"arguments":[sharedNode2168,sharedNode2169,sharedNode2170,sharedNode875,sharedNode2177,sharedNode752,sharedNode2178],"selectionSet":sharedNode2151}]}},sharedNode27,sharedNode705,sharedNode633]} as unknown as DocumentNode<AddIssueActivityFeedItemWithCommentAsUserMutation, AddIssueActivityFeedItemWithCommentAsUserMutationVariables>;
+export const ReportDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"reportDiscussion"},"variableDefinitions":[sharedNode740,sharedNode1546,sharedNode2181,sharedNode1550,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reportDiscussion"},"arguments":sharedNode2183,"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ReportDiscussionMutation, ReportDiscussionMutationVariables>;
+export const ArchiveDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"archiveDiscussion"},"variableDefinitions":[sharedNode740,sharedNode2181,sharedNode1550,sharedNode1546,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"archiveDiscussion"},"arguments":sharedNode2183,"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ArchiveDiscussionMutation, ArchiveDiscussionMutationVariables>;
+export const UnarchiveDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unarchiveDiscussion"},"variableDefinitions":[sharedNode740,sharedNode738,sharedNode2186],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unarchiveDiscussion"},"arguments":[sharedNode753,sharedNode752,sharedNode2187],"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<UnarchiveDiscussionMutation, UnarchiveDiscussionMutationVariables>;
+export const ReportEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"reportEvent"},"variableDefinitions":[sharedNode1001,sharedNode1546,sharedNode2181,sharedNode1550,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reportEvent"},"arguments":sharedNode2188,"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ReportEventMutation, ReportEventMutationVariables>;
+export const UnarchiveEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unarchiveEvent"},"variableDefinitions":[sharedNode1001,sharedNode738,sharedNode2186],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unarchiveEvent"},"arguments":[sharedNode1002,sharedNode752,sharedNode2187],"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<UnarchiveEventMutation, UnarchiveEventMutationVariables>;
+export const ArchiveEventDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"archiveEvent"},"variableDefinitions":[sharedNode1001,sharedNode2181,sharedNode1550,sharedNode1546,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"archiveEvent"},"arguments":sharedNode2188,"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ArchiveEventMutation, ArchiveEventMutationVariables>;
+export const ReportCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"reportComment"},"variableDefinitions":[sharedNode970,sharedNode1546,sharedNode2181,sharedNode1550,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reportComment"},"arguments":[sharedNode988,sharedNode1551,sharedNode2182,sharedNode1552,sharedNode752],"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ReportCommentMutation, ReportCommentMutationVariables>;
+export const ReportWikiEditDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"reportWikiEdit"},"variableDefinitions":[sharedNode1531,{"kind":"VariableDefinition","variable":sharedNode2190,"type":sharedNode712},sharedNode1546,sharedNode2181,sharedNode1550,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reportWikiEdit"},"arguments":[sharedNode1533,{"kind":"Argument","name":sharedNode2189,"value":sharedNode2190},sharedNode1551,sharedNode2182,sharedNode1552,sharedNode752],"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ReportWikiEditMutation, ReportWikiEditMutationVariables>;
+export const ArchiveCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"archiveComment"},"variableDefinitions":[sharedNode970,sharedNode2181,sharedNode1550,sharedNode1546],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"archiveComment"},"arguments":[sharedNode988,sharedNode1551,sharedNode2182,sharedNode1552],"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ArchiveCommentMutation, ArchiveCommentMutationVariables>;
+export const UnarchiveCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unarchiveComment"},"variableDefinitions":[sharedNode970,sharedNode2186],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unarchiveComment"},"arguments":[sharedNode988,sharedNode2187],"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<UnarchiveCommentMutation, UnarchiveCommentMutationVariables>;
+export const LockIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"lockIssue"},"variableDefinitions":[sharedNode2152,sharedNode1536],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"lockIssue"},"arguments":sharedNode2191,"selectionSet":sharedNode2148}]}},sharedNode27,sharedNode705,sharedNode633]} as unknown as DocumentNode<LockIssueMutation, LockIssueMutationVariables>;
+export const UnlockIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unlockIssue"},"variableDefinitions":[sharedNode2152,sharedNode1558],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unlockIssue"},"arguments":sharedNode2191,"selectionSet":sharedNode2148}]}},sharedNode27,sharedNode705,sharedNode633]} as unknown as DocumentNode<UnlockIssueMutation, UnlockIssueMutationVariables>;
+export const ReportImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"reportImage"},"variableDefinitions":[sharedNode1012,sharedNode1546,sharedNode2181,sharedNode1550,sharedNode2192],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reportImage"},"arguments":sharedNode2193,"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ReportImageMutation, ReportImageMutationVariables>;
+export const ReportProfilePictureDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"reportProfilePicture"},"variableDefinitions":[sharedNode873,sharedNode1546,sharedNode1550],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reportProfilePicture"},"arguments":[sharedNode875,sharedNode1551,sharedNode1552],"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ReportProfilePictureMutation, ReportProfilePictureMutationVariables>;
+export const ArchiveImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"archiveImage"},"variableDefinitions":[sharedNode1012,sharedNode2181,sharedNode1550,sharedNode1546,sharedNode2192],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"archiveImage"},"arguments":sharedNode2193,"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<ArchiveImageMutation, ArchiveImageMutationVariables>;
+export const UnarchiveImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unarchiveImage"},"variableDefinitions":[sharedNode1012,sharedNode2194,sharedNode2192],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unarchiveImage"},"arguments":[sharedNode1937,sharedNode2187,sharedNode752],"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<UnarchiveImageMutation, UnarchiveImageMutationVariables>;
+export const PermanentlyRemoveImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"permanentlyRemoveImage"},"variableDefinitions":[sharedNode1012,sharedNode2194],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"permanentlyRemoveImage"},"arguments":[sharedNode1937,sharedNode2187],"selectionSet":sharedNode982}]}}]} as unknown as DocumentNode<PermanentlyRemoveImageMutation, PermanentlyRemoveImageMutationVariables>;
+export const GetIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":sharedNode2195,"variableDefinitions":[sharedNode738,sharedNode2197],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2134,"arguments":sharedNode2205,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode635]}}]}},sharedNode633]} as unknown as DocumentNode<GetIssueQuery, GetIssueQueryVariables>;
+export const GetIssueActivityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getIssueActivity"},"variableDefinitions":[sharedNode738,sharedNode2197,sharedNode2208,sharedNode2211],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2134,"arguments":sharedNode2205,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode636,"arguments":sharedNode2214,"selectionSet":sharedNode687},sharedNode702]}}]}},sharedNode27]} as unknown as DocumentNode<GetIssueActivityQuery, GetIssueActivityQueryVariables>;
+export const GetIssueSource3f1ebf796bDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":sharedNode2195,"variableDefinitions":sharedNode2056,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2134,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode604,"value":sharedNode803},sharedNode800]}}],"selectionSet":sharedNode2216}]}}]} as unknown as DocumentNode<GetIssueSource3f1ebf796bQuery, GetIssueSource3f1ebf796bQueryVariables>;
+export const GetIssueSource003ac8783fDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":sharedNode2195,"variableDefinitions":sharedNode1007,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2134,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode606,"value":sharedNode1006},sharedNode800]}}],"selectionSet":sharedNode2216}]}}]} as unknown as DocumentNode<GetIssueSource003ac8783fQuery, GetIssueSource003ac8783fQueryVariables>;
+export const GetDiscussionCommentIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionCommentIssue"},"variableDefinitions":sharedNode2056,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode796,"arguments":sharedNode2220,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode793,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"RelatedIssues_SOME"},"value":{"kind":"ObjectValue","fields":sharedNode1696}}]}},sharedNode2222],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode980,"selectionSet":sharedNode2224}]}}]}}]}}]} as unknown as DocumentNode<GetDiscussionCommentIssueQuery, GetDiscussionCommentIssueQueryVariables>;
+export const GetIssuesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getIssues"},"variableDefinitions":sharedNode2226,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2134,"arguments":[sharedNode2145,sharedNode641],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode599,sharedNode127,sharedNode85,sharedNode601,sharedNode38,sharedNode40,sharedNode603,sharedNode605,sharedNode607,sharedNode609,sharedNode611,sharedNode613,sharedNode2227,sharedNode624,sharedNode224,sharedNode626,sharedNode628,sharedNode630,sharedNode2228,sharedNode622,sharedNode702]}}]}}]} as unknown as DocumentNode<GetIssuesQuery, GetIssuesQueryVariables>;
+export const GetSiteWideIssueListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getSiteWideIssueList"},"variableDefinitions":[sharedNode1667,sharedNode2054,sharedNode1312,sharedNode1314,{"kind":"VariableDefinition","variable":sharedNode2230,"type":sharedNode1133},{"kind":"VariableDefinition","variable":sharedNode2231,"type":sharedNode1143},{"kind":"VariableDefinition","variable":sharedNode2233,"type":sharedNode1133},{"kind":"VariableDefinition","variable":sharedNode2235,"type":sharedNode1133},{"kind":"VariableDefinition","variable":sharedNode2237,"type":sharedNode1133},{"kind":"VariableDefinition","variable":sharedNode2032,"type":{"kind":"NamedType","name":{"kind":"Name","value":"IssueListOptions"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getSiteWideIssueList"},"arguments":[sharedNode1671,sharedNode2055,sharedNode1326,sharedNode1327,{"kind":"Argument","name":sharedNode2229,"value":sharedNode2230},{"kind":"Argument","name":sharedNode600,"value":sharedNode2231},{"kind":"Argument","name":sharedNode2232,"value":sharedNode2233},{"kind":"Argument","name":sharedNode2234,"value":sharedNode2235},{"kind":"Argument","name":sharedNode2236,"value":sharedNode2237},sharedNode2039],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregateIssueCount"}},{"kind":"Field","name":sharedNode2134,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode599,sharedNode127,sharedNode85,sharedNode601,sharedNode38,sharedNode40,sharedNode603,sharedNode605,sharedNode607,sharedNode609,sharedNode611,sharedNode613,sharedNode2227,sharedNode624,sharedNode224,sharedNode628,sharedNode99,sharedNode231,sharedNode1423,{"kind":"Field","name":{"kind":"Name","value":"reportCount"}}]}}]}}]}}]} as unknown as DocumentNode<GetSiteWideIssueListQuery, GetSiteWideIssueListQueryVariables>;
+export const GetClosedIssuesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getClosedIssues"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2134,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode2238]}},sharedNode641],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode599,sharedNode127,sharedNode85,sharedNode601,sharedNode38,sharedNode40,sharedNode603,sharedNode605,sharedNode607,sharedNode609,sharedNode611,sharedNode613,sharedNode2228,sharedNode99,sharedNode224,sharedNode626,sharedNode628,sharedNode630,sharedNode622,sharedNode702]}}]}}]} as unknown as DocumentNode<GetClosedIssuesQuery, GetClosedIssuesQueryVariables>;
+export const GetChannelReportsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChannelReports"},"variableDefinitions":sharedNode2240,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2134,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode2241,{"kind":"ObjectField","name":sharedNode133,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode614,"value":sharedNode769}]}},sharedNode2245]}},sharedNode641],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode599,sharedNode127,sharedNode85,sharedNode601,sharedNode38,sharedNode40,sharedNode615,sharedNode624,sharedNode224,sharedNode626,sharedNode628,sharedNode630,sharedNode622,sharedNode702]}}]}}]} as unknown as DocumentNode<GetChannelReportsQuery, GetChannelReportsQueryVariables>;
+export const GetImageReportsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getImageReports"},"variableDefinitions":sharedNode2240,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2134,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode765,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode133,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode608,"value":sharedNode769}]}}]},{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode133,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"relatedProfilePicUserId"},"value":sharedNode769}]}}]},{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode133,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"relatedChannelIconName"},"value":sharedNode769}]}}]},{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode133,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"relatedChannelBannerName"},"value":sharedNode769}]}}]}]}},sharedNode2245]}},sharedNode641],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode599,sharedNode127,sharedNode85,sharedNode601,sharedNode38,sharedNode40,sharedNode99,sharedNode609,{"kind":"Field","name":{"kind":"Name","value":"relatedAlbumId"}},{"kind":"Field","name":{"kind":"Name","value":"relatedProfilePicUserId"}},{"kind":"Field","name":{"kind":"Name","value":"relatedChannelIconName"}},{"kind":"Field","name":{"kind":"Name","value":"relatedChannelBannerName"}},sharedNode615,sharedNode624,sharedNode622,sharedNode702]}}]}}]} as unknown as DocumentNode<GetImageReportsQuery, GetImageReportsQueryVariables>;
+export const GetServerIssueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getServerIssue"},"variableDefinitions":[sharedNode2197,sharedNode2208,sharedNode2211],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2134,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode2241,sharedNode2201]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode635,{"kind":"Field","name":sharedNode636,"arguments":sharedNode2214,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":sharedNode644,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode646,sharedNode648,sharedNode38,sharedNode2059,{"kind":"Field","name":sharedNode61,"selectionSet":sharedNode7},sharedNode667,sharedNode682]}}]}},sharedNode702]}}]}},sharedNode27,sharedNode633]} as unknown as DocumentNode<GetServerIssueQuery, GetServerIssueQueryVariables>;
+export const GetUserFavoriteCommentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserFavoriteComments"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1741,"arguments":sharedNode678,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,sharedNode40,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode619,sharedNode5,sharedNode57,sharedNode64,sharedNode68,sharedNode66,sharedNode38]}},{"kind":"InlineFragment","typeCondition":sharedNode55,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode619,sharedNode57]}}]}},{"kind":"Field","name":sharedNode97,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode101,sharedNode99,sharedNode176,sharedNode2248]}},sharedNode176,{"kind":"Field","name":sharedNode95,"selectionSet":sharedNode581}]}}]}}]}}]} as unknown as DocumentNode<GetUserFavoriteCommentsQuery, GetUserFavoriteCommentsQueryVariables>;
+export const GetUserFavoriteDiscussionsNoDownloadsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserFavoriteDiscussionsNoDownloads"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1032,"arguments":[{"kind":"Argument","name":sharedNode132,"value":sharedNode911},sharedNode641],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode203,sharedNode1751,sharedNode2251,sharedNode276,sharedNode1760,sharedNode205]}}]}}]}}]} as unknown as DocumentNode<GetUserFavoriteDiscussionsNoDownloadsQuery, GetUserFavoriteDiscussionsNoDownloadsQueryVariables>;
+export const GetUserFavoriteDownloadsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserFavoriteDownloads"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1032,"arguments":[sharedNode1750,sharedNode677],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode203,sharedNode1751,sharedNode2251,sharedNode276,sharedNode1770,sharedNode205]}}]}}]}}]} as unknown as DocumentNode<GetUserFavoriteDownloadsQuery, GetUserFavoriteDownloadsQueryVariables>;
+export const GetUserFavoriteImagesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserFavoriteImages"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1014,"arguments":sharedNode678,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode150,sharedNode152,sharedNode154,sharedNode156,sharedNode2104,sharedNode205,sharedNode2106,sharedNode38,sharedNode2107]}}]}}]}}]} as unknown as DocumentNode<GetUserFavoriteImagesQuery, GetUserFavoriteImagesQueryVariables>;
+export const GetUnifiedLibraryFavoritesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetUnifiedLibraryFavorites"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1032,"arguments":sharedNode2254,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode203,sharedNode169,sharedNode2257,{"kind":"Field","name":sharedNode128,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode130,{"kind":"Field","name":sharedNode131,"selectionSet":sharedNode1024}]}}]}},{"kind":"Field","name":sharedNode1014,"arguments":sharedNode2254,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode150,sharedNode152,sharedNode154,sharedNode38,sharedNode2107,{"kind":"Field","name":{"kind":"Name","value":"Albums"},"arguments":sharedNode2258,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode1682,"arguments":sharedNode2258,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode2257]}}]}}]}},{"kind":"Field","name":sharedNode1741,"arguments":sharedNode2254,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":sharedNode168},sharedNode60]}},{"kind":"Field","name":sharedNode97,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode101,sharedNode99,sharedNode462,sharedNode2248]}},sharedNode462]}},{"kind":"Field","name":sharedNode1026,"arguments":sharedNode2254,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode57,sharedNode189,sharedNode231,sharedNode38,{"kind":"Field","name":sharedNode708,"arguments":sharedNode2258,"selectionSet":sharedNode168}]}}]}}]}}]} as unknown as DocumentNode<GetUnifiedLibraryFavoritesQuery, GetUnifiedLibraryFavoritesQueryVariables>;
+export const InviteForumOwnerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"inviteForumOwner"},"variableDefinitions":sharedNode2259,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inviteForumOwner"},"arguments":sharedNode2260}]}}]} as unknown as DocumentNode<InviteForumOwnerMutation, InviteForumOwnerMutationVariables>;
+export const InviteForumModDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"inviteForumMod"},"variableDefinitions":sharedNode2259,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"inviteForumMod"},"arguments":sharedNode2260}]}}]} as unknown as DocumentNode<InviteForumModMutation, InviteForumModMutationVariables>;
+export const CancelInviteForumOwnerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"cancelInviteForumOwner"},"variableDefinitions":sharedNode2259,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cancelInviteForumOwner"},"arguments":sharedNode2260}]}}]} as unknown as DocumentNode<CancelInviteForumOwnerMutation, CancelInviteForumOwnerMutationVariables>;
+export const CancelInviteForumModDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"cancelInviteForumMod"},"variableDefinitions":sharedNode2259,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cancelInviteForumMod"},"arguments":sharedNode2260}]}}]} as unknown as DocumentNode<CancelInviteForumModMutation, CancelInviteForumModMutationVariables>;
+export const RemoveForumOwnerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"removeForumOwner"},"variableDefinitions":sharedNode1025,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeForumOwner"},"arguments":[sharedNode875,sharedNode752]}]}}]} as unknown as DocumentNode<RemoveForumOwnerMutation, RemoveForumOwnerMutationVariables>;
+export const RemoveForumModDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"removeForumMod"},"variableDefinitions":[sharedNode1817,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeForumMod"},"arguments":[{"kind":"Argument","name":sharedNode1409,"value":sharedNode1816},sharedNode752]}]}}]} as unknown as DocumentNode<RemoveForumModMutation, RemoveForumModMutationVariables>;
+export const AcceptInviteForumOwnerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"acceptInviteForumOwner"},"variableDefinitions":sharedNode2261,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"acceptForumOwnerInvite"},"arguments":sharedNode2263}]}}]} as unknown as DocumentNode<AcceptInviteForumOwnerMutation, AcceptInviteForumOwnerMutationVariables>;
+export const AcceptInviteForumModDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"acceptInviteForumMod"},"variableDefinitions":sharedNode2261,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"acceptForumModInvite"},"arguments":sharedNode2263}]}}]} as unknown as DocumentNode<AcceptInviteForumModMutation, AcceptInviteForumModMutationVariables>;
+export const SuspendUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"suspendUser"},"variableDefinitions":sharedNode2273,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"suspendUser"},"arguments":sharedNode2277,"selectionSet":sharedNode81}]}}]} as unknown as DocumentNode<SuspendUserMutation, SuspendUserMutationVariables>;
+export const SuspendModDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"suspendMod"},"variableDefinitions":sharedNode2273,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"suspendMod"},"arguments":sharedNode2277,"selectionSet":sharedNode81}]}}]} as unknown as DocumentNode<SuspendModMutation, SuspendModMutationVariables>;
+export const UnsuspendUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unsuspendUser"},"variableDefinitions":sharedNode2278,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unsuspendUser"},"arguments":sharedNode2279,"selectionSet":sharedNode81}]}}]} as unknown as DocumentNode<UnsuspendUserMutation, UnsuspendUserMutationVariables>;
+export const UnsuspendModDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"unsuspendMod"},"variableDefinitions":sharedNode2278,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unsuspendMod"},"arguments":sharedNode2279,"selectionSet":sharedNode81}]}}]} as unknown as DocumentNode<UnsuspendModMutation, UnsuspendModMutationVariables>;
+export const CountOpenIssuesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"countOpenIssues"},"variableDefinitions":sharedNode1542,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2280,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode800,sharedNode1625]}}],"selectionSet":sharedNode21}]}}]} as unknown as DocumentNode<CountOpenIssuesQuery, CountOpenIssuesQueryVariables>;
+export const CountIssuesByServerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"countIssuesByServer"},"variableDefinitions":sharedNode2226,"selectionSet":sharedNode2284}]} as unknown as DocumentNode<CountIssuesByServerQuery, CountIssuesByServerQueryVariables>;
+export const CountClosedIssuesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"countClosedIssues"},"variableDefinitions":sharedNode1542,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2280,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode800,sharedNode2238]}}],"selectionSet":sharedNode21}]}}]} as unknown as DocumentNode<CountClosedIssuesQuery, CountClosedIssuesQueryVariables>;
+export const CountClosedIssuesByServerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"countClosedIssuesByServer"},"variableDefinitions":sharedNode2226,"selectionSet":sharedNode2284}]} as unknown as DocumentNode<CountClosedIssuesByServerQuery, CountClosedIssuesByServerQueryVariables>;
+export const GetModDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getMod"},"variableDefinitions":[sharedNode1231],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2285,"arguments":sharedNode2287,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,sharedNode38,{"kind":"Field","name":{"kind":"Name","value":"AuthoredCommentsConnection"},"selectionSet":sharedNode21},{"kind":"Field","name":{"kind":"Name","value":"AuthoredIssuesConnection"},"selectionSet":sharedNode21},{"kind":"Field","name":sharedNode689,"selectionSet":sharedNode21},{"kind":"Field","name":{"kind":"Name","value":"AuthoredComments"},"arguments":sharedNode2290,"selectionSet":sharedNode2297},{"kind":"Field","name":{"kind":"Name","value":"AuthoredIssues"},"arguments":sharedNode2290,"selectionSet":sharedNode2300}]}}]}}]} as unknown as DocumentNode<GetModQuery, GetModQueryVariables>;
+export const GetModCommentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getModComments"},"variableDefinitions":sharedNode2301,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2285,"arguments":sharedNode2287,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,{"kind":"Field","name":{"kind":"Name","value":"AuthoredComments"},"arguments":sharedNode2302,"selectionSet":sharedNode2297}]}}]}}]} as unknown as DocumentNode<GetModCommentsQuery, GetModCommentsQueryVariables>;
+export const GetModIssuesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getModIssues"},"variableDefinitions":sharedNode2301,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2285,"arguments":sharedNode2287,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,{"kind":"Field","name":{"kind":"Name","value":"AuthoredIssues"},"arguments":sharedNode2302,"selectionSet":sharedNode2300}]}}]}}]} as unknown as DocumentNode<GetModIssuesQuery, GetModIssuesQueryVariables>;
+export const GetModContributionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getModContributions"},"variableDefinitions":[sharedNode1231,sharedNode1674],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getModContributions"},"arguments":[sharedNode2171,sharedNode1675],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode1372,sharedNode395,{"kind":"Field","name":sharedNode1676,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode648,sharedNode646,sharedNode38,{"kind":"Field","name":sharedNode596,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode599,sharedNode99,sharedNode605,sharedNode607,sharedNode603,sharedNode127,sharedNode601]}},{"kind":"Field","name":sharedNode1,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38]}},{"kind":"Field","name":{"kind":"Name","value":"RelatedDiscussion"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode38,{"kind":"Field","name":sharedNode170,"selectionSet":sharedNode1680}]}},{"kind":"Field","name":{"kind":"Name","value":"RelatedEvent"},"selectionSet":sharedNode2307},{"kind":"Field","name":{"kind":"Name","value":"RelatedComment"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,sharedNode1681,{"kind":"Field","name":sharedNode95,"selectionSet":sharedNode2307}]}}]}}]}}]}}]} as unknown as DocumentNode<GetModContributionsQuery, GetModContributionsQueryVariables>;
+export const GetModsByChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getModsByChannel"},"variableDefinitions":sharedNode1542,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1031,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode1407,{"kind":"Field","name":sharedNode1408,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode5,sharedNode38,sharedNode1402,sharedNode1404,sharedNode1411,sharedNode1406]}}]}}]}}]} as unknown as DocumentNode<GetModsByChannelQuery, GetModsByChannelQueryVariables>;
+export const GetModsByChannelSource31c1e8fd16Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getModsByChannel"},"variableDefinitions":sharedNode1542,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1031,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,{"kind":"Field","name":sharedNode708,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode38,sharedNode57,sharedNode64]}},{"kind":"Field","name":sharedNode763,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode57,sharedNode38,{"kind":"Field","name":{"kind":"Name","value":"ModChannelRoles"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode187,sharedNode189]}}]}}]}}]}}]} as unknown as DocumentNode<GetModsByChannelSource31c1e8fd16Query, GetModsByChannelSource31c1e8fd16QueryVariables>;
+export const GetChannelOwnersByChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChannelOwnersByChannel"},"variableDefinitions":sharedNode1542,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1031,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,{"kind":"Field","name":sharedNode708,"selectionSet":sharedNode2309}]}}]}}]} as unknown as DocumentNode<GetChannelOwnersByChannelQuery, GetChannelOwnersByChannelQueryVariables>;
+export const GetPendingChannelOwnersByChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPendingChannelOwnersByChannel"},"variableDefinitions":sharedNode1542,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1031,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,{"kind":"Field","name":{"kind":"Name","value":"PendingOwnerInvites"},"selectionSet":sharedNode2309}]}}]}}]} as unknown as DocumentNode<GetPendingChannelOwnersByChannelQuery, GetPendingChannelOwnersByChannelQueryVariables>;
+export const GetPendingChannelModsByChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPendingChannelModsByChannel"},"variableDefinitions":sharedNode1542,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1031,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,{"kind":"Field","name":sharedNode1300,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode57,sharedNode38]}}]}}]}}]} as unknown as DocumentNode<GetPendingChannelModsByChannelQuery, GetPendingChannelModsByChannelQueryVariables>;
+export const PendingInviteExistsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"pendingInviteExists"},"variableDefinitions":sharedNode2310,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode2315,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,{"kind":"Field","name":{"kind":"Name","value":"PendingOwnerInvites"},"arguments":sharedNode886,"selectionSet":sharedNode7}]}}]}}]} as unknown as DocumentNode<PendingInviteExistsQuery, PendingInviteExistsQueryVariables>;
+export const PendingModInviteExistsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"pendingModInviteExists"},"variableDefinitions":sharedNode2310,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode2315,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,{"kind":"Field","name":sharedNode1300,"arguments":sharedNode886,"selectionSet":sharedNode7}]}}]}}]} as unknown as DocumentNode<PendingModInviteExistsQuery, PendingModInviteExistsQueryVariables>;
+export const GetDiscussionChannelIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionChannelID"},"variableDefinitions":sharedNode2056,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode796,"arguments":sharedNode2220,"selectionSet":sharedNode1009}]}}]} as unknown as DocumentNode<GetDiscussionChannelIdQuery, GetDiscussionChannelIdQueryVariables>;
+export const GetDiscussionChannelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getDiscussionChannels"},"variableDefinitions":sharedNode2011,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode796,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode134,"value":sharedNode1945}]}}]}}],"selectionSet":sharedNode985}]}}]} as unknown as DocumentNode<GetDiscussionChannelsQuery, GetDiscussionChannelsQueryVariables>;
+export const GetEventChannelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getEventChannels"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode2316,"type":sharedNode713}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"eventChannels"},"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode29,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode134,"value":sharedNode2316}]}}]}}],"selectionSet":sharedNode985}]}}]} as unknown as DocumentNode<GetEventChannelsQuery, GetEventChannelsQueryVariables>;
+export const GetSuspensionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getSuspension"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1554,"type":sharedNode737}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"isOriginalPosterSuspended"},"arguments":sharedNode2154}]}}]} as unknown as DocumentNode<GetSuspensionQuery, GetSuspensionQueryVariables>;
+export const GetChannelSource26d7fbbb05Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getChannel"},"variableDefinitions":sharedNode1542,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1031,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode1399,{"kind":"Field","name":sharedNode1400,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode5,sharedNode38,sharedNode1402,sharedNode1404,{"kind":"Field","name":{"kind":"Name","value":"SuspendedUser"},"selectionSet":sharedNode7},sharedNode1406]}}]}}]}}]} as unknown as DocumentNode<GetChannelSource26d7fbbb05Query, GetChannelSource26d7fbbb05QueryVariables>;
+export const GetNotificationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getNotifications"},"variableDefinitions":sharedNode2322,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode64,{"kind":"Field","name":sharedNode2323,"arguments":[sharedNode757,sharedNode756,sharedNode755],"selectionSet":sharedNode2335},{"kind":"Field","alias":sharedNode2336,"name":sharedNode951,"arguments":sharedNode960,"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetNotificationsQuery, GetNotificationsQueryVariables>;
+export const GetFeedbackNotificationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getFeedbackNotifications"},"variableDefinitions":sharedNode2322,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode2323,"arguments":[{"kind":"Argument","name":sharedNode132,"value":sharedNode2343},sharedNode757,sharedNode756,sharedNode755],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode38,sharedNode2324,sharedNode32,sharedNode2326,sharedNode2328]}},{"kind":"Field","alias":sharedNode2336,"name":sharedNode951,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[sharedNode953,sharedNode2341]}}]}}],"selectionSet":sharedNode21},{"kind":"Field","alias":{"kind":"Name","value":"totalNotificationsAggregate"},"name":sharedNode951,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":sharedNode2343}]}}],"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetFeedbackNotificationsQuery, GetFeedbackNotificationsQueryVariables>;
+export const GetGeneralNotificationsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getGeneralNotifications"},"variableDefinitions":sharedNode2322,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode2323,"arguments":[{"kind":"Argument","name":sharedNode132,"value":sharedNode2354},sharedNode757,sharedNode756,sharedNode755],"selectionSet":sharedNode2335},{"kind":"Field","alias":sharedNode2336,"name":sharedNode951,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":{"kind":"ObjectValue","fields":[sharedNode953,sharedNode2352]}}]}}],"selectionSet":sharedNode21},{"kind":"Field","alias":{"kind":"Name","value":"totalNotificationsAggregate"},"name":sharedNode951,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":sharedNode2354}]}}],"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetGeneralNotificationsQuery, GetGeneralNotificationsQueryVariables>;
+export const CreateScratchpadEntryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createScratchpadEntry"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode2356,"type":sharedNode737},sharedNode1819,sharedNode2359,sharedNode2362,{"kind":"VariableDefinition","variable":sharedNode2364,"type":sharedNode736}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createScratchpadEntry"},"arguments":[{"kind":"Argument","name":sharedNode2355,"value":sharedNode2356},sharedNode2064,sharedNode2365,sharedNode2366,{"kind":"Argument","name":sharedNode2363,"value":sharedNode2364}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode38,sharedNode32,sharedNode2330,sharedNode2367,sharedNode2368,sharedNode2369,sharedNode101,sharedNode169,sharedNode2371,sharedNode2372]}}]}}]} as unknown as DocumentNode<CreateScratchpadEntryMutation, CreateScratchpadEntryMutationVariables>;
+export const UpdateScratchpadEntryVisibilityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateScratchpadEntryVisibility"},"variableDefinitions":[sharedNode2375,{"kind":"VariableDefinition","variable":sharedNode2376,"type":sharedNode1143}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateScratchpadEntryVisibility"},"arguments":[sharedNode2377,{"kind":"Argument","name":sharedNode2329,"value":sharedNode2376}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode2330,sharedNode32,sharedNode2367,sharedNode2368,sharedNode2369,sharedNode101,sharedNode38,sharedNode169,sharedNode2371]}}]}}]} as unknown as DocumentNode<UpdateScratchpadEntryVisibilityMutation, UpdateScratchpadEntryVisibilityMutationVariables>;
+export const DeleteScratchpadEntryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteScratchpadEntry"},"variableDefinitions":[sharedNode2375],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteScratchpadEntry"},"arguments":[sharedNode2377]}]}}]} as unknown as DocumentNode<DeleteScratchpadEntryMutation, DeleteScratchpadEntryMutationVariables>;
+export const UndoSuperUpvoteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"undoSuperUpvote"},"variableDefinitions":[sharedNode2359,sharedNode2362],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"undoSuperUpvote"},"arguments":[sharedNode2365,sharedNode2366],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},sharedNode540,sharedNode2368,sharedNode2367,sharedNode2372]}}]}}]} as unknown as DocumentNode<UndoSuperUpvoteMutation, UndoSuperUpvoteMutationVariables>;
+export const GetPublicScratchpadEntriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPublicScratchpadEntries"},"variableDefinitions":[sharedNode873,sharedNode750,sharedNode748],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"scratchpadEntriesConnection"},"arguments":[sharedNode2382],"selectionSet":sharedNode21},{"kind":"Field","name":sharedNode2383,"arguments":[sharedNode2382,sharedNode677,sharedNode756,sharedNode755],"selectionSet":sharedNode2385}]}}]} as unknown as DocumentNode<GetPublicScratchpadEntriesQuery, GetPublicScratchpadEntriesQueryVariables>;
+export const GetPendingScratchpadEntriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPendingScratchpadEntries"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2383,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[sharedNode2378,{"kind":"ObjectField","name":sharedNode2329,"value":sharedNode250}]}},sharedNode677],"selectionSet":sharedNode2385}]}}]} as unknown as DocumentNode<GetPendingScratchpadEntriesQuery, GetPendingScratchpadEntriesQueryVariables>;
+export const GetAllScratchpadEntriesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getAllScratchpadEntries"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2383,"arguments":[sharedNode2388,sharedNode677],"selectionSet":sharedNode2385}]}}]} as unknown as DocumentNode<GetAllScratchpadEntriesQuery, GetAllScratchpadEntriesQueryVariables>;
+export const GetSuperUpvoteCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getSuperUpvoteCount"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"scratchpadEntriesConnection"},"arguments":[sharedNode2388],"selectionSet":sharedNode21}]}}]} as unknown as DocumentNode<GetSuperUpvoteCountQuery, GetSuperUpvoteCountQueryVariables>;
+export const GetOwnEmailSource3c35564c1eDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":sharedNode2065,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2065,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode64,sharedNode1410,sharedNode2067]}}]}}]} as unknown as DocumentNode<GetOwnEmailSource3c35564c1eQuery, GetOwnEmailSource3c35564c1eQueryVariables>;
+export const GetOwnEmailNotificationCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getOwnEmailNotificationCount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode2065,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode2067]}}]}}]} as unknown as DocumentNode<GetOwnEmailNotificationCountQuery, GetOwnEmailNotificationCountQueryVariables>;
+export const CreateTagDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createTag"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode1041,"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TagCreateInput"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTags"},"arguments":sharedNode1948,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1429,"selectionSet":sharedNode275}]}}]}}]} as unknown as DocumentNode<CreateTagMutation, CreateTagMutationVariables>;
+export const GetTagsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getTags"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode961,"type":{"kind":"NamedType","name":{"kind":"Name","value":"TagWhere"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1429,"arguments":[sharedNode965,sharedNode1562],"selectionSet":sharedNode275}]}}]} as unknown as DocumentNode<GetTagsQuery, GetTagsQueryVariables>;
+export const PermanentlyDeleteProfileImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"permanentlyDeleteProfileImage"},"variableDefinitions":[sharedNode873,sharedNode1512],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"permanentlyDeleteProfileImage"},"arguments":[sharedNode875,sharedNode1514],"selectionSet":sharedNode1678}]}}]} as unknown as DocumentNode<PermanentlyDeleteProfileImageMutation, PermanentlyDeleteProfileImageMutationVariables>;
+export const MarkNotificationsAsReadDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"markNotificationsAsRead"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":[sharedNode885,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode2323,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode132,"value":sharedNode958},sharedNode2392]}}]}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode2323,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode32,sharedNode2324,sharedNode38]}}]}}]}}]}}]} as unknown as DocumentNode<MarkNotificationsAsReadMutation, MarkNotificationsAsReadMutationVariables>;
+export const MarkNotificationAsReadDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"markNotificationAsRead"},"variableDefinitions":[sharedNode873,{"kind":"VariableDefinition","variable":sharedNode2394,"type":sharedNode713}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":[sharedNode885,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode2323,"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode245,"value":sharedNode2400}]}},sharedNode2392]}}]}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode2323,"arguments":[{"kind":"Argument","name":sharedNode132,"value":sharedNode2400}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode2324]}}]}}]}}]}}]} as unknown as DocumentNode<MarkNotificationAsReadMutation, MarkNotificationAsReadMutationVariables>;
+export const AddFavoriteChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addFavoriteChannel"},"variableDefinitions":sharedNode2404,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":[sharedNode885,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1026,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":sharedNode2418}]}}]}}],"selectionSet":sharedNode2424}]}}]} as unknown as DocumentNode<AddFavoriteChannelMutation, AddFavoriteChannelMutationVariables>;
+export const RemoveFavoriteChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"removeFavoriteChannel"},"variableDefinitions":sharedNode2404,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":[sharedNode885,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1026,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1126,"value":sharedNode2418}]}}]}}],"selectionSet":sharedNode2424}]}}]} as unknown as DocumentNode<RemoveFavoriteChannelMutation, RemoveFavoriteChannelMutationVariables>;
+export const AddFavoriteDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addFavoriteDiscussion"},"variableDefinitions":sharedNode2425,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":[sharedNode885,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1032,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":sharedNode2433}]}}]}}],"selectionSet":sharedNode2438}]}}]} as unknown as DocumentNode<AddFavoriteDiscussionMutation, AddFavoriteDiscussionMutationVariables>;
+export const RemoveFavoriteDiscussionDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"removeFavoriteDiscussion"},"variableDefinitions":sharedNode2425,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":[sharedNode885,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1032,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1126,"value":sharedNode2433}]}}]}}],"selectionSet":sharedNode2438}]}}]} as unknown as DocumentNode<RemoveFavoriteDiscussionMutation, RemoveFavoriteDiscussionMutationVariables>;
+export const AddFavoriteCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addFavoriteComment"},"variableDefinitions":sharedNode2439,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":[sharedNode885,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1741,"value":sharedNode1998}]}}],"selectionSet":sharedNode2445}]}}]} as unknown as DocumentNode<AddFavoriteCommentMutation, AddFavoriteCommentMutationVariables>;
+export const RemoveFavoriteCommentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"removeFavoriteComment"},"variableDefinitions":sharedNode2439,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":[sharedNode885,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1741,"value":sharedNode2001}]}}],"selectionSet":sharedNode2445}]}}]} as unknown as DocumentNode<RemoveFavoriteCommentMutation, RemoveFavoriteCommentMutationVariables>;
+export const AddFavoriteImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"addFavoriteImage"},"variableDefinitions":sharedNode2446,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":[sharedNode885,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1014,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1105,"value":sharedNode2454}]}}]}}],"selectionSet":sharedNode2460}]}}]} as unknown as DocumentNode<AddFavoriteImageMutation, AddFavoriteImageMutationVariables>;
+export const RemoveFavoriteImageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"removeFavoriteImage"},"variableDefinitions":sharedNode2446,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode964,"arguments":[sharedNode885,{"kind":"Argument","name":sharedNode962,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1014,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1126,"value":sharedNode2454}]}}]}}],"selectionSet":sharedNode2460}]}}]} as unknown as DocumentNode<RemoveFavoriteImageMutation, RemoveFavoriteImageMutationVariables>;
+export const GetUserCommentsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserComments"},"variableDefinitions":[sharedNode873,sharedNode2117,sharedNode2118,sharedNode1869],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode64,{"kind":"Field","name":sharedNode244,"arguments":sharedNode2127,"selectionSet":sharedNode21},{"kind":"Field","name":sharedNode793,"arguments":sharedNode2122,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,sharedNode40,sharedNode2292,sharedNode44,sharedNode36,sharedNode82,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":sharedNode1678},sharedNode60]}},sharedNode2295,sharedNode591,sharedNode674,sharedNode22,sharedNode8]}}]}}]}}]} as unknown as DocumentNode<GetUserCommentsQuery, GetUserCommentsQueryVariables>;
+export const GetUserDiscussionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserDiscussions"},"variableDefinitions":sharedNode2462,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode64,{"kind":"Field","name":sharedNode1682,"arguments":sharedNode2463,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,{"kind":"Field","name":sharedNode88,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode68,sharedNode66,sharedNode38]}},sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode2292,sharedNode203,{"kind":"Field","name":sharedNode170,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode44,sharedNode222,sharedNode224,sharedNode674,sharedNode36,sharedNode30,sharedNode101,sharedNode99]}},sharedNode276]}}]}}]}}]} as unknown as DocumentNode<GetUserDiscussionsQuery, GetUserDiscussionsQueryVariables>;
+export const GetUserDownloadsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserDownloads"},"variableDefinitions":sharedNode2462,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode64,{"kind":"Field","name":sharedNode1682,"arguments":sharedNode2463,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode1751,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode2292,sharedNode203,sharedNode205,{"kind":"Field","name":sharedNode170,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode44,sharedNode222,sharedNode224,sharedNode674,sharedNode456,sharedNode36,sharedNode30,sharedNode101,sharedNode99]}},sharedNode276,sharedNode1770]}}]}}]}}]} as unknown as DocumentNode<GetUserDownloadsQuery, GetUserDownloadsQueryVariables>;
+export const GetUserOwnedDownloadsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserOwnedDownloads"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":{"kind":"Name","value":"OwnedDownloads"},"arguments":[sharedNode1750,sharedNode641],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode38,sharedNode40,sharedNode203,{"kind":"Field","name":sharedNode819,"arguments":sharedNode876},sharedNode1751,sharedNode2251,sharedNode276,sharedNode1770,sharedNode205]}}]}}]}}]} as unknown as DocumentNode<GetUserOwnedDownloadsQuery, GetUserOwnedDownloadsQueryVariables>;
+export const GetUserOwnedDownloadsCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserOwnedDownloadsCount"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":{"kind":"Name","value":"OwnedDownloadsConnection"},"arguments":sharedNode926,"selectionSet":sharedNode21}]}}]}}]} as unknown as DocumentNode<GetUserOwnedDownloadsCountQuery, GetUserOwnedDownloadsCountQueryVariables>;
+export const GetUploadedDownloadableFilesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUploadedDownloadableFiles"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getUploadedDownloadableFiles"},"arguments":sharedNode876,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"discussion"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode38,sharedNode40,{"kind":"Field","name":sharedNode1315}]}},{"kind":"Field","name":{"kind":"Name","value":"files"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode286,sharedNode288,sharedNode290,sharedNode150,{"kind":"Field","name":{"kind":"Name","value":"uploadedAt"}},sharedNode38]}}]}}]}}]} as unknown as DocumentNode<GetUploadedDownloadableFilesQuery, GetUploadedDownloadableFilesQueryVariables>;
+export const GetUserEventsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserEvents"},"variableDefinitions":[sharedNode873,sharedNode2098],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode64,{"kind":"Field","name":{"kind":"Name","value":"Events"},"arguments":sharedNode2463,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode368,sharedNode370,sharedNode372,sharedNode374,sharedNode376,sharedNode453,sharedNode2068,sharedNode276,sharedNode38,sharedNode40,sharedNode2292,{"kind":"Field","name":sharedNode457,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode99,sharedNode674]}}]}}]}}]}}]} as unknown as DocumentNode<GetUserEventsQuery, GetUserEventsQueryVariables>;
+export const GetUserWikiEditsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserWikiEdits"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode961,"type":sharedNode1519},{"kind":"VariableDefinition","variable":sharedNode2464,"type":{"kind":"NamedType","name":{"kind":"Name","value":"TextVersionWhere"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1526,"arguments":[sharedNode965,sharedNode1586],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode85,sharedNode87,sharedNode1503,sharedNode38,sharedNode40,sharedNode99,sharedNode2465,{"kind":"Field","name":sharedNode83,"arguments":[{"kind":"Argument","name":sharedNode132,"value":sharedNode2464},sharedNode677],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode85,sharedNode87,sharedNode38,sharedNode169]}}]}}]}}]} as unknown as DocumentNode<GetUserWikiEditsQuery, GetUserWikiEditsQueryVariables>;
+export const DoesUserExistDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"doesUserExist"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode64,sharedNode939]}}]}}]} as unknown as DocumentNode<DoesUserExistQuery, DoesUserExistQueryVariables>;
+export const GetUserFavoriteChannelsSource1187297d18Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserFavoriteChannels"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":sharedNode1026,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode57,sharedNode189,sharedNode1563,sharedNode276]}}]}}]}},sharedNode572]} as unknown as DocumentNode<GetUserFavoriteChannelsSource1187297d18Query, GetUserFavoriteChannelsSource1187297d18QueryVariables>;
+export const GetModdedChannelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getModdedChannels"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode64,{"kind":"Field","name":{"kind":"Name","value":"ModOfChannels"},"selectionSet":sharedNode2484},sharedNode935]}}]}},sharedNode572]} as unknown as DocumentNode<GetModdedChannelsQuery, GetModdedChannelsQueryVariables>;
+export const GetOwnedChannelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getOwnedChannels"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,sharedNode64,{"kind":"Field","name":{"kind":"Name","value":"AdminOfChannels"},"selectionSet":sharedNode2484},sharedNode935]}}]}},sharedNode572]} as unknown as DocumentNode<GetOwnedChannelsQuery, GetOwnedChannelsQueryVariables>;
+export const GetUserContributionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserContributions"},"variableDefinitions":[sharedNode873,sharedNode1674],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getUserContributions"},"arguments":[sharedNode875,sharedNode1675],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode395,sharedNode1372,{"kind":"Field","name":sharedNode1676,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode189,sharedNode403,{"kind":"Field","name":sharedNode793,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode32,sharedNode38,{"kind":"Field","name":sharedNode53,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"InlineFragment","typeCondition":sharedNode62,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode64]}}]}},sharedNode674,sharedNode1681,sharedNode96]}},sharedNode1687,{"kind":"Field","name":{"kind":"Name","value":"Events"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode38,sharedNode2068,{"kind":"Field","name":sharedNode457,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode99,sharedNode459]}}]}},{"kind":"Field","name":{"kind":"Name","value":"WikiEdits"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode85,sharedNode87,sharedNode38,sharedNode1683,{"kind":"Field","name":{"kind":"Name","value":"WikiPage"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode1503,sharedNode99]}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetUserContributionsQuery, GetUserContributionsQueryVariables>;
+export const UserIsModInChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"userIsModInChannel"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode2486,"type":sharedNode737},sharedNode873,sharedNode738],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1031,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,{"kind":"Field","name":sharedNode708,"arguments":sharedNode886,"selectionSet":sharedNode7},{"kind":"Field","name":sharedNode1400,"arguments":sharedNode886,"selectionSet":sharedNode7},{"kind":"Field","name":sharedNode763,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode56,"value":sharedNode2489}]}}],"selectionSet":sharedNode59},{"kind":"Field","name":sharedNode1408,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1409,"value":sharedNode2489}]}}],"selectionSet":sharedNode1609}]}}]}}]} as unknown as DocumentNode<UserIsModInChannelQuery, UserIsModInChannelQueryVariables>;
+export const GetUserSuspensionInChannelDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserSuspensionInChannel"},"variableDefinitions":[sharedNode738,sharedNode873],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":sharedNode1031,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,{"kind":"Field","name":sharedNode1400,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode1402,sharedNode1404,sharedNode2490]}}]}}]}}]} as unknown as DocumentNode<GetUserSuspensionInChannelQuery, GetUserSuspensionInChannelQueryVariables>;
+export const GetUserActiveSuspensionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserActiveSuspensions"},"variableDefinitions":[sharedNode873,sharedNode1669],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":{"kind":"Name","value":"Suspensions"},"arguments":[{"kind":"Argument","name":sharedNode132,"value":sharedNode1598},sharedNode2222,{"kind":"Argument","name":sharedNode428,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode1401,"value":sharedNode637}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode99,sharedNode1402,sharedNode1404,sharedNode2490]}}]}}]}}]} as unknown as DocumentNode<GetUserActiveSuspensionsQuery, GetUserActiveSuspensionsQueryVariables>;
+export const GetUserFavoriteCountsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getUserFavoriteCounts"},"variableDefinitions":sharedNode874,"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode878,"arguments":sharedNode886,"selectionSet":{"kind":"SelectionSet","selections":[sharedNode5,{"kind":"Field","name":{"kind":"Name","value":"FavoriteChannelsConnection"},"selectionSet":sharedNode2494},{"kind":"Field","name":{"kind":"Name","value":"FavoriteImagesConnection"},"selectionSet":sharedNode2494},{"kind":"Field","name":{"kind":"Name","value":"FavoriteCommentsConnection"},"selectionSet":sharedNode2494},{"kind":"Field","name":{"kind":"Name","value":"FavoriteDiscussionsConnection"},"arguments":sharedNode916,"selectionSet":sharedNode2494},{"kind":"Field","alias":{"kind":"Name","value":"FavoriteDownloadsConnection"},"name":{"kind":"Name","value":"FavoriteDiscussionsConnection"},"arguments":sharedNode926,"selectionSet":sharedNode2494}]}}]}}]} as unknown as DocumentNode<GetUserFavoriteCountsQuery, GetUserFavoriteCountsQueryVariables>;
+export const GetSiteWideWikiListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getSiteWideWikiList"},"variableDefinitions":[sharedNode2023,sharedNode2054,{"kind":"VariableDefinition","variable":sharedNode2032,"type":{"kind":"NamedType","name":{"kind":"Name","value":"WikiListOptions"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getSiteWideWikiList"},"arguments":[sharedNode1671,sharedNode2055,sharedNode2039],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"aggregateWikiPageCount"}},{"kind":"Field","name":{"kind":"Name","value":"featuredWikiPages"},"selectionSet":sharedNode2496},{"kind":"Field","name":sharedNode1526,"selectionSet":sharedNode2496}]}}]}}]} as unknown as DocumentNode<GetSiteWideWikiListQuery, GetSiteWideWikiListQueryVariables>;
+export const GetWikiPinChannelsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getWikiPinChannels"},"variableDefinitions":[{"kind":"VariableDefinition","variable":sharedNode2497,"type":sharedNode1549}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1491,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"uniqueName_IN"},"value":sharedNode2497}]}}],"selectionSet":{"kind":"SelectionSet","selections":[sharedNode173,sharedNode709,sharedNode1610,{"kind":"Field","name":{"kind":"Name","value":"DefaultChannelRole"},"selectionSet":sharedNode2499},{"kind":"Field","name":{"kind":"Name","value":"ElevatedChannelRole"},"selectionSet":sharedNode2499},{"kind":"Field","name":{"kind":"Name","value":"PinnedWikiPages"},"selectionSet":{"kind":"SelectionSet","selections":[sharedNode30,sharedNode127,sharedNode1503]}}]}}]}}]} as unknown as DocumentNode<GetWikiPinChannelsQuery, GetWikiPinChannelsQueryVariables>;
+export const GetWikiPagesByIdsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getWikiPagesByIds"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":sharedNode1097}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":sharedNode1526,"arguments":[{"kind":"Argument","name":sharedNode132,"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":sharedNode2017,"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}]}}],"selectionSet":sharedNode2496}]}}]} as unknown as DocumentNode<GetWikiPagesByIdsQuery, GetWikiPagesByIdsQueryVariables>;

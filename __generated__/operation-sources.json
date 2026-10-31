@@ -1,0 +1,4773 @@
+{
+  "sources": {
+    "graphQLData/comment/queries.js#GET_COMMENT": {
+      "operations": [
+        {
+          "name": "getComment",
+          "document": "GetCommentDocument",
+          "result": "GetCommentQuery",
+          "variables": "GetCommentQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "CommentFields",
+          "document": "CommentFieldsFragmentDoc",
+          "result": "CommentFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/comment/queries.js#GET_DISCUSSION_COMMENTS": {
+      "operations": [
+        {
+          "name": "getCommentSection",
+          "document": "GetCommentSectionDocument",
+          "result": "GetCommentSectionQuery",
+          "variables": "GetCommentSectionQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/comment/queries.js#GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE": {
+      "operations": [
+        {
+          "name": "getDiscussionChannelCommentAggregate",
+          "document": "GetDiscussionChannelCommentAggregateDocument",
+          "result": "GetDiscussionChannelCommentAggregateQuery",
+          "variables": "GetDiscussionChannelCommentAggregateQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/queries.js#GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE": {
+      "operations": [
+        {
+          "name": "getDiscussionChannelRootCommentAggregate",
+          "document": "GetDiscussionChannelRootCommentAggregateDocument",
+          "result": "GetDiscussionChannelRootCommentAggregateQuery",
+          "variables": "GetDiscussionChannelRootCommentAggregateQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/queries.js#GET_DISCUSSION_DETAIL": {
+      "operations": [
+        {
+          "name": "getDiscussionDetail",
+          "document": "GetDiscussionDetailDocument",
+          "result": "GetDiscussionDetailQuery",
+          "variables": "GetDiscussionDetailQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "DiscussionDetailFields",
+          "document": "DiscussionDetailFieldsFragmentDoc",
+          "result": "DiscussionDetailFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CrosspostPreviewFields",
+          "document": "CrosspostPreviewFieldsFragmentDoc",
+          "result": "CrosspostPreviewFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "SharedCollectionPreviewFields",
+          "document": "SharedCollectionPreviewFieldsFragmentDoc",
+          "result": "SharedCollectionPreviewFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "DiscussionFlairFields",
+          "document": "DiscussionFlairFieldsFragmentDoc",
+          "result": "DiscussionFlairFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#GET_DOWNLOAD_DETAIL": {
+      "operations": [
+        {
+          "name": "getDownloadDetail",
+          "document": "GetDownloadDetailDocument",
+          "result": "GetDownloadDetailQuery",
+          "variables": "GetDownloadDetailQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CrosspostPreviewFields",
+          "document": "CrosspostPreviewFieldsFragmentDoc",
+          "result": "CrosspostPreviewFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "DiscussionFlairFields",
+          "document": "DiscussionFlairFieldsFragmentDoc",
+          "result": "DiscussionFlairFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#GET_DISCUSSION": {
+      "operations": [
+        {
+          "name": "getDiscussion",
+          "document": "GetDiscussionDocument",
+          "result": "GetDiscussionQuery",
+          "variables": "GetDiscussionQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "DiscussionDetailFields",
+          "document": "DiscussionDetailFieldsFragmentDoc",
+          "result": "DiscussionDetailFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CrosspostPreviewFields",
+          "document": "CrosspostPreviewFieldsFragmentDoc",
+          "result": "CrosspostPreviewFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "SharedCollectionPreviewFields",
+          "document": "SharedCollectionPreviewFieldsFragmentDoc",
+          "result": "SharedCollectionPreviewFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "DiscussionFlairFields",
+          "document": "DiscussionFlairFieldsFragmentDoc",
+          "result": "DiscussionFlairFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#GET_DISCUSSION_DETAIL_ANSWERS_PAGE": {
+      "operations": [
+        {
+          "name": "getDiscussionDetailAnswersPage",
+          "document": "GetDiscussionDetailAnswersPageDocument",
+          "result": "GetDiscussionDetailAnswersPageQuery",
+          "variables": "GetDiscussionDetailAnswersPageQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#CREATE_COMMENT": {
+      "operations": [
+        {
+          "name": "createComment",
+          "document": "CreateCommentDocument",
+          "result": "CreateCommentMutation",
+          "variables": "CreateCommentMutationVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "CommentFields",
+          "document": "CommentFieldsFragmentDoc",
+          "result": "CommentFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/user/queries.js#GET_PUBLIC_USER_PROFILE": {
+      "operations": [
+        {
+          "name": "getPublicUserProfile",
+          "document": "GetPublicUserProfileDocument",
+          "result": "GetPublicUserProfileQuery",
+          "variables": "GetPublicUserProfileQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/user/queries.js#GET_USER": {
+      "operations": [
+        {
+          "name": "getBasicUserInfo",
+          "document": "GetBasicUserInfoDocument",
+          "result": "GetBasicUserInfoQuery",
+          "variables": "GetBasicUserInfoQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/user/mutations.js#UPDATE_USER": {
+      "operations": [
+        {
+          "name": "updateUser",
+          "document": "UpdateUserDocument",
+          "result": "UpdateUserMutation",
+          "variables": "UpdateUserMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_COMMENT_ISSUE": {
+      "operations": [
+        {
+          "name": "getCommentIssue",
+          "document": "GetCommentIssueDocument",
+          "result": "GetCommentIssueQuery",
+          "variables": "GetCommentIssueQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/queries.js#GET_COMMENT_REPLIES": {
+      "operations": [
+        {
+          "name": "getCommentWithReplies",
+          "document": "GetCommentWithRepliesDocument",
+          "result": "GetCommentWithRepliesQuery",
+          "variables": "GetCommentWithRepliesQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "CommentFields",
+          "document": "CommentFieldsFragmentDoc",
+          "result": "CommentFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/comment/queries.js#GET_COMMENT_AND_REPLIES": {
+      "operations": [
+        {
+          "name": "getPermalinkedComment",
+          "document": "GetPermalinkedCommentDocument",
+          "result": "GetPermalinkedCommentQuery",
+          "variables": "GetPermalinkedCommentQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "CommentFields",
+          "document": "CommentFieldsFragmentDoc",
+          "result": "CommentFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/comment/mutations.js#SUBSCRIBE_TO_COMMENT": {
+      "operations": [
+        {
+          "name": "subscribeToComment",
+          "document": "SubscribeToCommentDocument",
+          "result": "SubscribeToCommentMutation",
+          "variables": "SubscribeToCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#UNSUBSCRIBE_FROM_COMMENT": {
+      "operations": [
+        {
+          "name": "unsubscribeFromComment",
+          "document": "UnsubscribeFromCommentDocument",
+          "result": "UnsubscribeFromCommentMutation",
+          "variables": "UnsubscribeFromCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#STICKY_COMMENT": {
+      "operations": [
+        {
+          "name": "stickyComment",
+          "document": "StickyCommentDocument",
+          "result": "StickyCommentMutation",
+          "variables": "StickyCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#UNSTICKY_COMMENT": {
+      "operations": [
+        {
+          "name": "unstickyComment",
+          "document": "UnstickyCommentDocument",
+          "result": "UnstickyCommentMutation",
+          "variables": "UnstickyCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/queries.js#GET_EVENT": {
+      "operations": [
+        {
+          "name": "getEvent",
+          "document": "GetEventDocument",
+          "result": "GetEventQuery",
+          "variables": "GetEventQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "EventFields",
+          "document": "EventFieldsFragmentDoc",
+          "result": "EventFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/comment/queries.js#GET_EVENT_COMMENTS": {
+      "operations": [
+        {
+          "name": "getEventComments",
+          "document": "GetEventCommentsDocument",
+          "result": "GetEventCommentsQuery",
+          "variables": "GetEventCommentsQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "CommentFields",
+          "document": "CommentFieldsFragmentDoc",
+          "result": "CommentFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/comment/queries.js#GET_EVENT_ROOT_COMMENT_AGGREGATE": {
+      "operations": [
+        {
+          "name": "getEventRootCommentAggregate",
+          "document": "GetEventRootCommentAggregateDocument",
+          "result": "GetEventRootCommentAggregateQuery",
+          "variables": "GetEventRootCommentAggregateQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_EVENT_CHANNEL": {
+      "operations": [
+        {
+          "name": "getEventChannelID",
+          "document": "GetEventChannelIdDocument",
+          "result": "GetEventChannelIdQuery",
+          "variables": "GetEventChannelIdQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "components/favorites/AddImageToFavorites.vue#GET_USER_FAVORITE_IMAGE": {
+      "operations": [
+        {
+          "name": "getUserFavoriteImage",
+          "document": "GetUserFavoriteImageDocument",
+          "result": "GetUserFavoriteImageQuery",
+          "variables": "GetUserFavoriteImageQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "components/favorites/AddToChannelFavorites.vue#GET_USER_FAVORITES": {
+      "operations": [
+        {
+          "name": "getUserFavorites",
+          "document": "GetUserFavoritesDocument",
+          "result": "GetUserFavoritesQuery",
+          "variables": "GetUserFavoritesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "components/favorites/AddToCommentFavorites.vue#GET_USER_FAVORITE_COMMENT": {
+      "operations": [
+        {
+          "name": "getUserFavoriteComment",
+          "document": "GetUserFavoriteCommentDocument",
+          "result": "GetUserFavoriteCommentQuery",
+          "variables": "GetUserFavoriteCommentQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "components/favorites/AddToDiscussionFavorites.vue#GET_USER_FAVORITE_DISCUSSION": {
+      "operations": [
+        {
+          "name": "getUserFavoriteDiscussion",
+          "document": "GetUserFavoriteDiscussionDocument",
+          "result": "GetUserFavoriteDiscussionQuery",
+          "variables": "GetUserFavoriteDiscussionQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "components/favorites/AddToImageFavorites.vue#GET_USER_FAVORITE_IMAGE": {
+      "operations": [
+        {
+          "name": "getUserFavoriteImage",
+          "document": "GetUserFavoriteImageDocument",
+          "result": "GetUserFavoriteImageQuery",
+          "variables": "GetUserFavoriteImageQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "composables/useBestAnswerMutations.ts#UPDATED_ANSWERS_FRAGMENT": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "UpdatedAnswers",
+          "document": "UpdatedAnswersFragmentDoc",
+          "result": "UpdatedAnswersFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/admin/mutations.js#UPDATE_SERVER_CONFIG": {
+      "operations": [
+        {
+          "name": "updateServerConfig",
+          "document": "UpdateServerConfigDocument",
+          "result": "UpdateServerConfigMutation",
+          "variables": "UpdateServerConfigMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#SET_FEATURED_WIKI_PAGES": {
+      "operations": [
+        {
+          "name": "setFeaturedWikiPages",
+          "document": "SetFeaturedWikiPagesDocument",
+          "result": "SetFeaturedWikiPagesMutation",
+          "variables": "SetFeaturedWikiPagesMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#REFRESH_PLUGINS": {
+      "operations": [
+        {
+          "name": "RefreshPlugins",
+          "document": "RefreshPluginsDocument",
+          "result": "RefreshPluginsMutation",
+          "variables": "RefreshPluginsMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#ALLOW_PLUGIN": {
+      "operations": [
+        {
+          "name": "AllowPlugin",
+          "document": "AllowPluginDocument",
+          "result": "AllowPluginMutation",
+          "variables": "AllowPluginMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#DISALLOW_PLUGIN": {
+      "operations": [
+        {
+          "name": "DisallowPlugin",
+          "document": "DisallowPluginDocument",
+          "result": "DisallowPluginMutation",
+          "variables": "DisallowPluginMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#INSTALL_PLUGIN_VERSION": {
+      "operations": [
+        {
+          "name": "InstallPluginVersion",
+          "document": "InstallPluginVersionDocument",
+          "result": "InstallPluginVersionMutation",
+          "variables": "InstallPluginVersionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#ENABLE_SERVER_PLUGIN": {
+      "operations": [
+        {
+          "name": "EnableServerPlugin",
+          "document": "EnableServerPluginDocument",
+          "result": "EnableServerPluginMutation",
+          "variables": "EnableServerPluginMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#SET_SERVER_PLUGIN_SECRET": {
+      "operations": [
+        {
+          "name": "SetServerPluginSecret",
+          "document": "SetServerPluginSecretDocument",
+          "result": "SetServerPluginSecretMutation",
+          "variables": "SetServerPluginSecretMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#CREATE_PLUGIN_PIPELINE_CAMPAIGN": {
+      "operations": [
+        {
+          "name": "CreatePluginPipelineCampaign",
+          "document": "CreatePluginPipelineCampaignDocument",
+          "result": "CreatePluginPipelineCampaignMutation",
+          "variables": "CreatePluginPipelineCampaignMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#PAUSE_PLUGIN_PIPELINE_CAMPAIGN": {
+      "operations": [
+        {
+          "name": "PausePluginPipelineCampaign",
+          "document": "PausePluginPipelineCampaignDocument",
+          "result": "PausePluginPipelineCampaignMutation",
+          "variables": "PausePluginPipelineCampaignMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#RESUME_PLUGIN_PIPELINE_CAMPAIGN": {
+      "operations": [
+        {
+          "name": "ResumePluginPipelineCampaign",
+          "document": "ResumePluginPipelineCampaignDocument",
+          "result": "ResumePluginPipelineCampaignMutation",
+          "variables": "ResumePluginPipelineCampaignMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#UPDATE_MOD_CHANNEL_ROLE": {
+      "operations": [
+        {
+          "name": "UpdateModChannelRole",
+          "document": "UpdateModChannelRoleDocument",
+          "result": "UpdateModChannelRoleMutation",
+          "variables": "UpdateModChannelRoleMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#UPDATE_SERVER_ROLE": {
+      "operations": [
+        {
+          "name": "UpdateServerRole",
+          "document": "UpdateServerRoleDocument",
+          "result": "UpdateServerRoleMutation",
+          "variables": "UpdateServerRoleMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#ADD_SERVER_ADMIN": {
+      "operations": [
+        {
+          "name": "AddServerAdmin",
+          "document": "AddServerAdminDocument",
+          "result": "AddServerAdminMutation",
+          "variables": "AddServerAdminMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#REMOVE_SERVER_ADMIN": {
+      "operations": [
+        {
+          "name": "RemoveServerAdmin",
+          "document": "RemoveServerAdminDocument",
+          "result": "RemoveServerAdminMutation",
+          "variables": "RemoveServerAdminMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#ADD_SERVER_MODERATOR": {
+      "operations": [
+        {
+          "name": "AddServerModerator",
+          "document": "AddServerModeratorDocument",
+          "result": "AddServerModeratorMutation",
+          "variables": "AddServerModeratorMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#REMOVE_SERVER_MODERATOR": {
+      "operations": [
+        {
+          "name": "RemoveServerModerator",
+          "document": "RemoveServerModeratorDocument",
+          "result": "RemoveServerModeratorMutation",
+          "variables": "RemoveServerModeratorMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#INVITE_SERVER_ADMIN": {
+      "operations": [
+        {
+          "name": "InviteServerAdmin",
+          "document": "InviteServerAdminDocument",
+          "result": "InviteServerAdminMutation",
+          "variables": "InviteServerAdminMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#CANCEL_INVITE_SERVER_ADMIN": {
+      "operations": [
+        {
+          "name": "CancelInviteServerAdmin",
+          "document": "CancelInviteServerAdminDocument",
+          "result": "CancelInviteServerAdminMutation",
+          "variables": "CancelInviteServerAdminMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#ACCEPT_SERVER_ADMIN_INVITE": {
+      "operations": [
+        {
+          "name": "AcceptServerAdminInvite",
+          "document": "AcceptServerAdminInviteDocument",
+          "result": "AcceptServerAdminInviteMutation",
+          "variables": "AcceptServerAdminInviteMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#INVITE_SERVER_MOD": {
+      "operations": [
+        {
+          "name": "InviteServerMod",
+          "document": "InviteServerModDocument",
+          "result": "InviteServerModMutation",
+          "variables": "InviteServerModMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#CANCEL_INVITE_SERVER_MOD": {
+      "operations": [
+        {
+          "name": "CancelInviteServerMod",
+          "document": "CancelInviteServerModDocument",
+          "result": "CancelInviteServerModMutation",
+          "variables": "CancelInviteServerModMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#ACCEPT_SERVER_MOD_INVITE": {
+      "operations": [
+        {
+          "name": "AcceptServerModInvite",
+          "document": "AcceptServerModInviteDocument",
+          "result": "AcceptServerModInviteMutation",
+          "variables": "AcceptServerModInviteMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#UPDATE_MOD_SERVER_ROLE": {
+      "operations": [
+        {
+          "name": "UpdateModServerRole",
+          "document": "UpdateModServerRoleDocument",
+          "result": "UpdateModServerRoleMutation",
+          "variables": "UpdateModServerRoleMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#UPDATE_PLUGIN_PIPELINES": {
+      "operations": [
+        {
+          "name": "UpdatePluginPipelines",
+          "document": "UpdatePluginPipelinesDocument",
+          "result": "UpdatePluginPipelinesMutation",
+          "variables": "UpdatePluginPipelinesMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#START_PLUGIN_PIPELINE": {
+      "operations": [
+        {
+          "name": "StartPluginPipeline",
+          "document": "StartPluginPipelineDocument",
+          "result": "StartPluginPipelineMutation",
+          "variables": "StartPluginPipelineMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/mutations.js#RERUN_PLUGIN_PIPELINE": {
+      "operations": [
+        {
+          "name": "RerunPluginPipeline",
+          "document": "RerunPluginPipelineDocument",
+          "result": "RerunPluginPipelineMutation",
+          "variables": "RerunPluginPipelineMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_INSTANCE_SETUP_STATUS": {
+      "operations": [
+        {
+          "name": "GetInstanceSetupStatus",
+          "document": "GetInstanceSetupStatusDocument",
+          "result": "GetInstanceSetupStatusQuery",
+          "variables": "GetInstanceSetupStatusQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_SERVER_BRANDING": {
+      "operations": [
+        {
+          "name": "getServerBranding",
+          "document": "GetServerBrandingDocument",
+          "result": "GetServerBrandingQuery",
+          "variables": "GetServerBrandingQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_SERVER_CONFIG": {
+      "operations": [
+        {
+          "name": "getServerConfig",
+          "document": "GetServerConfigDocument",
+          "result": "GetServerConfigQuery",
+          "variables": "GetServerConfigQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_SERVER_HEALTH_DASHBOARD": {
+      "operations": [
+        {
+          "name": "getServerHealthDashboard",
+          "document": "GetServerHealthDashboardDocument",
+          "result": "GetServerHealthDashboardQuery",
+          "variables": "GetServerHealthDashboardQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_DOWNLOAD_SCAN_REVIEW_QUEUE": {
+      "operations": [
+        {
+          "name": "getDownloadScanReviewQueue",
+          "document": "GetDownloadScanReviewQueueDocument",
+          "result": "GetDownloadScanReviewQueueQuery",
+          "variables": "GetDownloadScanReviewQueueQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_SERVER_HEALTH_DASHBOARD_OVERVIEW": {
+      "operations": [
+        {
+          "name": "getServerHealthDashboardOverview",
+          "document": "GetServerHealthDashboardOverviewDocument",
+          "result": "GetServerHealthDashboardOverviewQuery",
+          "variables": "GetServerHealthDashboardOverviewQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_SERVER_HEALTH_CHANNEL_HEALTH": {
+      "operations": [
+        {
+          "name": "getServerHealthChannelHealth",
+          "document": "GetServerHealthChannelHealthDocument",
+          "result": "GetServerHealthChannelHealthQuery",
+          "variables": "GetServerHealthChannelHealthQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_SERVER_PERMISSIONS": {
+      "operations": [
+        {
+          "name": "getServerConfig",
+          "document": "GetServerConfigSource8a6aa06bf0Document",
+          "result": "GetServerConfigSource8a6aa06bf0Query",
+          "variables": "GetServerConfigSource8a6aa06bf0QueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_SERVER_SUSPENDED_USERS": {
+      "operations": [
+        {
+          "name": "getServerSuspendedUsers",
+          "document": "GetServerSuspendedUsersDocument",
+          "result": "GetServerSuspendedUsersQuery",
+          "variables": "GetServerSuspendedUsersQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_SERVER_SUSPENDED_MODS": {
+      "operations": [
+        {
+          "name": "getServerSuspendedMods",
+          "document": "GetServerSuspendedModsDocument",
+          "result": "GetServerSuspendedModsQuery",
+          "variables": "GetServerSuspendedModsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_SERVER_RULES": {
+      "operations": [
+        {
+          "name": "getServerRules",
+          "document": "GetServerRulesDocument",
+          "result": "GetServerRulesQuery",
+          "variables": "GetServerRulesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_MOD_CHANNEL_ROLES": {
+      "operations": [
+        {
+          "name": "GetModChannelRoles",
+          "document": "GetModChannelRolesDocument",
+          "result": "GetModChannelRolesQuery",
+          "variables": "GetModChannelRolesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_PLUGINS": {
+      "operations": [
+        {
+          "name": "getPlugins",
+          "document": "GetPluginsDocument",
+          "result": "GetPluginsQuery",
+          "variables": "GetPluginsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_PLUGIN_BY_ID": {
+      "operations": [
+        {
+          "name": "getPluginById",
+          "document": "GetPluginByIdDocument",
+          "result": "GetPluginByIdQuery",
+          "variables": "GetPluginByIdQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_AVAILABLE_PLUGINS": {
+      "operations": [
+        {
+          "name": "GetPlugins",
+          "document": "GetPluginsSource6c031b0d8aDocument",
+          "result": "GetPluginsSource6c031b0d8aQuery",
+          "variables": "GetPluginsSource6c031b0d8aQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_INSTALLED_PLUGINS": {
+      "operations": [
+        {
+          "name": "GetInstalledPlugins",
+          "document": "GetInstalledPluginsDocument",
+          "result": "GetInstalledPluginsQuery",
+          "variables": "GetInstalledPluginsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_SERVER_PLUGIN_SECRETS": {
+      "operations": [
+        {
+          "name": "GetServerPluginSecrets",
+          "document": "GetServerPluginSecretsDocument",
+          "result": "GetServerPluginSecretsQuery",
+          "variables": "GetServerPluginSecretsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_PLUGIN_CONFIG_STATUS": {
+      "operations": [
+        {
+          "name": "GetPluginConfigStatus",
+          "document": "GetPluginConfigStatusDocument",
+          "result": "GetPluginConfigStatusQuery",
+          "variables": "GetPluginConfigStatusQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_PLUGIN_MANAGEMENT_DATA": {
+      "operations": [
+        {
+          "name": "GetPluginManagementData",
+          "document": "GetPluginManagementDataDocument",
+          "result": "GetPluginManagementDataQuery",
+          "variables": "GetPluginManagementDataQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_PLUGIN_DETAIL": {
+      "operations": [
+        {
+          "name": "GetPluginDetail",
+          "document": "GetPluginDetailDocument",
+          "result": "GetPluginDetailQuery",
+          "variables": "GetPluginDetailQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#PIPELINE_PAGE_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "PipelinePageFields",
+          "document": "PipelinePageFieldsFragmentDoc",
+          "result": "PipelinePageFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/admin/queries.js#GET_PLUGIN_PIPELINE_SUMMARY": {
+      "operations": [
+        {
+          "name": "GetPipelineSummaryPage",
+          "document": "GetPipelineSummaryPageDocument",
+          "result": "GetPipelineSummaryPageQuery",
+          "variables": "GetPipelineSummaryPageQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "PipelinePageFields",
+          "document": "PipelinePageFieldsFragmentDoc",
+          "result": "PipelinePageFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/admin/queries.js#GET_PLUGIN_PIPELINE_RUN_PAGE": {
+      "operations": [
+        {
+          "name": "GetPipelineRunPage",
+          "document": "GetPipelineRunPageDocument",
+          "result": "GetPipelineRunPageQuery",
+          "variables": "GetPipelineRunPageQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "PipelinePageFields",
+          "document": "PipelinePageFieldsFragmentDoc",
+          "result": "PipelinePageFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/admin/queries.js#GET_INTERNAL_PLUGIN_PIPELINE_RUN": {
+      "operations": [
+        {
+          "name": "GetInternalPluginPipelineRun",
+          "document": "GetInternalPluginPipelineRunDocument",
+          "result": "GetInternalPluginPipelineRunQuery",
+          "variables": "GetInternalPluginPipelineRunQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_DOWNLOAD_PIPELINE_OVERVIEW": {
+      "operations": [
+        {
+          "name": "GetDownloadPipelineOverview",
+          "document": "GetDownloadPipelineOverviewDocument",
+          "result": "GetDownloadPipelineOverviewQuery",
+          "variables": "GetDownloadPipelineOverviewQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_PLUGIN_PIPELINE_CAMPAIGNS": {
+      "operations": [
+        {
+          "name": "GetPluginPipelineCampaigns",
+          "document": "GetPluginPipelineCampaignsDocument",
+          "result": "GetPluginPipelineCampaignsQuery",
+          "variables": "GetPluginPipelineCampaignsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#PREVIEW_PLUGIN_PIPELINE_CAMPAIGN": {
+      "operations": [
+        {
+          "name": "PreviewPluginPipelineCampaign",
+          "document": "PreviewPluginPipelineCampaignDocument",
+          "result": "PreviewPluginPipelineCampaignQuery",
+          "variables": "PreviewPluginPipelineCampaignQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_PLUGIN_PIPELINE_CAMPAIGN_FAILURES": {
+      "operations": [
+        {
+          "name": "GetPluginPipelineCampaignFailures",
+          "document": "GetPluginPipelineCampaignFailuresDocument",
+          "result": "GetPluginPipelineCampaignFailuresQuery",
+          "variables": "GetPluginPipelineCampaignFailuresQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/admin/queries.js#GET_PLUGIN_PIPELINES": {
+      "operations": [
+        {
+          "name": "GetPluginPipelines",
+          "document": "GetPluginPipelinesDocument",
+          "result": "GetPluginPipelinesQuery",
+          "variables": "GetPluginPipelinesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/age/mutations.js#SET_MY_BIRTHDAY": {
+      "operations": [
+        {
+          "name": "setMyBirthday",
+          "document": "SetMyBirthdayDocument",
+          "result": "SetMyBirthdayMutation",
+          "variables": "SetMyBirthdayMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/age/queries.js#GET_AGE_POLICY": {
+      "operations": [
+        {
+          "name": "getAgePolicy",
+          "document": "GetAgePolicyDocument",
+          "result": "GetAgePolicyQuery",
+          "variables": "GetAgePolicyQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/age/queries.js#GET_DISCUSSION_AGE_GATE_CHECK": {
+      "operations": [
+        {
+          "name": "getDiscussionAgeGateCheck",
+          "document": "GetDiscussionAgeGateCheckDocument",
+          "result": "GetDiscussionAgeGateCheckQuery",
+          "variables": "GetDiscussionAgeGateCheckQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#SET_CHANNEL_DISCUSSION_FLAIR_CONFIG": {
+      "operations": [
+        {
+          "name": "setChannelDiscussionFlairConfig",
+          "document": "SetChannelDiscussionFlairConfigDocument",
+          "result": "SetChannelDiscussionFlairConfigMutation",
+          "variables": "SetChannelDiscussionFlairConfigMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#CREATE_CHANNEL": {
+      "operations": [
+        {
+          "name": "createChannel",
+          "document": "CreateChannelDocument",
+          "result": "CreateChannelMutation",
+          "variables": "CreateChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#UPDATE_CHANNEL": {
+      "operations": [
+        {
+          "name": "updateChannel",
+          "document": "UpdateChannelDocument",
+          "result": "UpdateChannelMutation",
+          "variables": "UpdateChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#PERMANENTLY_DELETE_CHANNEL_BANNER": {
+      "operations": [
+        {
+          "name": "permanentlyDeleteChannelBanner",
+          "document": "PermanentlyDeleteChannelBannerDocument",
+          "result": "PermanentlyDeleteChannelBannerMutation",
+          "variables": "PermanentlyDeleteChannelBannerMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#SET_CHANNEL_ICON": {
+      "operations": [
+        {
+          "name": "setChannelIcon",
+          "document": "SetChannelIconDocument",
+          "result": "SetChannelIconMutation",
+          "variables": "SetChannelIconMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#CREATE_WIKI_PAGE": {
+      "operations": [
+        {
+          "name": "createWikiPage",
+          "document": "CreateWikiPageDocument",
+          "result": "CreateWikiPageMutation",
+          "variables": "CreateWikiPageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#UPDATE_WIKI_PAGE": {
+      "operations": [
+        {
+          "name": "updateWikiPage",
+          "document": "UpdateWikiPageDocument",
+          "result": "UpdateWikiPageMutation",
+          "variables": "UpdateWikiPageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#CREATE_CHILD_WIKI_PAGE": {
+      "operations": [
+        {
+          "name": "createChildWikiPage",
+          "document": "CreateChildWikiPageDocument",
+          "result": "CreateChildWikiPageMutation",
+          "variables": "CreateChildWikiPageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#PIN_WIKI_PAGE_TO_CHANNEL": {
+      "operations": [
+        {
+          "name": "pinWikiPageToChannel",
+          "document": "PinWikiPageToChannelDocument",
+          "result": "PinWikiPageToChannelMutation",
+          "variables": "PinWikiPageToChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#UNPIN_WIKI_PAGE_FROM_CHANNEL": {
+      "operations": [
+        {
+          "name": "unpinWikiPageFromChannel",
+          "document": "UnpinWikiPageFromChannelDocument",
+          "result": "UnpinWikiPageFromChannelMutation",
+          "variables": "UnpinWikiPageFromChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#LOCK_WIKI_PAGE": {
+      "operations": [
+        {
+          "name": "lockWikiPage",
+          "document": "LockWikiPageDocument",
+          "result": "LockWikiPageMutation",
+          "variables": "LockWikiPageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#UNLOCK_WIKI_PAGE": {
+      "operations": [
+        {
+          "name": "unlockWikiPage",
+          "document": "UnlockWikiPageDocument",
+          "result": "UnlockWikiPageMutation",
+          "variables": "UnlockWikiPageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#BECOME_CHANNEL_ADMIN": {
+      "operations": [
+        {
+          "name": "becomeChannelAdmin",
+          "document": "BecomeChannelAdminDocument",
+          "result": "BecomeChannelAdminMutation",
+          "variables": "BecomeChannelAdminMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#UPDATE_CHANNEL_PLUGIN_PIPELINES": {
+      "operations": [
+        {
+          "name": "UpdateChannelPluginPipelines",
+          "document": "UpdateChannelPluginPipelinesDocument",
+          "result": "UpdateChannelPluginPipelinesMutation",
+          "variables": "UpdateChannelPluginPipelinesMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#UPDATE_CHANNEL_ENABLED_PLUGINS": {
+      "operations": [
+        {
+          "name": "UpdateChannelEnabledPlugins",
+          "document": "UpdateChannelEnabledPluginsDocument",
+          "result": "UpdateChannelEnabledPluginsMutation",
+          "variables": "UpdateChannelEnabledPluginsMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#REPORT_CHANNEL": {
+      "operations": [
+        {
+          "name": "reportChannel",
+          "document": "ReportChannelDocument",
+          "result": "ReportChannelMutation",
+          "variables": "ReportChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#LOCK_CHANNEL": {
+      "operations": [
+        {
+          "name": "lockChannel",
+          "document": "LockChannelDocument",
+          "result": "LockChannelMutation",
+          "variables": "LockChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#UNLOCK_CHANNEL": {
+      "operations": [
+        {
+          "name": "unlockChannel",
+          "document": "UnlockChannelDocument",
+          "result": "UnlockChannelMutation",
+          "variables": "UnlockChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/mutations.js#REPORT_CHANNEL_IMAGE": {
+      "operations": [
+        {
+          "name": "reportChannelImage",
+          "document": "ReportChannelImageDocument",
+          "result": "ReportChannelImageMutation",
+          "variables": "ReportChannelImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_CHANNEL_NAMES": {
+      "operations": [
+        {
+          "name": "getChannelNames",
+          "document": "GetChannelNamesDocument",
+          "result": "GetChannelNamesQuery",
+          "variables": "GetChannelNamesQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "ChannelIconFields",
+          "document": "ChannelIconFieldsFragmentDoc",
+          "result": "ChannelIconFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/channel/queries.js#GET_CHANNEL_DISCUSSION_FLAIR_CONFIG": {
+      "operations": [
+        {
+          "name": "getChannelDiscussionFlairConfig",
+          "document": "GetChannelDiscussionFlairConfigDocument",
+          "result": "GetChannelDiscussionFlairConfigQuery",
+          "variables": "GetChannelDiscussionFlairConfigQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_WIKI_PAGE": {
+      "operations": [
+        {
+          "name": "getWikiPage",
+          "document": "GetWikiPageDocument",
+          "result": "GetWikiPageQuery",
+          "variables": "GetWikiPageQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_CHANNEL": {
+      "operations": [
+        {
+          "name": "getChannel",
+          "document": "GetChannelDocument",
+          "result": "GetChannelQuery",
+          "variables": "GetChannelQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "ChannelIconFields",
+          "document": "ChannelIconFieldsFragmentDoc",
+          "result": "ChannelIconFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/channel/queries.js#GET_CHANNEL_RULES": {
+      "operations": [
+        {
+          "name": "getChannelRules",
+          "document": "GetChannelRulesDocument",
+          "result": "GetChannelRulesQuery",
+          "variables": "GetChannelRulesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_SOONEST_EVENTS_IN_CHANNEL": {
+      "operations": [
+        {
+          "name": "getEvents",
+          "document": "GetEventsDocument",
+          "result": "GetEventsQuery",
+          "variables": "GetEventsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_CHANNEL_DOWNLOAD_COUNT": {
+      "operations": [
+        {
+          "name": "getChannelDownloadCount",
+          "document": "GetChannelDownloadCountDocument",
+          "result": "GetChannelDownloadCountQuery",
+          "variables": "GetChannelDownloadCountQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_CHANNELS_DISCUSSIONS": {
+      "operations": [
+        {
+          "name": "getSortedChannelsDiscussions",
+          "document": "GetSortedChannelsDiscussionsDocument",
+          "result": "GetSortedChannelsDiscussionsQuery",
+          "variables": "GetSortedChannelsDiscussionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_CHANNELS_DOWNLOADS": {
+      "operations": [
+        {
+          "name": "getSortedChannelsDownloads",
+          "document": "GetSortedChannelsDownloadsDocument",
+          "result": "GetSortedChannelsDownloadsQuery",
+          "variables": "GetSortedChannelsDownloadsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_CHANNEL_CONTRIBUTIONS": {
+      "operations": [
+        {
+          "name": "getChannelContributions",
+          "document": "GetChannelContributionsDocument",
+          "result": "GetChannelContributionsQuery",
+          "variables": "GetChannelContributionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_USER_FAVORITE_CHANNELS": {
+      "operations": [
+        {
+          "name": "GetUserFavoriteChannels",
+          "document": "GetUserFavoriteChannelsDocument",
+          "result": "GetUserFavoriteChannelsQuery",
+          "variables": "GetUserFavoriteChannelsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_CHANNEL_PLUGIN_PIPELINES": {
+      "operations": [
+        {
+          "name": "GetChannelPluginPipelines",
+          "document": "GetChannelPluginPipelinesDocument",
+          "result": "GetChannelPluginPipelinesQuery",
+          "variables": "GetChannelPluginPipelinesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/channel/queries.js#GET_CHANNEL_PLUGIN_SETTINGS": {
+      "operations": [
+        {
+          "name": "GetChannelPluginSettings",
+          "document": "GetChannelPluginSettingsDocument",
+          "result": "GetChannelPluginSettingsQuery",
+          "variables": "GetChannelPluginSettingsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#CREATE_COLLECTION": {
+      "operations": [
+        {
+          "name": "CreateCollection",
+          "document": "CreateCollectionDocument",
+          "result": "CreateCollectionMutation",
+          "variables": "CreateCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#ADD_DISCUSSION_TO_COLLECTION": {
+      "operations": [
+        {
+          "name": "AddDiscussionToCollection",
+          "document": "AddDiscussionToCollectionDocument",
+          "result": "AddDiscussionToCollectionMutation",
+          "variables": "AddDiscussionToCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#ADD_COMMENT_TO_COLLECTION": {
+      "operations": [
+        {
+          "name": "AddCommentToCollection",
+          "document": "AddCommentToCollectionDocument",
+          "result": "AddCommentToCollectionMutation",
+          "variables": "AddCommentToCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#ADD_IMAGE_TO_COLLECTION": {
+      "operations": [
+        {
+          "name": "AddImageToCollection",
+          "document": "AddImageToCollectionDocument",
+          "result": "AddImageToCollectionMutation",
+          "variables": "AddImageToCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#ADD_CHANNEL_TO_COLLECTION": {
+      "operations": [
+        {
+          "name": "AddChannelToCollection",
+          "document": "AddChannelToCollectionDocument",
+          "result": "AddChannelToCollectionMutation",
+          "variables": "AddChannelToCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#REMOVE_DISCUSSION_FROM_COLLECTION": {
+      "operations": [
+        {
+          "name": "RemoveDiscussionFromCollection",
+          "document": "RemoveDiscussionFromCollectionDocument",
+          "result": "RemoveDiscussionFromCollectionMutation",
+          "variables": "RemoveDiscussionFromCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#REMOVE_COMMENT_FROM_COLLECTION": {
+      "operations": [
+        {
+          "name": "RemoveCommentFromCollection",
+          "document": "RemoveCommentFromCollectionDocument",
+          "result": "RemoveCommentFromCollectionMutation",
+          "variables": "RemoveCommentFromCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#REMOVE_IMAGE_FROM_COLLECTION": {
+      "operations": [
+        {
+          "name": "RemoveImageFromCollection",
+          "document": "RemoveImageFromCollectionDocument",
+          "result": "RemoveImageFromCollectionMutation",
+          "variables": "RemoveImageFromCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#REMOVE_CHANNEL_FROM_COLLECTION": {
+      "operations": [
+        {
+          "name": "RemoveChannelFromCollection",
+          "document": "RemoveChannelFromCollectionDocument",
+          "result": "RemoveChannelFromCollectionMutation",
+          "variables": "RemoveChannelFromCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#ADD_DOWNLOAD_TO_COLLECTION": {
+      "operations": [
+        {
+          "name": "AddDownloadToCollection",
+          "document": "AddDownloadToCollectionDocument",
+          "result": "AddDownloadToCollectionMutation",
+          "variables": "AddDownloadToCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#REMOVE_DOWNLOAD_FROM_COLLECTION": {
+      "operations": [
+        {
+          "name": "RemoveDownloadFromCollection",
+          "document": "RemoveDownloadFromCollectionDocument",
+          "result": "RemoveDownloadFromCollectionMutation",
+          "variables": "RemoveDownloadFromCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#UPDATE_COLLECTION": {
+      "operations": [
+        {
+          "name": "UpdateCollection",
+          "document": "UpdateCollectionDocument",
+          "result": "UpdateCollectionMutation",
+          "variables": "UpdateCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#DELETE_COLLECTION": {
+      "operations": [
+        {
+          "name": "DeleteCollection",
+          "document": "DeleteCollectionDocument",
+          "result": "DeleteCollectionMutation",
+          "variables": "DeleteCollectionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#REORDER_COLLECTION_ITEM": {
+      "operations": [
+        {
+          "name": "ReorderCollectionItem",
+          "document": "ReorderCollectionItemDocument",
+          "result": "ReorderCollectionItemMutation",
+          "variables": "ReorderCollectionItemMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/mutations.ts#SHARE_COLLECTION_AS_DISCUSSION": {
+      "operations": [
+        {
+          "name": "ShareCollectionAsDiscussion",
+          "document": "ShareCollectionAsDiscussionDocument",
+          "result": "ShareCollectionAsDiscussionMutation",
+          "variables": "ShareCollectionAsDiscussionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#GET_USER_COLLECTIONS_DISCUSSIONS": {
+      "operations": [
+        {
+          "name": "GetUserCollectionsDiscussions",
+          "document": "GetUserCollectionsDiscussionsDocument",
+          "result": "GetUserCollectionsDiscussionsQuery",
+          "variables": "GetUserCollectionsDiscussionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#GET_USER_COLLECTIONS_COMMENTS": {
+      "operations": [
+        {
+          "name": "GetUserCollectionsComments",
+          "document": "GetUserCollectionsCommentsDocument",
+          "result": "GetUserCollectionsCommentsQuery",
+          "variables": "GetUserCollectionsCommentsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#GET_USER_COLLECTIONS_IMAGES": {
+      "operations": [
+        {
+          "name": "GetUserCollectionsImages",
+          "document": "GetUserCollectionsImagesDocument",
+          "result": "GetUserCollectionsImagesQuery",
+          "variables": "GetUserCollectionsImagesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#GET_USER_COLLECTIONS_CHANNELS": {
+      "operations": [
+        {
+          "name": "GetUserCollectionsChannels",
+          "document": "GetUserCollectionsChannelsDocument",
+          "result": "GetUserCollectionsChannelsQuery",
+          "variables": "GetUserCollectionsChannelsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#GET_USER_COLLECTIONS_DOWNLOADS": {
+      "operations": [
+        {
+          "name": "GetUserCollectionsDownloads",
+          "document": "GetUserCollectionsDownloadsDocument",
+          "result": "GetUserCollectionsDownloadsQuery",
+          "variables": "GetUserCollectionsDownloadsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#GET_COLLECTION_ITEMS": {
+      "operations": [
+        {
+          "name": "GetCollectionItems",
+          "document": "GetCollectionItemsDocument",
+          "result": "GetCollectionItemsQuery",
+          "variables": "GetCollectionItemsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD": {
+      "operations": [
+        {
+          "name": "GetPublicCollectionsForDownload",
+          "document": "GetPublicCollectionsForDownloadDocument",
+          "result": "GetPublicCollectionsForDownloadQuery",
+          "variables": "GetPublicCollectionsForDownloadQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#GET_PUBLIC_COLLECTION_BY_ID": {
+      "operations": [
+        {
+          "name": "GetPublicCollectionById",
+          "document": "GetPublicCollectionByIdDocument",
+          "result": "GetPublicCollectionByIdQuery",
+          "variables": "GetPublicCollectionByIdQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#CHECK_DISCUSSION_IN_COLLECTIONS": {
+      "operations": [
+        {
+          "name": "CheckDiscussionInCollections",
+          "document": "CheckDiscussionInCollectionsDocument",
+          "result": "CheckDiscussionInCollectionsQuery",
+          "variables": "CheckDiscussionInCollectionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#CHECK_COMMENT_IN_COLLECTIONS": {
+      "operations": [
+        {
+          "name": "CheckCommentInCollections",
+          "document": "CheckCommentInCollectionsDocument",
+          "result": "CheckCommentInCollectionsQuery",
+          "variables": "CheckCommentInCollectionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#CHECK_DOWNLOAD_IN_COLLECTIONS": {
+      "operations": [
+        {
+          "name": "CheckDownloadInCollections",
+          "document": "CheckDownloadInCollectionsDocument",
+          "result": "CheckDownloadInCollectionsQuery",
+          "variables": "CheckDownloadInCollectionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#CHECK_IMAGE_IN_COLLECTIONS": {
+      "operations": [
+        {
+          "name": "CheckImageInCollections",
+          "document": "CheckImageInCollectionsDocument",
+          "result": "CheckImageInCollectionsQuery",
+          "variables": "CheckImageInCollectionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#CHECK_CHANNEL_IN_COLLECTIONS": {
+      "operations": [
+        {
+          "name": "CheckChannelInCollections",
+          "document": "CheckChannelInCollectionsDocument",
+          "result": "CheckChannelInCollectionsQuery",
+          "variables": "CheckChannelInCollectionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#GET_ALL_USER_COLLECTIONS": {
+      "operations": [
+        {
+          "name": "GetAllUserCollections",
+          "document": "GetAllUserCollectionsDocument",
+          "result": "GetAllUserCollectionsQuery",
+          "variables": "GetAllUserCollectionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/collection/queries.ts#GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS": {
+      "operations": [
+        {
+          "name": "GetUserChannelCollectionsWithChannels",
+          "document": "GetUserChannelCollectionsWithChannelsDocument",
+          "result": "GetUserChannelCollectionsWithChannelsQuery",
+          "variables": "GetUserChannelCollectionsWithChannelsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#ADD_EMOJI_TO_COMMENT": {
+      "operations": [
+        {
+          "name": "addEmojiToComment",
+          "document": "AddEmojiToCommentDocument",
+          "result": "AddEmojiToCommentMutation",
+          "variables": "AddEmojiToCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#REMOVE_EMOJI_FROM_COMMENT": {
+      "operations": [
+        {
+          "name": "removeEmojiFromComment",
+          "document": "RemoveEmojiFromCommentDocument",
+          "result": "RemoveEmojiFromCommentMutation",
+          "variables": "RemoveEmojiFromCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#UPVOTE_COMMENT": {
+      "operations": [
+        {
+          "name": "upvoteComment",
+          "document": "UpvoteCommentDocument",
+          "result": "UpvoteCommentMutation",
+          "variables": "UpvoteCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#UNDO_UPVOTE_COMMENT": {
+      "operations": [
+        {
+          "name": "undoUpvoteComment",
+          "document": "UndoUpvoteCommentDocument",
+          "result": "UndoUpvoteCommentMutation",
+          "variables": "UndoUpvoteCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#UPDATE_COMMENT": {
+      "operations": [
+        {
+          "name": "updateComment",
+          "document": "UpdateCommentDocument",
+          "result": "UpdateCommentMutation",
+          "variables": "UpdateCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#SOFT_DELETE_COMMENT": {
+      "operations": [
+        {
+          "name": "softDeleteComment",
+          "document": "SoftDeleteCommentDocument",
+          "result": "SoftDeleteCommentMutation",
+          "variables": "SoftDeleteCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#DELETE_COMMENT": {
+      "operations": [
+        {
+          "name": "deleteComment",
+          "document": "DeleteCommentDocument",
+          "result": "DeleteCommentMutation",
+          "variables": "DeleteCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#ADD_FEEDBACK_COMMENT_TO_COMMENT": {
+      "operations": [
+        {
+          "name": "addFeedbackCommentToComment",
+          "document": "AddFeedbackCommentToCommentDocument",
+          "result": "AddFeedbackCommentToCommentMutation",
+          "variables": "AddFeedbackCommentToCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/mutations.js#DELETE_COMMENT_REVISION": {
+      "operations": [
+        {
+          "name": "deleteCommentRevision",
+          "document": "DeleteCommentRevisionDocument",
+          "result": "DeleteCommentRevisionMutation",
+          "variables": "DeleteCommentRevisionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/queries.js#SEARCH_COMMENT_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "SearchCommentFields",
+          "document": "SearchCommentFieldsFragmentDoc",
+          "result": "SearchCommentFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/comment/queries.js#SEARCH_COMMENTS": {
+      "operations": [
+        {
+          "name": "searchComments",
+          "document": "SearchCommentsDocument",
+          "result": "SearchCommentsQuery",
+          "variables": "SearchCommentsQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "SearchCommentFields",
+          "document": "SearchCommentFieldsFragmentDoc",
+          "result": "SearchCommentFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/comment/queries.js#COMMENT_VOTE_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/comment/queries.js#COMMENT_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "CommentFields",
+          "document": "CommentFieldsFragmentDoc",
+          "result": "CommentFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/comment/queries.js#GET_FEEDBACK_COMMENT": {
+      "operations": [
+        {
+          "name": "getFeedbackComment",
+          "document": "GetFeedbackCommentDocument",
+          "result": "GetFeedbackCommentQuery",
+          "variables": "GetFeedbackCommentQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/queries.js#GET_ACTIVITY_FEED_COMMENT": {
+      "operations": [
+        {
+          "name": "getActivityFeedComment",
+          "document": "GetActivityFeedCommentDocument",
+          "result": "GetActivityFeedCommentQuery",
+          "variables": "GetActivityFeedCommentQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/queries.js#GET_COMMENT_ARCHIVED": {
+      "operations": [
+        {
+          "name": "getComment",
+          "document": "GetCommentSource06938535b8Document",
+          "result": "GetCommentSource06938535b8Query",
+          "variables": "GetCommentSource06938535b8QueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/queries.js#GET_FEEDBACK_ON_COMMENT": {
+      "operations": [
+        {
+          "name": "getFeedbackOnComment",
+          "document": "GetFeedbackOnCommentDocument",
+          "result": "GetFeedbackOnCommentQuery",
+          "variables": "GetFeedbackOnCommentQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/queries.js#GET_SPECIFIC_COMMENT_FEEDBACK": {
+      "operations": [
+        {
+          "name": "getSpecificCommentFeedback",
+          "document": "GetSpecificCommentFeedbackDocument",
+          "result": "GetSpecificCommentFeedbackQuery",
+          "variables": "GetSpecificCommentFeedbackQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/fragments.ts#UPDATED_ANSWERS_FRAGMENT": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "UpdatedAnswers",
+          "document": "UpdatedAnswersFragmentDoc",
+          "result": "UpdatedAnswersFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/mutations.js#CREATE_SIGNED_STORAGE_URL": {
+      "operations": [
+        {
+          "name": "createSignedURL",
+          "document": "CreateSignedUrlDocument",
+          "result": "CreateSignedUrlMutation",
+          "variables": "CreateSignedUrlMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#CREATE_IMAGE": {
+      "operations": [
+        {
+          "name": "createImage",
+          "document": "CreateImageDocument",
+          "result": "CreateImageMutation",
+          "variables": "CreateImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#CREATE_DOWNLOADABLE_FILE": {
+      "operations": [
+        {
+          "name": "createDownloadableFile",
+          "document": "CreateDownloadableFileDocument",
+          "result": "CreateDownloadableFileMutation",
+          "variables": "CreateDownloadableFileMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#PREPARE_DOWNLOAD": {
+      "operations": [
+        {
+          "name": "prepareDownload",
+          "document": "PrepareDownloadDocument",
+          "result": "PrepareDownloadMutation",
+          "variables": "PrepareDownloadMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#RETRY_DOWNLOADABLE_FILE_SCAN": {
+      "operations": [
+        {
+          "name": "retryDownloadableFileScan",
+          "document": "RetryDownloadableFileScanDocument",
+          "result": "RetryDownloadableFileScanMutation",
+          "variables": "RetryDownloadableFileScanMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#REQUEST_DOWNLOADABLE_FILE_REVIEW": {
+      "operations": [
+        {
+          "name": "requestDownloadableFileReview",
+          "document": "RequestDownloadableFileReviewDocument",
+          "result": "RequestDownloadableFileReviewMutation",
+          "variables": "RequestDownloadableFileReviewMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#CLEAR_DOWNLOADABLE_FILE_SCAN": {
+      "operations": [
+        {
+          "name": "clearDownloadableFileScan",
+          "document": "ClearDownloadableFileScanDocument",
+          "result": "ClearDownloadableFileScanMutation",
+          "variables": "ClearDownloadableFileScanMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#PERMANENTLY_DELETE_IMAGE": {
+      "operations": [
+        {
+          "name": "permanentlyDeleteImage",
+          "document": "PermanentlyDeleteImageDocument",
+          "result": "PermanentlyDeleteImageMutation",
+          "variables": "PermanentlyDeleteImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#PERMANENTLY_DELETE_DOWNLOADABLE_FILE": {
+      "operations": [
+        {
+          "name": "permanentlyDeleteDownloadableFile",
+          "document": "PermanentlyDeleteDownloadableFileDocument",
+          "result": "PermanentlyDeleteDownloadableFileMutation",
+          "variables": "PermanentlyDeleteDownloadableFileMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS": {
+      "operations": [
+        {
+          "name": "updateDownloadableFileSupportSettings",
+          "document": "UpdateDownloadableFileSupportSettingsDocument",
+          "result": "UpdateDownloadableFileSupportSettingsMutation",
+          "variables": "UpdateDownloadableFileSupportSettingsMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#ADD_EMOJI_TO_DISCUSSION_CHANNEL": {
+      "operations": [
+        {
+          "name": "addEmojiToDiscussionChannel",
+          "document": "AddEmojiToDiscussionChannelDocument",
+          "result": "AddEmojiToDiscussionChannelMutation",
+          "variables": "AddEmojiToDiscussionChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL": {
+      "operations": [
+        {
+          "name": "removeEmojiFromDiscussionChannel",
+          "document": "RemoveEmojiFromDiscussionChannelDocument",
+          "result": "RemoveEmojiFromDiscussionChannelMutation",
+          "variables": "RemoveEmojiFromDiscussionChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS": {
+      "operations": [
+        {
+          "name": "createDiscussion",
+          "document": "CreateDiscussionDocument",
+          "result": "CreateDiscussionMutation",
+          "variables": "CreateDiscussionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UPDATE_DISCUSSION": {
+      "operations": [
+        {
+          "name": "updateDiscussion",
+          "document": "UpdateDiscussionDocument",
+          "result": "UpdateDiscussionMutation",
+          "variables": "UpdateDiscussionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS": {
+      "operations": [
+        {
+          "name": "updateDiscussionWithChannelConnections",
+          "document": "UpdateDiscussionWithChannelConnectionsDocument",
+          "result": "UpdateDiscussionWithChannelConnectionsMutation",
+          "variables": "UpdateDiscussionWithChannelConnectionsMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#DELETE_DISCUSSION": {
+      "operations": [
+        {
+          "name": "deleteDiscussion",
+          "document": "DeleteDiscussionDocument",
+          "result": "DeleteDiscussionMutation",
+          "variables": "DeleteDiscussionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UPVOTE_DISCUSSION_CHANNEL": {
+      "operations": [
+        {
+          "name": "upvoteDiscussionChannel",
+          "document": "UpvoteDiscussionChannelDocument",
+          "result": "UpvoteDiscussionChannelMutation",
+          "variables": "UpvoteDiscussionChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UNDO_UPVOTE_DISCUSSION_CHANNEL": {
+      "operations": [
+        {
+          "name": "undoUpvoteDiscussionChannel",
+          "document": "UndoUpvoteDiscussionChannelDocument",
+          "result": "UndoUpvoteDiscussionChannelMutation",
+          "variables": "UndoUpvoteDiscussionChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#ADD_FEEDBACK_COMMENT_TO_DISCUSSION": {
+      "operations": [
+        {
+          "name": "addFeedbackCommentToDiscussion",
+          "document": "AddFeedbackCommentToDiscussionDocument",
+          "result": "AddFeedbackCommentToDiscussionMutation",
+          "variables": "AddFeedbackCommentToDiscussionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#MARK_AS_ANSWERED": {
+      "operations": [
+        {
+          "name": "markAsAnswered",
+          "document": "MarkAsAnsweredDocument",
+          "result": "MarkAsAnsweredMutation",
+          "variables": "MarkAsAnsweredMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#MARK_AS_ANSWERED_BY_COMMENT": {
+      "operations": [
+        {
+          "name": "markAsAnswered",
+          "document": "MarkAsAnsweredSource68ece8b51cDocument",
+          "result": "MarkAsAnsweredSource68ece8b51cMutation",
+          "variables": "MarkAsAnsweredSource68ece8b51cMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#MARK_AS_UNANSWERED": {
+      "operations": [
+        {
+          "name": "markAsUnAnswered",
+          "document": "MarkAsUnAnsweredDocument",
+          "result": "MarkAsUnAnsweredMutation",
+          "variables": "MarkAsUnAnsweredMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UNMARK_COMMENT_AS_ANSWER": {
+      "operations": [
+        {
+          "name": "unmarkCommentAsAnswer",
+          "document": "UnmarkCommentAsAnswerDocument",
+          "result": "UnmarkCommentAsAnswerMutation",
+          "variables": "UnmarkCommentAsAnswerMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UPDATE_IMAGE": {
+      "operations": [
+        {
+          "name": "updateImage",
+          "document": "UpdateImageDocument",
+          "result": "UpdateImageMutation",
+          "variables": "UpdateImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UPDATE_IMAGE_METADATA": {
+      "operations": [
+        {
+          "name": "updateImageMetadata",
+          "document": "UpdateImageMetadataDocument",
+          "result": "UpdateImageMetadataMutation",
+          "variables": "UpdateImageMetadataMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#DELETE_DISCUSSION_BODY_REVISION": {
+      "operations": [
+        {
+          "name": "deleteDiscussionBodyRevision",
+          "document": "DeleteDiscussionBodyRevisionDocument",
+          "result": "DeleteDiscussionBodyRevisionMutation",
+          "variables": "DeleteDiscussionBodyRevisionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#DELETE_WIKI_REVISION": {
+      "operations": [
+        {
+          "name": "deleteWikiRevision",
+          "document": "DeleteWikiRevisionDocument",
+          "result": "DeleteWikiRevisionMutation",
+          "variables": "DeleteWikiRevisionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#SUBSCRIBE_TO_DISCUSSION_CHANNEL": {
+      "operations": [
+        {
+          "name": "subscribeToDiscussionChannel",
+          "document": "SubscribeToDiscussionChannelDocument",
+          "result": "SubscribeToDiscussionChannelMutation",
+          "variables": "SubscribeToDiscussionChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL": {
+      "operations": [
+        {
+          "name": "unsubscribeFromDiscussionChannel",
+          "document": "UnsubscribeFromDiscussionChannelDocument",
+          "result": "UnsubscribeFromDiscussionChannelMutation",
+          "variables": "UnsubscribeFromDiscussionChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UPDATE_DISCUSSION_SENSITIVE_CONTENT": {
+      "operations": [
+        {
+          "name": "updateDiscussionSensitiveContent",
+          "document": "UpdateDiscussionSensitiveContentDocument",
+          "result": "UpdateDiscussionSensitiveContentMutation",
+          "variables": "UpdateDiscussionSensitiveContentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UPDATE_DISCUSSION_CHANNEL_LABELS": {
+      "operations": [
+        {
+          "name": "updateDiscussionChannelLabels",
+          "document": "UpdateDiscussionChannelLabelsDocument",
+          "result": "UpdateDiscussionChannelLabelsMutation",
+          "variables": "UpdateDiscussionChannelLabelsMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/mutations.js#UPDATE_DOWNLOAD_LABELS": {
+      "operations": [
+        {
+          "name": "updateDownloadLabels",
+          "document": "UpdateDownloadLabelsDocument",
+          "result": "UpdateDownloadLabelsMutation",
+          "variables": "UpdateDownloadLabelsMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/queries.js#DISCUSSION_FLAIR_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "DiscussionFlairFields",
+          "document": "DiscussionFlairFieldsFragmentDoc",
+          "result": "DiscussionFlairFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#CROSSPOST_PREVIEW_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "CrosspostPreviewFields",
+          "document": "CrosspostPreviewFieldsFragmentDoc",
+          "result": "CrosspostPreviewFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#SHARED_COLLECTION_PREVIEW_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "SharedCollectionPreviewFields",
+          "document": "SharedCollectionPreviewFieldsFragmentDoc",
+          "result": "SharedCollectionPreviewFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA": {
+      "operations": [
+        {
+          "name": "getDiscussionsInChannel",
+          "document": "GetDiscussionsInChannelDocument",
+          "result": "GetDiscussionsInChannelQuery",
+          "variables": "GetDiscussionsInChannelQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "DiscussionFlairFields",
+          "document": "DiscussionFlairFieldsFragmentDoc",
+          "result": "DiscussionFlairFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#GET_SITE_WIDE_DISCUSSION_LIST": {
+      "operations": [
+        {
+          "name": "getSiteWideDiscussionList",
+          "document": "GetSiteWideDiscussionListDocument",
+          "result": "GetSiteWideDiscussionListQuery",
+          "variables": "GetSiteWideDiscussionListQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "DiscussionFlairFields",
+          "document": "DiscussionFlairFieldsFragmentDoc",
+          "result": "DiscussionFlairFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#IS_DISCUSSION_ANSWERED": {
+      "operations": [
+        {
+          "name": "isDiscussionAnswered",
+          "document": "IsDiscussionAnsweredDocument",
+          "result": "IsDiscussionAnsweredQuery",
+          "variables": "IsDiscussionAnsweredQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/queries.js#DISCUSSION_DETAIL_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "DiscussionDetailFields",
+          "document": "DiscussionDetailFieldsFragmentDoc",
+          "result": "DiscussionDetailFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CrosspostPreviewFields",
+          "document": "CrosspostPreviewFieldsFragmentDoc",
+          "result": "CrosspostPreviewFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "SharedCollectionPreviewFields",
+          "document": "SharedCollectionPreviewFieldsFragmentDoc",
+          "result": "SharedCollectionPreviewFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "DiscussionFlairFields",
+          "document": "DiscussionFlairFieldsFragmentDoc",
+          "result": "DiscussionFlairFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#GET_DISCUSSION_DETAIL_IMAGES_PAGE": {
+      "operations": [
+        {
+          "name": "getDiscussionDetailImagesPage",
+          "document": "GetDiscussionDetailImagesPageDocument",
+          "result": "GetDiscussionDetailImagesPageQuery",
+          "variables": "GetDiscussionDetailImagesPageQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/queries.js#GET_DISCUSSION_DETAIL_FILES_PAGE": {
+      "operations": [
+        {
+          "name": "getDiscussionDetailFilesPage",
+          "document": "GetDiscussionDetailFilesPageDocument",
+          "result": "GetDiscussionDetailFilesPageQuery",
+          "variables": "GetDiscussionDetailFilesPageQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/queries.js#GET_DISCUSSION_ACTIVITY": {
+      "operations": [
+        {
+          "name": "getDiscussionActivity",
+          "document": "GetDiscussionActivityDocument",
+          "result": "GetDiscussionActivityQuery",
+          "variables": "GetDiscussionActivityQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/queries.js#GET_ISSUE_RELATED_DISCUSSION": {
+      "operations": [
+        {
+          "name": "getIssueRelatedDiscussion",
+          "document": "GetIssueRelatedDiscussionDocument",
+          "result": "GetIssueRelatedDiscussionQuery",
+          "variables": "GetIssueRelatedDiscussionQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#GET_DOWNLOAD_ACTIVITY": {
+      "operations": [
+        {
+          "name": "getDownloadActivity",
+          "document": "GetDownloadActivityDocument",
+          "result": "GetDownloadActivityQuery",
+          "variables": "GetDownloadActivityQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/queries.js#GET_CROSSPOST_PREVIEW": {
+      "operations": [
+        {
+          "name": "getCrosspostPreview",
+          "document": "GetCrosspostPreviewDocument",
+          "result": "GetCrosspostPreviewQuery",
+          "variables": "GetCrosspostPreviewQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "CrosspostPreviewFields",
+          "document": "CrosspostPreviewFieldsFragmentDoc",
+          "result": "CrosspostPreviewFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#GET_DISCUSSION_FEEDBACK": {
+      "operations": [
+        {
+          "name": "getDiscussionFeedback",
+          "document": "GetDiscussionFeedbackDocument",
+          "result": "GetDiscussionFeedbackQuery",
+          "variables": "GetDiscussionFeedbackQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "CrosspostPreviewFields",
+          "document": "CrosspostPreviewFieldsFragmentDoc",
+          "result": "CrosspostPreviewFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/discussion/queries.js#GET_SPECIFIC_DISCUSSION_FEEDBACK": {
+      "operations": [
+        {
+          "name": "getSpecificDiscussionFeedback",
+          "document": "GetSpecificDiscussionFeedbackDocument",
+          "result": "GetSpecificDiscussionFeedbackQuery",
+          "variables": "GetSpecificDiscussionFeedbackQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/discussion/queries.js#GET_DOWNLOAD_LABELS": {
+      "operations": [
+        {
+          "name": "getDownloadLabels",
+          "document": "GetDownloadLabelsDocument",
+          "result": "GetDownloadLabelsQuery",
+          "variables": "GetDownloadLabelsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/email/mutations.js#CREATE_EMAIL_AND_USER": {
+      "operations": [
+        {
+          "name": "createEmailAndUser",
+          "document": "CreateEmailAndUserDocument",
+          "result": "CreateEmailAndUserMutation",
+          "variables": "CreateEmailAndUserMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/email/mutations.js#SEND_BUG_REPORT": {
+      "operations": [
+        {
+          "name": "sendBugReport",
+          "document": "SendBugReportDocument",
+          "result": "SendBugReportMutation",
+          "variables": "SendBugReportMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/email/queries.js#GET_OWN_EMAIL": {
+      "operations": [
+        {
+          "name": "getOwnEmail",
+          "document": "GetOwnEmailDocument",
+          "result": "GetOwnEmailQuery",
+          "variables": "GetOwnEmailQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/mutations.js#CREATE_EVENT_WITH_CHANNEL_CONNECTIONS": {
+      "operations": [
+        {
+          "name": "createEvent",
+          "document": "CreateEventDocument",
+          "result": "CreateEventMutation",
+          "variables": "CreateEventMutationVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "EventFields",
+          "document": "EventFieldsFragmentDoc",
+          "result": "EventFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/event/mutations.js#CREATE_EVENT_SERIES_WITH_CHANNEL_CONNECTIONS": {
+      "operations": [
+        {
+          "name": "createEventSeries",
+          "document": "CreateEventSeriesDocument",
+          "result": "CreateEventSeriesMutation",
+          "variables": "CreateEventSeriesMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/mutations.js#UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS": {
+      "operations": [
+        {
+          "name": "updateEvents",
+          "document": "UpdateEventsDocument",
+          "result": "UpdateEventsMutation",
+          "variables": "UpdateEventsMutationVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "EventFields",
+          "document": "EventFieldsFragmentDoc",
+          "result": "EventFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/event/mutations.js#UPDATE_EVENT_IN_SERIES": {
+      "operations": [
+        {
+          "name": "updateEventInSeries",
+          "document": "UpdateEventInSeriesDocument",
+          "result": "UpdateEventInSeriesMutation",
+          "variables": "UpdateEventInSeriesMutationVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "EventFields",
+          "document": "EventFieldsFragmentDoc",
+          "result": "EventFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/event/mutations.js#CANCEL_EVENT": {
+      "operations": [
+        {
+          "name": "cancelEvent",
+          "document": "CancelEventDocument",
+          "result": "CancelEventMutation",
+          "variables": "CancelEventMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/mutations.js#DELETE_EVENT": {
+      "operations": [
+        {
+          "name": "deleteEvent",
+          "document": "DeleteEventDocument",
+          "result": "DeleteEventMutation",
+          "variables": "DeleteEventMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/mutations.js#DELETE_EVENT_IN_SERIES": {
+      "operations": [
+        {
+          "name": "deleteEventInSeries",
+          "document": "DeleteEventInSeriesDocument",
+          "result": "DeleteEventInSeriesMutation",
+          "variables": "DeleteEventInSeriesMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/mutations.js#ADD_FEEDBACK_COMMENT_TO_EVENT": {
+      "operations": [
+        {
+          "name": "addFeedbackCommentToEvent",
+          "document": "AddFeedbackCommentToEventDocument",
+          "result": "AddFeedbackCommentToEventMutation",
+          "variables": "AddFeedbackCommentToEventMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/mutations.js#SUBSCRIBE_TO_EVENT": {
+      "operations": [
+        {
+          "name": "subscribeToEvent",
+          "document": "SubscribeToEventDocument",
+          "result": "SubscribeToEventMutation",
+          "variables": "SubscribeToEventMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/mutations.js#UNSUBSCRIBE_FROM_EVENT": {
+      "operations": [
+        {
+          "name": "unsubscribeFromEvent",
+          "document": "UnsubscribeFromEventDocument",
+          "result": "UnsubscribeFromEventMutation",
+          "variables": "UnsubscribeFromEventMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/mutations.js#SUBSCRIBE_TO_EVENT_UPDATES": {
+      "operations": [
+        {
+          "name": "subscribeToEventUpdates",
+          "document": "SubscribeToEventUpdatesDocument",
+          "result": "SubscribeToEventUpdatesMutation",
+          "variables": "SubscribeToEventUpdatesMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/mutations.js#UNSUBSCRIBE_FROM_EVENT_UPDATES": {
+      "operations": [
+        {
+          "name": "unsubscribeFromEventUpdates",
+          "document": "UnsubscribeFromEventUpdatesDocument",
+          "result": "UnsubscribeFromEventUpdatesMutation",
+          "variables": "UnsubscribeFromEventUpdatesMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/mutations.js#DELETE_EVENT_DESCRIPTION_REVISION": {
+      "operations": [
+        {
+          "name": "deleteEventDescriptionRevision",
+          "document": "DeleteEventDescriptionRevisionDocument",
+          "result": "DeleteEventDescriptionRevisionMutation",
+          "variables": "DeleteEventDescriptionRevisionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/queries.js#EVENT_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "EventFields",
+          "document": "EventFieldsFragmentDoc",
+          "result": "EventFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/event/queries.js#GET_EVENTS": {
+      "operations": [
+        {
+          "name": "getEvents",
+          "document": "GetEventsSourcef3f666cbeeDocument",
+          "result": "GetEventsSourcef3f666cbeeQuery",
+          "variables": "GetEventsSourcef3f666cbeeQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "EventFields",
+          "document": "EventFieldsFragmentDoc",
+          "result": "EventFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/event/queries.js#GET_EVENT_FEEDBACK": {
+      "operations": [
+        {
+          "name": "getEventFeedback",
+          "document": "GetEventFeedbackDocument",
+          "result": "GetEventFeedbackQuery",
+          "variables": "GetEventFeedbackQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/fragments.js#AUTHOR_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "AuthorFields",
+          "document": "AuthorFieldsFragmentDoc",
+          "result": "AuthorFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/fragments.js#CHANNEL_ICON_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "ChannelIconFields",
+          "document": "ChannelIconFieldsFragmentDoc",
+          "result": "ChannelIconFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/image/mutations.js#ADD_IMAGE_TO_ALBUM": {
+      "operations": [
+        {
+          "name": "AddImageToAlbum",
+          "document": "AddImageToAlbumDocument",
+          "result": "AddImageToAlbumMutation",
+          "variables": "AddImageToAlbumMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/mutations.js#REMOVE_IMAGE_FROM_ALBUM": {
+      "operations": [
+        {
+          "name": "RemoveImageFromAlbum",
+          "document": "RemoveImageFromAlbumDocument",
+          "result": "RemoveImageFromAlbumMutation",
+          "variables": "RemoveImageFromAlbumMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_IMAGE_DETAILS": {
+      "operations": [
+        {
+          "name": "GetImageDetails",
+          "document": "GetImageDetailsDocument",
+          "result": "GetImageDetailsQuery",
+          "variables": "GetImageDetailsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_ALBUM_DETAILS": {
+      "operations": [
+        {
+          "name": "GetAlbumDetails",
+          "document": "GetAlbumDetailsDocument",
+          "result": "GetAlbumDetailsQuery",
+          "variables": "GetAlbumDetailsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_USER_ALBUMS": {
+      "operations": [
+        {
+          "name": "GetUserAlbums",
+          "document": "GetUserAlbumsDocument",
+          "result": "GetUserAlbumsQuery",
+          "variables": "GetUserAlbumsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_USER_ALBUMS_FOR_IMAGE_SAVE": {
+      "operations": [
+        {
+          "name": "GetUserAlbumsForImageSave",
+          "document": "GetUserAlbumsForImageSaveDocument",
+          "result": "GetUserAlbumsForImageSaveQuery",
+          "variables": "GetUserAlbumsForImageSaveQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_USER_IMAGES": {
+      "operations": [
+        {
+          "name": "GetUserImages",
+          "document": "GetUserImagesDocument",
+          "result": "GetUserImagesQuery",
+          "variables": "GetUserImagesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_REUSABLE_USER_IMAGES": {
+      "operations": [
+        {
+          "name": "GetReusableUserImages",
+          "document": "GetReusableUserImagesDocument",
+          "result": "GetReusableUserImagesQuery",
+          "variables": "GetReusableUserImagesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_REUSABLE_FAVORITE_IMAGES": {
+      "operations": [
+        {
+          "name": "GetReusableFavoriteImages",
+          "document": "GetReusableFavoriteImagesDocument",
+          "result": "GetReusableFavoriteImagesQuery",
+          "variables": "GetReusableFavoriteImagesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_REUSABLE_IMAGE_COLLECTIONS": {
+      "operations": [
+        {
+          "name": "GetReusableImageCollections",
+          "document": "GetReusableImageCollectionsDocument",
+          "result": "GetReusableImageCollectionsQuery",
+          "variables": "GetReusableImageCollectionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_REUSABLE_COLLECTION_IMAGES": {
+      "operations": [
+        {
+          "name": "GetReusableCollectionImages",
+          "document": "GetReusableCollectionImagesDocument",
+          "result": "GetReusableCollectionImagesQuery",
+          "variables": "GetReusableCollectionImagesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#CREATE_ISSUE": {
+      "operations": [
+        {
+          "name": "createIssue",
+          "document": "CreateIssueDocument",
+          "result": "CreateIssueMutation",
+          "variables": "CreateIssueMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#CLOSE_ISSUE": {
+      "operations": [
+        {
+          "name": "closeIssue",
+          "document": "CloseIssueDocument",
+          "result": "CloseIssueMutation",
+          "variables": "CloseIssueMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#REOPEN_ISSUE": {
+      "operations": [
+        {
+          "name": "reopenIssue",
+          "document": "ReopenIssueDocument",
+          "result": "ReopenIssueMutation",
+          "variables": "ReopenIssueMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#UPDATE_ISSUE": {
+      "operations": [
+        {
+          "name": "updateIssue",
+          "document": "UpdateIssueDocument",
+          "result": "UpdateIssueMutation",
+          "variables": "UpdateIssueMutationVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "IssueFields",
+          "document": "IssueFieldsFragmentDoc",
+          "result": "IssueFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "IssueBaseFields",
+          "document": "IssueBaseFieldsFragmentDoc",
+          "result": "IssueBaseFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/issue/mutations.js#SUBSCRIBE_TO_ISSUE": {
+      "operations": [
+        {
+          "name": "subscribeToIssue",
+          "document": "SubscribeToIssueDocument",
+          "result": "SubscribeToIssueMutation",
+          "variables": "SubscribeToIssueMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#UNSUBSCRIBE_FROM_ISSUE": {
+      "operations": [
+        {
+          "name": "unsubscribeFromIssue",
+          "document": "UnsubscribeFromIssueDocument",
+          "result": "UnsubscribeFromIssueMutation",
+          "variables": "UnsubscribeFromIssueMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#ADD_ISSUE_ACTIVITY_FEED_ITEM": {
+      "operations": [
+        {
+          "name": "addIssueActivityFeedItem",
+          "document": "AddIssueActivityFeedItemDocument",
+          "result": "AddIssueActivityFeedItemMutation",
+          "variables": "AddIssueActivityFeedItemMutationVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "IssueFields",
+          "document": "IssueFieldsFragmentDoc",
+          "result": "IssueFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "IssueBaseFields",
+          "document": "IssueBaseFieldsFragmentDoc",
+          "result": "IssueBaseFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/issue/mutations.js#ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD": {
+      "operations": [
+        {
+          "name": "addIssueActivityFeedItemWithCommentAsMod",
+          "document": "AddIssueActivityFeedItemWithCommentAsModDocument",
+          "result": "AddIssueActivityFeedItemWithCommentAsModMutation",
+          "variables": "AddIssueActivityFeedItemWithCommentAsModMutationVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "IssueFields",
+          "document": "IssueFieldsFragmentDoc",
+          "result": "IssueFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "IssueBaseFields",
+          "document": "IssueBaseFieldsFragmentDoc",
+          "result": "IssueBaseFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/issue/mutations.js#ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER": {
+      "operations": [
+        {
+          "name": "addIssueActivityFeedItemWithCommentAsUser",
+          "document": "AddIssueActivityFeedItemWithCommentAsUserDocument",
+          "result": "AddIssueActivityFeedItemWithCommentAsUserMutation",
+          "variables": "AddIssueActivityFeedItemWithCommentAsUserMutationVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "IssueFields",
+          "document": "IssueFieldsFragmentDoc",
+          "result": "IssueFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "IssueBaseFields",
+          "document": "IssueBaseFieldsFragmentDoc",
+          "result": "IssueBaseFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/issue/mutations.js#REPORT_DISCUSSION": {
+      "operations": [
+        {
+          "name": "reportDiscussion",
+          "document": "ReportDiscussionDocument",
+          "result": "ReportDiscussionMutation",
+          "variables": "ReportDiscussionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#ARCHIVE_DISCUSSION": {
+      "operations": [
+        {
+          "name": "archiveDiscussion",
+          "document": "ArchiveDiscussionDocument",
+          "result": "ArchiveDiscussionMutation",
+          "variables": "ArchiveDiscussionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#UNARCHIVE_DISCUSSION": {
+      "operations": [
+        {
+          "name": "unarchiveDiscussion",
+          "document": "UnarchiveDiscussionDocument",
+          "result": "UnarchiveDiscussionMutation",
+          "variables": "UnarchiveDiscussionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#REPORT_EVENT": {
+      "operations": [
+        {
+          "name": "reportEvent",
+          "document": "ReportEventDocument",
+          "result": "ReportEventMutation",
+          "variables": "ReportEventMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#UNARCHIVE_EVENT": {
+      "operations": [
+        {
+          "name": "unarchiveEvent",
+          "document": "UnarchiveEventDocument",
+          "result": "UnarchiveEventMutation",
+          "variables": "UnarchiveEventMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#ARCHIVE_EVENT": {
+      "operations": [
+        {
+          "name": "archiveEvent",
+          "document": "ArchiveEventDocument",
+          "result": "ArchiveEventMutation",
+          "variables": "ArchiveEventMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#REPORT_COMMENT": {
+      "operations": [
+        {
+          "name": "reportComment",
+          "document": "ReportCommentDocument",
+          "result": "ReportCommentMutation",
+          "variables": "ReportCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#REPORT_WIKI_EDIT": {
+      "operations": [
+        {
+          "name": "reportWikiEdit",
+          "document": "ReportWikiEditDocument",
+          "result": "ReportWikiEditMutation",
+          "variables": "ReportWikiEditMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#ARCHIVE_COMMENT": {
+      "operations": [
+        {
+          "name": "archiveComment",
+          "document": "ArchiveCommentDocument",
+          "result": "ArchiveCommentMutation",
+          "variables": "ArchiveCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#UNARCHIVE_COMMENT": {
+      "operations": [
+        {
+          "name": "unarchiveComment",
+          "document": "UnarchiveCommentDocument",
+          "result": "UnarchiveCommentMutation",
+          "variables": "UnarchiveCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#LOCK_ISSUE": {
+      "operations": [
+        {
+          "name": "lockIssue",
+          "document": "LockIssueDocument",
+          "result": "LockIssueMutation",
+          "variables": "LockIssueMutationVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "IssueFields",
+          "document": "IssueFieldsFragmentDoc",
+          "result": "IssueFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "IssueBaseFields",
+          "document": "IssueBaseFieldsFragmentDoc",
+          "result": "IssueBaseFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/issue/mutations.js#UNLOCK_ISSUE": {
+      "operations": [
+        {
+          "name": "unlockIssue",
+          "document": "UnlockIssueDocument",
+          "result": "UnlockIssueMutation",
+          "variables": "UnlockIssueMutationVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "IssueFields",
+          "document": "IssueFieldsFragmentDoc",
+          "result": "IssueFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "IssueBaseFields",
+          "document": "IssueBaseFieldsFragmentDoc",
+          "result": "IssueBaseFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/issue/mutations.js#REPORT_IMAGE": {
+      "operations": [
+        {
+          "name": "reportImage",
+          "document": "ReportImageDocument",
+          "result": "ReportImageMutation",
+          "variables": "ReportImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#REPORT_PROFILE_PICTURE": {
+      "operations": [
+        {
+          "name": "reportProfilePicture",
+          "document": "ReportProfilePictureDocument",
+          "result": "ReportProfilePictureMutation",
+          "variables": "ReportProfilePictureMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#ARCHIVE_IMAGE": {
+      "operations": [
+        {
+          "name": "archiveImage",
+          "document": "ArchiveImageDocument",
+          "result": "ArchiveImageMutation",
+          "variables": "ArchiveImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#UNARCHIVE_IMAGE": {
+      "operations": [
+        {
+          "name": "unarchiveImage",
+          "document": "UnarchiveImageDocument",
+          "result": "UnarchiveImageMutation",
+          "variables": "UnarchiveImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/mutations.js#PERMANENTLY_REMOVE_IMAGE": {
+      "operations": [
+        {
+          "name": "permanentlyRemoveImage",
+          "document": "PermanentlyRemoveImageDocument",
+          "result": "PermanentlyRemoveImageMutation",
+          "variables": "PermanentlyRemoveImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/queries.js#ISSUE_BASE_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "IssueBaseFields",
+          "document": "IssueBaseFieldsFragmentDoc",
+          "result": "IssueBaseFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/issue/queries.js#ISSUE_FIELDS": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "IssueFields",
+          "document": "IssueFieldsFragmentDoc",
+          "result": "IssueFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "IssueBaseFields",
+          "document": "IssueBaseFieldsFragmentDoc",
+          "result": "IssueBaseFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/issue/queries.js#GET_ISSUE": {
+      "operations": [
+        {
+          "name": "getIssue",
+          "document": "GetIssueDocument",
+          "result": "GetIssueQuery",
+          "variables": "GetIssueQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "IssueBaseFields",
+          "document": "IssueBaseFieldsFragmentDoc",
+          "result": "IssueBaseFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/issue/queries.js#GET_ISSUE_ACTIVITY": {
+      "operations": [
+        {
+          "name": "getIssueActivity",
+          "document": "GetIssueActivityDocument",
+          "result": "GetIssueActivityQuery",
+          "variables": "GetIssueActivityQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/issue/queries.js#CHECK_DISCUSSION_ISSUE_EXISTENCE": {
+      "operations": [
+        {
+          "name": "getIssue",
+          "document": "GetIssueSource3f1ebf796bDocument",
+          "result": "GetIssueSource3f1ebf796bQuery",
+          "variables": "GetIssueSource3f1ebf796bQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/queries.js#CHECK_EVENT_ISSUE_EXISTENCE": {
+      "operations": [
+        {
+          "name": "getIssue",
+          "document": "GetIssueSource003ac8783fDocument",
+          "result": "GetIssueSource003ac8783fQuery",
+          "variables": "GetIssueSource003ac8783fQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/queries.js#CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE": {
+      "operations": [
+        {
+          "name": "getDiscussionCommentIssue",
+          "document": "GetDiscussionCommentIssueDocument",
+          "result": "GetDiscussionCommentIssueQuery",
+          "variables": "GetDiscussionCommentIssueQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/queries.js#GET_ISSUES": {
+      "operations": [
+        {
+          "name": "getIssues",
+          "document": "GetIssuesDocument",
+          "result": "GetIssuesQuery",
+          "variables": "GetIssuesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/queries.js#GET_SITE_WIDE_ISSUE_LIST": {
+      "operations": [
+        {
+          "name": "getSiteWideIssueList",
+          "document": "GetSiteWideIssueListDocument",
+          "result": "GetSiteWideIssueListQuery",
+          "variables": "GetSiteWideIssueListQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/queries.js#GET_CLOSED_ISSUES": {
+      "operations": [
+        {
+          "name": "getClosedIssues",
+          "document": "GetClosedIssuesDocument",
+          "result": "GetClosedIssuesQuery",
+          "variables": "GetClosedIssuesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/queries.js#GET_CHANNEL_REPORTS": {
+      "operations": [
+        {
+          "name": "getChannelReports",
+          "document": "GetChannelReportsDocument",
+          "result": "GetChannelReportsQuery",
+          "variables": "GetChannelReportsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/queries.js#GET_IMAGE_REPORTS": {
+      "operations": [
+        {
+          "name": "getImageReports",
+          "document": "GetImageReportsDocument",
+          "result": "GetImageReportsQuery",
+          "variables": "GetImageReportsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/issue/queries.js#GET_SERVER_ISSUE": {
+      "operations": [
+        {
+          "name": "getServerIssue",
+          "document": "GetServerIssueDocument",
+          "result": "GetServerIssueQuery",
+          "variables": "GetServerIssueQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "IssueBaseFields",
+          "document": "IssueBaseFieldsFragmentDoc",
+          "result": "IssueBaseFieldsFragment",
+          "variables": "unknown"
+        },
+        {
+          "name": "CommentVoteFields",
+          "document": "CommentVoteFieldsFragmentDoc",
+          "result": "CommentVoteFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/library/favoriteQueries.ts#GET_USER_FAVORITE_COMMENTS": {
+      "operations": [
+        {
+          "name": "getUserFavoriteComments",
+          "document": "GetUserFavoriteCommentsDocument",
+          "result": "GetUserFavoriteCommentsQuery",
+          "variables": "GetUserFavoriteCommentsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/library/favoriteQueries.ts#GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS": {
+      "operations": [
+        {
+          "name": "getUserFavoriteDiscussionsNoDownloads",
+          "document": "GetUserFavoriteDiscussionsNoDownloadsDocument",
+          "result": "GetUserFavoriteDiscussionsNoDownloadsQuery",
+          "variables": "GetUserFavoriteDiscussionsNoDownloadsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/library/favoriteQueries.ts#GET_USER_FAVORITE_DOWNLOADS": {
+      "operations": [
+        {
+          "name": "getUserFavoriteDownloads",
+          "document": "GetUserFavoriteDownloadsDocument",
+          "result": "GetUserFavoriteDownloadsQuery",
+          "variables": "GetUserFavoriteDownloadsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/library/favoriteQueries.ts#GET_USER_FAVORITE_IMAGES": {
+      "operations": [
+        {
+          "name": "getUserFavoriteImages",
+          "document": "GetUserFavoriteImagesDocument",
+          "result": "GetUserFavoriteImagesQuery",
+          "variables": "GetUserFavoriteImagesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/library/favoriteStatusQueries.ts#AddImageToFavoritesQuery": {
+      "operations": [
+        {
+          "name": "getUserFavoriteImage",
+          "document": "GetUserFavoriteImageDocument",
+          "result": "GetUserFavoriteImageQuery",
+          "variables": "GetUserFavoriteImageQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/library/favoriteStatusQueries.ts#AddToChannelFavoritesQuery": {
+      "operations": [
+        {
+          "name": "getUserFavorites",
+          "document": "GetUserFavoritesDocument",
+          "result": "GetUserFavoritesQuery",
+          "variables": "GetUserFavoritesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/library/favoriteStatusQueries.ts#AddToCommentFavoritesQuery": {
+      "operations": [
+        {
+          "name": "getUserFavoriteComment",
+          "document": "GetUserFavoriteCommentDocument",
+          "result": "GetUserFavoriteCommentQuery",
+          "variables": "GetUserFavoriteCommentQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/library/favoriteStatusQueries.ts#AddToDiscussionFavoritesQuery": {
+      "operations": [
+        {
+          "name": "getUserFavoriteDiscussion",
+          "document": "GetUserFavoriteDiscussionDocument",
+          "result": "GetUserFavoriteDiscussionQuery",
+          "variables": "GetUserFavoriteDiscussionQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/library/favoriteStatusQueries.ts#AddToImageFavoritesQuery": {
+      "operations": [
+        {
+          "name": "getUserFavoriteImage",
+          "document": "GetUserFavoriteImageDocument",
+          "result": "GetUserFavoriteImageQuery",
+          "variables": "GetUserFavoriteImageQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/library/queries.ts#GET_UNIFIED_LIBRARY_FAVORITES": {
+      "operations": [
+        {
+          "name": "GetUnifiedLibraryFavorites",
+          "document": "GetUnifiedLibraryFavoritesDocument",
+          "result": "GetUnifiedLibraryFavoritesQuery",
+          "variables": "GetUnifiedLibraryFavoritesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#INVITE_FORUM_OWNER": {
+      "operations": [
+        {
+          "name": "inviteForumOwner",
+          "document": "InviteForumOwnerDocument",
+          "result": "InviteForumOwnerMutation",
+          "variables": "InviteForumOwnerMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#INVITE_FORUM_MOD": {
+      "operations": [
+        {
+          "name": "inviteForumMod",
+          "document": "InviteForumModDocument",
+          "result": "InviteForumModMutation",
+          "variables": "InviteForumModMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#CANCEL_INVITE_FORUM_OWNER": {
+      "operations": [
+        {
+          "name": "cancelInviteForumOwner",
+          "document": "CancelInviteForumOwnerDocument",
+          "result": "CancelInviteForumOwnerMutation",
+          "variables": "CancelInviteForumOwnerMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#CANCEL_INVITE_FORUM_MOD": {
+      "operations": [
+        {
+          "name": "cancelInviteForumMod",
+          "document": "CancelInviteForumModDocument",
+          "result": "CancelInviteForumModMutation",
+          "variables": "CancelInviteForumModMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#REMOVE_FORUM_OWNER": {
+      "operations": [
+        {
+          "name": "removeForumOwner",
+          "document": "RemoveForumOwnerDocument",
+          "result": "RemoveForumOwnerMutation",
+          "variables": "RemoveForumOwnerMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#REMOVE_FORUM_MOD": {
+      "operations": [
+        {
+          "name": "removeForumMod",
+          "document": "RemoveForumModDocument",
+          "result": "RemoveForumModMutation",
+          "variables": "RemoveForumModMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#ACCEPT_FORUM_OWNER_INVITE": {
+      "operations": [
+        {
+          "name": "acceptInviteForumOwner",
+          "document": "AcceptInviteForumOwnerDocument",
+          "result": "AcceptInviteForumOwnerMutation",
+          "variables": "AcceptInviteForumOwnerMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#ACCEPT_FORUM_MOD_INVITE": {
+      "operations": [
+        {
+          "name": "acceptInviteForumMod",
+          "document": "AcceptInviteForumModDocument",
+          "result": "AcceptInviteForumModMutation",
+          "variables": "AcceptInviteForumModMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#SUSPEND_USER": {
+      "operations": [
+        {
+          "name": "suspendUser",
+          "document": "SuspendUserDocument",
+          "result": "SuspendUserMutation",
+          "variables": "SuspendUserMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#SUSPEND_MOD": {
+      "operations": [
+        {
+          "name": "suspendMod",
+          "document": "SuspendModDocument",
+          "result": "SuspendModMutation",
+          "variables": "SuspendModMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#UNSUSPEND_USER": {
+      "operations": [
+        {
+          "name": "unsuspendUser",
+          "document": "UnsuspendUserDocument",
+          "result": "UnsuspendUserMutation",
+          "variables": "UnsuspendUserMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/mutations.js#UNSUSPEND_MOD": {
+      "operations": [
+        {
+          "name": "unsuspendMod",
+          "document": "UnsuspendModDocument",
+          "result": "UnsuspendModMutation",
+          "variables": "UnsuspendModMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#COUNT_OPEN_ISSUES": {
+      "operations": [
+        {
+          "name": "countOpenIssues",
+          "document": "CountOpenIssuesDocument",
+          "result": "CountOpenIssuesQuery",
+          "variables": "CountOpenIssuesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#SERVER_SCOPED_ISSUE_COUNT": {
+      "operations": [
+        {
+          "name": "countIssuesByServer",
+          "document": "CountIssuesByServerDocument",
+          "result": "CountIssuesByServerQuery",
+          "variables": "CountIssuesByServerQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#COUNT_CLOSED_ISSUES": {
+      "operations": [
+        {
+          "name": "countClosedIssues",
+          "document": "CountClosedIssuesDocument",
+          "result": "CountClosedIssuesQuery",
+          "variables": "CountClosedIssuesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#SERVER_SCOPED_CLOSED_ISSUE_COUNT": {
+      "operations": [
+        {
+          "name": "countClosedIssuesByServer",
+          "document": "CountClosedIssuesByServerDocument",
+          "result": "CountClosedIssuesByServerQuery",
+          "variables": "CountClosedIssuesByServerQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_MOD": {
+      "operations": [
+        {
+          "name": "getMod",
+          "document": "GetModDocument",
+          "result": "GetModQuery",
+          "variables": "GetModQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_MOD_COMMENTS": {
+      "operations": [
+        {
+          "name": "getModComments",
+          "document": "GetModCommentsDocument",
+          "result": "GetModCommentsQuery",
+          "variables": "GetModCommentsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_MOD_ISSUES": {
+      "operations": [
+        {
+          "name": "getModIssues",
+          "document": "GetModIssuesDocument",
+          "result": "GetModIssuesQuery",
+          "variables": "GetModIssuesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_MOD_CONTRIBUTIONS": {
+      "operations": [
+        {
+          "name": "getModContributions",
+          "document": "GetModContributionsDocument",
+          "result": "GetModContributionsQuery",
+          "variables": "GetModContributionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_SUSPENDED_MODS_BY_CHANNEL": {
+      "operations": [
+        {
+          "name": "getModsByChannel",
+          "document": "GetModsByChannelDocument",
+          "result": "GetModsByChannelQuery",
+          "variables": "GetModsByChannelQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_MODS_BY_CHANNEL": {
+      "operations": [
+        {
+          "name": "getModsByChannel",
+          "document": "GetModsByChannelSource31c1e8fd16Document",
+          "result": "GetModsByChannelSource31c1e8fd16Query",
+          "variables": "GetModsByChannelSource31c1e8fd16QueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_CHANNEL_OWNERS_BY_CHANNEL": {
+      "operations": [
+        {
+          "name": "getChannelOwnersByChannel",
+          "document": "GetChannelOwnersByChannelDocument",
+          "result": "GetChannelOwnersByChannelQuery",
+          "variables": "GetChannelOwnersByChannelQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL": {
+      "operations": [
+        {
+          "name": "getPendingChannelOwnersByChannel",
+          "document": "GetPendingChannelOwnersByChannelDocument",
+          "result": "GetPendingChannelOwnersByChannelQuery",
+          "variables": "GetPendingChannelOwnersByChannelQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_PENDING_CHANNEL_MODS_BY_CHANNEL": {
+      "operations": [
+        {
+          "name": "getPendingChannelModsByChannel",
+          "document": "GetPendingChannelModsByChannelDocument",
+          "result": "GetPendingChannelModsByChannelQuery",
+          "variables": "GetPendingChannelModsByChannelQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#PENDING_FORUM_OWNER_INVITE_EXISTS": {
+      "operations": [
+        {
+          "name": "pendingInviteExists",
+          "document": "PendingInviteExistsDocument",
+          "result": "PendingInviteExistsQuery",
+          "variables": "PendingInviteExistsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#PENDING_FORUM_MOD_INVITE_EXISTS": {
+      "operations": [
+        {
+          "name": "pendingModInviteExists",
+          "document": "PendingModInviteExistsDocument",
+          "result": "PendingModInviteExistsQuery",
+          "variables": "PendingModInviteExistsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_DISCUSSION_CHANNEL": {
+      "operations": [
+        {
+          "name": "getDiscussionChannelID",
+          "document": "GetDiscussionChannelIdDocument",
+          "result": "GetDiscussionChannelIdQuery",
+          "variables": "GetDiscussionChannelIdQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_DISCUSSION_ISSUE": {
+      "operations": [
+        {
+          "name": "getDiscussionChannels",
+          "document": "GetDiscussionChannelsDocument",
+          "result": "GetDiscussionChannelsQuery",
+          "variables": "GetDiscussionChannelsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_EVENT_ISSUE": {
+      "operations": [
+        {
+          "name": "getEventChannels",
+          "document": "GetEventChannelsDocument",
+          "result": "GetEventChannelsQuery",
+          "variables": "GetEventChannelsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#IS_ORIGINAL_POSTER_SUSPENDED": {
+      "operations": [
+        {
+          "name": "getSuspension",
+          "document": "GetSuspensionDocument",
+          "result": "GetSuspensionQuery",
+          "variables": "GetSuspensionQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/mod/queries.js#GET_SUSPENDED_USERS_IN_CHANNEL": {
+      "operations": [
+        {
+          "name": "getChannel",
+          "document": "GetChannelSource26d7fbbb05Document",
+          "result": "GetChannelSource26d7fbbb05Query",
+          "variables": "GetChannelSource26d7fbbb05QueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/notification/queries.js#GET_NOTIFICATIONS": {
+      "operations": [
+        {
+          "name": "getNotifications",
+          "document": "GetNotificationsDocument",
+          "result": "GetNotificationsQuery",
+          "variables": "GetNotificationsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/notification/queries.js#GET_FEEDBACK_NOTIFICATIONS": {
+      "operations": [
+        {
+          "name": "getFeedbackNotifications",
+          "document": "GetFeedbackNotificationsDocument",
+          "result": "GetFeedbackNotificationsQuery",
+          "variables": "GetFeedbackNotificationsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/notification/queries.js#GET_GENERAL_NOTIFICATIONS": {
+      "operations": [
+        {
+          "name": "getGeneralNotifications",
+          "document": "GetGeneralNotificationsDocument",
+          "result": "GetGeneralNotificationsQuery",
+          "variables": "GetGeneralNotificationsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/scratchpad/mutations.js#CREATE_SCRATCHPAD_ENTRY": {
+      "operations": [
+        {
+          "name": "createScratchpadEntry",
+          "document": "CreateScratchpadEntryDocument",
+          "result": "CreateScratchpadEntryMutation",
+          "variables": "CreateScratchpadEntryMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/scratchpad/mutations.js#UPDATE_SCRATCHPAD_ENTRY_VISIBILITY": {
+      "operations": [
+        {
+          "name": "updateScratchpadEntryVisibility",
+          "document": "UpdateScratchpadEntryVisibilityDocument",
+          "result": "UpdateScratchpadEntryVisibilityMutation",
+          "variables": "UpdateScratchpadEntryVisibilityMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/scratchpad/mutations.js#DELETE_SCRATCHPAD_ENTRY": {
+      "operations": [
+        {
+          "name": "deleteScratchpadEntry",
+          "document": "DeleteScratchpadEntryDocument",
+          "result": "DeleteScratchpadEntryMutation",
+          "variables": "DeleteScratchpadEntryMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/scratchpad/mutations.js#UNDO_SUPER_UPVOTE": {
+      "operations": [
+        {
+          "name": "undoSuperUpvote",
+          "document": "UndoSuperUpvoteDocument",
+          "result": "UndoSuperUpvoteMutation",
+          "variables": "UndoSuperUpvoteMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/scratchpad/queries.js#GET_PUBLIC_SCRATCHPAD_ENTRIES": {
+      "operations": [
+        {
+          "name": "getPublicScratchpadEntries",
+          "document": "GetPublicScratchpadEntriesDocument",
+          "result": "GetPublicScratchpadEntriesQuery",
+          "variables": "GetPublicScratchpadEntriesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/scratchpad/queries.js#GET_PENDING_SCRATCHPAD_ENTRIES": {
+      "operations": [
+        {
+          "name": "getPendingScratchpadEntries",
+          "document": "GetPendingScratchpadEntriesDocument",
+          "result": "GetPendingScratchpadEntriesQuery",
+          "variables": "GetPendingScratchpadEntriesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/scratchpad/queries.js#GET_ALL_SCRATCHPAD_ENTRIES": {
+      "operations": [
+        {
+          "name": "getAllScratchpadEntries",
+          "document": "GetAllScratchpadEntriesDocument",
+          "result": "GetAllScratchpadEntriesQuery",
+          "variables": "GetAllScratchpadEntriesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/scratchpad/queries.js#GET_SUPER_UPVOTE_COUNT": {
+      "operations": [
+        {
+          "name": "getSuperUpvoteCount",
+          "document": "GetSuperUpvoteCountDocument",
+          "result": "GetSuperUpvoteCountQuery",
+          "variables": "GetSuperUpvoteCountQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/server/queries.ts#GET_SESSION_PROFILE": {
+      "operations": [
+        {
+          "name": "getOwnEmail",
+          "document": "GetOwnEmailSource3c35564c1eDocument",
+          "result": "GetOwnEmailSource3c35564c1eQuery",
+          "variables": "GetOwnEmailSource3c35564c1eQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/server/queries.ts#GET_NOTIFICATION_COUNT": {
+      "operations": [
+        {
+          "name": "getOwnEmailNotificationCount",
+          "document": "GetOwnEmailNotificationCountDocument",
+          "result": "GetOwnEmailNotificationCountQuery",
+          "variables": "GetOwnEmailNotificationCountQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/server/queries.ts#GET_AUTH_PROFILE": {
+      "operations": [
+        {
+          "name": "getOwnEmail",
+          "document": "GetOwnEmailDocument",
+          "result": "GetOwnEmailQuery",
+          "variables": "GetOwnEmailQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/tag/fragments.ts#NEW_TAG": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "NewTag",
+          "document": "NewTagFragmentDoc",
+          "result": "NewTagFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/tag/mutations.ts#CREATE_TAG": {
+      "operations": [
+        {
+          "name": "createTag",
+          "document": "CreateTagDocument",
+          "result": "CreateTagMutation",
+          "variables": "CreateTagMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/tag/queries.ts#GET_TAGS": {
+      "operations": [
+        {
+          "name": "getTags",
+          "document": "GetTagsDocument",
+          "result": "GetTagsQuery",
+          "variables": "GetTagsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#PERMANENTLY_DELETE_PROFILE_IMAGE": {
+      "operations": [
+        {
+          "name": "permanentlyDeleteProfileImage",
+          "document": "PermanentlyDeleteProfileImageDocument",
+          "result": "PermanentlyDeleteProfileImageMutation",
+          "variables": "PermanentlyDeleteProfileImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#MARK_NOTIFICATIONS_AS_READ": {
+      "operations": [
+        {
+          "name": "markNotificationsAsRead",
+          "document": "MarkNotificationsAsReadDocument",
+          "result": "MarkNotificationsAsReadMutation",
+          "variables": "MarkNotificationsAsReadMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#MARK_NOTIFICATION_AS_READ": {
+      "operations": [
+        {
+          "name": "markNotificationAsRead",
+          "document": "MarkNotificationAsReadDocument",
+          "result": "MarkNotificationAsReadMutation",
+          "variables": "MarkNotificationAsReadMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#ADD_FAVORITE_CHANNEL": {
+      "operations": [
+        {
+          "name": "addFavoriteChannel",
+          "document": "AddFavoriteChannelDocument",
+          "result": "AddFavoriteChannelMutation",
+          "variables": "AddFavoriteChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#REMOVE_FAVORITE_CHANNEL": {
+      "operations": [
+        {
+          "name": "removeFavoriteChannel",
+          "document": "RemoveFavoriteChannelDocument",
+          "result": "RemoveFavoriteChannelMutation",
+          "variables": "RemoveFavoriteChannelMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#ADD_FAVORITE_DISCUSSION": {
+      "operations": [
+        {
+          "name": "addFavoriteDiscussion",
+          "document": "AddFavoriteDiscussionDocument",
+          "result": "AddFavoriteDiscussionMutation",
+          "variables": "AddFavoriteDiscussionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#REMOVE_FAVORITE_DISCUSSION": {
+      "operations": [
+        {
+          "name": "removeFavoriteDiscussion",
+          "document": "RemoveFavoriteDiscussionDocument",
+          "result": "RemoveFavoriteDiscussionMutation",
+          "variables": "RemoveFavoriteDiscussionMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#ADD_FAVORITE_COMMENT": {
+      "operations": [
+        {
+          "name": "addFavoriteComment",
+          "document": "AddFavoriteCommentDocument",
+          "result": "AddFavoriteCommentMutation",
+          "variables": "AddFavoriteCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#REMOVE_FAVORITE_COMMENT": {
+      "operations": [
+        {
+          "name": "removeFavoriteComment",
+          "document": "RemoveFavoriteCommentDocument",
+          "result": "RemoveFavoriteCommentMutation",
+          "variables": "RemoveFavoriteCommentMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#ADD_FAVORITE_IMAGE": {
+      "operations": [
+        {
+          "name": "addFavoriteImage",
+          "document": "AddFavoriteImageDocument",
+          "result": "AddFavoriteImageMutation",
+          "variables": "AddFavoriteImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/mutations.js#REMOVE_FAVORITE_IMAGE": {
+      "operations": [
+        {
+          "name": "removeFavoriteImage",
+          "document": "RemoveFavoriteImageDocument",
+          "result": "RemoveFavoriteImageMutation",
+          "variables": "RemoveFavoriteImageMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_COMMENTS": {
+      "operations": [
+        {
+          "name": "getUserComments",
+          "document": "GetUserCommentsDocument",
+          "result": "GetUserCommentsQuery",
+          "variables": "GetUserCommentsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_DISCUSSIONS": {
+      "operations": [
+        {
+          "name": "getUserDiscussions",
+          "document": "GetUserDiscussionsDocument",
+          "result": "GetUserDiscussionsQuery",
+          "variables": "GetUserDiscussionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_DOWNLOADS": {
+      "operations": [
+        {
+          "name": "getUserDownloads",
+          "document": "GetUserDownloadsDocument",
+          "result": "GetUserDownloadsQuery",
+          "variables": "GetUserDownloadsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_OWNED_DOWNLOADS": {
+      "operations": [
+        {
+          "name": "getUserOwnedDownloads",
+          "document": "GetUserOwnedDownloadsDocument",
+          "result": "GetUserOwnedDownloadsQuery",
+          "variables": "GetUserOwnedDownloadsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_OWNED_DOWNLOADS_COUNT": {
+      "operations": [
+        {
+          "name": "getUserOwnedDownloadsCount",
+          "document": "GetUserOwnedDownloadsCountDocument",
+          "result": "GetUserOwnedDownloadsCountQuery",
+          "variables": "GetUserOwnedDownloadsCountQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_UPLOADED_DOWNLOADABLE_FILES": {
+      "operations": [
+        {
+          "name": "getUploadedDownloadableFiles",
+          "document": "GetUploadedDownloadableFilesDocument",
+          "result": "GetUploadedDownloadableFilesQuery",
+          "variables": "GetUploadedDownloadableFilesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_EVENTS": {
+      "operations": [
+        {
+          "name": "getUserEvents",
+          "document": "GetUserEventsDocument",
+          "result": "GetUserEventsQuery",
+          "variables": "GetUserEventsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_WIKI_EDITS": {
+      "operations": [
+        {
+          "name": "getUserWikiEdits",
+          "document": "GetUserWikiEditsDocument",
+          "result": "GetUserWikiEditsQuery",
+          "variables": "GetUserWikiEditsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#DOES_USER_EXIST": {
+      "operations": [
+        {
+          "name": "doesUserExist",
+          "document": "DoesUserExistDocument",
+          "result": "DoesUserExistQuery",
+          "variables": "DoesUserExistQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_FAVORITE_CHANNELS": {
+      "operations": [
+        {
+          "name": "getUserFavoriteChannels",
+          "document": "GetUserFavoriteChannelsSource1187297d18Document",
+          "result": "GetUserFavoriteChannelsSource1187297d18Query",
+          "variables": "GetUserFavoriteChannelsSource1187297d18QueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "ChannelIconFields",
+          "document": "ChannelIconFieldsFragmentDoc",
+          "result": "ChannelIconFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/user/queries.js#GET_MODDED_CHANNELS": {
+      "operations": [
+        {
+          "name": "getModdedChannels",
+          "document": "GetModdedChannelsDocument",
+          "result": "GetModdedChannelsQuery",
+          "variables": "GetModdedChannelsQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "ChannelIconFields",
+          "document": "ChannelIconFieldsFragmentDoc",
+          "result": "ChannelIconFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/user/queries.js#GET_OWNED_CHANNELS": {
+      "operations": [
+        {
+          "name": "getOwnedChannels",
+          "document": "GetOwnedChannelsDocument",
+          "result": "GetOwnedChannelsQuery",
+          "variables": "GetOwnedChannelsQueryVariables"
+        }
+      ],
+      "fragments": [
+        {
+          "name": "ChannelIconFields",
+          "document": "ChannelIconFieldsFragmentDoc",
+          "result": "ChannelIconFieldsFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "graphQLData/user/queries.js#GET_USER_CONTRIBUTIONS": {
+      "operations": [
+        {
+          "name": "getUserContributions",
+          "document": "GetUserContributionsDocument",
+          "result": "GetUserContributionsQuery",
+          "variables": "GetUserContributionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#USER_IS_MOD_OR_OWNER_IN_CHANNEL": {
+      "operations": [
+        {
+          "name": "userIsModInChannel",
+          "document": "UserIsModInChannelDocument",
+          "result": "UserIsModInChannelQuery",
+          "variables": "UserIsModInChannelQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_SUSPENSION_IN_CHANNEL": {
+      "operations": [
+        {
+          "name": "getUserSuspensionInChannel",
+          "document": "GetUserSuspensionInChannelDocument",
+          "result": "GetUserSuspensionInChannelQuery",
+          "variables": "GetUserSuspensionInChannelQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_ACTIVE_SUSPENSIONS": {
+      "operations": [
+        {
+          "name": "getUserActiveSuspensions",
+          "document": "GetUserActiveSuspensionsDocument",
+          "result": "GetUserActiveSuspensionsQuery",
+          "variables": "GetUserActiveSuspensionsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/user/queries.js#GET_USER_FAVORITE_COUNTS": {
+      "operations": [
+        {
+          "name": "getUserFavoriteCounts",
+          "document": "GetUserFavoriteCountsDocument",
+          "result": "GetUserFavoriteCountsQuery",
+          "variables": "GetUserFavoriteCountsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/wiki/queries.js#GET_SITE_WIDE_WIKI_LIST": {
+      "operations": [
+        {
+          "name": "getSiteWideWikiList",
+          "document": "GetSiteWideWikiListDocument",
+          "result": "GetSiteWideWikiListQuery",
+          "variables": "GetSiteWideWikiListQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/wiki/queries.js#GET_WIKI_PIN_CHANNELS": {
+      "operations": [
+        {
+          "name": "getWikiPinChannels",
+          "document": "GetWikiPinChannelsDocument",
+          "result": "GetWikiPinChannelsQuery",
+          "variables": "GetWikiPinChannelsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/wiki/queries.js#GET_WIKI_PAGES_BY_IDS": {
+      "operations": [
+        {
+          "name": "getWikiPagesByIds",
+          "document": "GetWikiPagesByIdsDocument",
+          "result": "GetWikiPagesByIdsQuery",
+          "variables": "GetWikiPagesByIdsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "pages/forums/create.vue#inline:NewChannel": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "NewChannel",
+          "document": "NewChannelFragmentDoc",
+          "result": "NewChannelFragment",
+          "variables": "unknown"
+        }
+      ]
+    },
+    "pages/library/favorite-comments.vue#GET_USER_FAVORITE_COMMENTS": {
+      "operations": [
+        {
+          "name": "getUserFavoriteComments",
+          "document": "GetUserFavoriteCommentsDocument",
+          "result": "GetUserFavoriteCommentsQuery",
+          "variables": "GetUserFavoriteCommentsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "pages/library/favorite-discussions.vue#GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS": {
+      "operations": [
+        {
+          "name": "getUserFavoriteDiscussionsNoDownloads",
+          "document": "GetUserFavoriteDiscussionsNoDownloadsDocument",
+          "result": "GetUserFavoriteDiscussionsNoDownloadsQuery",
+          "variables": "GetUserFavoriteDiscussionsNoDownloadsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "pages/library/favorite-downloads.vue#GET_USER_FAVORITE_DOWNLOADS": {
+      "operations": [
+        {
+          "name": "getUserFavoriteDownloads",
+          "document": "GetUserFavoriteDownloadsDocument",
+          "result": "GetUserFavoriteDownloadsQuery",
+          "variables": "GetUserFavoriteDownloadsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "pages/library/favorite-images.vue#GET_USER_FAVORITE_IMAGES": {
+      "operations": [
+        {
+          "name": "getUserFavoriteImages",
+          "document": "GetUserFavoriteImagesDocument",
+          "result": "GetUserFavoriteImagesQuery",
+          "variables": "GetUserFavoriteImagesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "server/api/auth/profile.get.ts#GET_OWN_EMAIL": {
+      "operations": [
+        {
+          "name": "getOwnEmail",
+          "document": "GetOwnEmailSource3c35564c1eDocument",
+          "result": "GetOwnEmailSource3c35564c1eQuery",
+          "variables": "GetOwnEmailSource3c35564c1eQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "server/api/session/profile.get.ts#GET_OWN_EMAIL": {
+      "operations": [
+        {
+          "name": "getOwnEmail",
+          "document": "GetOwnEmailSource3c35564c1eDocument",
+          "result": "GetOwnEmailSource3c35564c1eQuery",
+          "variables": "GetOwnEmailSource3c35564c1eQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "server/api/session/token.get.ts#GET_NOTIFICATION_COUNT": {
+      "operations": [
+        {
+          "name": "getOwnEmailNotificationCount",
+          "document": "GetOwnEmailNotificationCountDocument",
+          "result": "GetOwnEmailNotificationCountQuery",
+          "variables": "GetOwnEmailNotificationCountQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "server/middleware/2.auth-session.ts#GET_OWN_EMAIL": {
+      "operations": [
+        {
+          "name": "getOwnEmail",
+          "document": "GetOwnEmailDocument",
+          "result": "GetOwnEmailQuery",
+          "variables": "GetOwnEmailQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "utils/index.ts#inline:NewTag": {
+      "operations": [],
+      "fragments": [
+        {
+          "name": "NewTag",
+          "document": "NewTagFragmentDoc",
+          "result": "NewTagFragment",
+          "variables": "unknown"
+        }
+      ]
+    }
+  },
+  "exceptions": []
+}

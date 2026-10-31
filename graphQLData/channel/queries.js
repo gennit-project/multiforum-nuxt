@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client/core';
-import { DateTime } from 'luxon';
 import { AUTHOR_FIELDS, CHANNEL_ICON_FIELDS } from '../fragments';
 
 export const GET_CHANNEL_NAMES = gql`
@@ -337,14 +336,6 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
   }
 `;
 
-// Round down to nearest 10 seconds to ensure SSR and client use same timestamp
-const now = DateTime.now()
-  .set({
-    second: Math.floor(DateTime.now().second / 10) * 10,
-    millisecond: 0,
-  })
-  .toISO();
-
 export const GET_CHANNEL_DOWNLOAD_COUNT = gql`
   query getChannelDownloadCount($uniqueName: String!) {
     channels(where: { uniqueName: { eq: $uniqueName } }) {
@@ -377,7 +368,7 @@ export const GET_CHANNELS_DISCUSSIONS = gql`
     $tags: [String]
     $searchInput: String
     $loggedInUsername: String
-    $now: DateTime = "${now}"
+    $now: DateTime!
   ) {
     getSortedChannels(
       offset: $offset
