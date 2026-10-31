@@ -175,7 +175,7 @@ The latter uses the same strict extractor as `graphql:check`, resolving the actu
 source selections and imported fragments without executing application modules.
 The explicit `pilotDocuments` list in `scripts/generate-graphql-operations.mjs`
 limits generation to public profiles, account settings, archived-comment issue
-links, sticky/unsticky comment mutations, and the recursive reply slice below. These consumers import typed ASTs:
+links, sticky/unsticky comment mutations, and the comment slices below. These consumers import typed ASTs:
 
 ```ts
 import { GetPublicUserProfileDocument } from '@/__generated__/operations';
@@ -274,6 +274,40 @@ selected-field fixtures, and existing edit/report/vote/subscription interactions
 The existing nested-comment browser flow runs in normal CI. Strict validation,
 offline generation/freshness, and existing resolver null-filter safeguards remain
 unchanged.
+
+## Phase 5, slice 2: permalinked comments (#700)
+
+One more read is migrated (eight generated operations total):
+`GET_COMMENT_AND_REPLIES` now names its operation `getPermalinkedComment`, avoiding
+its former collision with the recursive `getCommentWithReplies` operation. The
+exported source constant and composed `CommentFields`/`CommentVoteFields`
+selections are unchanged. Operation-name mocks must distinguish these two reads.
+
+| Boundary | Contract | Remaining work |
+| --- | --- | --- |
+| `PermalinkedComment.vue` query and named slot | `GetPermalinkedCommentDocument`; exact `GetPermalinkedCommentQuery['comments'][number]` slot payload | None for this read |
+| Discussion and event `comments/[commentId].vue` pages | Inferred slot payload passes directly to the existing `CommentView` renderer | Existing interaction operations remain separate slices |
+
+The component is the single route-ID source; the wrappers no longer snapshot or
+pass an undeclared `comment-id` attribute. A reactive variables getter accepts
+only nonempty scalar IDs and disables the query for missing, blank, or array
+values. Loading/error states and a matching-result-ID guard prevent an old
+comment and its context link from appearing during navigation. Context links
+require scalar forum/discussion/event route IDs. Nullable text, author and parent
+remain nullable; no schema entity assertions or new compatibility types are used.
+
+CI asserts generated-document identity and source/fragment equivalence, invalid
+ID types and missing variables, selected-field/nullability guarantees, and root
+and child compatibility with the shared renderer. Component/page tests cover
+invalid IDs, state transitions, navigation, context links, nested rendering and
+interaction forwarding. Browser coverage exercises discussion and event comment
+permalinks, parent navigation and accessibility; recursive reply mocks keep their
+original operation name. Pinned schema provenance, offline freshness generation,
+strict validation and null guards remain in force.
+
+Root feeds, profile tabs, mutations/cache writes and backend enforcement remain
+follow-up work owned by frontend #700 (or the backend campaign). Slice 1's shared
+presentation compatibility exceptions remain necessary for their other producers.
 
 ## Next milestones
 

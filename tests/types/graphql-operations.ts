@@ -4,6 +4,9 @@ import {
   GetPublicUserProfileDocument,
   GetCommentIssueDocument,
   GetCommentWithRepliesDocument,
+  GetPermalinkedCommentDocument,
+  type GetPermalinkedCommentQuery,
+  type GetPermalinkedCommentQueryVariables,
   StickyCommentDocument,
   UpdateUserDocument,
   type GetPublicUserProfileQuery,
@@ -72,4 +75,27 @@ export function checkReplyInference(reply: ReplyComment) {
   const voteCount: number =
     reply.UpvotedByUsersConnection.aggregate.count.nodes;
   return { view, voteCount, text, incompleteView, emoji };
+}
+
+export function checkPermalinkInference(
+  root: GetPermalinkedCommentQuery['comments'][number]
+) {
+  const query = useQuery(GetPermalinkedCommentDocument, { id: 'c1' });
+  // @ts-expect-error ID is a scalar, not an array
+  query.refetch({ id: ['c1'] });
+  // @ts-expect-error ID cannot be missing
+  const missing: GetPermalinkedCommentQueryVariables = {};
+  // @ts-expect-error invalid ID type
+  query.refetch({ id: false });
+  // @ts-expect-error full schema fields were not selected
+  void root.isRootComment;
+  // @ts-expect-error parent is nullable
+  void root.ParentComment.id;
+  // @ts-expect-error author is nullable
+  void root.CommentAuthor.__typename;
+  // @ts-expect-error text is nullable
+  const text: string = root.text;
+  const view: CommentView = root;
+  const children: CommentView[] = root.ChildComments;
+  return { view, children, text, missing };
 }

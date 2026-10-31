@@ -475,7 +475,7 @@ export const GET_EVENT_ROOT_COMMENT_AGGREGATE = gql`
 `;
 
 export const GET_COMMENT_AND_REPLIES = gql`
-  query getCommentWithReplies($id: ID!) {
+  query getPermalinkedComment($id: ID!) {
     comments(where: { id: { eq: $id } }) {
       ...CommentFields
       ChildComments {
