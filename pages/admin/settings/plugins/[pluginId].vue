@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { GetServerPluginSecretsQuery } from '@/__generated__/operations';
 import { ref, computed, nextTick, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useQuery, useMutation } from '@vue/apollo-composable';
+import { SecretValidationStatus } from '@/__generated__/graphql';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
@@ -40,6 +42,8 @@ import {
 } from '@/utils/pluginCompatibility';
 import {
   getPluginFormSections,
+  getPluginSecretDeclarations,
+  parseSettingsJson,
   stringifyManifest,
 } from '@/utils/pluginManifestUtils';
 import {
@@ -51,17 +55,7 @@ import type {
   PluginSecretStatus as PluginSecretStatusType,
   PluginSettings,
 } from '@/types/pluginForms';
-import {
-  GET_AVAILABLE_PLUGINS,
-  GET_INSTALLED_PLUGINS,
-  GET_SERVER_PLUGIN_SECRETS,
-  GET_PLUGIN_DETAIL,
-} from '@/graphQLData/admin/queries';
-import {
-  INSTALL_PLUGIN_VERSION,
-  ENABLE_SERVER_PLUGIN,
-  SET_SERVER_PLUGIN_SECRET,
-} from '@/graphQLData/admin/mutations';
+import { GetPluginsSource6c031b0d8aDocument as GET_AVAILABLE_PLUGINS, GetInstalledPluginsDocument as GET_INSTALLED_PLUGINS, GetServerPluginSecretsDocument as GET_SERVER_PLUGIN_SECRETS, GetPluginDetailDocument as GET_PLUGIN_DETAIL, InstallPluginVersionDocument as INSTALL_PLUGIN_VERSION, EnableServerPluginDocument as ENABLE_SERVER_PLUGIN, SetServerPluginSecretDocument as SET_SERVER_PLUGIN_SECRET  } from '@/__generated__/operations';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -69,7 +63,7 @@ definePageMeta({
 });
 
 const route = useRoute();
-const pluginId = route.params.pluginId as string;
+const pluginId = computed(() => typeof route.params.pluginId === 'string' ? route.params.pluginId : '');
 
 // Toast notifications
 const toast = useToast();
@@ -88,59 +82,7 @@ const pendingUpgrade = ref<{
   secrets: Array<{ key: string; isSet: boolean }>;
 } | null>(null);
 
-// Types
-interface PluginSecretStatus {
-  key: string;
-  status: 'NOT_SET' | 'SET_UNTESTED' | 'VALID' | 'INVALID';
-  required?: boolean;
-  lastValidatedAt?: string;
-  validationError?: string;
-}
-
-interface PluginMetadata {
-  id: string;
-  name: string;
-  displayName?: string;
-  description?: string;
-  authorName?: string;
-  authorUrl?: string;
-  homepage?: string;
-  license?: string;
-  tags?: string[];
-}
-
-interface PluginManifest {
-  secrets?: Array<{
-    key: string;
-    scope?: string;
-    required?: boolean;
-  }>;
-  ui?: {
-    forms?: {
-      server?: PluginFormSection[];
-    };
-  };
-  settingsDefaults?: Record<string, unknown>;
-}
-
-interface InstalledPlugin {
-  plugin: PluginMetadata;
-  version: string;
-  scope: string;
-  enabled: boolean;
-  settingsJson: Record<string, unknown>;
-  readmeMarkdown?: string;
-  manifest?: PluginManifest;
-  registryUrl?: string | null;
-  releaseNotesUrl?: string | null;
-  sourceRepoUrl?: string | null;
-  sourceCommit?: string | null;
-  minServerVersion?: string | null;
-  apiVersion?: string | null;
-  hasUpdate?: boolean;
-  latestVersion?: string;
-  availableVersions?: string[];
-}
+type PluginSecretStatus = GetServerPluginSecretsQuery['getServerPluginSecrets'][number] & { required?: boolean };
 
 // Queries
 const {
@@ -161,7 +103,8 @@ const {
 // Query for plugin detail including version README (for non-installed plugins)
 const { result: pluginDetailResult, loading: pluginDetailLoading } = useQuery(
   GET_PLUGIN_DETAIL,
-  { pluginId }
+  () => ({ pluginId: pluginId.value }),
+  { enabled: computed(() => !!pluginId.value) }
 );
 
 // Mutations
@@ -173,41 +116,8 @@ const { mutate: enableMutation, loading: enabling } =
 const { mutate: setSecretMutation } = useMutation(SET_SERVER_PLUGIN_SECRET);
 
 // Core computed properties needed for secrets query
-interface PluginFromQuery {
-  id: string;
-  name?: string;
-  displayName?: string;
-  description?: string;
-  authorName?: string;
-  authorUrl?: string;
-  homepage?: string;
-  license?: string;
-  tags?: string[];
-  Versions?: Array<{
-    version: string;
-    repoUrl?: string;
-    readmeMarkdown?: string;
-    registryUrl?: string | null;
-    releaseNotesUrl?: string | null;
-    sourceRepoUrl?: string | null;
-    sourceCommit?: string | null;
-    minServerVersion?: string | null;
-    apiVersion?: string | null;
-    manifest?: PluginManifest;
-  }>;
-}
-
-const plugin = computed((): PluginFromQuery | undefined => {
-  const plugins = pluginsResult.value?.plugins || [];
-  return plugins.find((p: PluginFromQuery) => p.id === pluginId);
-});
-
-const installedPlugin = computed((): InstalledPlugin | null => {
-  const installed = installedResult.value?.getInstalledPlugins || [];
-  return (
-    installed.find((p: InstalledPlugin) => p.plugin.id === pluginId) || null
-  );
-});
+const plugin = computed(() => pluginsResult.value?.plugins.find((p) => p.id === pluginId.value));
+const installedPlugin = computed(() => installedResult.value?.getInstalledPlugins.find((p) => p.plugin.id === pluginId.value) || null);
 
 // Plugin slug (name) used for secrets - must be defined before secrets query
 const pluginSlug = computed(() => {
@@ -216,7 +126,7 @@ const pluginSlug = computed(() => {
 
 // Secrets query - uses pluginSlug (plugin name) not the route param (plugin id)
 const secretsQueryVars = computed(() => ({
-  pluginId: pluginSlug.value || pluginId,
+  pluginId: pluginSlug.value || pluginId.value,
 }));
 
 const {
@@ -233,7 +143,7 @@ const storedSecrets = computed((): PluginSecretStatus[] => {
 });
 
 const declaredServerSecrets = computed(() =>
-  (installedPlugin.value?.manifest?.secrets || []).filter(
+  getPluginSecretDeclarations(installedPlugin.value?.manifest).filter(
     (secret) => !secret.scope || secret.scope === 'server'
   )
 );
@@ -248,7 +158,9 @@ const secrets = computed((): PluginSecretStatus[] =>
       (secret) => secret.key === declaration.key
     ) || {
       key: declaration.key,
-      status: 'NOT_SET' as const,
+      status: SecretValidationStatus.NotSet,
+      lastValidatedAt: null,
+      validationError: null,
     }),
     required: declaration.required !== false,
   }))
@@ -285,7 +197,7 @@ const pluginMeta = computed(() =>
   resolvePluginMetadata({
     installed: installedPlugin.value?.plugin,
     registry: plugin.value,
-    pluginId,
+    pluginId: pluginId.value,
   })
 );
 
@@ -298,13 +210,7 @@ const pluginLicense = computed(() => pluginMeta.value.license);
 const pluginTags = computed(() => pluginMeta.value.tags);
 
 // Get versions with full details from the plugin detail query
-const pluginDetailVersions = computed(
-  (): NonNullable<PluginFromQuery['Versions']> => {
-  const plugins = pluginDetailResult.value?.plugins || [];
-  const pluginDetail = plugins.find((p: PluginFromQuery) => p.id === pluginId);
-  return pluginDetail?.Versions || [];
-  }
-);
+const pluginDetailVersions = computed(() => pluginDetailResult.value?.plugins.find((p) => p.id === pluginId.value)?.Versions || []);
 
 const pluginReadme = computed(() =>
   resolvePluginReadme({
@@ -331,8 +237,8 @@ const secretStatusesForForm = computed((): PluginSecretStatusType[] => {
   return secrets.value.map((s) => ({
     key: s.key,
     status: s.status,
-    lastValidatedAt: s.lastValidatedAt,
-    validationError: s.validationError,
+    lastValidatedAt: s.lastValidatedAt ?? undefined,
+    validationError: s.validationError ?? undefined,
   }));
 });
 
@@ -346,7 +252,7 @@ const pluginRepoUrl = computed(() => {
   const currentVersion = versions.find(
     (v) => v.version === (selectedVersion.value || installedVersion.value)
   );
-  return currentVersion?.sourceRepoUrl || currentVersion?.repoUrl;
+  return currentVersion?.sourceRepoUrl || pluginDetailVersions.value.find((version) => version.version === currentVersion?.version)?.repoUrl;
 });
 
 const selectedVersionMetadata = computed(() => {
@@ -440,7 +346,7 @@ watch(
     selectedVersion.value = resolveDefaultVersion({
       availableVersions: versions.map((v) => v.version),
       installedVersion: installedVersion.value,
-      latestVersion: latest,
+      latestVersion: latest ?? undefined,
       shouldAutoUpdate: autoUpdate,
       currentSelected: selectedVersion.value,
     });
@@ -464,7 +370,7 @@ watch(
   installedPlugin,
   (newInstalledPlugin) => {
     if (newInstalledPlugin?.settingsJson) {
-      settingsValues.value = { ...newInstalledPlugin.settingsJson };
+      settingsValues.value = parseSettingsJson(newInstalledPlugin.settingsJson);
     }
   },
   { immediate: true }
@@ -477,7 +383,7 @@ const performInstall = async (
 ): Promise<boolean> => {
   try {
     const result = await installMutation({
-      pluginId,
+      pluginId: pluginId.value,
       version: versionToInstall,
       carrySettings,
     });
@@ -537,10 +443,10 @@ const handleInstall = async (versionOverride?: string) => {
     }
 
     const preview = buildPluginUpgradePreview({
-      oldSettings: installedPlugin.value.settingsJson || {},
+      oldSettings: parseSettingsJson(installedPlugin.value.settingsJson),
       newManifest: targetManifest,
     });
-    const targetSecrets = (targetManifest.secrets || [])
+    const targetSecrets = getPluginSecretDeclarations(targetManifest)
       .filter(
         (secret) =>
           (!secret.scope || secret.scope === 'server') &&
@@ -632,7 +538,7 @@ const handleSetSecret = async (key: string, value: string) => {
 const handleFocusConfigField = async (field: PluginConfigFieldStatus) => {
   await nextTick();
   const control = document.getElementById(
-    getPluginConfigFieldId({ kind: field.kind, key: field.key })
+    getPluginConfigFieldId({ kind: field.kind === 'SECRET' ? 'SECRET' : 'SETTING', key: field.key })
   );
   if (!control) return;
 

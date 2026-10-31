@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_INSTANCE_SETUP_STATUS } from '@/graphQLData/admin/queries';
+import { GetInstanceSetupStatusDocument as GET_INSTANCE_SETUP_STATUS } from '@/__generated__/operations';
 import {
   useInstanceCapability,
   useInstanceSetupStatus,

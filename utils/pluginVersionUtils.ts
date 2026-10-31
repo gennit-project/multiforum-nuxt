@@ -1,3 +1,4 @@
+import type { GetInstalledPluginsQuery } from '@/__generated__/operations';
 import { compareVersionStrings } from '@/utils/versionUtils';
 import type { PluginFormSection } from '@/types/pluginForms';
 import { isPluginFieldVisible } from '@/utils/pluginSettingsUtils';
@@ -8,26 +9,9 @@ import { isPluginFieldVisible } from '@/utils/pluginSettingsUtils';
  * so the version/metadata/validation/error logic can be unit-tested directly.
  */
 
-export interface PluginVersionLike {
-  version: string;
-  repoUrl?: string;
-  readmeMarkdown?: string;
-}
-
-export interface PluginSecretLike {
-  status: 'NOT_SET' | 'SET_UNTESTED' | 'VALID' | 'INVALID';
-}
-
-interface PluginMetaSource {
-  displayName?: string;
-  name?: string;
-  description?: string;
-  authorName?: string;
-  authorUrl?: string;
-  homepage?: string;
-  license?: string;
-  tags?: string[];
-}
+export type PluginVersionLike = { version: string; repoUrl?: string | null; readmeMarkdown?: string | null };
+export interface PluginSecretLike { status: string; }
+type PluginMetaSource = Partial<GetInstalledPluginsQuery['getInstalledPlugins'][number]['plugin']>;
 
 export interface ResolvedPluginMetadata {
   displayName: string;
@@ -55,11 +39,11 @@ export function resolvePluginMetadata(params: {
       registry?.displayName ||
       registry?.name ||
       pluginId,
-    description: installed?.description || registry?.description,
-    authorName: installed?.authorName || registry?.authorName,
-    authorUrl: installed?.authorUrl || registry?.authorUrl,
-    homepage: installed?.homepage || registry?.homepage,
-    license: installed?.license || registry?.license,
+    description: installed?.description || registry?.description || undefined,
+    authorName: installed?.authorName || registry?.authorName || undefined,
+    authorUrl: installed?.authorUrl || registry?.authorUrl || undefined,
+    homepage: installed?.homepage || registry?.homepage || undefined,
+    license: installed?.license || registry?.license || undefined,
     tags: installed?.tags || registry?.tags || [],
   };
 }

@@ -1,75 +1,15 @@
 <script setup lang="ts">
+import type { GetServerHealthDashboardQuery } from '@/__generated__/operations';
 import { computed, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'vue-router';
 import { ArrowLeft, RefreshCw } from 'lucide-vue-next';
 import ServerDashboardActivityChart from '@/components/admin/ServerDashboardActivityChart.vue';
 import ServerDashboardIssueAging from '@/components/admin/ServerDashboardIssueAging.vue';
-import { GET_SERVER_HEALTH_DASHBOARD } from '@/graphQLData/admin/queries';
+import { GetServerHealthDashboardDocument as GET_SERVER_HEALTH_DASHBOARD } from '@/__generated__/operations';
 
-type ServerHealthSummary = {
-  discussionCount: number;
-  commentCount: number;
-  eventCount: number;
-  downloadCount: number;
-  voteCount: number;
-  openIssueCount: number;
-  issueOpenedCount: number;
-  issueClosedCount: number;
-  moderationActionCount: number;
-  archivedContentCount: number;
-  lockedContentCount: number;
-  medianOpenIssueAgeDays?: number | null;
-};
-
-type ServerHealthTimeSeriesPoint = {
-  date: string;
-  discussions: number;
-  comments: number;
-  events: number;
-  downloads: number;
-  issuesOpened: number;
-  moderationActions: number;
-};
-
-type IssueAgingBucket = {
-  label: string;
-  minDays: number;
-  maxDays?: number | null;
-  count: number;
-};
-
-type ChannelHealthRow = {
-  id: string;
-  channelUniqueName: string;
-  displayName?: string | null;
-  channelIconURL?: string | null;
-  discussionCount: number;
-  commentCount: number;
-  eventCount: number;
-  downloadCount: number;
-  voteCount: number;
-  uniqueContributorCount: number;
-  openIssueCount: number;
-  issueOpenedCount: number;
-  moderationActionCount: number;
-  archivedContentCount: number;
-  lockedContentCount: number;
-  oldestOpenIssueAgeDays?: number | null;
-  issuesPerHundredContributions: number;
-  activityScore: number;
-  healthLabel: string;
-};
-
-type DashboardData = {
-  startDate: string;
-  endDate: string;
-  generatedAt: string;
-  summary: ServerHealthSummary;
-  timeSeries: ServerHealthTimeSeriesPoint[];
-  channelHealth: ChannelHealthRow[];
-  issueAging: IssueAgingBucket[];
-};
+type DashboardData = GetServerHealthDashboardQuery['getServerHealthDashboard'];
+type ChannelHealthRow = DashboardData['channelHealth'][number];
 
 const props = withDefaults(
   defineProps<{
@@ -208,7 +148,7 @@ const summaryCards = computed(() => {
     {
       label: 'Issue Pressure',
       value:
-        channel.value.issuesPerHundredContributions === 0
+        channel.value.issuesPerHundredContributions == null ? '—' : channel.value.issuesPerHundredContributions === 0
           ? '0'
           : channel.value.issuesPerHundredContributions.toFixed(1),
       detail: 'new issues per 100 contributions',

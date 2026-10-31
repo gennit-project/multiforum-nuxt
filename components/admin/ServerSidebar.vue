@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import type { ServerConfig } from '@/__generated__/graphql';
+import type { GetServerConfigQuery } from '@/__generated__/operations';
 import RulesComponent from '@/components/channel/Rules.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
+type ServerConfig = GetServerConfigQuery['serverConfigs'][number];
 
 const props = defineProps({
   serverConfig: {
@@ -16,7 +17,10 @@ const props = defineProps({
   },
 });
 
-const serverRules = computed(() => props.serverConfig?.rules ?? '');
+const serverRules = computed(() => {
+  const rules = props.serverConfig.rules;
+  return typeof rules === 'string' ? rules : rules == null ? '' : JSON.stringify(rules);
+});
 const serverDescription = computed(
   () => props.serverConfig?.serverDescription ?? ''
 );

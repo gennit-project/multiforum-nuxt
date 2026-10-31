@@ -1,3 +1,4 @@
+import { getOperationAST, type DocumentNode } from 'graphql';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import PublicDownloadPipelines from './PublicDownloadPipelines.vue';
@@ -36,10 +37,8 @@ const mockServerAdminUsernames = vi.hoisted(() => ({
 vi.mock('@vue/apollo-composable', async () => {
   const { ref } = await import('vue');
   return {
-    useMutation: (document: { loc?: { source?: { body?: string } } }) => {
-      const isRerun = document.loc?.source?.body?.includes(
-        'RerunPluginPipeline'
-      );
+    useMutation: (document: DocumentNode) => {
+      const isRerun = getOperationAST(document)?.name?.value === 'RerunPluginPipeline';
       const mutate = isRerun ? mockRerunPipeline : mockStartPipeline;
       const callbacks = isRerun
         ? mockRerunDoneCallbacks

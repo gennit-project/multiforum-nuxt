@@ -1,19 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_PLUGIN_PIPELINE_RUN_PAGE } from '@/graphQLData/admin/queries';
-import type {
-  PublicPluginPipelineRunPage,
-  QueryGetPipelineRunPageArgs,
-} from '@/__generated__/graphql';
+import { GetPipelineRunPageDocument as GET_PLUGIN_PIPELINE_RUN_PAGE } from '@/__generated__/operations';
+import type { PublicPluginPipelineRunPage } from '@/composables/usePipelineHistory';
 
 const props = defineProps<{ attempt: PublicPluginPipelineRunPage }>();
 const emit = defineEmits<{ update: [PublicPluginPipelineRunPage] }>();
 const after = ref<string | null>(null);
-const { result, loading, error, refetch, onResult } = useQuery<
-  { getPipelineRunPage: PublicPluginPipelineRunPage | null },
-  QueryGetPipelineRunPageArgs
->(
+const { result, loading, error, refetch, onResult } = useQuery(
   GET_PLUGIN_PIPELINE_RUN_PAGE,
   () => ({ pipelineRunId: props.attempt.run.id, after: after.value }),
   () => ({

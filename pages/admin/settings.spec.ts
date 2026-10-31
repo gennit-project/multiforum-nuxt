@@ -4,6 +4,11 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { flushPromises } from '@vue/test-utils';
 
 import ServerSettingsPage from './settings.vue';
+vi.mock('@/__generated__/operations', () => ({
+GetServerConfigDocument: 'q',
+UpdateServerConfigDocument: 'm',
+SetFeaturedWikiPagesDocument: 'setFeatured'
+}));
 
 const harness = vi.hoisted(() => ({
   result: null as unknown as { value: unknown },
@@ -72,11 +77,8 @@ vi.mock('@vue/apollo-composable', async () => {
 });
 
 vi.mock('@/config', () => ({ config: { serverName: 'test-server' } }));
-vi.mock('@/graphQLData/admin/queries', () => ({ GET_SERVER_CONFIG: 'q' }));
-vi.mock('@/graphQLData/admin/mutations', () => ({
-  UPDATE_SERVER_CONFIG: 'm',
-  SET_FEATURED_WIKI_PAGES: 'setFeatured',
-}));
+
+
 
 const FieldsStub = {
   name: 'CreateEditServerFields',
@@ -278,6 +280,7 @@ describe('Admin server settings page', () => {
   });
 
   it('applies a successful mutation response to the form and cache', async () => {
+    harness.result.value = { serverConfigs: [{ serverName: 'test-server', rules: '[]' }] };
     const wrapper = mountPage();
     const cache = { writeQuery: vi.fn(), evict: vi.fn() };
     harness.updateOptions.update(cache, {
@@ -308,6 +311,7 @@ describe('Admin server settings page', () => {
   });
 
   it('recovers from malformed rules in a mutation response', () => {
+    harness.result.value = { serverConfigs: [{ serverName: 'test-server', rules: '[]' }] };
     const cache = { writeQuery: vi.fn(), evict: vi.fn() };
     harness.updateOptions.update(cache, {
       data: {
@@ -324,6 +328,7 @@ describe('Admin server settings page', () => {
   });
 
   it('evicts server config when writing the mutation result fails', () => {
+    harness.result.value = { serverConfigs: [{ serverName: 'test-server', rules: '[]' }] };
     const cache = {
       writeQuery: vi.fn(() => {
         throw new Error('cache unavailable');
@@ -359,4 +364,12 @@ describe('Admin server settings page', () => {
       .vm.$emit('close-notification');
     expect(wrapper.find('.notification').exists()).toBe(false);
   });
+});
+
+it('does not fabricate a complete settings cache entry when the read is absent', async () => {
+  const wrapper = mountPage();
+  const cache = { writeQuery: vi.fn(), evict: vi.fn() };
+  harness.updateOptions.update(cache, { data: { updateServerConfigs: { serverConfigs: [{ serverDescription: 'Saved', rules: '[]', enableEvents: true }] } } });
+  await wrapper.vm.$nextTick();
+  expect({ description: fields(wrapper).props('formValues').serverDescription, cacheWrites: cache.writeQuery.mock.calls.length }).toEqual({ description: 'Saved', cacheWrites: 0 });
 });

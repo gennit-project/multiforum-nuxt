@@ -7,20 +7,17 @@ import {
   type Ref,
 } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_PLUGIN_PIPELINE_SUMMARY } from '@/graphQLData/admin/queries';
-import type {
-  PluginPipelineSummaryPage,
-  PublicPluginPipelineRunPage,
-  QueryGetPipelineSummaryPageArgs,
-} from '@/__generated__/graphql';
+import { GetPipelineSummaryPageDocument as GET_PLUGIN_PIPELINE_SUMMARY } from '@/__generated__/operations';
+import type { GetPipelineSummaryPageQuery, GetPipelineSummaryPageQueryVariables, GetPipelineRunPageQuery } from '@/__generated__/operations';
+type PluginPipelineSummaryPage = GetPipelineSummaryPageQuery['getPipelineSummaryPage'];
+export type PublicPluginPipelineRunPage = NonNullable<GetPipelineRunPageQuery['getPipelineRunPage']>;
 
 /** The initial page owns current status; continuation requests never replace it. */
 export function usePipelineHistory(
-  variables: Ref<QueryGetPipelineSummaryPageArgs>,
+  variables: Ref<GetPipelineSummaryPageQueryVariables>,
   enabled: Ref<boolean>,
   pollInterval = 3000
 ) {
-  type Data = { getPipelineSummaryPage: PluginPipelineSummaryPage };
   const identity = computed(() => JSON.stringify(variables.value));
   const after = ref<string | null>(null);
   const older = shallowRef<PublicPluginPipelineRunPage[]>([]);
@@ -30,7 +27,7 @@ export function usePipelineHistory(
   const continuation = shallowRef<PluginPipelineSummaryPage['pageInfo'] | null>(
     null
   );
-  const initial = useQuery<Data, QueryGetPipelineSummaryPageArgs>(
+  const initial = useQuery(
     GET_PLUGIN_PIPELINE_SUMMARY,
     variables,
     () => ({
@@ -40,7 +37,7 @@ export function usePipelineHistory(
       notifyOnNetworkStatusChange: true,
     })
   );
-  const more = useQuery<Data, QueryGetPipelineSummaryPageArgs>(
+  const more = useQuery(
     GET_PLUGIN_PIPELINE_SUMMARY,
     () => ({ ...variables.value, after: after.value }),
     () => ({

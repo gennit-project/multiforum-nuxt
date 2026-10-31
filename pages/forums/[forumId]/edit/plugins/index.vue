@@ -1,15 +1,12 @@
 <script setup lang="ts">
+import type { GetInstalledPluginsQuery } from '@/__generated__/operations';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import { parseSettingsJson, getSettingsDefaults } from '@/utils/pluginManifestUtils';
 import { useToast } from '@/composables/useToast';
-import { GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
-import {
-  GET_CHANNEL,
-  GET_CHANNEL_PLUGIN_SETTINGS,
-} from '@/graphQLData/channel/queries';
-import { UPDATE_CHANNEL_ENABLED_PLUGINS } from '@/graphQLData/channel/mutations';
+import { GetInstalledPluginsDocument as GET_INSTALLED_PLUGINS, GetChannelDocument as GET_CHANNEL, GetChannelPluginSettingsDocument as GET_CHANNEL_PLUGIN_SETTINGS , UpdateChannelEnabledPluginsDocument as UPDATE_CHANNEL_ENABLED_PLUGINS  } from '@/__generated__/operations';
 
 type PluginState = {
   enabled: boolean;
@@ -68,20 +65,7 @@ const enabledPluginEdges = computed(() => {
   );
 });
 
-interface EnabledPluginEdge {
-  node?: {
-    id?: string;
-    Plugin?: {
-      id?: string;
-      name?: string;
-      displayName?: string;
-    };
-    version?: string;
-  };
-  properties?: {
-    settingsJson?: unknown;
-  };
-}
+type EnabledPluginEdge = (typeof enabledPluginEdges.value)[number];
 
 const enabledPluginsByKey = computed(() => {
   const map = new Map<string, EnabledPluginEdge>();
@@ -95,23 +79,7 @@ const enabledPluginsByKey = computed(() => {
   return map;
 });
 
-interface ServerPlugin {
-  plugin: {
-    id: string;
-    name?: string;
-    displayName?: string;
-    description?: string;
-  };
-  version: string;
-  enabled: boolean;
-  manifest?: {
-    settingsDefaults?: {
-      channel?: Record<string, unknown>;
-    };
-  };
-  latestVersion?: string;
-  availableVersions?: string[];
-}
+type ServerPlugin = GetInstalledPluginsQuery['getInstalledPlugins'][number];
 
 const serverEnabledPlugins = computed((): ServerPlugin[] => {
   const installed = installedResult.value?.getInstalledPlugins || [];
@@ -173,15 +141,7 @@ const isLoading = computed(
     (installedLoading.value && !installedResult.value)
 );
 
-function getChannelDefaults(
-  manifest: ServerPlugin['manifest']
-): Record<string, unknown> {
-  const defaults = manifest?.settingsDefaults?.channel;
-  if (!defaults || typeof defaults !== 'object') {
-    return {};
-  }
-  return { ...defaults };
-}
+const getChannelDefaults = (manifest: unknown) => getSettingsDefaults(manifest, 'channel');
 
 function initializePluginState(
   pluginKey: string,
@@ -197,24 +157,6 @@ function initializePluginState(
       ...parseSettingsJson(settingsJson),
     },
   };
-}
-
-function parseSettingsJson(settingsJson: unknown): Record<string, unknown> {
-  if (!settingsJson) {
-    return {};
-  }
-  if (typeof settingsJson === 'string') {
-    try {
-      const parsed = JSON.parse(settingsJson);
-      return parsed && typeof parsed === 'object' ? parsed : {};
-    } catch {
-      return {};
-    }
-  }
-  if (typeof settingsJson === 'object') {
-    return settingsJson as Record<string, unknown>;
-  }
-  return {};
 }
 
 function serializeSettingsJson(settings: unknown) {
@@ -489,7 +431,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
             </p>
             <ul class="mt-2 list-inside list-disc space-y-1">
               <li v-for="edge in orphanedChannelPlugins" :key="edge.node.id">
-                {{ edge.node.Plugin.displayName || edge.node.Plugin.name }}
+                {{ edge.node.Plugin?.displayName || edge.node.Plugin?.name || '[Unavailable plugin]' }}
                 <span
                   class="text-xs text-yellow-700/80 dark:text-yellow-300/80"
                 >

@@ -1,6 +1,6 @@
 import { computed, type Ref } from 'vue';
 import { usePipelineHistory } from './usePipelineHistory';
-import type { PublicPluginPipelineRunPage } from '@/__generated__/graphql';
+import type { PublicPluginPipelineRunPage } from './usePipelineHistory';
 
 export type PipelineStatus =
   | 'PENDING'
@@ -11,7 +11,7 @@ export type PipelineStatus =
   | 'TIMED_OUT'
   | 'CANCELLED';
 
-export type PipelineScope = 'SERVER' | 'CHANNEL';
+export type PipelineScope = PublicPluginPipelineRunPage['run']['scope'];
 
 export interface PublicPipelineDiagnostic {
   level: 'INFO' | 'WARNING' | 'ERROR';
@@ -91,7 +91,7 @@ export function usePluginPipeline(
       runs: page.run.jobs.map((job) => ({
         ...job,
         pipelineId: page.run.pipelineId,
-        scope: job.scope as PipelineScope,
+        scope: job.scope,
         channelId: job.channelId ?? undefined,
         message: job.message ?? undefined,
         durationMs: job.durationMs ?? undefined,
@@ -104,7 +104,7 @@ export function usePluginPipeline(
       startedAt: page.run.createdAt,
       status: page.displayStatus,
       isComplete: !page.hasActiveWork,
-      scope: page.run.scope as PipelineScope,
+      scope: page.run.scope,
       channelId: page.run.channelId ?? undefined,
     }))
   );

@@ -10,10 +10,7 @@ import ServerDashboardMetricCards from '@/components/admin/ServerDashboardMetric
 import ServerDashboardModerationSnapshot from '@/components/admin/ServerDashboardModerationSnapshot.vue';
 import ServerDashboardPipelineHealth from '@/components/admin/ServerDashboardPipelineHealth.vue';
 import { RefreshCw } from 'lucide-vue-next';
-import {
-  GET_SERVER_HEALTH_CHANNEL_HEALTH,
-  GET_SERVER_HEALTH_DASHBOARD_OVERVIEW,
-} from '@/graphQLData/admin/queries';
+import { GetServerHealthChannelHealthDocument as GET_SERVER_HEALTH_CHANNEL_HEALTH, GetServerHealthDashboardOverviewDocument as GET_SERVER_HEALTH_DASHBOARD_OVERVIEW } from '@/__generated__/operations';
 
 type ServerHealthSummary = {
   activeChannelCount: number;

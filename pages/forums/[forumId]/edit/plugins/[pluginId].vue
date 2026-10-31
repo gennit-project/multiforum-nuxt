@@ -11,14 +11,9 @@ import type {
   ExistingBot,
 } from '@/components/plugins/BotProfilesEditor.vue';
 import { useToast } from '@/composables/useToast';
-import { GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
-import {
-  GET_CHANNEL,
-  GET_CHANNEL_PLUGIN_SETTINGS,
-} from '@/graphQLData/channel/queries';
-import { UPDATE_CHANNEL_ENABLED_PLUGINS } from '@/graphQLData/channel/mutations';
+import { GetInstalledPluginsDocument as GET_INSTALLED_PLUGINS, GetChannelDocument as GET_CHANNEL, GetChannelPluginSettingsDocument as GET_CHANNEL_PLUGIN_SETTINGS , UpdateChannelEnabledPluginsDocument as UPDATE_CHANNEL_ENABLED_PLUGINS  } from '@/__generated__/operations';
 import type { PluginFormSection, PluginSettings } from '@/types/pluginForms';
-import type { InstalledPlugin, User } from '@/__generated__/graphql';
+
 import {
   getPluginFormSections,
   getSettingsDefaults,
@@ -108,12 +103,12 @@ const enabledPluginsById = computed(() => {
 
 const serverEnabledPlugins = computed(() => {
   const installed = installedResult.value?.getInstalledPlugins || [];
-  return installed.filter((plugin: InstalledPlugin) => plugin.enabled);
+  return installed.filter((plugin) => plugin.enabled);
 });
 
 const plugin = computed(() => {
   return serverEnabledPlugins.value.find(
-    (p: InstalledPlugin) => p.plugin.id === pluginId.value
+    (p) => p.plugin.id === pluginId.value
   );
 });
 
@@ -267,7 +262,7 @@ const serverBotName = computed(() =>
 // Get existing bots for this channel
 const existingBots = computed<ExistingBot[]>(() => {
   const bots = channelResult.value?.channels?.[0]?.Bots || [];
-  return bots.map((bot: User) => ({
+  return bots.map((bot) => ({
     username: bot.username,
     botProfileId: bot.botProfileId,
     isDeprecated: bot.isDeprecated,

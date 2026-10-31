@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GetServerConfigDocument as GET_SERVER_CONFIG } from '@/__generated__/operations';
 import { config } from '@/config';
 import ServerSidebar from '@/components/admin/ServerSidebar.vue';
 
@@ -27,7 +27,7 @@ const serverConfig = computed(() => {
   <div class="w-full">
     <ServerSidebar
       v-if="serverConfig"
-      :key="serverConfig.rules"
+      :key="JSON.stringify(serverConfig.rules)"
       :server-config="serverConfig"
       class="p-2"
     />

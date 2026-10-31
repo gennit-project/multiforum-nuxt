@@ -2,6 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 import PipelinesPage from './pipelines.vue';
+vi.mock('@/__generated__/operations', () => ({
+GetPluginPipelinesDocument: 'q1',
+GetInstalledPluginsDocument: 'q2',
+UpdatePluginPipelinesDocument: 'm'
+}));
 
 vi.stubGlobal('definePageMeta', vi.fn());
 
@@ -40,11 +45,8 @@ vi.mock('@/utils/pipelineUtils', () => ({
   transformPipelinesForMutation: (c: unknown) => c,
   getAvailablePluginsFromInstalled: () => h.available,
 }));
-vi.mock('@/graphQLData/admin/queries', () => ({
-  GET_PLUGIN_PIPELINES: 'q1',
-  GET_INSTALLED_PLUGINS: 'q2',
-}));
-vi.mock('@/graphQLData/admin/mutations', () => ({ UPDATE_PLUGIN_PIPELINES: 'm' }));
+
+
 
 const stubs = {
   FormRow: { name: 'FormRow', template: '<div><slot name="content" /><slot /></div>' },

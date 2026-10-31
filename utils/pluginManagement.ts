@@ -1,8 +1,11 @@
-import type { Plugin, PluginVersion } from '@/__generated__/graphql';
+import type { GetPluginManagementDataQuery, GetInstalledPluginsQuery } from '@/__generated__/operations';
+import { parseSettingsJson } from '@/utils/pluginManifestUtils';
 import {
   getPluginVersionCompatibility,
   type PluginVersionCompatibility,
 } from '@/utils/pluginCompatibility';
+type Plugin = GetPluginManagementDataQuery['plugins'][number];
+type PluginVersion = Plugin['Versions'][number];
 
 export type PluginVersionMetadata = Pick<PluginVersion, 'version'> & {
   apiVersion?: string | null;
@@ -30,30 +33,9 @@ export interface PluginState {
   latestVersion?: string;
 }
 
-interface InstalledPlugin {
-  plugin: {
-    id: string;
-    name: string;
-    description?: string;
-  };
-  version: string;
-  scope: string;
-  enabled: boolean;
-  settingsJson: Record<string, unknown>;
-  hasUpdate?: boolean;
-  latestVersion?: string;
-  availableVersions?: string[];
-}
-
+type InstalledPlugin = GetInstalledPluginsQuery['getInstalledPlugins'][number];
 type BuildPluginStatesParams = {
-  pluginManagementResult?:
-    | {
-        serverConfigs?: Array<{
-          AllowedPlugins?: Plugin[];
-        }>;
-        plugins?: Plugin[];
-      }
-    | null;
+  pluginManagementResult?: GetPluginManagementDataQuery | null;
   installedPlugins?: InstalledPlugin[] | null;
 };
 
@@ -71,7 +53,7 @@ export function buildPluginStates({
   const normalizedInstalledPlugins = installedPlugins ?? [];
 
   return allPlugins.map((plugin: Plugin): PluginState => {
-    const isAllowed = allowedPlugins.some((allowed: Plugin) => allowed.id === plugin.id);
+    const isAllowed = allowedPlugins.some((allowed) => allowed.id === plugin.id);
     const installedPlugin = normalizedInstalledPlugins.find(
       (installed: InstalledPlugin) => installed.plugin.id === plugin.id
     );
@@ -97,19 +79,19 @@ export function buildPluginStates({
     return {
       id: plugin.id,
       name: plugin.name,
-      description: plugin.description || installedPlugin?.plugin?.description,
+      description: plugin.description || installedPlugin?.plugin?.description || undefined,
       status,
       installedVersion: installedPlugin
         ? {
             id: installedPlugin.plugin.id,
             version: installedPlugin.version,
             enabled: installedPlugin.enabled,
-            settings: installedPlugin.settingsJson || {},
+            settings: parseSettingsJson(installedPlugin.settingsJson),
           }
         : undefined,
       availableVersions,
       hasUpdate: installedPlugin?.hasUpdate ?? false,
-      latestVersion: installedPlugin?.latestVersion,
+      latestVersion: installedPlugin?.latestVersion || undefined,
     };
   });
 }

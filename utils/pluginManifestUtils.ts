@@ -1,4 +1,4 @@
-import type { PluginFormSection } from '@/types/pluginForms';
+import type { PluginFormSection, PluginField, PluginConfigValue } from '@/types/pluginForms';
 import type {
   ChannelEnabledPluginsUpdateFieldInput,
   PluginVersionWhere,
@@ -31,25 +31,65 @@ export interface PluginBotProfile {
   prompt: string;
 }
 
+export function isPluginRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+const isConfigValue = (value: unknown): value is PluginConfigValue =>
+  typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean' ||
+  (Array.isArray(value) && value.every((item: unknown) => typeof item === 'string'));
+
+function isPluginField(value: unknown): value is PluginField {
+  if (!isPluginRecord(value) || typeof value.key !== 'string' || typeof value.label !== 'string') return false;
+  if (!['text', 'number', 'boolean', 'toggle', 'select', 'secret', 'textarea', 'forum-multiselect'].includes(String(value.type))) return false;
+  if (['description', 'placeholder'].some((key) => value[key] !== undefined && typeof value[key] !== 'string')) return false;
+  if (value.required !== undefined && typeof value.required !== 'boolean') return false;
+  if (value.default !== undefined && !isConfigValue(value.default)) return false;
+  if (value.options !== undefined && (!Array.isArray(value.options) || !value.options.every((option: unknown) => isPluginRecord(option) && typeof option.label === 'string' && ['string', 'number', 'boolean'].includes(typeof option.value)))) return false;
+  if (value.visibleWhen !== undefined && (!isPluginRecord(value.visibleWhen) || typeof value.visibleWhen.key !== 'string' || !['string', 'number', 'boolean'].includes(typeof value.visibleWhen.equals))) return false;
+  if (value.validation !== undefined) {
+    if (!isPluginRecord(value.validation)) return false;
+    const validation = value.validation;
+    if (['min', 'max', 'minLength', 'maxLength'].some((key) => validation[key] !== undefined && typeof validation[key] !== 'number')) return false;
+    if (validation.pattern !== undefined && typeof validation.pattern !== 'string') return false;
+    if (validation.required !== undefined && typeof validation.required !== 'boolean') return false;
+  }
+  return true;
+}
+
+export function getPluginSecretDeclarations(manifest: unknown): Array<{ key: string; scope?: string; required?: boolean }> {
+  if (!isPluginRecord(manifest) || !Array.isArray(manifest.secrets)) return [];
+  return manifest.secrets.flatMap((secret: unknown) => {
+    if (!isPluginRecord(secret) || typeof secret.key !== 'string') return [];
+    return [{ key: secret.key, scope: typeof secret.scope === 'string' ? secret.scope : undefined, required: typeof secret.required === 'boolean' ? secret.required : undefined }];
+  });
+}
+
 /** Return the form sections for a given scope, or `[]` when absent. */
 export function getPluginFormSections(
-  manifest: PluginManifestLike | null | undefined,
+  manifest: unknown,
   scope: PluginFormScope
 ): PluginFormSection[] {
-  const sections = manifest?.ui?.forms?.[scope];
-  return Array.isArray(sections) ? sections : [];
+  if (!isPluginRecord(manifest) || !isPluginRecord(manifest.ui) || !isPluginRecord(manifest.ui.forms)) return [];
+  const sections = manifest.ui.forms[scope];
+  if (!Array.isArray(sections)) return [];
+  const isSection = (section: unknown): section is PluginFormSection =>
+    isPluginRecord(section) && typeof section.title === 'string' &&
+    (section.description === undefined || typeof section.description === 'string') &&
+    Array.isArray(section.fields) && section.fields.every(isPluginField);
+  return sections.every(isSection) ? sections : sections.filter(isSection);
 }
 
 /** Return a shallow copy of the scope's settings defaults, or `{}`. */
 export function getSettingsDefaults(
-  manifest: PluginManifestLike | null | undefined,
+  manifest: unknown,
   scope: PluginFormScope
 ): Record<string, unknown> {
-  const defaults = manifest?.settingsDefaults?.[scope];
-  if (!defaults || typeof defaults !== 'object') {
+  const defaults = isPluginRecord(manifest) && isPluginRecord(manifest.settingsDefaults) ? manifest.settingsDefaults[scope] : undefined;
+  if (!isPluginRecord(defaults)) {
     return {};
   }
-  return { ...(defaults as Record<string, unknown>) };
+  return { ...defaults };
 }
 
 /** Coerce a settingsJson value (string | object | nullish) into an object. */
@@ -59,14 +99,14 @@ export function parseSettingsJson(settingsJson: unknown): Record<string, unknown
   }
   if (typeof settingsJson === 'string') {
     try {
-      const parsed = JSON.parse(settingsJson);
-      return parsed && typeof parsed === 'object' ? parsed : {};
+      const parsed: unknown = JSON.parse(settingsJson);
+      return isPluginRecord(parsed) ? parsed : {};
     } catch {
       return {};
     }
   }
-  if (typeof settingsJson === 'object') {
-    return settingsJson as Record<string, unknown>;
+  if (isPluginRecord(settingsJson)) {
+    return settingsJson;
   }
   return {};
 }
@@ -81,7 +121,7 @@ export function serializeSettingsJson(settings: unknown): string {
 
 /** Pretty-print a manifest for display, or `null` when there is none. */
 export function stringifyManifest(
-  manifest: PluginManifestLike | null | undefined
+  manifest: unknown
 ): string | null {
   if (!manifest) return null;
   return JSON.stringify(manifest, null, 2);
@@ -102,7 +142,7 @@ export function normalizeBotProfiles(
 ): PluginBotProfile[] {
   if (!Array.isArray(rawProfiles)) return [];
   return rawProfiles.map((p) => {
-    const profile = (p ?? {}) as Record<string, unknown>;
+    const profile = isPluginRecord(p) ? p : {};
     const label =
       (profile.label as string) ||
       (opts.displayNameFallback ? (profile.displayName as string) : '') ||
@@ -133,18 +173,16 @@ export function parseBotProfiles(profilesJson: unknown): PluginBotProfile[] {
  */
 export function resolveServerBotName(params: {
   settingsJson?: unknown;
-  manifest?: PluginManifestLike | null;
+  manifest?: unknown;
 }): string {
   const { settingsJson, manifest } = params;
   if (settingsJson) {
     const settings = parseSettingsJson(settingsJson);
-    if (settings?.botName) {
-      return settings.botName as string;
+    if (typeof settings.botName === 'string' && settings.botName) {
+      return settings.botName;
     }
   }
-  const serverDefaults = manifest?.settingsDefaults?.server as
-    | Record<string, unknown>
-    | undefined;
+  const serverDefaults = getSettingsDefaults(manifest, 'server');
   const defaultBotName = serverDefaults?.botName;
   return typeof defaultBotName === 'string' ? defaultBotName : '';
 }
@@ -155,7 +193,7 @@ export function resolveServerBotName(params: {
  */
 export function resolveServerProfiles(params: {
   settingsJson?: unknown;
-  manifest?: PluginManifestLike | null;
+  manifest?: unknown;
 }): PluginBotProfile[] {
   const { settingsJson, manifest } = params;
   if (settingsJson) {
@@ -164,7 +202,7 @@ export function resolveServerProfiles(params: {
       try {
         const parsed =
           typeof settings.profilesJson === 'string'
-            ? JSON.parse(settings.profilesJson as string)
+            ? JSON.parse(settings.profilesJson)
             : settings.profilesJson;
         if (Array.isArray(parsed) && parsed.length > 0) {
           return normalizeBotProfiles(parsed, { displayNameFallback: true });
@@ -179,9 +217,7 @@ export function resolveServerProfiles(params: {
       });
     }
   }
-  const serverDefaults = manifest?.settingsDefaults?.server as
-    | Record<string, unknown>
-    | undefined;
+  const serverDefaults = getSettingsDefaults(manifest, 'server');
   const profiles = serverDefaults?.profiles;
   if (Array.isArray(profiles) && profiles.length > 0) {
     return normalizeBotProfiles(profiles, { displayNameFallback: true });

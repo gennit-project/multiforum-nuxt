@@ -7,11 +7,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginPipelineEditor from '@/components/plugins/PluginPipelineEditor.vue';
 import PluginPipelineCampaigns from '@/components/plugins/PluginPipelineCampaigns.vue';
 import { useToast } from '@/composables/useToast';
-import {
-  GET_PLUGIN_PIPELINES,
-  GET_INSTALLED_PLUGINS,
-} from '@/graphQLData/admin/queries';
-import { UPDATE_PLUGIN_PIPELINES } from '@/graphQLData/admin/mutations';
+import { GetPluginPipelinesDocument as GET_PLUGIN_PIPELINES, GetInstalledPluginsDocument as GET_INSTALLED_PLUGINS, UpdatePluginPipelinesDocument as UPDATE_PLUGIN_PIPELINES  } from '@/__generated__/operations';
 import type { PipelineConfig } from '@/utils/pipelineSchema';
 import {
   parsePipelinesFromBackend,

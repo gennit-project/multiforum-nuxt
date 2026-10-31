@@ -2,6 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { nextTick, ref } from 'vue';
 import ForumPluginsPage from './index.vue';
+vi.mock('@/__generated__/operations', () => ({
+GetInstalledPluginsDocument: 'INSTALLED',
+GetChannelDocument: 'CHANNEL',
+GetChannelPluginSettingsDocument: 'CHANNEL_SETTINGS',
+UpdateChannelEnabledPluginsDocument: 'UPDATE'
+}));
 
 const h = vi.hoisted(() => ({
   channelResult: null as unknown as { value: any },
@@ -58,16 +64,9 @@ vi.mock('@vue/apollo-composable', () => ({
 vi.mock('@/composables/useToast', () => ({
   useToast: () => ({ success: h.toastSuccess, error: h.toastError }),
 }));
-vi.mock('@/graphQLData/admin/queries', () => ({
-  GET_INSTALLED_PLUGINS: 'INSTALLED',
-}));
-vi.mock('@/graphQLData/channel/queries', () => ({
-  GET_CHANNEL: 'CHANNEL',
-  GET_CHANNEL_PLUGIN_SETTINGS: 'CHANNEL_SETTINGS',
-}));
-vi.mock('@/graphQLData/channel/mutations', () => ({
-  UPDATE_CHANNEL_ENABLED_PLUGINS: 'UPDATE',
-}));
+
+
+
 
 const mountPage = () => mountWithDefaults(ForumPluginsPage);
 

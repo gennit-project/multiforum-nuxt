@@ -2,6 +2,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 import RegistriesPage from './registries.vue';
+vi.mock('@/__generated__/operations', () => ({
+GetServerConfigDocument: 'q',
+UpdateServerConfigDocument: 'm'
+}));
 
 vi.stubGlobal('definePageMeta', vi.fn());
 
@@ -44,8 +48,8 @@ vi.mock('@vue/apollo-composable', async () => {
 const toast = vi.hoisted(() => ({ success: vi.fn(), error: vi.fn() }));
 vi.mock('@/composables/useToast', () => ({ useToast: () => toast }));
 vi.mock('@/config', () => ({ config: { serverName: 'test-server' } }));
-vi.mock('@/graphQLData/admin/queries', () => ({ GET_SERVER_CONFIG: 'q' }));
-vi.mock('@/graphQLData/admin/mutations', () => ({ UPDATE_SERVER_CONFIG: 'm' }));
+
+
 
 const stubs = {
   FormRow: {
@@ -128,7 +132,7 @@ describe('Plugin registries page', () => {
     await Promise.resolve();
     expect(h.mutate).toHaveBeenCalledWith({
       serverName: 'test-server',
-      input: { pluginRegistries: ['https://new.example.com'] },
+      input: { pluginRegistries: { set: ['https://new.example.com'] } },
     });
     expect(toast.success).toHaveBeenCalled();
   });

@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import {
-  SET_FEATURED_WIKI_PAGES,
-  UPDATE_SERVER_CONFIG,
-} from '@/graphQLData/admin/mutations';
+import { GetServerConfigDocument as GET_SERVER_CONFIG, SetFeaturedWikiPagesDocument as SET_FEATURED_WIKI_PAGES, UpdateServerConfigDocument as UPDATE_SERVER_CONFIG  } from '@/__generated__/operations';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import type {
-  ServerConfig,
   ServerConfigUpdateInput,
 } from '@/__generated__/graphql';
+import { isPluginRecord } from '@/utils/pluginManifestUtils';
 import type { BrandingLink } from '@/utils/branding';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { config } from '@/config';
@@ -24,20 +20,18 @@ import {
 // not GraphQL update inputs. The v7 ServerConfigUpdateInput wraps every scalar
 // in `{ set: ... }`; that wrapping happens only at the mutation boundary
 // (serverUpdateInput / saveServerField), so the form itself stays plain.
-type ServerSettingsFormValues = Partial<ServerConfig>;
+import type { ServerSettingsFormValues } from '@/types/ServerSettings';
 
 // The API returns the JSON column as either a parsed array or a string,
 // depending on the driver; normalize before the form binds to it.
 const parseCustomFooterLinks = (value: unknown): BrandingLink[] => {
-  if (Array.isArray(value)) return value as BrandingLink[];
-  if (typeof value !== 'string' || !value.trim()) return [];
-  try {
-    const parsed = JSON.parse(value);
-    return Array.isArray(parsed) ? (parsed as BrandingLink[]) : [];
-  } catch (e) {
-    console.error('Error parsing branding footer links', e);
-    return [];
+  let parsed: unknown = value;
+  if (typeof value === 'string') {
+    try { parsed = JSON.parse(value); } catch { return []; }
   }
+  return Array.isArray(parsed) ? parsed.flatMap((item: unknown) =>
+    isPluginRecord(item) && typeof item.label === 'string' && typeof item.url === 'string'
+      ? [{ label: item.label, url: item.url }] : []) : [];
 };
 
 const dataLoaded = ref(false);
@@ -95,7 +89,7 @@ onGetServerResult((result) => {
 
   let rules = [];
   try {
-    rules = JSON.parse(serverConfig.rules) || [];
+    rules = typeof serverConfig.rules === 'string' ? JSON.parse(serverConfig.rules) : serverConfig.rules || [];
   } catch (e) {
     console.error('Error parsing server rules', e);
   }
@@ -211,7 +205,7 @@ const {
         };
 
         // Also update the cache - reconstruct the full config
-        cache.writeQuery({
+        if (serverConfig.value) cache.writeQuery({
           query: GET_SERVER_CONFIG,
           variables: {
             serverName: config.serverName,
@@ -325,7 +319,7 @@ function updateFormValues(data: ServerSettingsFormValues) {
             :get-server-error="getServerError"
             :update-server-error="combinedUpdateError"
             :edit-server-loading="isSaving"
-            :form-values="(formValues as unknown as ServerConfigUpdateInput)"
+            :form-values="formValues"
             :save-status="autosaveStatus"
             :save-error-message="autosaveErrorMessage"
             @submit="submit"

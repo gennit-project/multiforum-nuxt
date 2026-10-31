@@ -5,8 +5,7 @@ import FormRow from '@/components/FormRow.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginDiscoverySection from '@/components/admin/plugins/PluginDiscoverySection.vue';
 import { useToast } from '@/composables/useToast';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import { UPDATE_SERVER_CONFIG } from '@/graphQLData/admin/mutations';
+import { GetServerConfigDocument as GET_SERVER_CONFIG, UpdateServerConfigDocument as UPDATE_SERVER_CONFIG  } from '@/__generated__/operations';
 import { config } from '@/config';
 
 const toast = useToast();
@@ -72,7 +71,7 @@ const saveRegistries = async () => {
   try {
     await updateServerConfig({
       serverName: config.serverName,
-      input: { pluginRegistries: pluginRegistries.value },
+      input: { pluginRegistries: { set: pluginRegistries.value } },
     });
     originalRegistries.value = [...pluginRegistries.value];
     toast.success('Plugin registries updated.');
