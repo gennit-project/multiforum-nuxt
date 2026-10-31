@@ -14,6 +14,8 @@ export const pilotDocuments = [
   'graphQLData/mod/queries.js#GET_COMMENT_ISSUE',
   'graphQLData/comment/queries.js#GET_COMMENT_REPLIES',
   'graphQLData/comment/queries.js#GET_COMMENT_AND_REPLIES',
+  'graphQLData/comment/mutations.js#SUBSCRIBE_TO_COMMENT',
+  'graphQLData/comment/mutations.js#UNSUBSCRIBE_FROM_COMMENT',
   'graphQLData/comment/mutations.js#STICKY_COMMENT',
   'graphQLData/comment/mutations.js#UNSTICKY_COMMENT',
 ];

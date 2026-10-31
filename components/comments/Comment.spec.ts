@@ -1,4 +1,4 @@
-import { StickyCommentDocument } from '@/__generated__/operations';
+import { StickyCommentDocument, SubscribeToCommentDocument, UnsubscribeFromCommentDocument } from '@/__generated__/operations';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
@@ -32,9 +32,9 @@ vi.mock('nuxt/app', () => ({
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (mutation: unknown) => ({
     mutate:
-      mutation === 'SUBSCRIBE_TO_COMMENT'
+      mutation === SubscribeToCommentDocument
         ? h.subscribeToComment
-        : mutation === 'UNSUBSCRIBE_FROM_COMMENT'
+        : mutation === UnsubscribeFromCommentDocument
           ? h.unsubscribeFromComment
           : mutation === StickyCommentDocument
             ? h.stickyComment

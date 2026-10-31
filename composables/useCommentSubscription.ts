@@ -1,14 +1,14 @@
 import { computed, type ComputedRef, type Ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import type { CommentView } from '@/types/Comment';
 import { useUsername } from '@/composables/useAuthState';
 import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 import { isCommentSubscribedByUser } from '@/utils/commentDisplay';
 import {
-  SUBSCRIBE_TO_COMMENT,
-  UNSUBSCRIBE_FROM_COMMENT,
-} from '@/graphQLData/comment/mutations';
-type Comment = Pick<CommentView, 'id' | 'SubscribedToNotifications'>;
+  SubscribeToCommentDocument,
+  UnsubscribeFromCommentDocument,
+  type CommentFieldsFragment,
+} from '@/__generated__/operations';
+type Comment = Pick<CommentFieldsFragment, 'id' | 'SubscribedToNotifications'>;
 
 /**
  * Reply-notification subscription for a single comment: the subscribe /
@@ -23,44 +23,14 @@ export function useCommentSubscription(
   const usernameVar = useUsername();
   const commentId = computed(() => commentData.value.id);
 
-  const { mutate: subscribeToComment } = useMutation(SUBSCRIBE_TO_COMMENT, {
-    update: (cache, result) => {
-      if (result.data?.subscribeToComment) {
-        cache.modify({
-          id: cache.identify({
-            __typename: 'Comment',
-            id: commentData.value.id,
-          }),
-          fields: {
-            SubscribedToNotifications(_) {
-              return result.data.subscribeToComment.SubscribedToNotifications;
-            },
-          },
-        });
-      }
-    },
-  });
-
+  // Both responses select Comment.id and the complete subscriber list. Apollo's
+  // normalizer replaces that list on the returned entity, even if the renderer
+  // has navigated to another comment before the mutation resolves.
+  const { mutate: subscribeToComment } = useMutation(
+    SubscribeToCommentDocument
+  );
   const { mutate: unsubscribeFromComment } = useMutation(
-    UNSUBSCRIBE_FROM_COMMENT,
-    {
-      update: (cache, result) => {
-        if (result.data?.unsubscribeFromComment) {
-          cache.modify({
-            id: cache.identify({
-              __typename: 'Comment',
-              id: commentData.value.id,
-            }),
-            fields: {
-              SubscribedToNotifications(_) {
-                return result.data.unsubscribeFromComment
-                  .SubscribedToNotifications;
-              },
-            },
-          });
-        }
-      },
-    }
+    UnsubscribeFromCommentDocument
   );
 
   const isSubscribed = computed(() =>

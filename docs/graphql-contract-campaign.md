@@ -175,7 +175,7 @@ The latter uses the same strict extractor as `graphql:check`, resolving the actu
 source selections and imported fragments without executing application modules.
 The explicit `pilotDocuments` list in `scripts/generate-graphql-operations.mjs`
 limits generation to public profiles, account settings, archived-comment issue
-links, sticky/unsticky comment mutations, and the comment slices below. These consumers import typed ASTs:
+links, comment notification/sticky mutations, and the comment read slices below. These consumers import typed ASTs:
 
 ```ts
 import { GetPublicUserProfileDocument } from '@/__generated__/operations';
@@ -237,7 +237,7 @@ retains the current page; a valid next page can replace a null previous page.
 | `ChildComments.vue`: `useQuery`, `fetchMore`, slot                                                                                    | Generated `GetCommentWithRepliesDocument` and exact query result                                                                         | None for this read                                                     |
 | `Comment.vue` recursive props and forwarded interaction payloads                                                                      | `CommentView`, derived from generated `CommentFieldsFragment`; `ReplyComment` is the exact selected reply                                | Other producers below still supply legacy context                      |
 | `CommentHeader`, `CommentButtons`, `VoteButtons`, `ReplyButton`, `CommentEditsDropdown`                                               | Selected comment fields; revision pairs use selected `PastVersions`; author unions narrow by available fields, no full-entity assertions | Vote/reaction/revision/favorite mutations remain separate slices       |
-| `useCommentPermalink`, `useCommentSubscription`, `useCommentStickyMutations`, `useBestAnswerMutations`                                | Selected view or minimal `Pick` inputs; pin/unpin documents remain typed from phase 3                                                    | Subscription and best-answer operations/cache fragments remain legacy  |
+| `useCommentPermalink`, `useCommentSubscription`, `useCommentStickyMutations`, `useBestAnswerMutations`                                | Selected view or minimal `Pick` inputs; pin/unpin documents remain typed from phase 3                                                    | Subscription migrated in slice 3; best-answer operations/cache fragments remain legacy  |
 | `useCommentFormState`, `useCommentSectionModals`, `useCommentFeedbackMutation`, `BrokenRulesModal`, `ConfirmUndoCommentFeedbackModal` | Reply edit/report/feedback inputs accept the selected view; cache eviction identifies `Comment` by id                                    | Their write operations and new-feedback response are not migrated here |
 | `commentDisplay`, `commentPermalink`, `routerUtils`                                                                                   | Structural display helpers accept only the fields they inspect; feedback route input requires ids rather than complete entities          | Shared context operation migration below                               |
 
@@ -308,6 +308,36 @@ strict validation and null guards remain in force.
 Root feeds, profile tabs, mutations/cache writes and backend enforcement remain
 follow-up work owned by frontend #700 (or the backend campaign). Slice 1's shared
 presentation compatibility exceptions remain necessary for their other producers.
+
+## Phase 5, slice 3: comment reply-notification subscriptions (#700)
+
+Two more operations are generated (ten total): `SUBSCRIBE_TO_COMMENT` and
+`UNSUBSCRIBE_FROM_COMMENT`. Their selections and operation names are unchanged.
+`useCommentSubscription` is their only production Apollo consumer; the shared
+`Comment.vue` menu and its `?action=unsubscribe` integration use that composable.
+The input is a minimal `Pick<CommentFieldsFragment, 'id' |
+'SubscribedToNotifications'>`; both mutations infer exact variables and nullable
+results from generated documents without schema-entity assertions.
+
+The previous explicit cache modifier wrote subscribers onto the current render
+prop's ID. A late mutation response after navigation could therefore modify the
+wrong comment. Both returned comments select `id`, and Apollo adds `__typename`,
+so normal entity normalization replaces the selected subscriber list on the
+returned comment. The redundant modifiers are removed. Real Apollo/normalized
+cache tests cover repeated subscribe/unsubscribe, empty/null results, errors and
+navigation while a request is pending. Document-identity and source-equivalence
+checks guard this migrated boundary; negative compilation fixtures reject wrong
+ID types, missing variables and unselected fields. Browser coverage exercises
+repeated Watch/Unwatch Replies menu actions without a reload.
+
+Root-list migration remains separate: `GET_DISCUSSION_COMMENTS` feeds discussion
+detail fallback data, downloads, answer pagination and multiple form cache writes;
+`GET_EVENT_COMMENTS` likewise crosses the shared section/form boundaries. Migrate
+those coordinated consumers together instead of widening profile queries or
+weakening renderer types. Profile, root-list, other mutation/cache consumers and
+existing presentation compatibility exceptions remain frontend-owned #700 work.
+Discussion/event/issue subscription operations and the shared auto-unsubscribe
+lifecycle are unchanged by this slice.
 
 ## Next milestones
 
