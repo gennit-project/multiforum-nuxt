@@ -92,6 +92,37 @@ describe('useIssueActivityFeed', () => {
     );
   });
 
+  it.each([10, 20])('preserves a %i-item loaded window when a mutation returns all history', (loaded) => {
+    let resultCb: (r: unknown) => void = () => {};
+    const channelId = ref('general');
+    const { hasMoreActivityFeed } = useIssueActivityFeed({
+      channelId,
+      activityFeedLimit: 10,
+      onIssueResult: (cb) => {
+        resultCb = cb as (r: unknown) => void;
+        return { off: vi.fn() };
+      },
+    });
+    const options = (useMutation as unknown as ReturnType<typeof vi.fn>).mock.calls[0]![1];
+    const cachedIssue = { id: 'issue-1', ActivityFeed: makeFeed(loaded), ActivityFeedConnection: { aggregate: { count: { nodes: 35 } } } };
+    const cache = {
+      readQuery: vi.fn(() => ({ issues: [cachedIssue] })),
+      writeQuery: vi.fn((write) => resultCb({ data: write.data })),
+    };
+    // A pending mutation must keep writing its response's original forum key.
+    channelId.value = 'other';
+    const history = [{ id: 'newest' }, ...makeFeed(35)];
+    options.update(cache, { data: { addIssueActivityFeedItem: { issues: [{
+      id: 'issue-1', issueNumber: 1, channelUniqueName: 'general',
+      ActivityFeed: history, ActivityFeedConnection: { aggregate: { count: { nodes: 36 } } },
+    }] } } });
+    const write = cache.writeQuery.mock.calls[0]![0];
+    expect({ variables: write.variables, ids: write.data.issues[0].ActivityFeed.map((item: { id: string }) => item.id), count: write.data.issues[0].ActivityFeedConnection.aggregate.count.nodes, more: hasMoreActivityFeed.value }).toEqual({
+      variables: { channelUniqueName: 'general', issueNumber: 1, activityFeedLimit: 10, activityFeedOffset: 0 },
+      ids: history.slice(0, loaded).map(item => item.id), count: 36, more: true,
+    });
+  });
+
   it('skips cache writes when mutation data has no updated issues', () => {
     useIssueActivityFeed({
       channelId: ref('general'),

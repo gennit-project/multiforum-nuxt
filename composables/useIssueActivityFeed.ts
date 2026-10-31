@@ -48,12 +48,19 @@ export function useIssueActivityFeed({
     if (!issue) {
       return;
     }
-    lastActivityFeedBatchSize.value = issue.ActivityFeed?.length ?? 0;
+    const loaded = issue.ActivityFeed.length;
+    const total = issue.ActivityFeedConnection?.aggregate?.count?.nodes;
+    lastActivityFeedBatchSize.value = typeof total === 'number'
+      ? (loaded < total ? pageSize : 0)
+      : loaded;
   });
 
-  const hasMoreActivityFeed = computed(
-    () => lastActivityFeedBatchSize.value === pageSize
-  );
+  const hasMoreActivityFeed = computed(() => {
+    const total = activeIssue?.value?.ActivityFeedConnection?.aggregate?.count?.nodes;
+    return typeof total === 'number'
+      ? activityFeedItems.value.length < total
+      : lastActivityFeedBatchSize.value === pageSize;
+  });
 
   const loadMoreActivityFeed = async () => {
     if (
@@ -139,7 +146,15 @@ export function useIssueActivityFeed({
         const existingIssues = existingIssueData.issues;
 
         const newIssues = existingIssues.map((issue) =>
-          issue.id === updatedIssue.id ? { ...issue, ActivityFeed: updatedIssue.ActivityFeed, ActivityFeedConnection: updatedIssue.ActivityFeedConnection } : issue
+          issue.id === updatedIssue.id ? {
+            ...issue,
+            // The mutation returns the entire history. Keep the visible window
+            // already loaded for this query, rather than expanding it implicitly.
+            ActivityFeed: typeof activityFeedLimit === 'number'
+              ? updatedIssue.ActivityFeed.slice(0, Math.max(pageSize, issue.ActivityFeed.length))
+              : updatedIssue.ActivityFeed,
+            ActivityFeedConnection: updatedIssue.ActivityFeedConnection,
+          } : issue
         );
 
         cache.writeQuery({
