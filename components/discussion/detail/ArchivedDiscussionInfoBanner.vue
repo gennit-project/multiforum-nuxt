@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DISCUSSION_ISSUE } from '@/graphQLData/mod/queries';
+import { GetDiscussionChannelsDocument as GET_DISCUSSION_ISSUE } from '@/__generated__/operations';
 import ArchiveBox from '@/components/icons/ArchiveBox.vue';
 
 const props = defineProps({
@@ -19,8 +19,8 @@ const { result: getDiscussionIssueResult } = useQuery(GET_DISCUSSION_ISSUE, {
 });
 
 const issueNumber = computed(() => {
-  return getDiscussionIssueResult.value?.discussionChannels?.[0]?.RelatedIssues?.[0]
-    ?.issueNumber;
+  return getDiscussionIssueResult.value?.discussionChannels?.[0]
+    ?.RelatedIssues?.[0]?.issueNumber;
 });
 
 const markdownLinkToIssue = computed(() => {

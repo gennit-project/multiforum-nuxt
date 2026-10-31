@@ -3,12 +3,15 @@ import { ref, computed } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import GenericModal from '@/components/GenericModal.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { GET_SPECIFIC_DISCUSSION_FEEDBACK as GET_FEEDBACK } from '@/graphQLData/discussion/queries';
-import type { Comment } from '@/__generated__/graphql';
+import {
+  GetSpecificDiscussionFeedbackDocument as GET_FEEDBACK,
+  UpdateCommentDocument as UPDATE_COMMENT,
+} from '@/__generated__/operations';
+import type { GetSpecificDiscussionFeedbackQuery } from '@/__generated__/operations';
 import CommentHeader from '@/components/comments/CommentHeader.vue';
 import TextEditor from '@/components/TextEditor.vue';
-import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
+type Comment = GetSpecificDiscussionFeedbackQuery['comments'][number];
 
 const props = defineProps({
   discussionId: {
@@ -54,11 +57,11 @@ onResult((result) => {
   }
   feedbackToEditID.value = comment.id;
   commentData.value = comment;
-  editFormValues.value.text = comment.text;
+  editFormValues.value.text = comment.text || '';
 });
 
 const updateCommentInput = computed(() => ({
-  text: editFormValues.value?.text || '',
+  text: { set: editFormValues.value?.text || '' },
 }));
 
 const {
@@ -76,7 +79,7 @@ function handleEdit() {
   try {
     editComment({
       commentWhere: {
-        id: commentData.value?.id || '',
+        id: { eq: commentData.value?.id || '' },
       },
       updateCommentInput: updateCommentInput.value,
     });
@@ -121,7 +124,7 @@ const body = 'Are you sure you want to update your feedback?';
         <TextEditor
           id="editFeedbackComment"
           :key="commentData?.id"
-          class="mb-2 mt-3 p-1"
+          class="mt-3 mb-2 p-1"
           :initial-value="commentData?.text || '[Deleted]'"
           @update="updateFeedback"
         />

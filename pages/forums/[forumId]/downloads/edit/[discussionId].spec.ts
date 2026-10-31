@@ -1,13 +1,11 @@
+import { UpdateDownloadLabelsDocument as UPDATE_DOWNLOAD_LABELS } from '@/__generated__/operations';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import { shallowMount } from '@vue/test-utils';
 import { ref, unref, defineComponent, h } from 'vue';
 import { useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import {
-  UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
-  UPDATE_DOWNLOAD_LABELS,
-} from '@/graphQLData/discussion/mutations';
+import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 
 const routeHarness = vi.hoisted(() => ({ routerPush: vi.fn() }));
@@ -84,6 +82,7 @@ const populatedDiscussion = () => ({
   Tags: [{ text: 'art' }, { text: '3d' }],
   DiscussionChannels: [
     {
+      channelUniqueName: 'cats',
       Channel: { uniqueName: 'cats' },
       LabelOptions: [{ value: 'pdf', group: { key: 'type' } }],
     },
@@ -165,9 +164,9 @@ describe('download edit page', () => {
 
   it('shows the access-denied message for unauthorized users', async () => {
     const wrapper = await loadPage(RequireAuthDeniedStub);
-    expect(
-      wrapper.findComponent(AccessDeniedMessage).props('action')
-    ).toBe('edit this download');
+    expect(wrapper.findComponent(AccessDeniedMessage).props('action')).toBe(
+      'edit this download'
+    );
   });
 
   it('does not render the form for unauthorized users', async () => {

@@ -34,7 +34,11 @@ vi.mock('@vue/apollo-composable', () => ({
     if (h.callIndex.n === 2)
       return { mutate: h.updateLabels, loading: ref(false), error: ref(null) };
     if (h.callIndex.n === 3)
-      return { mutate: h.updateDiscussion, loading: ref(false), error: ref(null) };
+      return {
+        mutate: h.updateDiscussion,
+        loading: ref(false),
+        error: ref(null),
+      };
     return { mutate: h.updateSupport, loading: ref(false), error: ref(null) };
   },
 }));
@@ -42,7 +46,9 @@ vi.mock('nuxt/app', () => ({
   useRoute: () => h.route,
   useRouter: () => ({ push: h.push }),
 }));
-vi.mock('@/composables/useAuthState', () => ({ useUsername: () => h.username }));
+vi.mock('@/composables/useAuthState', () => ({
+  useUsername: () => h.username,
+}));
 
 const fieldsStub = {
   name: 'CreateEditDiscussionFields',
@@ -167,6 +173,35 @@ describe('CreateDownload submit', () => {
     ).toBe('My Model');
   });
 
+  it('preserves author, tag, channel and crosspost connections', async () => {
+    const wrapper = mountCreate();
+    await submit(wrapper, {
+      title: 'T',
+      selectedTags: ['models'],
+      crosspostId: 'source',
+    });
+
+    expect(h.createDownload).toHaveBeenCalledWith({
+      input: [
+        {
+          channelConnections: ['cats'],
+          discussionCreateInput: {
+            title: 'T',
+            body: '',
+            hasDownload: true,
+            Tags: {
+              connect: [{ where: { node: { text: { eq: 'models' } } } }],
+            },
+            Author: { connect: { where: { node: { username: 'alice' } } } },
+            CrosspostedDiscussion: {
+              connect: { where: { node: { id: 'source' } } },
+            },
+          },
+        },
+      ],
+    });
+  });
+
   it('connects downloadable files that have ids', async () => {
     const wrapper = mountCreate();
 
@@ -184,7 +219,11 @@ describe('CreateDownload submit', () => {
 
 describe('CreateDownload onDone follow-ups', () => {
   const respond = (id = 'newD') => ({
-    data: { createDiscussionWithChannelConnections: { id } },
+    data: {
+      createDiscussionWithChannelConnections: [
+        { DiscussionChannels: [{ Discussion: { id } }] },
+      ],
+    },
   });
 
   it('navigates to the new download page on success', async () => {
@@ -222,6 +261,31 @@ describe('CreateDownload onDone follow-ups', () => {
     await flushPromises();
 
     expect(h.updateDiscussion).toHaveBeenCalled();
+  });
+
+  it('preserves the album payload and excludes images without IDs', async () => {
+    const wrapper = mountCreate();
+    await submit(wrapper, {
+      title: 'T',
+      album: { images: [{ id: 'img1' }, { id: '' }], imageOrder: ['img1'] },
+    });
+
+    await h.onDone?.(respond());
+    await flushPromises();
+
+    expect(h.updateDiscussion).toHaveBeenCalledWith({
+      where: { id: { eq: 'newD' } },
+      updateDiscussionInput: {
+        Album: {
+          create: {
+            node: {
+              imageOrder: ['img1'],
+              Images: { connect: [{ where: { node: { id: 'img1' } } }] },
+            },
+          },
+        },
+      },
+    });
   });
 
   it('saves download labels mapped to filter-option ids', async () => {

@@ -408,11 +408,11 @@ function handleSaveEdit() {
 
   editComment({
     commentWhere: {
-      id: commentToEdit.value.id,
+      id: { eq: commentToEdit.value.id },
     },
     updateCommentInput: {
-      text: editFormValues.value.text,
-      isRootComment: editFormValues.value.isRootComment,
+      text: { set: editFormValues.value.text },
+      isRootComment: editFormValues.value.isRootComment === undefined ? undefined : { set: editFormValues.value.isRootComment },
     },
   });
 }

@@ -2,6 +2,7 @@
 import {
   GetDiscussionDetailDocument as GET_DISCUSSION_DETAIL,
   GetDownloadDetailDocument as GET_DOWNLOAD_DETAIL,
+  UpdateDiscussionWithChannelConnectionsDocument as UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
 } from '@/__generated__/operations';
 import { ref, nextTick, computed } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
@@ -9,7 +10,6 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import TextInput from '@/components/TextInput.vue';
-import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
@@ -103,7 +103,7 @@ const {
 } = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: {
     where: { id: { eq: discussionId.value } },
-    updateDiscussionInput: formValues.value,
+    updateDiscussionInput: { title: { set: formValues.value.title } },
   },
 }));
 

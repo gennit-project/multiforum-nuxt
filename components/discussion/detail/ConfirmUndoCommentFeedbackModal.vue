@@ -4,11 +4,14 @@ import type { PropType } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import GenericModal from '@/components/GenericModal.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { DELETE_COMMENT } from '@/graphQLData/comment/mutations';
-import { GET_SPECIFIC_COMMENT_FEEDBACK as GET_FEEDBACK } from '@/graphQLData/comment/queries';
-import type { CommentView as Comment } from '@/types/Comment';
+import {
+  DeleteCommentDocument as DELETE_COMMENT,
+  GetSpecificCommentFeedbackDocument as GET_FEEDBACK,
+} from '@/__generated__/operations';
+import type { GetSpecificCommentFeedbackQuery } from '@/__generated__/operations';
 import CommentHeader from '@/components/comments/CommentHeader.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
+type Comment = GetSpecificCommentFeedbackQuery['comments'][number];
 
 const props = defineProps({
   commentId: {
@@ -16,7 +19,7 @@ const props = defineProps({
     required: true,
   },
   commentToRemoveFeedbackFrom: {
-    type: Object as PropType<Comment>,
+    type: Object as PropType<{ id: string }>,
     required: true,
   },
   modName: {
@@ -62,7 +65,7 @@ const {
   onDone: onFeedbackDeleted,
 } = useMutation(DELETE_COMMENT, {
   update: (cache, { data }) => {
-    if (commentData.value && data?.deleteComments?.nodesDeleted > 0) {
+    if (commentData.value && (data?.deleteComments?.nodesDeleted || 0) > 0) {
       cache.evict({
         id: cache.identify({ __typename: 'Comment', id: commentData.value.id }),
       });

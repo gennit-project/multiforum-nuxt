@@ -10,7 +10,7 @@ import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import CancelButton from '@/components/CancelButton.vue';
 import { useMutation } from '@vue/apollo-composable';
-import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
+import { UpdateImageDocument as UPDATE_IMAGE } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
 import AppImage from '@/components/image/AppImage.vue';

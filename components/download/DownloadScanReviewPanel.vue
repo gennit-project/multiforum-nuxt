@@ -2,9 +2,9 @@
 import { computed, ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import {
-  CLEAR_DOWNLOADABLE_FILE_SCAN,
-  RETRY_DOWNLOADABLE_FILE_SCAN,
-} from '@/graphQLData/discussion/mutations';
+  ClearDownloadableFileScanDocument as CLEAR_DOWNLOADABLE_FILE_SCAN,
+  RetryDownloadableFileScanDocument as RETRY_DOWNLOADABLE_FILE_SCAN,
+} from '@/__generated__/operations';
 import { useIsAuthenticated, useUsername } from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { useToast } from '@/composables/useToast';

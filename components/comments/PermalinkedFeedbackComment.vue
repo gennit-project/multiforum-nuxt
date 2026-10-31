@@ -1,21 +1,27 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_FEEDBACK_COMMENT } from '@/graphQLData/comment/queries';
+import { GetFeedbackCommentDocument as GET_FEEDBACK_COMMENT } from '@/__generated__/operations';
 import ErrorBanner from '../ErrorBanner.vue';
 import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 
-const feedbackId = computed(() => route.params.feedbackId as string);
+const feedbackId = computed(() =>
+  typeof route.params.feedbackId === 'string' ? route.params.feedbackId : ''
+);
 
 const {
   result: commentResult,
   error: commentError,
   loading: commentLoading,
-} = useQuery(GET_FEEDBACK_COMMENT, {
-  id: feedbackId,
-});
+} = useQuery(
+  GET_FEEDBACK_COMMENT,
+  () => ({
+    id: feedbackId.value,
+  }),
+  { enabled: computed(() => !!feedbackId.value), keepPreviousResult: false }
+);
 </script>
 
 <template>

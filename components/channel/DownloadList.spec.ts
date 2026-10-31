@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
 import { sims4PackPreferenceFilterGroups } from '@/tests/playwright/helpers/sims4DownloadFixtures';
@@ -17,7 +17,11 @@ const h = vi.hoisted(() => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: (_query: unknown, variables: Record<string, unknown>) => {
+  useQuery: (
+    _query: unknown,
+    input: Record<string, unknown> | (() => Record<string, unknown>)
+  ) => {
+    const variables = typeof input === 'function' ? input() : input;
     h.useQueryCalls.push({ variables });
     return {
       result: h.result,
@@ -68,8 +72,15 @@ const mountList = (props: Record<string, unknown> = {}) =>
           emits: ['close-lightbox'],
           template: '<div />',
         },
-        DownloadSkeletonCard: { name: 'DownloadSkeletonCard', template: '<div class="skeleton" />' },
-        ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err" />' },
+        DownloadSkeletonCard: {
+          name: 'DownloadSkeletonCard',
+          template: '<div class="skeleton" />',
+        },
+        ErrorBanner: {
+          name: 'ErrorBanner',
+          props: ['text'],
+          template: '<div class="err" />',
+        },
         RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
         ClientOnly: { template: '<div><slot /></div>' },
       },
@@ -127,6 +138,43 @@ describe('DownloadList pagination', () => {
     expect(h.fetchMore).toHaveBeenCalled();
   });
 
+  it('deduplicates rows delivered by repeated pagination responses', async () => {
+    const wrapper = mountList();
+    await wrapper.getComponent({ name: 'LoadMore' }).vm.$emit('load-more');
+    const update = h.fetchMore.mock.calls[0]![0].updateQuery;
+    expect(
+      update(resultWith([channel('d1')], 3), {
+        fetchMoreResult: resultWith([channel('d1'), channel('d2')], 3),
+      }).getDiscussionsInChannel.discussionChannels.map(
+        (row: { id: string }) => row.id
+      )
+    ).toEqual(['dc-d1', 'dc-d2']);
+  });
+
+  it('ignores a page that completes after navigating to another forum', async () => {
+    const route = reactive({ params: { forumId: 'cats' }, query: {} });
+    h.route = route;
+    const wrapper = mountList();
+    await wrapper.getComponent({ name: 'LoadMore' }).vm.$emit('load-more');
+    const update = h.fetchMore.mock.calls[0]![0].updateQuery;
+    route.params.forumId = 'dogs';
+    const previous = resultWith([channel('d1')]);
+    expect(
+      update(previous, { fetchMoreResult: resultWith([channel('d2')]) })
+    ).toBe(previous);
+  });
+
+  it('retains existing rows when a page returns a null root', async () => {
+    const wrapper = mountList();
+    await wrapper.getComponent({ name: 'LoadMore' }).vm.$emit('load-more');
+    const previous = resultWith([channel('d1')]);
+    expect(
+      h.fetchMore.mock.calls[0]![0].updateQuery(previous, {
+        fetchMoreResult: { getDiscussionsInChannel: null },
+      })
+    ).toBe(previous);
+  });
+
   it('reports the end of results when all rows are loaded', () => {
     h.result = ref(resultWith([channel('d1')], 1));
     const wrapper = mountList();
@@ -177,13 +225,9 @@ describe('DownloadList label filters', () => {
       (call) => 'labelFilters' in call.variables
     );
 
-    expect(
-      (
-        downloadListQueryCall?.variables.labelFilters as {
-          value: Array<{ groupKey: string; values: string[] }>;
-        }
-      ).value
-    ).toEqual([{ groupKey: 'type', values: ['pdf'] }]);
+    expect(downloadListQueryCall?.variables.labelFilters).toEqual([
+      { groupKey: 'type', values: ['pdf'] },
+    ]);
   });
   it('passes paired Sims pack include and exclude filters to the query variables', () => {
     h.route = {
@@ -198,13 +242,7 @@ describe('DownloadList label filters', () => {
       (call) => 'labelFilters' in call.variables
     );
 
-    expect(
-      (
-        downloadListQueryCall?.variables.labelFilters as {
-          value: Array<{ groupKey: string; values: string[] }>;
-        }
-      ).value
-    ).toEqual([
+    expect(downloadListQueryCall?.variables.labelFilters).toEqual([
       { groupKey: 'include_game_packs', values: ['vampires'] },
       { groupKey: 'exclude_game_packs', values: ['dine_out'] },
     ]);
@@ -215,23 +253,33 @@ describe('DownloadList album lightbox', () => {
   it('opens the album lightbox on open-album', async () => {
     const wrapper = mountList();
 
-    await wrapper.getComponent({ name: 'ChannelDownloadListItem' }).vm.$emit('open-album', {
-      discussion: { id: 'd1' },
-      album: { Images: [{ id: 'i1' }] },
-    });
+    await wrapper
+      .getComponent({ name: 'ChannelDownloadListItem' })
+      .vm.$emit('open-album', {
+        discussion: { id: 'd1' },
+        album: { Images: [{ id: 'i1' }] },
+      });
 
-    expect(wrapper.findComponent({ name: 'DiscussionAlbum' }).exists()).toBe(true);
+    expect(wrapper.findComponent({ name: 'DiscussionAlbum' }).exists()).toBe(
+      true
+    );
   });
 
   it('closes the album lightbox', async () => {
     const wrapper = mountList();
-    await wrapper.getComponent({ name: 'ChannelDownloadListItem' }).vm.$emit('open-album', {
-      discussion: { id: 'd1' },
-      album: { Images: [{ id: 'i1' }] },
-    });
+    await wrapper
+      .getComponent({ name: 'ChannelDownloadListItem' })
+      .vm.$emit('open-album', {
+        discussion: { id: 'd1' },
+        album: { Images: [{ id: 'i1' }] },
+      });
 
-    await wrapper.getComponent({ name: 'DiscussionAlbum' }).vm.$emit('close-lightbox');
+    await wrapper
+      .getComponent({ name: 'DiscussionAlbum' })
+      .vm.$emit('close-lightbox');
 
-    expect(wrapper.findComponent({ name: 'DiscussionAlbum' }).exists()).toBe(false);
+    expect(wrapper.findComponent({ name: 'DiscussionAlbum' }).exists()).toBe(
+      false
+    );
   });
 });

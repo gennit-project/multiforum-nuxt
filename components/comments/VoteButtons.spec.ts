@@ -1,3 +1,4 @@
+import { print, type DocumentNode } from 'graphql';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { createAuthStateMock } from '@/tests/utils/mockAuth';
@@ -25,10 +26,10 @@ const detectVote = (src: string) =>
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (
-    doc: { loc?: { source?: { body?: string } } },
+    doc: DocumentNode,
     options?: { update?: (cache: unknown, res: unknown) => void }
   ) => {
-    const t = trackVote(detectVote(doc?.loc?.source?.body || ''));
+    const t = trackVote(detectVote(print(doc)));
     if (options?.update) t.update = options.update;
     return { mutate: t.mutate, error: { value: null }, loading: { value: false } };
   },

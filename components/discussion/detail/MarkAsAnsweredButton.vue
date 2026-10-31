@@ -2,9 +2,9 @@
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import { useMutation } from '@vue/apollo-composable';
 import {
-  MARK_AS_ANSWERED,
-  MARK_AS_UNANSWERED,
-} from '@/graphQLData/discussion/mutations';
+  MarkAsAnsweredDocument as MARK_AS_ANSWERED,
+  MarkAsUnAnsweredDocument as MARK_AS_UNANSWERED,
+} from '@/__generated__/operations';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 

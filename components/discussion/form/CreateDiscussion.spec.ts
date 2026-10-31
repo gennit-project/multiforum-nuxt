@@ -69,15 +69,17 @@ vi.mock('@vue/apollo-composable', () => ({
       },
     };
   }),
-  useQuery: vi.fn((document: { definitions?: Array<{ name?: { value?: string } }> }) => ({
-    result:
-      document.definitions?.[0]?.name?.value ===
-      'getChannelDiscussionFlairConfig'
-        ? mockFlairConfigResult
-        : ref(null),
-    loading: ref(false),
-    error: ref(null),
-  })),
+  useQuery: vi.fn(
+    (document: { definitions?: Array<{ name?: { value?: string } }> }) => ({
+      result:
+        document.definitions?.[0]?.name?.value ===
+        'getChannelDiscussionFlairConfig'
+          ? mockFlairConfigResult
+          : ref(null),
+      loading: ref(false),
+      error: ref(null),
+    })
+  ),
   useApolloClient: () => ({
     resolveClient: () => ({ query: mockApolloClientQuery }),
   }),
@@ -273,7 +275,9 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
 
   it('connects a crossposted discussion when a crosspost id is set', async () => {
     const wrapper = mountCD();
-    await fields(wrapper).vm.$emit('update-form-values', { crosspostId: 'src-1' });
+    await fields(wrapper).vm.$emit('update-form-values', {
+      crosspostId: 'src-1',
+    });
 
     expect(buildInput().CrosspostedDiscussion).toBeTruthy();
   });
@@ -350,8 +354,8 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     expect({
       configs: fields(wrapper)
         .props('discussionFlairConfigs')
-        .map((config: { channelUniqueName: string }) =>
-          config.channelUniqueName
+        .map(
+          (config: { channelUniqueName: string }) => config.channelUniqueName
         ),
       selections: buildChannelFlairSelections(),
     }).toEqual({
@@ -428,27 +432,28 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
       selectedChannels: ['cats'],
     });
 
-    expect(fields(wrapper).props('formValues').selectedFlairIdsByChannel).toEqual({
+    expect(
+      fields(wrapper).props('formValues').selectedFlairIdsByChannel
+    ).toEqual({
       cats: ['cats-flair'],
     });
   });
 
-  it('writes the new discussion into the channel list cache', () => {
+  it('updates existing scoped channel lists without fabricating a cache miss', () => {
     mountCD();
     const cache = {
-      readQuery: vi.fn(() => null),
-      writeQuery: vi.fn(),
+      modify: vi.fn(),
     };
     capturedCreateOptions!().update(cache, {
       data: {
-        createDiscussionWithChannelConnections: {
-          DiscussionChannels: [
-            { Channel: { uniqueName: 'cats' }, id: 'dc-1' },
-          ],
-        },
+        createDiscussionWithChannelConnections: [
+          {
+            DiscussionChannels: [{ channelUniqueName: 'cats', id: 'dc-1' }],
+          },
+        ],
       },
     });
 
-    expect(cache.writeQuery).toHaveBeenCalledTimes(1);
+    expect(cache.modify).toHaveBeenCalledTimes(1);
   });
 });

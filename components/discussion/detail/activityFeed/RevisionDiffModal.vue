@@ -6,8 +6,20 @@ import GenericModal from '@/components/GenericModal.vue';
 import PlusMinusIcon from '@/components/icons/PlusMinusIcon.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
 import { useMutation } from '@vue/apollo-composable';
-import type { DocumentNode } from 'graphql';
-import { DELETE_DISCUSSION_BODY_REVISION } from '@/graphQLData/discussion/mutations';
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type {
+  DeleteDiscussionBodyRevisionMutation,
+  DeleteDiscussionBodyRevisionMutationVariables,
+  DeleteEventDescriptionRevisionMutation,
+  DeleteWikiRevisionMutation,
+} from '@/__generated__/operations';
+import { DeleteDiscussionBodyRevisionDocument as DELETE_DISCUSSION_BODY_REVISION } from '@/__generated__/operations';
+type RevisionDeleteDocument = TypedDocumentNode<
+  | DeleteDiscussionBodyRevisionMutation
+  | DeleteEventDescriptionRevisionMutation
+  | DeleteWikiRevisionMutation,
+  DeleteDiscussionBodyRevisionMutationVariables
+>;
 
 interface VersionData {
   id: string;
@@ -41,7 +53,7 @@ const props = defineProps({
   // mutation so existing callers are unchanged; event surfaces pass the event
   // description revision mutation.
   deleteMutation: {
-    type: Object as PropType<DocumentNode>,
+    type: Object as PropType<RevisionDeleteDocument>,
     default: () => DELETE_DISCUSSION_BODY_REVISION,
   },
 });

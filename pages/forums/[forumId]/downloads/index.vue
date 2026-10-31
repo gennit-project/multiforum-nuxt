@@ -5,14 +5,17 @@ import { useQuery } from '@vue/apollo-composable';
 import DownloadList from '@/components/channel/DownloadList.vue';
 import DownloadFilterBar from '@/components/download/DownloadFilterBar.vue';
 import DownloadFilters from '@/components/download/DownloadFilters.vue';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import type { FilterGroup } from '@/__generated__/graphql';
+import {
+  GetChannelDocument as GET_CHANNEL,
+  GetServerConfigDocument as GET_SERVER_CONFIG,
+} from '@/__generated__/operations';
+import type { GetChannelQuery } from '@/__generated__/operations';
 import { config } from '@/config';
 import { DateTime } from 'luxon';
 import { evaluateForumFeatureGate } from '@/utils/forumFeatureGate';
 import { getStaleDownloadFilterQueryKeys } from '@/utils/downloadFilters';
 import { updateFilters } from '@/utils/routerUtils';
+type FilterGroup = GetChannelQuery['channels'][number]['FilterGroups'][number];
 
 const route = useRoute();
 const router = useRouter();
@@ -28,14 +31,15 @@ const {
   error: channelError,
 } = useQuery(
   GET_CHANNEL,
-  {
-    uniqueName: channelId,
+  () => ({
+    uniqueName: channelId.value,
     now: DateTime.local().startOf('hour').toISO(),
-  },
-  {
+  }),
+  () => ({
     fetchPolicy: 'cache-first',
     enabled: !!channelId.value,
-  }
+    keepPreviousResult: false,
+  })
 );
 
 // Get server config to check if downloads are enabled server-wide

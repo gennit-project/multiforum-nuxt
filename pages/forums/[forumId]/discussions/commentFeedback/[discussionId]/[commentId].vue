@@ -1,8 +1,11 @@
 <script lang="ts" setup>
-import type { Comment } from '@/__generated__/graphql';
+import type { FeedbackCommentView as Comment } from '@/types/Comment';
+import { appendCreatedFeedback } from '@/utils/feedbackCommentCache';
 import BackLink from '@/components/BackLink.vue';
-import { GET_FEEDBACK_ON_COMMENT } from '@/graphQLData/comment/queries';
-import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from '@/graphQLData/comment/mutations';
+import {
+  GetFeedbackOnCommentDocument as GET_FEEDBACK_ON_COMMENT,
+  AddFeedbackCommentToCommentDocument as ADD_FEEDBACK_COMMENT_TO_COMMENT,
+} from '@/__generated__/operations';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { ref, computed, watch } from 'vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
@@ -30,18 +33,23 @@ const {
   loading: getCommentLoading,
   fetchMore,
   onResult: onGetCommentDone,
-} = useQuery(GET_FEEDBACK_ON_COMMENT, () => ({
-  commentId: commentId.value,
-  limit: PAGE_LIMIT,
-  offset: offset.value,
-  loggedInModName: modProfileNameVar.value,
-}));
+} = useQuery(
+  GET_FEEDBACK_ON_COMMENT,
+  () => ({
+    commentId: commentId.value,
+    limit: PAGE_LIMIT,
+    offset: offset.value,
+    loggedInModName: modProfileNameVar.value,
+  }),
+  () => ({ enabled: !!commentId.value, keepPreviousResult: false })
+);
 
-const originalComment = computed<Comment | null>(() => {
+const originalComment = computed(() => {
   if (!getCommentResult.value || getCommentError.value) {
     return null;
   }
-  return getCommentResult.value?.comments?.[0] || null;
+  const selected = getCommentResult.value?.comments?.[0];
+  return selected?.id === commentId.value ? selected : null;
 });
 
 const contextOfFeedbackComment = computed(() => {
@@ -133,12 +141,8 @@ watch(
   { immediate: true }
 );
 
-const parentCommentId = computed(() => {
-  if (originalComment.value && originalComment.value.ParentComment) {
-    return originalComment.value.ParentComment.id;
-  }
-  return '';
-});
+// This operation does not select ParentComment; feedback links use the selected context.
+const parentCommentId = '';
 
 const feedbackComments = computed(() => {
   if (originalComment.value) {
@@ -165,15 +169,30 @@ const loadMore = () => {
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
 
-      const prevFeedbackComments = previousResult.comments[0].FeedbackComments;
-      const newFeedbackComments = fetchMoreResult.comments[0].FeedbackComments;
+      const previous = previousResult.comments[0];
+      const next = fetchMoreResult.comments[0];
+      if (
+        !previous ||
+        !next ||
+        previous.id !== commentId.value ||
+        next.id !== previous.id
+      )
+        return previousResult;
+      const prevFeedbackComments = previous.FeedbackComments;
+      const newFeedbackComments = next.FeedbackComments;
 
       return {
         ...previousResult,
         comments: [
           {
-            ...previousResult.comments[0],
-            FeedbackComments: [...prevFeedbackComments, ...newFeedbackComments],
+            ...previous,
+            FeedbackComments: [
+              ...new Map(
+                [...prevFeedbackComments, ...newFeedbackComments].map(
+                  (comment) => [comment.id, comment]
+                )
+              ).values(),
+            ],
           },
         ],
       };
@@ -197,61 +216,12 @@ const {
   error: addFeedbackCommentToCommentError,
   onDone: onAddFeedbackCommentToCommentDone,
 } = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, {
-  update: (cache, result) => {
-    const newFeedbackComment =
-      result.data.createCommentWithOwnedConnections.comments[0];
-
-    if (commentToGiveFeedbackOn.value) {
-      const prevQueryResult = cache.readQuery<{ comments: Comment[] }>({
-        query: GET_FEEDBACK_ON_COMMENT,
-        variables: {
-          commentId: commentId.value,
-          limit: PAGE_LIMIT,
-          offset: 0,
-          loggedInModName: modProfileNameVar.value,
-        },
-      });
-
-      const prevOriginalFeedbackList =
-        originalComment.value?.FeedbackComments || [];
-      const prevFeedbackComments =
-        commentToGiveFeedbackOn.value.FeedbackComments || [];
-
-      const updatedComment = {
-        ...originalComment.value,
-        FeedbackComments: [
-          ...prevOriginalFeedbackList.filter(
-            (comment) => comment.id !== commentToGiveFeedbackOn.value?.id
-          ),
-          {
-            ...commentToGiveFeedbackOn.value,
-            FeedbackComments: [...prevFeedbackComments, newFeedbackComment],
-            FeedbackCommentsConnection: {
-              aggregate: {
-                count: {
-                  nodes:
-                    (prevQueryResult?.comments?.[0]?.FeedbackCommentsConnection
-                      ?.aggregate?.count?.nodes ?? 0) + 1,
-                },
-              },
-            },
-          },
-        ],
-      };
-
-      cache.writeQuery({
-        query: GET_FEEDBACK_ON_COMMENT,
-        variables: {
-          commentId: commentId.value,
-          limit: PAGE_LIMIT,
-          offset: 0,
-          loggedInModName: modProfileNameVar.value,
-        },
-        data: {
-          comments: [updatedComment],
-        },
-      });
-    }
+  update: (cache, result, options) => {
+    appendCreatedFeedback(
+      cache,
+      String(options.variables?.commentId || ''),
+      result.data?.createCommentWithOwnedConnections.comments[0]
+    );
   },
 });
 const showFeedbackFormModal = ref(false);

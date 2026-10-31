@@ -1,11 +1,13 @@
 <script setup lang="ts">
+import type { UpdateDiscussionWithChannelConnectionsMutation } from '@/__generated__/operations';
+// Reviewed #700 exception: existing album relationship updates require backend #413.
+import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import { config } from '@/config';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import {
-  UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
-  UPDATE_DOWNLOAD_LABELS,
-} from '@/graphQLData/discussion/mutations';
+  GetDiscussionDocument as GET_DISCUSSION,
+  GetChannelDocument as GET_CHANNEL,
+  UpdateDownloadLabelsDocument as UPDATE_DOWNLOAD_LABELS,
+} from '@/__generated__/operations';
 import { computed, ref } from 'vue';
 import { useRouter, useRoute, useHead } from 'nuxt/app';
 import { buildEditDiscussionHead } from '@/utils/discussionSeo';
@@ -16,14 +18,8 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import type {
-  Discussion,
-  DiscussionChannel,
-  Tag as TagData,
-  DiscussionTagsUpdateFieldInput,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
-  Image,
-  FilterOption,
 } from '@/__generated__/graphql';
 import { useModProfileName } from '@/composables/useAuthState';
 import { resolveSelectedLabelOptionIds } from '@/utils/downloadLabelUtils';
@@ -60,11 +56,15 @@ const {
   onResult: onGetDiscussionResult,
   loading: getDiscussionLoading,
   error: getDiscussionError,
-} = useQuery(GET_DISCUSSION, {
-  id: discussionId,
-  loggedInModName: modProfileNameVar.value,
-  channelUniqueName: channelId.value,
-});
+} = useQuery(
+  GET_DISCUSSION,
+  () => ({
+    id: discussionId.value,
+    loggedInModName: modProfileNameVar.value,
+    channelUniqueName: channelId.value,
+  }),
+  { enabled: computed(() => !!discussionId.value), keepPreviousResult: false }
+);
 
 const {
   result: getChannelResult,
@@ -74,11 +74,11 @@ const {
   uniqueName: channelId.value,
 });
 
-const discussion = computed<Discussion>(() => {
+const discussion = computed(() => {
   if (getDiscussionError.value || getDiscussionLoading.value) {
     return null;
   }
-  return getDiscussionResult.value.discussions[0];
+  return getDiscussionResult.value?.discussions[0] || null;
 });
 
 const channelData = computed(() => {
@@ -94,7 +94,7 @@ const channelData = computed(() => {
 
 const images = computed(() => {
   if (!discussion.value?.Album?.Images) return [];
-  return discussion.value.Album.Images.map((image: Image) => {
+  return discussion.value?.Album.Images.map((image) => {
     return {
       id: image.id,
       url: image.url || '',
@@ -109,7 +109,7 @@ const images = computed(() => {
 });
 
 const imageOrder = computed<string[]>(() => {
-  return (discussion.value.Album?.imageOrder ?? []).filter(
+  return (discussion.value?.Album?.imageOrder ?? []).filter(
     (imageId): imageId is string => !!imageId
   );
 });
@@ -135,12 +135,12 @@ const getDefaultFormValues = (): CreateEditDiscussionFormValues => {
     // Extract existing download labels from DiscussionChannel
     const downloadLabels: Record<string, string[]> = {};
     const primaryDiscussionChannel = discussion.value.DiscussionChannels.find(
-      (dc: DiscussionChannel) => dc.Channel?.uniqueName === channelId.value
+      (dc) => dc.Channel?.uniqueName === channelId.value
     );
 
     if (primaryDiscussionChannel?.LabelOptions) {
       // Group labels by their filter group key
-      primaryDiscussionChannel.LabelOptions.forEach((option: FilterOption) => {
+      primaryDiscussionChannel.LabelOptions.forEach((option) => {
         const groupKey = option.group?.key;
         if (groupKey) {
           if (!downloadLabels[groupKey]) {
@@ -154,11 +154,11 @@ const getDefaultFormValues = (): CreateEditDiscussionFormValues => {
     return {
       title: discussion.value.title,
       body: discussion.value?.body || '',
-      selectedTags: discussion.value.Tags.map((tag: TagData) => {
+      selectedTags: discussion.value.Tags.map((tag) => {
         return tag.text;
       }),
       selectedChannels: discussion.value.DiscussionChannels.map(
-        (discussionChannel: DiscussionChannel) => {
+        (discussionChannel) => {
           return discussionChannel?.Channel?.uniqueName || '';
         }
       ),
@@ -220,7 +220,8 @@ onGetDiscussionResult((value) => {
   if (value.loading === true || !value.data?.discussions?.length) {
     return;
   }
-  const discussion = value.data.discussions[0];
+  const discussion = value.data?.discussions[0];
+  if (!discussion) return;
 
   // Preserve any existing downloadLabels the user might have changed; otherwise
   // derive them from the discussion's primary channel (utils/downloadEditForm).
@@ -249,11 +250,11 @@ const existingTags = computed(() => {
   if (
     getDiscussionLoading.value ||
     getDiscussionError.value ||
-    !getDiscussionResult.value.discussions[0].Tags
+    !getDiscussionResult.value?.discussions[0]?.Tags
   ) {
     return [];
   }
-  return getDiscussionResult.value.discussions[0].Tags.map((tag: TagData) => {
+  return (getDiscussionResult.value?.discussions[0]?.Tags || []).map((tag) => {
     return tag.text;
   });
 });
@@ -304,7 +305,7 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
       {
         connect: tagConnections,
         disconnect: tagDisconnections,
-      } as unknown as DiscussionTagsUpdateFieldInput,
+      },
     ],
     ...albumUpdateInput, // Include album data
     ...downloadableFilesUpdateInput,
@@ -323,23 +324,30 @@ const albumImageDisconnections = computed(() =>
   })
 );
 
+const updateVariables = () => ({
+  where: { id: { eq: discussionId.value } },
+  updateDiscussionInput: updateDiscussionInput.value,
+  channelConnections: channelConnections.value,
+  channelDisconnections: (discussion.value?.DiscussionChannels || [])
+    .filter((dc) => {
+      return !channelConnections.value.includes(dc.Channel?.uniqueName || '');
+    })
+    .map((dc) => {
+      return dc.channelUniqueName;
+    }),
+  albumImageDisconnections: albumImageDisconnections.value,
+});
+
 const {
   mutate: updateDiscussion,
   error: updateDiscussionError,
   loading: updateDiscussionLoading,
   onDone,
-} = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
-  variables: {
-    where: { id: { eq: discussionId.value } },
-    updateDiscussionInput: updateDiscussionInput.value,
-    channelConnections: channelConnections.value,
-    channelDisconnections: discussion.value.DiscussionChannels.filter((dc) => {
-      return !channelConnections.value.includes(dc.Channel?.uniqueName || '');
-    }).map((dc) => {
-      return dc.Channel?.uniqueName;
-    }),
-    albumImageDisconnections: albumImageDisconnections.value,
-  },
+} = useMutation<
+  UpdateDiscussionWithChannelConnectionsMutation,
+  ReturnType<typeof updateVariables>
+>(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
+  variables: updateVariables(),
 }));
 
 // Helper function to convert downloadLabels to label option IDs
@@ -413,11 +421,7 @@ void updateLabelsLoading;
     >
       <LoadingSpinner label="Checking permissions…" />
     </div>
-    <RequireAuth
-      v-else
-      :require-ownership="true"
-      :owners="ownerList"
-    >
+    <RequireAuth v-else :require-ownership="true" :owners="ownerList">
       <template #has-auth>
         <CreateEditDiscussionFields
           :key="dataLoaded.toString()"

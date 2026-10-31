@@ -1,12 +1,12 @@
 import { computed, type Ref, type ComputedRef } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { gql } from '@apollo/client/core';
+import {
+  UpdatedAnswersFragmentDoc as UPDATED_ANSWERS_FRAGMENT,
+  MarkAsAnsweredSource68ece8b51cDocument as MARK_AS_ANSWERED_BY_COMMENT,
+  UnmarkCommentAsAnswerDocument as UNMARK_COMMENT_AS_ANSWER,
+} from '@/__generated__/operations';
 import type { Reference } from '@apollo/client/core';
 import type { CommentFieldsFragment } from '@/__generated__/operations';
-import {
-  MARK_AS_ANSWERED_BY_COMMENT,
-  UNMARK_COMMENT_AS_ANSWER,
-} from '@/graphQLData/discussion/mutations';
 import { useUsername } from '@/composables/useAuthState';
 type Comment = Pick<CommentFieldsFragment, 'id'>;
 
@@ -28,24 +28,6 @@ type UseBestAnswerMutationsReturn = {
 };
 
 // Fragment for updating cached answer data
-const UPDATED_ANSWERS_FRAGMENT = gql`
-  fragment UpdatedAnswers on DiscussionChannel {
-    id
-    answered
-    Answers {
-      id
-      text
-      CommentAuthor {
-        ... on User {
-          username
-        }
-        ... on ModerationProfile {
-          displayName
-        }
-      }
-    }
-  }
-`;
 
 /**
  * Composable that handles best answer mutations for comments.

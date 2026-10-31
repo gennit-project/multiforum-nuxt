@@ -4,28 +4,23 @@ import {
   GetDiscussionDetailDocument as GET_DISCUSSION_DETAIL,
   GetDownloadDetailDocument as GET_DOWNLOAD_DETAIL,
   GetDiscussionDetailAnswersPageDocument as GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
+  GetDiscussionActivityDocument as GET_DISCUSSION_ACTIVITY,
+  GetDiscussionDetailFilesPageDocument as GET_DISCUSSION_DETAIL_FILES_PAGE,
+  GetDiscussionDetailImagesPageDocument as GET_DISCUSSION_DETAIL_IMAGES_PAGE,
+  GetIssueSource3f1ebf796bDocument as CHECK_DISCUSSION_ISSUE_EXISTENCE,
+  GetDiscussionCommentIssueDocument as CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
+  GetChannelDocument as GET_CHANNEL,
+  GetServerConfigDocument as GET_SERVER_CONFIG,
 } from '@/__generated__/operations';
 import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import { useApolloClient, useQuery } from '@vue/apollo-composable';
-import {
-  GET_DISCUSSION_ACTIVITY,
-  GET_DISCUSSION_DETAIL_FILES_PAGE,
-  GET_DISCUSSION_DETAIL_IMAGES_PAGE,
-} from '@/graphQLData/discussion/queries';
 
-import {
-  CHECK_DISCUSSION_ISSUE_EXISTENCE,
-  CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
-} from '@/graphQLData/issue/queries';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { DateTime } from 'luxon';
 import { config } from '@/config';
 import type { RouteLocationRaw } from 'vue-router';
 import type {
   GetDiscussionDetailQuery,
   GetDownloadDetailQuery,
-  GetDiscussionQuery,
 } from '@/__generated__/operations';
 import type {
   RootCommentSection,
@@ -72,11 +67,6 @@ type DetailPageInfo = {
 type DetailDiscussion =
   | GetDiscussionDetailQuery['discussions'][number]
   | GetDownloadDetailQuery['discussions'][number];
-type DetailPageVariables = {
-  discussionId: string;
-  channelUniqueName: string;
-  after?: string | null;
-};
 
 const mergeById = <T extends { id: string }>(base: T[], additions: T[]) => {
   const items = new Map(
@@ -173,16 +163,15 @@ const {
 // Revision history is useful but noncritical to first paint. Fetching it in the
 // browser keeps potentially unbounded version lists out of the SSR response and
 // lets the discussion body, channel state, and comments render first.
-const { result: getDiscussionActivityResult } = useQuery<{
-  discussions: Pick<
-    GetDiscussionQuery['discussions'][number],
-    'id' | 'PastTitleVersions' | 'PastBodyVersions' | 'BodyLastEditedBy'
-  >[];
-}>(GET_DISCUSSION_ACTIVITY, () => ({ id: props.discussionId }), {
-  fetchPolicy: 'cache-first',
-  enabled: computed(() => !props.downloadMode && !!props.discussionId),
-  prefetch: false,
-});
+const { result: getDiscussionActivityResult } = useQuery(
+  GET_DISCUSSION_ACTIVITY,
+  () => ({ id: props.discussionId }),
+  {
+    fetchPolicy: 'cache-first',
+    enabled: computed(() => !props.downloadMode && !!props.discussionId),
+    prefetch: false,
+  }
+);
 
 onGetDiscussionResult((newResult) => {
   const item = newResult?.data?.discussions?.find(
@@ -456,15 +445,7 @@ const loadMoreMedia = async () => {
     if (currentImagePageInfo.value?.hasNextPage) {
       requests.push(
         client
-          .query<
-            {
-              getDiscussionDetailImages: {
-                images: Image[];
-                pageInfo: DetailPageInfo;
-              };
-            },
-            DetailPageVariables
-          >({
+          .query({
             query: GET_DISCUSSION_DETAIL_IMAGES_PAGE,
             variables: {
               discussionId: props.discussionId,
@@ -474,7 +455,10 @@ const loadMoreMedia = async () => {
             fetchPolicy: 'network-only',
           })
           .then(({ data }) => {
-            if (requestGeneration === collectionGeneration.value) {
+            if (
+              requestGeneration === collectionGeneration.value &&
+              data.getDiscussionDetailImages
+            ) {
               additionalImages.value = mergeById(
                 additionalImages.value,
                 data.getDiscussionDetailImages.images
@@ -488,15 +472,7 @@ const loadMoreMedia = async () => {
     if (currentFilePageInfo.value?.hasNextPage) {
       requests.push(
         client
-          .query<
-            {
-              getDiscussionDetailFiles: {
-                files: DownloadableFile[];
-                pageInfo: DetailPageInfo;
-              };
-            },
-            DetailPageVariables
-          >({
+          .query({
             query: GET_DISCUSSION_DETAIL_FILES_PAGE,
             variables: {
               discussionId: props.discussionId,
@@ -506,7 +482,10 @@ const loadMoreMedia = async () => {
             fetchPolicy: 'network-only',
           })
           .then(({ data }) => {
-            if (requestGeneration === collectionGeneration.value) {
+            if (
+              requestGeneration === collectionGeneration.value &&
+              data.getDiscussionDetailFiles
+            ) {
               additionalFiles.value = mergeById(
                 additionalFiles.value,
                 data.getDiscussionDetailFiles.files

@@ -1,31 +1,24 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
+import type { CreateDiscussionMutation } from '@/__generated__/operations';
+import { appendCreatedDiscussion } from '@/utils/discussionCreateCache';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import type {
-  DiscussionChannel,
-  DiscussionCreateInput,
-  DiscussionAuthorFieldInput,
-  DiscussionCrosspostedDiscussionFieldInput,
-} from '@/__generated__/graphql';
 import {
-  GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
-  GET_CROSSPOST_PREVIEW,
-} from '@/graphQLData/discussion/queries';
+  GetCrosspostPreviewDocument as GET_CROSSPOST_PREVIEW,
+  GetChannelDiscussionFlairConfigDocument as GET_CHANNEL_DISCUSSION_FLAIR_CONFIG,
+} from '@/__generated__/operations';
+// Reviewed #700 exception: legacy relationship connects are absent from the
+// pinned create input; backend #413 must repair this before typed input migration.
 import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import 'md-editor-v3/lib/style.css';
-import {
-  getSortFromQuery,
-  getTimeFrameFromQuery,
-} from '@/utils/getSortFromQuery';
 import { useRouter, useRoute } from 'nuxt/app';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useForumLock } from '@/composables/useForumLock';
 import { useUsername } from '@/composables/useAuthState';
-import { GET_CHANNEL_DISCUSSION_FLAIR_CONFIG } from '@/graphQLData/channel/queries';
 import {
   useChannelDiscussionFlairConfigs,
   type ChannelDiscussionFlairConfig,
@@ -33,7 +26,6 @@ import {
 
 const usernameVar = useUsername();
 
-const DISCUSSION_PAGE_LIMIT = 10;
 const route = useRoute();
 const router = useRouter();
 
@@ -129,9 +121,8 @@ const missingRequiredFlairConfig = computed(() =>
   effectiveFlairConfigs.value.find(
     (config) =>
       config.flairRequired &&
-      (formValues.value.selectedFlairIdsByChannel?.[
-        config.channelUniqueName
-      ]?.length || 0) === 0
+      (formValues.value.selectedFlairIdsByChannel?.[config.channelUniqueName]
+        ?.length || 0) === 0
   )
 );
 
@@ -152,7 +143,7 @@ const {
 } = useQuery(
   GET_CROSSPOST_PREVIEW,
   () => ({
-    id: crosspostDiscussionId.value,
+    id: crosspostDiscussionId.value || '',
   }),
   {
     enabled: computed(() => !!crosspostDiscussionId.value),
@@ -164,12 +155,12 @@ const crosspostPreviewDiscussion = computed(() => {
   return crosspostPreviewResult.value?.discussions?.[0] || null;
 });
 
-const discussionCreateInput = computed<DiscussionCreateInput>(() => {
+const discussionCreateInput = computed(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
     where: { node: { text: { eq: tag } } },
   }));
 
-  const result: DiscussionCreateInput = {
+  const result = {
     title: formValues.value.title,
     body: formValues.value.body,
     hasDownload: false,
@@ -179,63 +170,65 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
       connect: tagConnections,
     },
     // v7 Author input no longer exposes `connect`; preserve the existing
-    // connect payload the custom resolver expects via a cast.
+    // legacy payload at the documented raw operation boundary.
     Author: {
       connect: {
         where: {
           node: { username: usernameVar.value },
         },
       },
-    } as unknown as DiscussionAuthorFieldInput,
+    },
   };
 
-  if (formValues.value.album.images.length > 0) {
-    // If imageOrder is empty or doesn't match the images length, reconstruct it from the images
-    const imageIds = formValues.value.album.images.map((img) => img.id);
+  const album = (() => {
+    if (formValues.value.album.images.length > 0) {
+      // If imageOrder is empty or doesn't match the images length, reconstruct it from the images
+      const imageIds = formValues.value.album.images.map((img) => img.id);
 
-    // Images already have IDs from when they were uploaded and created in the database
-    const validImages = formValues.value.album.images.filter(
-      (image): image is (typeof image & { id: string }) => Boolean(image.id)
-    );
+      // Images already have IDs from when they were uploaded and created in the database
+      const validImages = formValues.value.album.images.filter(
+        (image): image is typeof image & { id: string } => Boolean(image.id)
+      );
 
-    const albumNode: {
-      imageOrder: string[];
-      Images: {
-        connect: { where: { node: { id: { eq: string } } } }[];
-      };
-    } = {
-      // Use the explicit imageOrder if it's valid, otherwise generate from image IDs
-      imageOrder:
-        formValues.value.album.imageOrder.length === imageIds.length
-          ? formValues.value.album.imageOrder.filter((id) => id !== undefined)
-          : imageIds.filter((id) => id !== undefined),
-      Images: {
-        connect: validImages.map((image) => ({
-          where: { node: { id: { eq: image.id } } },
-        })),
-      },
-    };
-
-    result.Album = {
-      create: {
-        node: albumNode,
-      },
-    };
-  }
-
-  if (formValues.value.crosspostId) {
-    // v7 CrosspostedDiscussion input no longer exposes `connect`; preserve the
-    // existing connect payload the custom resolver expects via a cast.
-    result.CrosspostedDiscussion = {
-      connect: {
-        where: {
-          node: { id: formValues.value.crosspostId },
+      const albumNode: {
+        imageOrder: string[];
+        Images: {
+          connect: { where: { node: { id: { eq: string } } } }[];
+        };
+      } = {
+        // Use the explicit imageOrder if it's valid, otherwise generate from image IDs
+        imageOrder:
+          formValues.value.album.imageOrder.length === imageIds.length
+            ? formValues.value.album.imageOrder.filter((id) => id !== undefined)
+            : imageIds.filter((id) => id !== undefined),
+        Images: {
+          connect: validImages.map((image) => ({
+            where: { node: { id: { eq: image.id } } },
+          })),
         },
-      },
-    } as unknown as DiscussionCrosspostedDiscussionFieldInput;
-  }
+      };
 
-  return result;
+      return {
+        create: {
+          node: albumNode,
+        },
+      };
+    }
+
+    return undefined;
+  })();
+
+  return {
+    ...result,
+    ...(album ? { Album: album } : {}),
+    ...(formValues.value.crosspostId
+      ? {
+          CrosspostedDiscussion: {
+            connect: { where: { node: { id: formValues.value.crosspostId } } },
+          },
+        }
+      : {}),
+  };
 });
 
 const channelConnections = computed(() => formValues.value.selectedChannels);
@@ -259,81 +252,31 @@ const showSuspensionNotice = computed(() => {
   return submitAttempted.value && !!suspensionIssueNumber.value;
 });
 
+const createVariables = () => ({
+  input: [
+    {
+      discussionCreateInput: discussionCreateInput.value,
+      channelConnections: channelConnections.value,
+      channelFlairSelections: channelFlairSelections.value,
+    },
+  ],
+});
+
 const {
   mutate: createDiscussion,
   loading: createDiscussionLoading,
   error: createDiscussionError,
   onDone,
-} = useMutation(CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
-  errorPolicy: 'all',
-  variables: {
-    input: [
-      {
-        discussionCreateInput: discussionCreateInput.value,
-        channelConnections: channelConnections.value,
-        channelFlairSelections: channelFlairSelections.value,
-      },
-    ],
-  },
-  update: (cache, result) => {
-    const discussionChannels =
-      result.data?.createDiscussionWithChannelConnections?.DiscussionChannels ||
-      [];
-    const discussionChannelInCurrentChannel = discussionChannels.filter(
-      (dc: DiscussionChannel) => dc?.Channel?.uniqueName === channelId.value
-    );
-
-    const existingData: {
-      getDiscussionsInChannel?: {
-        aggregateDiscussionChannelsCount?: number;
-        discussionChannels?: DiscussionChannel[];
-      };
-    } | null = cache.readQuery({
-      query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
-      variables: {
-        channelUniqueName: channelId.value,
-        searchInput: '',
-        selectedTags: [],
-        options: {
-          limit: DISCUSSION_PAGE_LIMIT,
-          offset: 0,
-          sort: getSortFromQuery(route.query),
-          timeFrame: getTimeFrameFromQuery(route.query),
-        },
-      },
-    });
-
-    const existingNumberOfDiscussionChannels =
-      existingData?.getDiscussionsInChannel?.aggregateDiscussionChannelsCount ||
-      0;
-
-    cache.writeQuery({
-      query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
-      variables: {
-        channelUniqueName: channelId.value,
-        searchInput: '',
-        selectedTags: [],
-        options: {
-          limit: DISCUSSION_PAGE_LIMIT,
-          offset: 0,
-          sort: getSortFromQuery(route.query),
-          timeFrame: getTimeFrameFromQuery(route.query),
-        },
-      },
-      data: {
-        getDiscussionsInChannel: {
-          aggregateDiscussionChannelsCount:
-            existingNumberOfDiscussionChannels + 1,
-          discussionChannels: [
-            ...discussionChannelInCurrentChannel,
-            ...(existingData?.getDiscussionsInChannel?.discussionChannels ||
-              []),
-          ],
-        },
-      },
-    });
-  },
-}));
+} = useMutation<CreateDiscussionMutation, ReturnType<typeof createVariables>>(
+  CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
+  () => ({
+    errorPolicy: 'all',
+    variables: createVariables(),
+    update: (cache, result) => {
+      appendCreatedDiscussion(cache, result.data);
+    },
+  })
+);
 
 onDone((response) => {
   const newDiscussionArray =
@@ -384,22 +327,20 @@ function submit() {
 }
 
 function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
-
   if (data.selectedChannels) {
     const selectedChannels = new Set(data.selectedChannels);
     data = {
       ...data,
       selectedFlairIdsByChannel: Object.fromEntries(
-        Object.entries(
-          formValues.value.selectedFlairIdsByChannel || {}
-        ).filter(([channel]) => selectedChannels.has(channel))
+        Object.entries(formValues.value.selectedFlairIdsByChannel || {}).filter(
+          ([channel]) => selectedChannels.has(channel)
+        )
       ),
     };
   }
 
   // Handle album updates specially to avoid overwriting the entire album object
   if (data.album) {
-
     // Explicitly handle images and imageOrder to ensure they stay in sync
     if (data.album.images) {
       formValues.value.album.images = data.album.images;
@@ -417,7 +358,6 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
       ...formValues.value,
       ...restData,
     };
-
   } else {
     // If no album data, just update normally
     formValues.value = {
@@ -441,9 +381,7 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
         :suspension-issue-number="
           showSuspensionNotice ? suspensionIssueNumber : null
         "
-        :suspension-channel-id="
-          showSuspensionNotice ? suspensionChannelId : ''
-        "
+        :suspension-channel-id="showSuspensionNotice ? suspensionChannelId : ''"
         :suspension-until="showSuspensionNotice ? suspensionUntil : null"
         :suspension-indefinitely="
           showSuspensionNotice ? suspensionIndefinitely : null
@@ -458,12 +396,8 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
         :discussion-flairs-loading="scopedDiscussionFlairsLoading"
         :discussion-flairs-error="scopedDiscussionFlairsQueryError?.message"
         :discussion-flair-configs="sitewideFlairConfigs"
-        :discussion-flairs-loading-channels="
-          sitewideFlairsLoadingChannels
-        "
-        :discussion-flairs-errors-by-channel="
-          sitewideFlairsErrorsByChannel
-        "
+        :discussion-flairs-loading-channels="sitewideFlairsLoadingChannels"
+        :discussion-flairs-errors-by-channel="sitewideFlairsErrorsByChannel"
         @submit="submit"
         @update-form-values="updateFormValues"
       />

@@ -2,7 +2,7 @@
 import { ref, computed, watch } from 'vue';
 import type { PropType, Ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GetServerConfigDocument as GET_SERVER_CONFIG } from '@/__generated__/operations';
 import SearchBar from '@/components/SearchBar.vue';
 import ErrorBanner from './ErrorBanner.vue';
 import { config } from '@/config';

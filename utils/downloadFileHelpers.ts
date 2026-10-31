@@ -1,3 +1,4 @@
+import { FileKind } from '@/__generated__/graphql';
 import type {
   DiscussionUpdateInput,
   DiscussionDownloadableFilesConnectFieldInput,
@@ -39,16 +40,16 @@ export function getDownloadFileMimeType(filename: string): string | null {
 }
 
 /** Map a file name to a FileKind enum value (ZIP/RAR/PNG/.../OTHER). */
-export function getDownloadFileKind(filename: string): string {
+export function getDownloadFileKind(filename: string): FileKind {
   const extension = filename.toLowerCase().split('.').pop();
-  if (extension === 'zip') return 'ZIP';
-  if (extension === 'rar') return 'RAR';
-  if (extension === 'png') return 'PNG';
-  if (['jpg', 'jpeg'].includes(extension || '')) return 'JPG';
-  if (extension === 'blend') return 'BLEND';
-  if (extension === 'stl') return 'STL';
-  if (extension === 'glb') return 'GLB';
-  return 'OTHER';
+  if (extension === 'zip') return FileKind.Zip;
+  if (extension === 'rar') return FileKind.Rar;
+  if (extension === 'png') return FileKind.Png;
+  if (['jpg', 'jpeg'].includes(extension || '')) return FileKind.Jpg;
+  if (extension === 'blend') return FileKind.Blend;
+  if (extension === 'stl') return FileKind.Stl;
+  if (extension === 'glb') return FileKind.Glb;
+  return FileKind.Other;
 }
 
 /**

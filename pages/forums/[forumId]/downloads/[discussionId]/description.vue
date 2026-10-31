@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useMutation } from '@vue/apollo-composable';
-import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import { UpdateDiscussionDocument as UPDATE_DISCUSSION } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
@@ -12,10 +12,7 @@ import GenericButton from '@/components/GenericButton.vue';
 import CharCounter from '@/components/CharCounter.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { MAX_CHARS_IN_DISCUSSION_BODY } from '@/utils/constants';
-import type {
-  Discussion,
-  DiscussionUpdateInput,
-} from '@/__generated__/graphql';
+import type { Discussion } from '@/__generated__/graphql';
 
 const usernameVar = useUsername();
 
@@ -69,8 +66,8 @@ const {
   variables: {
     where: { id: { eq: discussionId.value } },
     updateDiscussionInput: {
-      body: formValues.value.body,
-    } as DiscussionUpdateInput,
+      body: { set: formValues.value.body },
+    },
   },
 }));
 

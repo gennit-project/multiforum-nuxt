@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DownloadNowButton from '@/components/channel/DownloadNowButton.vue';
-import { PREPARE_DOWNLOAD } from '@/graphQLData/discussion/mutations';
+import { PrepareDownloadDocument as PREPARE_DOWNLOAD } from '@/__generated__/operations';
 import { useToastStore } from '@/stores/toastStore';
 import { useMutation } from '@vue/apollo-composable';
 
@@ -77,8 +77,7 @@ const handleDownload = async () => {
       discussionId: props.discussionId,
     });
     const result = response?.data?.prepareDownload as
-      | PrepareDownloadResult
-      | undefined;
+      PrepareDownloadResult | undefined;
 
     if (!result?.ready || !result.url) {
       toastStore.updateToast(toastId, {
@@ -107,7 +106,6 @@ const handleDownload = async () => {
     });
   }
 };
-
 </script>
 
 <template>

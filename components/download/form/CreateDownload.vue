@@ -1,17 +1,22 @@
 <script setup lang="ts">
+// Reviewed #700 exceptions: the pin omits Author/CrosspostedDiscussion.connect
+// and DiscussionUpdateInput.Album. Keep these existing wire payloads until backend #413.
+import {
+  CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
+  UPDATE_DISCUSSION,
+} from '@/graphQLData/discussion/mutations';
 import { computed, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import {
-  CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
-  UPDATE_DOWNLOAD_LABELS,
-  UPDATE_DISCUSSION,
-  UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS,
-} from '@/graphQLData/discussion/mutations';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+  type CreateDiscussionMutation,
+  type UpdateDiscussionMutation,
+  UpdateDownloadLabelsDocument as UPDATE_DOWNLOAD_LABELS,
+  UpdateDownloadableFileSupportSettingsDocument as UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS,
+} from '@/__generated__/operations';
+import { GetChannelDocument as GET_CHANNEL } from '@/__generated__/operations';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
-import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 
@@ -51,12 +56,94 @@ const formValues = ref<CreateEditDiscussionFormValues>({
 });
 const submitError = ref('');
 
+const createDownloadVariables = () => {
+  const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
+    where: { node: { text: { eq: tag } } },
+  }));
+
+  // Build downloadable files connections
+  const downloadableFileConnections = (formValues.value.downloadableFiles || [])
+    .filter((file) => file.id) // Only connect files that have database IDs
+    .map((file) => ({
+      where: { node: { id: file.id } },
+    }));
+
+  // Album will be created as a follow-up mutation after discussion creation
+
+  const discussionCreateInput = {
+    title: formValues.value.title,
+    body: formValues.value.body,
+    hasDownload: true,
+    Tags: { connect: tagConnections },
+    Author: {
+      connect: {
+        where: {
+          node: { username: usernameVar.value },
+        },
+      },
+    },
+    ...(downloadableFileConnections.length > 0 && {
+      DownloadableFiles: {
+        connect: downloadableFileConnections,
+      },
+    }),
+    ...(formValues.value.crosspostId && {
+      CrosspostedDiscussion: {
+        connect: {
+          where: { node: { id: formValues.value.crosspostId } },
+        },
+      },
+    }),
+  };
+
+  return {
+    input: [
+      {
+        discussionCreateInput,
+        channelConnections: formValues.value.selectedChannels,
+      },
+    ],
+  };
+};
+
+const downloadAlbumVariables = (discussionId: string) => {
+  // Build the album node
+  const albumNode = {
+    imageOrder: formValues.value.album?.imageOrder || [],
+    Images: {
+      // Connect to existing images using their IDs
+      connect: (formValues.value.album?.images || [])
+        .filter((img): img is typeof img & { id: string } => Boolean(img.id))
+        .map((img) => ({
+          where: { node: { id: img.id } },
+        })),
+    },
+  };
+
+  // Create album structure similar to getUpdateDiscussionInputForAlbum
+  const albumUpdateInput = {
+    Album: {
+      create: {
+        node: albumNode,
+      },
+    },
+  };
+
+  return {
+    where: { id: { eq: discussionId } },
+    updateDiscussionInput: albumUpdateInput,
+  };
+};
+
 const {
   mutate: createDownload,
   loading: createDownloadLoading,
   error: createDownloadError,
   onDone,
-} = useMutation(CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS);
+} = useMutation<
+  CreateDiscussionMutation,
+  ReturnType<typeof createDownloadVariables>
+>(CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS);
 
 const {
   mutate: updateDiscussionChannelLabels,
@@ -68,20 +155,19 @@ const {
   mutate: updateDiscussion,
   loading: _updateDiscussionLoading,
   error: _updateDiscussionError,
-} = useMutation(UPDATE_DISCUSSION);
+} = useMutation<
+  UpdateDiscussionMutation,
+  ReturnType<typeof downloadAlbumVariables>
+>(UPDATE_DISCUSSION);
 
 const { mutate: updateDownloadableFileSupportSettings } = useMutation(
   UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS
 );
 
 onDone(async (response) => {
-  // Try both possible response structures
-  const directId = response.data?.createDiscussionWithChannelConnections?.id;
-  const arrayId =
+  const newDiscussionId =
     response.data?.createDiscussionWithChannelConnections?.[0]
       ?.DiscussionChannels?.[0]?.Discussion?.id;
-
-  const newDiscussionId = directId || arrayId;
 
   if (newDiscussionId) {
     // Handle album if there are images
@@ -114,32 +200,7 @@ onDone(async (response) => {
 // Helper function to save album after discussion creation
 const saveDownloadAlbum = async (discussionId: string) => {
   try {
-    // Build the album node
-    const albumNode = {
-      imageOrder: formValues.value.album?.imageOrder || [],
-      Images: {
-        // Connect to existing images using their IDs
-        connect: (formValues.value.album?.images || [])
-          .filter((img): img is typeof img & { id: string } => Boolean(img.id))
-          .map((img) => ({
-            where: { node: { id: img.id } },
-          })),
-      },
-    };
-
-    // Create album structure similar to getUpdateDiscussionInputForAlbum
-    const albumUpdateInput = {
-      Album: {
-        create: {
-          node: albumNode,
-        },
-      },
-    };
-
-    await updateDiscussion({
-      where: { id: { eq: discussionId } },
-      updateDiscussionInput: albumUpdateInput,
-    });
+    await updateDiscussion(downloadAlbumVariables(discussionId));
   } catch (error) {
     console.error('Error creating album:', error);
   }
@@ -148,7 +209,7 @@ const saveDownloadAlbum = async (discussionId: string) => {
 const saveDownloadSupportSettings = async (discussionId: string) => {
   await Promise.all(
     (formValues.value.downloadableFiles || [])
-      .filter((file) => Boolean(file.id))
+      .filter((file): file is typeof file & { id: string } => Boolean(file.id))
       .map((file) =>
         updateDownloadableFileSupportSettings({
           downloadableFileId: file.id,
@@ -180,12 +241,12 @@ const saveDownloadLabels = async (discussionId: string) => {
     Object.entries(formValues.value.downloadLabels || {}).forEach(
       ([groupKey, selectedValues]) => {
         const filterGroup = channelData.value?.FilterGroups?.find(
-          (fg: FilterGroup) => fg.key === groupKey
+          (fg) => fg.key === groupKey
         );
         if (filterGroup) {
           selectedValues.forEach((value) => {
             const option = filterGroup.options?.find(
-              (opt: FilterOption) => opt.value === value
+              (opt) => opt.value === value
             );
             if (option?.id) {
               labelOptionIds.push(option.id);
@@ -221,55 +282,7 @@ const submitForm = async () => {
     }
 
     submitError.value = '';
-    const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
-      where: { node: { text: { eq: tag } } },
-    }));
-
-    // Build downloadable files connections
-    const downloadableFileConnections = (
-      formValues.value.downloadableFiles || []
-    )
-      .filter((file) => file.id) // Only connect files that have database IDs
-      .map((file) => ({
-        where: { node: { id: file.id } },
-      }));
-
-    // Album will be created as a follow-up mutation after discussion creation
-
-    const discussionCreateInput = {
-      title: formValues.value.title,
-      body: formValues.value.body,
-      hasDownload: true,
-      Tags: { connect: tagConnections },
-      Author: {
-        connect: {
-          where: {
-            node: { username: usernameVar.value },
-          },
-        },
-      },
-      ...(downloadableFileConnections.length > 0 && {
-        DownloadableFiles: {
-          connect: downloadableFileConnections,
-        },
-      }),
-      ...(formValues.value.crosspostId && {
-        CrosspostedDiscussion: {
-          connect: {
-            where: { node: { id: formValues.value.crosspostId } },
-          },
-        },
-      }),
-    };
-
-    await createDownload({
-      input: [
-        {
-          discussionCreateInput,
-          channelConnections: formValues.value.selectedChannels,
-        },
-      ],
-    });
+    await createDownload(createDownloadVariables());
 
     // Navigation is now handled in the onDone hook
   } catch (error) {
@@ -293,11 +306,7 @@ watch(
   <div class="mx-auto max-w-4xl px-4 py-6">
     <div v-if="channelLoading">Loading channel data...</div>
     <template v-else>
-      <ErrorBanner
-        v-if="submitError"
-        :text="submitError"
-        class="mb-4"
-      />
+      <ErrorBanner v-if="submitError" :text="submitError" class="mb-4" />
       <CreateEditDiscussionFields
         :edit-mode="false"
         :form-values="formValues"

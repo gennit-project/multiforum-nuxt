@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
+import type { DiscussionPresentation } from '@/types/DiscussionPresentation';
 import { ref, computed, onMounted } from 'vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import EmojiButtons from '@/components/comments/EmojiButtons.vue';
@@ -10,7 +10,7 @@ import type { PropType } from 'vue';
 
 import { useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_USER } from '@/graphQLData/user/queries';
+import { GetBasicUserInfoDocument as GET_USER } from '@/__generated__/operations';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
@@ -30,6 +30,11 @@ const { result: getUserResult } = useQuery(
     enabled: isAuthenticatedVar.value && !!usernameVar.value,
   })
 );
+
+type Discussion = Pick<DiscussionPresentation, 'body' | 'hasSensitiveContent'> &
+  Partial<Pick<DiscussionPresentation, 'Tags'>> & {
+    Album?: { Images: readonly unknown[] } | null;
+  };
 
 const props = defineProps({
   channelId: {

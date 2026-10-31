@@ -2,10 +2,11 @@
 import { computed, watch } from 'vue';
 import type { PropType } from 'vue';
 import { FilterSelection } from '@/__generated__/graphql';
-import type { FilterGroup } from '@/__generated__/graphql';
+import type { GetChannelQuery } from '@/__generated__/operations';
 import MultiSelect from '@/components/MultiSelect.vue';
 import type { MultiSelectOption } from '@/components/MultiSelect.vue';
 import CheckBox from '@/components/CheckBox.vue';
+type FilterGroup = GetChannelQuery['channels'][number]['FilterGroups'][number];
 
 const props = defineProps({
   filterGroups: {
@@ -211,7 +212,7 @@ const selectedLabelCount = computed(() => {
             :id="`download-label-${group.id}`"
             :value="getSingleSelection(group.key)"
             :aria-label="`Select one ${group.displayName} label`"
-            class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            class="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             @change="
               handleSingleSelectChange({ groupKey: group.key, event: $event })
             "
@@ -250,7 +251,7 @@ const selectedLabelCount = computed(() => {
                   optionValue: option.value,
                 })
               "
-            >
+            />
             <label
               :for="`download-label-${group.id}-${option.id}`"
               class="ml-3 text-sm text-gray-700 dark:text-gray-300"

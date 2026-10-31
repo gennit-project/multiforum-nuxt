@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onUnmounted, useId } from 'vue';
 import type { PropType } from 'vue';
-import type { CommentView as Comment } from '@/types/Comment';
+import type { CommentHeaderView as Comment } from '@/types/Comment';
 import {
   usePopoverPositioning,
   type PopoverPosition,
@@ -31,7 +31,7 @@ const popoverPosition = ref<PopoverPosition>({
   left: 0,
   placement: 'below',
 });
-type HistoricalVersion = Comment['PastVersions'][number];
+type HistoricalVersion = NonNullable<Comment['PastVersions']>[number];
 type TextVersion = Omit<HistoricalVersion, 'Author'> & {
   Author?: HistoricalVersion['Author'] | Comment['CommentAuthor'];
 };

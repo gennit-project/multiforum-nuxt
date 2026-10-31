@@ -433,17 +433,6 @@
       ],
       "fragments": []
     },
-    "composables/useBestAnswerMutations.ts#UPDATED_ANSWERS_FRAGMENT": {
-      "operations": [],
-      "fragments": [
-        {
-          "name": "UpdatedAnswers",
-          "document": "UpdatedAnswersFragmentDoc",
-          "result": "UpdatedAnswersFragment",
-          "variables": "unknown"
-        }
-      ]
-    },
     "graphQLData/admin/mutations.js#UPDATE_SERVER_CONFIG": {
       "operations": [
         {

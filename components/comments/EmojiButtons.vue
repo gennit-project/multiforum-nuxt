@@ -2,13 +2,11 @@
 import { useMutation } from '@vue/apollo-composable';
 import VoteButton from '@/components/VoteButton.vue';
 import {
-  ADD_EMOJI_TO_COMMENT,
-  REMOVE_EMOJI_FROM_COMMENT,
-} from '@/graphQLData/comment/mutations';
-import {
-  ADD_EMOJI_TO_DISCUSSION_CHANNEL,
-  REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL,
-} from '@/graphQLData/discussion/mutations';
+  AddEmojiToCommentDocument as ADD_EMOJI_TO_COMMENT,
+  RemoveEmojiFromCommentDocument as REMOVE_EMOJI_FROM_COMMENT,
+  AddEmojiToDiscussionChannelDocument as ADD_EMOJI_TO_DISCUSSION_CHANNEL,
+  RemoveEmojiFromDiscussionChannelDocument as REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL,
+} from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 import { ref } from 'vue';
 
@@ -87,9 +85,17 @@ function toggleCommentEmoji(emojiVoteInput: EmojiVoteInput) {
     return;
   }
   if (isActive(emojiVoteInput.emojiLabel)) {
-    removeEmojiFromComment(emojiVoteInput);
+    if (!emojiVoteInput.commentId) return;
+    removeEmojiFromComment({
+      ...emojiVoteInput,
+      commentId: emojiVoteInput.commentId,
+    });
   } else {
-    addEmojiToComment(emojiVoteInput);
+    if (!emojiVoteInput.commentId) return;
+    addEmojiToComment({
+      ...emojiVoteInput,
+      commentId: emojiVoteInput.commentId,
+    });
   }
 }
 
@@ -99,9 +105,17 @@ function toggleDiscussionChannelEmoji(emojiVoteInput: EmojiVoteInput) {
     return;
   }
   if (isActive(emojiVoteInput.emojiLabel)) {
-    removeEmojiFromDiscussionChannel(emojiVoteInput);
+    if (!emojiVoteInput.discussionChannelId) return;
+    removeEmojiFromDiscussionChannel({
+      ...emojiVoteInput,
+      discussionChannelId: emojiVoteInput.discussionChannelId,
+    });
   } else {
-    addEmojiToDiscussionChannel(emojiVoteInput);
+    if (!emojiVoteInput.discussionChannelId) return;
+    addEmojiToDiscussionChannel({
+      ...emojiVoteInput,
+      discussionChannelId: emojiVoteInput.discussionChannelId,
+    });
   }
 }
 
@@ -177,7 +191,9 @@ function getDefaultVariant(emojiLabel: string) {
           >
             {{ unicode }}
           </span>
-          <span class="text-xs">{{ isActive(emojiLabel) ? 'Undo' : 'React' }}</span>
+          <span class="text-xs">{{
+            isActive(emojiLabel) ? 'Undo' : 'React'
+          }}</span>
         </span>
       </VoteButton>
     </div>

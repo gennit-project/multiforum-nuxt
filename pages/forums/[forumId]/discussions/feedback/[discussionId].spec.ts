@@ -1,3 +1,4 @@
+import { makeFeedbackPageCache } from '@/tests/utils/feedbackCacheFixtures';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -155,10 +156,12 @@ describe('discussion feedback page', () => {
     loadMore();
     const options = h.fetchMore.mock.calls[0][0];
     const updated = options.updateQuery(
-      { discussions: [{ FeedbackComments: [{ id: 'one' }] }] },
+      { discussions: [{ id: 'd1', FeedbackComments: [{ id: 'one' }] }] },
       {
         fetchMoreResult: {
-          discussions: [{ FeedbackComments: [{ id: 'two' }] }],
+          discussions: [
+            { id: 'd1', FeedbackComments: [{ id: 'one' }, { id: 'two' }] },
+          ],
         },
       }
     );
@@ -166,6 +169,23 @@ describe('discussion feedback page', () => {
       options.variables,
       updated.discussions[0].FeedbackComments,
     ]).toEqual([{ offset: 1 }, [{ id: 'one' }, { id: 'two' }]]);
+  });
+
+  it('ignores a feedback page that arrives after navigation', async () => {
+    const wrapper = await mountPage();
+    (wrapper.findComponent(FeedbackSection).props('loadMore') as () => void)();
+    h.route.params = { ...h.route.params, discussionId: 'd2' };
+    await wrapper.vm.$nextTick();
+    const previous = {
+      discussions: [{ id: 'd1', FeedbackComments: [{ id: 'one' }] }],
+    };
+    expect(
+      h.fetchMore.mock.calls[0][0].updateQuery(previous, {
+        fetchMoreResult: {
+          discussions: [{ id: 'd1', FeedbackComments: [{ id: 'two' }] }],
+        },
+      })
+    ).toBe(previous);
   });
 
   it('keeps the previous page when fetchMore returns nothing', async () => {
@@ -195,25 +215,31 @@ describe('discussion feedback page', () => {
       id: 'parent',
       FeedbackComments: [{ id: 'existing' }],
     });
-    const cache = {
-      readQuery: vi.fn().mockReturnValue({
-        discussions: [{ FeedbackCommentsConnection: { aggregate: { count: { nodes: 2 } } } }],
-      }),
-      writeQuery: vi.fn(),
-    };
-    h.mutationOptions?.update(cache, {
-      data: { createCommentWithOwnedConnections: { comments: [{ id: 'new' }] } },
-    });
-    expect(
-      cache.writeQuery.mock.calls[0][0].data.discussions[0].FeedbackComments
-    ).toEqual([
-      { id: 'other' },
+    const { cache, read } = makeFeedbackPageCache('parent', 'existing');
+    h.mutationOptions?.update(
+      cache,
       {
-        id: 'parent',
-        FeedbackComments: [{ id: 'existing' }, { id: 'new' }],
-        FeedbackCommentsConnection: {
-          aggregate: { count: { nodes: 3 } },
+        data: {
+          createCommentWithOwnedConnections: { comments: [{ id: 'new' }] },
         },
+      },
+      { variables: { commentId: 'parent' } }
+    );
+    expect([read('parent'), read('sibling')]).toEqual([
+      {
+        __typename: 'Comment',
+        id: 'parent',
+        FeedbackComments: [
+          { __typename: 'Comment', id: 'existing' },
+          { __typename: 'Comment', id: 'new' },
+        ],
+        FeedbackCommentsConnection: { aggregate: { count: { nodes: 2 } } },
+      },
+      {
+        __typename: 'Comment',
+        id: 'sibling',
+        FeedbackComments: [],
+        FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
       },
     ]);
   });
@@ -240,7 +266,7 @@ describe('discussion feedback page', () => {
     };
     await wrapper.vm.$nextTick();
     expect(wrapper.findComponent({ name: 'BackLink' }).props('link')).toBe(
-      '/forums/dogs/discussions/d1'
+      '/forums/dogs/discussions/d2'
     );
   });
 });

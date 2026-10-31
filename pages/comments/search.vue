@@ -7,9 +7,10 @@ import SearchBar from '@/components/SearchBar.vue';
 import FilterChip from '@/components/FilterChip.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
-import { SEARCH_COMMENTS } from '@/graphQLData/comment/queries';
+import { SearchCommentsDocument as SEARCH_COMMENTS } from '@/__generated__/operations';
 import { updateFilters } from '@/utils/routerUtils';
-import type { Comment } from '@/__generated__/graphql';
+import type { SearchCommentsQuery } from '@/__generated__/operations';
+import { SortDirection } from '@/__generated__/graphql';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import { relativeTime } from '@/utils';
@@ -25,6 +26,7 @@ import {
   getCommentAuthorDisplayName as getAuthorDisplayName,
   getCommentAuthorProfilePic as getAuthorProfilePic,
 } from '@/utils/commentSearch';
+type Comment = SearchCommentsQuery['comments'][number];
 
 const route = useRoute();
 const router = useRouter();
@@ -108,7 +110,7 @@ const commentWhere = computed(() =>
 const commentOptions = computed(() => ({
   limit: RESULTS_PER_PAGE,
   offset: 0,
-  sort: [{ createdAt: 'DESC' }],
+  sort: [{ createdAt: SortDirection.Desc }],
 }));
 
 // Skip query if no search input
@@ -314,7 +316,7 @@ const getContextForum = (comment: Comment) => {
                   :src="getAuthorProfilePic(comment)"
                   :text="getAuthorUsername(comment)"
                   :variant-source="
-                    comment.CommentAuthor?.__typename === 'User'
+                    comment.CommentAuthor && 'username' in comment.CommentAuthor
                       ? comment.CommentAuthor
                       : null
                   "
@@ -322,7 +324,10 @@ const getContextForum = (comment: Comment) => {
                 />
                 <div class="text-sm">
                   <router-link
-                    v-if="comment.CommentAuthor?.__typename === 'User'"
+                    v-if="
+                      comment.CommentAuthor &&
+                      'username' in comment.CommentAuthor
+                    "
                     :to="{
                       name: 'u-username',
                       params: { username: getAuthorUsername(comment) },

@@ -16,7 +16,7 @@ import LightboxImagePanel from '@/components/discussion/detail/LightboxImagePane
 import LightboxInfoPanel from '@/components/discussion/detail/LightboxInfoPanel.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useMutation } from '@vue/apollo-composable';
-import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
+import { UpdateImageDocument as UPDATE_IMAGE } from '@/__generated__/operations';
 
 const BrokenRulesModal = defineAsyncComponent(
   () => import('@/components/mod/BrokenRulesModal.vue')

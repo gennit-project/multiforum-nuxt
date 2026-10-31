@@ -3,9 +3,9 @@ import { ref, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import {
-  DELETE_COMMENT,
-  UPDATE_COMMENT,
-} from '@/graphQLData/comment/mutations';
+  DeleteCommentDocument as DELETE_COMMENT,
+  UpdateCommentDocument as UPDATE_COMMENT,
+} from '@/__generated__/operations';
 import VoteButtons from './VoteButtons.vue';
 import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
 import MarkdownPreview from '../MarkdownPreview.vue';
@@ -15,7 +15,7 @@ import SaveButton from '@/components/SaveButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import type { PropType } from 'vue';
-import type { Comment } from '@/__generated__/graphql';
+import type { FeedbackCommentView as Comment } from '@/types/Comment';
 import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
 import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
 import { timeAgo, ALLOWED_ICONS } from '@/utils';
@@ -81,9 +81,9 @@ const {
 } = useMutation(UPDATE_COMMENT, () => ({
   variables: {
     commentWhere: {
-      id: props.comment.id,
+      id: { eq: props.comment.id },
     },
-    updateCommentInput: updateCommentInput.value,
+    updateCommentInput: { text: { set: updateCommentInput.value.text } },
   },
 }));
 

@@ -504,8 +504,8 @@ describe('useCommentCrudMutations', () => {
         parentOfCommentToDelete: 'parent-1',
       });
       expect(
-        captured.fields.ChildComments([{ id: 'c-1' }, { id: 'c-2' }])
-      ).toEqual([{ id: 'c-2' }]);
+        captured.fields.ChildComments([{ __ref: 'Comment:c-1' }, { __ref: 'Comment:c-2' }], { readField: (_: string, ref: { __ref: string }) => ref.__ref.slice(8) })
+      ).toEqual([{ __ref: 'Comment:c-2' }]);
     });
 
     it('decrements ChildCommentsAggregate but never below zero', () => {
@@ -525,8 +525,8 @@ describe('useCommentCrudMutations', () => {
         commentToDeleteId: 'c-1',
         parentOfCommentToDelete: '',
       });
-      expect(captured.fields.Comments([{ id: 'c-1' }, { id: 'c-2' }])).toEqual([
-        { id: 'c-2' },
+      expect(captured.fields.Comments([{ __ref: 'Comment:c-1' }, { __ref: 'Comment:c-2' }], { readField: (_: string, ref: { __ref: string }) => ref.__ref.slice(8) })).toEqual([
+        { __ref: 'Comment:c-2' },
       ]);
     });
 

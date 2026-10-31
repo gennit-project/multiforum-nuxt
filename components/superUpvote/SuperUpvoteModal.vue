@@ -9,7 +9,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from '@headlessui/vue';
-import { CREATE_SCRATCHPAD_ENTRY } from '@/graphQLData/scratchpad/mutations';
+import { CreateScratchpadEntryDocument as CREATE_SCRATCHPAD_ENTRY } from '@/__generated__/operations';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import StarIcon from '@/components/icons/StarIcon.vue';

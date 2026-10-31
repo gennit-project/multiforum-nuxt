@@ -7,13 +7,16 @@ import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vu
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 import FeedbackSection from '@/components/comments/FeedbackSection.vue';
-import { GET_DISCUSSION_FEEDBACK } from '@/graphQLData/discussion/queries';
-import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from '@/graphQLData/comment/mutations';
-import { GET_FEEDBACK_ON_COMMENT } from '@/graphQLData/comment/queries';
+import {
+  GetDiscussionFeedbackDocument as GET_DISCUSSION_FEEDBACK,
+  AddFeedbackCommentToCommentDocument as ADD_FEEDBACK_COMMENT_TO_COMMENT,
+  GetFeedbackOnCommentDocument as GET_FEEDBACK_ON_COMMENT,
+} from '@/__generated__/operations';
 import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
 import { buildFeedbackContextLink } from '@/utils/feedbackContextLink';
-import type { Comment, DownloadableFile } from '@/__generated__/graphql';
+import type { FeedbackCommentView as Comment } from '@/types/Comment';
+import { appendCreatedFeedback } from '@/utils/feedbackCommentCache';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
 
 const modProfileNameVar = useModProfileName();
@@ -48,27 +51,29 @@ const {
   fetchMore,
 } = useQuery(
   GET_DISCUSSION_FEEDBACK,
-  {
-    id: discussionId,
+  () => ({
+    id: discussionId.value,
     limit: PAGE_LIMIT,
-    offset: offset,
+    offset: offset.value,
     loggedInModName: modProfileNameVar.value,
-  },
-  {
+  }),
+  () => ({
     fetchPolicy: 'cache-first',
-  }
+    enabled: !!discussionId.value,
+    keepPreviousResult: false,
+  })
 );
 
 const commentToRemoveFeedbackFrom = ref(null);
 const commentToGiveFeedbackOn = ref<Comment | null>(null);
 
 const discussion = computed(() => {
-  return getDiscussionResult.value?.discussions?.[0] || null;
+  const selected = getDiscussionResult.value?.discussions?.[0];
+  return selected?.id === discussionId.value ? selected : null;
 });
 
 const stlFiles = computed(() => {
-  const files = (discussion.value?.DownloadableFiles ||
-    []) as DownloadableFile[];
+  const files = discussion.value?.DownloadableFiles || [];
   return files.filter(
     (file) =>
       file.fileName?.toLowerCase().endsWith('.stl') ||
@@ -85,7 +90,8 @@ const feedbackComments = computed(
   () => discussion.value?.FeedbackComments || []
 );
 const feedbackCommentsAggregate = computed(
-  () => discussion.value?.FeedbackCommentsConnection?.aggregate?.count?.nodes || 0
+  () =>
+    discussion.value?.FeedbackCommentsConnection?.aggregate?.count?.nodes || 0
 );
 
 const loadMore = () => {
@@ -95,16 +101,29 @@ const loadMore = () => {
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
-      const prevFeedbackComments =
-        previousResult.discussions[0].FeedbackComments;
-      const newFeedbackComments =
-        fetchMoreResult.discussions[0].FeedbackComments;
+      const previous = previousResult.discussions[0];
+      const next = fetchMoreResult.discussions[0];
+      if (
+        !previous ||
+        !next ||
+        previous.id !== discussionId.value ||
+        next.id !== previous.id
+      )
+        return previousResult;
+      const prevFeedbackComments = previous.FeedbackComments;
+      const newFeedbackComments = next.FeedbackComments;
       return {
         ...previousResult,
         discussions: [
           {
-            ...previousResult.discussions[0],
-            FeedbackComments: [...prevFeedbackComments, ...newFeedbackComments],
+            ...previous,
+            FeedbackComments: [
+              ...new Map(
+                [...prevFeedbackComments, ...newFeedbackComments].map(
+                  (comment) => [comment.id, comment]
+                )
+              ).values(),
+            ],
           },
         ],
       };
@@ -118,12 +137,12 @@ const {
   loading: getCommentLoading,
 } = useQuery(
   GET_FEEDBACK_ON_COMMENT,
-  {
-    commentId: commentId,
+  () => ({
+    commentId: commentId.value,
     limit: PAGE_LIMIT,
-    offset: offset,
+    offset: offset.value,
     loggedInModName: modProfileNameVar.value,
-  },
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -164,58 +183,12 @@ const {
   error: addFeedbackCommentToCommentError,
   onDone: onAddFeedbackCommentToCommentDone,
 } = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, {
-  update: (cache, result) => {
-    const newFeedbackComment =
-      result.data.createCommentWithOwnedConnections.comments[0];
-    const prevQueryResult = cache.readQuery({
-      query: GET_DISCUSSION_FEEDBACK,
-      variables: {
-        id: discussionId.value,
-        limit: PAGE_LIMIT,
-        offset: offset.value,
-        loggedInModName: modProfileNameVar.value,
-      },
-    }) as {
-      discussions: Array<{
-        FeedbackCommentsConnection?: {
-          aggregate?: { count?: { nodes?: number } };
-        };
-      }>;
-    } | null;
-    const prevOriginalFeedbackList = discussion.value.FeedbackComments;
-    const prevFeedbackComments =
-      commentToGiveFeedbackOn.value?.FeedbackComments || [];
-    const updatedDiscussion = {
-      ...discussion.value,
-      FeedbackComments: [
-        ...prevOriginalFeedbackList.filter(
-          (comment: Comment) => comment.id !== commentToGiveFeedbackOn.value?.id
-        ),
-        {
-          ...commentToGiveFeedbackOn.value,
-          FeedbackComments: [...prevFeedbackComments, newFeedbackComment],
-          FeedbackCommentsConnection: {
-            aggregate: {
-              count: {
-                nodes:
-                  (prevQueryResult?.discussions?.[0]?.FeedbackCommentsConnection
-                    ?.aggregate?.count?.nodes || 0) + 1,
-              },
-            },
-          },
-        },
-      ],
-    };
-    cache.writeQuery({
-      query: GET_DISCUSSION_FEEDBACK,
-      variables: {
-        commentId: commentId.value,
-        limit: PAGE_LIMIT,
-        offset: 0,
-        loggedInModName: modProfileNameVar.value,
-      },
-      data: { discussions: [updatedDiscussion] },
-    });
+  update: (cache, result, options) => {
+    appendCreatedFeedback(
+      cache,
+      String(options.variables?.commentId || ''),
+      result.data?.createCommentWithOwnedConnections.comments[0]
+    );
   },
 });
 
@@ -250,7 +223,7 @@ watch(() => route.params, updateParams, { immediate: true });
   >
     <div class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5">
       <BackLink
-        :link="`/forums/${channelId}/discussions/${discussion?.id}`"
+        :link="`/forums/${channelId}/discussions/${discussionId}`"
         :data-testid="'discussion-detail-back-link'"
       />
     </div>

@@ -1,3 +1,4 @@
+import type { CommentWhere } from '@/__generated__/graphql';
 /**
  * Pure helpers for the comment-search page: parsing the channel filter from the
  * route, building the GraphQL `where` clause, and resolving author display
@@ -28,10 +29,10 @@ export function getChannelsFromQuery(
  */
 export function buildCommentSearchWhere(
   params: CommentSearchWhereParams
-): Record<string, unknown> {
+): CommentWhere {
   const { searchInput, selectedChannels } = params;
-  const where: Record<string, unknown> = {
-    isFeedbackComment_NOT: true,
+  const where: CommentWhere = {
+    NOT: { isFeedbackComment: { eq: true } },
     Issue: null,
   };
 
@@ -67,7 +68,7 @@ type CommentLike = { CommentAuthor?: CommentAuthorLike } | null | undefined;
 /** Username (or mod display name) shown for a comment author; 'Unknown' fallback. */
 export function getCommentAuthorUsername(comment: CommentLike): string {
   const author = comment?.CommentAuthor;
-  if (author?.__typename === 'User') return author.username ?? 'Unknown';
+  if (author && (author.__typename === 'User' || 'username' in author)) return author.username ?? 'Unknown';
   if (author?.__typename === 'ModerationProfile') {
     return author.displayName ?? 'Unknown';
   }
@@ -77,7 +78,7 @@ export function getCommentAuthorUsername(comment: CommentLike): string {
 /** Display name for a comment author, preferring displayName then username. */
 export function getCommentAuthorDisplayName(comment: CommentLike): string {
   const author = comment?.CommentAuthor;
-  if (author?.__typename === 'User') {
+  if (author && (author.__typename === 'User' || 'username' in author)) {
     return author.displayName || author.username || 'Unknown';
   }
   if (author?.__typename === 'ModerationProfile') {
@@ -89,6 +90,6 @@ export function getCommentAuthorDisplayName(comment: CommentLike): string {
 /** Profile picture URL for a User author; empty string for mods/unknown. */
 export function getCommentAuthorProfilePic(comment: CommentLike): string {
   const author = comment?.CommentAuthor;
-  if (author?.__typename === 'User') return author.profilePicURL ?? '';
+  if (author && (author.__typename === 'User' || 'username' in author)) return author.profilePicURL ?? '';
   return '';
 }

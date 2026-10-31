@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { CreateCommentDocument as CREATE_COMMENT } from '@/__generated__/operations';
+import {
+  CreateCommentDocument as CREATE_COMMENT,
+  GetBasicUserInfoDocument as GET_USER,
+} from '@/__generated__/operations';
 import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import type { OwnedCommentCreateInput } from '@/__generated__/graphql';
 
-import { GET_USER } from '@/graphQLData/user/queries';
 import { useUsername } from '@/composables/useAuthState';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { useRoute } from 'nuxt/app';

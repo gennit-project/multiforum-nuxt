@@ -4,7 +4,7 @@ import GenericModal from '@/components/GenericModal.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
 import PlusMinusIcon from '@/components/icons/PlusMinusIcon.vue';
 import { useMutation } from '@vue/apollo-composable';
-import { DELETE_COMMENT_REVISION } from '@/graphQLData/comment/mutations';
+import { DeleteCommentRevisionDocument as DELETE_COMMENT_REVISION } from '@/__generated__/operations';
 
 const props = defineProps({
   open: {
