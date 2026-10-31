@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { GetDiscussionDetailDocument as GET_DISCUSSION_DETAIL } from '@/__generated__/operations';
 import { config } from '@/config';
 import { ref, watchEffect, computed } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
@@ -7,7 +8,7 @@ import 'md-editor-v3/lib/style.css';
 import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DISCUSSION_DETAIL } from '@/graphQLData/discussion/queries';
+
 import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { buildDiscussionHead } from '@/utils/discussionSeo';
 

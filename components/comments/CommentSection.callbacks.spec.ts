@@ -1,3 +1,4 @@
+import { makeCreatedComment } from '@/tests/utils/rootCommentFixtures';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ref } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
@@ -115,17 +116,60 @@ beforeEach(() => {
 describe('CommentSection — mutation callbacks', () => {
   it('resets the create form when a comment is created', () => {
     const wrapper = mountSection();
-    router.get('createComment').fireDone();
+    router
+      .get('createComment')
+      .onDone.mock.calls[0]![0]({
+        data: {
+          createCommentWithOwnedConnections: {
+            comments: [makeCreatedComment()],
+          },
+        },
+      });
     expect(wrapper.emitted('updateCreateFormValues')).toBeTruthy();
   });
 
-  it('emits incrementCommentCount from the create cache update', () => {
+  it('does not reset a new conversation when a previous creation completes', async () => {
     const wrapper = mountSection();
+    await wrapper.setProps({
+      commentSectionQueryVariables: {
+        discussionId: 'd2',
+        channelUniqueName: 'cats',
+        limit: 50,
+        offset: 0,
+        sort: 'new',
+      },
+    });
+    router
+      .get('createComment')
+      .onDone.mock.calls[0]![0]({
+        data: {
+          createCommentWithOwnedConnections: {
+            comments: [makeCreatedComment()],
+          },
+        },
+      });
+    expect(wrapper.emitted('updateCreateFormValues')).toBeUndefined();
+  });
+
+  it('emits incrementCommentCount for an event create response', () => {
+    const wrapper = mountSection({
+      commentSectionQueryVariables: {
+        eventId: 'e1',
+        limit: 50,
+        offset: 0,
+        sort: 'new',
+      },
+    });
     router.get('createComment').update!(fakeCache(), {
       data: {
         createCommentWithOwnedConnections: {
           comments: [
-            { __typename: 'Comment', id: 'new-1', ParentComment: null },
+            {
+              __typename: 'Comment',
+              id: 'new-1',
+              ParentComment: null,
+              Event: { id: 'e1' },
+            },
           ],
         },
       },

@@ -1,10 +1,28 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 
 import PinnedAnswers from '@/components/comments/PinnedAnswers.vue';
-import type { Comment as CommentType } from '@/__generated__/graphql';
+import { makeHydratedAnswer } from '@/tests/utils/rootCommentFixtures';
+vi.mock('@vue/apollo-composable', async () => {
+  const { computed, ref } = await import('vue');
+  return {
+    useQuery: (_doc: unknown, variables: () => { id: string }) => ({
+      result: computed(() => ({
+        comments: [makeHydratedAnswer({ id: variables().id })],
+      })),
+      loading: ref(false),
+      error: ref(null),
+      refetch: vi.fn(),
+    }),
+  };
+});
 
-const answer = (id: string) => ({ id }) as unknown as CommentType;
+const answer = (id: string) => ({
+  id,
+  text: 'Summary',
+  createdAt: '2026-01-01',
+  CommentAuthor: null,
+});
 
 // [child event emitted by Comment, parent event re-emitted by PinnedAnswers]
 const REEMIT_TABLE: [string, string][] = [
@@ -15,8 +33,14 @@ const REEMIT_TABLE: [string, string][] = [
   ['update-edit-comment-input', 'updateEditCommentInput'],
   ['update-create-reply-comment-input', 'updateCreateReplyCommentInput'],
   ['show-copied-link-notification', 'showCopiedLinkNotification'],
-  ['show-marked-as-best-answer-notification', 'showMarkedAsBestAnswerNotification'],
-  ['show-unmarked-as-best-answer-notification', 'showUnmarkedAsBestAnswerNotification'],
+  [
+    'show-marked-as-best-answer-notification',
+    'showMarkedAsBestAnswerNotification',
+  ],
+  [
+    'show-unmarked-as-best-answer-notification',
+    'showUnmarkedAsBestAnswerNotification',
+  ],
   ['click-report', 'clickReport'],
   ['click-feedback', 'clickFeedback'],
   ['click-undo-feedback', 'clickUndoFeedback'],

@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { buildSchema, validate } from 'graphql';
-import { combineDocuments } from './generate-graphql-operations.mjs';
+import { buildSchema, parse, validate } from 'graphql';
+import {
+  combineDocuments,
+  shareDocumentNodes,
+} from './generate-graphql-operations.mjs';
 
 const schema = buildSchema(
   'type Query { user(name: String!): User } type User { id: ID! bio: String }'
@@ -51,5 +54,35 @@ test('invalid variable declarations remain validation failures', () => {
   assert.match(
     validate(schema, document)[0].message,
     /Variable "\$name" of type "ID!" used in position expecting type "String!"/
+  );
+});
+
+test('shared precompiled fragments preserve complete operation documents', () => {
+  const document = JSON.parse(
+    JSON.stringify(
+      parse(
+        'query Profile { user(name: "alice") { ...Fields } } fragment Fields on User { id bio }',
+        { noLocation: true }
+      )
+    )
+  );
+  const source = ['One', 'Two']
+    .map(
+      (name) =>
+        `export const ${name} = ${JSON.stringify(document)} as unknown as DocumentNode<Result, Variables>;`
+    )
+    .join('\n');
+  const shared = shareDocumentNodes(source);
+  const executable = shared
+    .replaceAll('export const ', 'const ')
+    .replaceAll(' as unknown as DocumentNode<Result, Variables>', '');
+  const [one, two] = new Function(`${executable}; return [One, Two];`)();
+  assert.deepEqual(one, document);
+  assert.deepEqual(two, document);
+  assert.equal(one.definitions[1], two.definitions[1]);
+  assert.deepEqual(validate(schema, one), []);
+  assert.equal(
+    one.definitions[0].selectionSet,
+    two.definitions[0].selectionSet
   );
 });

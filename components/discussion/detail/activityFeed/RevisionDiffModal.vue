@@ -11,7 +11,7 @@ import { DELETE_DISCUSSION_BODY_REVISION } from '@/graphQLData/discussion/mutati
 
 interface VersionData {
   id: string;
-  body?: string;
+  body?: string | null;
   title?: string;
   createdAt: string;
   editReason?: string | null;

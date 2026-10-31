@@ -2,10 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import InlineCommentForm from './InlineCommentForm.vue';
-import type { Mutation } from '@/__generated__/graphql';
+import type { CreateCommentMutation } from '@/__generated__/operations';
+import { makeCreatedComment } from '@/tests/utils/rootCommentFixtures';
+const mockInsert = vi.hoisted(() => vi.fn());
+vi.mock('@/utils/rootCommentCache', () => ({ insertRootComment: mockInsert }));
 
 type CreateCommentsResult = {
-  data?: Pick<Mutation, 'createCommentWithOwnedConnections'>;
+  data?: CreateCommentMutation;
+  errors?: { message: string }[];
 };
 
 const createCommentError = ref<{ message: string } | null>(null);
@@ -58,7 +62,9 @@ vi.mock('@/composables/useSuspensionNotice', () => ({
   }),
 }));
 
-const baseStubs = (authSlot: 'has-auth' | 'does-not-have-auth' = 'has-auth') => ({
+const baseStubs = (
+  authSlot: 'has-auth' | 'does-not-have-auth' = 'has-auth'
+) => ({
   ErrorBanner: {
     template: '<div data-testid="error-banner">{{ text }}</div>',
     props: ['text'],
@@ -93,27 +99,19 @@ const buildWrapper = (opts: BuildOpts = {}) =>
     },
   });
 
-const buildFakeCache = (
-  queryResult: unknown,
-  overrides: Record<string, unknown> = {}
-) => ({
-  writeFragment: vi.fn(() => ({ __ref: 'Comment:new' })),
-  readQuery: vi.fn(() => queryResult),
-  writeQuery: vi.fn(),
-  // Invoke the field policy functions so their bodies are exercised.
-  modify: vi.fn(({ fields }: { fields: Record<string, any> }) => {
-    for (const key of Object.keys(fields)) {
-      fields[key](undefined, { readField: () => [] });
-    }
-  }),
-  identify: vi.fn(() => 'ROOT_QUERY'),
-  ...overrides,
-});
-
 const successResult = () => ({
   data: {
     createCommentWithOwnedConnections: {
-      comments: [{ id: 'new-comment-1', text: 'hi', __typename: 'Comment' }],
+      comments: [
+        {
+          ...makeCreatedComment(),
+          DiscussionChannel: {
+            id: 'discussion-channel-1',
+            discussionId: 'discussion-1',
+            channelUniqueName: 'cats',
+          },
+        },
+      ],
     },
   },
 });
@@ -126,6 +124,7 @@ beforeEach(() => {
   suspensionChannelId.value = '';
   usernameRef.value = 'alice';
   mutateMock.mockClear();
+  mockInsert.mockClear();
   capturedMutationOptions = null;
   onDoneCallbacks = [];
 });
@@ -227,64 +226,21 @@ describe('InlineCommentForm — create comment input', () => {
 });
 
 describe('InlineCommentForm — cache update', () => {
-  it('prepends the new comment to an existing cached comment section', () => {
+  it('passes the selected submission scope to the shared cache updater', () => {
     buildWrapper();
-    const cache = buildFakeCache({
-      getCommentSection: { Comments: [{ id: 'old' }] },
+    capturedMutationOptions!().update({}, successResult());
+    expect(mockInsert.mock.calls[0]?.[2]).toMatchObject({
+      discussionId: 'discussion-1',
+      channelUniqueName: 'cats',
     });
-    capturedMutationOptions!().update(cache, successResult());
-
-    expect(cache.writeQuery).toHaveBeenCalledTimes(1);
   });
-
-  it('falls back to cache.modify when the query result is missing', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    buildWrapper();
-    const cache = buildFakeCache(null);
-    capturedMutationOptions!().update(cache, successResult());
-    warnSpy.mockRestore();
-
-    expect(cache.writeQuery).not.toHaveBeenCalled();
-  });
-
-  it('bumps the discussion channel comment count on the cache', () => {
-    buildWrapper();
-    const cache = buildFakeCache({
-      getCommentSection: { Comments: [] },
-    });
-    capturedMutationOptions!().update(cache, successResult());
-
-    expect(cache.modify).toHaveBeenCalled();
-  });
-
   it('does nothing when the mutation returns no new comment', () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     buildWrapper();
-    const cache = buildFakeCache({ getCommentSection: { Comments: [] } });
-    capturedMutationOptions!().update(cache, {
-      data: { createCommentWithOwnedConnections: { comments: [] } },
-    });
-    errorSpy.mockRestore();
-
-    expect(cache.writeFragment).not.toHaveBeenCalled();
-  });
-
-  it('swallows errors thrown while updating the cache', () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    buildWrapper();
-    const cache = buildFakeCache(
-      { getCommentSection: { Comments: [] } },
-      {
-        writeFragment: vi.fn(() => {
-          throw new Error('cache boom');
-        }),
-      }
+    capturedMutationOptions!().update(
+      {},
+      { data: { createCommentWithOwnedConnections: { comments: [] } } }
     );
-
-    expect(() =>
-      capturedMutationOptions!().update(cache, successResult())
-    ).not.toThrow();
-    errorSpy.mockRestore();
+    expect(mockInsert).not.toHaveBeenCalled();
   });
 });
 
@@ -343,7 +299,10 @@ describe('InlineCommentForm — bot mention autocomplete', () => {
     },
   ];
 
-  const typeMention = async (wrapper: ReturnType<typeof buildWrapper>, text: string) => {
+  const typeMention = async (
+    wrapper: ReturnType<typeof buildWrapper>,
+    text: string
+  ) => {
     const textarea = wrapper.find('[data-testid="discussion-inline-comment"]');
     (textarea.element as HTMLTextAreaElement).value = text;
     (textarea.element as HTMLTextAreaElement).selectionStart = text.length;
@@ -369,9 +328,8 @@ describe('InlineCommentForm — bot mention autocomplete', () => {
     const wrapper = buildWrapper({ props: { botSuggestions } });
     await typeMention(wrapper, '/bot/hel');
     await wrapper.find('button[type="button"]').trigger('click');
-    const textarea = wrapper.find(
-      '[data-testid="discussion-inline-comment"]'
-    ).element as HTMLTextAreaElement;
+    const textarea = wrapper.find('[data-testid="discussion-inline-comment"]')
+      .element as HTMLTextAreaElement;
 
     expect(textarea.value).toContain('/bot/helper');
   });
@@ -387,7 +345,10 @@ describe('InlineCommentForm — mod mention autocomplete', () => {
     },
   ];
 
-  const typeMention = async (wrapper: ReturnType<typeof buildWrapper>, text: string) => {
+  const typeMention = async (
+    wrapper: ReturnType<typeof buildWrapper>,
+    text: string
+  ) => {
     const textarea = wrapper.find('[data-testid="discussion-inline-comment"]');
     (textarea.element as HTMLTextAreaElement).value = text;
     (textarea.element as HTMLTextAreaElement).selectionStart = text.length;
@@ -406,9 +367,8 @@ describe('InlineCommentForm — mod mention autocomplete', () => {
     const wrapper = buildWrapper({ props: { modSuggestions } });
     await typeMention(wrapper, '/m/ali');
     await wrapper.find('button[type="button"]').trigger('click');
-    const textarea = wrapper.find(
-      '[data-testid="discussion-inline-comment"]'
-    ).element as HTMLTextAreaElement;
+    const textarea = wrapper.find('[data-testid="discussion-inline-comment"]')
+      .element as HTMLTextAreaElement;
 
     expect(textarea.value).toContain('/m/alice');
   });
@@ -419,7 +379,9 @@ describe('InlineCommentForm — accessibility', () => {
     const wrapper = buildWrapper();
 
     expect(
-      wrapper.get('[data-testid="discussion-inline-comment"]').attributes('aria-label')
+      wrapper
+        .get('[data-testid="discussion-inline-comment"]')
+        .attributes('aria-label')
     ).toBe('Add a comment');
   });
 

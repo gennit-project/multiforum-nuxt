@@ -1,7 +1,10 @@
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
-import type { Album, Image } from '@/__generated__/graphql';
+import type {
+  PresentationAlbum as Album,
+  PresentationImage as Image,
+} from '@/types/DiscussionPresentation';
 import { normalizeImageOrder } from '@/utils/albumImageOrder';
 import { getRemovedAlbumImageIds } from '@/utils/albumImageDisconnections';
 
@@ -91,7 +94,7 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
     }
 
     // If the album already exists, build the connect/update/disconnect arrays
-    const oldImages: Image[] = (existingAlbum?.Images as Image[]) ?? [];
+    const oldImages: Image[] = existingAlbum?.Images ?? [];
     const newImages = albumData.images || [];
     const normalizedImageOrder = normalizeImageOrder({
       images: newImages,

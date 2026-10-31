@@ -1,7 +1,10 @@
 <script lang="ts" setup>
+import type {
+  DiscussionPresentation as Discussion,
+  PresentationLabel as FilterOption,
+} from '@/types/DiscussionPresentation';
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
-import type { Discussion, FilterOption } from '@/__generated__/graphql';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import DownloadMetadata from '@/components/download/DownloadMetadata.vue';

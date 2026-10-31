@@ -43,7 +43,7 @@ export type ReplyComment = NonNullable<
 // Legacy schema types permit omission of nullable fields. Preserve that at the
 // shared UI boundary while keeping non-null selected fields required. Query
 // results themselves remain the exact generated operation types.
-type NullableSelection<T> = T extends readonly (infer Item)[]
+export type NullableSelection<T> = T extends readonly (infer Item)[]
   ? NullableSelection<Item>[]
   : T extends object
     ? {

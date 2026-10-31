@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
 import { ref, computed, onMounted } from 'vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import EmojiButtons from '@/components/comments/EmojiButtons.vue';
@@ -6,7 +7,7 @@ import Tag from '../../TagComponent.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import 'md-editor-v3/lib/preview.css';
 import type { PropType } from 'vue';
-import type { Discussion } from '@/__generated__/graphql';
+
 import { useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';

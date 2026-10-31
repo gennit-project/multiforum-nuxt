@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
 import { ref, computed, defineAsyncComponent } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
@@ -19,7 +20,7 @@ import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
-import type { Discussion } from '@/__generated__/graphql';
+
 import type { RouteLocationRaw } from 'vue-router';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';

@@ -123,6 +123,27 @@ export const createCommentHandlers = (
         },
       },
     }),
+    getDiscussionChannelCommentAggregate: () => ({
+      data: {
+        discussionChannels: [
+          {
+            id: config.discussionChannelId,
+            discussionId: config.discussionId,
+            channelUniqueName: config.channelId,
+            archived: false,
+            answered: false,
+            locked: false,
+            CommentsConnection: {
+              aggregate: {
+                count: {
+                  nodes: state.comments.length,
+                },
+              },
+            },
+          },
+        ],
+      },
+    }),
     getDiscussionChannelRootCommentAggregate: () => ({
       data: {
         discussionChannels: [

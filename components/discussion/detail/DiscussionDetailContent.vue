@@ -1,15 +1,18 @@
 <script lang="ts" setup>
+import {
+  GetCommentSectionDocument as GET_DISCUSSION_COMMENTS,
+  GetDiscussionDetailDocument as GET_DISCUSSION_DETAIL,
+  GetDownloadDetailDocument as GET_DOWNLOAD_DETAIL,
+  GetDiscussionDetailAnswersPageDocument as GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
+} from '@/__generated__/operations';
 import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import { useApolloClient, useQuery } from '@vue/apollo-composable';
 import {
   GET_DISCUSSION_ACTIVITY,
-  GET_DISCUSSION_DETAIL,
-  GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
   GET_DISCUSSION_DETAIL_FILES_PAGE,
   GET_DISCUSSION_DETAIL_IMAGES_PAGE,
-  GET_DOWNLOAD_DETAIL,
 } from '@/graphQLData/discussion/queries';
-import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
+
 import {
   CHECK_DISCUSSION_ISSUE_EXISTENCE,
   CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
@@ -20,13 +23,16 @@ import { DateTime } from 'luxon';
 import { config } from '@/config';
 import type { RouteLocationRaw } from 'vue-router';
 import type {
-  Discussion,
-  DiscussionChannel,
-  Comment,
-  DownloadableFile,
-  Image,
-  Album,
-} from '@/__generated__/graphql';
+  GetDiscussionDetailQuery,
+  GetDownloadDetailQuery,
+  GetDiscussionQuery,
+} from '@/__generated__/operations';
+import type {
+  RootCommentSection,
+  AnswerSummary,
+  DetailImage as Image,
+  DetailFile as DownloadableFile,
+} from '@/types/DiscussionPresentation';
 import InfoBanner from '@/components/InfoBanner.vue';
 import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vue';
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
@@ -34,7 +40,7 @@ import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges
 import PageNotFound from '@/components/PageNotFound.vue';
 import AgeGatedDiscussionNotice from '@/components/auth/AgeGatedDiscussionNotice.vue';
 import LoadMore from '@/components/LoadMore.vue';
-import type { DiscussionChannelWithFlairs } from '@/types/Discussion';
+
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { useRoute } from 'nuxt/app';
@@ -63,19 +69,9 @@ type DetailPageInfo = {
   hasNextPage: boolean;
 };
 
-type DetailAlbum = Album & {
-  detailImagesPageInfo?: DetailPageInfo;
-};
-
-type DetailDiscussion = Discussion & {
-  Album?: DetailAlbum | null;
-  detailFilesPageInfo?: DetailPageInfo;
-};
-
-type DetailDiscussionChannel = DiscussionChannel & {
-  detailAnswersPageInfo?: DetailPageInfo;
-};
-
+type DetailDiscussion =
+  | GetDiscussionDetailQuery['discussions'][number]
+  | GetDownloadDetailQuery['discussions'][number];
 type DetailPageVariables = {
   discussionId: string;
   channelUniqueName: string;
@@ -83,8 +79,12 @@ type DetailPageVariables = {
 };
 
 const mergeById = <T extends { id: string }>(base: T[], additions: T[]) => {
-  const items = new Map(base.map((item) => [item.id, item]));
-  additions.forEach((item) => items.set(item.id, item));
+  const items = new Map(
+    base.filter((item) => item?.id).map((item) => [item.id, item])
+  );
+  additions.forEach((item) => {
+    if (item?.id) items.set(item.id, item);
+  });
   return [...items.values()];
 };
 
@@ -130,8 +130,8 @@ const isDownloadChecksRoute = computed(
     route.name.includes('pipelines')
 );
 const loggedInUserModName = computed(() => modProfileNameVar.value);
-const lastValidDiscussion = ref<Discussion | null>(null);
-const additionalAnswers = ref<Comment[]>([]);
+const lastValidDiscussion = ref<DetailDiscussion | null>(null);
+const additionalAnswers = ref<AnswerSummary[]>([]);
 const additionalFiles = ref<DownloadableFile[]>([]);
 const additionalImages = ref<Image[]>([]);
 const answerPageInfo = ref<DetailPageInfo | null>(null);
@@ -173,28 +173,29 @@ const {
 // Revision history is useful but noncritical to first paint. Fetching it in the
 // browser keeps potentially unbounded version lists out of the SSR response and
 // lets the discussion body, channel state, and comments render first.
-const { result: getDiscussionActivityResult } = useQuery(
-  GET_DISCUSSION_ACTIVITY,
-  () => ({ id: props.discussionId }),
-  {
-    fetchPolicy: 'cache-first',
-    enabled: computed(() => !props.downloadMode && !!props.discussionId),
-    prefetch: false,
-  }
-);
+const { result: getDiscussionActivityResult } = useQuery<{
+  discussions: Pick<
+    GetDiscussionQuery['discussions'][number],
+    'id' | 'PastTitleVersions' | 'PastBodyVersions' | 'BodyLastEditedBy'
+  >[];
+}>(GET_DISCUSSION_ACTIVITY, () => ({ id: props.discussionId }), {
+  fetchPolicy: 'cache-first',
+  enabled: computed(() => !props.downloadMode && !!props.discussionId),
+  prefetch: false,
+});
 
 onGetDiscussionResult((newResult) => {
-  if (newResult?.data?.discussions?.length) {
-    lastValidDiscussion.value = newResult.data.discussions[0];
+  const item = newResult?.data?.discussions?.find(
+    (item) => item.id === props.discussionId
+  );
+  if (item) {
+    lastValidDiscussion.value = item;
   }
 });
 
 const commentSort = computed(() => getSortFromQuery(route.query));
 
-const lastValidCommentSection = ref<{
-  DiscussionChannel: DiscussionChannel | null;
-  Comments: Comment[];
-} | null>(null);
+const lastValidCommentSection = ref<RootCommentSection | null>(null);
 
 const {
   result: getDiscussionChannelResult,
@@ -226,9 +227,13 @@ const discussionBodyEditMode = ref(false);
 const albumEditMode = ref(false);
 const feedbackModalManager = ref();
 
-const baseDiscussion = computed<DetailDiscussion | null>(() => {
-  const currentDiscussion = getDiscussionResult.value?.discussions?.[0];
-  const activity = getDiscussionActivityResult.value?.discussions?.[0];
+const baseDiscussion = computed(() => {
+  const currentDiscussion = getDiscussionResult.value?.discussions?.find(
+    (item) => item.id === props.discussionId
+  );
+  const activity = getDiscussionActivityResult.value?.discussions?.find(
+    (item) => item.id === props.discussionId
+  );
   const currentWithActivity = currentDiscussion
     ? { ...currentDiscussion, ...(activity || {}) }
     : null;
@@ -240,10 +245,10 @@ const baseDiscussion = computed<DetailDiscussion | null>(() => {
     lastValidDiscussion.value?.id === props.discussionId
       ? lastValidDiscussion.value
       : null;
-  return (currentWithActivity || lastValid) as DetailDiscussion | null;
+  return currentWithActivity || lastValid;
 });
 
-const discussion = computed<Discussion | null>(() => {
+const discussion = computed(() => {
   const base = baseDiscussion.value;
   if (!base) return null;
 
@@ -252,22 +257,20 @@ const discussion = computed<Discussion | null>(() => {
     Album: base.Album
       ? {
           ...base.Album,
-          Images: mergeById(
-            (base.Album.Images || []) as Image[],
-            additionalImages.value
-          ),
+          Images: mergeById(base.Album.Images || [], additionalImages.value),
         }
       : base.Album,
     DownloadableFiles: mergeById(
-      (base.DownloadableFiles || []) as DownloadableFile[],
+      base.DownloadableFiles || [],
       additionalFiles.value
     ),
-  } as Discussion;
+  };
 });
 
-watch(commentSort, () =>
-  fetchMoreComments({ variables: { sort: commentSort.value } })
-);
+watch([commentSort, loggedInUserModName], () => {
+  lastValidCommentSection.value = null;
+  offset.value = 0;
+});
 
 watch(
   () => usernameVar.value,
@@ -283,12 +286,13 @@ watch(
 // Apollo can retain the previous result while reactive query variables change.
 // Never use that result (or a saved fallback) for a different conversation.
 const matchesSelectedConversation = (
-  section: { DiscussionChannel: DiscussionChannel | null } | null | undefined
+  section: RootCommentSection | null | undefined
 ) =>
   section?.DiscussionChannel?.discussionId === props.discussionId &&
   section.DiscussionChannel.channelUniqueName === channelId.value;
 
 const currentCommentSection = computed(() => {
+  if (getDiscussionChannelLoading.value) return null;
   const section = getDiscussionChannelResult.value?.getCommentSection;
   return matchesSelectedConversation(section) ? section : null;
 });
@@ -300,12 +304,7 @@ const selectedCommentSection = computed(
       : null)
 );
 
-const setLastValidCommentSection = (
-  section: {
-    DiscussionChannel: DiscussionChannel | null;
-    Comments: Comment[];
-  } | null
-) => {
+const setLastValidCommentSection = (section: RootCommentSection | null) => {
   lastValidCommentSection.value = matchesSelectedConversation(section)
     ? section
     : null;
@@ -320,6 +319,7 @@ if (getDiscussionChannelResult.value?.getCommentSection) {
 }
 
 onGetDiscussionChannelResult((newResult) => {
+  if (newResult.loading) return;
   if (newResult?.data?.getCommentSection) {
     setLastValidCommentSection({
       DiscussionChannel: newResult.data.getCommentSection.DiscussionChannel,
@@ -333,24 +333,21 @@ onGetDiscussionChannelResult((newResult) => {
   }
 });
 
-watch(
-  [() => props.discussionId, channelId],
-  () => {
-    collectionGeneration.value += 1;
-    setLastValidCommentSection(null);
-    additionalAnswers.value = [];
-    additionalFiles.value = [];
-    additionalImages.value = [];
-    answerPageInfo.value = null;
-    filePageInfo.value = null;
-    imagePageInfo.value = null;
-    answersLoading.value = false;
-    mediaLoading.value = false;
-    collectionError.value = '';
-  }
-);
+watch([() => props.discussionId, channelId], () => {
+  collectionGeneration.value += 1;
+  setLastValidCommentSection(null);
+  additionalAnswers.value = [];
+  additionalFiles.value = [];
+  additionalImages.value = [];
+  answerPageInfo.value = null;
+  filePageInfo.value = null;
+  imagePageInfo.value = null;
+  answersLoading.value = false;
+  mediaLoading.value = false;
+  collectionError.value = '';
+});
 
-const formDiscussionChannel = computed<DiscussionChannel | null>(() => {
+const formDiscussionChannel = computed(() => {
   const discussionChannels = discussion.value?.DiscussionChannels || [];
   return (
     discussionChannels.find(
@@ -360,7 +357,7 @@ const formDiscussionChannel = computed<DiscussionChannel | null>(() => {
   );
 });
 
-const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
+const activeDiscussionChannel = computed(() => {
   return (
     selectedCommentSection.value?.DiscussionChannel ||
     formDiscussionChannel.value
@@ -368,21 +365,23 @@ const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
 });
 
 const answers = computed(() => {
-  const initialAnswers = activeDiscussionChannel.value?.Answers || [];
-  return mergeById(initialAnswers as Comment[], additionalAnswers.value);
+  const channel = activeDiscussionChannel.value;
+  const initialAnswers = channel && 'Answers' in channel ? channel.Answers : [];
+  return mergeById(initialAnswers, additionalAnswers.value);
 });
 
 const currentAnswerPageInfo = computed(
   () =>
     answerPageInfo.value ||
-    (activeDiscussionChannel.value as DetailDiscussionChannel | null)
-      ?.detailAnswersPageInfo ||
+    (activeDiscussionChannel.value &&
+    'detailAnswersPageInfo' in activeDiscussionChannel.value
+      ? activeDiscussionChannel.value.detailAnswersPageInfo
+      : null) ||
     null
 );
 
 const currentFilePageInfo = computed(
-  () =>
-    filePageInfo.value || baseDiscussion.value?.detailFilesPageInfo || null
+  () => filePageInfo.value || baseDiscussion.value?.detailFilesPageInfo || null
 );
 
 const currentImagePageInfo = computed(
@@ -414,12 +413,7 @@ const loadMoreAnswers = async () => {
   const requestGeneration = collectionGeneration.value;
   try {
     const client = resolveClient();
-    const { data } = await client.query<{
-      getDiscussionDetailAnswers: {
-        answers: Comment[];
-        pageInfo: DetailPageInfo;
-      };
-    }, DetailPageVariables>({
+    const { data } = await client.query({
       query: GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
       variables: {
         discussionId: props.discussionId,
@@ -428,7 +422,10 @@ const loadMoreAnswers = async () => {
       },
       fetchPolicy: 'network-only',
     });
-    if (requestGeneration === collectionGeneration.value) {
+    if (
+      requestGeneration === collectionGeneration.value &&
+      data.getDiscussionDetailAnswers
+    ) {
       additionalAnswers.value = mergeById(
         additionalAnswers.value,
         data.getDiscussionDetailAnswers.answers
@@ -459,12 +456,15 @@ const loadMoreMedia = async () => {
     if (currentImagePageInfo.value?.hasNextPage) {
       requests.push(
         client
-          .query<{
-            getDiscussionDetailImages: {
-              images: Image[];
-              pageInfo: DetailPageInfo;
-            };
-          }, DetailPageVariables>({
+          .query<
+            {
+              getDiscussionDetailImages: {
+                images: Image[];
+                pageInfo: DetailPageInfo;
+              };
+            },
+            DetailPageVariables
+          >({
             query: GET_DISCUSSION_DETAIL_IMAGES_PAGE,
             variables: {
               discussionId: props.discussionId,
@@ -488,12 +488,15 @@ const loadMoreMedia = async () => {
     if (currentFilePageInfo.value?.hasNextPage) {
       requests.push(
         client
-          .query<{
-            getDiscussionDetailFiles: {
-              files: DownloadableFile[];
-              pageInfo: DetailPageInfo;
-            };
-          }, DetailPageVariables>({
+          .query<
+            {
+              getDiscussionDetailFiles: {
+                files: DownloadableFile[];
+                pageInfo: DetailPageInfo;
+              };
+            },
+            DetailPageVariables
+          >({
             query: GET_DISCUSSION_DETAIL_FILES_PAGE,
             variables: {
               discussionId: props.discussionId,
@@ -557,12 +560,15 @@ const { locked: forumLocked } = useForumLock(
 const commentsDisabled = computed(() => locked.value || forumLocked.value);
 
 const comments = computed(() => {
-  return selectedCommentSection.value?.Comments || [];
+  return (
+    selectedCommentSection.value?.Comments.filter((comment) => !!comment?.id) ||
+    []
+  );
 });
 
 const loadedRootCommentCount = computed(() => {
   const rootComments = comments.value.filter(
-    (comment: Comment) => comment.ParentComment === null
+    (comment) => comment.ParentComment === null
   );
   return rootComments.length;
 });
@@ -673,17 +679,19 @@ const aggregateCommentCount = computed(() => {
 });
 
 const aggregateRootCommentCount = computed(() => {
-  const channel = activeDiscussionChannel.value as
-    | (DiscussionChannel & {
-        RootCommentsConnection?: {
-          aggregate?: { count?: { nodes?: number | null } | null } | null;
-        } | null;
-      })
-    | null;
-  return channel?.RootCommentsConnection?.aggregate?.count?.nodes || 0;
+  const channel = activeDiscussionChannel.value;
+  return channel && 'RootCommentsConnection' in channel
+    ? channel.RootCommentsConnection.aggregate.count.nodes
+    : 0;
 });
 
 const loadMore = () => {
+  const requestScope = [
+    props.discussionId,
+    channelId.value,
+    commentSort.value,
+    loggedInUserModName.value,
+  ].join('\0');
   fetchMoreComments({
     variables: {
       offset:
@@ -691,16 +699,27 @@ const loadMore = () => {
         0,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
-      offset.value += fetchMoreResult.getCommentSection?.Comments?.length || 0;
+      if (
+        requestScope !==
+          [
+            props.discussionId,
+            channelId.value,
+            commentSort.value,
+            loggedInUserModName.value,
+          ].join('\0') ||
+        !previousResult.getCommentSection ||
+        !fetchMoreResult?.getCommentSection ||
+        !matchesSelectedConversation(fetchMoreResult.getCommentSection)
+      )
+        return previousResult;
       return {
         ...previousResult,
         getCommentSection: {
           ...previousResult.getCommentSection,
-          Comments: [
-            ...previousResult.getCommentSection.Comments,
-            ...fetchMoreResult.getCommentSection.Comments,
-          ],
+          Comments: mergeById(
+            previousResult.getCommentSection.Comments,
+            fetchMoreResult.getCommentSection.Comments
+          ),
         },
       };
     },
@@ -890,10 +909,7 @@ const handleEditAlbum = () => {
               />
               <DiscussionFlairBadges
                 v-if="formDiscussionChannel && !isDownloadChecksRoute"
-                :flairs="
-                  (formDiscussionChannel as DiscussionChannelWithFlairs)
-                    .Flairs || []
-                "
+                :flairs="formDiscussionChannel.Flairs || []"
                 :channel-name="formDiscussionChannel.channelUniqueName"
               />
               <div class="w-full">
@@ -1007,9 +1023,9 @@ const handleEditAlbum = () => {
             </ClientOnly>
           </div>
           <DiscussionChannelLinks
-            v-if="discussion && (discussion as Discussion).DiscussionChannels"
+            v-if="discussion && discussion.DiscussionChannels"
             :channel-id="activeDiscussionChannel?.channelUniqueName || ''"
-            :discussion-channels="(discussion as Discussion).DiscussionChannels"
+            :discussion-channels="discussion.DiscussionChannels"
           />
         </div>
       </div>

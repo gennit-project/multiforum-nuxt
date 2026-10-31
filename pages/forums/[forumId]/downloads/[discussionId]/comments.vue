@@ -1,24 +1,22 @@
 <script setup lang="ts">
+import {
+  GetCommentSectionDocument as GET_DISCUSSION_COMMENTS,
+  GetDiscussionChannelCommentAggregateDocument as GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
+  GetDiscussionChannelRootCommentAggregateDocument as GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
+  GetDiscussionDocument as GET_DISCUSSION,
+} from '@/__generated__/operations';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
-import {
-  GET_DISCUSSION_COMMENTS,
-  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-} from '@/graphQLData/comment/queries';
+
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
-import type {
-  Comment,
-  Discussion,
-  DiscussionChannel,
-} from '@/__generated__/graphql';
+import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
+import { getSortFromQuery } from '@/utils/getSortFromQuery';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -32,7 +30,6 @@ const props = defineProps<{
 }>();
 
 const route = useRoute();
-const offset = ref(0);
 
 const discussionId = computed(() => {
   return typeof route.params.discussionId === 'string'
@@ -54,16 +51,23 @@ const { result: getDiscussionResult } = useQuery(
     channelUniqueName: channelId.value,
   }),
   {
-    enabled: !props.discussion,
+    enabled: computed(
+      () => !!discussionId.value && props.discussion?.id !== discussionId.value
+    ),
   }
 );
 
 const discussion = computed(
-  () => props.discussion || getDiscussionResult.value?.discussions?.[0] || null
+  () =>
+    (props.discussion?.id === discussionId.value ? props.discussion : null) ||
+    getDiscussionResult.value?.discussions?.find(
+      (item) => item.id === discussionId.value
+    ) ||
+    null
 );
 const activeDiscussionChannel = computed(() => {
   return discussion.value?.DiscussionChannels?.find(
-    (dc: DiscussionChannel) => dc.channelUniqueName === channelId.value
+    (dc) => dc.channelUniqueName === channelId.value
   );
 });
 
@@ -81,6 +85,7 @@ const {
     modName: loggedInUserModName.value,
     offset: 0,
     limit: COMMENT_LIMIT,
+    sort: getSortFromQuery(route.query),
   }),
   {
     fetchPolicy: 'cache-first',
@@ -103,10 +108,10 @@ onMounted(() => {
 
 const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
   GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-  {
-    discussionId,
-    channelUniqueName: channelId,
-  },
+  () => ({
+    discussionId: discussionId.value,
+    channelUniqueName: channelId.value,
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -114,10 +119,10 @@ const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
 
 const { result: getDiscussionChannelRootCommentAggregateResult } = useQuery(
   GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-  {
-    discussionId,
-    channelUniqueName: channelId,
-  },
+  () => ({
+    discussionId: discussionId.value,
+    channelUniqueName: channelId.value,
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -138,37 +143,54 @@ const locked = computed(() => {
 });
 
 const comments = computed(() =>
-  getDiscussionChannelError.value
+  getDiscussionChannelError.value || getDiscussionChannelLoading.value
     ? []
-    : getDiscussionChannelResult.value?.getCommentSection?.Comments || []
+    : getDiscussionChannelResult.value?.getCommentSection?.DiscussionChannel
+          ?.discussionId === discussionId.value &&
+        getDiscussionChannelResult.value.getCommentSection.DiscussionChannel
+          .channelUniqueName === channelId.value
+      ? getDiscussionChannelResult.value.getCommentSection.Comments.filter(
+          (comment) => !!comment?.id
+        )
+      : []
 );
 
 const loadedRootCommentCount = computed(() => {
   const rootComments = comments.value.filter(
-    (comment: Comment) => comment.ParentComment === null
+    (comment) => comment.ParentComment === null
   );
   return rootComments.length;
 });
 
 const commentCount = computed(
-  () => activeDiscussionChannel.value?.CommentsConnection?.aggregate?.count?.nodes || 0
+  () =>
+    activeDiscussionChannel.value?.CommentsConnection?.aggregate?.count
+      ?.nodes || 0
 );
 
 const aggregateCommentCount = computed(() => {
   return (
-    getDiscussionChannelCommentAggregateResult.value?.discussionChannels?.[0]
-      ?.CommentsConnection?.aggregate?.count?.nodes || 0
+    getDiscussionChannelCommentAggregateResult.value?.discussionChannels?.find(
+      (channel) => channel.id === activeDiscussionChannel.value?.id
+    )?.CommentsConnection?.aggregate?.count?.nodes || 0
   );
 });
 
 const aggregateRootCommentCount = computed(() => {
   return (
-    getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels?.[0]
-      ?.CommentsConnection?.aggregate?.count?.nodes || 0
+    getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels?.find(
+      (channel) => channel.id === activeDiscussionChannel.value?.id
+    )?.CommentsConnection?.aggregate?.count?.nodes || 0
   );
 });
 
 const loadMore = () => {
+  const requestScope = [
+    discussionId.value,
+    channelId.value,
+    getSortFromQuery(route.query),
+    loggedInUserModName.value,
+  ].join('\0');
   fetchMoreComments({
     variables: {
       offset:
@@ -176,15 +198,35 @@ const loadMore = () => {
         0,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
-      offset.value += fetchMoreResult.getCommentSection.Comments.length;
+      if (
+        requestScope !==
+          [
+            discussionId.value,
+            channelId.value,
+            getSortFromQuery(route.query),
+            loggedInUserModName.value,
+          ].join('\0') ||
+        !previousResult.getCommentSection ||
+        !fetchMoreResult?.getCommentSection ||
+        fetchMoreResult.getCommentSection.DiscussionChannel?.discussionId !==
+          discussionId.value ||
+        fetchMoreResult.getCommentSection.DiscussionChannel
+          .channelUniqueName !== channelId.value
+      )
+        return previousResult;
       return {
         ...previousResult,
         getCommentSection: {
           ...previousResult.getCommentSection,
           Comments: [
-            ...previousResult.getCommentSection.Comments,
-            ...fetchMoreResult.getCommentSection.Comments,
+            ...new Map(
+              [
+                ...previousResult.getCommentSection.Comments,
+                ...fetchMoreResult.getCommentSection.Comments,
+              ]
+                .filter((item) => !!item?.id)
+                .map((item) => [item.id, item])
+            ).values(),
           ],
         },
       };

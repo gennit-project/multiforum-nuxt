@@ -1,3 +1,4 @@
+import { GetDownloadDetailDocument } from '@/__generated__/operations';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { defineComponent, ref, type Ref } from 'vue';
@@ -87,7 +88,7 @@ describe('download detail page wrapper', () => {
   it('uses the download-specific query for SSR metadata', async () => {
     await mountPage();
 
-    expect(h.queryDocument).toBe('GET_DOWNLOAD_DETAIL');
+    expect(h.queryDocument).toBe(GetDownloadDetailDocument);
   });
 
   it('shows an error banner when the route discussion id is missing', async () => {
@@ -147,7 +148,7 @@ describe('download detail page wrapper', () => {
         {
           title: 'My Download',
           body: 'A'.repeat(200),
-          coverImageURL: 'https://example.test/image.png',
+          Album: { Images: [{ url: 'https://example.test/image.png' }] },
           createdAt: '2024-01-01T00:00:00.000Z',
           updatedAt: '2024-01-02T00:00:00.000Z',
           Author: { displayName: 'Alice', username: 'alice' },

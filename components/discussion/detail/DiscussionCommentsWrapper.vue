@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import type {
-  DiscussionChannel,
-  OwnedCommentCreateInput,
-  Comment as CommentType,
-} from '@/__generated__/graphql';
+  CommentView as CommentType,
+  CreateEditCommentFormValues,
+} from '@/types/Comment';
+import type {
+  CommentChannelView as DiscussionChannel,
+  AnswerSummary,
+} from '@/types/DiscussionPresentation';
+import type { OwnedCommentCreateInput } from '@/__generated__/graphql';
 import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
 import type { PropType } from 'vue';
 import { computed, ref, onMounted } from 'vue';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
-import type { CreateEditCommentFormValues } from '@/types/Comment';
 import CommentSection from '@/components/comments/CommentSection.vue';
 import { useRoute } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
@@ -95,7 +98,7 @@ const props = defineProps({
     default: false,
   },
   answers: {
-    type: Array as PropType<CommentType[]>,
+    type: Array as PropType<AnswerSummary[]>,
     required: false,
     default: () => [],
   },
@@ -189,7 +192,8 @@ const botSuggestions = computed(() => {
 
   return buildBotMentionOptions({
     channelUniqueName:
-      channel?.Channel?.uniqueName || formDiscussionChannel.value?.channelUniqueName,
+      channel?.Channel?.uniqueName ||
+      formDiscussionChannel.value?.channelUniqueName,
     bots: channel?.Channel?.Bots || [],
   });
 });
@@ -205,8 +209,10 @@ const modSuggestions = computed(() => {
 
   return buildModMentionOptions({
     mods: (channel?.Channel?.Moderators || [])
-      .filter((mod): mod is typeof mod & { displayName: string } =>
-        typeof mod.displayName === 'string' && mod.displayName.length > 0)
+      .filter(
+        (mod): mod is typeof mod & { displayName: string } =>
+          typeof mod.displayName === 'string' && mod.displayName.length > 0
+      )
       .map((mod) => ({ displayName: mod.displayName })),
   });
 });
@@ -522,7 +528,9 @@ const handleSubscriptionToggle = () => {
 };
 
 // Handle ?action=unsubscribe query param for one-click unsubscribe from notifications
-const discussionChannelIdRef = computed(() => props.discussionChannel?.id || null);
+const discussionChannelIdRef = computed(
+  () => props.discussionChannel?.id || null
+);
 useAutoUnsubscribe({
   entityId: discussionChannelIdRef,
   unsubscribeFn: async (id: string) => {

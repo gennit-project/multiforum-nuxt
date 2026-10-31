@@ -4,7 +4,7 @@ import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { GET_DISCUSSION_DETAIL } from '@/graphQLData/discussion/queries';
+import { GetDiscussionDetailDocument as GET_DISCUSSION_DETAIL } from '@/__generated__/operations';
 
 const useHead = vi.fn();
 const routeParams: { discussionId?: string; forumId?: string } = {

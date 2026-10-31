@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { useCommentCrudMutations } from './useCommentCrudMutations';
-import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
+import { CreateCommentDocument as CREATE_COMMENT } from '@/__generated__/operations';
+import { print } from 'graphql';
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: vi.fn(),
@@ -312,7 +313,10 @@ describe('useCommentCrudMutations', () => {
     it('leaves getCommentReplies entries for other parents unchanged', () => {
       const { captured } = runReplyUpdate('parent-1', 'new-1');
       const existing = existingReplies();
-      const result = captured.getCommentReplies(existing, helpers('other-parent'));
+      const result = captured.getCommentReplies(
+        existing,
+        helpers('other-parent')
+      );
       expect(result).toBe(existing);
     });
 
@@ -343,7 +347,7 @@ describe('useCommentCrudMutations', () => {
   // mutation omits any of them, Apollo writes an incomplete entry ("Missing
   // field ... while writing result") and the new reply fails to render.
   describe('CREATE_COMMENT returns the fields the cache requires', () => {
-    const body = CREATE_COMMENT.loc?.source.body || '';
+    const body = print(CREATE_COMMENT);
 
     it.each([
       'textLastEdited',
@@ -378,42 +382,52 @@ describe('useCommentCrudMutations', () => {
       update(cache, {
         data: {
           createCommentWithOwnedConnections: {
-            comments: [{ __typename: 'Comment', id: 'root-1', ParentComment: null }],
+            comments: [
+              {
+                __typename: 'Comment',
+                id: 'root-1',
+                ParentComment: null,
+                DiscussionChannel: {
+                  id: 'actual-channel',
+                  discussionId: 'discussion-123',
+                  channelUniqueName: 'cats',
+                },
+              },
+            ],
           },
         },
       });
       return { captured, cache };
     };
 
-    it('prepends the new root comment to the Comments list', () => {
+    it('prepends a normalized reference to the root list', () => {
       const { captured } = runRootUpdate();
       expect(
-        captured.fields.Comments([{ id: 'old' }])
-      ).toEqual([{ __typename: 'Comment', id: 'root-1', ParentComment: null }, { id: 'old' }]);
+        captured.fields.Comments([{ __ref: 'Comment:old' }], {
+          readField: () => 'old',
+          toReference: () => ({ __ref: 'Comment:root-1' }),
+        })
+      ).toEqual([{ __ref: 'Comment:root-1' }, { __ref: 'Comment:old' }]);
     });
 
-    it('increments the CommentsAggregate count', () => {
-      const { captured } = runRootUpdate();
-      expect(
-        captured.fields.CommentsConnection({ aggregate: { count: { nodes: 2 } } })
-      ).toEqual({ aggregate: { count: { nodes: 3 } } });
+    it('updates the response channel rather than the current discussion ID', () => {
+      const { cache } = runRootUpdate();
+      expect(cache.modify.mock.calls.map(([options]) => options.id)).toEqual([
+        'DiscussionChannel:actual-channel',
+        'DiscussionChannel:actual-channel',
+      ]);
     });
 
-    it('defaults the CommentsAggregate count to 1 when none exists', () => {
-      const { captured } = runRootUpdate();
-      expect(captured.fields.CommentsConnection(undefined)).toEqual({
-        aggregate: { count: { nodes: 1 } },
-      });
-    });
-
-    it('calls onIncrementCommentCount for root comments', () => {
+    it('does not trigger a second discussion count increment through the legacy callback', () => {
       const onIncrementCommentCount = vi.fn();
       runRootUpdate(onIncrementCommentCount);
-      expect(onIncrementCommentCount).toHaveBeenCalled();
+      expect(onIncrementCommentCount).not.toHaveBeenCalled();
     });
 
     it('logs an error when the reply cache update throws', () => {
-      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleError = vi
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
       useCommentCrudMutations({
         discussionId: computed(() => 'discussion-123'),
         commentToDeleteId: ref(''),
@@ -430,12 +444,19 @@ describe('useCommentCrudMutations', () => {
         data: {
           createCommentWithOwnedConnections: {
             comments: [
-              { __typename: 'Comment', id: 'reply-1', ParentComment: { id: 'parent-1' } },
+              {
+                __typename: 'Comment',
+                id: 'reply-1',
+                ParentComment: { id: 'parent-1' },
+              },
             ],
           },
         },
       });
-      expect(consoleError).toHaveBeenCalledWith('Error updating cache:', expect.any(Error));
+      expect(consoleError).toHaveBeenCalledWith(
+        'Error updating cache:',
+        expect.any(Error)
+      );
       consoleError.mockRestore();
     });
   });
@@ -504,9 +525,9 @@ describe('useCommentCrudMutations', () => {
         commentToDeleteId: 'c-1',
         parentOfCommentToDelete: '',
       });
-      expect(
-        captured.fields.Comments([{ id: 'c-1' }, { id: 'c-2' }])
-      ).toEqual([{ id: 'c-2' }]);
+      expect(captured.fields.Comments([{ id: 'c-1' }, { id: 'c-2' }])).toEqual([
+        { id: 'c-2' },
+      ]);
     });
 
     it('decrements the root CommentsAggregate count', () => {
@@ -515,7 +536,9 @@ describe('useCommentCrudMutations', () => {
         parentOfCommentToDelete: '',
       });
       expect(
-        captured.fields.CommentsConnection({ aggregate: { count: { nodes: 3 } } })
+        captured.fields.CommentsConnection({
+          aggregate: { count: { nodes: 3 } },
+        })
       ).toEqual({ aggregate: { count: { nodes: 2 } } });
     });
 
@@ -526,7 +549,10 @@ describe('useCommentCrudMutations', () => {
         parentOfCommentToDelete: '',
         onDecrementCommentCount,
       });
-      expect([cache.gc.mock.calls.length, onDecrementCommentCount.mock.calls.length]).toEqual([1, 1]);
+      expect([
+        cache.gc.mock.calls.length,
+        onDecrementCommentCount.mock.calls.length,
+      ]).toEqual([1, 1]);
     });
   });
 

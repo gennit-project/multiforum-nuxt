@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
-import type { Discussion } from '@/__generated__/graphql';
+import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
 import CloseIcon from '@/components/icons/CloseIcon.vue';
 import DownloadFileIcon from '@/components/icons/DownloadFileIcon.vue';
 import FacebookIcon from '@/components/icons/FacebookIcon.vue';

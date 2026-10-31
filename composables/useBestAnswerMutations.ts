@@ -15,7 +15,7 @@ type UseBestAnswerMutationsParams = {
   forumId: Ref<string> | ComputedRef<string>;
   discussionId: Ref<string | undefined> | ComputedRef<string | undefined>;
   originalPoster: Ref<string> | ComputedRef<string>;
-  answers: Ref<Comment[]> | ComputedRef<Comment[]>;
+  answers: Ref<Pick<Comment, 'id'>[]> | ComputedRef<Pick<Comment, 'id'>[]>;
   onMarked?: () => void;
   onUnmarked?: () => void;
 };

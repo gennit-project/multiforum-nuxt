@@ -49,14 +49,18 @@ test('creates a root comment', async ({ context, page }, testInfo) => {
 
     await page.goto(discussionUrl);
     await expect(
-      page.getByRole('heading', { name: DEFAULT_COMMENT_CONFIG.discussionTitle })
+      page.getByRole('heading', {
+        name: DEFAULT_COMMENT_CONFIG.discussionTitle,
+      })
     ).toBeVisible();
 
     await page.getByTestId('addComment').click();
     await page.getByTestId('texteditor-textarea').fill(ROOT_COMMENT_TEXT);
     await page.getByTestId('createCommentButton').click();
-    await waitForGraphqlOperation(diagnostics.completedOperations, 'createComment');
-    await page.goto(discussionUrl);
+    await waitForGraphqlOperation(
+      diagnostics.completedOperations,
+      'createComment'
+    );
     await expect(page.getByText(ROOT_COMMENT_TEXT)).toBeVisible();
 
     expect(diagnostics.pageErrors).toEqual([]);

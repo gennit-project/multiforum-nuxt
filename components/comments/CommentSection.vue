@@ -1,4 +1,10 @@
 <script lang="ts" setup>
+import type {
+  CommentView as CommentType,
+  CreateEditCommentFormValues,
+  CreateReplyInputData,
+} from '@/types/Comment';
+import type { AnswerSummary } from '@/types/DiscussionPresentation';
 import { ref, computed, watch, watchEffect } from 'vue';
 import Comment from './Comment.vue';
 import LoadMore from '../LoadMore.vue';
@@ -10,14 +16,7 @@ import Notification from '@/components/NotificationComponent.vue';
 import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue';
 import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
-import type {
-  OwnedCommentCreateInput,
-  Comment as CommentType,
-} from '@/__generated__/graphql';
-import type {
-  CreateEditCommentFormValues,
-  CreateReplyInputData,
-} from '@/types/Comment';
+import type { OwnedCommentCreateInput } from '@/__generated__/graphql';
 import type { PropType } from 'vue';
 import { useModProfileName } from '@/composables/useAuthState';
 import { useRouter, useRoute } from 'nuxt/app';
@@ -119,7 +118,7 @@ const props = defineProps({
     default: false,
   },
   answers: {
-    type: Array as PropType<CommentType[]>,
+    type: Array as PropType<AnswerSummary[]>,
     default: () => [],
   },
   answersHasNextPage: {
@@ -322,6 +321,7 @@ const {
   softDeleteComment,
 } = useCommentCrudMutations({
   discussionId: discussionIdRef,
+  eventId: computed(() => props.commentSectionQueryVariables.eventId),
   commentToDeleteId,
   parentOfCommentToDelete,
   onCommentDeleted: () => {
@@ -336,7 +336,17 @@ const {
   },
 });
 
-onDoneCreatingComment(() => {
+onDoneCreatingComment((result) => {
+  const comment = result.data?.createCommentWithOwnedConnections?.comments?.[0];
+  const scope = props.commentSectionQueryVariables;
+  if (!comment) return;
+  if (
+    scope.discussionId &&
+    (comment.DiscussionChannel?.discussionId !== scope.discussionId ||
+      comment.DiscussionChannel.channelUniqueName !== scope.channelUniqueName)
+  )
+    return;
+  if (scope.eventId && comment.Event?.id !== scope.eventId) return;
   resetAfterCreate();
   emit('updateCreateFormValues', {
     text: '',
@@ -542,10 +552,10 @@ const commentPassThroughProps = computed(() => ({
             v-model="searchText"
             type="text"
             placeholder="Search comments..."
-            class="w-full rounded-md border border-gray-300 py-1.5 pl-8 pr-8 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-          >
+            class="w-full rounded-md border border-gray-300 py-1.5 pr-8 pl-8 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+          />
           <svg
-            class="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+            class="absolute top-1/2 left-2.5 h-4 w-4 -translate-y-1/2 text-gray-400"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -560,16 +570,28 @@ const commentPassThroughProps = computed(() => ({
           <button
             v-if="searchText"
             type="button"
-            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+            class="absolute top-1/2 right-2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
             @click="searchText = ''"
           >
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              class="h-4 w-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
         <span
-          v-if="searchText && filteredComments.length !== (comments?.length || 0)"
+          v-if="
+            searchText && filteredComments.length !== (comments?.length || 0)
+          "
           class="ml-2 text-sm text-gray-500 dark:text-gray-400"
         >
           {{ filteredComments.length }} of {{ comments?.length || 0 }} loaded
@@ -579,6 +601,11 @@ const commentPassThroughProps = computed(() => ({
       <PinnedAnswers
         v-if="answers?.length > 0"
         :answers="answers"
+        :interaction-props="{
+          ...commentPassThroughProps,
+          editFormOpenAtCommentID,
+          editCommentError,
+        }"
         :has-next-page="answersHasNextPage"
         :loading="answersLoading"
         :enable-feedback="enableFeedback"
@@ -626,7 +653,7 @@ const commentPassThroughProps = computed(() => ({
       />
       <InfoBanner
         v-if="locked || archived"
-        class="mr-10 mt-2"
+        class="mt-2 mr-10"
         :text="'This comment section is locked.'"
       >
         <LockIcon class="h-5 w-5" />

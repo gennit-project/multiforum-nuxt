@@ -1,3 +1,9 @@
+import {
+  GetDiscussionDetailAnswersPageDocument as GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
+  GetDownloadDetailDocument as GET_DOWNLOAD_DETAIL,
+  GetDiscussionDetailDocument as GET_DISCUSSION_DETAIL,
+  GetCommentSectionDocument as GET_DISCUSSION_COMMENTS,
+} from '@/__generated__/operations';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { unref, type ref } from 'vue';
 import { flushPromises } from '@vue/test-utils';
@@ -7,13 +13,14 @@ import {
   createQueryMock,
   configureApolloMocks,
 } from '@/tests/utils/mockApollo';
-import type { Comment, Discussion } from '@/__generated__/graphql';
+import type { Discussion } from '@/__generated__/graphql';
+import type { RootComment as Comment } from '@/types/DiscussionPresentation';
+import { makeReply } from '@/tests/utils/replyFixtures';
 
 import { useQuery } from '@vue/apollo-composable';
 
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import {
-  GET_DISCUSSION_COMMENTS,
   GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
   GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
 } from '@/graphQLData/comment/queries';
@@ -24,11 +31,8 @@ import {
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import {
   GET_DISCUSSION_ACTIVITY,
-  GET_DISCUSSION_DETAIL,
-  GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
   GET_DISCUSSION_DETAIL_FILES_PAGE,
   GET_DISCUSSION_DETAIL_IMAGES_PAGE,
-  GET_DOWNLOAD_DETAIL,
 } from '@/graphQLData/discussion/queries';
 
 const mockApolloClientQuery = vi.hoisted(() => vi.fn());
@@ -176,8 +180,10 @@ const makeDiscussion = (overrides: Record<string, unknown> = {}): Discussion =>
     ...overrides,
   }) as unknown as Discussion;
 
-const makeComment = (id: string): Comment =>
-  ({ id, __typename: 'Comment' }) as unknown as Comment;
+const makeComment = (id: string): Comment => ({
+  ...makeReply({ id, ParentComment: null }),
+  CommentAuthor: null,
+});
 
 const commentSection = (comments: Comment[]) => ({
   getCommentSection: {
@@ -470,7 +476,9 @@ describe('DiscussionDetailContent', () => {
   it('checks the age gate for the discussion it could not load', () => {
     const { wrapper } = setup({ discussions: [], hasCommentSection: false });
     expect(
-      wrapper.findComponent({ name: 'AgeGatedDiscussionNotice' }).props('discussionId')
+      wrapper
+        .findComponent({ name: 'AgeGatedDiscussionNotice' })
+        .props('discussionId')
     ).toBe(wrapper.props('discussionId'));
   });
 
@@ -489,7 +497,10 @@ describe('DiscussionDetailContent', () => {
     const { wrapper } = setup({
       discussionChannelOverrides: {
         Answers: [initialAnswer],
-        detailAnswersPageInfo: { endCursor: 'answer-cursor', hasNextPage: true },
+        detailAnswersPageInfo: {
+          endCursor: 'answer-cursor',
+          hasNextPage: true,
+        },
       },
     });
     mockApolloClientQuery.mockResolvedValue({
@@ -535,7 +546,10 @@ describe('DiscussionDetailContent', () => {
     );
     const { wrapper, discussionQuery, commentSectionQuery } = setup({
       discussionChannelOverrides: {
-        detailAnswersPageInfo: { endCursor: 'answer-cursor', hasNextPage: true },
+        detailAnswersPageInfo: {
+          endCursor: 'answer-cursor',
+          hasNextPage: true,
+        },
       },
     });
 
@@ -606,7 +620,9 @@ describe('DiscussionDetailContent', () => {
     expect({
       images: renderedDiscussion.Album?.Images.map((image) => image.id),
       files: renderedDiscussion.DownloadableFiles.map((file) => file.id),
-      queries: mockApolloClientQuery.mock.calls.map(([options]) => options.query),
+      queries: mockApolloClientQuery.mock.calls.map(
+        ([options]) => options.query
+      ),
     }).toEqual({
       images: ['image-1', 'image-2'],
       files: ['file-1', 'file-2'],
@@ -892,18 +908,63 @@ describe('DiscussionDetailContent', () => {
       .vm.$emit('load-more');
 
     const { updateQuery } = commentSectionQuery.fetchMore.mock.calls[0]![0];
-    const merged = updateQuery(
-      { getCommentSection: { Comments: [makeComment('a')] } },
-      {
-        fetchMoreResult: {
-          getCommentSection: { Comments: [makeComment('b')] },
-        },
-      }
-    );
+    const merged = updateQuery(commentSection([makeComment('a')]), {
+      fetchMoreResult: {
+        ...commentSection([makeComment('b')]),
+      },
+    });
 
     expect(merged.getCommentSection.Comments.map((c: Comment) => c.id)).toEqual(
       ['a', 'b']
     );
+  });
+
+  it.each([null, { getCommentSection: null }])(
+    'retains the previous page for a nullable pagination response %j',
+    async (page) => {
+      const { wrapper, commentSectionQuery } = setup({
+        comments: [makeComment('a')],
+      });
+      await wrapper
+        .findComponent(DiscussionCommentsWrapperStub)
+        .vm.$emit('load-more');
+      const { updateQuery } = commentSectionQuery.fetchMore.mock.calls[0]![0];
+      const previous = commentSection([makeComment('a')]);
+      expect(updateQuery(previous, { fetchMoreResult: page })).toBe(previous);
+    }
+  );
+
+  it('rejects a pagination response after switching forums', async () => {
+    const { wrapper, commentSectionQuery } = setup({
+      comments: [makeComment('a')],
+    });
+    await wrapper
+      .findComponent(DiscussionCommentsWrapperStub)
+      .vm.$emit('load-more');
+    const { updateQuery } = commentSectionQuery.fetchMore.mock.calls[0]![0];
+    await wrapper.setProps({ channelId: 'dogs' });
+    const previous = commentSection([makeComment('a')]);
+    expect(
+      updateQuery(previous, {
+        fetchMoreResult: commentSection([makeComment('b')]),
+      })
+    ).toBe(previous);
+  });
+
+  it('deduplicates repeated comments across pagination', async () => {
+    const { wrapper, commentSectionQuery } = setup({
+      comments: [makeComment('a')],
+    });
+    await wrapper
+      .findComponent(DiscussionCommentsWrapperStub)
+      .vm.$emit('load-more');
+    const { updateQuery } = commentSectionQuery.fetchMore.mock.calls[0]![0];
+    const merged = updateQuery(commentSection([makeComment('a')]), {
+      fetchMoreResult: commentSection([makeComment('a'), makeComment('b')]),
+    });
+    expect(
+      merged.getCommentSection.Comments.map((item: Comment) => item.id)
+    ).toEqual(['a', 'b']);
   });
 
   it('returns the previous result when loadMore has no more comments', async () => {
