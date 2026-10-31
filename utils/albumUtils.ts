@@ -3,7 +3,11 @@
  * Used by DiscussionAlbum, ImageLightbox, and download list components.
  */
 
-import type { Image, Album } from '@/__generated__/graphql';
+import type { GetUserImagesQuery } from '@/__generated__/operations';
+
+type SelectedImage = GetUserImagesQuery['users'][number]['Images'][number];
+type AlbumImage = Pick<SelectedImage, 'id'> & Partial<Pick<SelectedImage, 'url' | 'alt' | 'caption'>>;
+type AlbumImages<T extends AlbumImage> = { Images?: readonly T[] | null; imageOrder?: readonly (string | null)[] | null };
 
 export type AlbumDimensionParams = {
   expandedView: boolean;
@@ -39,7 +43,7 @@ export type StlFileInput = {
   fileName?: string;
 };
 
-export type OrderedImage = Image & {
+export type OrderedImage = AlbumImage & {
   isStlFile?: boolean;
   fileName?: string;
 };
@@ -48,16 +52,16 @@ export type OrderedImage = Image & {
  * Order album images according to imageOrder array and combine with STL files.
  * Images without a defined order are placed after ordered images.
  */
-export function getOrderedAlbumImages(params: {
-  album: Album | null;
+export function getOrderedAlbumImages<T extends AlbumImage>(params: {
+  album: AlbumImages<T> | null;
   stlFiles?: StlFileInput[];
-}): OrderedImage[] {
+}): (T | OrderedImage)[] {
   const { album, stlFiles = [] } = params;
-  let albumImages: Image[] = [];
+  let albumImages: readonly T[] = [];
 
   if (album) {
     if (!album.imageOrder || album.imageOrder.length === 0) {
-      albumImages = (album.Images || []) as Image[];
+      albumImages = album.Images || [];
     } else {
       albumImages = album.imageOrder
         .map((imageId) => {
@@ -66,7 +70,7 @@ export function getOrderedAlbumImages(params: {
           );
           return foundImage;
         })
-        .filter((image): image is Image => image !== undefined);
+        .filter((image): image is T => image !== undefined);
     }
   }
 
@@ -78,7 +82,7 @@ export function getOrderedAlbumImages(params: {
     caption: stlFile.fileName || `3D Model: ${stlFile.fileName}`,
     isStlFile: true,
     fileName: stlFile.fileName,
-  })) as OrderedImage[];
+  }));
 
   // Combine album images with STL files
   return [...albumImages, ...stlAsImages];
@@ -88,7 +92,7 @@ export function getOrderedAlbumImages(params: {
  * Get the first image URL from an album, respecting imageOrder.
  * Returns null if no images are available.
  */
-export function getFirstAlbumImage(album: Album | null | undefined): string | null {
+export function getFirstAlbumImage<T extends AlbumImage>(album: AlbumImages<T> | null | undefined): string | null {
   if (!album?.Images?.length) return null;
 
   // If imageOrder exists and has items, use the first ordered image

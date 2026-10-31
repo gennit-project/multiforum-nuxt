@@ -1,11 +1,9 @@
 <script lang="ts" setup>
+import type { GetReusableImageCollectionsQuery } from '@/__generated__/operations';
 import { computed, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
-import {
-  GET_REUSABLE_IMAGE_COLLECTIONS,
-  GET_REUSABLE_COLLECTION_IMAGES,
-} from '@/graphQLData/image/queries';
+import { GetReusableImageCollectionsDocument as GET_REUSABLE_IMAGE_COLLECTIONS, GetReusableCollectionImagesDocument as GET_REUSABLE_COLLECTION_IMAGES } from '@/__generated__/operations';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import AlbumReusableImageGrid from './AlbumReusableImageGrid.vue';
 import LoadMore from '@/components/LoadMore.vue';
@@ -14,28 +12,7 @@ import type { ReusableImage } from './reusableImageTypes';
 
 const PAGE_SIZE = 24;
 
-type ImageCollection = {
-  id: string;
-  name?: string | null;
-  itemCount?: number | null;
-};
-
-type CollectionsResult = {
-  users?: Array<{
-    Collections?: ImageCollection[] | null;
-  }> | null;
-};
-
-type CollectionImagesResult = {
-  collections?: Array<{
-    id: string;
-    name?: string | null;
-    Images?: ReusableImage[] | null;
-    ImagesConnection?: {
-      aggregate?: { count?: { nodes?: number | null } | null } | null;
-    } | null;
-  }> | null;
-};
+type ImageCollection = GetReusableImageCollectionsQuery['users'][number]['Collections'][number];
 
 const props = defineProps<{
   searchTerm: string;
@@ -54,7 +31,7 @@ const currentOffset = ref(0);
 const isLoadingMore = ref(false);
 
 const buildImageVariables = (offset: number) => ({
-  collectionId: selectedCollectionId.value,
+  collectionId: selectedCollectionId.value || '',
   where: buildReusableImageWhere(props.searchTerm),
   offset,
   limit: PAGE_SIZE,
@@ -64,7 +41,7 @@ const {
   result: collectionsResult,
   loading: collectionsLoading,
   error: collectionsError,
-} = useQuery<CollectionsResult>(
+} = useQuery(
   GET_REUSABLE_IMAGE_COLLECTIONS,
   () => ({ username: usernameVar.value }),
   () => ({
@@ -87,7 +64,7 @@ const {
   loading: collectionImagesLoading,
   error: collectionImagesError,
   fetchMore,
-} = useQuery<CollectionImagesResult>(
+} = useQuery(
   GET_REUSABLE_COLLECTION_IMAGES,
   () => buildImageVariables(0),
   () => ({
@@ -108,7 +85,7 @@ const selectedCollection = computed(
 );
 
 const collectionImages = computed<ReusableImage[]>(
-  () => selectedCollection.value?.Images || []
+  () => (selectedCollection.value?.Images || []).map((image) => ({ ...image, url: image.url || '' }))
 );
 
 const collectionImagesTotal = computed(
@@ -128,17 +105,19 @@ watch([selectedCollectionId, () => props.searchTerm], () => {
 const loadMoreCollectionImages = async () => {
   if (!hasMoreCollectionImages.value || isLoadingMore.value) return;
 
+  const scope = JSON.stringify([selectedCollectionId.value, props.searchTerm, usernameVar.value]);
+  const sameScope = () => scope === JSON.stringify([selectedCollectionId.value, props.searchTerm, usernameVar.value]);
   const newOffset = currentOffset.value + PAGE_SIZE;
   isLoadingMore.value = true;
 
   try {
     await fetchMore({
       variables: buildImageVariables(newOffset),
-      updateQuery: (previous: CollectionImagesResult, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return previous;
+      updateQuery: (previous, { fetchMoreResult }) => {
+        if (!fetchMoreResult || !sameScope()) return previous;
         const prevCollection = previous.collections?.[0];
         const nextCollection = fetchMoreResult.collections?.[0];
-        if (!prevCollection || !nextCollection) return previous;
+        if (!prevCollection || !nextCollection || prevCollection.id !== selectedCollectionId.value || nextCollection.id !== selectedCollectionId.value) return previous;
 
         return {
           ...previous,
@@ -147,7 +126,7 @@ const loadMoreCollectionImages = async () => {
               ...prevCollection,
               Images: [
                 ...(prevCollection.Images || []),
-                ...(nextCollection.Images || []),
+                ...nextCollection.Images.filter((image) => !prevCollection.Images.some((old) => old.id === image.id)),
               ],
               ImagesConnection: nextCollection.ImagesConnection,
             },
@@ -156,7 +135,7 @@ const loadMoreCollectionImages = async () => {
       },
     });
 
-    currentOffset.value = newOffset;
+    if (sameScope()) currentOffset.value = newOffset;
   } finally {
     isLoadingMore.value = false;
   }

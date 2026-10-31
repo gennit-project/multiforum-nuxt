@@ -2,16 +2,12 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
-import { GET_REUSABLE_USER_IMAGES } from '@/graphQLData/image/queries';
+import { GetReusableUserImagesDocument as GET_REUSABLE_USER_IMAGES } from '@/__generated__/operations';
 import AppImage from '@/components/image/AppImage.vue';
 import { buildReusableImageWhere } from './reusableImageTypes';
 import type { ReusableImage } from './reusableImageTypes';
 
 const RECENT_LIMIT = 8;
-
-type RecentUploadsResult = {
-  users?: Array<{ Images?: ReusableImage[] | null }> | null;
-};
 
 const props = defineProps<{
   selectedImageIds: string[];
@@ -24,7 +20,7 @@ const emit = defineEmits<{
 
 const usernameVar = useUsername();
 
-const { result } = useQuery<RecentUploadsResult>(
+const { result } = useQuery(
   GET_REUSABLE_USER_IMAGES,
   () => ({
     username: usernameVar.value,
@@ -39,7 +35,7 @@ const { result } = useQuery<RecentUploadsResult>(
 );
 
 const images = computed<ReusableImage[]>(
-  () => result.value?.users?.[0]?.Images || []
+  () => (result.value?.users?.[0]?.Images || []).map((image) => ({ ...image, url: image.url || '' }))
 );
 const inAlbum = computed(() => new Set(props.selectedImageIds));
 const label = (image: ReusableImage) =>

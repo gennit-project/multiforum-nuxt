@@ -22,7 +22,7 @@ const { usernameRef, queryResult, queryLoading, queryError, fetchMore } =
     },
     queryLoading: { value: false },
     queryError: { value: null as Error | null },
-    fetchMore: vi.fn(() => Promise.resolve()),
+    fetchMore: vi.fn<(options: { updateQuery: (previous: unknown, options: { fetchMoreResult: unknown }) => unknown }) => Promise<void>>(() => Promise.resolve()),
   }));
 
 vi.mock('@/composables/useAuthState', () => ({
@@ -121,4 +121,21 @@ describe('AlbumReusableUserImagesTab', () => {
       })
     );
   });
+  it('ignores a pending page after the search changes', async () => {
+    const wrapper = mountTab('uploads');
+    await loadMoreButton(wrapper)!.trigger('click');
+    const update = fetchMore.mock.calls[0]![0].updateQuery;
+    await wrapper.setProps({ searchTerm: 'new search' });
+    const previous = { users: [{ Images: [{ id: 'first' }] }] };
+    expect(update(previous, { fetchMoreResult: { users: [{ Images: [{ id: 'old-search' }] }] } })).toBe(previous);
+  });
+
+  it('deduplicates images from overlapping pages', async () => {
+    const wrapper = mountTab('uploads');
+    await loadMoreButton(wrapper)!.trigger('click');
+    const update = fetchMore.mock.calls[0]![0].updateQuery;
+    const previous = { users: [{ Images: [{ id: 'first' }] }] };
+    expect(update(previous, { fetchMoreResult: { users: [{ Images: [{ id: 'first' }, { id: 'second' }], ImagesConnection: {} }] } })).toEqual({ users: [{ Images: [{ id: 'first' }, { id: 'second' }], ImagesConnection: {} }] });
+  });
+
 });

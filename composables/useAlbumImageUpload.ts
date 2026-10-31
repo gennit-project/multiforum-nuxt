@@ -1,14 +1,10 @@
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import {
-  CREATE_SIGNED_STORAGE_URL,
-  CREATE_IMAGE,
-} from '@/graphQLData/discussion/mutations';
+import { CreateSignedUrlDocument as CREATE_SIGNED_STORAGE_URL, CreateImageDocument as CREATE_IMAGE } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
-  type SignedStorageUrlPayload,
 } from '@/utils';
 import { isFileSizeValid } from '@/utils/index';
 
@@ -79,7 +75,7 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
       // Ask the server for a signed storage URL
       const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
       const signedUpload = signedUrlResult?.data
-        ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+        ?.createSignedStorageURL;
       const signedStorageURL = signedUpload?.url;
 
       if (!signedStorageURL) {
@@ -120,7 +116,7 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
       // Notify parent of the new image
       onImageUploaded({
         id: createdImage.id,
-        url: createdImage.url,
+        url: createdImage.url || '',
         alt: createdImage.alt || file.name,
         caption: createdImage.caption || '',
         copyright: createdImage.copyright || '',
@@ -254,7 +250,7 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
 
       return {
         id: createdImage.id,
-        url: createdImage.url,
+        url: createdImage.url || '',
         alt: createdImage.alt || '',
         caption: createdImage.caption || '',
         copyright: createdImage.copyright || '',

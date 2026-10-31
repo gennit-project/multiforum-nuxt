@@ -2,7 +2,7 @@
 import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
 import { ref, computed, onMounted } from 'vue';
 import type { PropType } from 'vue';
-import type { DiscussionUpdateInput } from '@/__generated__/graphql';
+import type { UpdateDiscussionMutation } from '@/__generated__/operations';
 import {
   mapAlbumImagesToForm,
   getInitialImageOrder,
@@ -11,6 +11,7 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import { useMutation } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+// Reviewed #700 exception: Album relationship input is absent from the pin.
 import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
 import Notification from '@/components/NotificationComponent.vue';
@@ -45,7 +46,7 @@ interface AlbumFormData {
 const route = useRoute();
 const discussionIdInParams = computed(() => {
   // If the discussion ID is provided in the route params, use it
-  return route.params.discussionId ? String(route.params.discussionId) : '';
+  return typeof route.params.discussionId === 'string' ? route.params.discussionId : '';
 });
 
 const props = defineProps({
@@ -132,7 +133,7 @@ onMounted(() => {
   formValues.value.album.imageOrder = [...initialImageOrder.value];
 });
 
-function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
+function getUpdateDiscussionInputForAlbum() {
   // 1) If the album doesn't exist yet, CREATE it and connect to existing images
   if (!albumId.value) {
     const newImages = formValues.value.album.images;
@@ -163,7 +164,7 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
           node: albumNode,
         },
       },
-    } as unknown as DiscussionUpdateInput;
+    };
   }
 
   // 2) If the album already exists, we build the connect/update/delete arrays
@@ -235,20 +236,19 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
         },
       },
     },
-  } as unknown as DiscussionUpdateInput;
+  };
 }
 
+const buildAlbumVariables = () => ({
+  where: { id: { eq: props.discussion?.id || discussionIdInParams.value } },
+  updateDiscussionInput: getUpdateDiscussionInputForAlbum(),
+});
 const {
   mutate: updateDiscussion,
   error: updateDiscussionError,
   loading: updateDiscussionLoading,
   onDone,
-} = useMutation(UPDATE_DISCUSSION, () => ({
-  variables: {
-    where: { id: { eq: props.discussion?.id || discussionIdInParams.value } },
-    updateDiscussionInput: getUpdateDiscussionInputForAlbum(),
-  },
-}));
+} = useMutation<UpdateDiscussionMutation, ReturnType<typeof buildAlbumVariables>>(UPDATE_DISCUSSION, () => ({ variables: buildAlbumVariables() }));
 
 onDone(() => {
   emit('closeEditor');

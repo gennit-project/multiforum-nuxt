@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { CreateSignedUrlDocument } from '@/__generated__/operations';
 import { flushPromises } from '@vue/test-utils';
 import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
 
@@ -14,8 +15,7 @@ const { mockUploadAndGetEmbeddedLink, mockIsFileSizeValid, mockUsername } =
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (doc: unknown) => {
     // Return different mocks based on the mutation document
-    const docString = String(doc);
-    if (docString.includes('SIGNED_STORAGE')) {
+    if (doc === CreateSignedUrlDocument) {
       return {
         mutate: mockCreateSignedStorageUrl,
         error: { value: null },
@@ -26,11 +26,6 @@ vi.mock('@vue/apollo-composable', () => ({
       error: { value: null },
     };
   },
-}));
-
-vi.mock('@/graphQLData/discussion/mutations', () => ({
-  CREATE_SIGNED_STORAGE_URL: Symbol('CREATE_SIGNED_STORAGE_URL'),
-  CREATE_IMAGE: Symbol('CREATE_IMAGE'),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({

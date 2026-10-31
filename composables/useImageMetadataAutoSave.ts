@@ -1,9 +1,9 @@
 import { onBeforeUnmount } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { UPDATE_IMAGE_METADATA } from '@/graphQLData/discussion/mutations';
-import type { Image } from '@/__generated__/graphql';
+import { UpdateImageMetadataDocument as UPDATE_IMAGE_METADATA } from '@/__generated__/operations';
+import type { UpdateImageMetadataMutationVariables } from '@/__generated__/operations';
 
-export type ImageMetadata = Pick<Image, 'alt' | 'caption' | 'copyright'>;
+export type ImageMetadata = Pick<UpdateImageMetadataMutationVariables, 'alt' | 'caption' | 'copyright'>;
 
 type SaveImageMetadataParams = {
   imageId: string;

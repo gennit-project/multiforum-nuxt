@@ -1,5 +1,7 @@
-import { ref } from 'vue';
+import { ref, onBeforeUnmount } from 'vue';
+import type { UpdateDiscussionWithChannelConnectionsMutation } from '@/__generated__/operations';
 import { useMutation } from '@vue/apollo-composable';
+// Reviewed #700 exception: Album relationship input is absent from the pin.
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import type {
   PresentationAlbum as Album,
@@ -34,7 +36,7 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
 
   // GraphQL Mutation
   const { mutate: updateDiscussion, error: updateDiscussionError } =
-    useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS);
+    useMutation<UpdateDiscussionWithChannelConnectionsMutation, ReturnType<typeof buildAlbumVariables>>(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS);
 
   // Auto-save state
   const isAutoSaving = ref(false);
@@ -169,6 +171,19 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
     };
   };
 
+  const buildAlbumVariables = () => ({
+    where: { id: { eq: discussionId } },
+    updateDiscussionInput: getAlbumUpdateInput(),
+    albumImageDisconnections: getRemovedAlbumImageIds({
+      existingImages: existingAlbum?.Images,
+      currentImages: getAlbumData().images,
+    }),
+  });
+
+  onBeforeUnmount(() => {
+    if (autoSaveTimeout) clearTimeout(autoSaveTimeout);
+  });
+
   /**
    * Perform the auto-save operation.
    */
@@ -181,21 +196,11 @@ export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
       isAutoSaving.value = true;
       autoSaveSuccess.value = false;
 
-      const albumUpdateInput = getAlbumUpdateInput();
-      const albumImageDisconnections = getRemovedAlbumImageIds({
-        existingImages: existingAlbum?.Images,
-        currentImages: getAlbumData().images,
-      });
-
-      if (Object.keys(albumUpdateInput).length === 0) {
+      const variables = buildAlbumVariables();
+      if (Object.keys(variables.updateDiscussionInput).length === 0) {
         return;
       }
-
-      await updateDiscussion({
-        where: { id: { eq: discussionId } },
-        updateDiscussionInput: albumUpdateInput,
-        albumImageDisconnections,
-      });
+      await updateDiscussion(variables);
 
       autoSaveSuccess.value = true;
 
