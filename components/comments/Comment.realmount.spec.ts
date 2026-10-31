@@ -4,6 +4,7 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeComment } from '@/tests/utils/factories';
 import type { Comment as CommentType } from '@/__generated__/graphql';
 
+import { makePermalinkedComment } from '@/tests/utils/permalinkFixtures';
 import { makeReply } from '@/tests/utils/replyFixtures';
 
 import Comment from '@/components/comments/Comment.vue';
@@ -342,7 +343,7 @@ describe('generated recursive replies', () => {
   it('renders selected fields through the real ChildComments and recursive Comment components', () => {
     const wrapper = mountWithDefaults(Comment, {
       props: {
-        commentData: makeReply({
+        commentData: makePermalinkedComment({
           id: 'root',
           text: 'Selected root body',
           ParentComment: null,

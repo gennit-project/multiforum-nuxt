@@ -1,12 +1,8 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import type { ApolloError } from '@apollo/client/core';
-import { useRoute } from 'nuxt/app';
 import Comment from '@/components/comments/Comment.vue';
 import PermalinkedComment from '@/components/comments/PermalinkedComment.vue';
 
-const route = useRoute();
-const permalinkedCommentId = ref(route.params.commentId);
 
 defineEmits([
   'clickEditComment',
@@ -65,7 +61,7 @@ defineProps({
 </script>
 
 <template>
-  <PermalinkedComment class="mt-2" :comment-id="permalinkedCommentId">
+  <PermalinkedComment class="mt-2">
     <template #comment="{ commentData }">
       <Comment
         :aggregate-comment-count="aggregateCommentCount"

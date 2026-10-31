@@ -9,6 +9,7 @@ import {
   buildDiscussionChannel,
   buildUser,
 } from '../../helpers/graphqlFixtures';
+import { expectNoAxeViolations } from '../../helpers/axe';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
 
@@ -219,7 +220,7 @@ const getCommonMocks = (username: string) => ({
       },
     },
   }),
-  getCommentWithReplies: () => ({
+  getPermalinkedComment: () => ({
     data: {
       comments: [],
     },
@@ -387,13 +388,13 @@ test.describe('Link verification - pages resolve correctly', () => {
       comment: {
         id: commentId,
         text: 'This is a permalinked comment',
-        parentCommentId: null,
+        parentCommentId: 'parent-1',
       },
       comments: [
         {
           id: commentId,
           text: 'This is a permalinked comment',
-          parentCommentId: null,
+          parentCommentId: 'parent-1',
         },
       ],
       channelUniqueName: TEST_CHANNEL,
@@ -482,9 +483,14 @@ test.describe('Link verification - pages resolve correctly', () => {
           },
         },
       }),
-      getCommentWithReplies: () => ({
+      getPermalinkedComment: ({ body }) => ({
         data: {
-          comments: [testComment],
+          comments: [{
+            ...testComment,
+            id: body.variables?.id,
+            text: body.variables?.id === commentId ? testComment.text : 'Parent discussion comment',
+            ParentComment: body.variables?.id === commentId ? { __typename: 'Comment', id: 'parent-1' } : null,
+          }],
         },
       }),
       checkDiscussionIssueExistence: () => ({
@@ -505,6 +511,11 @@ test.describe('Link verification - pages resolve correctly', () => {
       // Verify URL contains the comment ID
       expect(page.url()).toContain(`/comments/${commentId}`);
 
+      await expect(page.getByRole('link', { name: 'View Context', exact: true })).toHaveAttribute('href', `/forums/${TEST_CHANNEL}/discussions/${discussionId}/comments/parent-1`);
+      await expectNoAxeViolations(page);
+      await page.getByRole('link', { name: 'View Context', exact: true }).click();
+      await expect(page.getByText('Parent discussion comment', { exact: true })).toBeVisible();
+      await expect(page.getByTestId('permalinked-comment').getByText('This is a permalinked comment', { exact: true })).toHaveCount(0);
       expect(diagnostics.pageErrors).toEqual([]);
     } finally {
       await testInfo.attach('graphql-operations.json', {
@@ -514,75 +525,101 @@ test.describe('Link verification - pages resolve correctly', () => {
     }
   });
 
-  test('event permalink resolves to event detail page', async ({ context, page }, testInfo) => {
-    const eventId = 'event-1';
-    const eventChannelId = 'event-channel-1';
+  for (const commentPermalink of [false, true]) {
+    test(`event ${commentPermalink ? 'comment permalink and context navigation' : 'permalink resolves to event detail page'}`, async ({ context, page }, testInfo) => {
+      const eventId = 'event-1';
+      const eventChannelId = 'event-channel-1';
 
-    await installMockAuth(context, page, {
-      username: TEST_USERNAME,
-      email: 'test@example.com',
-    });
+      await installMockAuth(context, page, {
+        username: TEST_USERNAME,
+        email: 'test@example.com',
+      });
 
-    const diagnostics = await installGraphqlMocks(page, {
-      ...getCommonMocks(TEST_USERNAME),
-      getEvent: () => ({
-        data: {
-          events: [
-            buildEvent({
-              id: eventId,
-              title: 'Test Event Title',
-            }),
-          ],
-        },
-      }),
-      getEventComments: () => ({
-        data: {
-          getEventComments: {
-            Event: buildEvent({ id: eventId }),
-            Comments: [],
+      const diagnostics = await installGraphqlMocks(page, {
+        ...getCommonMocks(TEST_USERNAME),
+        getPermalinkedComment: ({ body }) => ({ data: { comments: [{
+          ...buildComment({
+            comment: {
+              id: String(body.variables?.id),
+              text: body.variables?.id === 'event-comment' ? 'Event permalink body' : 'Parent event comment',
+              parentCommentId: null,
+            },
+            comments: [],
+          }),
+          DiscussionChannel: null,
+          Event: { __typename: 'Event', id: eventId },
+          ParentComment: body.variables?.id === 'event-comment'
+            ? { __typename: 'Comment', id: 'event-parent' }
+            : null,
+        }] } }),
+        getEvent: () => ({
+          data: {
+            events: [
+              buildEvent({
+                id: eventId,
+                title: 'Test Event Title',
+              }),
+            ],
           },
-        },
-      }),
-      getEventRootCommentAggregate: () => ({
-        data: {
-          events: [
-            {
-              id: eventId,
-              CommentsConnection: { aggregate: { count: { nodes: 0 } } },
+        }),
+        getEventComments: () => ({
+          data: {
+            getEventComments: {
+              Event: buildEvent({ id: eventId }),
+              Comments: [],
             },
-          ],
-        },
-      }),
-      getEventChannelID: () => ({
-        data: {
-          eventChannels: [
-            {
-              id: eventChannelId,
-              archived: false,
-            },
-          ],
-        },
-      }),
+          },
+        }),
+        getEventRootCommentAggregate: () => ({
+          data: {
+            events: [
+              {
+                id: eventId,
+                CommentsConnection: { aggregate: { count: { nodes: 0 } } },
+              },
+            ],
+          },
+        }),
+        getEventChannelID: () => ({
+          data: {
+            eventChannels: [
+              {
+                id: eventChannelId,
+                archived: false,
+              },
+            ],
+          },
+        }),
+      });
+
+      try {
+        // Navigate to event permalink
+        await page.goto(`/forums/${TEST_CHANNEL}/events/${eventId}${commentPermalink ? '/comments/event-comment' : ''}`);
+
+        // Verify the event detail shell loaded
+        await expect(page.getByTestId('event-menu-button')).toBeVisible();
+
+        // Verify URL is correct
+        expect(page.url()).toContain(`/forums/${TEST_CHANNEL}/events/${eventId}`);
+
+        if (commentPermalink) {
+          await expect(page.getByText('Event permalink body', { exact: true })).toBeVisible();
+          await expect(page.getByRole('link', { name: 'View Context', exact: true })).toHaveAttribute('href', `/forums/${TEST_CHANNEL}/events/${eventId}/comments/event-parent`);
+          await expectNoAxeViolations(page);
+          await page.getByRole('link', { name: 'View Context', exact: true }).click();
+          await expect(page.getByText('Parent event comment', { exact: true })).toBeVisible();
+          await expect(page.getByText('Event permalink body', { exact: true })).toHaveCount(0);
+        }
+        expect(diagnostics.pageErrors).toEqual([]);
+      } finally {
+        await testInfo.attach('graphql-operations.json', {
+          body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
+          contentType: 'application/json',
+        });
+      }
     });
 
-    try {
-      // Navigate to event permalink
-      await page.goto(`/forums/${TEST_CHANNEL}/events/${eventId}`);
-
-      // Verify the event detail shell loaded
-      await expect(page.getByTestId('event-menu-button')).toBeVisible();
-
-      // Verify URL is correct
-      expect(page.url()).toContain(`/forums/${TEST_CHANNEL}/events/${eventId}`);
-
-      expect(diagnostics.pageErrors).toEqual([]);
-    } finally {
-      await testInfo.attach('graphql-operations.json', {
-        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
-        contentType: 'application/json',
-      });
-    }
-  });
+  }
 
   test('feedback page resolves and shows feedback', async ({ context, page }, testInfo) => {
     const discussionId = 'discussion-1';

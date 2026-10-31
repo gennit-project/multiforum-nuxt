@@ -2,6 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { defineComponent, h } from 'vue';
 import Comment from '@/components/comments/Comment.vue';
+import { makePermalinkedComment } from '@/tests/utils/permalinkFixtures';
+const selectedComment = makePermalinkedComment();
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: { commentId: 'comment-1' } }),
@@ -9,10 +11,8 @@ vi.mock('nuxt/app', () => ({
 
 const PermalinkedStub = defineComponent({
   name: 'PermalinkedComment',
-  props: ['commentId'],
   setup(_props, { slots }) {
-    return () =>
-      h('div', slots.comment?.({ commentData: { id: 'comment-1' } }));
+    return () => h('div', slots.comment?.({ commentData: selectedComment }));
   },
 });
 
@@ -30,11 +30,13 @@ const mountPage = async () => {
 };
 
 describe('event comment permalink page', () => {
-  it('passes the route comment id to the permalinked comment', async () => {
+  it('passes the exact selected slot payload to the renderer', async () => {
     const wrapper = await mountPage();
-    expect(wrapper.findComponent(PermalinkedStub).props('commentId')).toBe(
-      'comment-1'
-    );
+    expect({
+      data: wrapper.findComponent(Comment).props('commentData'),
+      undeclaredId:
+        wrapper.findComponent(PermalinkedStub).vm.$attrs['comment-id'],
+    }).toEqual({ data: selectedComment, undeclaredId: undefined });
   });
 
   it('disables feedback for event comments', async () => {
