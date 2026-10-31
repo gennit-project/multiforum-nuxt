@@ -294,54 +294,6 @@ export const CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE = gql`
   }
 `;
 
-export const GET_ISSUES = gql`
-  query getIssues($issueWhere: IssueWhere) {
-    issues(where: $issueWhere, sort: { createdAt: DESC }) {
-      id
-      issueNumber
-      title
-      body
-      isOpen
-      createdAt
-      updatedAt
-      relatedCommentId
-      relatedDiscussionId
-      relatedEventId
-      relatedImageId
-      relatedWikiPageId
-      relatedWikiRevisionId
-      relatedUsername
-      flaggedServerRuleViolation
-      locked
-      lockedAt
-      lockReason
-      LockedBy {
-        displayName
-      }
-      Channel {
-        uniqueName
-        channelIconURL
-      }
-      Author {
-        __typename
-        ... on ModerationProfile {
-          displayName
-        }
-        ... on User {
-          username
-        }
-      }
-      ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {
-        aggregate {
-          count {
-            nodes
-          }
-        }
-      }
-    }
-  }
-`;
-
 export const GET_SITE_WIDE_ISSUE_LIST = gql`
   query getSiteWideIssueList(
     $searchInput: String
@@ -390,53 +342,6 @@ export const GET_SITE_WIDE_ISSUE_LIST = gql`
         channelIconURL
         authorName
         reportCount
-      }
-    }
-  }
-`;
-
-export const GET_CLOSED_ISSUES = gql`
-  query getClosedIssues {
-    issues(where: { isOpen: { eq: false } }, sort: { createdAt: DESC }) {
-      id
-      issueNumber
-      title
-      body
-      isOpen
-      createdAt
-      updatedAt
-      relatedCommentId
-      relatedDiscussionId
-      relatedEventId
-      relatedImageId
-      relatedWikiPageId
-      relatedWikiRevisionId
-      Channel {
-        uniqueName
-        channelIconURL
-      }
-      channelUniqueName
-      locked
-      lockedAt
-      lockReason
-      LockedBy {
-        displayName
-      }
-      Author {
-        __typename
-        ... on ModerationProfile {
-          displayName
-        }
-        ... on User {
-          username
-        }
-      }
-      ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {
-        aggregate {
-          count {
-            nodes
-          }
-        }
       }
     }
   }
@@ -523,100 +428,6 @@ export const GET_IMAGE_REPORTS = gql`
         }
         ... on User {
           username
-        }
-      }
-      ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {
-        aggregate {
-          count {
-            nodes
-          }
-        }
-      }
-    }
-  }
-`;
-
-export const GET_SERVER_ISSUE = gql`
-  ${ISSUE_BASE_FIELDS}
-  ${COMMENT_VOTE_FIELDS}
-  query getServerIssue(
-    $issueNumber: Int!
-    $activityFeedLimit: Int
-    $activityFeedOffset: Int
-  ) {
-    issues(
-      where: {
-        channelUniqueName: { eq: null }
-        issueNumber: { eq: $issueNumber }
-      }
-    ) {
-      ...IssueBaseFields
-      ActivityFeed(
-        sort: { createdAt: DESC }
-        limit: $activityFeedLimit
-        offset: $activityFeedOffset
-      ) {
-        ... on ModerationAction {
-          id
-          actionDescription
-          actionType
-          createdAt
-          ModerationProfile {
-            displayName
-          }
-          User {
-            username
-          }
-          Revision {
-            id
-            body
-            createdAt
-            Author {
-              username
-            }
-          }
-          Comment {
-            id
-            text
-            emoji
-            weightedVotesCount
-            createdAt
-            updatedAt
-            Issue {
-              id
-            }
-            CommentAuthor {
-              ... on ModerationProfile {
-                displayName
-              }
-              ... on User {
-                username
-              }
-            }
-            Channel {
-              uniqueName
-            }
-            ChildCommentsConnection {
-              aggregate {
-                count {
-                  nodes
-                }
-              }
-            }
-            ParentComment {
-              id
-            }
-            editReason
-            PastVersions(sort: [{ createdAt: DESC }]) {
-              id
-              body
-              createdAt
-              Author {
-                username
-              }
-            }
-            ...CommentVoteFields
-          }
         }
       }
       ActivityFeedConnection(where: { node: { actionType: { eq: "report" } } }) {

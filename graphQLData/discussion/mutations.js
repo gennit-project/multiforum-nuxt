@@ -152,16 +152,6 @@ export const CLEAR_DOWNLOADABLE_FILE_SCAN = gql`
   }
 `;
 
-export const PERMANENTLY_DELETE_IMAGE = gql`
-  mutation permanentlyDeleteImage($imageId: ID!) {
-    permanentlyDeleteImage(imageId: $imageId) {
-      id
-      permanentlyRemoved
-      permanentlyRemovedAt
-    }
-  }
-`;
-
 export const PERMANENTLY_DELETE_DOWNLOADABLE_FILE = gql`
   mutation permanentlyDeleteDownloadableFile($downloadableFileId: ID!) {
     permanentlyDeleteDownloadableFile(
@@ -709,42 +699,6 @@ export const UPDATE_DISCUSSION_SENSITIVE_CONTENT = gql`
       discussions {
         id
         hasSensitiveContent
-      }
-    }
-  }
-`;
-
-export const UPDATE_DISCUSSION_CHANNEL_LABELS = gql`
-  mutation updateDiscussionChannelLabels(
-    $channelUniqueName: String!
-    $discussionId: ID!
-    $labelOptionIds: [ID!]!
-  ) {
-    updateDiscussionChannels(
-      where: {
-        channelUniqueName: { eq: $channelUniqueName }
-        discussionId: { eq: $discussionId }
-      }
-      update: {
-        LabelOptions: {
-          connect: { where: { node: { id_IN: $labelOptionIds } } }
-          disconnect: { where: { node: { NOT: { id_IN: $labelOptionIds } } } }
-        }
-      }
-    ) {
-      discussionChannels {
-        id
-        LabelOptions {
-          id
-          value
-          displayName
-          order
-          group {
-            id
-            key
-            displayName
-          }
-        }
       }
     }
   }

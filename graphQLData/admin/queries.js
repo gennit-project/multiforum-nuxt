@@ -618,40 +618,6 @@ export const GET_MOD_CHANNEL_ROLES = gql`
   }
 `;
 
-export const GET_PLUGINS = gql`
-  query getPlugins($serverName: String!) {
-    serverConfigs(where: { serverName: { eq: $serverName } }) {
-      AllowedPlugins {
-        id
-        name
-      }
-      InstalledVersions {
-        id
-        version
-        repoUrl
-        entryPath
-      }
-    }
-  }
-`;
-
-export const GET_PLUGIN_BY_ID = gql`
-  query getPluginById($serverName: String!, $pluginId: ID!) {
-    serverConfigs(where: { serverName: { eq: $serverName } }) {
-      AllowedPlugins(where: { id: { eq: $pluginId } }) {
-        id
-        name
-      }
-      InstalledVersions {
-        id
-        version
-        repoUrl
-        entryPath
-      }
-    }
-  }
-`;
-
 export const GET_AVAILABLE_PLUGINS = gql`
   query GetPlugins {
     plugins {

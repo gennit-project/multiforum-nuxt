@@ -239,27 +239,6 @@ export const UPDATE_SERVER_ROLE = gql`
   }
 `;
 
-export const ADD_SERVER_ADMIN = gql`
-  mutation AddServerAdmin($serverName: String!, $username: String!) {
-    updateServerConfigs(
-      where: { serverName: { eq: $serverName } }
-      update: {
-        Admins: [
-          { connect: [{ where: { node: { username: { eq: $username } } } }] }
-        ]
-      }
-    ) {
-      serverConfigs {
-        serverName
-        Admins {
-          username
-          displayName
-        }
-      }
-    }
-  }
-`;
-
 export const REMOVE_SERVER_ADMIN = gql`
   mutation RemoveServerAdmin($serverName: String!, $username: String!) {
     updateServerConfigs(
@@ -274,30 +253,6 @@ export const REMOVE_SERVER_ADMIN = gql`
         serverName
         Admins {
           username
-          displayName
-        }
-      }
-    }
-  }
-`;
-
-export const ADD_SERVER_MODERATOR = gql`
-  mutation AddServerModerator($serverName: String!, $displayName: String!) {
-    updateServerConfigs(
-      where: { serverName: { eq: $serverName } }
-      update: {
-        Moderators: [
-          {
-            connect: [
-              { where: { node: { displayName: { eq: $displayName } } } }
-            ]
-          }
-        ]
-      }
-    ) {
-      serverConfigs {
-        serverName
-        Moderators {
           displayName
         }
       }

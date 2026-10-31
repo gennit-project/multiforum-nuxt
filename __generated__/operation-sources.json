@@ -576,17 +576,6 @@
       ],
       "fragments": []
     },
-    "graphQLData/admin/mutations.js#ADD_SERVER_ADMIN": {
-      "operations": [
-        {
-          "name": "AddServerAdmin",
-          "document": "AddServerAdminDocument",
-          "result": "AddServerAdminMutation",
-          "variables": "AddServerAdminMutationVariables"
-        }
-      ],
-      "fragments": []
-    },
     "graphQLData/admin/mutations.js#REMOVE_SERVER_ADMIN": {
       "operations": [
         {
@@ -594,17 +583,6 @@
           "document": "RemoveServerAdminDocument",
           "result": "RemoveServerAdminMutation",
           "variables": "RemoveServerAdminMutationVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "graphQLData/admin/mutations.js#ADD_SERVER_MODERATOR": {
-      "operations": [
-        {
-          "name": "AddServerModerator",
-          "document": "AddServerModeratorDocument",
-          "result": "AddServerModeratorMutation",
-          "variables": "AddServerModeratorMutationVariables"
         }
       ],
       "fragments": []
@@ -862,35 +840,13 @@
       ],
       "fragments": []
     },
-    "graphQLData/admin/queries.js#GET_PLUGINS": {
-      "operations": [
-        {
-          "name": "getPlugins",
-          "document": "GetPluginsDocument",
-          "result": "GetPluginsQuery",
-          "variables": "GetPluginsQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "graphQLData/admin/queries.js#GET_PLUGIN_BY_ID": {
-      "operations": [
-        {
-          "name": "getPluginById",
-          "document": "GetPluginByIdDocument",
-          "result": "GetPluginByIdQuery",
-          "variables": "GetPluginByIdQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
     "graphQLData/admin/queries.js#GET_AVAILABLE_PLUGINS": {
       "operations": [
         {
           "name": "GetPlugins",
-          "document": "GetPluginsSource6c031b0d8aDocument",
-          "result": "GetPluginsSource6c031b0d8aQuery",
-          "variables": "GetPluginsSource6c031b0d8aQueryVariables"
+          "document": "GetPluginsDocument",
+          "result": "GetPluginsQuery",
+          "variables": "GetPluginsQueryVariables"
         }
       ],
       "fragments": []
@@ -2097,17 +2053,6 @@
       ],
       "fragments": []
     },
-    "graphQLData/discussion/mutations.js#PERMANENTLY_DELETE_IMAGE": {
-      "operations": [
-        {
-          "name": "permanentlyDeleteImage",
-          "document": "PermanentlyDeleteImageDocument",
-          "result": "PermanentlyDeleteImageMutation",
-          "variables": "PermanentlyDeleteImageMutationVariables"
-        }
-      ],
-      "fragments": []
-    },
     "graphQLData/discussion/mutations.js#PERMANENTLY_DELETE_DOWNLOADABLE_FILE": {
       "operations": [
         {
@@ -2350,17 +2295,6 @@
       ],
       "fragments": []
     },
-    "graphQLData/discussion/mutations.js#UPDATE_DISCUSSION_CHANNEL_LABELS": {
-      "operations": [
-        {
-          "name": "updateDiscussionChannelLabels",
-          "document": "UpdateDiscussionChannelLabelsDocument",
-          "result": "UpdateDiscussionChannelLabelsMutation",
-          "variables": "UpdateDiscussionChannelLabelsMutationVariables"
-        }
-      ],
-      "fragments": []
-    },
     "graphQLData/discussion/mutations.js#UPDATE_DOWNLOAD_LABELS": {
       "operations": [
         {
@@ -2446,17 +2380,6 @@
           "variables": "unknown"
         }
       ]
-    },
-    "graphQLData/discussion/queries.js#IS_DISCUSSION_ANSWERED": {
-      "operations": [
-        {
-          "name": "isDiscussionAnswered",
-          "document": "IsDiscussionAnsweredDocument",
-          "result": "IsDiscussionAnsweredQuery",
-          "variables": "IsDiscussionAnsweredQueryVariables"
-        }
-      ],
-      "fragments": []
     },
     "graphQLData/discussion/queries.js#DISCUSSION_DETAIL_FIELDS": {
       "operations": [],
@@ -2598,17 +2521,6 @@
           "document": "GetSpecificDiscussionFeedbackDocument",
           "result": "GetSpecificDiscussionFeedbackQuery",
           "variables": "GetSpecificDiscussionFeedbackQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "graphQLData/discussion/queries.js#GET_DOWNLOAD_LABELS": {
-      "operations": [
-        {
-          "name": "getDownloadLabels",
-          "document": "GetDownloadLabelsDocument",
-          "result": "GetDownloadLabelsQuery",
-          "variables": "GetDownloadLabelsQueryVariables"
         }
       ],
       "fragments": []
@@ -2885,17 +2797,6 @@
           "document": "AddImageToAlbumDocument",
           "result": "AddImageToAlbumMutation",
           "variables": "AddImageToAlbumMutationVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "graphQLData/image/mutations.js#REMOVE_IMAGE_FROM_ALBUM": {
-      "operations": [
-        {
-          "name": "RemoveImageFromAlbum",
-          "document": "RemoveImageFromAlbumDocument",
-          "result": "RemoveImageFromAlbumMutation",
-          "variables": "RemoveImageFromAlbumMutationVariables"
         }
       ],
       "fragments": []
@@ -3502,17 +3403,6 @@
       ],
       "fragments": []
     },
-    "graphQLData/issue/queries.js#GET_ISSUES": {
-      "operations": [
-        {
-          "name": "getIssues",
-          "document": "GetIssuesDocument",
-          "result": "GetIssuesQuery",
-          "variables": "GetIssuesQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
     "graphQLData/issue/queries.js#GET_SITE_WIDE_ISSUE_LIST": {
       "operations": [
         {
@@ -3520,17 +3410,6 @@
           "document": "GetSiteWideIssueListDocument",
           "result": "GetSiteWideIssueListQuery",
           "variables": "GetSiteWideIssueListQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "graphQLData/issue/queries.js#GET_CLOSED_ISSUES": {
-      "operations": [
-        {
-          "name": "getClosedIssues",
-          "document": "GetClosedIssuesDocument",
-          "result": "GetClosedIssuesQuery",
-          "variables": "GetClosedIssuesQueryVariables"
         }
       ],
       "fragments": []
@@ -3556,30 +3435,6 @@
         }
       ],
       "fragments": []
-    },
-    "graphQLData/issue/queries.js#GET_SERVER_ISSUE": {
-      "operations": [
-        {
-          "name": "getServerIssue",
-          "document": "GetServerIssueDocument",
-          "result": "GetServerIssueQuery",
-          "variables": "GetServerIssueQueryVariables"
-        }
-      ],
-      "fragments": [
-        {
-          "name": "IssueBaseFields",
-          "document": "IssueBaseFieldsFragmentDoc",
-          "result": "IssueBaseFieldsFragment",
-          "variables": "unknown"
-        },
-        {
-          "name": "CommentVoteFields",
-          "document": "CommentVoteFieldsFragmentDoc",
-          "result": "CommentVoteFieldsFragment",
-          "variables": "unknown"
-        }
-      ]
     },
     "graphQLData/library/favoriteQueries.ts#GET_USER_FAVORITE_COMMENTS": {
       "operations": [
@@ -4142,28 +3997,6 @@
       ],
       "fragments": []
     },
-    "graphQLData/scratchpad/queries.js#GET_ALL_SCRATCHPAD_ENTRIES": {
-      "operations": [
-        {
-          "name": "getAllScratchpadEntries",
-          "document": "GetAllScratchpadEntriesDocument",
-          "result": "GetAllScratchpadEntriesQuery",
-          "variables": "GetAllScratchpadEntriesQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "graphQLData/scratchpad/queries.js#GET_SUPER_UPVOTE_COUNT": {
-      "operations": [
-        {
-          "name": "getSuperUpvoteCount",
-          "document": "GetSuperUpvoteCountDocument",
-          "result": "GetSuperUpvoteCountQuery",
-          "variables": "GetSuperUpvoteCountQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
     "graphQLData/server/queries.ts#GET_SESSION_PROFILE": {
       "operations": [
         {
@@ -4449,24 +4282,6 @@
         }
       ],
       "fragments": []
-    },
-    "graphQLData/user/queries.js#GET_USER_FAVORITE_CHANNELS": {
-      "operations": [
-        {
-          "name": "getUserFavoriteChannels",
-          "document": "GetUserFavoriteChannelsSource1187297d18Document",
-          "result": "GetUserFavoriteChannelsSource1187297d18Query",
-          "variables": "GetUserFavoriteChannelsSource1187297d18QueryVariables"
-        }
-      ],
-      "fragments": [
-        {
-          "name": "ChannelIconFields",
-          "document": "ChannelIconFieldsFragmentDoc",
-          "result": "ChannelIconFieldsFragment",
-          "variables": "unknown"
-        }
-      ]
     },
     "graphQLData/user/queries.js#GET_MODDED_CHANNELS": {
       "operations": [

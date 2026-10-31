@@ -4,7 +4,7 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 import PluginDetailPage from './[pluginId].vue';
 vi.mock('@/__generated__/operations', () => ({
-GetPluginsSource6c031b0d8aDocument: 'AVAILABLE',
+GetPluginsDocument: 'AVAILABLE',
 GetInstalledPluginsDocument: 'INSTALLED',
 GetServerPluginSecretsDocument: 'SECRETS',
 GetPluginConfigStatusDocument: 'CONFIG_STATUS',

@@ -55,7 +55,7 @@ import type {
   PluginSecretStatus as PluginSecretStatusType,
   PluginSettings,
 } from '@/types/pluginForms';
-import { GetPluginsSource6c031b0d8aDocument as GET_AVAILABLE_PLUGINS, GetInstalledPluginsDocument as GET_INSTALLED_PLUGINS, GetServerPluginSecretsDocument as GET_SERVER_PLUGIN_SECRETS, GetPluginDetailDocument as GET_PLUGIN_DETAIL, InstallPluginVersionDocument as INSTALL_PLUGIN_VERSION, EnableServerPluginDocument as ENABLE_SERVER_PLUGIN, SetServerPluginSecretDocument as SET_SERVER_PLUGIN_SECRET  } from '@/__generated__/operations';
+import { GetPluginsDocument as GET_AVAILABLE_PLUGINS, GetInstalledPluginsDocument as GET_INSTALLED_PLUGINS, GetServerPluginSecretsDocument as GET_SERVER_PLUGIN_SECRETS, GetPluginDetailDocument as GET_PLUGIN_DETAIL, InstallPluginVersionDocument as INSTALL_PLUGIN_VERSION, EnableServerPluginDocument as ENABLE_SERVER_PLUGIN, SetServerPluginSecretDocument as SET_SERVER_PLUGIN_SECRET  } from '@/__generated__/operations';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({

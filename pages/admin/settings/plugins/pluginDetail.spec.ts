@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 vi.mock('@/__generated__/operations', () => ({
-GetPluginsSource6c031b0d8aDocument: 'mock-query',
+GetPluginsDocument: 'mock-query',
 GetInstalledPluginsDocument: 'mock-query',
 GetServerPluginSecretsDocument: 'mock-query',
 InstallPluginVersionDocument: 'mock-mutation',
