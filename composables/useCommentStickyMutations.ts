@@ -3,15 +3,10 @@ import { useMutation } from '@vue/apollo-composable';
 import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
 import type { Comment } from '@/__generated__/graphql';
 import {
-  STICKY_COMMENT,
-  UNSTICKY_COMMENT,
-} from '@/graphQLData/comment/mutations';
-
-type StickyCommentFields = Comment & {
-  isSticky?: boolean | null;
-  stickyAt?: string | null;
-  stickyByUsername?: string | null;
-};
+  StickyCommentDocument as STICKY_COMMENT,
+  UnstickyCommentDocument as UNSTICKY_COMMENT,
+  type StickyCommentMutation,
+} from '@/__generated__/operations';
 
 /**
  * Sticky / unsticky mutations for a single comment. Each writes the sticky
@@ -23,7 +18,7 @@ export function useCommentStickyMutations(
 ) {
   const updateStickyCache = (
     cache: ApolloCache<NormalizedCacheObject>,
-    comment: StickyCommentFields | null | undefined
+    comment: StickyCommentMutation['stickyComment'] | undefined
   ) => {
     if (!comment?.id) {
       return;

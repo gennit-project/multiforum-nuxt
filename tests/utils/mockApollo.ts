@@ -1,3 +1,4 @@
+import { print, type DocumentNode } from 'graphql';
 import { ref, type Ref } from 'vue';
 import { vi, type Mock } from 'vitest';
 
@@ -90,7 +91,12 @@ export function mockByDocument<T>(
   return (doc: unknown) => {
     const source =
       (doc as { loc?: { source?: { body?: string } } })?.loc?.source?.body ??
-      String(doc);
+      (typeof doc === 'object' &&
+      doc !== null &&
+      'kind' in doc &&
+      doc.kind === 'Document'
+        ? print(doc as DocumentNode)
+        : String(doc));
     for (const [needle, value] of Object.entries(matchers)) {
       if (source.includes(needle)) {
         return value;
@@ -214,7 +220,12 @@ export function createMutationRouter(names: string[]): MutationRouter {
   const useMutation = (doc: unknown, options?: unknown): MutationTracker => {
     const src =
       (doc as { loc?: { source?: { body?: string } } })?.loc?.source?.body ??
-      String(doc);
+      (typeof doc === 'object' &&
+      doc !== null &&
+      'kind' in doc &&
+      doc.kind === 'Document'
+        ? print(doc as DocumentNode)
+        : String(doc));
     const tracker = get(detect(src));
     // Options may be a plain object or a function returning reactive options.
     let resolved: unknown = options;

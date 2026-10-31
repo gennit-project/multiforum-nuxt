@@ -1,5 +1,5 @@
 // Generate schema-wide types from the verified, committed backend contract.
-// This intentionally does not generate operation-specific result types yet.
+// Operation types are generated separately by generate-graphql-operations.mjs.
 // Use `pnpm schema:update <directory>` to select a different backend revision;
 // neither a running server nor schema endpoint secrets are needed.
 import fs from 'node:fs';

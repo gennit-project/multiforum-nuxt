@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import { GET_USER } from '@/graphQLData/user/queries';
-import { UPDATE_USER } from '@/graphQLData/user/mutations';
+import {
+  GetBasicUserInfoDocument as GET_USER,
+  UpdateUserDocument as UPDATE_USER,
+} from '@/__generated__/operations';
 import EditAccountSettingsFields from '@/components/user/EditAccountSettingsFields.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import NotificationComponent from '@/components/NotificationComponent.vue';
@@ -79,15 +81,14 @@ const showSavedChangesNotification = ref(false);
 
 const userEmail = computed(() => {
   if (getUserResult.value && getUserResult.value.users.length > 0) {
-    return getUserResult.value.users[0].Email?.address || null;
+    return getUserResult.value.users[0]?.Email?.address || null;
   }
   return null;
 });
 
 watch(getUserResult, (newVal) => {
-  if (newVal && newVal.users.length > 0) {
-    const user = newVal.users[0];
-
+  const user = newVal?.users[0];
+  if (user) {
     // Update basic settings
     basicFormValues.value = {
       profilePicURL: user.profilePicURL || '',
@@ -122,8 +123,9 @@ watch(getUserResult, (newVal) => {
 });
 
 // Handle initial data load
-if (getUserResult.value && getUserResult.value.users.length > 0) {
-  const user = getUserResult.value.users[0];
+const initialUser = getUserResult.value?.users[0];
+if (initialUser) {
+  const user = initialUser;
 
   basicFormValues.value = {
     profilePicURL: user.profilePicURL || '',
@@ -160,7 +162,7 @@ const basicUserUpdateInput = computed(() => {
     displayName: { set: basicFormValues.value.displayName },
     bio: { set: basicFormValues.value.bio },
     profilePicURL: { set: basicFormValues.value.profilePicURL },
-  } as UserUpdateInput;
+  } satisfies UserUpdateInput;
 });
 
 const notificationUserUpdateInput = computed(() => {
@@ -191,7 +193,7 @@ const notificationUserUpdateInput = computed(() => {
     enableSensitiveContentByDefault: {
       set: notificationFormValues.value.enableSensitiveContentByDefault,
     },
-  } as UserUpdateInput;
+  } satisfies UserUpdateInput;
 });
 
 const {
@@ -207,7 +209,7 @@ onDone(() => {
 
 async function submitBasicSettings() {
   await updateUser({
-    where: { username: usernameVar.value },
+    where: { username: { eq: usernameVar.value } },
     update: basicUserUpdateInput.value,
   });
   await refetchUser();
@@ -215,7 +217,7 @@ async function submitBasicSettings() {
 
 async function submitNotificationSettings() {
   await updateUser({
-    where: { username: usernameVar.value },
+    where: { username: { eq: usernameVar.value } },
     update: notificationUserUpdateInput.value,
   });
   await refetchUser();
