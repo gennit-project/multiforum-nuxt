@@ -1,3 +1,5 @@
+import { GetOwnEmailDocument as GET_OWN_EMAIL } from '@/__generated__/operations';
+import { requestGraphql } from '@/server/utils/typed-graphql';
 // server/middleware/2.auth-session.ts
 //
 // SPIKE (auth0-nuxt server-session migration) — Phase 1, server half.
@@ -87,29 +89,6 @@ declare module 'h3' {
 // entirely. getOwnEmail is self-scoped — the backend resolves the caller's
 // email from the bearer token, so no $emailAddress variable is sent and the
 // top-level `emails` enumeration query (now admin-only) is never used.
-const GET_OWN_EMAIL = /* GraphQL */ `
-  query getOwnEmail {
-    getOwnEmail {
-      address
-      username
-      profilePicURL
-      modProfileName
-      unreadNotificationCount
-    }
-  }
-`;
-
-type OwnEmailResponse = {
-  data?: {
-    getOwnEmail?: {
-      address?: string | null;
-      username?: string | null;
-      profilePicURL?: string | null;
-      modProfileName?: string | null;
-      unreadNotificationCount?: number | null;
-    } | null;
-  };
-};
 
 // The slice of the profile that is stable enough to cache between requests.
 // notificationCount is deliberately excluded — the browser hydrates it after
@@ -189,14 +168,17 @@ export default defineEventHandler(async (event) => {
     if (!accessToken || !graphqlUrl) return;
 
     try {
-      const response = await $fetch<OwnEmailResponse>(graphqlUrl, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          authorization: `Bearer ${accessToken}`,
-        },
-        body: { query: GET_OWN_EMAIL },
-      });
+      const response = await requestGraphql(
+        graphqlUrl,
+        GET_OWN_EMAIL,
+        {},
+        {
+          headers: {
+            'content-type': 'application/json',
+            authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
       const profile = response?.data?.getOwnEmail;
       if (!profile?.address) {
         deleteCookie(event, LOCAL_AUTH_COOKIE, { path: '/' });
@@ -273,17 +255,17 @@ export default defineEventHandler(async (event) => {
         if (accessToken && graphqlUrl) {
           const profileStartedAt = performance.now();
           const queryBackend = () =>
-            $fetch<OwnEmailResponse>(graphqlUrl, {
-              method: 'POST',
-              headers: {
-                'content-type': 'application/json',
-                authorization: `Bearer ${accessToken}`,
-              },
-              body: {
-                query: GET_OWN_EMAIL,
-                variables: { emailAddress: email },
-              },
-            });
+            requestGraphql(
+              graphqlUrl,
+              GET_OWN_EMAIL,
+              {},
+              {
+                headers: {
+                  'content-type': 'application/json',
+                  authorization: `Bearer ${accessToken}`,
+                },
+              }
+            );
 
           const cache = useStorage<StableProfile>('authProfileCache');
           const cacheKey = `profile:${email}`;

@@ -4713,50 +4713,6 @@
       ],
       "fragments": []
     },
-    "server/api/auth/profile.get.ts#GET_OWN_EMAIL": {
-      "operations": [
-        {
-          "name": "getOwnEmail",
-          "document": "GetOwnEmailSource3c35564c1eDocument",
-          "result": "GetOwnEmailSource3c35564c1eQuery",
-          "variables": "GetOwnEmailSource3c35564c1eQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "server/api/session/profile.get.ts#GET_OWN_EMAIL": {
-      "operations": [
-        {
-          "name": "getOwnEmail",
-          "document": "GetOwnEmailSource3c35564c1eDocument",
-          "result": "GetOwnEmailSource3c35564c1eQuery",
-          "variables": "GetOwnEmailSource3c35564c1eQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "server/api/session/token.get.ts#GET_NOTIFICATION_COUNT": {
-      "operations": [
-        {
-          "name": "getOwnEmailNotificationCount",
-          "document": "GetOwnEmailNotificationCountDocument",
-          "result": "GetOwnEmailNotificationCountQuery",
-          "variables": "GetOwnEmailNotificationCountQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "server/middleware/2.auth-session.ts#GET_OWN_EMAIL": {
-      "operations": [
-        {
-          "name": "getOwnEmail",
-          "document": "GetOwnEmailDocument",
-          "result": "GetOwnEmailQuery",
-          "variables": "GetOwnEmailQueryVariables"
-        }
-      ],
-      "fragments": []
-    },
     "utils/index.ts#inline:NewTag": {
       "operations": [],
       "fragments": [

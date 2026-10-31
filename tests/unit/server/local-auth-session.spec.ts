@@ -173,7 +173,7 @@ describe('auth session middleware', () => {
         }),
         body: expect.objectContaining({
           query: expect.stringContaining('query getOwnEmail'),
-          variables: { emailAddress: 'admin@example.test' },
+          variables: {},
         }),
       })
     );
