@@ -200,6 +200,9 @@ test.describe('Unsubscribe flow', () => {
       email: 'alice@example.com',
     });
 
+    // Subsequent root reads must reflect the completed mutation, as the backend
+    // does; a fixed subscribed fixture would undo the normalized cache update.
+    let subscribed = true;
     const diagnostics = await installGraphqlMocks(page, {
       ...getBaseMocks(TEST_USER),
       getDiscussion: () => ({
@@ -219,7 +222,9 @@ test.describe('Unsubscribe flow', () => {
                     channelUniqueName: TEST_CHANNEL,
                     overrides: {
                       // User is currently subscribed
-                      SubscribedToNotifications: [{ username: TEST_USER }],
+                      SubscribedToNotifications: subscribed
+                        ? [{ username: TEST_USER }]
+                        : [],
                     },
                   }),
                 ],
@@ -238,7 +243,9 @@ test.describe('Unsubscribe flow', () => {
               title: 'Test Discussion',
               commentsCount: 0,
               overrides: {
-                SubscribedToNotifications: [{ username: TEST_USER }],
+                SubscribedToNotifications: subscribed
+                  ? [{ username: TEST_USER }]
+                  : [],
               },
             }),
             Comments: [],
@@ -255,6 +262,7 @@ test.describe('Unsubscribe flow', () => {
       }),
       // Mock unsubscribe mutation
       unsubscribeFromDiscussionChannel: () => {
+        subscribed = false;
         return {
           data: {
             unsubscribeFromDiscussionChannel: {
