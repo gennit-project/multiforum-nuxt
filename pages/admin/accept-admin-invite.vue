@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { useRouter } from 'nuxt/app';
 import { config } from '@/config';
-import { ACCEPT_SERVER_ADMIN_INVITE } from '@/graphQLData/admin/mutations';
+import { AcceptServerAdminInviteDocument as ACCEPT_SERVER_ADMIN_INVITE } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 
 const usernameVar = useUsername();

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { GET_COMMENT } from '@/graphQLData/comment/queries';
+import { GetCommentDocument as GET_COMMENT } from '@/__generated__/operations';
+
 import { useQuery } from '@vue/apollo-composable';
 import CommentHeader from '@/components/comments/CommentHeader.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
@@ -59,9 +60,9 @@ const originalComment = computed(() => {
 
 const authorBadges = computed(() => {
   const author = originalComment.value?.CommentAuthor;
-  const username = author?.__typename === 'User' ? author.username : null;
+  const username = author && 'username' in author ? author.username : null;
   const modProfileName =
-    author?.__typename === 'ModerationProfile' ? author.displayName : null;
+    author && 'displayName' in author ? author.displayName : null;
 
   return getAuthorBadges({
     username,
@@ -165,7 +166,7 @@ const permalinkObject = computed(() => {
         <CommentHeader
           :comment-data="originalComment"
           :is-highlighted="false"
-          :parent-comment-id="originalComment?.parentCommentId"
+          :parent-comment-id="originalComment?.ParentComment?.id"
           :show-context-link="true"
           :show-channel="false"
           :is-server-admin="authorBadges.isServerAdmin"

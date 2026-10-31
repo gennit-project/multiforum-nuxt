@@ -1,28 +1,23 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import type { IssueView as Issue } from '@/types/Issue';
 import { useQuery } from '@vue/apollo-composable';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import {
   ModerationRecommendedAction,
-  type Issue,
+
 } from '@/__generated__/graphql';
 import ArchiveButton from './ArchiveButton.vue';
 import SuspendUserButton from './SuspendUserButton.vue';
 import SuspendModButton from './SuspendModButton.vue';
 import AdminIcon from '../icons/AdminIcon.vue';
 import ScalesIcon from '../icons/ScalesIcon.vue';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GetDiscussionDocument as GET_DISCUSSION, GetDiscussionChannelIdDocument as GET_DISCUSSION_CHANNEL, GetEventChannelIdDocument as GET_EVENT_CHANNEL, GetSuspensionDocument as IS_ORIGINAL_POSTER_SUSPENDED , GetCommentSource06938535b8Document as GET_COMMENT_ARCHIVED , GetImageDetailsDocument as GET_IMAGE_DETAILS  } from '@/__generated__/operations';
 import { useModProfileName } from '@/composables/useAuthState';
 import PencilIcon from '../icons/PencilIcon.vue';
 import EditContentModal from './EditContentModal.vue';
 import CloseIssueAction from './CloseIssueAction.vue';
-import {
-  GET_DISCUSSION_CHANNEL,
-  GET_EVENT_CHANNEL,
-  IS_ORIGINAL_POSTER_SUSPENDED,
-} from '@/graphQLData/mod/queries';
-import { GET_COMMENT_ARCHIVED } from '@/graphQLData/comment/queries';
-import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
+
 
 const modProfileNameVar = useModProfileName();
 

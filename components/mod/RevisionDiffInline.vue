@@ -2,14 +2,15 @@
 import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { TextVersion } from '@/__generated__/graphql';
+
 import * as DiffMatchPatch from 'diff-match-patch';
 
 interface VersionData {
   id: string;
-  body?: string;
+  body?: string | null;
   title?: string;
   createdAt: string;
-  editReason?: string;
+  editReason?: string | null;
   Author?: {
     username?: string;
   } | null;

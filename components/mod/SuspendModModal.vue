@@ -5,9 +5,8 @@ import GenericModal from '@/components/GenericModal.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import UserMinus from '@/components/icons/UserMinus.vue';
 import { useApolloClient, useMutation } from '@vue/apollo-composable';
-import { GET_ISSUE } from '@/graphQLData/issue/queries';
-import { IS_ORIGINAL_POSTER_SUSPENDED } from '@/graphQLData/mod/queries';
-import { SUSPEND_MOD } from '@/graphQLData/mod/mutations';
+import { GetIssueDocument as GET_ISSUE, GetSuspensionDocument as IS_ORIGINAL_POSTER_SUSPENDED , SuspendModDocument as SUSPEND_MOD  } from '@/__generated__/operations';
+
 
 const props = defineProps({
   open: {

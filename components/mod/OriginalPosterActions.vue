@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import type { Issue } from '@/__generated__/graphql';
+import type { IssueView as Issue } from '@/types/Issue';
 import EyeIcon from '../icons/EyeIcon.vue';
 import TrashIcon from '../icons/TrashIcon.vue';
 import ArrowUpRightIcon from '@/components/icons/ArrowUpRightIcon.vue';

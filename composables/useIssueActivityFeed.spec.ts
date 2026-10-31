@@ -47,8 +47,8 @@ describe('useIssueActivityFeed', () => {
     const cache = {
       readQuery: vi.fn(() => ({
         issues: [
-          { id: 'issue-1', issueNumber: 1, body: 'Original' },
-          { id: 'issue-2', issueNumber: 2, body: 'Other' },
+          { id: 'issue-1', ActivityFeed: [], ActivityFeedConnection: { aggregate: { count: { nodes: 0 } } } },
+          { id: 'issue-2', ActivityFeed: [], ActivityFeedConnection: { aggregate: { count: { nodes: 0 } } } },
         ],
       })),
       writeQuery: vi.fn(),
@@ -56,13 +56,14 @@ describe('useIssueActivityFeed', () => {
 
     firstOptions.update(cache, {
       data: {
-        updateIssues: {
+        addIssueActivityFeedItem: {
           issues: [
             {
               id: 'issue-1',
               issueNumber: 1,
               channelUniqueName: 'general',
-              body: 'Updated',
+              ActivityFeed: [{ id: 'new-activity' }],
+              ActivityFeedConnection: { aggregate: { count: { nodes: 1 } } },
             },
           ],
         },
@@ -81,11 +82,10 @@ describe('useIssueActivityFeed', () => {
           issues: [
             {
               id: 'issue-1',
-              issueNumber: 1,
-              channelUniqueName: 'general',
-              body: 'Updated',
+              ActivityFeed: [{ id: 'new-activity' }],
+              ActivityFeedConnection: { aggregate: { count: { nodes: 1 } } },
             },
-            { id: 'issue-2', issueNumber: 2, body: 'Other' },
+            { id: 'issue-2', ActivityFeed: [], ActivityFeedConnection: { aggregate: { count: { nodes: 0 } } } },
           ],
         },
       })
@@ -103,7 +103,7 @@ describe('useIssueActivityFeed', () => {
       writeQuery: vi.fn(),
     };
 
-    firstOptions.update(cache, { data: { updateIssues: { issues: [] } } });
+    firstOptions.update(cache, { data: { addIssueActivityFeedItem: { issues: [] } } });
 
     expect(cache.writeQuery).not.toHaveBeenCalled();
   });
@@ -138,6 +138,7 @@ describe('useIssueActivityFeed — pagination', () => {
       activityFeedLimit: 10,
       onIssueResult: (cb) => {
         resultCb = cb as (r: unknown) => void;
+        return { off: vi.fn() };
       },
     });
 
@@ -153,6 +154,7 @@ describe('useIssueActivityFeed — pagination', () => {
       activityFeedLimit: 10,
       onIssueResult: (cb) => {
         resultCb = cb as (r: unknown) => void;
+        return { off: vi.fn() };
       },
     });
 
@@ -254,4 +256,25 @@ describe('useIssueActivityFeed — pagination', () => {
 
     expect(refetchIssue).toHaveBeenCalledTimes(1);
   });
+  it('rejects a page after the forum changes', async () => {
+    const channelId = ref('cats');
+    const fetchMoreIssue = vi.fn().mockResolvedValue({ data: { issues: [] } });
+    const { loadMoreActivityFeed } = useIssueActivityFeed({ channelId, issueNumber: ref(1), fetchMoreIssue });
+    await loadMoreActivityFeed();
+    channelId.value = 'dogs';
+    const previous = { issues: [{ id: 'i1', ActivityFeed: [{ id: 'old' }] }] };
+    expect(fetchMoreIssue.mock.calls[0]![0].updateQuery(previous, { fetchMoreResult: { issues: [{ id: 'i1', ActivityFeed: [{ id: 'new' }] }] } })).toBe(previous);
+  });
+
+  it('deduplicates repeated overlapping activity pages', async () => {
+    const fetchMoreIssue = vi.fn().mockResolvedValue({ data: { issues: [] } });
+    const { loadMoreActivityFeed } = useIssueActivityFeed({ channelId: ref('cats'), issueNumber: ref(1), fetchMoreIssue });
+    await loadMoreActivityFeed();
+    const previous = { issues: [{ id: 'i1', ActivityFeed: [{ id: 'old' }] }] };
+    const next = { issues: [{ id: 'i1', ActivityFeed: [{ id: 'old' }, { id: 'new' }] }] };
+    const merge = fetchMoreIssue.mock.calls[0]![0].updateQuery;
+    const first = merge(previous, { fetchMoreResult: next });
+    expect(merge(first, { fetchMoreResult: next }).issues[0].ActivityFeed).toEqual([{ id: 'old' }, { id: 'new' }]);
+  });
+
 });

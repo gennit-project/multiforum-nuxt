@@ -8,12 +8,10 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import type { IssueCreateInput } from '@/__generated__/graphql';
+import type { CreateIssueMutation } from '@/__generated__/operations';
 import { CREATE_ISSUE } from '@/graphQLData/issue/mutations';
-import {
-  COUNT_OPEN_ISSUES,
-  SERVER_SCOPED_ISSUE_COUNT,
-} from '@/graphQLData/mod/queries';
+
+import { CountOpenIssuesDocument as COUNT_OPEN_ISSUES, CountIssuesByServerDocument as SERVER_SCOPED_ISSUE_COUNT  } from '@/__generated__/operations';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 
 const modProfileNameVar = useModProfileName();
@@ -80,7 +78,7 @@ const authorName = computed(() => {
   return '';
 });
 
-const issueInput = computed<IssueCreateInput>(
+const issueInput = computed(
   () =>
     ({
       title: formValues.value.title.trim(),
@@ -97,20 +95,11 @@ const issueInput = computed<IssueCreateInput>(
         : undefined,
       Author: authorInput.value || undefined,
       authorName: authorName.value || undefined,
-      // The custom `createIssue` resolver accepts Channel/Author connect
-      // portions that the generated `IssueCreateInput` no longer models, so
-      // narrow through `unknown`.
-    }) as unknown as IssueCreateInput
+      // Legacy input contract exception: Author/Channel connects and server-assigned
+      // issueNumber disagree with the pinned IssueCreateInput. Tracked in #700
+      // and backend #413; preserve this request until the backend contract is fixed.
+    })
 );
-
-// Shape of the open-issue count queries after the v7 migration
-// (`issuesConnection { aggregate { count { nodes } } }`). Kept loose so the
-// optimistic cache write does not need to supply every connection field.
-type IssueCountCache = {
-  issuesConnection?: {
-    aggregate?: { count?: { nodes?: number | null } | null } | null;
-  } | null;
-};
 
 const canSubmit = computed(() => {
   return (
@@ -125,26 +114,30 @@ const {
   loading: createIssueLoading,
   error: createIssueError,
   onDone: onCreateIssueDone,
-} = useMutation(CREATE_ISSUE, () => ({
+} = useMutation<CreateIssueMutation, { input: typeof issueInput.value }>(CREATE_ISSUE, () => {
+  const channelUniqueName = selectedChannelId.value;
+  let applied = false;
+  return {
   variables: {
     input: issueInput.value,
   },
   update: (cache, { data }) => {
     const createdIssue = data?.createIssue;
-    if (!createdIssue) return;
+    if (!createdIssue || applied) return;
+    applied = true;
 
-    if (selectedChannelId.value) {
+    if (channelUniqueName) {
       try {
-        const openCount = cache.readQuery<IssueCountCache>({
+        const openCount = cache.readQuery({
           query: COUNT_OPEN_ISSUES,
-          variables: { channelUniqueName: selectedChannelId.value },
+          variables: { channelUniqueName: channelUniqueName },
         });
         const currentCount =
           openCount?.issuesConnection?.aggregate?.count?.nodes;
         if (typeof currentCount === 'number') {
-          cache.writeQuery<IssueCountCache>({
+          cache.writeQuery({
             query: COUNT_OPEN_ISSUES,
-            variables: { channelUniqueName: selectedChannelId.value },
+            variables: { channelUniqueName: channelUniqueName },
             data: {
               issuesConnection: {
                 aggregate: { count: { nodes: currentCount + 1 } },
@@ -158,13 +151,13 @@ const {
     }
 
     try {
-      const serverCount = cache.readQuery<IssueCountCache>({
+      const serverCount = cache.readQuery({
         query: SERVER_SCOPED_ISSUE_COUNT,
       });
       const currentServerCount =
         serverCount?.issuesConnection?.aggregate?.count?.nodes;
       if (typeof currentServerCount === 'number') {
-        cache.writeQuery<IssueCountCache>({
+        cache.writeQuery({
           query: SERVER_SCOPED_ISSUE_COUNT,
           data: {
             issuesConnection: {
@@ -177,7 +170,8 @@ const {
       // Cache might not have this query yet; ignore.
     }
   },
-}));
+};
+});
 
 onCreateIssueDone((result) => {
   const newIssue = result?.data?.createIssue;

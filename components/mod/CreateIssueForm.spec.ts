@@ -242,6 +242,25 @@ describe('CreateIssueForm cache update', () => {
     expect(cache.writeQuery).toHaveBeenCalled();
   });
 
+  it('keeps a pending creation count in its original forum after navigation', async () => {
+    const wrapper = mountForm({ defaultChannelId: 'cats' });
+    const update = h.mutationOptions?.().update as (c: unknown, r: unknown) => void;
+    await wrapper.setProps({ defaultChannelId: 'dogs' });
+    const cache = makeCache();
+    update(cache, { data: { createIssue: { issueNumber: 1 } } });
+    expect(cache.writeQuery.mock.calls[0]?.[0]).toMatchObject({ variables: { channelUniqueName: 'cats' } });
+  });
+
+  it('does not double increment counts for repeated completion of one creation', () => {
+    mountForm({ defaultChannelId: 'cats' });
+    const update = h.mutationOptions?.().update as (c: unknown, r: unknown) => void;
+    const cache = makeCache();
+    const result = { data: { createIssue: { issueNumber: 1 } } };
+    update(cache, result);
+    update(cache, result);
+    expect(cache.writeQuery).toHaveBeenCalledTimes(2);
+  });
+
   it('still bumps the server count for an issue with no channel', () => {
     mountForm();
     const cache = makeCache();

@@ -3,35 +3,9 @@ import PendingForumModList from '@/components/channel/form/PendingForumModList.v
 import ModList from '@/components/channel/form/ModList.vue';
 import { ref, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import {
-  INVITE_FORUM_MOD,
-  CANCEL_INVITE_FORUM_MOD,
-  REMOVE_FORUM_MOD,
-} from '@/graphQLData/mod/mutations';
+import { InviteForumModDocument as INVITE_FORUM_MOD, CancelInviteForumModDocument as CANCEL_INVITE_FORUM_MOD, RemoveForumModDocument as REMOVE_FORUM_MOD, GetPendingChannelModsByChannelDocument as GET_PENDING_CHANNEL_MODS_BY_CHANNEL, GetModsByChannelSource31c1e8fd16Document as GET_MODS_BY_CHANNEL  } from '@/__generated__/operations';
 import { useRoute } from 'nuxt/app';
-import {
-  GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
-  GET_MODS_BY_CHANNEL,
-} from '@/graphQLData/mod/queries';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-
-// Cache query result types
-interface PendingModInvite {
-  displayName?: string;
-  username?: string;
-}
-
-interface ChannelMod {
-  displayName?: string | null;
-}
-
-interface PendingModsQueryResult {
-  channels?: Array<{ PendingModInvites?: PendingModInvite[] }>;
-}
-
-interface ModsQueryResult {
-  channels?: Array<{ uniqueName?: string; Moderators?: ChannelMod[] }>;
-}
 
 const route = useRoute();
 
@@ -49,119 +23,36 @@ const {
   error: inviteModError,
   mutate: inviteMod,
   onDone: inviteModDone,
-} = useMutation(INVITE_FORUM_MOD, {
-  update: (cache) => {
-    // update the result of GET_PENDING_CHANNEL_MODS_BY_CHANNEL
-    // to add the newly invited user
-
-    const existingData = cache.readQuery({
-      query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-    }) as PendingModsQueryResult | null;
-
-    const existingInvites = existingData?.channels?.[0]?.PendingModInvites ?? [];
-
-    cache.writeQuery({
-      query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-      data: {
-        channels: [
-          {
-            PendingModInvites: [
-              ...existingInvites,
-              {
-                displayName: newModUsername.value,
-              },
-            ],
-          },
-        ],
-      },
-    });
-  },
-});
+} = useMutation(INVITE_FORUM_MOD, () => ({
+  // The boolean mutation response cannot populate a selected user/mod row.
+  // Refetch the captured forum instead of fabricating an incomplete cache entry.
+  refetchQueries: [{ query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL, variables: { channelUniqueName: forumId.value } }],
+  awaitRefetchQueries: true,
+}));
 
 const {
   mutate: cancelInviteMod,
   loading: cancelInviteModLoading,
   error: cancelInviteModError,
   onDone: cancelInviteModDone,
-} = useMutation(CANCEL_INVITE_FORUM_MOD, {
-  update: (cache) => {
-    // update the result of GET_PENDING_CHANNEL_MODS_BY_CHANNEL
-    // to remove the cancelled invite
-
-    const existingData = cache.readQuery({
-      query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-    }) as PendingModsQueryResult | null;
-
-    const existingInvites = existingData?.channels?.[0]?.PendingModInvites ?? [];
-
-    cache.writeQuery({
-      query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-      data: {
-        channels: [
-          {
-            PendingModInvites: [
-              ...existingInvites.filter(
-                (invite: PendingModInvite) =>
-                  invite.username !== newModUsername.value
-              ),
-            ],
-          },
-        ],
-      },
-    });
-  },
-});
+} = useMutation(CANCEL_INVITE_FORUM_MOD, () => ({
+  // The boolean mutation response cannot populate a selected user/mod row.
+  // Refetch the captured forum instead of fabricating an incomplete cache entry.
+  refetchQueries: [{ query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL, variables: { channelUniqueName: forumId.value } }],
+  awaitRefetchQueries: true,
+}));
 
 const {
   mutate: removeForumMod,
   loading: removeForumModLoading,
   onDone: removeForumModDone,
   error: removeForumModError,
-} = useMutation(REMOVE_FORUM_MOD, {
-  update: (cache, { data: _data }) => {
-    // Drop the removed moderator from GET_MODS_BY_CHANNEL, keeping the rest of
-    // the cached channel (admins, other mods) intact.
-
-    const existingData = cache.readQuery({
-      query: GET_MODS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-    }) as ModsQueryResult | null;
-
-    const existingChannel = existingData?.channels?.[0];
-    if (!existingChannel) return;
-
-    cache.writeQuery({
-      query: GET_MODS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-      data: {
-        channels: [
-          {
-            ...existingChannel,
-            Moderators: (existingChannel.Moderators ?? []).filter(
-              (mod: ChannelMod) => mod.displayName !== forumModToRemove.value
-            ),
-          },
-        ],
-      },
-    });
-  },
-});
+} = useMutation(REMOVE_FORUM_MOD, () => ({
+  // The boolean mutation response cannot populate a selected user/mod row.
+  // Refetch the captured forum instead of fabricating an incomplete cache entry.
+  refetchQueries: [{ query: GET_MODS_BY_CHANNEL, variables: { channelUniqueName: forumId.value } }],
+  awaitRefetchQueries: true,
+}));
 
 inviteModDone(() => {
   newModUsername.value = '';

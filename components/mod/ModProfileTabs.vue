@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import TabButton from '@/components/channel/TabButton.vue';
-import type { ModerationProfile } from '@/__generated__/graphql';
+import type { GetModQuery } from '@/__generated__/operations';
+
 import { useRoute } from 'nuxt/app';
+type ModerationProfile = GetModQuery['moderationProfiles'][number];
 
 const route = useRoute();
 

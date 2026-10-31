@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Issue } from '@/__generated__/graphql';
+import type { IssueView as Issue } from '@/types/Issue';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import DotCircleIcon from '@/components/icons/DotCircleIcon.vue';
 

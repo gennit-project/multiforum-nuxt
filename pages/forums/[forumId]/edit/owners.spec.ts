@@ -1,3 +1,5 @@
+import { getOperationAST } from 'graphql';
+import type { DocumentNode } from 'graphql';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -6,7 +8,7 @@ import PendingForumOwnerList from '@/components/channel/form/PendingForumOwnerLi
 
 const h = vi.hoisted(() => ({
   mutations: new Map<unknown, ReturnType<typeof vi.fn>>(),
-  options: new Map<unknown, { update?: (...args: unknown[]) => void }>(),
+  options: new Map<unknown, () => { refetchQueries: Array<{ query: DocumentNode; variables: { channelUniqueName: string } }>; awaitRefetchQueries: boolean }>(),
   done: new Map<unknown, () => void>(),
 }));
 
@@ -14,17 +16,15 @@ vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: { forumId: 'cats' } }),
 }));
 
-vi.mock('@/graphQLData/mod/mutations', () => ({
-  INVITE_FORUM_OWNER: 'invite',
-  CANCEL_INVITE_FORUM_OWNER: 'cancel',
-  REMOVE_FORUM_OWNER: 'remove',
-}));
+
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (
-    operation: unknown,
-    options: { update?: (...args: unknown[]) => void }
+    document: DocumentNode,
+    options: () => { refetchQueries: Array<{ query: DocumentNode; variables: { channelUniqueName: string } }>; awaitRefetchQueries: boolean }
   ) => {
+    const name = getOperationAST(document)?.name?.value;
+    const operation = name === 'inviteForumOwner' ? 'invite' : name === 'cancelInviteForumOwner' ? 'cancel' : 'remove';
     const mutate = vi.fn();
     h.mutations.set(operation, mutate);
     h.options.set(operation, options);
@@ -120,45 +120,18 @@ describe('forum owners edit page', () => {
     });
   });
 
-  it('updates cached pending invitations after an invite', async () => {
-    const wrapper = await mountPage();
-    wrapper.findComponent({ name: 'TextInput' }).vm.$emit('update', 'bob');
-    const cache = {
-      readQuery: vi.fn().mockReturnValue({
-        channels: [
-          { PendingOwnerInvites: [{ username: 'alice' }], slug: 'cats' },
-        ],
-      }),
-      writeQuery: vi.fn(),
-    };
-    h.options.get('invite')?.update?.(cache);
-    expect(cache.writeQuery.mock.calls[0][0].data.channels[0]).toEqual({
-      slug: 'cats',
-      PendingOwnerInvites: [{ username: 'alice' }, { username: 'bob' }],
-    });
-  });
-
-  it('filters cached invitations and owners', async () => {
+  it.each(['invite', 'cancel', 'remove'])('refetches the exact selected forum after %s', async (operation) => {
     await mountPage();
-    const cache = {
-      readQuery: vi.fn().mockReturnValue({
-        channels: [
-          { PendingOwnerInvites: [{ username: 'alice' }, { username: '' }] },
-        ],
-      }),
-      writeQuery: vi.fn(),
-    };
-    h.options.get('cancel')?.update?.(cache);
-    cache.readQuery.mockReturnValue({
-      channels: [{ Admins: [{ username: 'alice' }, { username: '' }] }],
+    const options = h.options.get(operation)?.();
+    expect({
+      query: getOperationAST(options!.refetchQueries[0]!.query)?.name?.value,
+      variables: options?.refetchQueries[0]?.variables,
+      awaitRefetchQueries: options?.awaitRefetchQueries,
+    }).toEqual({
+      query: operation === 'remove' ? 'getChannelOwnersByChannel' : 'getPendingChannelOwnersByChannel',
+      variables: { channelUniqueName: 'cats' },
+      awaitRefetchQueries: true,
     });
-    h.options.get('remove')?.update?.(cache);
-    expect(
-      cache.writeQuery.mock.calls.map((call) => call[0].data.channels[0])
-    ).toEqual([
-      { PendingOwnerInvites: [{ username: 'alice' }] },
-      { Admins: [{ username: 'alice' }] },
-    ]);
   });
 
   it('closes action modals when mutations finish', async () => {

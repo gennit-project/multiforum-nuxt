@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GET_MODS_BY_CHANNEL } from '@/graphQLData/mod/queries';
+import { GetModsByChannelSource31c1e8fd16Document as GET_MODS_BY_CHANNEL } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 
@@ -21,7 +21,7 @@ const { result, loading, error } = useQuery(
     fetchPolicy: 'cache-first',
   }
 );
-const mods = computed(() => result.value?.channels?.[0]?.Moderators);
+const mods = computed(() => result.value?.channels?.[0]?.Moderators.filter((mod): mod is typeof mod & { displayName: string } => typeof mod.displayName === 'string' && !!mod.displayName));
 
 // Moderators are identified by mod-profile name; the account behind a profile
 // is private (the API denies ModerationProfile.User).
@@ -36,7 +36,7 @@ defineEmits<{
     <div
       v-else-if="
         result?.channels?.length === 0 ||
-        result.channels[0]?.Moderators?.length === 0
+        result?.channels[0]?.Moderators?.length === 0
       "
       class="text-sm"
     >

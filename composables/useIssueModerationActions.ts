@@ -1,29 +1,15 @@
+import type { AddIssueActivityFeedItemMutationVariables, AddIssueActivityFeedItemWithCommentAsModMutationVariables, AddIssueActivityFeedItemWithCommentAsUserMutationVariables } from '@/__generated__/operations';
 import { ref } from 'vue';
 import type { ComputedRef, Ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { DELETE_DISCUSSION } from '@/graphQLData/discussion/mutations';
-import { DELETE_EVENT } from '@/graphQLData/event/mutations';
-import { DELETE_COMMENT } from '@/graphQLData/comment/mutations';
+import { DeleteDiscussionDocument as DELETE_DISCUSSION, DeleteEventDocument as DELETE_EVENT , DeleteCommentDocument as DELETE_COMMENT  } from '@/__generated__/operations';
 
 type MaybeRef<T> = Ref<T> | ComputedRef<T>;
 type AsyncFn = () => Promise<unknown> | undefined;
 
-type AddFeedItem = (args: {
-  issueId: string;
-  displayName: string;
-  actionDescription: string;
-  actionType: string;
-}) => Promise<unknown> | undefined;
-
-type AddFeedItemWithComment = (args: {
-  issueId: string;
-  commentText: string;
-  username?: string;
-  displayName?: string;
-  actionDescription: string;
-  actionType: string;
-  channelUniqueName: string;
-}) => Promise<unknown> | undefined;
+type AddFeedItem = (args: AddIssueActivityFeedItemMutationVariables) => Promise<unknown> | undefined;
+type AddFeedItemAsMod = (args: AddIssueActivityFeedItemWithCommentAsModMutationVariables) => Promise<unknown> | undefined;
+type AddFeedItemAsUser = (args: AddIssueActivityFeedItemWithCommentAsUserMutationVariables) => Promise<unknown> | undefined;
 
 type IssueLike = {
   id: string;
@@ -42,8 +28,8 @@ type UseIssueModerationActionsParams = {
   closeIssue: AsyncFn;
   reopenIssue: AsyncFn;
   addIssueActivityFeedItem: AddFeedItem;
-  addIssueActivityFeedItemWithCommentAsMod: AddFeedItemWithComment;
-  addIssueActivityFeedItemWithCommentAsUser: AddFeedItemWithComment;
+  addIssueActivityFeedItemWithCommentAsMod: AddFeedItemAsMod;
+  addIssueActivityFeedItemWithCommentAsUser: AddFeedItemAsUser;
   resetActivityFeed: AsyncFn;
   refetchChannel: AsyncFn;
 };

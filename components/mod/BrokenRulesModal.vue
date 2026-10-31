@@ -7,23 +7,12 @@ import { DateTime } from 'luxon';
 import GenericModal from '@/components/GenericModal.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
-import {
-  REPORT_DISCUSSION,
-  REPORT_EVENT,
-  REPORT_COMMENT,
-  REPORT_IMAGE,
-  REPORT_WIKI_EDIT,
-  ARCHIVE_DISCUSSION,
-  ARCHIVE_EVENT,
-  ARCHIVE_COMMENT,
-  ARCHIVE_IMAGE,
-} from '@/graphQLData/issue/mutations';
-import { GET_ISSUE } from '@/graphQLData/issue/queries';
-import { SUSPEND_USER } from '@/graphQLData/mod/mutations';
-import type { CommentView as Comment } from '@/types/Comment';
+import { ReportDiscussionDocument as REPORT_DISCUSSION, ReportEventDocument as REPORT_EVENT, ReportCommentDocument as REPORT_COMMENT, ReportImageDocument as REPORT_IMAGE, ReportWikiEditDocument as REPORT_WIKI_EDIT, ArchiveDiscussionDocument as ARCHIVE_DISCUSSION, ArchiveEventDocument as ARCHIVE_EVENT, ArchiveCommentDocument as ARCHIVE_COMMENT, ArchiveImageDocument as ARCHIVE_IMAGE, GetIssueDocument as GET_ISSUE , SuspendUserDocument as SUSPEND_USER , GetSuspensionDocument as IS_ORIGINAL_POSTER_SUSPENDED  } from '@/__generated__/operations';
+
+import type { GetCommentQuery } from '@/__generated__/operations';
 import SelectBrokenRules from '@/components/admin/SelectBrokenRules.vue';
 import ArchiveBox from '@/components/icons/ArchiveBox.vue';
-import { IS_ORIGINAL_POSTER_SUSPENDED } from '@/graphQLData/mod/queries';
+type Comment = Pick<GetCommentQuery['comments'][number], 'id'>;
 
 type FinalCommentTextInput = {
   selectedForumRules: string[];
@@ -495,7 +484,7 @@ const submit = async () => {
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value,
       });
-      issueId = issue?.data?.archiveDiscussion?.id;
+      issueId = issue?.data?.archiveDiscussion?.id || "";
     } else if (props.eventId) {
       const issue = await archiveEvent({
         eventId: props.eventId,
@@ -504,7 +493,7 @@ const submit = async () => {
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value,
       });
-      issueId = issue?.data?.archiveEvent?.id;
+      issueId = issue?.data?.archiveEvent?.id || "";
     } else if (props.commentId) {
       const issue = await archiveComment({
         commentId: props.commentId,
@@ -512,7 +501,7 @@ const submit = async () => {
         selectedForumRules: selectedForumRules.value,
         selectedServerRules: selectedServerRules.value,
       });
-      issueId = issue?.data?.archiveComment?.id;
+      issueId = issue?.data?.archiveComment?.id || "";
     } else if (props.imageId) {
       const issue = await archiveImage({
         imageId: props.imageId,
@@ -521,7 +510,7 @@ const submit = async () => {
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value || null,
       });
-      issueId = issue?.data?.archiveImage?.id;
+      issueId = issue?.data?.archiveImage?.id || "";
     }
 
     if (!issueId) {

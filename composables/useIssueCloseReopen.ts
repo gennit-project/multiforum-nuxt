@@ -1,15 +1,6 @@
 import { useMutation } from '@vue/apollo-composable';
 import type { Ref, ComputedRef } from 'vue';
-import { CLOSE_ISSUE, REOPEN_ISSUE } from '@/graphQLData/issue/mutations';
-import {
-  COUNT_CLOSED_ISSUES,
-  COUNT_OPEN_ISSUES,
-} from '@/graphQLData/mod/queries';
-
-// Cache query result types
-interface IssuesAggregateData {
-  issuesConnection?: { aggregate?: { count?: { nodes?: number } } };
-}
+import { CloseIssueDocument as CLOSE_ISSUE, ReopenIssueDocument as REOPEN_ISSUE, CountClosedIssuesDocument as COUNT_CLOSED_ISSUES, CountOpenIssuesDocument as COUNT_OPEN_ISSUES  } from '@/__generated__/operations';
 
 type UseIssueCloseReopenParams = {
   activeIssueId: Ref<string> | ComputedRef<string>;
@@ -26,16 +17,22 @@ export function useIssueCloseReopen({
 }: UseIssueCloseReopenParams) {
   const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
     CLOSE_ISSUE,
-    () => ({
+    () => {
+      const issueId = activeIssueId.value;
+      const forumId = channelId.value;
+      let applied = false;
+      return {
       variables: {
-        id: activeIssueId.value,
+        id: issueId,
       },
       update(cache) {
+        if (applied) return;
+        applied = true;
         // Get the issue in the cache by ID, then edit it so the isOpen field is false.
         cache.modify({
           id: cache.identify({
             __typename: 'Issue',
-            id: activeIssueId.value,
+            id: issueId,
           }),
           fields: {
             isOpen() {
@@ -48,10 +45,10 @@ export function useIssueCloseReopen({
         // to increment the count of closed issues
         const existingClosedIssuesData = cache.readQuery({
           query: COUNT_CLOSED_ISSUES,
-          variables: { channelUniqueName: channelId.value },
+          variables: { channelUniqueName: forumId },
         });
 
-        const closedIssuesData = existingClosedIssuesData as IssuesAggregateData | null;
+        const closedIssuesData = existingClosedIssuesData;
         if (closedIssuesData?.issuesConnection) {
           const existingClosedIssues = closedIssuesData.issuesConnection;
           const newClosedIssues = {
@@ -62,7 +59,7 @@ export function useIssueCloseReopen({
 
           cache.writeQuery({
             query: COUNT_CLOSED_ISSUES,
-            variables: { channelUniqueName: channelId.value },
+            variables: { channelUniqueName: forumId },
             data: {
               issuesConnection: newClosedIssues,
             },
@@ -73,42 +70,49 @@ export function useIssueCloseReopen({
         // to decrement the count of open issues
         const existingOpenIssuesData = cache.readQuery({
           query: COUNT_OPEN_ISSUES,
-          variables: { channelUniqueName: channelId.value },
+          variables: { channelUniqueName: forumId },
         });
 
-        const openIssuesData = existingOpenIssuesData as IssuesAggregateData | null;
+        const openIssuesData = existingOpenIssuesData;
         if (openIssuesData?.issuesConnection) {
           const existingOpenIssues = openIssuesData.issuesConnection;
           const newOpenIssues = {
             aggregate: {
-              count: { nodes: (existingOpenIssues.aggregate?.count?.nodes ?? 0) - 1 },
+              count: { nodes: Math.max(0, (existingOpenIssues.aggregate?.count?.nodes ?? 0) - 1) },
             },
           };
 
           cache.writeQuery({
             query: COUNT_OPEN_ISSUES,
-            variables: { channelUniqueName: channelId.value },
+            variables: { channelUniqueName: forumId },
             data: {
               issuesConnection: newOpenIssues,
             },
           });
         }
       },
-    })
+    };
+    }
   );
 
   const { mutate: reopenIssue, loading: reopenIssueLoading } = useMutation(
     REOPEN_ISSUE,
-    () => ({
+    () => {
+      const issueId = activeIssueId.value;
+      const forumId = channelId.value;
+      let applied = false;
+      return {
       variables: {
-        id: activeIssueId.value,
+        id: issueId,
       },
       update(cache) {
+        if (applied) return;
+        applied = true;
         // Get the issue in the cache by ID, then edit it so the isOpen field is true.
         cache.modify({
           id: cache.identify({
             __typename: 'Issue',
-            id: activeIssueId.value,
+            id: issueId,
           }),
           fields: {
             isOpen() {
@@ -120,21 +124,21 @@ export function useIssueCloseReopen({
         // to decrement the count of closed issues
         const existingClosedIssuesData = cache.readQuery({
           query: COUNT_CLOSED_ISSUES,
-          variables: { channelUniqueName: channelId.value },
+          variables: { channelUniqueName: forumId },
         });
 
-        const closedIssuesData = existingClosedIssuesData as IssuesAggregateData | null;
+        const closedIssuesData = existingClosedIssuesData;
         if (closedIssuesData?.issuesConnection) {
           const existingClosedIssues = closedIssuesData.issuesConnection;
           const newClosedIssues = {
             aggregate: {
-              count: { nodes: (existingClosedIssues.aggregate?.count?.nodes ?? 0) - 1 },
+              count: { nodes: Math.max(0, (existingClosedIssues.aggregate?.count?.nodes ?? 0) - 1) },
             },
           };
 
           cache.writeQuery({
             query: COUNT_CLOSED_ISSUES,
-            variables: { channelUniqueName: channelId.value },
+            variables: { channelUniqueName: forumId },
             data: {
               issuesConnection: newClosedIssues,
             },
@@ -145,10 +149,10 @@ export function useIssueCloseReopen({
         // to increment the count of open issues
         const existingOpenIssuesData = cache.readQuery({
           query: COUNT_OPEN_ISSUES,
-          variables: { channelUniqueName: channelId.value },
+          variables: { channelUniqueName: forumId },
         });
 
-        const openIssuesData = existingOpenIssuesData as IssuesAggregateData | null;
+        const openIssuesData = existingOpenIssuesData;
         if (openIssuesData?.issuesConnection) {
           const existingOpenIssues = openIssuesData.issuesConnection;
           const newOpenIssues = {
@@ -159,14 +163,15 @@ export function useIssueCloseReopen({
 
           cache.writeQuery({
             query: COUNT_OPEN_ISSUES,
-            variables: { channelUniqueName: channelId.value },
+            variables: { channelUniqueName: forumId },
             data: {
               issuesConnection: newOpenIssues,
             },
           });
         }
       },
-    })
+    };
+    }
   );
 
   return {

@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL_RULES } from '@/graphQLData/channel/queries';
-import { GET_SERVER_RULES } from '@/graphQLData/admin/queries';
+import { GetChannelRulesDocument as GET_CHANNEL_RULES, GetServerRulesDocument as GET_SERVER_RULES  } from '@/__generated__/operations';
 import BrokenRuleListItem from './BrokenRuleListItem.vue';
-import { config } from '@/config';
+import { parseRuleOptions as getRules } from '@/utils/parseRuleOptions';
 import { useRoute } from 'nuxt/app';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 
@@ -31,9 +30,7 @@ const {
   loading: serverRulesLoading,
   error: serverRulesError,
   result: serverRulesResult,
-} = useQuery(GET_SERVER_RULES, {
-  serverName: config.serverName,
-});
+} = useQuery(GET_SERVER_RULES);
 
 const {
   loading: channelRulesLoading,
@@ -43,21 +40,7 @@ const {
   uniqueName: forumId.value,
 }));
 
-const getRules = (rulesJSON: string): RuleOption[] => {
-  const rules: RuleOption[] = [];
-  try {
-    const rulesArray = JSON.parse(rulesJSON) || [];
-    for (const rule of rulesArray) {
-      rules.push({
-        detail: rule.detail,
-        summary: rule.summary,
-      });
-    }
-  } catch (e) {
-    console.error('Error parsing channel rules', e);
-  }
-  return rules;
-};
+
 
 const forumRuleOptions = computed<RuleOption[]>(() => {
   const channel = channelRulesResult.value?.channels?.[0];

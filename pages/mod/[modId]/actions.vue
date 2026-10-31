@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
-import { GET_MOD_CONTRIBUTIONS } from '@/graphQLData/mod/queries';
+import { GetModContributionsDocument as GET_MOD_CONTRIBUTIONS } from '@/__generated__/operations';
 import {
   getModActivityLinks,
   type ModActivityLinkInput,

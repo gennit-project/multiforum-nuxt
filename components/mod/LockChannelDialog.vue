@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import GenericModal from '@/components/GenericModal.vue';
 import LockClosedIcon from '@/components/icons/LockClosedIcon.vue';
-import { LOCK_CHANNEL } from '@/graphQLData/channel/mutations';
+import { LockChannelDocument as LOCK_CHANNEL } from '@/__generated__/operations';
 
 const props = defineProps<{
   channelUniqueName: string;

@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
 import { config } from '@/config';
-import { GET_SERVER_SUSPENDED_USERS } from '@/graphQLData/admin/queries';
+import { GetServerSuspendedUsersDocument as GET_SERVER_SUSPENDED_USERS } from '@/__generated__/operations';
 
 const { result, loading, error } = useQuery(
   GET_SERVER_SUSPENDED_USERS,
@@ -39,7 +39,7 @@ const humanReadableDate = (dateISO?: string | null): string => {
     <div
       v-else-if="
         result?.serverConfigs?.length === 0 ||
-        result.serverConfigs[0]?.SuspendedUsers?.length === 0
+        result?.serverConfigs[0]?.SuspendedUsers?.length === 0
       "
       class="text-sm"
     >

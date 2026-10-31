@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
+import type { IssueListItem, IssueSummary, IssueActivity } from '@/types/Issue';
+import type { GetModIssuesQuery } from '@/__generated__/operations';
+
 import { DateTime } from 'luxon';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import DotCircleIcon from '@/components/icons/DotCircleIcon.vue';
@@ -8,12 +10,9 @@ import FlagIcon from '@/components/icons/FlagIcon.vue';
 import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
 import TagComponent from '@/components/TagComponent.vue';
 
-// Client-only fields the list view denormalizes onto the issue before passing
-// it in; they are not part of the generated GraphQL Issue schema.
-type Issue = GeneratedIssue & {
-  channelIconURL?: string | null;
-  reportCount?: number | null;
-};
+// List producers intentionally select different author/channel metadata.
+type ModIssue = GetModIssuesQuery['moderationProfiles'][number]['AuthoredIssues'][number];
+type Issue = Pick<IssueListItem, 'id' | 'issueNumber' | 'title' | 'createdAt' | 'isOpen'> & Partial<IssueListItem> & { Author?: IssueSummary['Author'] | ModIssue['Author'] } & Partial<Pick<ModIssue, 'Channel'>> & Partial<Pick<IssueActivity, 'ActivityFeedConnection'>>;
 
 const props = defineProps({
   issue: {
@@ -47,11 +46,11 @@ const issueAuthorName = (issue: Issue) => {
     return issue.authorName;
   }
 
-  if (issue.Author?.__typename === 'ModerationProfile') {
+  if (issue.Author && 'displayName' in issue.Author) {
     return issue.Author.displayName || '[Deleted]';
   }
 
-  if (issue.Author?.__typename === 'User') {
+  if (issue.Author && 'username' in issue.Author) {
     return issue.Author.username || '[Deleted]';
   }
 
@@ -104,7 +103,7 @@ const relatedChannels = computed(() => {
       {
         uniqueName,
         iconURL:
-          props.issue.Channel?.channelIconURL || props.issue.channelIconURL || '',
+          props.issue.channelIconURL || '',
       },
     ];
   }

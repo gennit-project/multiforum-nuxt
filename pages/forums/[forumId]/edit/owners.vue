@@ -3,41 +3,9 @@ import PendingForumOwnerList from '@/components/channel/form/PendingForumOwnerLi
 import ForumOwnerList from '@/components/channel/form/ForumOwnerList.vue';
 import { ref, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import {
-  INVITE_FORUM_OWNER,
-  CANCEL_INVITE_FORUM_OWNER,
-  REMOVE_FORUM_OWNER,
-} from '@/graphQLData/mod/mutations';
+import { InviteForumOwnerDocument as INVITE_FORUM_OWNER, CancelInviteForumOwnerDocument as CANCEL_INVITE_FORUM_OWNER, RemoveForumOwnerDocument as REMOVE_FORUM_OWNER, GetPendingChannelOwnersByChannelDocument as GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL, GetChannelOwnersByChannelDocument as GET_CHANNEL_OWNERS_BY_CHANNEL  } from '@/__generated__/operations';
 import { useRoute } from 'nuxt/app';
-import {
-  GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-  GET_CHANNEL_OWNERS_BY_CHANNEL,
-} from '@/graphQLData/mod/queries';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-
-// Cache query result types
-interface PendingOwnerInvite {
-  username?: string;
-}
-
-interface ChannelOwner {
-  username: string;
-  displayName?: string;
-}
-
-interface ChannelData {
-  PendingOwnerInvites?: PendingOwnerInvite[];
-  Admins?: ChannelOwner[];
-  [key: string]: unknown;
-}
-
-interface PendingOwnersQueryResult {
-  channels?: ChannelData[];
-}
-
-interface OwnersQueryResult {
-  channels?: Array<{ Admins?: ChannelOwner[] }>;
-}
 
 const route = useRoute();
 
@@ -55,122 +23,36 @@ const {
   error: inviteOwnerError,
   mutate: inviteOwner,
   onDone: inviteOwnerDone,
-} = useMutation(INVITE_FORUM_OWNER, {
-  update: (cache) => {
-    // update the result of GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL
-    // to add the newly invited user
-
-    const existingData = cache.readQuery({
-      query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-    }) as PendingOwnersQueryResult | null;
-
-    const existingInvites =
-      existingData?.channels?.[0]?.PendingOwnerInvites ?? [];
-
-    cache.writeQuery({
-      query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-      data: {
-        channels: [
-          {
-            ...(existingData?.channels?.[0] ?? {}),
-            PendingOwnerInvites: [
-              ...existingInvites,
-              {
-                username: newOwnerUsername.value,
-              },
-            ],
-          },
-        ],
-      },
-    });
-  },
-});
+} = useMutation(INVITE_FORUM_OWNER, () => ({
+  // The boolean mutation response cannot populate a selected user/mod row.
+  // Refetch the captured forum instead of fabricating an incomplete cache entry.
+  refetchQueries: [{ query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL, variables: { channelUniqueName: forumId.value } }],
+  awaitRefetchQueries: true,
+}));
 
 const {
   mutate: cancelInviteOwner,
   loading: cancelInviteOwnerLoading,
   error: cancelInviteOwnerError,
   onDone: cancelInviteOwnerDone,
-} = useMutation(CANCEL_INVITE_FORUM_OWNER, {
-  update: (cache) => {
-    // update the result of GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL
-    // to remove the cancelled invite
-
-    const existingData = cache.readQuery({
-      query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-    }) as PendingOwnersQueryResult | null;
-
-    const existingInvites =
-      existingData?.channels?.[0]?.PendingOwnerInvites ?? [];
-
-    cache.writeQuery({
-      query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-      data: {
-        channels: [
-          {
-            PendingOwnerInvites: [
-              ...existingInvites.filter(
-                (invite: PendingOwnerInvite) =>
-                  invite.username !== newOwnerUsername.value
-              ),
-            ],
-          },
-        ],
-      },
-    });
-  },
-});
+} = useMutation(CANCEL_INVITE_FORUM_OWNER, () => ({
+  // The boolean mutation response cannot populate a selected user/mod row.
+  // Refetch the captured forum instead of fabricating an incomplete cache entry.
+  refetchQueries: [{ query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL, variables: { channelUniqueName: forumId.value } }],
+  awaitRefetchQueries: true,
+}));
 
 const {
   mutate: removeForumOwner,
   loading: removeForumOwnerLoading,
   onDone: removeForumOwnerDone,
   error: removeForumOwnerError,
-} = useMutation(REMOVE_FORUM_OWNER, {
-  update: (cache) => {
-    // update the result of GET_CHANNEL_OWNERS_BY_CHANNEL
-    // to remove the removed user
-
-    const existingData = cache.readQuery({
-      query: GET_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-    }) as OwnersQueryResult | null;
-
-    const existingOwners = existingData?.channels?.[0]?.Admins ?? [];
-
-    cache.writeQuery({
-      query: GET_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-      data: {
-        channels: [
-          {
-            Admins: [
-              ...existingOwners.filter(
-                (owner: ChannelOwner) => owner.username !== newOwnerUsername.value
-              ),
-            ],
-          },
-        ],
-      },
-    });
-  },
-});
+} = useMutation(REMOVE_FORUM_OWNER, () => ({
+  // The boolean mutation response cannot populate a selected user/mod row.
+  // Refetch the captured forum instead of fabricating an incomplete cache entry.
+  refetchQueries: [{ query: GET_CHANNEL_OWNERS_BY_CHANNEL, variables: { channelUniqueName: forumId.value } }],
+  awaitRefetchQueries: true,
+}));
 
 inviteOwnerDone(() => {
   newOwnerUsername.value = '';

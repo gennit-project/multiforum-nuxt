@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GET_PENDING_CHANNEL_MODS_BY_CHANNEL } from '@/graphQLData/mod/queries';
+import { GetPendingChannelModsByChannelDocument as GET_PENDING_CHANNEL_MODS_BY_CHANNEL } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 
@@ -34,7 +34,7 @@ defineEmits(['click-cancel-invite']);
     <div
       v-else-if="
         result?.channels?.length === 0 ||
-        result.channels[0]?.PendingModInvites?.length === 0
+        result?.channels[0]?.PendingModInvites?.length === 0
       "
       class="text-sm"
     >
@@ -52,16 +52,12 @@ defineEmits(['click-cancel-invite']);
         >
           <AvatarComponent
             :text="invite.username"
-            :src="invite.profilePicURL ?? ''"
             class="mr-2 h-6 w-6"
           />
           <UsernameWithTooltip
             v-if="invite.username"
             :username="invite.username"
-            :src="invite.profilePicURL ?? ''"
             :display-name="invite.displayName ?? ''"
-            :comment-karma="invite.commentKarma ?? 0"
-            :discussion-karma="invite.discussionKarma ?? 0"
             :account-created="invite.createdAt ?? ''"
           />
         </nuxt-link>

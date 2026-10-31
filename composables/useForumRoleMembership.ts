@@ -8,7 +8,8 @@ import {
   type Ref,
 } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_MODS_BY_CHANNEL } from '@/graphQLData/mod/queries';
+import { GetModsByChannelSource31c1e8fd16Document as GET_MODS_BY_CHANNEL } from '@/__generated__/operations';
+
 
 type ForumRoleMembership = {
   forumAdminUsernames: ComputedRef<string[]>;
@@ -58,7 +59,7 @@ export const createForumRoleMembership = (
     return (
       result.value?.channels?.[0]?.Moderators?.map(
         (moderator: { displayName?: string | null }) => moderator.displayName
-      ).filter(Boolean) || []
+      ).filter((value): value is string => typeof value === 'string' && value.length > 0) || []
     );
   });
 

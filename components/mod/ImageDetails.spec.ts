@@ -183,7 +183,7 @@ describe('ImageDetails content', () => {
     );
   });
 
-  it('links the album context discussion', () => {
+  it('does not infer album context absent from the selected query', () => {
     h.result = ref({
       images: [
         image({
@@ -201,7 +201,7 @@ describe('ImageDetails content', () => {
     });
     const wrapper = mountDetails();
 
-    expect(wrapper.text()).toContain('Cat thread');
+    expect(wrapper.text()).not.toContain('Cat thread');
   });
 });
 

@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, watch, ref } from 'vue';
+import type { ServerRoleUpdateInput, ModServerRoleUpdateInput } from '@/__generated__/graphql';
 import { useMutation } from '@vue/apollo-composable';
-import {
-  UPDATE_MOD_SERVER_ROLE,
-  UPDATE_SERVER_ROLE,
-} from '@/graphQLData/admin/mutations';
+import { UpdateModServerRoleDocument as UPDATE_MOD_SERVER_ROLE, UpdateServerRoleDocument as UPDATE_SERVER_ROLE } from '@/__generated__/operations';
 import PermissionsList from '@/components/admin/PermissionsList.vue';
 import GenericModal from '@/components/GenericModal.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
@@ -19,7 +17,7 @@ interface RoleDefinition {
   key: string;
   label: string;
   type: 'server' | 'mod';
-  permissions: string[];
+  permissions: readonly string[];
   node: RoleNode | null | undefined;
 }
 
@@ -66,7 +64,7 @@ const serverPermissionKeys = [
   'canUpvoteComment',
   'canUploadFile',
   'canGiveFeedback',
-];
+] as const;
 
 const modPermissionKeys = [
   'canHideComment',
@@ -81,7 +79,7 @@ const modPermissionKeys = [
   'canReport',
   'canSuspendUser',
   'canLockChannel',
-];
+] as const;
 
 const roleState = reactive<Record<string, RoleState>>({});
 const editingRoleKey = ref<string | null>(null);
@@ -224,18 +222,22 @@ const closeModal = () => {
 
 const saveRole = async () => {
   const def = editingDefinition.value;
-  if (!def?.node) return;
+  if (!def?.node?.name) return;
   const state = ensureRoleState(def);
   try {
     const input = {
-      name: state.name,
-      description: state.description,
-      ...state.values,
+      name: { set: state.name },
+      description: { set: state.description },
+
     };
     if (def.type === 'server') {
-      await updateServerRole({ name: def.node.name, input });
+      const update: ServerRoleUpdateInput = { ...input };
+      for (const key of serverPermissionKeys) update[key] = { set: !!state.values[key] };
+      await updateServerRole({ name: def.node.name, input: update });
     } else {
-      await updateModRole({ name: def.node.name, input });
+      const update: ModServerRoleUpdateInput = { ...input };
+      for (const key of modPermissionKeys) update[key] = { set: !!state.values[key] };
+      await updateModRole({ name: def.node.name, input: update });
     }
     roleState[def.key] = {
       name: state.name,

@@ -1,3 +1,4 @@
+import { print } from 'graphql';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -24,7 +25,7 @@ vi.mock('@/config', () => ({
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (fn: any) => {
-    const source = fn?.loc?.source?.body || '';
+    const source = fn ? print(fn) : '';
     let mutateFn = inviteServerAdmin;
     let errorRef = mockAdminError;
     if (source.includes('CancelInviteServerAdmin'))

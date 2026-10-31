@@ -9,16 +9,8 @@ import PencilIcon from '@/components/icons/PencilIcon.vue';
 import ButtonContent from '@/components/ButtonContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import type { PropType } from 'vue';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
-import { GET_EVENT } from '@/graphQLData/event/queries';
-import { GET_COMMENT } from '@/graphQLData/comment/queries';
-import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
-import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
-import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
-import {
-  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
-  UPDATE_ISSUE,
-} from '@/graphQLData/issue/mutations';
+import { GetDiscussionDocument as GET_DISCUSSION, GetEventDocument as GET_EVENT , GetCommentDocument as GET_COMMENT , UpdateCommentDocument as UPDATE_COMMENT , UpdateDiscussionDocument as UPDATE_DISCUSSION , UpdateEventsDocument as UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS , AddIssueActivityFeedItemWithCommentAsModDocument as ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD, UpdateIssueDocument as UPDATE_ISSUE  } from '@/__generated__/operations';
+
 import { useModProfileName } from '@/composables/useAuthState';
 
 const modProfileNameVar = useModProfileName();
@@ -233,10 +225,10 @@ const saveEdits = async () => {
   if (props.targetType === 'comment') {
     await updateComment({
       updateCommentInput: {
-        text: bodyValue.value,
-        editReason: editDetails,
+        text: { set: bodyValue.value },
+        editReason: { set: editDetails },
       },
-      commentWhere: { id: props.commentId },
+      commentWhere: { id: { eq: props.commentId } },
     });
     if (updateCommentError.value) return;
   } else if (
@@ -246,18 +238,18 @@ const saveEdits = async () => {
     await updateDiscussion({
       where: { id: { eq: props.discussionId } },
       updateDiscussionInput: {
-        title: titleValue.value,
-        body: bodyValue.value,
-        editReason: editDetails,
+        title: { set: titleValue.value },
+        body: { set: bodyValue.value },
+        editReason: { set: editDetails },
       },
     });
     if (updateDiscussionError.value) return;
   } else if (props.targetType === 'event') {
     await updateEvent({
       updateEventInput: {
-        title: titleValue.value,
-        description: bodyValue.value,
-        editReason: editDetails,
+        title: { set: titleValue.value },
+        description: { set: bodyValue.value },
+        editReason: { set: editDetails },
       },
       where: { id: { eq: props.eventId } },
       channelConnections: [],
@@ -281,8 +273,8 @@ const saveEdits = async () => {
     if (addFeedItemError.value) return;
   } else {
     await updateIssue({
-      issueWhere: { id: props.issueId },
-      updateIssueInput: { flaggedServerRuleViolation: true },
+      issueWhere: { id: { eq: props.issueId } },
+      updateIssueInput: { flaggedServerRuleViolation: { set: true } },
     });
     if (updateIssueError.value) return;
   }

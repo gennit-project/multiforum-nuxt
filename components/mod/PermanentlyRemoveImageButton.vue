@@ -5,8 +5,8 @@ import GenericModal from '@/components/GenericModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import TrashIcon from '@/components/icons/TrashIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
-import { PERMANENTLY_REMOVE_IMAGE } from '@/graphQLData/issue/mutations';
-import { GET_ISSUE } from '@/graphQLData/issue/queries';
+import { PermanentlyRemoveImageDocument as PERMANENTLY_REMOVE_IMAGE, GetIssueDocument as GET_ISSUE  } from '@/__generated__/operations';
+
 
 const props = defineProps({
   imageId: {

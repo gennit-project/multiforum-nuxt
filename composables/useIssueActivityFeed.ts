@@ -1,38 +1,17 @@
 import { computed, ref } from 'vue';
-import { useMutation } from '@vue/apollo-composable';
+import { useMutation, type UseQueryReturn } from '@vue/apollo-composable';
 import type { ComputedRef, Ref } from 'vue';
-import type { ApolloCache, NormalizedCacheObject } from '@apollo/client/core';
-import { GET_ISSUE_ACTIVITY } from '@/graphQLData/issue/queries';
-import {
-  ADD_ISSUE_ACTIVITY_FEED_ITEM,
-  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
-  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER,
-} from '@/graphQLData/issue/mutations';
-import type { Issue, ModerationAction } from '@/__generated__/graphql';
+import type { ApolloCache, NormalizedCacheObject, FetchResult } from '@apollo/client/core';
+import { GetIssueActivityDocument as GET_ISSUE_ACTIVITY, AddIssueActivityFeedItemDocument as ADD_ISSUE_ACTIVITY_FEED_ITEM, AddIssueActivityFeedItemWithCommentAsModDocument as ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD, AddIssueActivityFeedItemWithCommentAsUserDocument as ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER  } from '@/__generated__/operations';
+import type { IssueView as Issue, IssueActivityItem as ModerationAction } from '@/types/Issue';
+
+import type { GetIssueActivityQuery, GetIssueActivityQueryVariables, AddIssueActivityFeedItemMutation } from '@/__generated__/operations';
 
 const DEFAULT_ACTIVITY_FEED_PAGE_SIZE = 10;
 
-type IssueFeedData = { issues?: Issue[] | null };
-
-// Narrow views of the Apollo query handles the pagination needs. Typed loosely
-// enough that GET_ISSUE_ACTIVITY's inferred handles assign cleanly while still
-// describing the shape the merge logic relies on.
-export type FetchMoreIssue = (options: {
-  variables: {
-    channelUniqueName: string;
-    issueNumber: number | null;
-    activityFeedLimit: number;
-    activityFeedOffset: number;
-  };
-  updateQuery: (
-    previousResult: { issues: Issue[] },
-    options: { fetchMoreResult?: { issues?: Issue[] } | null }
-  ) => { issues: Issue[] };
-}) => Promise<{ data?: IssueFeedData } | null | undefined> | undefined;
-
-type OnIssueResult = (
-  cb: (result: { data?: IssueFeedData | null }) => void
-) => unknown;
+type ActivityQuery = UseQueryReturn<GetIssueActivityQuery, GetIssueActivityQueryVariables>;
+export type FetchMoreIssue = ActivityQuery['fetchMore'];
+type OnIssueResult = ActivityQuery['onResult'];
 
 type UseIssueActivityFeedParams = {
   channelId: Ref<string>;
@@ -86,17 +65,20 @@ export function useIssueActivityFeed({
     }
 
     const previousCount = activityFeedItems.value.length;
+    const requestedIssue = activeIssue?.value?.id;
+    const requestedChannel = channelId.value;
+    const requestedNumber = issueNumber?.value;
     const result = await fetchMoreIssue({
       variables: {
         channelUniqueName: channelId.value,
-        issueNumber: issueNumber?.value ?? null,
+        issueNumber: issueNumber?.value ?? 0,
         activityFeedLimit: pageSize,
         activityFeedOffset: previousCount,
       },
       updateQuery: (previousResult, { fetchMoreResult }) => {
         const prevIssue = previousResult.issues?.[0];
         const nextIssue = fetchMoreResult?.issues?.[0];
-        if (!prevIssue || !nextIssue) {
+        if (!prevIssue || !nextIssue || prevIssue.id !== nextIssue.id || requestedIssue !== activeIssue?.value?.id || requestedChannel !== channelId.value || requestedNumber !== issueNumber?.value) {
           return previousResult;
         }
 
@@ -108,13 +90,14 @@ export function useIssueActivityFeed({
           issues: [
             {
               ...prevIssue,
-              ActivityFeed: [...prevFeed, ...nextFeed],
+              ActivityFeed: [...new Map([...prevFeed, ...nextFeed].map((item) => [item.id, item])).values()],
             },
           ],
         };
       },
     });
 
+    if (requestedIssue !== activeIssue?.value?.id || requestedChannel !== channelId.value || requestedNumber !== issueNumber?.value) return;
     const newCount =
       result?.data?.issues?.[0]?.ActivityFeed?.length ?? previousCount;
     lastActivityFeedBatchSize.value = Math.max(newCount - previousCount, 0);
@@ -128,17 +111,17 @@ export function useIssueActivityFeed({
   const createCacheUpdater = () => ({
     update: (
       cache: ApolloCache<NormalizedCacheObject>,
-      { data }: { data?: { updateIssues?: { issues: Issue[] } } | null }
+      { data }: FetchResult<AddIssueActivityFeedItemMutation>
     ) => {
-      if (!data?.updateIssues?.issues) return;
+      if (!data?.addIssueActivityFeedItem?.issues) return;
 
-      const { issues } = data.updateIssues;
-      const updatedIssue = issues[0] as Issue | undefined;
+      const { issues } = data.addIssueActivityFeedItem;
+      const updatedIssue = issues[0];
       if (!updatedIssue) return;
 
       // Attempt to read the existing issues from the cache
-      const variables: Record<string, unknown> = {
-        channelUniqueName: updatedIssue.channelUniqueName || channelId.value,
+      const variables: GetIssueActivityQueryVariables = {
+        channelUniqueName: updatedIssue.channelUniqueName || '',
         issueNumber: updatedIssue.issueNumber,
       };
 
@@ -147,16 +130,16 @@ export function useIssueActivityFeed({
         variables.activityFeedOffset = 0;
       }
 
-      const existingIssueData = cache.readQuery<{ issues: Issue[] }>({
+      const existingIssueData = cache.readQuery({
         query: GET_ISSUE_ACTIVITY,
         variables,
       });
 
       if (existingIssueData?.issues && existingIssueData.issues.length > 0) {
-        const existingIssues: Issue[] = existingIssueData.issues;
+        const existingIssues = existingIssueData.issues;
 
         const newIssues = existingIssues.map((issue) =>
-          issue.id === updatedIssue.id ? updatedIssue : issue
+          issue.id === updatedIssue.id ? { ...issue, ActivityFeed: updatedIssue.ActivityFeed, ActivityFeedConnection: updatedIssue.ActivityFeedConnection } : issue
         );
 
         cache.writeQuery({

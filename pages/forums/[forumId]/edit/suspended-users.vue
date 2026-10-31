@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_SUSPENDED_USERS_IN_CHANNEL } from '@/graphQLData/mod/queries';
+import { GetChannelSource26d7fbbb05Document as GET_SUSPENDED_USERS_IN_CHANNEL } from '@/__generated__/operations';
 import { DateTime } from 'luxon';
 
 const route = useRoute();
@@ -33,7 +33,8 @@ const aggregateCount = computed(() => {
   );
 });
 
-const humanReadableDate = (dateISO: string): string => {
+const humanReadableDate = (dateISO: string | null | undefined): string => {
+  if (!dateISO) return "Unknown";
   return DateTime.fromISO(dateISO).toLocaleString(DateTime.DATETIME_MED);
 };
 </script>
@@ -72,7 +73,7 @@ const humanReadableDate = (dateISO: string): string => {
       <div v-if="suspendedUsers.length > 0" class="flex-col text-sm">
         <div
           v-for="user in suspendedUsers"
-          :key="user.username"
+          :key="user.id"
           class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           <div class="w-full flex-col">
@@ -86,16 +87,11 @@ const humanReadableDate = (dateISO: string): string => {
               >
                 <AvatarComponent
                   :text="user.username"
-                  :src="user.profilePicURL ?? ''"
                   class="mr-2 h-6 w-6"
                 />
                 <UsernameWithTooltip
                   v-if="user.username"
                   :username="user.username"
-                  :src="user.profilePicURL ?? ''"
-                  :display-name="user.displayName ?? ''"
-                  :comment-karma="user.commentKarma ?? 0"
-                  :discussion-karma="user.discussionKarma ?? 0"
                   :account-created="user.createdAt ?? ''"
                 />
               </nuxt-link>

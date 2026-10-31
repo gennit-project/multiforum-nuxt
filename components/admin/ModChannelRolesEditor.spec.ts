@@ -91,7 +91,7 @@ describe('ModChannelRolesEditor', () => {
     await nextTick();
     expect(mutateSpy).toHaveBeenCalledWith({
       name: 'BasicModRole',
-      input: { canEditComments: true },
+      input: { canEditComments: { set: true } },
     });
   });
 

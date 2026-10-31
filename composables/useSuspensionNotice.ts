@@ -1,9 +1,6 @@
 import { computed, type Ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import {
-  GET_USER_ACTIVE_SUSPENSIONS,
-  GET_USER_SUSPENSION_IN_CHANNEL,
-} from '@/graphQLData/user/queries';
+import { GetUserActiveSuspensionsDocument as GET_USER_ACTIVE_SUSPENSIONS, GetUserSuspensionInChannelDocument as GET_USER_SUSPENSION_IN_CHANNEL } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 
 type ChannelSuspension = {

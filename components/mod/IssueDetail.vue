@@ -1,18 +1,13 @@
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_ISSUE, GET_ISSUE_ACTIVITY } from '@/graphQLData/issue/queries';
-import { GET_ISSUE_RELATED_DISCUSSION } from '@/graphQLData/discussion/queries';
-import { GET_EVENT } from '@/graphQLData/event/queries';
-import { GET_COMMENT } from '@/graphQLData/comment/queries';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GetIssueDocument as GET_ISSUE, GetIssueActivityDocument as GET_ISSUE_ACTIVITY , GetIssueRelatedDiscussionDocument as GET_ISSUE_RELATED_DISCUSSION , GetEventDocument as GET_EVENT , GetCommentDocument as GET_COMMENT , GetChannelDocument as GET_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG  } from '@/__generated__/operations';
+
+
+
 import { DateTime } from 'luxon';
-import type {
-  EventChannel,
-  DiscussionChannel,
-  Issue,
-} from '@/__generated__/graphql';
+import type { EventChannel, DiscussionChannel } from '@/__generated__/graphql';
+import type { IssueView as Issue } from '@/types/Issue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
 import PageNotFound from '@/components/PageNotFound.vue';
@@ -38,7 +33,7 @@ import { useIssueOriginalPoster } from '@/composables/useIssueOriginalPoster';
 import { useIssueCloseReopen } from '@/composables/useIssueCloseReopen';
 import {
   useIssueActivityFeed,
-  type FetchMoreIssue,
+  
 } from '@/composables/useIssueActivityFeed';
 import { useIssueLock } from '@/composables/useIssueLock';
 import { useIssueBodyEdit } from '@/composables/useIssueBodyEdit';
@@ -109,7 +104,7 @@ const {
   GET_ISSUE,
   () => ({
     channelUniqueName: channelId.value,
-    issueNumber: issueNumber.value,
+    issueNumber: issueNumber.value ?? 0,
   }),
   () => ({
     enabled: issueNumber.value !== null,
@@ -129,7 +124,7 @@ const {
   GET_ISSUE_ACTIVITY,
   () => ({
     channelUniqueName: channelId.value,
-    issueNumber: issueNumber.value,
+    issueNumber: issueNumber.value ?? 0,
     activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE,
     activityFeedOffset: 0,
   }),
@@ -173,8 +168,8 @@ const activeIssue = computed<Issue | null>(() => {
   return {
     ...issueSummary,
     ActivityFeed: issueActivity?.ActivityFeed ?? [],
-    ActivityFeedAggregate: issueActivity?.ActivityFeedAggregate,
-  } as Issue;
+    ActivityFeedConnection: issueActivity?.ActivityFeedConnection,
+  };
 });
 
 const activeIssueId = computed(() => activeIssue.value?.id || '');
@@ -323,7 +318,7 @@ const {
   getIssueLoading: getIssueActivityLoading,
   // Apollo's fetchMore is generic over its data/variables; narrow it to the
   // composable's concrete merge shape (variables + updateQuery are identical).
-  fetchMoreIssue: fetchMoreIssue as unknown as FetchMoreIssue,
+  fetchMoreIssue,
   refetchIssue: refetchIssueActivity,
   onIssueResult,
 });
@@ -412,22 +407,17 @@ const extractChannelUniqueNames = (
 
 const issueContextChannels = computed<string[]>(() => {
   const discussionChannels = extractChannelUniqueNames(
-    relatedDiscussion.value?.DiscussionChannels as
-      DiscussionChannel[] | null | undefined
+    relatedDiscussion.value?.DiscussionChannels
   );
   if (discussionChannels.length > 0) {
     return [...new Set(discussionChannels)];
   }
 
   const eventChannels = extractChannelUniqueNames(
-    relatedEvent.value?.EventChannels as EventChannel[] | null | undefined
+    relatedEvent.value?.EventChannels 
   );
   if (eventChannels.length > 0) {
     return [...new Set(eventChannels)];
-  }
-
-  if (activeIssue.value?.Channel?.uniqueName) {
-    return [activeIssue.value.Channel.uniqueName];
   }
 
   if (activeIssue.value?.channelUniqueName) {
@@ -722,7 +712,7 @@ const handleLockReasonUpdate = (value: string) => {
                 :can-edit-discussions="modPermissions.canEditDiscussions"
                 :can-edit-events="modPermissions.canEditEvents"
                 :related-discussion-has-download="
-                  relatedDiscussion?.hasDownload ?? null
+                  relatedDiscussion?.hasDownload ?? false
                 "
                 :report-count="reportCount ?? undefined"
                 :is-author-bot="isAuthorBot"

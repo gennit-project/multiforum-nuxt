@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import 'md-editor-v3/lib/style.css';
-import { GET_MOD } from '@/graphQLData/mod/queries';
+import { GetModDocument as GET_MOD } from '@/__generated__/operations';
 import { relativeTime } from '@/utils';
 import type { ServerRoleBadge } from '@/utils/serverRoleBadges';
 import { useRoute } from 'nuxt/app';

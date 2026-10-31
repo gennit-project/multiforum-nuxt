@@ -1,12 +1,12 @@
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import type { Ref, ComputedRef } from 'vue';
-import { LOCK_ISSUE, UNLOCK_ISSUE } from '@/graphQLData/issue/mutations';
-import type { Issue } from '@/__generated__/graphql';
+import { LockIssueDocument as LOCK_ISSUE, UnlockIssueDocument as UNLOCK_ISSUE } from '@/__generated__/operations';
+import type { IssueView as Issue } from '@/types/Issue';
 
 type UseIssueLockParams = {
   activeIssueId: Ref<string> | ComputedRef<string>;
-  activeIssue: Ref<Issue | null> | ComputedRef<Issue | null>;
+  activeIssue: Ref<Pick<Issue, 'id'> | null> | ComputedRef<Pick<Issue, 'id'> | null>;
   isSuspendedMod: Ref<boolean> | ComputedRef<boolean | undefined>;
   refetchIssue: () => Promise<unknown> | undefined;
 };

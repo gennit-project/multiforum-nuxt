@@ -4,10 +4,7 @@ import { mount } from '@vue/test-utils';
 
 import SuspendUserButton from '@/components/mod/SuspendUserButton.vue';
 import type { Issue } from '@/__generated__/graphql';
-import {
-  GET_DISCUSSION_CHANNEL,
-  GET_EVENT_CHANNEL,
-} from '@/graphQLData/mod/queries';
+import { GetDiscussionChannelIdDocument as GET_DISCUSSION_CHANNEL, GetEventChannelIdDocument as GET_EVENT_CHANNEL } from '@/__generated__/operations';
 
 const h = vi.hoisted(() => ({
   result: null as unknown,

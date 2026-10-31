@@ -6,13 +6,9 @@ import UserMinus from '../icons/UserMinus.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useQuery } from '@vue/apollo-composable';
-import {
-  GET_DISCUSSION_CHANNEL,
-  GET_EVENT_CHANNEL,
-  IS_ORIGINAL_POSTER_SUSPENDED,
-} from '@/graphQLData/mod/queries';
+import { GetDiscussionChannelIdDocument as GET_DISCUSSION_CHANNEL, GetEventChannelIdDocument as GET_EVENT_CHANNEL, GetSuspensionDocument as IS_ORIGINAL_POSTER_SUSPENDED } from '@/__generated__/operations';
 import UnsuspendUserModal from '@/components/mod/UnsuspendUserModal.vue';
-import type { Issue } from '@/__generated__/graphql';
+import type { IssueView as Issue } from '@/types/Issue';
 import { useSuspensionActionUI } from '@/composables/useSuspensionActionUI';
 
 const props = defineProps({

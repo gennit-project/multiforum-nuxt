@@ -1,11 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
+import type { IssueRelatedDiscussion as Discussion, IssueView as Issue, ActivityPresentation as ModerationAction  } from '@/types/Issue';
 import { useRoute } from 'nuxt/app';
-import type {
-  Discussion,
-  Issue,
-  ModerationAction,
-} from '@/__generated__/graphql';
+
 import ActivityFeedListItem from './ActivityFeedListItem.vue';
 import { ActionType } from '@/types/Comment';
 
@@ -95,9 +92,8 @@ const getNextRevisionBody = (currentIndex: number): string | null => {
   const items = reversedFeedItems.value;
   // Look for the next item (later in time) that has a Revision
   for (let i = currentIndex + 1; i < items.length; i++) {
-    const item = items[i] as ModerationAction & {
-      Revision?: { body?: string };
-    };
+    const item = items[i];
+    if (!item) continue;
     if (item.Revision?.body) {
       return item.Revision.body;
     }
@@ -109,9 +105,8 @@ const getNextRevisionBody = (currentIndex: number): string | null => {
 const getNextBodyRevisionForIndex = (currentIndex: number): string | null => {
   const items = reversedFeedItems.value;
   for (let i = currentIndex + 1; i < items.length; i++) {
-    const item = items[i] as ModerationAction & {
-      Revision?: { body?: string };
-    };
+    const item = items[i];
+    if (!item) continue;
     if (!isDiscussionBodyEdit(item)) {
       continue;
     }
@@ -126,9 +121,8 @@ const getNextBodyRevisionForIndex = (currentIndex: number): string | null => {
 // This is used to get the correct old/new versions from the comment's PastVersions
 const getCommentEditIndex = (currentIndex: number): number | null => {
   const items = reversedFeedItems.value;
-  const currentItem = items[currentIndex] as ModerationAction & {
-    Comment?: { PastVersions?: Array<{ id: string }> };
-  };
+  const currentItem = items[currentIndex];
+  if (!currentItem) return null;
 
   // Only applies to Edit actions with a Comment that has PastVersions
   if (
@@ -142,9 +136,8 @@ const getCommentEditIndex = (currentIndex: number): number | null => {
   // in the reversed list (which is chronological order)
   let editIndex = 0;
   for (let i = currentIndex + 1; i < items.length; i++) {
-    const item = items[i] as ModerationAction & {
-      Comment?: { id: string };
-    };
+    const item = items[i];
+    if (!item) continue;
     // Count edits on the same comment
     if (
       isEditAction(item.actionType) &&

@@ -50,6 +50,7 @@ describe('mod profile comments page', () => {
     const wrapper = mount(ModCommentsPage, {
       global: {
         stubs: {
+          HydratedProfileComment: { props: ['comment'], template: '<slot :comment-data="comment" />' },
           ErrorBanner: true,
           LoadMore: true,
           Notification: true,

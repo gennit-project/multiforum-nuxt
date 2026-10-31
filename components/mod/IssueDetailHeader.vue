@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Issue } from '@/__generated__/graphql';
+import type { IssueView as Issue } from '@/types/Issue';
 import GenericButton from '@/components/GenericButton.vue';
 import ArrowPathIcon from '@/components/icons/ArrowPath.vue';
 import BellIcon from '@/components/icons/BellIcon.vue';
