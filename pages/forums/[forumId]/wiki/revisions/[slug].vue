@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
-import { GET_WIKI_PAGE } from '@/graphQLData/channel/queries';
+import { GetWikiPageDocument as GET_WIKI_PAGE } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import { timeAgo } from '@/utils';
-import type { WikiPage, TextVersion } from '@/__generated__/graphql';
+import type { WikiRevisionSelection as TextVersion } from '@/types/Wiki';
 import {
   buildSequentialRevisionPairs,
   getRevisionAuthorName,
@@ -14,12 +14,15 @@ import {
 } from '@/utils/revisionHistory';
 
 type WikiRevisionData = RevisionPair<TextVersion>;
-type WikiPageWithEditReason = WikiPage & { editReason?: string | null };
 
 const route = useRoute();
 const router = useRouter();
-const forumId = route.params.forumId as string;
-const slug = route.params.slug as string;
+const forumId = computed(() =>
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
+);
+const slug = computed(() =>
+  typeof route.params.slug === 'string' ? route.params.slug : ''
+);
 
 // Query wiki page data for the specific slug
 const {
@@ -28,17 +31,19 @@ const {
   error,
 } = useQuery(
   GET_WIKI_PAGE,
+  () => ({
+    channelUniqueName: forumId.value,
+    slug: slug.value,
+  }),
   {
-    channelUniqueName: forumId,
-    slug: slug,
-  },
-  { errorPolicy: 'all' }
+    errorPolicy: 'all',
+    keepPreviousResult: false,
+    enabled: computed(() => !!forumId.value && !!slug.value),
+  }
 );
 
 // Computed property for the wiki page data
-const wikiPage = computed(
-  () => wikiPageResult.value?.wikiPages?.[0] as WikiPage
-);
+const wikiPage = computed(() => wikiPageResult.value?.wikiPages?.[0]);
 
 // Total number of edits
 const totalEdits = computed(() => {
@@ -59,14 +64,9 @@ const allEdits = computed(() => {
   const currentVersion: TextVersion = {
     id: 'current',
     body: wikiPage.value.body,
-    editReason: (wikiPage.value as WikiPageWithEditReason).editReason,
+    editReason: wikiPage.value.editReason,
     createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
     Author: wikiPage.value.VersionAuthor,
-    AuthorConnection: {
-      edges: [],
-      pageInfo: { hasNextPage: false, hasPreviousPage: false },
-      totalCount: 0,
-    },
   };
 
   return buildSequentialRevisionPairs({
@@ -87,7 +87,7 @@ const getRevisionReason = (edit: WikiRevisionData) => {
 const viewRevisionDiff = (revision: WikiRevisionData) => {
   try {
     router.push(
-      `/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`
+      `/forums/${forumId.value}/wiki/revisions/diff/${slug.value}/${revision.id}`
     );
   } catch (error) {
     console.error('Navigation error:', error);
@@ -96,12 +96,12 @@ const viewRevisionDiff = (revision: WikiRevisionData) => {
 
 // Navigate back to wiki page
 const goBackToWiki = () => {
-  router.push(`/forums/${forumId}/wiki/${slug}`);
+  router.push(`/forums/${forumId.value}/wiki/${slug.value}`);
 };
 
 // SEO metadata setup
 useHead({
-  title: `Revision History - ${wikiPage.value?.title || 'Wiki Page'} | ${forumId}`,
+  title: `Revision History - ${wikiPage.value?.title || 'Wiki Page'} | ${forumId.value}`,
   meta: [
     {
       name: 'description',

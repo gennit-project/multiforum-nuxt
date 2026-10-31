@@ -1,3 +1,4 @@
+import { makeWikiPage } from '@/tests/utils/wikiFixtures';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -41,7 +42,7 @@ vi.mock('nuxt/app', async () => {
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(() => ({
     result: ref({
-      wikiPages: [wikiPageState.wikiPage],
+      wikiPages: [makeWikiPage(wikiPageState.wikiPage)],
       channels: [{ wikiEnabled: true }],
       serverConfigs: [],
     }),
@@ -66,7 +67,12 @@ describe('wiki edit page', () => {
   beforeEach(() => {
     suspension.active = null;
     suspension.issueNumber = null;
-    wikiPageState.wikiPage = { id: 'w1', title: 'Intro', body: 'Hi', locked: false };
+    wikiPageState.wikiPage = {
+      id: 'w1',
+      title: 'Intro',
+      body: 'Hi',
+      locked: false,
+    };
   });
 
   it('renders the title and edit-reason inputs when the page loads', async () => {
@@ -98,8 +104,8 @@ describe('wiki edit page', () => {
     };
     const wrapper = await mountPage();
 
-    expect(wrapper.find('[data-testid="wiki-edit-locked-banner"]').exists()).toBe(
-      true
-    );
+    expect(
+      wrapper.find('[data-testid="wiki-edit-locked-banner"]').exists()
+    ).toBe(true);
   });
 });

@@ -2,13 +2,13 @@
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import type { ServerConfig } from '@/__generated__/graphql';
+import type { ServerSettingsFormValues } from '@/types/ServerSettings';
 import FormRow from '@/components/FormRow.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import {
-  GET_SITE_WIDE_WIKI_LIST,
-  GET_WIKI_PAGES_BY_IDS,
-} from '@/graphQLData/wiki/queries';
+  GetSiteWideWikiListDocument as GET_SITE_WIDE_WIKI_LIST,
+  GetWikiPagesByIdsDocument as GET_WIKI_PAGES_BY_IDS,
+} from '@/__generated__/operations';
 import { getPlainWikiTitle } from '@/utils/wikiTitle';
 
 type WikiPageOption = {
@@ -17,8 +17,6 @@ type WikiPageOption = {
   slug?: string | null;
   channelUniqueName?: string | null;
 };
-
-type ServerSettingsFormValues = Partial<ServerConfig>;
 
 const props = defineProps({
   editMode: {
@@ -57,8 +55,7 @@ const { result: selectedPagesResult } = useQuery(
 );
 
 const selectedPagesById = computed(() => {
-  const pages = (selectedPagesResult.value?.wikiPages ||
-    []) as WikiPageOption[];
+  const pages = selectedPagesResult.value?.wikiPages || [];
   return new Map(pages.map((page) => [page.id, page]));
 });
 
@@ -75,8 +72,7 @@ const selectedPages = computed(() =>
 );
 
 const searchResults = computed(() => {
-  const pages = (searchResult.value?.getSiteWideWikiList?.wikiPages ||
-    []) as WikiPageOption[];
+  const pages = searchResult.value?.getSiteWideWikiList?.wikiPages || [];
   const selected = new Set(selectedIds.value);
   return pages.filter((page) => !selected.has(page.id));
 });

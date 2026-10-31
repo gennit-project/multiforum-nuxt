@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, type PropType } from 'vue';
+import type { RevisionVersionLike } from '@/utils/revisionHistory';
 import GenericModal from '@/components/GenericModal.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
 import PlusMinusIcon from '@/components/icons/PlusMinusIcon.vue';
 import { useMutation } from '@vue/apollo-composable';
-import { DELETE_WIKI_REVISION } from '@/graphQLData/discussion/mutations';
+import { DeleteWikiRevisionDocument as DELETE_WIKI_REVISION } from '@/__generated__/operations';
 
 const props = defineProps({
   open: {
@@ -12,11 +13,11 @@ const props = defineProps({
     required: true,
   },
   oldVersion: {
-    type: Object,
+    type: Object as PropType<RevisionVersionLike>,
     required: true,
   },
   newVersion: {
-    type: Object,
+    type: Object as PropType<RevisionVersionLike>,
     required: true,
   },
   isMostRecent: {

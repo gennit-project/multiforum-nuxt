@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import type { CreateChildWikiPageMutation } from '@/__generated__/operations';
+import { legacyCreateWikiChildVariables } from '@/utils/legacyWikiWrites';
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { GetChannelDocument as GET_CHANNEL } from '@/__generated__/operations';
+// #700/backend #413: pinned WikiPageVersionAuthorFieldInput lacks connect.
+// Preserve existing author attribution until the backend input contract is exposed.
 import { CREATE_CHILD_WIKI_PAGE } from '@/graphQLData/channel/mutations';
 import TextEditor from '@/components/TextEditor.vue';
 import TextInput from '@/components/TextInput.vue';
@@ -18,14 +22,18 @@ const usernameVar = useUsername();
 
 const route = useRoute();
 const router = useRouter();
-const forumId = route.params.forumId as string;
+const forumId = computed(() =>
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
+);
 
 // Query channel to get the wiki home page
 const {
   result: channelResult,
   loading: channelLoading,
   error: channelError,
-} = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: 'all' });
+} = useQuery(GET_CHANNEL, () => ({ uniqueName: forumId.value }), {
+  errorPolicy: 'all',
+});
 
 // Computed property for the channel data
 const channel = computed(() => channelResult.value?.channels?.[0]);
@@ -64,7 +72,10 @@ const {
   loading: isCreating,
   error: createError,
   onDone,
-} = useMutation(CREATE_CHILD_WIKI_PAGE);
+} = useMutation<
+  CreateChildWikiPageMutation,
+  ReturnType<typeof legacyCreateWikiChildVariables>
+>(CREATE_CHILD_WIKI_PAGE);
 
 // Handle form submission
 function handleSubmit() {
@@ -72,36 +83,14 @@ function handleSubmit() {
   if (!formValues.value.title || !formValues.value.body || !wikiHomePage.value)
     return;
 
-  const childPageInput = {
-    title: formValues.value.title,
-    body: formValues.value.body,
-    editReason: formValues.value.editReason || undefined,
-    slug: formValues.value.slug,
-    channelUniqueName: forumId,
-    VersionAuthor: {
-      connect: {
-        where: {
-          node: {
-            username: usernameVar.value,
-          },
-        },
-      },
-    },
-  };
-
-  createChildWikiPage({
-    // Connect by parent page ID
-    where: { id: { eq: wikiHomePage.value.id } },
-    update: {
-      ChildPages: {
-        create: [
-          {
-            node: childPageInput,
-          },
-        ],
-      },
-    },
-  });
+  createChildWikiPage(
+    legacyCreateWikiChildVariables(
+      formValues.value,
+      forumId.value,
+      usernameVar.value,
+      wikiHomePage.value.id
+    )
+  );
 }
 
 // Derive slug from title
@@ -115,7 +104,7 @@ function updateSlug(value: string) {
 // Handle mutation completion
 onDone(() => {
   // Navigate back to wiki home page
-  router.push(`/forums/${forumId}/wiki?t=${Date.now()}`);
+  router.push(`/forums/${forumId.value}/wiki?t=${Date.now()}`);
 });
 
 // Check if wiki is enabled
@@ -175,7 +164,7 @@ const hasWikiHomePage = computed(() => !!wikiHomePage.value);
       <div class="mb-6">
         <h1 class="text-2xl font-bold dark:text-white">Add Wiki Page</h1>
         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Create a new page in the {{ channel.displayName || forumId }} wiki.
+          Create a new page in the {{ channel?.displayName || forumId }} wiki.
         </p>
       </div>
 

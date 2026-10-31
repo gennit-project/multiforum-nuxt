@@ -4,6 +4,8 @@ import { ref } from 'vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import TextInput from '@/components/TextInput.vue';
+import TextEditor from '@/components/TextEditor.vue';
+const write = vi.hoisted(() => vi.fn());
 
 const suspension = vi.hoisted(() => ({
   active: null as unknown,
@@ -25,7 +27,7 @@ vi.mock('@vue/apollo-composable', () => ({
     error: ref(null),
   }),
   useMutation: () => ({
-    mutate: vi.fn(),
+    mutate: write,
     loading: ref(false),
     error: ref(null),
     onDone: vi.fn(),
@@ -75,5 +77,32 @@ describe('wiki create-child page', () => {
 
     expect(wrapper.findComponent(PrimaryButton).exists()).toBe(false);
     expect(wrapper.findComponent(SuspensionNotice).exists()).toBe(true);
+  });
+  it('preserves existing author attribution and legacy child-write shape', async () => {
+    const wrapper = await mountPage();
+    wrapper.findAllComponents(TextInput)[0]!.vm.$emit('update', 'New page');
+    wrapper.findComponent(TextEditor).vm.$emit('update', 'Body');
+    await wrapper.find('form').trigger('submit');
+    expect(write).toHaveBeenCalledWith({
+      where: { id: { eq: 'home-1' } },
+      update: {
+        ChildPages: {
+          create: [
+            {
+              node: {
+                title: 'New page',
+                body: 'Body',
+                editReason: undefined,
+                slug: 'new-page',
+                channelUniqueName: 'cats',
+                VersionAuthor: {
+                  connect: { where: { node: { username: 'alice' } } },
+                },
+              },
+            },
+          ],
+        },
+      },
+    });
   });
 });

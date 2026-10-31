@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, type PropType } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import type { Channel } from '@/__generated__/graphql';
+import type { GetChannelQuery } from '@/__generated__/operations';
 import {
-  LOCK_WIKI_PAGE,
-  UNLOCK_WIKI_PAGE,
-} from '@/graphQLData/channel/mutations';
+  LockWikiPageDocument as LOCK_WIKI_PAGE,
+  UnlockWikiPageDocument as UNLOCK_WIKI_PAGE,
+} from '@/__generated__/operations';
 import { useToast } from '@/composables/useToast';
 import { useWikiPageLockPermissions } from '@/composables/useWikiPageLockPermissions';
+type Channel = GetChannelQuery['channels'][number];
 
 type WikiPageLockState = {
   id: string;

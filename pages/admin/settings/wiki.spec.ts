@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import WikiSettingsPage from './wiki.vue';
+vi.mock('@/__generated__/operations', () => ({
+  GetSiteWideWikiListDocument: 'searchQuery',
+  GetWikiPagesByIdsDocument: 'selectedQuery',
+}));
 
 const h = vi.hoisted(() => ({
   searchResult: { value: {} },
@@ -12,11 +16,6 @@ vi.mock('@vue/apollo-composable', () => ({
     result: document === 'selectedQuery' ? h.selectedResult : h.searchResult,
     loading: { value: false },
   })),
-}));
-
-vi.mock('@/graphQLData/wiki/queries', () => ({
-  GET_SITE_WIDE_WIKI_LIST: 'searchQuery',
-  GET_WIKI_PAGES_BY_IDS: 'selectedQuery',
 }));
 
 const mountPage = (featuredWikiPageIds: string[] = []) =>
@@ -53,7 +52,9 @@ beforeEach(() => {
 describe('admin wiki settings page', () => {
   it('emits selected IDs when adding a featured page', async () => {
     const wrapper = mountPage();
-    await wrapper.find('[data-testid="featured-wiki-search-results"] button').trigger('click');
+    await wrapper
+      .find('[data-testid="featured-wiki-search-results"] button')
+      .trigger('click');
     expect(wrapper.emitted('updateFormValues')?.[0]).toEqual([
       { featuredWikiPageIds: ['w1'] },
     ]);
@@ -61,7 +62,9 @@ describe('admin wiki settings page', () => {
 
   it('emits selected IDs when removing a featured page', async () => {
     const wrapper = mountPage(['w1']);
-    await wrapper.find('[data-testid="featured-wiki-selected-list"] button:last-child').trigger('click');
+    await wrapper
+      .find('[data-testid="featured-wiki-selected-list"] button:last-child')
+      .trigger('click');
     expect(wrapper.emitted('updateFormValues')?.[0]).toEqual([
       { featuredWikiPageIds: [] },
     ]);
@@ -69,7 +72,9 @@ describe('admin wiki settings page', () => {
 
   it('emits reordered IDs when moving a featured page', async () => {
     const wrapper = mountPage(['w1', 'w2']);
-    const downButton = wrapper.findAll('[data-testid="featured-wiki-selected-list"] button')[1];
+    const downButton = wrapper.findAll(
+      '[data-testid="featured-wiki-selected-list"] button'
+    )[1];
     await downButton.trigger('click');
     expect(wrapper.emitted('updateFormValues')?.[0]).toEqual([
       { featuredWikiPageIds: ['w2', 'w1'] },

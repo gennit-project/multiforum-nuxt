@@ -1,10 +1,14 @@
 <script setup lang="ts">
+import type { CreateWikiPageMutation } from '@/__generated__/operations';
+import { legacyCreateWikiHomeVariables } from '@/utils/legacyWikiWrites';
 import { computed, ref } from 'vue';
 import { DateTime } from 'luxon';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
+// #700 exception: pinned ChannelUpdateInput omits WikiHomePage writes.
+// Owner: backend maintainers (#413); migrate this call after that input is exposed.
 import { CREATE_WIKI_PAGE } from '@/graphQLData/channel/mutations';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { GetChannelDocument as GET_CHANNEL } from '@/__generated__/operations';
 import TextEditor from '@/components/TextEditor.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -19,7 +23,9 @@ const usernameVar = useUsername();
 
 const route = useRoute();
 const router = useRouter();
-const forumId = route.params.forumId as string;
+const forumId = computed(() =>
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
+);
 
 // Form data
 const formValues = ref({
@@ -43,12 +49,12 @@ const {
 const { result: channelResult } = useQuery(
   GET_CHANNEL,
   computed(() => ({
-    uniqueName: forumId,
+    uniqueName: forumId.value,
     now: DateTime.utc().startOf('hour').toISO(),
   })),
   {
     fetchPolicy: 'cache-first',
-    enabled: computed(() => !!forumId),
+    enabled: computed(() => !!forumId.value),
   }
 );
 
@@ -79,46 +85,29 @@ const {
   loading: isCreating,
   error: creationError,
   onDone,
-} = useMutation(CREATE_WIKI_PAGE);
+} = useMutation<
+  CreateWikiPageMutation,
+  ReturnType<typeof legacyCreateWikiHomeVariables>
+>(CREATE_WIKI_PAGE);
 
 // Handle form submission
 function handleSubmit() {
   if (wikiDisabled.value) return;
   if (wikiEditBlockedBySuspension.value) return;
   if (!formValues.value.title || !formValues.value.body) return;
-  const channelUpdateInput = {
-    WikiHomePage: {
-      create: {
-        node: {
-          title: formValues.value.title,
-          body: formValues.value.body,
-          editReason: formValues.value.editReason || undefined,
-          slug: formValues.value.slug,
-          channelUniqueName: forumId,
-          VersionAuthor: {
-            connect: {
-              where: {
-                node: {
-                  username: usernameVar.value,
-                },
-              },
-            },
-          },
-        },
-      },
-    },
-  };
-
-  createWikiPage({
-    where: { uniqueName: { eq: forumId } },
-    update: channelUpdateInput,
-  });
+  createWikiPage(
+    legacyCreateWikiHomeVariables(
+      formValues.value,
+      forumId.value,
+      usernameVar.value
+    )
+  );
 }
 
 // Handle mutation completion
 onDone(() => {
   // Navigate to the wiki page with a query parameter to avoid cached data
-  router.push(`/forums/${forumId}/wiki?t=${Date.now()}`);
+  router.push(`/forums/${forumId.value}/wiki?t=${Date.now()}`);
 });
 </script>
 

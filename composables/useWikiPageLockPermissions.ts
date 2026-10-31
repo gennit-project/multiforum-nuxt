@@ -1,6 +1,6 @@
 import { computed, type ComputedRef, type Ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GetServerConfigDocument as GET_SERVER_CONFIG } from '@/__generated__/operations';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
 import { config } from '@/config';
@@ -18,7 +18,7 @@ type ChannelWithWikiLockRoles = PermissionData & {
 };
 
 export function useWikiPageLockPermissions(
-  channel: MaybeComputed<unknown>
+  channel: MaybeComputed<ChannelWithWikiLockRoles | null | undefined>
 ) {
   const username = useUsername();
   const modProfileName = useModProfileName();
@@ -33,23 +33,23 @@ export function useWikiPageLockPermissions(
     () => serverConfigResult.value?.serverConfigs?.[0] ?? null
   );
   const normalizedChannel = computed(() => {
-    const value = channel.value as ChannelWithWikiLockRoles | null;
+    const value = channel.value;
     if (!value) return null;
 
     return {
       ...value,
       Admins: (value.Admins || [])
-        .map((admin) => ({ username: admin.username || '' }))
-        .filter((admin) => !!admin.username),
+        .map((admin) => ({ username: admin?.username || '' }))
+        .filter((admin) => !!admin?.username),
       Moderators: (value.Moderators || [])
-        .map((mod) => ({ displayName: mod.displayName || '' }))
-        .filter((mod) => !!mod.displayName),
+        .map((mod) => ({ displayName: mod?.displayName || '' }))
+        .filter((mod) => !!mod?.displayName),
       SuspendedMods: (value.SuspendedMods || [])
-        .map((mod) => ({ modProfileName: mod.modProfileName || '' }))
-        .filter((mod) => !!mod.modProfileName),
+        .map((mod) => ({ modProfileName: mod?.modProfileName || '' }))
+        .filter((mod) => !!mod?.modProfileName),
       SuspendedUsers: (value.SuspendedUsers || [])
-        .map((user) => ({ username: user.username || '' }))
-        .filter((user) => !!user.username),
+        .map((user) => ({ username: user?.username || '' }))
+        .filter((user) => !!user?.username),
     };
   });
 

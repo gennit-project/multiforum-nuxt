@@ -1,14 +1,20 @@
+import { makeWikiPage } from '@/tests/utils/wikiFixtures';
+import type { WikiPageSelection } from '@/types/Wiki';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref, unref } from 'vue';
+import { ref, unref, reactive, nextTick } from 'vue';
 import { useHead } from 'nuxt/app';
 import { setActivePinia, createPinia } from 'pinia';
 import { useQuery } from '@vue/apollo-composable';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 
+const routeState = reactive<{
+  params: { forumId: string | string[]; slug: string | string[] };
+}>({ params: { forumId: 'cats', slug: 'intro' } });
+
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { forumId: 'cats', slug: 'intro' } }),
+  useRoute: () => routeState,
   useRouter: () => ({ push: vi.fn() }),
   useHead: vi.fn(),
   useState: (_key: string, init?: () => unknown) => ref(init ? init() : ''),
@@ -18,11 +24,11 @@ vi.mock('@vue/apollo-composable', () => ({ useQuery: vi.fn() }));
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountWith = async (wikiPage: unknown) => {
+const mountWith = async (wikiPage: Partial<WikiPageSelection> | null) => {
   mockedUseQuery
     // wiki page data
     .mockReturnValueOnce({
-      result: ref({ wikiPages: wikiPage ? [wikiPage] : [] }),
+      result: ref({ wikiPages: wikiPage ? [makeWikiPage(wikiPage)] : [] }),
       loading: ref(false),
       error: ref(null),
     })
@@ -44,6 +50,8 @@ const mountWith = async (wikiPage: unknown) => {
 
 describe('wiki page', () => {
   beforeEach(() => {
+    routeState.params = { forumId: 'cats', slug: 'intro' };
+    mockedUseQuery.mockClear();
     setActivePinia(createPinia());
     vi.mocked(useHead).mockClear();
   });
@@ -123,5 +131,28 @@ describe('wiki page', () => {
       markdown.compareDocumentPosition(fontSize) &
         Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
+  });
+});
+
+describe('wiki route selection', () => {
+  beforeEach(() => {
+    routeState.params = { forumId: 'cats', slug: 'intro' };
+    mockedUseQuery.mockClear();
+    setActivePinia(createPinia());
+  });
+  it('clears a previous selection when navigating to a different slug', async () => {
+    const wrapper = await mountWith({ body: 'Old page' });
+    routeState.params.slug = 'another';
+    await nextTick();
+    expect(wrapper.findComponent(MarkdownRenderer).exists()).toBe(false);
+  });
+  it('disables a wiki query for an array route ID', async () => {
+    routeState.params.forumId = ['cats', 'dogs'];
+    await mountWith(null);
+    expect(unref(mockedUseQuery.mock.calls[0][2].enabled)).toBe(false);
+  });
+  it('renders nullable wiki body as empty text', async () => {
+    const wrapper = await mountWith({ body: null, VersionAuthor: null });
+    expect(wrapper.findComponent(MarkdownRenderer).props('text')).toBe('');
   });
 });

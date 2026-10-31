@@ -125,16 +125,14 @@ describe('channel wiki landing page', () => {
     const wrapper = await mountWith();
 
     expect(
-      wrapper
-        .get('[data-testid="wiki-introduction"] a')
-        .attributes('href')
+      wrapper.get('[data-testid="wiki-introduction"] a').attributes('href')
     ).toBe('/forums/cats/wiki/home');
   });
 
   it('requests the wiki list for only the current forum', async () => {
     await mountWith();
 
-    expect(mockedUseQuery.mock.calls[1][1]).toMatchObject({
+    expect(mockedUseQuery.mock.calls[1][1]()).toMatchObject({
       selectedChannels: ['cats'],
       options: { limit: 100, offset: 0 },
     });
@@ -233,7 +231,9 @@ describe('channel wiki landing page', () => {
 
   it('shows a search-specific empty state', async () => {
     const wrapper = await mountWith({ wikiPages: [] });
-    await wrapper.findComponent(SearchBar).vm.$emit('updateSearchInput', 'dogs');
+    await wrapper
+      .findComponent(SearchBar)
+      .vm.$emit('updateSearchInput', 'dogs');
 
     expect(wrapper.text()).toContain('No pages match your search.');
   });
@@ -251,7 +251,9 @@ describe('channel wiki landing page', () => {
     testState.activeSuspension = { suspendedIndefinitely: true };
     testState.issueNumber = 5;
     const wrapper = await mountWith({
-      stubs: { RequireAuth: { template: '<div><slot name="has-auth" /></div>' } },
+      stubs: {
+        RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
+      },
     });
 
     expect({
@@ -302,7 +304,9 @@ describe('channel wiki landing page', () => {
         PinnedWikiPages: [],
       },
       wikiPages: hasHomePage ? [homePage] : [],
-      stubs: { RequireAuth: { template: '<div><slot name="has-auth" /></div>' } },
+      stubs: {
+        RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
+      },
     });
     await wrapper
       .findAllComponents(GenericButton)
@@ -315,7 +319,9 @@ describe('channel wiki landing page', () => {
   it('does not route an edit action while the user is suspended', async () => {
     testState.activeSuspension = { suspendedIndefinitely: true };
     const wrapper = await mountWith({
-      stubs: { RequireAuth: { template: '<div><slot name="has-auth" /></div>' } },
+      stubs: {
+        RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
+      },
     });
     await wrapper
       .findAllComponents(GenericButton)
@@ -334,6 +340,8 @@ describe('channel wiki landing page', () => {
     await mountWith({
       channel: { wikiEnabled: true, WikiHomePage: { title: 'Home' } },
     });
-    expect(unref(testState.useHead.mock.calls[0][0]).title).toMatch(/^Home \| /);
+    expect(unref(testState.useHead.mock.calls[0][0]).title).toMatch(
+      /^Home \| /
+    );
   });
 });

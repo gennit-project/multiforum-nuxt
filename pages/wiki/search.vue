@@ -19,30 +19,14 @@ import { updateFilters } from '@/utils/routerUtils';
 import { getChannelLabel, relativeTime } from '@/utils';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import {
-  GET_SITE_WIDE_WIKI_LIST,
-  GET_WIKI_PIN_CHANNELS,
-} from '@/graphQLData/wiki/queries';
+  GetSiteWideWikiListDocument as GET_SITE_WIDE_WIKI_LIST,
+  GetWikiPinChannelsDocument as GET_WIKI_PIN_CHANNELS,
+} from '@/__generated__/operations';
 import { formatWikiExcerpt, formatWordCount } from '@/utils/wikiSearchDisplay';
 import { getPlainWikiTitle } from '@/utils/wikiTitle';
-import type { Channel, User, WikiPage } from '@/__generated__/graphql';
+import type { WikiSearchSelection as WikiSearchPage } from '@/types/Wiki';
 
 const WIKI_PAGE_LIMIT = 25;
-
-type WikiSearchPage = Pick<
-  WikiPage,
-  | 'id'
-  | 'title'
-  | 'body'
-  | 'slug'
-  | 'channelUniqueName'
-  | 'createdAt'
-  | 'updatedAt'
-> & {
-  VersionAuthor?: Pick<
-    User,
-    'username' | 'displayName' | 'profilePicURL'
-  > | null;
-};
 
 const route = useRoute();
 const router = useRouter();
@@ -107,29 +91,27 @@ const {
   result: wikiResult,
   loading: wikiLoading,
   error: wikiError,
-} = useQuery(GET_SITE_WIDE_WIKI_LIST, {
-  searchInput: searchInputComputed,
-  selectedChannels: selectedChannelsComputed,
+} = useQuery(GET_SITE_WIDE_WIKI_LIST, () => ({
+  searchInput: searchInputComputed.value,
+  selectedChannels: selectedChannelsComputed.value,
   options: {
     limit: WIKI_PAGE_LIMIT,
     offset: 0,
   },
-});
+}));
 
 const wikiPages = computed<WikiSearchPage[]>(() => {
   if (!wikiResult.value?.getSiteWideWikiList) {
     return [];
   }
-  return (wikiResult.value.getSiteWideWikiList.wikiPages ||
-    []) as WikiSearchPage[];
+  return wikiResult.value.getSiteWideWikiList.wikiPages || [];
 });
 
 const featuredWikiPages = computed<WikiSearchPage[]>(() => {
   if (!wikiResult.value?.getSiteWideWikiList) {
     return [];
   }
-  return (wikiResult.value.getSiteWideWikiList.featuredWikiPages ||
-    []) as WikiSearchPage[];
+  return wikiResult.value.getSiteWideWikiList.featuredWikiPages || [];
 });
 
 const regularWikiPages = computed<WikiSearchPage[]>(() => {
@@ -146,13 +128,13 @@ const wikiChannelUniqueNames = computed(() => [
 ]);
 
 const { result: wikiPinChannelsResult, refetch: refetchWikiPinChannels } =
-  useQuery(GET_WIKI_PIN_CHANNELS, {
-    uniqueNames: wikiChannelUniqueNames,
-  });
+  useQuery(GET_WIKI_PIN_CHANNELS, () => ({
+    uniqueNames: wikiChannelUniqueNames.value,
+  }));
 
 const wikiPinChannelsByUniqueName = computed(() =>
   Object.fromEntries(
-    (wikiPinChannelsResult.value?.channels || []).map((channel: Channel) => [
+    (wikiPinChannelsResult.value?.channels || []).map((channel) => [
       channel.uniqueName,
       channel,
     ])

@@ -11,7 +11,9 @@ const h = vi.hoisted(() => ({
   success: vi.fn(),
   error: vi.fn(),
   pinMutate: vi.fn(async () => ({ data: { pinWikiPageToChannel: true } })),
-  unpinMutate: vi.fn(async () => ({ data: { unpinWikiPageFromChannel: true } })),
+  unpinMutate: vi.fn(async () => ({
+    data: { unpinWikiPageFromChannel: true },
+  })),
 }));
 
 vi.mock('@/composables/useAuthState', () => ({
@@ -129,4 +131,8 @@ describe('WikiPagePinButton', () => {
       'Could not update wiki sidebar pins: denied'
     );
   });
+});
+
+it('hides pin controls until channel permissions are loaded', () => {
+  expect(mountButton({ channel: null }).find('button').exists()).toBe(false);
 });

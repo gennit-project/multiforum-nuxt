@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
-import { GET_WIKI_PAGE } from '@/graphQLData/channel/queries';
+import { GetWikiPageDocument as GET_WIKI_PAGE, DeleteWikiRevisionDocument as DELETE_WIKI_REVISION  } from '@/__generated__/operations';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import { DELETE_WIKI_REVISION } from '@/graphQLData/discussion/mutations';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import RevisionDiffContent from '@/components/revision/RevisionDiffContent.vue';
@@ -11,7 +10,7 @@ import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
-import type { WikiPage, TextVersion } from '@/__generated__/graphql';
+import type { WikiRevisionSelection as TextVersion } from '@/types/Wiki';
 import {
   buildSelectedRevisionPairs,
   buildSelectedWikiRevisionRouteId,
@@ -23,13 +22,18 @@ import {
 } from '@/utils/revisionHistory';
 
 type WikiRevisionData = RevisionPair<TextVersion>;
-type WikiPageWithEditReason = WikiPage & { editReason?: string | null };
 
 const route = useRoute();
 const router = useRouter();
-const forumId = route.params.forumId as string;
-const slug = route.params.slug as string;
-const revisionId = computed(() => route.params.revisionId as string);
+const forumId = computed(() =>
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
+);
+const slug = computed(() =>
+  typeof route.params.slug === 'string' ? route.params.slug : ''
+);
+const revisionId = computed(() =>
+  typeof route.params.revisionId === 'string' ? route.params.revisionId : ''
+);
 
 const {
   showReportModal,
@@ -47,17 +51,19 @@ const {
   error,
 } = useQuery(
   GET_WIKI_PAGE,
+  () => ({
+    channelUniqueName: forumId.value,
+    slug: slug.value,
+  }),
   {
-    channelUniqueName: forumId,
-    slug: slug,
-  },
-  { errorPolicy: 'all' }
+    errorPolicy: 'all',
+    keepPreviousResult: false,
+    enabled: computed(() => !!forumId.value && !!slug.value),
+  }
 );
 
 // Computed property for the wiki page data
-const wikiPage = computed(
-  () => wikiPageResult.value?.wikiPages?.[0] as WikiPage
-);
+const wikiPage = computed(() => wikiPageResult.value?.wikiPages?.[0]);
 
 // Process all versions used by the revision-history screen.
 const historyEdits = computed(() => {
@@ -68,14 +74,9 @@ const historyEdits = computed(() => {
   const currentVersion: TextVersion = {
     id: 'current',
     body: wikiPage.value.body,
-    editReason: (wikiPage.value as WikiPageWithEditReason).editReason,
+    editReason: wikiPage.value.editReason,
     createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
     Author: wikiPage.value.VersionAuthor,
-    AuthorConnection: {
-      edges: [],
-      pageInfo: { hasNextPage: false, hasPreviousPage: false },
-      totalCount: 0,
-    },
   };
 
   return buildSequentialRevisionPairs({
@@ -97,14 +98,9 @@ const selectedRevisionEdits = computed(() => {
   const currentVersion: TextVersion = {
     id: 'current',
     body: wikiPage.value.body,
-    editReason: (wikiPage.value as WikiPageWithEditReason).editReason,
+    editReason: wikiPage.value.editReason,
     createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
     Author: wikiPage.value.VersionAuthor,
-    AuthorConnection: {
-      edges: [],
-      pageInfo: { hasNextPage: false, hasPreviousPage: false },
-      totalCount: 0,
-    },
   };
 
   return buildSelectedRevisionPairs({
@@ -159,7 +155,7 @@ const handleRevisionSelect = (event: Event) => {
   }
 
   router.push(
-    `/forums/${forumId}/wiki/revisions/diff/${slug}/${selectedRevisionId}`
+    `/forums/${forumId.value}/wiki/revisions/diff/${slug.value}/${selectedRevisionId}`
   );
 };
 
@@ -194,7 +190,7 @@ const {
 onDone(() => {
   isDeleting.value = false;
   // Navigate back to revision history
-  router.push(`/forums/${forumId}/wiki/revisions/${slug}`);
+  router.push(`/forums/${forumId.value}/wiki/revisions/${slug.value}`);
 });
 
 const handleDelete = async () => {
@@ -223,16 +219,16 @@ const revisionToReportId = computed(() => {
 
 // Navigation functions
 const goBackToRevisions = () => {
-  router.push(`/forums/${forumId}/wiki/revisions/${slug}`);
+  router.push(`/forums/${forumId.value}/wiki/revisions/${slug.value}`);
 };
 
 const goBackToWiki = () => {
-  router.push(`/forums/${forumId}/wiki/${slug}`);
+  router.push(`/forums/${forumId.value}/wiki/${slug.value}`);
 };
 
 // SEO metadata setup
 useHead({
-  title: `Revision Detail - ${wikiPage.value?.title || 'Wiki Page'} | ${forumId}`,
+  title: `Revision Detail - ${wikiPage.value?.title || 'Wiki Page'} | ${forumId.value}`,
   meta: [
     {
       name: 'description',
