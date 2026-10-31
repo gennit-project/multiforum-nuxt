@@ -1,3 +1,4 @@
+import { StickyCommentDocument } from '@/__generated__/operations';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
@@ -29,13 +30,13 @@ vi.mock('nuxt/app', () => ({
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useMutation: (mutation: string) => ({
+  useMutation: (mutation: unknown) => ({
     mutate:
       mutation === 'SUBSCRIBE_TO_COMMENT'
         ? h.subscribeToComment
         : mutation === 'UNSUBSCRIBE_FROM_COMMENT'
           ? h.unsubscribeFromComment
-          : mutation === 'STICKY_COMMENT'
+          : mutation === StickyCommentDocument
             ? h.stickyComment
             : h.unstickyComment,
   }),
@@ -334,8 +335,10 @@ describe('Comment', () => {
     await wrapper.get('.sticky-button').trigger('click');
     await wrapper.get('.unsticky-button').trigger('click');
 
-    expect(h.stickyComment).toHaveBeenCalledWith({ commentId: 'c1' });
-    expect(h.unstickyComment).toHaveBeenCalledWith({ commentId: 'c1' });
+    expect([h.stickyComment.mock.calls, h.unstickyComment.mock.calls]).toEqual([
+      [[{ commentId: 'c1' }]],
+      [[{ commentId: 'c1' }]],
+    ]);
   });
 
   it('renders child comments when replies are shown within the depth limit', () => {

@@ -162,7 +162,7 @@ describe('account_settings', () => {
     await vi.advanceTimersByTimeAsync(900);
 
     expect(updateUser).toHaveBeenCalledWith({
-      where: { username: 'alice' },
+      where: { username: { eq: 'alice' } },
       update: expect.objectContaining({
         notifyOnSubscribedIssueUpdates: { set: false },
       }),
@@ -184,7 +184,7 @@ describe('account_settings', () => {
     await vi.advanceTimersByTimeAsync(900);
 
     expect(updateUser).toHaveBeenCalledWith({
-      where: { username: 'alice' },
+      where: { username: { eq: 'alice' } },
       update: expect.objectContaining({
         notifyOnSuspensionBlocks: { set: false },
       }),
@@ -203,7 +203,7 @@ describe('account_settings', () => {
     await wrapper.get(`[data-testid="${testId}"]`).trigger('click');
     await vi.advanceTimersByTimeAsync(900);
     expect(updateUser).toHaveBeenCalledWith({
-      where: { username: 'alice' },
+      where: { username: { eq: 'alice' } },
       update: expect.objectContaining({ [field]: { set: true } }),
     });
   });
@@ -222,7 +222,7 @@ describe('account_settings', () => {
       refetches: refetchUser.mock.calls.length,
     }).toEqual({
       mutation: {
-        where: { username: 'alice' },
+        where: { username: { eq: 'alice' } },
         update: {
           displayName: { set: 'Alicia' },
           bio: { set: 'Hello' },

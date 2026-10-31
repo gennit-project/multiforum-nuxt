@@ -9,7 +9,8 @@
 - `pnpm run graphql:test` - Test GraphQL extraction, source locations, and baseline enforcement
 - `pnpm run schema:check` - Verify the pinned backend schema and report its source commit
 - `pnpm run schema:update /path/to/backend-artifact` - Update the schema pin; see [contract workflow](docs/graphql-contract-campaign.md)
-- `pnpm run compile` - Generate schema types offline from the pinned contract
+- `pnpm run compile` - Generate schema and pilot operation types offline from the pinned contract
+- `pnpm run operations:check` - Verify committed typed documents are fresh; see the [migration guide](docs/graphql-contract-campaign.md)
 - `pnpm run dev` - Start development server
 - `pnpm run build` - Build for production
 - `pnpm run test:playwright` - Run Playwright tests
@@ -113,6 +114,7 @@ Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#fro
 ## Code Style Guidelines
 
 - **TypeScript**: Use strict typing whenever possible, proper interfaces in `types/` directory
+  - **Typed operation pilots**: Import documents and exact selected result types from `@/__generated__/operations`; let Apollo infer variables/results. Prefer operation or fragment result subsets over full schema entities for migrated paths. See [the migration guide](docs/graphql-contract-campaign.md#phase-3-typed-operation-pilot).
   - **Import GraphQL Types**: Use the generated types in `@/__generated__/graphql` for **every** GraphQL input and response — query variables and mutation inputs (`…QueryVariables` / `…MutationVariables` / `…Input`) as well as responses. Use `Pick`/`Omit` on a generated entity type for subsets rather than hand-writing a partial interface.
   - **Examples**: Use `User`, `Comment`, `Discussion`, `Event`, `Revision`, `TextVersion` etc. from the generated GraphQL schema
   - **Avoid `any`**: `@typescript-eslint/no-explicit-any` is an **error** in application source (relaxed only in `*.spec.ts`). Only use `any` for genuinely untyped third-party interop, with a targeted `// eslint-disable-next-line` + reason — never for GraphQL data. See the `apollo-data` skill.

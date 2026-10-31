@@ -77,10 +77,9 @@ rg -n '\bgql\x60' graphQLData components composables pages utils --glob '*.{js,t
 
 ### Current type and test boundaries
 
-- `scripts/generate-graphql-types.mjs` generates schema entity/input types. It
-  does not generate operation types. The unused `codegen.ts` preset with its
-  placeholder TSX glob has been retired. `pnpm compile` generates entity types;
-  phase 3 will add operation-specific generation.
+- `scripts/generate-graphql-types.mjs` generates schema entity/input types. The unused `codegen.ts` preset with its
+  placeholder TSX glob has been retired. `pnpm compile` also runs the phase-3
+  pilot operation generator described below.
 - Most shared operations are JavaScript gql templates. Apollo is not yet
   uniformly receiving generated documents carrying exact variables/results.
   Handwritten response subsets and broad schema entity types remain.
@@ -168,6 +167,64 @@ validated using a placeholder and its source expression is recorded in the
 inventory; no application expression is evaluated. Runtime values and backend
 resolver completeness are outside schema validation, so retain the null-filter
 guards and real-schema integration tests.
+
+## Phase 3: typed operation pilot
+
+`pnpm compile` generates schema entities and `__generated__/operations.ts` offline.
+The latter uses the same strict extractor as `graphql:check`, resolving the actual
+source selections and imported fragments without executing application modules.
+The explicit `pilotDocuments` list in `scripts/generate-graphql-operations.mjs`
+limits generation to public profiles, account settings, archived-comment issue
+links, and sticky/unsticky comment mutations. These consumers import typed ASTs:
+
+```ts
+import { GetPublicUserProfileDocument } from '@/__generated__/operations';
+const { result } = useQuery(GetPublicUserProfileDocument, {
+  username: 'alice',
+});
+// result contains only the selected fields; bio remains string | null.
+```
+
+Apollo infers results, variables, callbacks, and mutation/cache payloads directly
+from the document. Do not add explicit Apollo generics or cast an operation result
+to a full schema entity. For shared function arguments, derive a subset from an
+operation result or generated fragment. Existing schema input types remain in
+`@/__generated__/graphql`; use annotations or `satisfies`, not assertions, when
+constructing inputs. The pilot fixes account updates to send
+`where: { username: { eq: username } }` and handles an absent first user explicitly.
+
+```sh
+pnpm operations:generate # regenerate committed pilot artifacts after source edits
+pnpm operations:check    # fail if committed output differs (does not rewrite it)
+pnpm graphql:test        # extraction, validation, composition and negative fixtures
+pnpm graphql:check       # all production documents, no suppression baseline
+pnpm tsc                 # includes tests/types/graphql-operations.ts negative cases
+```
+
+CI checks freshness **before** generation, then regenerates from the verified
+schema pin and checks TypeScript. Commit generated output with source changes;
+never edit it by hand. Codegen plugins are pinned direct dependencies. Operation
+DateTime outputs are strings and JSON outputs are unknown; schema input types
+retain the existing schema-generator scalar policy. Typed documents contain plain
+ASTs (no runtime gql parsing and no `loc.source.body`); test routers must inspect
+ASTs or use GraphQL `print`. Fragments are unmasked, composed, and deduplicated by
+name; conflicting definitions fail generation rather than silently shadowing.
+
+The extractor's phase-2 syntax boundaries still apply. Additionally, typed pilots
+must be named, and runtime interpolation even inside GraphQL string values is
+rejected: move values to variables. Identical shared definitions are supported;
+conflicting operation names in different legacy documents must be renamed before
+adding both to this output. Add each desired source ID to `pilotDocuments`,
+regenerate, replace imports in a bounded vertical slice, then remove conflicting
+response types and fix the resulting nullability/variable errors. Add negative
+compile cases and runtime/component/browser coverage for each migrated path.
+
+The recursive discussion reply UI remains a follow-up: `ChildComments` feeds
+components that still require complete schema `Comment` objects. Migrate those
+props and helper inputs to the selected comment fragment together, rather than
+casting partial results. Profile content tabs and remaining mutations likewise
+remain incremental work. Validation and generated types do not guarantee custom
+resolver payloads: retain runtime null filters and integration tests.
 
 ## Next milestones
 

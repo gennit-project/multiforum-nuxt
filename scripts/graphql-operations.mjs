@@ -163,7 +163,8 @@ function insideString(text) {
 export function inventoryOperations(
   root,
   schema,
-  files = discoverOperationSources(root)
+  files = discoverOperationSources(root),
+  { includeSource = false } = {}
 ) {
   const modules = new Map();
   const sourceMaps = new WeakMap();
@@ -849,6 +850,7 @@ export function inventoryOperations(
       line: at.line,
       column: at.column,
       hash: digest(text),
+      ...(includeSource ? { source: text } : {}),
       operations: ast.definitions
         .filter((d) => d.kind === Kind.OPERATION_DEFINITION)
         .map((d) => ({ name: d.name?.value ?? null, kind: d.operation })),

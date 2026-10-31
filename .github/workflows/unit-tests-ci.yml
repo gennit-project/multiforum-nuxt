@@ -207,6 +207,9 @@ jobs:
           pnpm run schema:test
           pnpm run schema:check
 
+      - name: Check committed typed operation freshness
+        run: pnpm run operations:check
+
       - name: Generate types from the pinned backend revision (no server)
         run: pnpm run compile
 

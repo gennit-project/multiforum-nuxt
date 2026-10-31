@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_COMMENT_ISSUE } from '@/graphQLData/mod/queries';
+import { GetCommentIssueDocument as GET_COMMENT_ISSUE } from '@/__generated__/operations';
 import ArchiveBox from '@/components/icons/ArchiveBox.vue';
 
 const props = defineProps({
