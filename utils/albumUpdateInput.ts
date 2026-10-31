@@ -12,8 +12,9 @@ import { normalizeImageOrder } from '@/utils/albumImageOrder';
  * `Album` portion of a discussion update input, choosing between creating a new
  * album and updating an existing one (connect/update/disconnect images).
  *
- * The return type is `Pick<DiscussionUpdateInput, 'Album'>`, so the generated
- * GraphQL schema validates the produced shape at compile time.
+ * This is a legacy UI-to-payload builder, not a valid DiscussionUpdateInput.
+ * The pending companion contract must replace it before the raw boundary can
+ * migrate to generated operation variables.
  */
 
 export type AlbumUpdateImageInput = {
@@ -36,8 +37,8 @@ export type ExistingAlbumImage = { id?: string | null };
 
 // v7's generated `DiscussionUpdateInput` no longer exposes the nested `Album`
 // relationship, but the custom `updateDiscussionWithChannelConnections` resolver
-// still accepts an `Album` create/update portion on the discussion update input.
-// Describe that portion here from the generated Album input types.
+// reads a loose `Album` field that GraphQL coercion rejects before execution.
+// Nested generated Album types do not make the enclosing request valid.
 export type AlbumUpdatePortion = {
   Album?: {
     create?: DiscussionAlbumCreateFieldInput;
