@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, defineAsyncComponent } from 'vue';
-import { GET_USER_DOWNLOADS } from '@/graphQLData/user/queries';
+import { GetUserDownloadsDocument as GET_USER_DOWNLOADS } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import SitewideDownloadListItem from '@/components/discussion/list/SitewideDownloadListItem.vue';
 import { useRoute } from 'nuxt/app';
-import type { Album, Discussion } from '@/__generated__/graphql';
+import type { DownloadListPresentation } from '@/types/DiscussionList';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
+type Discussion = DownloadListPresentation;
+type Album = Discussion['Album'];
 
 const DiscussionAlbum = defineAsyncComponent(
   () => import('@/components/discussion/detail/DiscussionAlbum.vue')
@@ -23,11 +25,11 @@ const username = computed(() => {
 
 const downloadsWhere = computed(() => {
   if (!hasSelectedChannels.value) {
-    return { hasDownload: true };
+    return { hasDownload: { eq: true } };
   }
   return {
     AND: [
-      { hasDownload: true },
+      { hasDownload: { eq: true } },
       {
         DiscussionChannels_SOME: {
           channelUniqueName_IN: selectedChannels.value,
@@ -74,7 +76,7 @@ const handleCloseAlbum = () => {
       <div
         v-else-if="
           result?.users?.length === 0 ||
-          result.users[0]?.Discussions?.length === 0
+          result?.users?.[0]?.Discussions?.length === 0
         "
       >
         No downloads yet
@@ -82,7 +84,7 @@ const handleCloseAlbum = () => {
       <div v-else-if="result && result.users.length > 0">
         <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <SitewideDownloadListItem
-            v-for="discussion in result.users[0].Discussions"
+            v-for="discussion in result?.users?.[0]?.Discussions"
             :key="discussion.id"
             :discussion="discussion"
             :search-input="''"

@@ -1,8 +1,12 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import type { ServerConfig } from '@/__generated__/graphql';
+import type { GetServerConfigQuery } from '@/__generated__/operations';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
+type ServerConfig = Pick<
+  GetServerConfigQuery['serverConfigs'][number],
+  'serverDescription'
+>;
 
 const props = defineProps({
   serverConfig: {
@@ -23,7 +27,7 @@ const serverDescription = computed(
 <template>
   <div
     :class="[useScrollbar ? 'max-h-screen overflow-auto' : '']"
-    class="pb-8 pt-4"
+    class="pt-4 pb-8"
   >
     <div class="items-center gap-2" />
 

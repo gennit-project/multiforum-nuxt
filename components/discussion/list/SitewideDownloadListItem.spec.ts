@@ -1,3 +1,4 @@
+import type { GetUserDownloadsQuery } from '@/__generated__/operations';
 import { describe, it, expect, vi } from 'vitest';
 import { defineComponent } from 'vue';
 import { createMockRoute } from '@/tests/utils/mockRouter';
@@ -118,4 +119,50 @@ describe('SitewideDownloadListItem', () => {
       wrapper.getComponent(UsernameWithTooltipStub).props('variantSource')
     ).toEqual(discussion.Author);
   });
+});
+
+it('renders a profile download without inventing a quarantine status', () => {
+  const discussion: GetUserDownloadsQuery['users'][number]['Discussions'][number] =
+    {
+      id: 'profile-download',
+      title: 'Profile model',
+      body: null,
+      createdAt: '2026-01-01T00:00:00Z',
+      updatedAt: null,
+      deleted: false,
+      hasDownload: true,
+      hasSensitiveContent: null,
+      Author: null,
+      Tags: [],
+      Album: null,
+      DiscussionChannels: [
+        {
+          id: 'dc',
+          discussionId: 'profile-download',
+          channelUniqueName: 'models',
+          archived: null,
+          answered: null,
+          locked: null,
+          weightedVotesCount: null,
+          Channel: { uniqueName: 'models' },
+          CommentsConnection: { aggregate: { count: { nodes: 2 } } },
+        },
+      ],
+    };
+  const wrapper = mountWithDefaults(SitewideDownloadListItem, {
+    props: { discussion },
+    global: {
+      stubs: {
+        AddToDiscussionFavorites: true,
+        UsernameWithTooltip: UsernameWithTooltipStub,
+        DownloadQuarantineBadge: true,
+      },
+    },
+  });
+  expect({
+    title: wrapper.text().includes('Profile model'),
+    quarantine: wrapper
+      .findComponent({ name: 'DownloadQuarantineBadge' })
+      .exists(),
+  }).toEqual({ title: true, quarantine: false });
 });

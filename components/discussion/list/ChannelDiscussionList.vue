@@ -8,7 +8,7 @@ import ChannelDiscussionListItem from './ChannelDiscussionListItem.vue';
 import LoadMore from '../../LoadMore.vue';
 import ErrorBanner from '../../ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
+import { GetDiscussionsInChannelDocument as GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
@@ -16,7 +16,7 @@ import {
   getSortFromQuery,
   getTimeFrameFromQuery,
 } from '@/utils/getSortFromQuery';
-import type { DiscussionChannel } from '@/__generated__/graphql';
+import { mergeUniqueById } from '@/utils/mergeUniqueById';
 
 const usernameVar = useUsername();
 
@@ -36,7 +36,7 @@ const channelId = computed(() => {
 // membership-derived Forum Admin / Forum Mod author badges.
 provideForumRoleMembership(channelId);
 
-const filterValues = ref(
+const filterValues = computed(() =>
   getDiscussionFilterValuesFromParams({
     route,
     channelId: channelId.value,
@@ -83,20 +83,40 @@ const {
   loading: discussionLoading,
   refetch: refetchDiscussions,
   fetchMore,
-} = useQuery(GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA, {
-  channelUniqueName: channelId,
-  searchInput,
-  selectedTags,
-  showArchived,
-  hasDownload: false,
-  showUnanswered,
-  options: {
-    limit: DISCUSSION_PAGE_LIMIT,
-    offset: 0,
-    sort: activeSort,
-    timeFrame: activeTimeFrame,
-  },
-});
+} = useQuery(
+  GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
+  () => ({
+    channelUniqueName: channelId.value,
+    searchInput: searchInput.value || '',
+    selectedTags: selectedTags.value || [],
+    showArchived: showArchived.value || false,
+    hasDownload: false,
+    showUnanswered: showUnanswered.value,
+    options: {
+      limit: DISCUSSION_PAGE_LIMIT,
+      offset: 0,
+      sort: activeSort.value,
+      timeFrame: activeTimeFrame.value,
+    },
+  }),
+  { enabled: computed(() => !!channelId.value), keepPreviousResult: false }
+);
+const discussionChannels = computed(
+  () =>
+    discussionChannelResult.value?.getDiscussionsInChannel
+      ?.discussionChannels || []
+);
+const listScope = computed(() =>
+  JSON.stringify([
+    channelId.value,
+    searchInput.value,
+    selectedTags.value,
+    showArchived.value,
+    showUnanswered.value,
+    activeSort.value,
+    activeTimeFrame.value,
+  ])
+);
 // Refetch when user logs in/out to update isFavorited and upvote status
 watch(
   () => usernameVar.value,
@@ -106,29 +126,36 @@ watch(
 );
 
 const loadMore = () => {
-  fetchMore({
+  if (discussionLoading.value || !channelId.value) return;
+  const scope = listScope.value;
+  return fetchMore({
     variables: {
       options: {
         limit: DISCUSSION_PAGE_LIMIT,
         offset:
           discussionChannelResult.value?.getDiscussionsInChannel
-            .discussionChannels.length,
+            ?.discussionChannels.length,
         sort: activeSort.value,
         timeFrame: activeTimeFrame.value,
       },
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      if (
+        scope !== listScope.value ||
+        !fetchMoreResult?.getDiscussionsInChannel ||
+        !previousResult.getDiscussionsInChannel
+      )
+        return previousResult;
       return {
         getDiscussionsInChannel: {
           ...previousResult.getDiscussionsInChannel,
           aggregateDiscussionChannelsCount:
             fetchMoreResult.getDiscussionsInChannel
               .aggregateDiscussionChannelsCount,
-          discussionChannels: [
-            ...previousResult.getDiscussionsInChannel.discussionChannels,
-            ...fetchMoreResult.getDiscussionsInChannel.discussionChannels,
-          ],
+          discussionChannels: mergeUniqueById(
+            previousResult.getDiscussionsInChannel.discussionChannels,
+            fetchMoreResult.getDiscussionsInChannel.discussionChannels
+          ),
         },
       };
     },
@@ -139,24 +166,12 @@ const showModProfileModal = ref(false);
 
 onMounted(() => {
   if (
-    discussionChannelResult.value?.getDiscussionsInChannel.discussionChannels
+    discussionChannelResult.value?.getDiscussionsInChannel?.discussionChannels
       .length === 0
   ) {
     refetchDiscussions();
   }
 });
-
-watch(
-  () => route.query,
-  () => {
-    if (route.query) {
-      filterValues.value = getDiscussionFilterValuesFromParams({
-        route,
-        channelId: channelId.value,
-      });
-    }
-  }
-);
 
 watch(channelId, (newChannelId, oldChannelId) => {
   if (newChannelId !== oldChannelId) {
@@ -176,7 +191,7 @@ const filterByChannel = (channel: string) => {
 const reachedEndOfResults = computed(() => {
   return (
     discussionChannelResult.value?.getDiscussionsInChannel
-      .aggregateDiscussionChannelsCount ===
+      ?.aggregateDiscussionChannelsCount ===
     discussionChannelResult.value?.getDiscussionsInChannel?.discussionChannels
       .length
   );
@@ -192,7 +207,7 @@ watch(
 
     const selectedDiscussionChannel =
       newDiscussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.find(
-        (discussionChannel: DiscussionChannel) =>
+        (discussionChannel) =>
           discussionChannel.discussionId === newSelectedDiscussionId
       );
 
@@ -267,22 +282,18 @@ watch(
         </p>
 
         <ul
-          v-else-if="
-            discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
-              ?.length > 0
-          "
+          v-else-if="discussionChannels.length > 0"
           class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
           data-testid="channel-discussion-list"
         >
           <ChannelDiscussionListItem
-            v-for="discussionChannel in discussionChannelResult
-              .getDiscussionsInChannel.discussionChannels"
+            v-for="discussionChannel in discussionChannels"
             :key="`${discussionChannel.id}-${expandChannelDiscussions}`"
             :discussion="discussionChannel.Discussion"
             :discussion-channel="discussionChannel"
             :search-input="searchInput"
-            :selected-tags="selectedTags"
-            :selected-channels="selectedChannels"
+            :selected-tags="selectedTags || []"
+            :selected-channels="selectedChannels || []"
             :default-expanded="expandChannelDiscussions"
             :is-selectable="true"
             :selected-discussion-id="selectedDiscussionId"
@@ -291,12 +302,7 @@ watch(
             @filter-by-channel="filterByChannel"
           />
         </ul>
-        <div
-          v-if="
-            discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
-              ?.length > 0
-          "
-        >
+        <div v-if="discussionChannels.length > 0">
           <LoadMore
             class="mb-6 justify-self-center"
             :loading="discussionLoading"

@@ -9,11 +9,9 @@ import DiscussionVotes from '../vote/DiscussionVotes.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import { relativeTime } from '@/utils';
 import type {
-  Discussion,
-  DiscussionChannel,
-  Tag,
-} from '@/__generated__/graphql';
-import type { DiscussionChannelWithFavorited } from '@/types/Discussion';
+  ChannelDiscussionPresentation as Discussion,
+  ChannelListPresentation as DiscussionChannel,
+} from '@/types/DiscussionList';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
@@ -21,6 +19,7 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import DownloadQuarantineBadge from '@/components/download/DownloadQuarantineBadge.vue';
 import AppImage from '@/components/image/AppImage.vue';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
+type Tag = Discussion['Tags'][number];
 
 // Define props
 const props = defineProps({
@@ -33,7 +32,7 @@ const props = defineProps({
     required: true,
   },
   discussion: {
-    type: Object as PropType<Discussion>,
+    type: Object as PropType<Discussion | null>,
     default: null,
   },
   searchInput: {
@@ -61,8 +60,7 @@ const defaultUniqueName = computed(
   () => channelIdInParams.value || props.discussionChannel.channelUniqueName
 );
 const commentCount = computed(
-  () =>
-    props.discussionChannel?.CommentsConnection?.aggregate?.count?.nodes || 0
+  () => props.discussionChannel?.CommentsAggregate?.count || 0
 );
 
 const errorMessage = ref('');
@@ -112,12 +110,13 @@ const firstAlbumImage = computed(() => {
   return album.Images[0] || null;
 });
 
-const firstAlbumImageUrl = computed(() =>
-  getPreferredImageUrl({
-    source: firstAlbumImage.value,
-    preferred: ['list320', 'list160'],
-    originalUrl: firstAlbumImage.value?.url,
-  }) || ''
+const firstAlbumImageUrl = computed(
+  () =>
+    getPreferredImageUrl({
+      source: firstAlbumImage.value,
+      preferred: ['list320', 'list160'],
+      originalUrl: firstAlbumImage.value?.url,
+    }) || ''
 );
 
 const filteredQuery = computed(() => {
@@ -236,12 +235,7 @@ const filteredQuery = computed(() => {
                 :allow-add-to-list="true"
                 :discussion-id="discussion.id"
                 :discussion-title="discussion.title"
-                :initial-is-favorited="
-                  (
-                    discussionChannel as DiscussionChannel &
-                      DiscussionChannelWithFavorited
-                  ).isFavorited
-                "
+                :initial-is-favorited="discussionChannel.isFavorited ?? false"
                 entity-name="Download"
                 size="small"
                 overlay-style

@@ -2,11 +2,7 @@
 import { computed, defineAsyncComponent, ref } from 'vue';
 import type { PropType } from 'vue';
 import { useRoute } from 'nuxt/app';
-import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
-import type {
-  DiscussionChannelWithFlairs,
-  DiscussionWithFavorited,
-} from '@/types/Discussion';
+import type { SitewideDiscussionPresentation as Discussion } from '@/types/DiscussionList';
 import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges.vue';
 import { selectDiscussionForum } from '@/utils/selectDiscussionForum';
 import ChannelIconStack from '@/components/channel/ChannelIconStack.vue';
@@ -21,11 +17,13 @@ import AppImage from '@/components/image/AppImage.vue';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 import { stableRelativeTime } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_USER } from '@/graphQLData/user/queries';
+import { GetBasicUserInfoDocument as GET_USER } from '@/__generated__/operations';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
+
+type DiscussionChannel = Discussion['DiscussionChannels'][number];
 
 const usernameVar = useUsername();
 const isAuthenticatedVar = useIsAuthenticated();
@@ -160,7 +158,7 @@ const flairGroups = computed(() =>
   (props.discussion?.DiscussionChannels || [])
     .map((discussionChannel) => ({
       channelName: discussionChannel.channelUniqueName,
-      flairs: (discussionChannel as DiscussionChannelWithFlairs).Flairs || [],
+      flairs: discussionChannel.Flairs || [],
     }))
     .filter((group) => group.flairs.length > 0)
 );
@@ -399,10 +397,7 @@ const revealSensitiveContent = () => {
                   :allow-add-to-list="true"
                   :discussion-id="discussion.id"
                   :discussion-title="discussion.title"
-                  :initial-is-favorited="
-                    (discussion as Discussion & DiscussionWithFavorited)
-                      .isFavorited
-                  "
+                  :initial-is-favorited="discussion.isFavorited ?? false"
                   size="small"
                 />
               </div>
