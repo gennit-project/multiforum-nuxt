@@ -7,8 +7,8 @@ import {
   GetCrosspostPreviewDocument as GET_CROSSPOST_PREVIEW,
   GetChannelDiscussionFlairConfigDocument as GET_CHANNEL_DISCUSSION_FLAIR_CONFIG,
 } from '@/__generated__/operations';
-// Reviewed #700 exception: legacy relationship connects are absent from the
-// pinned create input; backend #413 must repair this before typed input migration.
+// Blocked #700 contract: CrosspostedDiscussion.connect is rejected by the pin.
+// Normal creation omits Author: the resolver derives it from authenticated context.
 import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
@@ -169,15 +169,7 @@ const discussionCreateInput = computed(() => {
     Tags: {
       connect: tagConnections,
     },
-    // v7 Author input no longer exposes `connect`; preserve the existing
-    // legacy payload at the documented raw operation boundary.
-    Author: {
-      connect: {
-        where: {
-          node: { username: usernameVar.value },
-        },
-      },
-    },
+    // The pinned backend derives Author from authenticated context.
   };
 
   const album = (() => {

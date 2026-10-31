@@ -1,3 +1,5 @@
+import { CreateDiscussionDocument } from '@/__generated__/operations';
+import { variableErrors } from '@/tests/utils/operationVariables';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -254,14 +256,32 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     );
   });
 
-  it('builds the title and author into the create input', async () => {
+  it('builds the title and leaves author assignment to authenticated backend context', async () => {
     const wrapper = mountCD();
     await fields(wrapper).vm.$emit('update-form-values', { title: 'My Title' });
 
-    expect(buildInput()).toMatchObject({
+    expect({
+      title: buildInput().title,
+      suppliesAuthor: 'Author' in buildInput(),
+    }).toEqual({
       title: 'My Title',
-      Author: { connect: { where: { node: { username: 'alice' } } } },
+      suppliesAuthor: false,
     });
+  });
+
+  it('sends a schema-valid normal create payload without obsolete author connections', async () => {
+    const wrapper = mountCD();
+    await fields(wrapper).vm.$emit('update-form-values', {
+      title: 'T',
+      selectedTags: ['cats'],
+      album: { images: [{ id: 'image-1' }], imageOrder: ['image-1'] },
+    });
+    expect(
+      variableErrors(
+        CreateDiscussionDocument,
+        capturedCreateOptions!().variables
+      )
+    ).toEqual([]);
   });
 
   it('adds an Album to the create input when images are present', async () => {

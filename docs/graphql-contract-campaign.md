@@ -458,17 +458,18 @@ overlap and must not be added together as a unique test total.
 
 ### Remaining legacy input contracts
 
-Every row below preserves an existing frontend payload, uses a generated selected
-result, and infers its variable shape from the actual payload builder. This does
-**not** prove that the backend accepts the payload, or make it conform to the pinned
-schema. There are no new schema casts or broad adapters. The schema pin and strict
+Every row below uses a generated selected result and infers variables from its
+actual payload builder. Read-only backend inspection and real schema-coercion tests
+confirm the remaining relationship payloads are rejected before resolver execution.
+They are **known blocked contracts, not working compatibility paths**. Frontend-only
+corrections remove obsolete author connections and fix scalar/filter operators. There are no new schema casts or broad adapters. The schema pin and strict
 GraphQL validation remain unchanged.
 
 | Exact production boundary | Pinned input mismatch |
 | --- | --- |
 | `components/discussion/detail/AlbumEditForm.vue` — `UPDATE_DISCUSSION` | `DiscussionUpdateInput.Album` absent |
-| `components/discussion/form/CreateDiscussion.vue` — `CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS` | Existing `Author.connect` / `CrosspostedDiscussion.connect` absent from relationship create inputs |
-| `components/download/form/CreateDownload.vue` — create mutation | Same author/crosspost relationship mismatch; downloadable-file connections are supported |
+| `components/discussion/form/CreateDiscussion.vue` — `CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS` | `CrosspostedDiscussion.connect` absent; obsolete Author input removed (resolver derives authenticated author) |
+| `components/download/form/CreateDownload.vue` — create mutation | Same crosspost mismatch; author removed and downloadable-file filters corrected to `id.eq` |
 | `components/download/form/CreateDownload.vue` — `UPDATE_DISCUSSION` | `DiscussionUpdateInput.Album` absent |
 | `components/mod/CreateIssueForm.vue` — `CREATE_ISSUE` | Input requires `issueNumber` but existing frontend omits it; author/channel relationships absent |
 | `composables/useAlbumAutoSave.ts` — `UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS` | `DiscussionUpdateInput.Album` absent |
@@ -494,29 +495,64 @@ those contracts or stale entries fail; runtime state values are not static proof
 The enforcement suite has 36 tests, including these change-detection cases. This is separate from `graphql:check`, which continues
 to reject every invalid authored GraphQL document without a suppression baseline.
 
-### Unused exports and coverage limits
+### Backend inspection and required scope
 
-These 15 operation exports have no resolved production consumer in the current
-static audit. They remain generated and schema-validated, but are **not counted as
-migrated call sites**. They are retained to avoid silently removing an exported
-contract based solely on static reachability. Frontend maintainers own confirming
-external/dynamic usage and deleting or wiring each export, tracked in #700:
+Backend sources were inspected read-only at `cb12a24c97a0fb68f804b2b569e773a9c4840db0`;
+the discussion create/update and album ownership implementations are identical at
+the pinned `1027843361dc88ec0e66b327d27f6f056afdb0c2` revision. No backend writes are
+included. These findings replace the earlier assumption that retaining old payloads
+preserved functioning flows.
 
-- `graphQLData/admin/mutations.js#ADD_SERVER_ADMIN`
-- `graphQLData/admin/mutations.js#ADD_SERVER_MODERATOR`
-- `graphQLData/admin/queries.js#GET_PLUGINS`
-- `graphQLData/admin/queries.js#GET_PLUGIN_BY_ID`
-- `graphQLData/discussion/mutations.js#PERMANENTLY_DELETE_IMAGE`
-- `graphQLData/discussion/mutations.js#UPDATE_DISCUSSION_CHANNEL_LABELS`
-- `graphQLData/discussion/queries.js#IS_DISCUSSION_ANSWERED`
-- `graphQLData/discussion/queries.js#GET_DOWNLOAD_LABELS`
-- `graphQLData/image/mutations.js#REMOVE_IMAGE_FROM_ALBUM`
-- `graphQLData/issue/queries.js#GET_ISSUES`
-- `graphQLData/issue/queries.js#GET_CLOSED_ISSUES`
-- `graphQLData/issue/queries.js#GET_SERVER_ISSUE`
-- `graphQLData/scratchpad/queries.js#GET_ALL_SCRATCHPAD_ENTRIES`
-- `graphQLData/scratchpad/queries.js#GET_SUPER_UPVOTE_COUNT`
-- `graphQLData/user/queries.js#GET_USER_FAVORITE_CHANNELS`
+Frontend corrections implemented: remove `Author.connect` from discussion/download
+creation (the resolver uses authenticated context); use `id.eq` for downloadable
+file/image connections; use `.set` for wiki updates and `.eq` for wiki page/author
+filters. Real-schema coercion tests validate normal non-crosspost create payloads
+and isolate the remaining wiki relationship errors.
+
+Required backend scope, pending separate authorization:
+
+1. **Crosspost creation:** declare an existing crosspost ID input and wire the
+   relationship under the existing creation/visibility checks. The current input
+   exposes only nested create; duplicating a discussion or dropping the crosspost
+   would change behavior. [Creation resolver](https://github.com/gennit-project/multiforum-backend/blob/1027843361dc88ec0e66b327d27f6f056afdb0c2/customResolvers/mutations/createDiscussionWithChannelConnections.ts).
+2. **Album editing:** declare the album payload on an application-owned input or
+   argument and retain discussion-edit authorization. The current custom resolver
+   reads a field rejected by GraphQL coercion. Its helper also does not implement
+   existing-image connect/update intent. `updateAlbums` has different permissions;
+   inverse writes would bypass the discussion gate. Inline album creation grants
+   uploader relationships to reused images, so it is not a safe workaround. The
+   backend must preserve existing uploader ownership, validate references and
+   support order/connect/disconnect/authorized metadata writes with rollback.
+   [Update resolver](https://github.com/gennit-project/multiforum-backend/blob/1027843361dc88ec0e66b327d27f6f056afdb0c2/customResolvers/mutations/updateDiscussionWithChannelConnections.ts),
+   [ownership writer](https://github.com/gennit-project/multiforum-backend/blob/1027843361dc88ec0e66b327d27f6f056afdb0c2/services/persistence/discussionAlbumWrite.ts),
+   [permissions](https://github.com/gennit-project/multiforum-backend/blob/cb12a24c97a0fb68f804b2b569e773a9c4840db0/permissions.ts).
+3. **Issue creation:** declare an application input excluding the server-allocated
+   number, with supported identity/target fields, then order identity validation
+   and number allocation correctly. Earlier middleware requires the number and
+   author relationships that the public input cannot express. Generic/server-wide
+   issue behavior also needs an explicit supported contract; dummy numbers or
+   invented targets are not fixes. [Resolver](https://github.com/gennit-project/multiforum-backend/blob/cb12a24c97a0fb68f804b2b569e773a9c4840db0/customResolvers/mutations/createIssue.ts),
+   [identity middleware](https://github.com/gennit-project/multiforum-backend/blob/cb12a24c97a0fb68f804b2b569e773a9c4840db0/middleware/issueIdentityMiddleware.ts).
+4. **Wiki writes:** expose authorized home-page linking and set editor attribution
+   from authenticated context, preserving revision/report/contribution identity.
+   Existing hooks do not replace the rejected VersionAuthor input safely; some
+   expect scalar IDs or pre-coercion child shapes. Switching to another generated
+   mutation would leave wrong attribution/history. [Ownership middleware](https://github.com/gennit-project/multiforum-backend/blob/cb12a24c97a0fb68f804b2b569e773a9c4840db0/middleware/wikiPageOwnershipMiddleware.ts),
+   [revision hook](https://github.com/gennit-project/multiforum-backend/blob/cb12a24c97a0fb68f804b2b569e773a9c4840db0/hooks/wikiPageVersionHistoryHook.ts).
+
+For each family, test actual requests through GraphQL coercion and authorization,
+not only direct resolver calls; publish the corrected contract, repin, migrate the
+remaining frontend variables and remove the exact exception entries. #700 remains
+unfinished pending these contracts and review.
+
+### Unused export cleanup and coverage limits
+
+Removed all 15 unused operation exports after checking production AST imports,
+namespace exports, dynamic registries, generated-symbol references and named
+refetches. The active channel-favorites operation was retained despite sharing an
+operation name with an unused user export. Removing the obsolete plugin-name
+collision renamed one active generated symbol; its runtime operation is unchanged.
+Generation/equivalence, strict validation and affected plugin tests pass.
 
 Composition-only fragments remain generated and checked through their parent
 documents. The audit follows local aliases, selector branches, document props,

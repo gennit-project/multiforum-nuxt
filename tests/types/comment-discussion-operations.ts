@@ -25,6 +25,7 @@ export function checkCommentDiscussionContracts() {
     // @ts-expect-error legacy Album relationship is absent from the pinned update input
     Album: { create: { node: { imageOrder: [] } } },
   };
+  // Author is now server-assigned; do not reintroduce the obsolete client connect.
   const author: DiscussionCreateInput = {
     // @ts-expect-error legacy Author connect is absent from the pinned create input
     Author: { connect: { where: { node: { username: 'alice' } } } },

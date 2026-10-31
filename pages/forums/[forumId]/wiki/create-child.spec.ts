@@ -78,7 +78,7 @@ describe('wiki create-child page', () => {
     expect(wrapper.findComponent(PrimaryButton).exists()).toBe(false);
     expect(wrapper.findComponent(SuspensionNotice).exists()).toBe(true);
   });
-  it('preserves existing author attribution and legacy child-write shape', async () => {
+  it('retains author intent with v7 username filtering in the blocked child write', async () => {
     const wrapper = await mountPage();
     wrapper.findAllComponents(TextInput)[0]!.vm.$emit('update', 'New page');
     wrapper.findComponent(TextEditor).vm.$emit('update', 'Body');
@@ -96,7 +96,7 @@ describe('wiki create-child page', () => {
                 slug: 'new-page',
                 channelUniqueName: 'cats',
                 VersionAuthor: {
-                  connect: { where: { node: { username: 'alice' } } },
+                  connect: { where: { node: { username: { eq: 'alice' } } } },
                 },
               },
             },

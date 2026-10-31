@@ -1,5 +1,6 @@
 // Narrow #700 exceptions until backend #413 exposes home-page and author inputs.
-// These builders describe existing runtime payloads, not schema compatibility.
+// Scalar/filter shapes follow v7; the authored relationship intents remain
+// unsupported and are not working compatibility APIs.
 interface WikiCreateFields {
   title: string;
   body: string;
@@ -12,7 +13,7 @@ interface WikiEditFields {
   editReason: string;
 }
 const authorConnection = (username: string) => ({
-  connect: { where: { node: { username } } },
+  connect: { where: { node: { username: { eq: username } } } },
 });
 const createNode = (
   form: WikiCreateFields,
@@ -27,9 +28,9 @@ const createNode = (
   VersionAuthor: authorConnection(username),
 });
 const updateNode = (form: WikiEditFields, username: string) => ({
-  title: form.title,
-  body: form.body,
-  editReason: form.editReason || null,
+  title: { set: form.title },
+  body: { set: form.body },
+  editReason: { set: form.editReason || null },
   VersionAuthor: authorConnection(username),
 });
 export const legacyCreateWikiHomeVariables = (
@@ -67,6 +68,6 @@ export const legacyUpdateWikiPageVariables = (
   username: string,
   slug: string
 ) => ({
-  where: { channelUniqueName: forumId, slug },
+  where: { channelUniqueName: { eq: forumId }, slug: { eq: slug } },
   update: updateNode(form, username),
 });

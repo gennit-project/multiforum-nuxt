@@ -6,7 +6,9 @@ import {
   legacyUpdateWikiPageVariables,
 } from './legacyWikiWrites';
 const form = { title: 'Intro', body: 'Body', editReason: '', slug: 'intro' };
-const VersionAuthor = { connect: { where: { node: { username: 'alice' } } } };
+const VersionAuthor = {
+  connect: { where: { node: { username: { eq: 'alice' } } } },
+};
 const created = {
   title: 'Intro',
   body: 'Body',
@@ -16,9 +18,9 @@ const created = {
   VersionAuthor,
 };
 const updated = {
-  title: 'Intro',
-  body: 'Body',
-  editReason: null,
+  title: { set: 'Intro' },
+  body: { set: 'Body' },
+  editReason: { set: null },
   VersionAuthor,
 };
 describe('legacy wiki payload contracts', () => {
@@ -46,7 +48,7 @@ describe('legacy wiki payload contracts', () => {
     expect(
       legacyUpdateWikiPageVariables(form, 'cats', 'alice', 'intro')
     ).toEqual({
-      where: { channelUniqueName: 'cats', slug: 'intro' },
+      where: { channelUniqueName: { eq: 'cats' }, slug: { eq: 'intro' } },
       update: updated,
     });
   });

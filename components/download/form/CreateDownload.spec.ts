@@ -1,3 +1,5 @@
+import { CreateDiscussionDocument } from '@/__generated__/operations';
+import { variableErrors } from '@/tests/utils/operationVariables';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref, reactive } from 'vue';
 import { mount, flushPromises } from '@vue/test-utils';
@@ -173,7 +175,7 @@ describe('CreateDownload submit', () => {
     ).toBe('My Model');
   });
 
-  it('preserves author, tag, channel and crosspost connections', async () => {
+  it('omits client author and preserves tag, channel and crosspost intent', async () => {
     const wrapper = mountCreate();
     await submit(wrapper, {
       title: 'T',
@@ -192,7 +194,6 @@ describe('CreateDownload submit', () => {
             Tags: {
               connect: [{ where: { node: { text: { eq: 'models' } } } }],
             },
-            Author: { connect: { where: { node: { username: 'alice' } } } },
             CrosspostedDiscussion: {
               connect: { where: { node: { id: 'source' } } },
             },
@@ -200,6 +201,18 @@ describe('CreateDownload submit', () => {
         },
       ],
     });
+  });
+
+  it('sends a schema-valid download create payload with file ID filters', async () => {
+    const wrapper = mountCreate();
+    await submit(wrapper, {
+      title: 'T',
+      selectedTags: ['models'],
+      downloadableFiles: [{ id: 'file-1' }],
+    });
+    const variables = (h.createDownload as ReturnType<typeof vi.fn>).mock
+      .calls[0][0];
+    expect(variableErrors(CreateDiscussionDocument, variables)).toEqual([]);
   });
 
   it('connects downloadable files that have ids', async () => {
@@ -213,7 +226,7 @@ describe('CreateDownload submit', () => {
     expect(
       (h.createDownload as ReturnType<typeof vi.fn>).mock.calls[0][0].input[0]
         .discussionCreateInput.DownloadableFiles.connect
-    ).toHaveLength(1);
+    ).toEqual([{ where: { node: { id: { eq: 'f1' } } } }]);
   });
 });
 
@@ -280,7 +293,9 @@ describe('CreateDownload onDone follow-ups', () => {
           create: {
             node: {
               imageOrder: ['img1'],
-              Images: { connect: [{ where: { node: { id: 'img1' } } }] },
+              Images: {
+                connect: [{ where: { node: { id: { eq: 'img1' } } } }],
+              },
             },
           },
         },

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-// Reviewed #700 exceptions: the pin omits Author/CrosspostedDiscussion.connect
-// and DiscussionUpdateInput.Album. Keep these existing wire payloads until backend #413.
+// Reviewed #700 exceptions: the pin omits CrosspostedDiscussion.connect
+// and DiscussionUpdateInput.Album. These remaining payloads need a backend contract correction before they can validate.
 import {
   CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
   UPDATE_DISCUSSION,
@@ -17,10 +17,7 @@ import {
 } from '@/__generated__/operations';
 import { GetChannelDocument as GET_CHANNEL } from '@/__generated__/operations';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
-import { useUsername } from '@/composables/useAuthState';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-
-const usernameVar = useUsername();
 
 const router = useRouter();
 const route = useRoute();
@@ -65,7 +62,7 @@ const createDownloadVariables = () => {
   const downloadableFileConnections = (formValues.value.downloadableFiles || [])
     .filter((file) => file.id) // Only connect files that have database IDs
     .map((file) => ({
-      where: { node: { id: file.id } },
+      where: { node: { id: { eq: file.id } } },
     }));
 
   // Album will be created as a follow-up mutation after discussion creation
@@ -75,13 +72,6 @@ const createDownloadVariables = () => {
     body: formValues.value.body,
     hasDownload: true,
     Tags: { connect: tagConnections },
-    Author: {
-      connect: {
-        where: {
-          node: { username: usernameVar.value },
-        },
-      },
-    },
     ...(downloadableFileConnections.length > 0 && {
       DownloadableFiles: {
         connect: downloadableFileConnections,
@@ -115,7 +105,7 @@ const downloadAlbumVariables = (discussionId: string) => {
       connect: (formValues.value.album?.images || [])
         .filter((img): img is typeof img & { id: string } => Boolean(img.id))
         .map((img) => ({
-          where: { node: { id: img.id } },
+          where: { node: { id: { eq: img.id } } },
         })),
     },
   };
