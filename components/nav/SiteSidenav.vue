@@ -17,7 +17,7 @@ import CheckIcon from '@/components/icons/CheckIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import XIcon from '@/components/icons/XmarkIcon.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
-import { GET_USER } from '@/graphQLData/user/queries';
+import { GetBasicUserInfoDocument as GET_USER } from '@/__generated__/operations';
 import { setSideNavIsOpenVar } from '@/cache';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import SiteSidenavLogout from './SiteSidenavLogout.vue';

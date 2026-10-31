@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { SEND_BUG_REPORT } from '@/graphQLData/email/mutations';
+import { SendBugReportDocument as SEND_BUG_REPORT } from '@/__generated__/operations';
 import TextEditor from '@/components/TextEditor.vue';
 import TextInput from '@/components/TextInput.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';

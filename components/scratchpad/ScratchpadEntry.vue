@@ -2,34 +2,15 @@
 import { computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { relativeTime } from '@/utils';
-import {
-  UPDATE_SCRATCHPAD_ENTRY_VISIBILITY,
-  DELETE_SCRATCHPAD_ENTRY,
-} from '@/graphQLData/scratchpad/mutations';
+import { UpdateScratchpadEntryVisibilityDocument as UPDATE_SCRATCHPAD_ENTRY_VISIBILITY, DeleteScratchpadEntryDocument as DELETE_SCRATCHPAD_ENTRY } from '@/__generated__/operations';
 import {
   getPermalinkToDiscussion,
   getPermalinkToDiscussionComment,
 } from '@/utils/routerUtils';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 
-interface ScratchpadEntryData {
-  id: string;
-  createdAt: string;
-  text: string;
-  isPublic: boolean;
-  sourceType: string;
-  // DiscussionChannel id (discussion) or Comment id (comment).
-  sourceId: string;
-  sourceChannelUniqueName?: string;
-  // The Discussion id the upvoted content belongs to. Needed to build a working
-  // link, since the discussion route expects the Discussion id, not sourceId.
-  discussionId?: string;
-  Author: {
-    username: string;
-    displayName?: string;
-    profilePicURL?: string;
-  };
-}
+import type { GetPublicScratchpadEntriesQuery } from '@/__generated__/operations';
+type ScratchpadEntryData = GetPublicScratchpadEntriesQuery['scratchpadEntries'][number];
 
 const props = defineProps({
   entry: {

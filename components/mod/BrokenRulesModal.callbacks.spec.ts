@@ -1,3 +1,4 @@
+import { print, type DocumentNode } from 'graphql';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 
@@ -40,8 +41,8 @@ const trackerFor = (name: string): Tracker => {
 const detect = (src: string) => NAMES.find((n) => src.includes(n)) || 'generic';
 
 vi.mock('@vue/apollo-composable', () => ({
-  useMutation: (doc: { loc?: { source?: { body?: string } } }, options?: { update?: (cache: unknown) => void }) => {
-    const name = detect(doc?.loc?.source?.body || '');
+  useMutation: (doc: DocumentNode, options?: { update?: (cache: unknown) => void }) => {
+    const name = detect(doc ? print(doc) : '');
     const t = trackerFor(name);
     if (options?.update) t.update = options.update;
     return {

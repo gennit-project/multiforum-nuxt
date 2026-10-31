@@ -1,3 +1,4 @@
+import { PermanentlyDeleteChannelBannerDocument, SetChannelIconDocument, RemoveForumOwnerDocument } from '@/__generated__/operations';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises, shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -66,22 +67,22 @@ vi.mock('@/graphQLData/mod/mutations', () => ({
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (operation: unknown) => {
     const loading =
-      operation === 'PERMANENTLY_DELETE_CHANNEL_BANNER'
+      operation === PermanentlyDeleteChannelBannerDocument
         ? (h.deleteLoading ??= ref(false))
         : ref(false);
     return {
       mutate:
-        operation === 'PERMANENTLY_DELETE_CHANNEL_BANNER'
+        operation === PermanentlyDeleteChannelBannerDocument
           ? h.permanentlyDeleteChannelBanner
-          : operation === 'SET_CHANNEL_ICON'
+          : operation === SetChannelIconDocument
             ? h.setChannelIcon
-          : operation === 'REMOVE_FORUM_OWNER'
+          : operation === RemoveForumOwnerDocument
             ? h.removeForumOwner
             : h.createSignedStorageUrl,
       loading,
       error: ref(null),
       onDone: (callback: () => void) => {
-        if (operation === 'REMOVE_FORUM_OWNER') h.removeDone = callback;
+        if (operation === RemoveForumOwnerDocument) h.removeDone = callback;
       },
       onError: vi.fn(),
     };

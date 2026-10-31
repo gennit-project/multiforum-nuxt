@@ -1,16 +1,10 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { gql } from '@apollo/client/core';
 import CreateEditChannelFields from '@/components/channel/form/CreateEditChannelFields.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
-import { CREATE_CHANNEL } from '@/graphQLData/channel/mutations';
-import type {
-  Channel,
-  ChannelCreateInput,
-  ChannelTagsFieldInput,
-} from '@/__generated__/graphql';
+import { CreateChannelDocument as CREATE_CHANNEL, GetChannelNamesDocument, GetSortedChannelsDiscussionsDocument } from '@/__generated__/operations';
 import type { CreateEditChannelFormValues } from '@/types/Channel';
 import { useUsername } from '@/composables/useAuthState';
 import { useRouter, useHead } from 'nuxt/app';
@@ -52,7 +46,7 @@ const createChannelInput = computed(() => {
     };
   });
 
-  const result: ChannelCreateInput[] = [
+  const result = [
     {
       uniqueName: formValues.value.uniqueName,
       description: formValues.value.description,
@@ -65,11 +59,9 @@ const createChannelInput = computed(() => {
       imageUploadsEnabled: formValues.value.imageUploadsEnabled,
       markdownImagesEnabled: formValues.value.markdownImagesEnabled,
       emojiEnabled: formValues.value.emojiEnabled,
-      // v7 Tags input no longer exposes `connectOrCreate`; the custom create
-      // resolver still accepts this payload, so preserve the shape via a cast.
       Tags: {
         connect: tagConnections,
-      } as unknown as ChannelTagsFieldInput,
+      },
       Admins: {
         connect: [
           {
@@ -106,49 +98,13 @@ const {
   loading: createChannelLoading,
   onDone,
   onError,
-} = useMutation(CREATE_CHANNEL, () => ({
-  update: (cache, result) => {
-    const newChannel: Channel = result.data?.createChannels?.channels?.[0];
-    if (!newChannel?.uniqueName) {
-      return;
-    }
-
-    cache.modify({
-      fields: {
-        channels(existingChannels = []) {
-          const newChannelRef = cache.writeFragment({
-            id: cache.identify({
-              __typename: 'Channel',
-              uniqueName: newChannel.uniqueName,
-            }),
-            data: {
-              ...newChannel,
-              __typename: 'Channel',
-            },
-            fragment: gql`
-              fragment NewChannel on Channel {
-                __typename
-                uniqueName
-                description
-                channelIconURL
-                channelBannerURL
-                Admins { username }
-                Tags { text }
-              }
-            `,
-          });
-          if (!newChannelRef) {
-            return existingChannels;
-          }
-          return [...existingChannels, newChannelRef];
-        },
-      },
-    });
-  },
-}));
+} = useMutation(CREATE_CHANNEL, {
+  // Refresh active filtered lists rather than inserting a partial response into every cache list.
+  refetchQueries: [GetChannelNamesDocument, GetSortedChannelsDiscussionsDocument],
+});
 
 onDone((response) => {
-  const newChannelId = response.data.createChannels.channels[0]?.uniqueName;
+  const newChannelId = response.data?.createChannels.channels[0]?.uniqueName;
   if (!newChannelId) {
     submitError.value =
       'Unable to create forum. Please check your permissions or try again.';

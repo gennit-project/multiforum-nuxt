@@ -3,6 +3,10 @@ import { nextTick, ref, type Ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { usePluginConfigStatus } from './usePluginConfigStatus';
 
+vi.mock('@/__generated__/operations', () => ({
+  GetPluginConfigStatusDocument: 'CONFIG_STATUS',
+}));
+
 const h = vi.hoisted(() => ({
   query: null as unknown as {
     result: Ref<unknown>;
@@ -24,10 +28,6 @@ vi.mock('@vue/apollo-composable', async () => {
     useQuery: vi.fn(() => h.query),
   };
 });
-
-vi.mock('@/graphQLData/admin/queries', () => ({
-  GET_PLUGIN_CONFIG_STATUS: 'CONFIG_STATUS',
-}));
 
 describe('usePluginConfigStatus', () => {
   beforeEach(() => {

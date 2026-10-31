@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { DateTime } from 'luxon';
-import type { Event } from '@/__generated__/graphql';
+import type { GetEventsQuery } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_SOONEST_EVENTS_IN_CHANNEL } from '@/graphQLData/channel/queries';
+import { GetEventsDocument as GET_SOONEST_EVENTS_IN_CHANNEL } from '@/__generated__/operations';
 import { useRoute } from 'nuxt/app';
 import ArrowUpRightIcon from '@/components/icons/ArrowUpRightIcon.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import TicketIcon from '@/components/icons/TicketIcon.vue';
+type Event = GetEventsQuery['events'][number];
 
 defineProps({
   eventChannelsAggregate: {
@@ -31,10 +32,10 @@ const {
   loading: getEventsLoading,
 } = useQuery(
   GET_SOONEST_EVENTS_IN_CHANNEL,
-  {
-    uniqueName: channelId,
+  () => ({
+    uniqueName: channelId.value,
     now: DateTime.local().startOf('hour').toISO(),
-  },
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -44,7 +45,7 @@ const soonestEventsInChannel = computed(() => {
   if (getEventsLoading.value || getEventsError.value) {
     return [];
   }
-  return getEventsResult.value.events;
+  return getEventsResult.value?.events ?? [];
 });
 
 // Helper functions

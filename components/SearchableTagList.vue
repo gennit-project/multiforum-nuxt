@@ -2,10 +2,8 @@
 import { ref, computed, watch } from 'vue';
 import type { PropType, Ref } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import { GET_TAGS } from '@/graphQLData/tag/queries';
-import type { Tag } from '@/__generated__/graphql';
+import { GetTagsDocument as GET_TAGS, CreateTagDocument as CREATE_TAG  } from '@/__generated__/operations';
 import SearchBar from '@/components/SearchBar.vue';
-import { CREATE_TAG } from '@/graphQLData/tag/mutations';
 import ErrorBanner from './ErrorBanner.vue';
 
 const {
@@ -41,11 +39,9 @@ const {
   result: tagsResult,
 } = useQuery(
   GET_TAGS,
-  {
-    where: {
-      text_CONTAINS: searchInputComputed,
-    },
-  },
+  () => ({
+    where: { text: { contains: searchInputComputed.value } },
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -55,7 +51,7 @@ const tagOptions = computed(() => {
   if (!tagsResult.value || !tagsResult.value.tags) {
     return [];
   }
-  return tagsResult.value.tags.map((tag: Tag) => ({
+  return tagsResult.value.tags.map((tag) => ({
     text: tag.text,
   }));
 });

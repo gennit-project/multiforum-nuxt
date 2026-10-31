@@ -33,7 +33,7 @@ import { useIssueOriginalPoster } from '@/composables/useIssueOriginalPoster';
 import { useIssueCloseReopen } from '@/composables/useIssueCloseReopen';
 import {
   useIssueActivityFeed,
-  
+
 } from '@/composables/useIssueActivityFeed';
 import { useIssueLock } from '@/composables/useIssueLock';
 import { useIssueBodyEdit } from '@/composables/useIssueBodyEdit';
@@ -414,7 +414,7 @@ const issueContextChannels = computed<string[]>(() => {
   }
 
   const eventChannels = extractChannelUniqueNames(
-    relatedEvent.value?.EventChannels 
+    relatedEvent.value?.EventChannels
   );
   if (eventChannels.length > 0) {
     return [...new Set(eventChannels)];

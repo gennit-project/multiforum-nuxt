@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import Tag from '@/components/TagComponent.vue';
-import type { Channel } from '@/__generated__/graphql';
+import type { ChannelDetail as Channel } from '@/types/ChannelPresentation';
 import AdminIcon from '@/components/icons/AdminIcon.vue';
 import ChannelRules from '@/components/channel/Rules.vue';
 import DocumentIcon from '@/components/icons/DocumentIcon.vue';
@@ -18,22 +18,11 @@ import ThumbtackIcon from '@/components/icons/ThumbtackIcon.vue';
 import { useIsAuthenticated } from '@/composables/useAuthState';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
 import { getPlainWikiTitle } from '@/utils/wikiTitle';
+import { parseChannelRules } from '@/utils/channelRules';
 
 const isAuthenticatedVar = useIsAuthenticated();
 
-type BotSummary = {
-  username: string;
-  displayName?: string | null;
-  botProfileId?: string | null;
-  isDeprecated?: boolean | null;
-  SuspensionsConnection?: {
-    aggregate?: { count?: { nodes?: number | null } | null } | null;
-  } | null;
-};
-
-type ChannelWithFavoriteState = Channel & {
-  isFavorited?: boolean | null;
-};
+type BotSummary = Channel['Bots'][number];
 
 const props = defineProps({
   channel: {
@@ -59,13 +48,13 @@ const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
-const channelRules = computed(() => props.channel?.rules ?? '');
+const channelRules = computed(() => parseChannelRules(props.channel.rules));
 const initialIsFavorited = computed(
-  () => (props.channel as ChannelWithFavoriteState)?.isFavorited ?? undefined
+  () => props.channel.isFavorited ?? undefined
 );
 const pinnedWikiPages = computed(() => props.channel?.PinnedWikiPages ?? []);
 const botAccounts = computed(() => {
-  const channel = props.channel as Channel & { Bots?: BotSummary[] };
+  const channel = props.channel;
   return channel?.Bots ?? [];
 });
 
@@ -215,7 +204,7 @@ const handleBecomeAdminSuccess = () => {
             </div>
           </div>
 
-          <div v-if="channelRules && channelRules !== '[]'" :key="channelRules">
+          <div v-if="channelRules.length" :key="JSON.stringify(channelRules)">
             <span
               class="my-2 mb-2 flex items-center text-sm leading-6 font-bold text-gray-500 dark:text-gray-400"
             >

@@ -1,9 +1,10 @@
 import type { LocationQuery } from 'vue-router';
+import { IssueSortType } from '@/__generated__/graphql';
 
 export const issueSortValues = {
-  NEWEST: 'newest',
-  OLDEST: 'oldest',
-  MOST_REPORTS: 'mostReports',
+  NEWEST: IssueSortType.Newest,
+  OLDEST: IssueSortType.Oldest,
+  MOST_REPORTS: IssueSortType.MostReports,
 } as const;
 
 export type IssueSortValue =

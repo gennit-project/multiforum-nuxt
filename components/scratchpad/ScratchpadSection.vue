@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import {
-  GET_PUBLIC_SCRATCHPAD_ENTRIES,
-  GET_PENDING_SCRATCHPAD_ENTRIES,
-} from '@/graphQLData/scratchpad/queries';
+import { GetPublicScratchpadEntriesDocument as GET_PUBLIC_SCRATCHPAD_ENTRIES, GetPendingScratchpadEntriesDocument as GET_PENDING_SCRATCHPAD_ENTRIES } from '@/__generated__/operations';
 import ScratchpadEntry from './ScratchpadEntry.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import LoadMore from '@/components/LoadMore.vue';
@@ -83,6 +80,7 @@ const showLoadMore = computed(() => {
 });
 
 const loadMorePublicEntries = async () => {
+  const username = props.username;
   await fetchMorePublic({
     variables: {
       username: props.username,
@@ -90,16 +88,16 @@ const loadMorePublicEntries = async () => {
       offset: publicEntries.value.length,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) {
+      if (!fetchMoreResult || props.username !== username) {
         return previousResult;
       }
 
       return {
         ...fetchMoreResult,
-        scratchpadEntries: [
-          ...(previousResult.scratchpadEntries || []),
-          ...(fetchMoreResult.scratchpadEntries || []),
-        ],
+        scratchpadEntries: [...new Map([
+          ...previousResult.scratchpadEntries,
+          ...fetchMoreResult.scratchpadEntries,
+        ].map(entry => [entry.id, entry])).values()],
       };
     },
   });

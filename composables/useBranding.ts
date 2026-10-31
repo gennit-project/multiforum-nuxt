@@ -1,8 +1,8 @@
 import { computed, type ComputedRef } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRuntimeConfig } from 'nuxt/app';
-import type { ServerConfig } from '@/__generated__/graphql';
-import { GET_SERVER_BRANDING } from '@/graphQLData/admin/queries';
+import type { GetServerBrandingQuery } from '@/__generated__/operations';
+import { GetServerBrandingDocument as GET_SERVER_BRANDING } from '@/__generated__/operations';
 import { config } from '@/config';
 import {
   resolveBranding,
@@ -10,21 +10,7 @@ import {
   type BrandingValues,
 } from '@/utils/branding';
 
-type ServerConfigBranding = Pick<
-  ServerConfig,
-  | 'serverIconURL'
-  | 'brandingLogoDarkURL'
-  | 'brandingLogoAlt'
-  | 'brandingFaviconURL'
-  | 'brandingPrimaryColor'
-  | 'brandingProductName'
-  | 'brandingDocsURL'
-  | 'brandingSourceURL'
-  | 'brandingIssuesURL'
-  | 'brandingSupportEmail'
-  | 'brandingShowUpstreamLinks'
-  | 'brandingCustomFooterLinks'
->;
+type ServerConfigBranding = Partial<Omit<GetServerBrandingQuery['serverConfigs'][number], 'serverName'>>;
 
 /**
  * Map the API's field names onto the resolver's. Only keys the admin has

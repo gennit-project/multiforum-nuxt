@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getAllPermissions } from './permissionUtils';
+import { getAllPermissions, checkPermission } from './permissionUtils';
 
 describe('permissionUtils', () => {
   it('includes edit permissions from elevated mod role', () => {
@@ -152,5 +152,11 @@ describe('permissionUtils', () => {
     });
 
     expect(permissions.isSuspendedMod).toBe(true);
+  });
+});
+
+describe('nullable selected membership identities', () => {
+  it('does not grant owner permission to an empty identity', () => {
+    expect(checkPermission({ permissionData: { Admins: [{ username: '' }, { username: null }, null] }, standardModRole: { canReport: false }, elevatedModRole: null, username: '', modProfileName: '', action: 'canReport' })).toBe(false);
   });
 });

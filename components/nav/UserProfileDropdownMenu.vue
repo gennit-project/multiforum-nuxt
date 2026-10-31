@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useUsername } from '@/composables/useAuthState';
 import { useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_USER } from '@/graphQLData/user/queries';
+import { GetBasicUserInfoDocument as GET_USER } from '@/__generated__/operations';
 import { useServerLogout } from '@/composables/useServerLogout';
 
 const usernameVar = useUsername();

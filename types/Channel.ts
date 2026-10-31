@@ -1,4 +1,4 @@
-import type { FilterGroup } from '@/__generated__/graphql';
+import type { ChannelFilterGroup as FilterGroup } from './ChannelPresentation';
 type RuleInput = {
   summary: string;
   detail: string;

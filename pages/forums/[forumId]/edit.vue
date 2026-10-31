@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
+import { parseChannelRules } from '@/utils/channelRules';
 import type { UserData } from '@/types/User';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { UPDATE_CHANNEL } from '@/graphQLData/channel/mutations';
+import { GetChannelDocument as GET_CHANNEL, UpdateChannelDocument as UPDATE_CHANNEL  } from '@/__generated__/operations';
 import type { CreateEditChannelFormValues } from '@/types/Channel';
 import CreateEditChannelFields from '@/components/channel/form/CreateEditChannelFields.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useUsername } from '@/composables/useAuthState';
 import type {
   ChannelUpdateInput,
-  ChannelTagsUpdateFieldInput,
-  Tag as TagData,
 } from '@/__generated__/graphql';
 import { buildFilterGroupsUpdate } from '@/utils/filterGroupUpdates';
 import { useRoute } from 'nuxt/app';
@@ -111,28 +109,23 @@ watch(
   (newVal) => {
     if (newVal && !getChannelLoading.value && !getChannelError.value) {
       const channelData = newVal.channels[0];
-      let rules = [];
-
-      try {
-        rules = JSON.parse(channelData.rules) || [];
-      } catch (e) {
-        console.error('Error parsing channel rules', e);
-      }
+      if (!channelData) return;
+      const rules = parseChannelRules(channelData.rules);
 
       formValues.value = {
         uniqueName: channelData.uniqueName,
-        description: channelData.description,
-        displayName: channelData.displayName,
-        selectedTags: channelData.Tags.map((tag: TagData) => tag.text),
-        channelIconURL: channelData.channelIconURL,
-        channelBannerURL: channelData.channelBannerURL,
-        wikiEnabled: channelData.wikiEnabled,
-        eventsEnabled: channelData.eventsEnabled,
-        feedbackEnabled: channelData.feedbackEnabled,
+        description: channelData.description ?? '',
+        displayName: channelData.displayName ?? '',
+        selectedTags: channelData.Tags.map((tag) => tag.text),
+        channelIconURL: channelData.channelIconURL ?? '',
+        channelBannerURL: channelData.channelBannerURL ?? '',
+        wikiEnabled: channelData.wikiEnabled === true,
+        eventsEnabled: channelData.eventsEnabled === true,
+        feedbackEnabled: channelData.feedbackEnabled === true,
         imageUploadsEnabled: channelData.imageUploadsEnabled !== false,
         markdownImagesEnabled: channelData.markdownImagesEnabled !== false,
         emojiEnabled: channelData.emojiEnabled !== false,
-        downloadsEnabled: channelData.downloadsEnabled,
+        downloadsEnabled: channelData.downloadsEnabled === true,
         allowedFileTypes: channelData.allowedFileTypes || [],
         downloadFilterGroups: channelData.FilterGroups || [],
         rules,
@@ -155,7 +148,7 @@ watch(
 );
 
 const existingTags = computed(() => {
-  return channel.value?.Tags?.map((tag: TagData) => tag.text) || [];
+  return channel.value?.Tags?.map((tag) => tag.text) || [];
 });
 
 const ownerList = computed(() => {
@@ -178,7 +171,7 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
 
   const tagDisconnections = existingTags.value
     .filter((tag: string) => !formValues.value.selectedTags.includes(tag))
-    .map((tag: TagData) => ({
+    .map((tag) => ({
       where: { node: { text: { eq: tag } } },
     }));
 
@@ -203,13 +196,11 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     emojiEnabled: { set: formValues.value.emojiEnabled },
     downloadsEnabled: { set: formValues.value.downloadsEnabled },
     allowedFileTypes: { set: formValues.value.allowedFileTypes },
-    // v7 Tags update input no longer exposes `connectOrCreate`; the custom
-    // update resolver still accepts this payload, so preserve the shape.
     Tags: [
       {
         connect: tagConnections,
         disconnect: tagDisconnections,
-      } as unknown as ChannelTagsUpdateFieldInput,
+      },
     ],
     ...(filterGroupsUpdate.length > 0
       ? { FilterGroups: filterGroupsUpdate }

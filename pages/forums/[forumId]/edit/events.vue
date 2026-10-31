@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import CheckBox from '@/components/CheckBox.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GetServerConfigDocument as GET_SERVER_CONFIG } from '@/__generated__/operations';
 import { config } from '@/config';
 
 const props = defineProps({

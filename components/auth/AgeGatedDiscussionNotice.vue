@@ -4,10 +4,9 @@ import { useHead, useRoute } from 'nuxt/app';
 import { useApolloClient, useMutation } from '@vue/apollo-composable';
 import {
   AgeGateCheckStatus,
-  type OwnAgeProfile,
 } from '@/__generated__/graphql';
 import DatePicker from '@/components/event/form/DatePicker.vue';
-import { SET_MY_BIRTHDAY } from '@/graphQLData/age/mutations';
+import { SetMyBirthdayDocument as SET_MY_BIRTHDAY } from '@/__generated__/operations';
 import { useAuthNavigation } from '@/composables/useAuthNavigation';
 import { useDiscussionAgeGateCheck } from '@/composables/useDiscussionAgeGateCheck';
 import { getAgeErrorMessage } from '@/utils/ageGating';
@@ -77,7 +76,7 @@ const {
   loading: savingBirthday,
   error: saveBirthdayError,
   onDone: onBirthdaySaved,
-} = useMutation<{ setMyBirthday: OwnAgeProfile }>(SET_MY_BIRTHDAY, () => ({
+} = useMutation(SET_MY_BIRTHDAY, () => ({
   variables: { birthday: birthday.value },
 }));
 

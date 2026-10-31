@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL_NAMES } from '@/graphQLData/channel/queries';
+import { GetChannelNamesDocument as GET_CHANNEL_NAMES } from '@/__generated__/operations';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 import SearchBar from '@/components/SearchBar.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';

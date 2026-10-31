@@ -4591,28 +4591,6 @@
         }
       ],
       "fragments": []
-    },
-    "pages/forums/create.vue#inline:NewChannel": {
-      "operations": [],
-      "fragments": [
-        {
-          "name": "NewChannel",
-          "document": "NewChannelFragmentDoc",
-          "result": "NewChannelFragment",
-          "variables": "unknown"
-        }
-      ]
-    },
-    "utils/index.ts#inline:NewTag": {
-      "operations": [],
-      "fragments": [
-        {
-          "name": "NewTag",
-          "document": "NewTagFragmentDoc",
-          "result": "NewTagFragment",
-          "variables": "unknown"
-        }
-      ]
     }
   },
   "exceptions": []

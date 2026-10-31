@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
+import type { ChannelFilterGroup as FilterGroup, ChannelFilterOption as FilterOption } from '@/types/ChannelPresentation';
 import { FilterMode, FilterSelection } from '@/__generated__/graphql';
 
 const props = defineProps({
@@ -169,14 +169,7 @@ const addOption = () => {
     displayName: newOptionForm.value.displayName,
     order: props.filterGroup.options?.length || 0,
     // Required fields for GraphQL type but not used in this context
-    __typename: 'FilterOption' as const,
-    group: props.filterGroup,
-    groupConnection: {
-      __typename: 'FilterOptionGroupConnection',
-      edges: [],
-      pageInfo: { hasNextPage: false, hasPreviousPage: false },
-      totalCount: 0,
-    },
+
   };
 
   const updatedOptions = [...(props.filterGroup.options || []), newOption];

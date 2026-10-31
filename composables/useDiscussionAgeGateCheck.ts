@@ -1,7 +1,6 @@
 import { computed, unref, type MaybeRef } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import type { AgeGateCheck } from '@/__generated__/graphql';
-import { GET_DISCUSSION_AGE_GATE_CHECK } from '@/graphQLData/age/queries';
+import { GetDiscussionAgeGateCheckDocument as GET_DISCUSSION_AGE_GATE_CHECK } from '@/__generated__/operations';
 
 type UseDiscussionAgeGateCheckParams = {
   discussionId: MaybeRef<string>;
@@ -18,9 +17,7 @@ export function useDiscussionAgeGateCheck({
   discussionId,
   enabled,
 }: UseDiscussionAgeGateCheckParams) {
-  const { result, loading } = useQuery<{
-    getDiscussionAgeGateCheck: AgeGateCheck;
-  }>(
+  const { result, loading } = useQuery(
     GET_DISCUSSION_AGE_GATE_CHECK,
     () => ({ discussionId: unref(discussionId) }),
     () => ({ enabled: unref(enabled) && Boolean(unref(discussionId)) })

@@ -2,10 +2,9 @@
 import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_TAGS } from '@/graphQLData/tag/queries';
+import { GetTagsDocument as GET_TAGS } from '@/__generated__/operations';
 import MultiSelect from '@/components/MultiSelect.vue';
 import type { MultiSelectOption } from '@/components/MultiSelect.vue';
-import type { Tag, TagWhere } from '@/__generated__/graphql';
 
 const props = defineProps({
   selectedTags: {
@@ -24,11 +23,7 @@ const emit = defineEmits<{
 
 const searchQuery = ref('');
 
-const { loading: tagsLoading, result: tagsResult } = useQuery<
-  { tags: Pick<Tag, 'text'>[] },
-  { where: TagWhere }
->(
-  GET_TAGS,
+const { loading: tagsLoading, result: tagsResult } = useQuery(  GET_TAGS,
   computed(() => ({
     where: {
       text_CONTAINS: searchQuery.value,

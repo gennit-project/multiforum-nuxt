@@ -3,10 +3,7 @@ import { computed, ref, watchEffect } from 'vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import ChannelList from '@/components/channel/ChannelList.vue';
-import {
-  GET_CHANNELS_DISCUSSIONS,
-  GET_CHANNELS_DOWNLOADS,
-} from '@/graphQLData/channel/queries';
+import { GetSortedChannelsDiscussionsDocument as GET_CHANNELS_DISCUSSIONS, GetSortedChannelsDownloadsDocument as GET_CHANNELS_DOWNLOADS } from '@/__generated__/operations';
 import TagIcon from '@/components/icons/TagIcon.vue';
 import FilterChip from '@/components/FilterChip.vue';
 import SearchBar from '@/components/SearchBar.vue';
@@ -21,7 +18,6 @@ import {
   toggleSelectedTag,
 } from '@/utils/forumListChannels';
 import type { LocationQueryValue } from 'vue-router';
-import type { Channel } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
 
 useHead({ title: 'Forums' });
@@ -95,14 +91,14 @@ const {
   error: channelError,
 } = useQuery(
   GET_CHANNELS_DISCUSSIONS,
-  {
+  () => ({
     now,
     limit: 25,
     offset: 0,
-    tags: selectedTags,
-    searchInput: searchInput,
+    tags: selectedTags.value,
+    searchInput: searchInput.value,
     loggedInUsername: loggedInUsername.value || null,
-  },
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -112,12 +108,12 @@ const {
 const { result: downloadCountsResult, fetchMore: fetchMoreDownloadCounts } =
   useQuery(
     GET_CHANNELS_DOWNLOADS,
-    {
+    () => ({
       limit: 25,
       offset: 0,
-      tags: selectedTags,
-      searchInput: searchInput,
-    },
+      tags: selectedTags.value,
+      searchInput: searchInput.value,
+    }),
     {
       fetchPolicy: 'cache-first',
     }
@@ -133,15 +129,18 @@ const downloadCountMap = computed(() =>
 );
 
 const mergedChannels = computed(() =>
-  mergeChannelCounts<Channel>({
+  mergeChannelCounts({
     baseChannels: channelResult.value?.getSortedChannels?.channels,
     discussionCountMap: discussionCountMap.value,
     downloadCountMap: downloadCountMap.value,
   })
 );
 
-// Function to load more channels
+// A page fetched for an old filter must not enter the current list.
+const pageScope = computed(() => JSON.stringify([selectedTags.value, searchInput.value, loggedInUsername.value]));
 const loadMore = () => {
+  if (channelLoading.value) return;
+  const scope = pageScope.value;
   const currentOffset =
     channelResult.value?.getSortedChannels?.channels?.length || 0;
 
@@ -150,16 +149,16 @@ const loadMore = () => {
       offset: currentOffset,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      if (scope !== pageScope.value || !fetchMoreResult?.getSortedChannels) return previousResult;
 
       return {
         ...previousResult,
         getSortedChannels: {
           ...fetchMoreResult.getSortedChannels,
-          channels: [
+          channels: [...new Map([
             ...(previousResult.getSortedChannels?.channels || []),
-            ...(fetchMoreResult.getSortedChannels?.channels || []),
-          ],
+            ...(fetchMoreResult.getSortedChannels.channels || []),
+          ].filter(channel => channel !== null).map(channel => [channel.uniqueName, channel])).values()],
         },
       };
     },
@@ -171,16 +170,16 @@ const loadMore = () => {
       offset: currentOffset,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      if (scope !== pageScope.value || !fetchMoreResult?.getSortedChannels) return previousResult;
 
       return {
         ...previousResult,
         getSortedChannels: {
           ...fetchMoreResult.getSortedChannels,
-          channels: [
+          channels: [...new Map([
             ...(previousResult.getSortedChannels?.channels || []),
-            ...(fetchMoreResult.getSortedChannels?.channels || []),
-          ],
+            ...(fetchMoreResult.getSortedChannels.channels || []),
+          ].filter(channel => channel !== null).map(channel => [channel.uniqueName, channel])).values()],
         },
       };
     },

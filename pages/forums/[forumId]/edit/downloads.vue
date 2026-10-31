@@ -6,7 +6,7 @@ import FilterGroupManager from '@/components/filter/FilterGroupManager.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import type { FilterGroup } from '@/__generated__/graphql';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GetServerConfigDocument as GET_SERVER_CONFIG } from '@/__generated__/operations';
 import { config } from '@/config';
 
 const props = defineProps({

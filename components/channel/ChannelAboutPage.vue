@@ -1,9 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import type { User } from '@/__generated__/graphql';
+import { GetChannelDocument as GET_CHANNEL, GetServerConfigDocument as GET_SERVER_CONFIG  } from '@/__generated__/operations';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ReportChannelModal from '@/components/mod/ReportChannelModal.vue';
@@ -30,22 +28,22 @@ const {
   result: getChannelResult,
   loading: getChannelLoading,
   refetch: refetchChannel,
-} = useQuery(GET_CHANNEL, {
+} = useQuery(GET_CHANNEL, () => ({
   uniqueName: channelId.value,
   now: new Date().toISOString(),
-});
+}));
 
 const channel = computed(() => {
   if (getChannelLoading.value || getChannelError.value) {
     return null;
   }
-  return getChannelResult.value.channels[0];
+  return getChannelResult.value?.channels[0] ?? null;
 });
 
 const admins = computed(() => channel.value?.Admins ?? []);
 
 const ownerList = computed(() =>
-  admins.value.map((adminData: User) => adminData?.username)
+  admins.value.map((adminData) => adminData?.username)
 );
 
 const handleRefetchChannelData = () => {

@@ -3,30 +3,9 @@ import { ref, computed } from 'vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 
-type Rule = {
-  detail: string;
-  summary: string;
-};
-
-const props = defineProps<{
-  rules?: string;
-}>();
-
-const channelRules = computed(() => {
-  const rules: Rule[] = [];
-  try {
-    const rulesArray = JSON.parse(props.rules || '[]') || [];
-    for (const rule of rulesArray) {
-      rules.push({
-        detail: rule.detail,
-        summary: rule.summary,
-      });
-    }
-  } catch (e) {
-    console.error('Error parsing channel rules', e);
-  }
-  return rules;
-});
+import { parseChannelRules } from '@/utils/channelRules';
+const props = defineProps<{ rules?: unknown }>();
+const channelRules = computed(() => parseChannelRules(props.rules));
 
 // Track which rules are expanded by their summary text
 const expandedRules = ref<Set<string>>(new Set());

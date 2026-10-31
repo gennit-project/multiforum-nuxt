@@ -274,8 +274,7 @@ describe('forum post flair settings', () => {
 
   it('applies the saved response and announces success', async () => {
     const wrapper = await mountPage();
-    harness.mutationDone?.(
-      configResult([
+    const saved = configResult([
         {
           id: 'flair-1',
           displayName: 'Saved',
@@ -283,8 +282,8 @@ describe('forum post flair settings', () => {
           order: 0,
           archived: false,
         },
-      ])
-    );
+      ]);
+    harness.mutationDone?.({ data: { setChannelDiscussionFlairConfig: saved.data.getChannelDiscussionFlairConfig } });
     await nextTick();
     expect([
       wrapper.get('input[aria-label="Flair name 1"]').element.value,

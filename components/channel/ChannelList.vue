@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
-import type { Channel } from '@/__generated__/graphql';
+import type { ChannelListEntry as Channel } from '@/types/ChannelPresentation';
 import ChannelListItem from '@/components/channel/ChannelListItem.vue';
 import LoadMore from '@/components/LoadMore.vue';
 

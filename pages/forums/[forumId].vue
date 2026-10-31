@@ -6,11 +6,8 @@ import ChannelHeaderDesktop from '@/components/channel/ChannelHeaderDesktop.vue'
 import DiscussionTitleEditForm from '@/components/discussion/detail/DiscussionTitleEditForm.vue';
 import EventTitleEditForm from '@/components/event/detail/EventTitleEditForm.vue';
 import IssueTitleEditForm from '@/components/mod/IssueTitleEditForm.vue';
-import {
-  GET_CHANNEL,
-  GET_CHANNEL_DOWNLOAD_COUNT,
-} from '@/graphQLData/channel/queries';
-import type { Channel, User } from '@/__generated__/graphql';
+import { GetChannelDocument as GET_CHANNEL, GetChannelDownloadCountDocument as GET_CHANNEL_DOWNLOAD_COUNT } from '@/__generated__/operations';
+import type { ChannelDetail as Channel } from '@/types/ChannelPresentation';
 import { computed } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import DiscussionDetailEmptyState from '@/components/discussion/list/DiscussionDetailEmptyState.vue';
@@ -150,8 +147,8 @@ const { result: downloadCountResult } = useQuery(
 
 const downloadCount = computed(() => {
   return (
-    downloadCountResult.value?.channels?.[0]?.DiscussionChannelsAggregate
-      ?.count ?? 0
+    downloadCountResult.value?.channels?.[0]?.DiscussionChannelsConnection
+      ?.aggregate?.count?.nodes ?? 0
   );
 });
 
@@ -287,7 +284,7 @@ const metaData = computed<HeadObject>(() => {
 // Set meta tags reactively
 useHead(metaData);
 const adminList = computed(() => {
-  return channel.value?.Admins?.map((user: User) => user?.username) || [];
+  return channel.value?.Admins?.map((user) => user?.username) || [];
 });
 if (!channelId.value) {
   if (import.meta.client) {
