@@ -1,0 +1,112 @@
+[
+  {
+    "id": "components/discussion/detail/AlbumEditForm.vue#useMutation:1",
+    "expression": "UPDATE_DISCUSSION",
+    "status": "raw",
+    "contractFingerprint": "9ce80ab7b86166285592a1f85417b7f554080d40335b1fcf9c19f0ceb0c27c64",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend discussion update payload sends Album changes, but pinned DiscussionUpdateInput omits Album.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  },
+  {
+    "id": "components/discussion/form/CreateDiscussion.vue#useMutation:1",
+    "expression": "CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS",
+    "status": "raw",
+    "contractFingerprint": "05b9c5cdccb7627a5545c392ef851a8c891ec4b5a712f14d6846f744d938fd0f",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend creation payload sends Author.connect and CrosspostedDiscussion.connect, which are absent from the pinned relationship create inputs. DownloadableFiles.connect is present in the pin and is not itself an exception.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  },
+  {
+    "id": "components/download/form/CreateDownload.vue#useMutation:1",
+    "expression": "CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS",
+    "status": "raw",
+    "contractFingerprint": "d26ac65d63db3878c6fd6ed9bb794cba376c2fff0164bf72870a14cfff475123",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend creation payload sends Author.connect and CrosspostedDiscussion.connect, which are absent from the pinned relationship create inputs. DownloadableFiles.connect is present in the pin and is not itself an exception.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  },
+  {
+    "id": "components/download/form/CreateDownload.vue#useMutation:3",
+    "expression": "UPDATE_DISCUSSION",
+    "status": "raw",
+    "contractFingerprint": "93c449fecfa0b27c76c0f416e831e76a6d6991f03aa169d7b361642fd468ad7e",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend discussion update payload sends Album changes, but pinned DiscussionUpdateInput omits Album.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  },
+  {
+    "id": "components/mod/CreateIssueForm.vue#useMutation:1",
+    "expression": "CREATE_ISSUE",
+    "status": "raw",
+    "contractFingerprint": "d05f5d0411699cbafe1e141c4742463c77f2bd5e8a9c8ac8ce778ab52985e19c",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend issue payload omits issueNumber and sends Author/Channel connections; pinned IssueCreateInput requires issueNumber and omits those relationship fields.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  },
+  {
+    "id": "composables/useAlbumAutoSave.ts#useMutation:1",
+    "expression": "UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS",
+    "status": "raw",
+    "contractFingerprint": "41e1b13d0500255cbf2a9f77d1c9256291155bd1974aedbdd84ffd6341127de3",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend discussion update payload sends Album changes, but pinned DiscussionUpdateInput omits Album.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  },
+  {
+    "id": "pages/forums/[forumId]/downloads/edit/[discussionId].vue#useMutation:1",
+    "expression": "UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS",
+    "status": "raw",
+    "contractFingerprint": "0d9fd648296a204dd895e5d563b619d1d8d4a8032c94a352efb3ce41cf5f8e3a",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend discussion update payload sends Album changes, but pinned DiscussionUpdateInput omits Album.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  },
+  {
+    "id": "pages/forums/[forumId]/wiki/create-child.vue#useMutation:1",
+    "expression": "CREATE_CHILD_WIKI_PAGE",
+    "status": "raw",
+    "contractFingerprint": "0e4078af01fcc390910cb20275f38e8c4caac5761057e2b036a19f087cbfc662",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend wiki payload sends VersionAuthor.connect on creation or VersionAuthor on update, which the pinned WikiPage relationship inputs do not expose.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  },
+  {
+    "id": "pages/forums/[forumId]/wiki/create.vue#useMutation:1",
+    "expression": "CREATE_WIKI_PAGE",
+    "status": "raw",
+    "contractFingerprint": "627923661b20c009b8b76904759a2d03a760a1b9b002921cf5f0fdd3482c8d77",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend wiki home payload sends ChannelUpdateInput.WikiHomePage, which the pinned input omits; nested author connections are also legacy frontend payloads.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  },
+  {
+    "id": "pages/forums/[forumId]/wiki/edit/[slug].vue#useMutation:1",
+    "expression": "UPDATE_WIKI_PAGE",
+    "status": "raw",
+    "contractFingerprint": "b50939790da41a83eb32816b86aaebe51faecfea65efcc3c2898fd69ac87e89e",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend wiki payload sends VersionAuthor.connect on creation or VersionAuthor on update, which the pinned WikiPage relationship inputs do not expose.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  },
+  {
+    "id": "pages/forums/[forumId]/wiki/edit/[slug].vue#useMutation:2",
+    "expression": "UPDATE_CHANNEL",
+    "status": "raw",
+    "contractFingerprint": "f42909f5913d9a15e87adcbdcc1f70d271fc278bb3da8f1016185d35724b02ff",
+    "owner": "Frontend and backend maintainers",
+    "reason": "The existing frontend wiki home payload sends ChannelUpdateInput.WikiHomePage, which the pinned input omits; nested author connections are also legacy frontend payloads.",
+    "resolution": "Reconcile the custom mutation input contract in backend #413, publish and pin that schema, then replace this exact legacy-variable boundary with generated document inference. Preserve selected generated result typing and existing behavior until then. Remove this entry when migrated.",
+    "tracking": "https://github.com/gennit-project/multiforum-backend/issues/413 ; https://github.com/gennit-project/multiforum-nuxt/issues/700"
+  }
+]

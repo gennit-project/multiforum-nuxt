@@ -426,6 +426,103 @@ remain separate. Existing cache-helper compatibility assertions were not removed
 or extended. The comprehensive issue checklist remains the project-wide inventory;
 this section records only the four operations and five migrated call sites.
 
+## Cumulative frontend migration (#700, draft PR #707)
+
+The cumulative branch migrates production consumers, not merely generated exports.
+It remains a **draft with backend-dependent input exceptions**, not a claim that
+all variable contracts are complete. Keep #700 open for review and follow-up.
+
+The consumer audit currently finds 557 primary boundaries: 546 generated-document
+consumers and 11 explicit legacy-variable boundaries; no unresolved document
+origins or generated-document generic overrides. It also traces 153 supplementary
+wrapper/cache calls and 30 refetch-document references. These counts reflect the
+current source, whereas the issue's original inventory records its earlier baseline.
+
+| Area / commit | Focused validation before integration |
+| --- | --- |
+| Generation `901c0368` | Source/AST equivalence, offline freshness and generator tests |
+| Server HTTP `0427b181` | 28 tests; typed envelopes and negative variables/results |
+| Collections/library `5c129ccc` | 321 tests; identity changes, pagination and repeated actions |
+| Administration `aaf3a550` | 742 tests plus 18 regression tests |
+| Moderation `ac3d3d75` | 746 tests plus membership/cache/navigation regressions |
+| Profiles/events `df3a7a3b` | 861 tests plus notification regressions |
+| Wiki `53b800d0` | 112 tests; selected lock state and explicit legacy builders |
+| Discussion lists `683fef5d` | 122 tests plus 19 profile-download compatibility tests |
+| Media `bb911159` | 127 tests; signed storage names, selection-safe albums and autosave |
+| Comment/discussion actions `d0be9122` | 1,411 component/helper tests; 128 page tests; final feedback navigation regressions |
+| Forums/shared consumers `0a6aac7f` | Forum, filter, scratchpad, navigation and permission suites; negative selected types |
+| Issue activity pagination `408489b1` | 31 tests; mutation responses larger than the loaded window |
+
+The final PR records full integration and browser/build/CI outcomes. Focused counts
+overlap and must not be added together as a unique test total.
+
+### Remaining legacy input contracts
+
+Every row below preserves an existing frontend payload, uses a generated selected
+result, and infers its variable shape from the actual payload builder. This does
+**not** prove that the backend accepts the payload, or make it conform to the pinned
+schema. There are no new schema casts or broad adapters. The schema pin and strict
+GraphQL validation remain unchanged.
+
+| Exact production boundary | Pinned input mismatch |
+| --- | --- |
+| `components/discussion/detail/AlbumEditForm.vue` — `UPDATE_DISCUSSION` | `DiscussionUpdateInput.Album` absent |
+| `components/discussion/form/CreateDiscussion.vue` — `CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS` | Existing `Author.connect` / `CrosspostedDiscussion.connect` absent from relationship create inputs |
+| `components/download/form/CreateDownload.vue` — create mutation | Same author/crosspost relationship mismatch; downloadable-file connections are supported |
+| `components/download/form/CreateDownload.vue` — `UPDATE_DISCUSSION` | `DiscussionUpdateInput.Album` absent |
+| `components/mod/CreateIssueForm.vue` — `CREATE_ISSUE` | Input requires `issueNumber` but existing frontend omits it; author/channel relationships absent |
+| `composables/useAlbumAutoSave.ts` — `UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS` | `DiscussionUpdateInput.Album` absent |
+| `pages/forums/[forumId]/downloads/edit/[discussionId].vue` — update mutation | `DiscussionUpdateInput.Album` absent |
+| `pages/forums/[forumId]/wiki/create-child.vue` — `CREATE_CHILD_WIKI_PAGE` | Existing `VersionAuthor.connect` absent |
+| `pages/forums/[forumId]/wiki/create.vue` — `CREATE_WIKI_PAGE` | `ChannelUpdateInput.WikiHomePage` absent |
+| `pages/forums/[forumId]/wiki/edit/[slug].vue` — `UPDATE_WIKI_PAGE` | Existing `VersionAuthor` update absent |
+| Same wiki edit page — `UPDATE_CHANNEL` | `ChannelUpdateInput.WikiHomePage` absent |
+
+Owners: frontend and backend maintainers, tracked in frontend #700 and backend
+#413. Resolution: inspect the actual custom input contract, correct/publish the
+backend schema or coordinate the frontend payload correction, update the pin,
+replace each legacy boundary with generated variable inference, and remove its
+exact entry from `scripts/typed-operation-exceptions.json`. Backend changes are a
+separate authorization/scope. Negative type tests expose the missing fields.
+
+`pnpm operations:check` additionally runs the consumer audit. New raw/unresolved
+consumers, erased document types and generated-document overrides fail this new
+check. Exceptions are exact call sites with reviewed fingerprints and owners. Fingerprints
+include normalized call/type syntax, referenced payload factories and transitive
+local/utility helpers, complete raw documents, and the pinned manifest. Changes to
+those contracts or stale entries fail; runtime state values are not static proof.
+The enforcement suite has 36 tests, including these change-detection cases. This is separate from `graphql:check`, which continues
+to reject every invalid authored GraphQL document without a suppression baseline.
+
+### Unused exports and coverage limits
+
+These 15 operation exports have no resolved production consumer in the current
+static audit. They remain generated and schema-validated, but are **not counted as
+migrated call sites**. They are retained to avoid silently removing an exported
+contract based solely on static reachability. Frontend maintainers own confirming
+external/dynamic usage and deleting or wiring each export, tracked in #700:
+
+- `graphQLData/admin/mutations.js#ADD_SERVER_ADMIN`
+- `graphQLData/admin/mutations.js#ADD_SERVER_MODERATOR`
+- `graphQLData/admin/queries.js#GET_PLUGINS`
+- `graphQLData/admin/queries.js#GET_PLUGIN_BY_ID`
+- `graphQLData/discussion/mutations.js#PERMANENTLY_DELETE_IMAGE`
+- `graphQLData/discussion/mutations.js#UPDATE_DISCUSSION_CHANNEL_LABELS`
+- `graphQLData/discussion/queries.js#IS_DISCUSSION_ANSWERED`
+- `graphQLData/discussion/queries.js#GET_DOWNLOAD_LABELS`
+- `graphQLData/image/mutations.js#REMOVE_IMAGE_FROM_ALBUM`
+- `graphQLData/issue/queries.js#GET_ISSUES`
+- `graphQLData/issue/queries.js#GET_CLOSED_ISSUES`
+- `graphQLData/issue/queries.js#GET_SERVER_ISSUE`
+- `graphQLData/scratchpad/queries.js#GET_ALL_SCRATCHPAD_ENTRIES`
+- `graphQLData/scratchpad/queries.js#GET_SUPER_UPVOTE_COUNT`
+- `graphQLData/user/queries.js#GET_USER_FAVORITE_CHANNELS`
+
+Composition-only fragments remain generated and checked through their parent
+documents. The audit follows local aliases, selector branches, document props,
+cache calls, typed HTTP helpers and known Apollo wrappers; it is not a proof of
+arbitrary constructed HTTP traffic or runtime backend response completeness.
+
 ## Next milestones
 
 1. **Phase 2:** fix the recorded compatibility debt and remove the temporary

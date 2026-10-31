@@ -9,8 +9,8 @@
 - `pnpm run graphql:test` - Test GraphQL extraction, source locations, and baseline enforcement
 - `pnpm run schema:check` - Verify the pinned backend schema and report its source commit
 - `pnpm run schema:update /path/to/backend-artifact` - Update the schema pin; see [contract workflow](docs/graphql-contract-campaign.md)
-- `pnpm run compile` - Generate schema and pilot operation types offline from the pinned contract
-- `pnpm run operations:check` - Verify committed typed documents are fresh; see the [migration guide](docs/graphql-contract-campaign.md)
+- `pnpm run compile` - Generate schema and operation types offline from the pinned contract
+- `pnpm run operations:check` - Verify typed-document freshness and production consumer contracts; see the [migration guide](docs/graphql-contract-campaign.md)
 - `pnpm run dev` - Start development server
 - `pnpm run build` - Build for production
 - `pnpm run test:playwright` - Run Playwright tests
@@ -114,30 +114,14 @@ Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#fro
 ## Code Style Guidelines
 
 - **TypeScript**: Use strict typing whenever possible, proper interfaces in `types/` directory
-  - **Typed operation pilots**: Import documents and exact selected result types from `@/__generated__/operations`; let Apollo infer variables/results. Prefer operation or fragment result subsets over full schema entities for migrated paths. See [the migration guide](docs/graphql-contract-campaign.md#phase-3-typed-operation-pilot).
-  - **Import GraphQL Types**: Use the generated types in `@/__generated__/graphql` for **every** GraphQL input and response — query variables and mutation inputs (`…QueryVariables` / `…MutationVariables` / `…Input`) as well as responses. Use `Pick`/`Omit` on a generated entity type for subsets rather than hand-writing a partial interface.
-  - **Examples**: Use `User`, `Comment`, `Discussion`, `Event`, `Revision`, `TextVersion` etc. from the generated GraphQL schema
+  - **Typed operations**: Import documents and exact selected result types from `@/__generated__/operations`; let Apollo infer variables/results. Prefer operation or fragment result subsets over full schema entities for migrated paths. See [the migration guide](docs/graphql-contract-campaign.md#phase-3-typed-operation-pilot).
+  - **GraphQL results and variables**: Import documents and selected result types from `@/__generated__/operations`; let Apollo infer variables/results. Schema entities from `@/__generated__/graphql` describe the complete schema, not a query's selections. Use schema input types/enums for genuine inputs, and selected operation/fragment types for props and caches. Do not invent unselected fields to satisfy a schema entity.
   - **Avoid `any`**: `@typescript-eslint/no-explicit-any` is an **error** in application source (relaxed only in `*.spec.ts`). Only use `any` for genuinely untyped third-party interop, with a targeted `// eslint-disable-next-line` + reason — never for GraphQL data. See the `apollo-data` skill.
   - **Type Checking**: Use `pnpm run tsc` (which runs `vue-tsc --noEmit`) for proper Vue component type checking
 
 ### Common TypeScript Patterns and Fixes
 
-- **GraphQL Type Completion**: When creating objects that match GraphQL types, ensure all required properties are included
-
-  ```typescript
-  // Example: TextVersion requires AuthorConnection
-  const textVersion: TextVersion = {
-    id: 'current',
-    body: content,
-    createdAt: new Date().toISOString(),
-    Author: user,
-    AuthorConnection: {
-      edges: [],
-      pageInfo: { hasNextPage: false, hasPreviousPage: false },
-      totalCount: 0,
-    },
-  };
-  ```
+- **GraphQL fixtures and cache writes**: Use the exact generated operation or fragment selection, including selected nullable fields. Never fabricate connection fields merely to satisfy a full schema entity. Preserve Apollo normalization keys and test cache writes against the real selected document.
 
 - **Vue Router Type Safety**: Use proper route object structure for navigation
 

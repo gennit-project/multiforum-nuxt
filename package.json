@@ -18,7 +18,7 @@
     "graphql:validate": "node scripts/validate-graphql-operations.mjs",
     "graphql:inventory": "node scripts/validate-graphql-operations.mjs --report-only --report artifacts/graphql/operations.json",
     "graphql:check": "node scripts/validate-graphql-operations.mjs --report artifacts/graphql/operations.json",
-    "graphql:test": "node --test scripts/graphql-operations.test.mjs scripts/graphql-typed-operations.test.mjs",
+    "graphql:test": "node --test scripts/graphql-operations.test.mjs scripts/graphql-typed-operations.test.mjs scripts/typed-operation-consumers.test.mjs",
     "schema:check": "node scripts/check-graphql-schema.mjs",
     "schema:update": "node scripts/update-graphql-schema.mjs",
     "schema:test": "node --test scripts/graphql-schema-contract.test.mjs",
@@ -52,7 +52,7 @@
     "verify": "pnpm run tsc && pnpm run test:unit:run",
     "lint-verify": "pnpm run test:unit:run && pnpm run lint:a11y",
     "operations:generate": "node scripts/generate-graphql-operations.mjs",
-    "operations:check": "node scripts/generate-graphql-operations.mjs --check"
+    "operations:check": "node scripts/generate-graphql-operations.mjs --check && node scripts/typed-operation-consumers.mjs --report artifacts/graphql/typed-consumers.json"
   },
   "dependencies": {
     "@apollo/client": "^3.13.5",
