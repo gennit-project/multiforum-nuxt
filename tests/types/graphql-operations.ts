@@ -7,6 +7,10 @@ import {
   GetPermalinkedCommentDocument,
   type GetPermalinkedCommentQuery,
   type GetPermalinkedCommentQueryVariables,
+  SubscribeToCommentDocument,
+  UnsubscribeFromCommentDocument,
+  type SubscribeToCommentMutation,
+  type SubscribeToCommentMutationVariables,
   StickyCommentDocument,
   UpdateUserDocument,
   type GetPublicUserProfileQuery,
@@ -98,4 +102,30 @@ export function checkPermalinkInference(
   const view: CommentView = root;
   const children: CommentView[] = root.ChildComments;
   return { view, children, text, missing };
+}
+
+export function checkCommentSubscriptionInference(
+  result: SubscribeToCommentMutation
+) {
+  const subscribe = useMutation(SubscribeToCommentDocument);
+  const unsubscribe = useMutation(UnsubscribeFromCommentDocument);
+  subscribe.mutate({ commentId: 'c1' });
+  unsubscribe.mutate({ commentId: 'c1' });
+  // @ts-expect-error IDs are scalar strings
+  subscribe.mutate({ commentId: ['c1'] });
+  // @ts-expect-error Boolean is not an ID
+  unsubscribe.mutate({ commentId: false });
+  // @ts-expect-error commentId is required
+  const missing: SubscribeToCommentMutationVariables = {};
+  // @ts-expect-error mutation result is nullable
+  void result.subscribeToComment.id;
+  if (result.subscribeToComment) {
+    const usernames: string[] =
+      result.subscribeToComment.SubscribedToNotifications.map(
+        (user) => user.username
+      );
+    // @ts-expect-error comment text was not selected
+    void result.subscribeToComment.text;
+    return { usernames, missing };
+  }
 }

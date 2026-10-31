@@ -9,6 +9,8 @@ import {
   GetCommentIssueDocument,
   GetCommentWithRepliesDocument,
   GetPermalinkedCommentDocument,
+  SubscribeToCommentDocument,
+  UnsubscribeFromCommentDocument,
   StickyCommentDocument,
   UnstickyCommentDocument,
 } from '@/__generated__/operations';
@@ -17,6 +19,8 @@ import { UPDATE_USER } from '@/graphQLData/user/mutations';
 import { GET_COMMENT_REPLIES, GET_COMMENT_AND_REPLIES } from '@/graphQLData/comment/queries';
 import { GET_COMMENT_ISSUE } from '@/graphQLData/mod/queries';
 import {
+  SUBSCRIBE_TO_COMMENT,
+  UNSUBSCRIBE_FROM_COMMENT,
   STICKY_COMMENT,
   UNSTICKY_COMMENT,
 } from '@/graphQLData/comment/mutations';
@@ -33,6 +37,8 @@ describe('generated operation runtime contracts', () => {
     ['comment issue', GetCommentIssueDocument, GET_COMMENT_ISSUE],
     ['comment replies', GetCommentWithRepliesDocument, GET_COMMENT_REPLIES],
     ['permalinked comment', GetPermalinkedCommentDocument, GET_COMMENT_AND_REPLIES],
+    ['watch comment', SubscribeToCommentDocument, SUBSCRIBE_TO_COMMENT],
+    ['unwatch comment', UnsubscribeFromCommentDocument, UNSUBSCRIBE_FROM_COMMENT],
     ['pin comment', StickyCommentDocument, STICKY_COMMENT],
     ['unpin comment', UnstickyCommentDocument, UNSTICKY_COMMENT],
   ])(
