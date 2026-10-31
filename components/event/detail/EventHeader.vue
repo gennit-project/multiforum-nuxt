@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import type { EventPresentation as Event } from '@/types/EventPresentation';
-import { ADD_FEEDBACK_COMMENT_TO_EVENT } from '@/graphQLData/event/mutations';
+import { AddFeedbackCommentToEventDocument as ADD_FEEDBACK_COMMENT_TO_EVENT, GetChannelDocument as GET_CHANNEL , UserIsModInChannelDocument as USER_IS_MOD_OR_OWNER_IN_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG , GetIssueSource003ac8783fDocument as CHECK_EVENT_ISSUE_EXISTENCE  } from '@/__generated__/operations';
 import EditScopeModal from '@/components/event/form/EditScopeModal.vue';
 import { useEventCancelDelete } from '@/composables/useEventCancelDelete';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
@@ -25,11 +25,7 @@ import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute, useRouter } from 'nuxt/app';
 import InfoBanner from '@/components/InfoBanner.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
-import { CHECK_EVENT_ISSUE_EXISTENCE } from '@/graphQLData/issue/queries';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { getAuthorBadges } from '@/utils/roleBadges';
@@ -289,7 +285,7 @@ const posterBadges = computed(() =>
   getAuthorBadges({
     username: props.eventData.Poster?.username,
     serverAdminUsernames: serverAdminUsernames.value,
-    serverModProfileNames: serverModProfileNames.value,
+    serverModProfileNames: serverModProfileNames.value.filter((name): name is string => typeof name === 'string' && !!name),
     forumAdminUsernames: forumAdminUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
   })

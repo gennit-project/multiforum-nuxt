@@ -8,7 +8,7 @@ import {
   type SignedStorageUrlPayload,
 } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
-import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
+import { CreateSignedUrlDocument as CREATE_SIGNED_STORAGE_URL } from '@/__generated__/operations';
 import AddImage from '@/components/AddImage.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';

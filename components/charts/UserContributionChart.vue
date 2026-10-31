@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { useUIStore } from '@/stores/uiStore';
 import GithubContributionChart from './GithubContributionChart.vue';
-import { GET_USER_CONTRIBUTIONS, GET_USER } from '@/graphQLData/user/queries';
+import { GetUserContributionsDocument as GET_USER_CONTRIBUTIONS, GetBasicUserInfoDocument as GET_USER } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 

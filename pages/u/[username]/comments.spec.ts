@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import Comment from '@/components/comments/Comment.vue';
+import HydratedProfileComment from '@/components/user/HydratedProfileComment.vue';
 
 const channelState = vi.hoisted(() => ({
   selectedChannels: { value: [] as string[] },
@@ -36,6 +36,7 @@ const mountWith = async (
     result: ref({
       users: [
         {
+          username: 'alice',
           Comments: comments,
           CommentsAggregate: {
             count: options.aggregateCount ?? comments.length,
@@ -57,7 +58,7 @@ describe('user comments page', () => {
     expect(wrapper.text()).toContain('No comments yet');
   });
 
-  it('renders a Comment for each non-archived comment', async () => {
+  it('hydrates each non-archived comment before exposing interactive controls', async () => {
     const wrapper = await mountWith([
       {
         id: 'c1',
@@ -74,7 +75,7 @@ describe('user comments page', () => {
         DiscussionChannel: {},
       },
     ]);
-    expect(wrapper.findAllComponents(Comment)).toHaveLength(2);
+    expect(wrapper.findAllComponents(HydratedProfileComment)).toHaveLength(2);
   });
 
   it('builds channel filters into the comments query', async () => {
@@ -181,10 +182,10 @@ describe('user comments page', () => {
 
     expect(
       updateQuery(
-        { users: [{ Comments: [{ id: 'c1' }] }] },
-        { fetchMoreResult: { users: [{ Comments: [{ id: 'c2' }] }] } }
+        { users: [{ username: 'alice', Comments: [{ id: 'c1' }] }] },
+        { fetchMoreResult: { users: [{ username: 'alice', Comments: [{ id: 'c2' }] }] } }
       )
-    ).toEqual({ users: [{ Comments: [{ id: 'c1' }, { id: 'c2' }] }] });
+    ).toEqual({ users: [{ username: 'alice', Comments: [{ id: 'c1' }, { id: 'c2' }] }] });
   });
 
   it('preserves the previous result when fetch-more returns nothing', async () => {
@@ -202,7 +203,7 @@ describe('user comments page', () => {
     );
     wrapper.findComponent({ name: 'LoadMore' }).vm.$emit('load-more');
     const updateQuery = fetchMore.mock.calls[0][0].updateQuery;
-    const previous = { users: [{ Comments: [{ id: 'c1' }] }] };
+    const previous = { users: [{ username: 'alice', Comments: [{ id: 'c1' }] }] };
 
     expect(updateQuery(previous, { fetchMoreResult: null })).toBe(previous);
   });

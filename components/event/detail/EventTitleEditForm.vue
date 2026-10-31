@@ -1,14 +1,13 @@
 <script lang="ts" setup>
-import { ref, nextTick, computed } from 'vue';
-import type { Event } from '@/__generated__/graphql';
+import { ref, nextTick, computed, watch } from 'vue';
+
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import TextInput from '@/components/TextInput.vue';
-import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
+import { UpdateEventsDocument as UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS, GetEventDocument as GET_EVENT  } from '@/__generated__/operations';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { GET_EVENT } from '@/graphQLData/event/queries';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { EVENT_TITLE_CHAR_LIMIT } from '@/utils/constants';
 import { useRoute } from 'nuxt/app';
@@ -31,16 +30,18 @@ const {
   error: getEventError,
   loading: getEventLoading,
   onResult: onGetEventResult,
-} = useQuery(GET_EVENT, {
-  id: eventId,
+} = useQuery(GET_EVENT, () => ({
+  id: eventId.value,
   loggedInModName: modProfileNameVar.value,
   channelUniqueName: channelId.value,
+}), () => ({ enabled: !!eventId.value, keepPreviousResult: false }));
+
+const event = computed(() => {
+  if (getEventLoading.value || getEventError.value) return null;
+  return getEventResult.value?.events.find((item) => item.id === eventId.value) || null;
 });
 
-const event = computed<Event | null>(() => {
-  if (getEventLoading.value || getEventError.value) return null;
-  return getEventResult.value?.events?.[0] || null;
-});
+watch([eventId, channelId], () => { titleEditMode.value = false; });
 
 const authorIsLoggedInUser = computed(
   () => event.value?.Poster?.username === usernameVar.value
@@ -48,11 +49,12 @@ const authorIsLoggedInUser = computed(
 
 const titleInputRef = ref(null);
 const formValues = ref({
-  title: getEventResult.value?.event?.title,
+  title: getEventResult.value?.events?.[0]?.title || '',
 });
 
 onGetEventResult((result) => {
-  formValues.value.title = result?.data?.events?.[0]?.title || '';
+  const current = result?.data?.events?.find((item) => item.id === eventId.value);
+  if (!result.loading && current) formValues.value.title = current.title;
 });
 
 const {
@@ -65,7 +67,7 @@ const {
     where: {
       id: { eq: eventId.value },
     },
-    updateEventInput: formValues.value,
+    updateEventInput: { title: { set: formValues.value.title } },
     channelConnections: [],
     channelDisconnections: [],
   },

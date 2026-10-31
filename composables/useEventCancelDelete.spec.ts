@@ -15,11 +15,13 @@ const router = createMutationRouter([
   'deleteEventInSeries',
 ]);
 
-const setup = (opts: {
-  eventId?: string;
-  channelId?: string;
-  isPartOfSeries?: boolean;
-} = {}) => {
+const setup = (
+  opts: {
+    eventId?: string;
+    channelId?: string;
+    isPartOfSeries?: boolean;
+  } = {}
+) => {
   const { eventId = 'e1', channelId = 'cats', isPartOfSeries = false } = opts;
   return useEventCancelDelete({
     eventId: ref(eventId),
@@ -38,19 +40,17 @@ describe('useEventCancelDelete — scope routing', () => {
   it('opens the plain delete confirm for a standalone event', () => {
     const s = setup({ isPartOfSeries: false });
     s.handleDeleteClick();
-    expect([s.confirmDeleteIsOpen.value, s.showDeleteScopeModal.value]).toEqual([
-      true,
-      false,
-    ]);
+    expect([s.confirmDeleteIsOpen.value, s.showDeleteScopeModal.value]).toEqual(
+      [true, false]
+    );
   });
 
   it('opens the delete scope modal for a series event', () => {
     const s = setup({ isPartOfSeries: true });
     s.handleDeleteClick();
-    expect([s.showDeleteScopeModal.value, s.confirmDeleteIsOpen.value]).toEqual([
-      true,
-      false,
-    ]);
+    expect([s.showDeleteScopeModal.value, s.confirmDeleteIsOpen.value]).toEqual(
+      [true, false]
+    );
   });
 
   it('opens the plain cancel confirm for a standalone event', () => {
@@ -69,18 +69,18 @@ describe('useEventCancelDelete — scope routing', () => {
 describe('useEventCancelDelete — series confirm handlers', () => {
   it('deletes the chosen scope of the series', () => {
     const s = setup();
-    s.handleDeleteScopeConfirm('thisEvent' as never);
+    s.handleDeleteScopeConfirm('THIS_ONLY');
     expect(router.get('deleteEventInSeries').mutate).toHaveBeenCalledWith({
       eventId: 'e1',
-      scope: 'thisEvent',
+      scope: 'THIS_ONLY',
     });
   });
 
   it('cancels the chosen scope of the series', () => {
     const s = setup();
-    s.handleCancelScopeConfirm('allEvents' as never);
+    s.handleCancelScopeConfirm('ALL_IN_SERIES');
     expect(router.get('updateEventInSeries').mutate).toHaveBeenCalledWith(
-      expect.objectContaining({ eventId: 'e1', scope: 'allEvents' })
+      expect.objectContaining({ eventId: 'e1', scope: 'ALL_IN_SERIES' })
     );
   });
 });
@@ -93,6 +93,18 @@ describe('useEventCancelDelete — post-action side effects', () => {
       name: 'forums-forumId-events',
       params: { forumId: 'cats' },
     });
+  });
+
+  it('does not redirect a different event after a pending delete completes', () => {
+    const eventId = ref('e1');
+    useEventCancelDelete({
+      eventId,
+      channelId: ref('cats'),
+      isPartOfSeries: ref(false),
+    });
+    eventId.value = 'e2';
+    router.get('deleteEvent').fireDone();
+    expect(pushSpy).not.toHaveBeenCalled();
   });
 
   it('does not navigate after delete when there is no channel', () => {
@@ -128,7 +140,13 @@ describe('useEventCancelDelete — post-action side effects', () => {
 
 describe('useEventCancelDelete — cache + combined state', () => {
   it('removes the deleted event from the cached events list', () => {
-    setup({ eventId: 'e1' });
+    const eventId = ref('e1');
+    useEventCancelDelete({
+      eventId,
+      channelId: ref('cats'),
+      isPartOfSeries: ref(false),
+    });
+    eventId.value = 'e2';
     let eventsFn: (refs: unknown[], h: unknown) => unknown[] = () => [];
     const cache = {
       modify: vi.fn((opts: any) => {

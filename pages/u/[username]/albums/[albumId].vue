@@ -2,12 +2,14 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useHead } from 'nuxt/app';
-import { GET_ALBUM_DETAILS } from '@/graphQLData/image/queries';
-import type { Album, Image } from '@/__generated__/graphql';
+import { GetAlbumDetailsDocument as GET_ALBUM_DETAILS } from '@/__generated__/operations';
+import type { GetAlbumDetailsQuery } from '@/__generated__/operations';
 import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useCopyCurrentUrl } from '@/composables/useCopyCurrentUrl';
+type Album = GetAlbumDetailsQuery['albums'][number];
+type Image = Album['Images'][number];
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -48,7 +50,7 @@ const {
 const album = computed((): Album | null => {
   if (albumError.value) return null;
   if (albumResult.value && albumResult.value.albums.length > 0) {
-    return albumResult.value.albums[0];
+    return albumResult.value.albums[0] || null;
   }
   return null;
 });

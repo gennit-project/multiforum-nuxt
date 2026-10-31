@@ -2,12 +2,18 @@ import { computed, ref, type ComputedRef, type Ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { useRouter } from 'nuxt/app';
 import {
-  DELETE_EVENT,
-  CANCEL_EVENT,
-  UPDATE_EVENT_IN_SERIES,
-  DELETE_EVENT_IN_SERIES,
-} from '@/graphQLData/event/mutations';
+  DeleteEventDocument as DELETE_EVENT,
+  CancelEventDocument as CANCEL_EVENT,
+  UpdateEventInSeriesDocument as UPDATE_EVENT_IN_SERIES,
+  DeleteEventInSeriesDocument as DELETE_EVENT_IN_SERIES,
+} from '@/__generated__/operations';
 import type { EventEditScope } from '@/components/event/form/EditScopeModal.vue';
+import { EventEditScope as EventEditScopeInput } from '@/__generated__/graphql';
+const scopeInput = {
+  THIS_ONLY: EventEditScopeInput.ThisOnly,
+  THIS_AND_FUTURE: EventEditScopeInput.ThisAndFuture,
+  ALL_IN_SERIES: EventEditScopeInput.AllInSeries,
+};
 
 type MaybeRef<T> = Ref<T> | ComputedRef<T>;
 
@@ -32,28 +38,39 @@ export function useEventCancelDelete(params: {
   const showCancelScopeModal = ref(false);
   const showDeleteScopeModal = ref(false);
 
+  let deleteContext = { eventId: eventId.value, channelId: channelId.value };
+  let seriesDeleteContext = { ...deleteContext };
+
   const {
     mutate: deleteEvent,
     error: deleteEventError,
     loading: deleteEventLoading,
     onDone: onDoneDeleting,
-  } = useMutation(DELETE_EVENT, {
-    variables: { id: eventId.value },
-    update: (cache) => {
-      cache.modify({
-        fields: {
-          events(existingEventRefs = [], { readField }) {
-            return existingEventRefs.filter(
-              (ref: { __ref?: string }) => readField('id', ref) !== eventId.value
-            );
+  } = useMutation(DELETE_EVENT, () => {
+    const targetId = eventId.value;
+    deleteContext = { eventId: targetId, channelId: channelId.value };
+    return {
+      variables: { id: targetId },
+      update: (cache) => {
+        cache.modify({
+          fields: {
+            events(existingEventRefs = [], { readField }) {
+              return existingEventRefs.filter(
+                (ref: { __ref?: string }) => readField('id', ref) !== targetId
+              );
+            },
           },
-        },
-      });
-    },
+        });
+      },
+    };
   });
 
   onDoneDeleting(() => {
-    if (channelId.value) {
+    if (
+      channelId.value &&
+      eventId.value === deleteContext.eventId &&
+      channelId.value === deleteContext.channelId
+    ) {
       router.push({
         name: 'forums-forumId-events',
         params: { forumId: channelId.value },
@@ -66,14 +83,14 @@ export function useEventCancelDelete(params: {
     error: cancelEventError,
     loading: cancelEventLoading,
     onDone: onDoneCanceling,
-  } = useMutation(CANCEL_EVENT, {
+  } = useMutation(CANCEL_EVENT, () => ({
     variables: {
-      updateEventInput: { canceled: true },
-      eventWhere: { id: eventId.value },
+      updateEventInput: { canceled: { set: true } },
+      eventWhere: { id: { eq: eventId.value } },
       channelConnections: [],
       channelDisconnections: [],
     },
-  });
+  }));
 
   onDoneCanceling(() => {
     confirmCancelIsOpen.value = false;
@@ -109,8 +126,8 @@ export function useEventCancelDelete(params: {
   function handleCancelScopeConfirm(scope: EventEditScope) {
     cancelEventInSeries({
       eventId: eventId.value,
-      scope,
-      eventUpdateInput: { canceled: true },
+      scope: scopeInput[scope],
+      eventUpdateInput: { canceled: { set: true } },
       channelConnections: [],
       channelDisconnections: [],
     });
@@ -125,7 +142,11 @@ export function useEventCancelDelete(params: {
 
   onDoneDeletingInSeries(() => {
     showDeleteScopeModal.value = false;
-    if (channelId.value) {
+    if (
+      channelId.value &&
+      eventId.value === seriesDeleteContext.eventId &&
+      channelId.value === seriesDeleteContext.channelId
+    ) {
       router.push({
         name: 'forums-forumId-events',
         params: { forumId: channelId.value },
@@ -149,9 +170,13 @@ export function useEventCancelDelete(params: {
   }
 
   function handleDeleteScopeConfirm(scope: EventEditScope) {
+    seriesDeleteContext = {
+      eventId: eventId.value,
+      channelId: channelId.value,
+    };
     deleteEventInSeriesMutation({
       eventId: eventId.value,
-      scope,
+      scope: scopeInput[scope],
     });
   }
 

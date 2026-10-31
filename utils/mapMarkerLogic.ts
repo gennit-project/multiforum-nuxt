@@ -1,4 +1,4 @@
-import type { Event } from '@/__generated__/graphql';
+import type { EventListPresentation as Event } from '@/types/EventPresentation';
 
 /**
  * Pure helpers extracted from components/event/map/Map.vue so the marker

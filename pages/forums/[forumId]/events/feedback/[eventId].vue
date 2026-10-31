@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { Event } from '@/__generated__/graphql';
-import { GET_EVENT_FEEDBACK } from '@/graphQLData/event/queries';
+
+import { GetEventDocument, GetEventFeedbackDocument as GET_EVENT_FEEDBACK } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
@@ -33,13 +33,20 @@ const {
   error: getEventError,
   loading: getEventLoading,
   fetchMore,
-} = useQuery(GET_EVENT_FEEDBACK, {
-  id: eventId,
+} = useQuery(GET_EVENT_FEEDBACK, () => ({
+  id: eventId.value,
   limit: PAGE_LIMIT,
   offset: 0,
-});
+}), () => ({ enabled: !!eventId.value, keepPreviousResult: false }));
 
-const event = computed<Event>(() => {
+// The feedback query returns a summary, not the full interactive event header.
+const { result: detailResult, loading: detailLoading, error: detailError } = useQuery(
+  GetEventDocument, () => ({ id: eventId.value, channelUniqueName: channelId.value }),
+  () => ({ enabled: !!eventId.value, fetchPolicy: 'cache-first', keepPreviousResult: false })
+);
+const detail = computed(() => !detailLoading.value && !detailError.value ? detailResult.value?.events.find((item) => item.id === eventId.value) : undefined);
+
+const event = computed(() => {
   if (getEventError.value) {
     return null;
   }
@@ -66,16 +73,18 @@ const loadMore = () => {
       offset: feedbackComments.value.length,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      const previous = previousResult.events[0];
+      const next = fetchMoreResult?.events[0];
+      if (!previous || !next || previous.id !== eventId.value || next.id !== eventId.value) return previousResult;
 
-      const prevFeedbackComments = previousResult.events[0].FeedbackComments;
-      const newFeedbackComments = fetchMoreResult.events[0].FeedbackComments;
+      const prevFeedbackComments = previous.FeedbackComments;
+      const newFeedbackComments = next.FeedbackComments;
 
       return {
         ...previousResult,
         events: [
           {
-            ...previousResult.events[0],
+            ...previous,
             FeedbackComments: [...prevFeedbackComments, ...newFeedbackComments],
           },
         ],
@@ -116,12 +125,12 @@ const reachedEndOfResults = computed(() => {
           class="rounded-lg border px-4 pb-2 dark:border-gray-700 dark:bg-gray-700 dark:bg-gray-950"
         >
           <EventHeader
-            v-if="event"
-            :event-data="event"
+            v-if="detail"
+            :event-data="detail"
             :channel-id="channelId"
             :show-menu-buttons="false"
           />
-          <EventBody v-if="event?.description" :event="event" />
+          <EventBody v-if="detail?.description" :event="detail" />
         </div>
       </div>
       <router-link

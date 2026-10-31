@@ -10,7 +10,7 @@ import {
   type PopoverPosition,
 } from '@/composables/usePopoverPositioning';
 import { timeAgo } from '@/utils';
-import { DELETE_EVENT_DESCRIPTION_REVISION } from '@/graphQLData/event/mutations';
+import { DeleteEventDescriptionRevisionDocument as DELETE_EVENT_DESCRIPTION_REVISION } from '@/__generated__/operations';
 import RevisionDiffModal from '@/components/discussion/detail/activityFeed/RevisionDiffModal.vue';
 type User = NonNullable<TextVersion['Author']>;
 

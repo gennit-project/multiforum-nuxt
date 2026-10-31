@@ -23,10 +23,7 @@ const h = vi.hoisted(() => ({
   onResultCb: null as
     null | ((value: { data?: { events: Array<{ id: string }> } }) => void),
   mdAndUp: null as unknown as { value: boolean },
-  queryVariables: null as null | {
-    where: { value: unknown };
-    sort: { value: unknown };
-  },
+  queryVariables: null as null | (() => { where: unknown; sort: unknown }),
   mapsCapability: null as unknown as { value: unknown },
   mapsAvailable: null as unknown as { value: boolean },
   mapsCapabilityLoading: null as unknown as { value: boolean },
@@ -61,8 +58,8 @@ vi.mock('@vue/apollo-composable', () => ({
     variables: NonNullable<typeof h.queryVariables>
   ) => {
     h.queryVariables = variables;
-    void variables.where.value;
-    void variables.sort.value;
+    void variables().where;
+    void variables().sort;
     return {
       result: h.result,
       loading: h.loading,
@@ -327,7 +324,7 @@ describe('MapView', () => {
   it('uses reverse chronological order for past events', () => {
     h.route.query = { timeShortcut: 'PAST_EVENTS' };
     mountView();
-    expect(h.queryVariables?.sort.value).toEqual([{ startTime: 'DESC' }]);
+    expect(h.queryVariables?.().sort).toEqual([{ startTime: 'DESC' }]);
   });
 
   it('opens the multiple-event preview when a map marker represents more than one event', async () => {

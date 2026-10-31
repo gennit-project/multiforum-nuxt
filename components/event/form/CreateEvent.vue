@@ -6,11 +6,7 @@ import { DateTime } from 'luxon';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import CreateEditEventFields from '@/components/event/form/CreateEditEventFields.vue';
-import {
-  CREATE_EVENT_WITH_CHANNEL_CONNECTIONS,
-  CREATE_EVENT_SERIES_WITH_CHANNEL_CONNECTIONS,
-} from '@/graphQLData/event/mutations';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { CreateEventDocument as CREATE_EVENT_WITH_CHANNEL_CONNECTIONS, CreateEventSeriesDocument as CREATE_EVENT_SERIES_WITH_CHANNEL_CONNECTIONS, GetChannelDocument as GET_CHANNEL  } from '@/__generated__/operations';
 import { getTimePieces } from '@/utils';
 import getDefaultEventFormValues from '@/utils/defaultEventFormValues';
 import { generateOccurrences } from '@/utils/generateOccurrences';
@@ -20,9 +16,10 @@ import type {
   CreateEventSeriesInput,
   EventCreateInput,
   EventTagsConnectFieldInput,
-  RepeatPatternInput,
-  Event,
+
+
 } from '@/__generated__/graphql';
+import { RepeatPatternType, RepeatEndType } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { FORUM_LOCKED_MESSAGE } from '@/composables/useForumLock';
@@ -129,7 +126,11 @@ const eventSeriesCreateInput = computed<CreateEventSeriesInput>(() => {
     // runtime.
     repeatPattern:
       fv.dateMode === 'recurring' && fv.repeatPattern
-        ? (fv.repeatPattern as unknown as RepeatPatternInput)
+        ? {
+            ...fv.repeatPattern,
+            type: { MANUAL: RepeatPatternType.Manual, DAILY: RepeatPatternType.Daily, WEEKLY: RepeatPatternType.Weekly, MONTHLY: RepeatPatternType.Monthly, YEARLY: RepeatPatternType.Yearly }[fv.repeatPattern.type],
+            endType: { NEVER: RepeatEndType.Never, AFTER_COUNT: RepeatEndType.AfterCount, ON_DATE: RepeatEndType.OnDate }[fv.repeatPattern.endType],
+          }
         : null,
   };
 
@@ -208,18 +209,9 @@ const {
   error: createEventError,
   onDone,
 } = useMutation(CREATE_EVENT_WITH_CHANNEL_CONNECTIONS, {
-  update(cache, result) {
-    const newEvent: Event = result.data?.createEventWithChannelConnections;
-    if (newEvent) {
-      cache.modify({
-        fields: {
-          events(existingEvents = []) {
-            return [newEvent, ...existingEvents];
-          },
-        },
-      });
-    }
-  },
+  // A new event may not match every cached search/filter. Re-read active lists
+  // instead of inserting a partial mutation selection into all list variants.
+  refetchQueries: ['getEvents'],
 });
 onDone((response) => {
   const newEventId = response.data?.createEventWithChannelConnections?.[0]?.id;

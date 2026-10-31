@@ -2,30 +2,15 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
-import { GET_USER_WIKI_EDITS } from '@/graphQLData/user/queries';
+import { GetUserWikiEditsDocument as GET_USER_WIKI_EDITS } from '@/__generated__/operations';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 import { timeAgo } from '@/utils';
-import type { TextVersion, WikiPage } from '@/__generated__/graphql';
+import type { GetUserWikiEditsQuery } from '@/__generated__/operations';
 import { buildSelectedWikiRevisionRouteId } from '@/utils/revisionHistory';
-
-type WikiEditPage = Pick<
-  WikiPage,
-  | 'id'
-  | 'title'
-  | 'body'
-  | 'editReason'
-  | 'slug'
-  | 'createdAt'
-  | 'updatedAt'
-  | 'channelUniqueName'
-  | 'VersionAuthor'
-> & {
-  PastVersions?: TextVersion[] | null;
-};
-
-type WikiEdit = TextVersion & {
-  listKey: string;
-  wikiPage: Pick<WikiPage, 'id' | 'title' | 'slug' | 'channelUniqueName'>;
+type WikiEditPage = GetUserWikiEditsQuery['wikiPages'][number];
+type WikiEdit = WikiEditPage['PastVersions'][number] & {
+ listKey: string;
+ wikiPage: Pick<WikiEditPage, 'id' | 'title' | 'slug' | 'channelUniqueName'>;
 };
 
 const route = useRoute();
@@ -38,7 +23,7 @@ const username = computed(() => {
 
 const versionWhere = computed(() => ({
   Author: {
-    username: username.value,
+    username: { eq: username.value },
   },
 }));
 
@@ -50,7 +35,7 @@ const wikiPagesWhere = computed(() => {
       },
       {
         VersionAuthor: {
-          username: username.value,
+          username: { eq: username.value },
         },
       },
     ],
@@ -82,7 +67,7 @@ const { result, loading, error } = useQuery(
 );
 
 const wikiEdits = computed<WikiEdit[]>(() => {
-  const pages = (result.value?.wikiPages || []) as WikiEditPage[];
+  const pages = result.value?.wikiPages || [];
 
   return pages
     .flatMap((wikiPage) => {
@@ -106,11 +91,6 @@ const wikiEdits = computed<WikiEdit[]>(() => {
           editReason: wikiPage.editReason,
           createdAt: wikiPage.updatedAt || wikiPage.createdAt,
           Author: wikiPage.VersionAuthor,
-          AuthorConnection: {
-            edges: [],
-            pageInfo: { hasNextPage: false, hasPreviousPage: false },
-            totalCount: 0,
-          },
           listKey: `${wikiPage.id}:current`,
           wikiPage: page,
         });

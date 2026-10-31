@@ -1,10 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { GET_EVENT } from '@/graphQLData/event/queries';
-import {
-  UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS,
-  UPDATE_EVENT_IN_SERIES,
-} from '@/graphQLData/event/mutations';
+import { ref, computed, watch } from 'vue';
+import { GetEventDocument as GET_EVENT, UpdateEventsDocument as UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS, UpdateEventInSeriesDocument as UPDATE_EVENT_IN_SERIES  } from '@/__generated__/operations';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import type { CreateEditEventFormValues } from '@/types/Event';
@@ -17,14 +13,14 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import type { EventEditScope } from '@/components/event/form/EditScopeModal.vue';
 import type {
-  EventChannel,
   EventUpdateInput,
   EventTagsConnectFieldInput,
   EventTagsDisconnectFieldInput,
-  Event,
-  Tag as TagData,
 } from '@/__generated__/graphql';
+import { EventEditScope as EventEditScopeInput } from '@/__generated__/graphql';
+import type { EventDetailSelection } from '@/types/EventPresentation';
 import { useModProfileName } from '@/composables/useAuthState';
+const scopeInput = { THIS_ONLY: EventEditScopeInput.ThisOnly, THIS_AND_FUTURE: EventEditScopeInput.ThisAndFuture, ALL_IN_SERIES: EventEditScopeInput.AllInSeries };
 
 const modProfileNameVar = useModProfileName();
 
@@ -38,7 +34,7 @@ const channelId = computed(() => {
   return '';
 });
 
-const eventId = route.params.eventId as string;
+const eventId = computed(() => typeof route.params.eventId === 'string' ? route.params.eventId : '');
 
 const dataLoaded = ref(false);
 const loggedInUserModName = computed(() => modProfileNameVar.value);
@@ -48,17 +44,17 @@ const {
   loading: getEventLoading,
   error: getEventError,
   onResult: onGetEventResult,
-} = useQuery(GET_EVENT, {
-  id: eventId,
+} = useQuery(GET_EVENT, () => ({
+  id: eventId.value,
   channelUniqueName: channelId.value,
   loggedInModName: loggedInUserModName.value,
-});
+}), () => ({ enabled: !!eventId.value, keepPreviousResult: false }));
 
 const event = computed(() => {
   if (getEventError.value || getEventLoading.value) {
     return null;
   }
-  return getEventResult.value.events[0];
+  return getEventResult.value?.events.find((item) => item.id === eventId.value) || null;
 });
 
 const ownerList = computed(() => {
@@ -75,7 +71,7 @@ const existingTags = computed(() => {
   if (getEventError.value || getEventLoading.value || !event.value?.Tags) {
     return [];
   }
-  return event.value.Tags.map((tag: TagData) => {
+  return event.value.Tags.map((tag) => {
     return tag.text;
   });
 });
@@ -88,7 +84,7 @@ const existingChannels = computed(() => {
   ) {
     return [];
   }
-  return event.value.EventChannels.map((ec: EventChannel) => {
+  return event.value.EventChannels.map((ec) => {
     return ec.channelUniqueName;
   });
 });
@@ -103,7 +99,7 @@ const showEditScopeModal = ref(false);
 
 // Field mapping lives in utils/eventEditForm.ts (unit-tested).
 const getFormValuesFromEventData = (
-  eventData: Event
+  eventData: EventDetailSelection
 ): CreateEditEventFormValues => buildEventEditFormValues(eventData);
 
 function getDefaultFormValues(): CreateEditEventFormValues {
@@ -120,11 +116,13 @@ function getDefaultFormValues(): CreateEditEventFormValues {
 }
 
 const formValues = ref<CreateEditEventFormValues>(getDefaultFormValues());
+watch([eventId, channelId], () => { dataLoaded.value = false; formValues.value = getDefaultEventFormValues(channelId.value); showEditScopeModal.value = false; });
 
 onGetEventResult((value) => {
   if (value.loading) return;
 
-  const eventData = value.data.events[0];
+  const eventData = value.data?.events.find((item) => item.id === eventId.value);
+  if (!eventData) return;
 
   formValues.value = getFormValuesFromEventData(eventData);
   dataLoaded.value = true;
@@ -253,7 +251,7 @@ const redirectToEventDetail = () => {
     name: 'forums-forumId-events-eventId',
     params: {
       forumId: formValues.value.selectedChannels[0],
-      eventId,
+      eventId: eventId.value,
     },
   });
 };
@@ -283,7 +281,7 @@ function submit() {
     channelConnections: channelConnections.value,
     channelDisconnections: channelDisconnections.value,
     where: {
-      id: { eq: eventId },
+      id: { eq: eventId.value },
     },
   };
   updateEvent(variables);
@@ -293,8 +291,8 @@ function handleEditScopeConfirm(scope: EventEditScope) {
   showEditScopeModal.value = false;
 
   const variables = {
-    eventId,
-    scope,
+    eventId: eventId.value,
+    scope: scopeInput[scope],
     eventUpdateInput: updateEventInput.value,
     channelConnections: channelConnections.value,
     channelDisconnections: channelDisconnections.value,

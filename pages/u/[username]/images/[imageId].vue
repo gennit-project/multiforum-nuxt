@@ -10,13 +10,8 @@ import {
 } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useRoute, useHead } from 'nuxt/app';
-import {
-  GET_IMAGE_DETAILS,
-  GET_USER_ALBUMS_FOR_IMAGE_SAVE,
-} from '@/graphQLData/image/queries';
-import { ADD_IMAGE_TO_ALBUM } from '@/graphQLData/image/mutations';
-import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
-import type { Image } from '@/__generated__/graphql';
+import { GetImageDetailsDocument as GET_IMAGE_DETAILS, GetUserAlbumsForImageSaveDocument as GET_USER_ALBUMS_FOR_IMAGE_SAVE, AddImageToAlbumDocument as ADD_IMAGE_TO_ALBUM , UpdateImageDocument as UPDATE_IMAGE  } from '@/__generated__/operations';
+import type { GetImageDetailsQuery, GetUserAlbumsForImageSaveQuery } from '@/__generated__/operations';
 import { useCopyCurrentUrl } from '@/composables/useCopyCurrentUrl';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ImageCaption from '@/components/image/ImageCaption.vue';
@@ -35,6 +30,8 @@ import AddToListPopover from '@/components/collection/AddToListPopover.vue';
 import { useToastStore } from '@/stores/toastStore';
 import { useFocusTrap } from '@/composables/useFocusTrap';
 
+type Image = GetImageDetailsQuery['images'][number];
+
 // The 3D runtimes are heavy; fetch them only when a 3D file is actually shown.
 const ModelViewer = defineAsyncComponent(
   () => import('@/components/ModelViewer.vue')
@@ -46,23 +43,7 @@ const StlViewer = defineAsyncComponent(
 const usernameVar = useUsername();
 const toastStore = useToastStore();
 
-type UserAlbumListItem = {
-  id: string;
-  imageOrder?: string[] | null;
-  Owner?: {
-    username?: string | null;
-    displayName?: string | null;
-  } | null;
-  ImagesConnection?: {
-    aggregate?: { count?: { nodes?: number | null } | null } | null;
-  } | null;
-  matchingImages?: Array<{
-    id: string;
-  }> | null;
-  Discussions?: Array<{
-    title?: string | null;
-  }> | null;
-};
+type UserAlbumListItem = GetUserAlbumsForImageSaveQuery['albums'][number];
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -128,7 +109,7 @@ const {
 const image = computed((): Image | null => {
   if (imageError.value) return null;
   if (imageResult.value && imageResult.value.images.length > 0) {
-    return imageResult.value.images[0] as Image;
+    return imageResult.value.images[0] || null;
   }
   return null;
 });
@@ -219,7 +200,7 @@ const currentUserAlbumIdsContainingImage = computed(() => {
 });
 
 const userAlbums = computed<UserAlbumListItem[]>(() => {
-  return (userAlbumsResult.value?.albums || []) as UserAlbumListItem[];
+  return userAlbumsResult.value?.albums || [];
 });
 
 const openAlbumSaveModal = () => {

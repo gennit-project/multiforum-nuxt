@@ -1,32 +1,6 @@
-type IssueInfo = {
-  channelUniqueName?: string;
-  issueNumber?: number | null;
-};
-
-type DiscussionChannelInfo = {
-  channelUniqueName?: string;
-  discussionId?: string;
-};
-
-type EventChannelInfo = {
-  channelUniqueName?: string;
-  eventId?: string;
-};
-
-type DiscussionInfo = {
-  DiscussionChannels?: DiscussionChannelInfo[];
-};
-
-type EventInfo = {
-  id?: string;
-  EventChannels?: EventChannelInfo[];
-};
-
-type CommentInfo = {
-  id?: string;
-  DiscussionChannel?: DiscussionChannelInfo | null;
-  Event?: EventInfo | null;
-};
+import type { GetModContributionsQuery } from '@/__generated__/operations';
+import type { NullableSelection } from '@/types/Comment';
+type SelectedActivity = GetModContributionsQuery['getModContributions'][number]['activities'][number];
 
 export type ModActivityLink = {
   label: string;
@@ -36,14 +10,7 @@ export type ModActivityLink = {
   };
 };
 
-export type ModActivityLinkInput = {
-  actionType?: string | null;
-  Comment?: CommentInfo | null;
-  Issue?: IssueInfo | null;
-  RelatedDiscussion?: DiscussionInfo | null;
-  RelatedEvent?: EventInfo | null;
-  RelatedComment?: CommentInfo | null;
-};
+export type ModActivityLinkInput = Partial<NullableSelection<Pick<SelectedActivity, 'actionType' | 'Comment' | 'Issue' | 'RelatedDiscussion' | 'RelatedEvent' | 'RelatedComment'>>>;
 
 const getFirst = <T>(items?: T[] | null) => {
   return Array.isArray(items) && items.length > 0 ? items[0] : null;

@@ -3,25 +3,14 @@ import { computed, ref, useId, nextTick } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
 import { timeAgo } from '@/utils';
-import type { Notification } from '@/__generated__/graphql';
+import { SortDirection } from '@/__generated__/graphql';
+import type { GetGeneralNotificationsQuery, GetFeedbackNotificationsQuery } from '@/__generated__/operations';
 import MarkdownRenderer from '../MarkdownRenderer.vue';
-import {
-  MARK_NOTIFICATIONS_AS_READ,
-  MARK_NOTIFICATION_AS_READ,
-} from '@/graphQLData/user/mutations';
-import { UPDATE_SCRATCHPAD_ENTRY_VISIBILITY } from '@/graphQLData/scratchpad/mutations';
-import {
-  GET_FEEDBACK_NOTIFICATIONS,
-  GET_GENERAL_NOTIFICATIONS,
-} from '@/graphQLData/notification/queries';
+import { MarkNotificationsAsReadDocument as MARK_NOTIFICATIONS_AS_READ, MarkNotificationAsReadDocument as MARK_NOTIFICATION_AS_READ, UpdateScratchpadEntryVisibilityDocument as UPDATE_SCRATCHPAD_ENTRY_VISIBILITY , GetFeedbackNotificationsDocument as GET_FEEDBACK_NOTIFICATIONS, GetGeneralNotificationsDocument as GET_GENERAL_NOTIFICATIONS  } from '@/__generated__/operations';
 
-// The generated Notification type doesn't yet carry the ScratchpadEntry link
-// (super upvote notifications), so augment it locally.
-type ScratchpadEntryRef = { id: string; isPublic: boolean };
-type NotificationWithEntry = Notification & {
-  ScratchpadEntry?: ScratchpadEntryRef | null;
-  link?: string | null;
-};
+type GeneralNotification = GetGeneralNotificationsQuery['users'][number]['Notifications'][number];
+type FeedbackNotification = GetFeedbackNotificationsQuery['users'][number]['Notifications'][number];
+type NotificationWithEntry = GeneralNotification | FeedbackNotification;
 
 const NOTIFICATION_PAGE_LIMIT = 15;
 
@@ -85,7 +74,7 @@ const {
     username: username.value,
     limit: NOTIFICATION_PAGE_LIMIT,
     offset: 0,
-    sort: [{ createdAt: 'DESC' }],
+    sort: [{ createdAt: SortDirection.Desc }],
   }),
   {
     fetchPolicy: 'cache-and-network',
@@ -106,7 +95,7 @@ const {
     username: username.value,
     limit: NOTIFICATION_PAGE_LIMIT,
     offset: 0,
-    sort: [{ createdAt: 'DESC' }],
+    sort: [{ createdAt: SortDirection.Desc }],
   }),
   {
     fetchPolicy: 'cache-and-network',
@@ -147,13 +136,13 @@ const refetchActive = () =>
 
 const canActOnScratchpadEntry = (notification: NotificationWithEntry) =>
   notification.notificationType === 'scratchpad' &&
-  !!notification.ScratchpadEntry?.id &&
-  !notification.ScratchpadEntry.isPublic &&
+  !!('ScratchpadEntry' in notification ? notification.ScratchpadEntry : null)?.id &&
+  !('ScratchpadEntry' in notification ? notification.ScratchpadEntry : null)?.isPublic &&
   !notification.read;
 
 const isPublishedScratchpadEntry = (notification: NotificationWithEntry) =>
   notification.notificationType === 'scratchpad' &&
-  !!notification.ScratchpadEntry?.isPublic;
+  !!('ScratchpadEntry' in notification ? notification.ScratchpadEntry : null)?.isPublic;
 
 const handleIgnore = async (notification: NotificationWithEntry) => {
   pendingNotificationId.value = notification.id;
@@ -172,7 +161,7 @@ const handleIgnore = async (notification: NotificationWithEntry) => {
 };
 
 const handleShowOnProfile = async (notification: NotificationWithEntry) => {
-  const entryId = notification.ScratchpadEntry?.id;
+  const entryId = ('ScratchpadEntry' in notification ? notification.ScratchpadEntry : null)?.id;
   if (!entryId) return;
   pendingNotificationId.value = notification.id;
   actionError.value = '';
@@ -251,36 +240,34 @@ const currentError = computed(() => {
 });
 
 const loadMore = () => {
-  const currentResult =
-    activeTab.value === 'general' ? generalResult.value : feedbackResult.value;
-  const fetchMoreFn =
-    activeTab.value === 'general' ? fetchMoreGeneral : fetchMoreFeedback;
-
-  if (!currentResult?.users?.[0]) return;
-
-  fetchMoreFn({
-    variables: {
-      username: username.value,
-      limit: NOTIFICATION_PAGE_LIMIT,
-      offset: currentResult.users[0].Notifications?.length || 0,
-      sort: [{ createdAt: 'DESC' }],
-    },
-    updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
-      return {
-        ...previousResult,
-        users: [
-          {
-            ...previousResult.users[0],
-            Notifications: [
-              ...previousResult.users[0].Notifications,
-              ...fetchMoreResult.users[0].Notifications,
-            ],
-          },
-        ],
-      };
-    },
-  });
+  const requestedUsername = username.value;
+  const requestedTab = activeTab.value;
+  if (requestedTab === 'general') {
+    const current = generalResult.value?.users[0];
+    if (!current) return;
+    return fetchMoreGeneral({
+      variables: { username: requestedUsername, limit: NOTIFICATION_PAGE_LIMIT, offset: current.Notifications.length, sort: [{ createdAt: SortDirection.Desc }] },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        const previous = previousResult.users[0];
+        const next = fetchMoreResult?.users[0];
+        if (requestedUsername !== username.value || requestedTab !== activeTab.value || !previous || !next || previous.username !== requestedUsername || next.username !== requestedUsername) return previousResult;
+        return { ...previousResult, users: [{ ...previous, Notifications: [...new Map([...previous.Notifications, ...next.Notifications].map((item) => [item.id, item])).values()] }] };
+      },
+    });
+  }
+  else if (requestedTab === 'feedback') {
+    const current = feedbackResult.value?.users[0];
+    if (!current) return;
+    return fetchMoreFeedback({
+      variables: { username: requestedUsername, limit: NOTIFICATION_PAGE_LIMIT, offset: current.Notifications.length, sort: [{ createdAt: SortDirection.Desc }] },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        const previous = previousResult.users[0];
+        const next = fetchMoreResult?.users[0];
+        if (requestedUsername !== username.value || requestedTab !== activeTab.value || !previous || !next || previous.username !== requestedUsername || next.username !== requestedUsername) return previousResult;
+        return { ...previousResult, users: [{ ...previous, Notifications: [...new Map([...previous.Notifications, ...next.Notifications].map((item) => [item.id, item])).values()] }] };
+      },
+    });
+  }
 };
 
 const markAllAsRead = () => {

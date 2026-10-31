@@ -33,7 +33,7 @@ const posterBadges = computed(() =>
   getAuthorBadges({
     username: props.eventData.Poster?.username,
     serverAdminUsernames: serverAdminUsernames.value,
-    serverModProfileNames: serverModProfileNames.value,
+    serverModProfileNames: serverModProfileNames.value.filter((name): name is string => typeof name === 'string' && !!name),
     forumAdminUsernames: forumAdminUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
   })

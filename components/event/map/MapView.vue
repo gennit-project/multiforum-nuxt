@@ -12,7 +12,7 @@ import ErrorBanner from '../../ErrorBanner.vue';
 import LoadingSpinner from '../../LoadingSpinner.vue';
 import EventFilterBar from '../list/filters/EventFilterBar.vue';
 import TimeShortcuts from '../list/filters/TimeShortcuts.vue';
-import { GET_EVENTS } from '@/graphQLData/event/queries';
+import { GetEventsSourcef3f666cbeeDocument as GET_EVENTS } from '@/__generated__/operations';
 import getEventWhere from '@/utils/getEventWhere';
 import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import {
@@ -25,7 +25,7 @@ import {
   cleanQueryParams,
   buildInfowindowContent,
 } from '@/utils/eventMap';
-import type { Event as EventData } from '@/__generated__/graphql';
+import type { EventListPresentation as EventData } from '@/types/EventPresentation';
 import type { SearchEventValues } from '@/types/Event';
 import type { Ref, PropType } from 'vue';
 import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
@@ -135,10 +135,10 @@ const {
   onResult: onGetEventResult,
 } = useQuery(
   GET_EVENTS,
-  {
-    where: eventWhere,
-    sort: computed(() => [resultsOrder.value]),
-  },
+  () => ({
+    where: eventWhere.value,
+    sort: [resultsOrder.value],
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -148,7 +148,7 @@ onGetEventResult((value) => {
   if (!value.data || value.data.events.length === 0) {
     return;
   }
-  const defaultSelectedEventId = value.data.events[0].id;
+  const defaultSelectedEventId = value.data.events[0]?.id || '';
   sendToPreview(defaultSelectedEventId, '');
 });
 

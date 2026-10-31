@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CreateCommentDocument as CREATE_COMMENT } from '@/__generated__/operations';
+import { CreateCommentDocument as CREATE_COMMENT, GetBasicUserInfoDocument as GET_USER  } from '@/__generated__/operations';
 import { ref, computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import type { PropType } from 'vue';
@@ -10,7 +10,6 @@ import {
   GetEventCommentsDocument as GET_EVENT_COMMENTS,
   type GetEventCommentsQueryVariables,
 } from '@/__generated__/operations';
-import { GET_USER } from '@/graphQLData/user/queries';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import type { OwnedCommentCreateInput } from '@/__generated__/graphql';

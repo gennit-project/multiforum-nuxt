@@ -1,8 +1,4 @@
-import type {
-  Activity,
-  DayData,
-  UserContributionData,
-} from '@/__generated__/graphql';
+import type { ChannelContributor } from '@/types/contribution';
 
 /**
  * Pure aggregation helpers for the forum contributors page. Extracted so the
@@ -12,11 +8,11 @@ import type {
 
 /** Highest single-day contribution count across all contributors (chart Y max). */
 export function getMaxDayCount(
-  contributors: UserContributionData[]
+  contributors: ChannelContributor[]
 ): number {
   let max = 0;
   for (const contributor of contributors) {
-    for (const day of contributor.dayData as DayData[]) {
+    for (const day of contributor.dayData) {
       if (day.count > max) {
         max = day.count;
       }
@@ -33,14 +29,14 @@ export type ContributorStat = {
 
 /** Total discussions and comments each contributor authored over the period. */
 export function buildContributorStats(
-  contributors: UserContributionData[]
+  contributors: ChannelContributor[]
 ): ContributorStat[] {
   return contributors.map((contributor) => {
     let discussionCount = 0;
     let commentCount = 0;
 
-    (contributor.dayData as DayData[]).forEach((day) => {
-      day.activities.forEach((activity: Activity) => {
+    (contributor.dayData).forEach((day) => {
+      day.activities.forEach((activity) => {
         discussionCount += (activity.Discussions || []).length;
         commentCount += (activity.Comments || []).length;
       });

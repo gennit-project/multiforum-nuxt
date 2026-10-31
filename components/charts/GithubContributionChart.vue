@@ -3,6 +3,7 @@ import { ref, computed, watch, type PropType, nextTick } from 'vue';
 import type { DayData } from '@/types/contribution';
 import { Calendar } from 'lucide-vue-next';
 import CommentComponent from '@/components/comments/Comment.vue';
+import HydratedProfileComment from '@/components/user/HydratedProfileComment.vue';
 import DiscussionItemInProfile from '@/components/user/DiscussionItemInProfile.vue';
 import EventListItemInProfile from '@/components/user/EventItemInProfile.vue';
 import ContributionChartSkeleton from './ContributionChartSkeleton.vue';
@@ -690,17 +691,18 @@ const cellCount = computed(() => {
                     :key="comment.id"
                     class="space-y-4"
                   >
+                    <HydratedProfileComment :comment="comment">
+                      <template #default="{ commentData }">
                     <CommentComponent
-                      v-if="!comment.archived"
-                      :comment-data="comment"
-                      :parent-comment-id="
-                        comment.ParentComment ? comment.ParentComment.id : ''
-                      "
+                      :comment-data="commentData"
+                      :parent-comment-id="commentData.ParentComment?.id"
                       :depth="0"
                       :show-channel="true"
                       :show-context-link="true"
                       :go-to-permalink-on-click="true"
                     />
+                      </template>
+                    </HydratedProfileComment>
                     <!-- <ArchivedCommentText 
                         v-if="comment?.archived"
                         :channel-id="comment.Channel?.id"
@@ -721,7 +723,7 @@ const cellCount = computed(() => {
                   </h4>
                   <DiscussionItemInProfile
                     v-for="discussion in activity.Discussions"
-                    :key="discussion.id"
+                    :key="discussion.id || undefined"
                     class="mb-1 flex-col gap-2"
                     :discussion="discussion"
                   />
@@ -739,7 +741,7 @@ const cellCount = computed(() => {
                   </h4>
                   <EventListItemInProfile
                     v-for="event in activity.Events"
-                    :key="event.id"
+                    :key="event.id || undefined"
                     class="mb-1 flex-col gap-2"
                     :current-channel-id="''"
                     :event="event"
@@ -780,7 +782,7 @@ const cellCount = computed(() => {
                           in {{ edit.WikiPage.channelUniqueName }}
                         </span>
                         <span class="text-gray-500 dark:text-gray-400">
-                          {{ timeAgo(new Date(edit.createdAt)) }}
+                          {{ edit.createdAt ? timeAgo(new Date(edit.createdAt)) : '' }}
                         </span>
                       </div>
                       <div

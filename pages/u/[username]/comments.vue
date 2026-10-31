@@ -6,9 +6,11 @@ import ArchivedCommentText from '@/components/comments/ArchivedCommentText.vue';
 import Comment from '@/components/comments/Comment.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
 import LoadMore from '@/components/LoadMore.vue';
-import { GET_USER_COMMENTS } from '@/graphQLData/user/queries';
-import type { Comment as CommentType } from '@/__generated__/graphql';
+import { GetUserCommentsDocument as GET_USER_COMMENTS } from '@/__generated__/operations';
+import type { GetUserCommentsQuery } from '@/__generated__/operations';
+import HydratedProfileComment from '@/components/user/HydratedProfileComment.vue';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
+type CommentType = GetUserCommentsQuery['users'][number]['Comments'][number];
 
 const PAGE_LIMIT = 25;
 
@@ -62,6 +64,8 @@ const {
   }),
   {
     fetchPolicy: 'cache-first',
+    enabled: computed(() => !!username.value),
+    keepPreviousResult: false,
   }
 );
 
@@ -70,6 +74,7 @@ const commentsAggregate = computed(() => {
 });
 
 const loadMore = () => {
+  const scope = JSON.stringify([username.value, commentsWhere.value]);
   if (!commentResult.value?.users?.[0]?.Comments) return;
 
   fetchMore({
@@ -80,14 +85,16 @@ const loadMore = () => {
       where: commentsWhere.value,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      const previous = previousResult.users[0];
+      const next = fetchMoreResult?.users[0];
+      if (scope !== JSON.stringify([username.value, commentsWhere.value]) || !previous || !next || previous.username !== username.value || next.username !== username.value) return previousResult;
       return {
         users: [
           {
-            ...previousResult.users[0],
+            ...previous,
             Comments: [
-              ...previousResult.users[0].Comments,
-              ...fetchMoreResult.users[0].Comments,
+              ...previous.Comments,
+              ...next.Comments,
             ],
           },
         ],
@@ -119,21 +126,24 @@ const isCommentOnDeletedEvent = (comment: CommentType) => {
     </div>
     <div v-else-if="commentResult && commentResult?.users?.length > 0">
       <div
-        v-for="comment in commentResult.users[0].Comments"
+        v-for="comment in commentResult?.users?.[0]?.Comments"
         :key="comment.id"
         class="space-y-4"
       >
+        <HydratedProfileComment v-if="!comment.archived" :comment="comment">
+          <template #default="{ commentData }">
         <Comment
-          v-if="!comment.archived"
-          :comment-data="comment"
+          :comment-data="commentData"
           :parent-comment-id="
-            comment.ParentComment ? comment.ParentComment.id : null
+            comment.ParentComment?.id
           "
           :depth="0"
           :show-channel="true"
           :show-context-link="true"
           :go-to-permalink-on-click="true"
         />
+          </template>
+        </HydratedProfileComment>
         <ArchivedCommentText
           v-if="comment?.archived"
           :channel-id="
@@ -156,7 +166,7 @@ const isCommentOnDeletedEvent = (comment: CommentType) => {
       <LoadMore
         class="justify-self-center"
         :reached-end-of-results="
-          commentsAggregate === commentResult.users[0].Comments.length
+          commentsAggregate === commentResult?.users?.[0]?.Comments.length
         "
         @load-more="loadMore"
       />

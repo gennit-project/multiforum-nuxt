@@ -1,12 +1,10 @@
+import { print } from 'graphql';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import NotificationTabs from './NotificationTabs.vue';
-import {
-  GET_FEEDBACK_NOTIFICATIONS,
-  GET_GENERAL_NOTIFICATIONS,
-} from '@/graphQLData/notification/queries';
+import { GetFeedbackNotificationsDocument as GET_FEEDBACK_NOTIFICATIONS, GetGeneralNotificationsDocument as GET_GENERAL_NOTIFICATIONS } from '@/__generated__/operations';
 
 // Mock useUsername
 vi.mock('@/composables/useAuthState', () => ({
@@ -71,7 +69,7 @@ let mockMutationIndex = 0;
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn((query) => {
     // Return different results based on query
-    const queryString = query?.loc?.source?.body || '';
+    const queryString = print(query);
     if (queryString.includes('getFeedbackNotifications')) {
       return {
         result: mockFeedbackResult,
@@ -333,6 +331,26 @@ describe('NotificationTabs', () => {
     );
   });
 
+  it('deduplicates overlapping notification pages', async () => {
+    mockGeneralResult.value.users[0].totalNotificationsAggregate = { aggregate: { count: { nodes: 6 } } };
+    const wrapper = mountNotificationTabs();
+    await wrapper.get('[data-testid="load-more"]').trigger('click');
+    const update = mockFetchMoreGeneral.mock.calls[0][0].updateQuery;
+    const previous = mockGeneralResult.value;
+    const next = { users: [{ ...previous.users[0], Notifications: [...previous.users[0].Notifications, { ...previous.users[0].Notifications[0], id: 'new' }] }] };
+    expect(update(previous, { fetchMoreResult: next }).users[0].Notifications.map((item: { id: string }) => item.id)).toEqual(['notif-1', 'notif-2', 'new']);
+  });
+
+  it('rejects an old page after changing notification tabs', async () => {
+    mockGeneralResult.value.users[0].totalNotificationsAggregate = { aggregate: { count: { nodes: 6 } } };
+    const wrapper = mountNotificationTabs();
+    await wrapper.get('[data-testid="load-more"]').trigger('click');
+    const update = mockFetchMoreGeneral.mock.calls[0][0].updateQuery;
+    await wrapper.findAll('[role="tab"]')[1]!.trigger('click');
+    const previous = mockGeneralResult.value;
+    expect(update(previous, { fetchMoreResult: mockFeedbackResult.value })).toBe(previous);
+  });
+
   it('keeps load more available when all loaded notifications are read but more exist', () => {
     mockGeneralResult.value.users[0].NotificationsAggregate = {
       aggregate: { count: { nodes: 0 } },
@@ -422,20 +440,20 @@ describe('NotificationTabs', () => {
   });
 
   it('declares pagination variables and total aggregates in the tab queries', () => {
-    expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain(
+    expect(print(GET_GENERAL_NOTIFICATIONS)).toContain(
       '$sort: [NotificationSort!]'
     );
-    expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain('sort: $sort');
-    expect(GET_GENERAL_NOTIFICATIONS.loc?.source.body).toContain(
+    expect(print(GET_GENERAL_NOTIFICATIONS)).toContain('sort: $sort');
+    expect(print(GET_GENERAL_NOTIFICATIONS)).toContain(
       'totalNotificationsAggregate'
     );
-    expect(GET_FEEDBACK_NOTIFICATIONS.loc?.source.body).toContain(
+    expect(print(GET_FEEDBACK_NOTIFICATIONS)).toContain(
       '$sort: [NotificationSort!]'
     );
-    expect(GET_FEEDBACK_NOTIFICATIONS.loc?.source.body).toContain(
+    expect(print(GET_FEEDBACK_NOTIFICATIONS)).toContain(
       'sort: $sort'
     );
-    expect(GET_FEEDBACK_NOTIFICATIONS.loc?.source.body).toContain(
+    expect(print(GET_FEEDBACK_NOTIFICATIONS)).toContain(
       'totalNotificationsAggregate'
     );
   });

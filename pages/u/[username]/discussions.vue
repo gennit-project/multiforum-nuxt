@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { DiscussionWhere } from '@/__generated__/graphql';
-import { GET_USER_DISCUSSIONS } from '@/graphQLData/user/queries';
+import { GetUserDiscussionsDocument as GET_USER_DISCUSSIONS } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import DiscussionItemInProfile from '@/components/user/DiscussionItemInProfile.vue';
 import { useRoute } from 'nuxt/app';
@@ -55,7 +55,7 @@ const { result, loading, error } = useQuery(
     <div
       v-else-if="
         result?.users?.length === 0 ||
-        result.users[0]?.Discussions?.length === 0
+        result?.users?.[0]?.Discussions?.length === 0
       "
     >
       No discussions yet
@@ -65,7 +65,7 @@ const { result, loading, error } = useQuery(
       class="flex flex-col gap-3"
     >
       <DiscussionItemInProfile
-        v-for="discussion in result.users[0].Discussions"
+        v-for="discussion in result?.users?.[0]?.Discussions"
         :key="discussion.id"
         :discussion="discussion"
       />

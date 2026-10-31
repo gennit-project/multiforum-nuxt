@@ -6,10 +6,8 @@ import {
   GetEventDocument as GET_EVENT,
   GetEventCommentsDocument as GET_EVENT_COMMENTS,
   GetEventRootCommentAggregateDocument as GET_EVENT_ROOT_COMMENT_AGGREGATE,
-  GetEventChannelIdDocument as GET_EVENT_CHANNEL,
+  GetEventChannelIdDocument as GET_EVENT_CHANNEL, GetChannelDocument as GET_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG 
 } from '@/__generated__/operations';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { DateTime } from 'luxon';
 import { config } from '@/config';
 import type {

@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useUIStore } from '@/stores/uiStore';
 import ContributionLineChart from './ContributionLineChart.vue';
-import type { DayData } from '@/__generated__/graphql';
+import type { ChannelContributionDay as DayData } from '@/types/contribution';
 
 defineProps<{
   dayData: DayData[];

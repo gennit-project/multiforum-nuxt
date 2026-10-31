@@ -37,7 +37,7 @@ vi.mock('@vue/apollo-composable', () => ({
     const index = useMutationCall++;
     const mutate = vi.fn().mockResolvedValue(undefined);
     mutateSpies[index] = mutate;
-    mutationOptions[index] = options as { update?: (cache: unknown) => void };
+    mutationOptions[index] = (typeof options === 'function' ? options() : options) as { update?: (cache: unknown) => void };
     return {
       mutate,
       loading: ref(false),
@@ -293,7 +293,7 @@ describe('EventHeader — cancel flow', () => {
     const scopeModal = wrapper.findAllComponents(
       '[data-testid="scope-modal"]'
     )[0]!;
-    await scopeModal.vm.$emit('confirm', 'thisEvent');
+    await scopeModal.vm.$emit('confirm', 'THIS_ONLY');
 
     expect(mutateSpies[2]).toHaveBeenCalledTimes(1);
   });
@@ -322,11 +322,11 @@ describe('EventHeader — delete flow', () => {
     const scopeModal = wrapper.findAllComponents(
       '[data-testid="scope-modal"]'
     )[1]!;
-    await scopeModal.vm.$emit('confirm', 'thisEvent');
+    await scopeModal.vm.$emit('confirm', 'THIS_ONLY');
 
     expect(mutateSpies[3]).toHaveBeenCalledWith({
       eventId: 'event-1',
-      scope: 'thisEvent',
+      scope: 'THIS_ONLY',
     });
   });
 

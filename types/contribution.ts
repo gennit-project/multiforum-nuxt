@@ -1,33 +1,28 @@
-// Shared types for contribution chart components
 import type {
-  Comment as CommentType,
-  Discussion as DiscussionType,
-  Event as EventType,
-  TextVersion as TextVersionType,
-  WikiPage as WikiPageType,
-} from '@/__generated__/graphql';
+  GetUserContributionsQuery,
+  GetChannelContributionsQuery,
+} from '@/__generated__/operations';
 
-type WikiEditType = TextVersionType & {
-  WikiPage?: Pick<
-    WikiPageType,
-    'id' | 'title' | 'slug' | 'channelUniqueName'
-  > | null;
+export type UserContributionDay =
+  GetUserContributionsQuery['getUserContributions'][number];
+export type UserContributionActivity =
+  UserContributionDay['activities'][number];
+// Moderation days share only the chart's activity identity/description contract.
+// Detail collections are the exact selected user-contribution summaries.
+export type Activity = Pick<
+  UserContributionActivity,
+  'id' | 'type' | 'description'
+> &
+  Partial<
+    Pick<
+      UserContributionActivity,
+      'Comments' | 'Discussions' | 'Events' | 'WikiEdits'
+    >
+  >;
+export type DayData = Pick<UserContributionDay, 'date' | 'count'> & {
+  activities: Activity[];
 };
 
-// Define the activity type for contribution charts
-export interface Activity {
-  id: string;
-  type: string;
-  description: string;
-  Comments?: CommentType[];
-  Discussions?: DiscussionType[];
-  Events?: EventType[];
-  WikiEdits?: WikiEditType[];
-}
-
-// Define the day data type for contribution charts
-export interface DayData {
-  date: string;
-  count: number;
-  activities: Activity[];
-}
+export type ChannelContributor =
+  GetChannelContributionsQuery['getChannelContributions'][number];
+export type ChannelContributionDay = ChannelContributor['dayData'][number];

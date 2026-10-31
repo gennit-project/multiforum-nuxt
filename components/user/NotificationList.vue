@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GET_NOTIFICATIONS } from '@/graphQLData/notification/queries';
+import { GetNotificationsDocument as GET_NOTIFICATIONS, MarkNotificationsAsReadDocument as MARK_NOTIFICATIONS_AS_READ  } from '@/__generated__/operations';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
 import { timeAgo } from '@/utils';
-import type { Notification } from '@/__generated__/graphql';
+import { SortDirection } from '@/__generated__/graphql';
+import type { GetNotificationsQuery } from '@/__generated__/operations';
 import MarkdownRenderer from '../MarkdownRenderer.vue';
-import { MARK_NOTIFICATIONS_AS_READ } from '@/graphQLData/user/mutations';
 
 const NOTIFICATION_PAGE_LIMIT = 15;
-type NotificationWithLink = Notification & { link?: string | null };
+type NotificationWithLink = GetNotificationsQuery['users'][number]['Notifications'][number];
 
 const usernameVar = useUsername();
 
@@ -28,7 +28,7 @@ const {
     username: username.value,
     limit: NOTIFICATION_PAGE_LIMIT,
     offset: 0,
-    sort: [{ createdAt: 'DESC' }],
+    sort: [{ createdAt: SortDirection.Desc }],
   }),
   {
     fetchPolicy: 'cache-and-network',
@@ -75,20 +75,22 @@ const loadMore = () => {
     variables: {
       username: username.value,
       limit: NOTIFICATION_PAGE_LIMIT,
-      offset: notificationResult.value.users[0]?.Notifications?.length,
-      sort: [{ createdAt: 'DESC' }],
+      offset: notificationResult.value?.users[0]?.Notifications?.length ?? 0,
+      sort: [{ createdAt: SortDirection.Desc }],
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      const previous = previousResult.users[0];
+      const next = fetchMoreResult?.users[0];
+      if (!previous || !next || previous.username !== username.value || next.username !== username.value) return previousResult;
 
       return {
         ...previousResult,
         users: [
           {
-            ...previousResult.users[0],
+            ...previous,
             Notifications: [
-              ...previousResult.users[0].Notifications,
-              ...fetchMoreResult.users[0].Notifications,
+              ...previous.Notifications,
+              ...next.Notifications.filter((item) => !previous.Notifications.some((existing) => existing.id === item.id)),
             ],
           },
         ],
@@ -172,7 +174,7 @@ const markAllAsRead = () => {
         <div
           v-if="
             aggregateNotificationCount >
-            notificationResult.users[0].Notifications.length
+            notifications.length
           "
         >
           <LoadMore
@@ -180,7 +182,7 @@ const markAllAsRead = () => {
             :loading="notificationLoading"
             :reached-end-of-results="
               aggregateNotificationCount ===
-              notificationResult.users[0].Notifications.length
+              notifications.length
             "
             @load-more="loadMore"
           />

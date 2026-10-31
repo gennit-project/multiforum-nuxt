@@ -75,7 +75,7 @@ describe('user downloads profile page', () => {
       username: 'alice',
       where: {
         AND: [
-          { hasDownload: true },
+          { hasDownload: { eq: true } },
           {
             DiscussionChannels_SOME: {
               channelUniqueName_IN: ['downloads'],

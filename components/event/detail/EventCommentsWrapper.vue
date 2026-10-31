@@ -13,14 +13,9 @@ import { useUsername } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
 import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
 import { useQuery, useMutation } from '@vue/apollo-composable';
-import type { ApolloCache } from '@apollo/client/core';
-import { GET_USER } from '@/graphQLData/user/queries';
-import {
-  SUBSCRIBE_TO_EVENT,
-  SUBSCRIBE_TO_EVENT_UPDATES,
-  UNSUBSCRIBE_FROM_EVENT,
-  UNSUBSCRIBE_FROM_EVENT_UPDATES,
-} from '@/graphQLData/event/mutations';
+import type { GetEventRootCommentAggregateQuery } from '@/__generated__/operations';
+import { isReference, type ApolloCache, type Reference } from '@apollo/client/core';
+import { GetBasicUserInfoDocument as GET_USER, SubscribeToEventDocument as SUBSCRIBE_TO_EVENT, SubscribeToEventUpdatesDocument as SUBSCRIBE_TO_EVENT_UPDATES, UnsubscribeFromEventDocument as UNSUBSCRIBE_FROM_EVENT, UnsubscribeFromEventUpdatesDocument as UNSUBSCRIBE_FROM_EVENT_UPDATES  } from '@/__generated__/operations';
 import Notification from '@/components/NotificationComponent.vue';
 import EventNotificationsMenu from './EventNotificationsMenu.vue';
 import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
@@ -247,10 +242,9 @@ function incrementCommentCount(cache: ApolloCache<unknown>) {
     cache.modify({
       id: eventId,
       fields: {
-        CommentsConnection(existing) {
-          const data = (existing || {}) as {
-            aggregate?: { count?: { nodes?: number } };
-          };
+        CommentsConnection(existing: GetEventRootCommentAggregateQuery['events'][number]['CommentsConnection'] | Reference) {
+          if (!existing || isReference(existing)) return existing;
+          const data = existing;
           const nodes = data.aggregate?.count?.nodes || 0;
           return {
             ...data,
@@ -289,10 +283,9 @@ function decrementCommentCount(cache: ApolloCache<unknown>) {
     cache.modify({
       id: eventId,
       fields: {
-        CommentsConnection(existing) {
-          const data = (existing || {}) as {
-            aggregate?: { count?: { nodes?: number } };
-          };
+        CommentsConnection(existing: GetEventRootCommentAggregateQuery['events'][number]['CommentsConnection'] | Reference) {
+          if (!existing || isReference(existing)) return existing;
+          const data = existing;
           const nodes = data.aggregate?.count?.nodes || 0;
           return {
             ...data,
@@ -342,7 +335,8 @@ const {
   onDone: onSubscribeComplete,
 } = useMutation(SUBSCRIBE_TO_EVENT, {
   update: (cache, result) => {
-    if (result.data?.subscribeToEvent && props.event?.id) {
+    const updated = result.data?.subscribeToEvent;
+    if (updated && props.event?.id) {
       cache.modify({
         id: cache.identify({
           __typename: 'Event',
@@ -350,7 +344,7 @@ const {
         }),
         fields: {
           SubscribedToNotifications(_) {
-            return result.data.subscribeToEvent.SubscribedToNotifications;
+            return updated.SubscribedToNotifications;
           },
         },
       });
@@ -371,7 +365,8 @@ const {
   onDone: onUnsubscribeComplete,
 } = useMutation(UNSUBSCRIBE_FROM_EVENT, {
   update: (cache, result) => {
-    if (result.data?.unsubscribeFromEvent && props.event?.id) {
+    const updated = result.data?.unsubscribeFromEvent;
+    if (updated && props.event?.id) {
       cache.modify({
         id: cache.identify({
           __typename: 'Event',
@@ -379,7 +374,7 @@ const {
         }),
         fields: {
           SubscribedToNotifications(_) {
-            return result.data.unsubscribeFromEvent.SubscribedToNotifications;
+            return updated.SubscribedToNotifications;
           },
         },
       });
@@ -404,7 +399,8 @@ const {
   onDone: onSubscribeToEventUpdatesDone,
 } = useMutation(SUBSCRIBE_TO_EVENT_UPDATES, {
   update: (cache, result) => {
-    if (result.data?.subscribeToEventUpdates && props.event?.id) {
+    const updated = result.data?.subscribeToEventUpdates;
+    if (updated && props.event?.id) {
       cache.modify({
         id: cache.identify({
           __typename: 'Event',
@@ -412,7 +408,7 @@ const {
         }),
         fields: {
           SubscribedToEventUpdates(_) {
-            return result.data.subscribeToEventUpdates.SubscribedToEventUpdates;
+            return updated.SubscribedToEventUpdates;
           },
         },
       });
@@ -433,7 +429,8 @@ const {
   onDone: onUnsubscribeFromEventUpdatesDone,
 } = useMutation(UNSUBSCRIBE_FROM_EVENT_UPDATES, {
   update: (cache, result) => {
-    if (result.data?.unsubscribeFromEventUpdates && props.event?.id) {
+    const updated = result.data?.unsubscribeFromEventUpdates;
+    if (updated && props.event?.id) {
       cache.modify({
         id: cache.identify({
           __typename: 'Event',
@@ -441,7 +438,7 @@ const {
         }),
         fields: {
           SubscribedToEventUpdates(_) {
-            return result.data.unsubscribeFromEventUpdates
+            return updated
               .SubscribedToEventUpdates;
           },
         },
