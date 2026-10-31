@@ -175,7 +175,7 @@ The latter uses the same strict extractor as `graphql:check`, resolving the actu
 source selections and imported fragments without executing application modules.
 The explicit `pilotDocuments` list in `scripts/generate-graphql-operations.mjs`
 limits generation to public profiles, account settings, archived-comment issue
-links, and sticky/unsticky comment mutations. These consumers import typed ASTs:
+links, sticky/unsticky comment mutations, and the recursive reply slice below. These consumers import typed ASTs:
 
 ```ts
 import { GetPublicUserProfileDocument } from '@/__generated__/operations';
@@ -219,12 +219,61 @@ regenerate, replace imports in a bounded vertical slice, then remove conflicting
 response types and fix the resulting nullability/variable errors. Add negative
 compile cases and runtime/component/browser coverage for each migrated path.
 
-The recursive discussion reply UI remains a follow-up: `ChildComments` feeds
-components that still require complete schema `Comment` objects. Migrate those
-props and helper inputs to the selected comment fragment together, rather than
-casting partial results. Profile content tabs and remaining mutations likewise
-remain incremental work. Validation and generated types do not guarantee custom
-resolver payloads: retain runtime null filters and integration tests.
+## Phase 5, slice 1: recursive comment replies (#700)
+
+This slice migrates one additional production Apollo query (seven generated
+operations total), not all of #700. `GET_COMMENT_REPLIES` / `getCommentWithReplies`
+is generated from its unchanged `CommentFields` and `CommentVoteFields`
+composition. `ChildComments.vue` imports `GetCommentWithRepliesDocument`; Apollo
+infers variables, results and `fetchMore` merges. A variables getter passes plain
+values and follows changes to parent ID, moderation profile, and sort. Nullable
+reply results render an empty list without a load-more control. A null next page
+retains the current page; a valid next page can replace a null previous page.
+
+### Slice call-site and consumer inventory
+
+| Boundary                                                                                                                              | Migrated contract / operation                                                                                                            | Remaining work                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `ChildComments.vue`: `useQuery`, `fetchMore`, slot                                                                                    | Generated `GetCommentWithRepliesDocument` and exact query result                                                                         | None for this read                                                     |
+| `Comment.vue` recursive props and forwarded interaction payloads                                                                      | `CommentView`, derived from generated `CommentFieldsFragment`; `ReplyComment` is the exact selected reply                                | Other producers below still supply legacy context                      |
+| `CommentHeader`, `CommentButtons`, `VoteButtons`, `ReplyButton`, `CommentEditsDropdown`                                               | Selected comment fields; revision pairs use selected `PastVersions`; author unions narrow by available fields, no full-entity assertions | Vote/reaction/revision/favorite mutations remain separate slices       |
+| `useCommentPermalink`, `useCommentSubscription`, `useCommentStickyMutations`, `useBestAnswerMutations`                                | Selected view or minimal `Pick` inputs; pin/unpin documents remain typed from phase 3                                                    | Subscription and best-answer operations/cache fragments remain legacy  |
+| `useCommentFormState`, `useCommentSectionModals`, `useCommentFeedbackMutation`, `BrokenRulesModal`, `ConfirmUndoCommentFeedbackModal` | Reply edit/report/feedback inputs accept the selected view; cache eviction identifies `Comment` by id                                    | Their write operations and new-feedback response are not migrated here |
+| `commentDisplay`, `commentPermalink`, `routerUtils`                                                                                   | Structural display helpers accept only the fields they inspect; feedback route input requires ids rather than complete entities          | Shared context operation migration below                               |
+
+### Reviewed compatibility exceptions (owner: frontend, follow-up #700)
+
+`CommentView` is a shared presentation contract, not an Apollo response type.
+Its non-null fragment fields remain required. Only nullable selected fields may
+also be absent, recursively, because the existing schema entity types used by
+legacy callers mark those keys optional. The exact reply result still retains
+GraphQL nullability and selected-field guarantees; no query result is cast to a
+schema entity. Apollo's injected author `__typename` is optional at this shared
+boundary. JSON reaction data remains unknown until narrowed to the existing
+string format expected by the emoji control.
+
+Legacy context is explicitly optional and schema-derived: channel/issue and
+feedback-target links, event channel names, author display names, and feedback
+counts. Replies do not claim to select those fields. These fields preserve
+behavior for `CommentSection`, `PinnedAnswers`, `CommentOnFeedbackPage`,
+`EditCommentFeedbackModal`, discussion feedback modals, `CommentDetails`,
+`GithubContributionChart`, and profile/library/mod/event/discussion pages using
+the shared renderer. Migrate those producers by vertical slice, generating their
+actual operations and replacing these compatibility fields with composed
+selection fragments. Remove the nullable-key compatibility mapping once those
+producers no longer use schema entity response annotations. Root comment lists,
+profile tabs, unrelated writes, server-side operations, and cross-repository
+backend response enforcement remain outside this slice.
+
+CI's reply component test asserts its single query uses the generated document
+identity (not a raw/untyped document). Compile fixtures assert reply-to-view
+compatibility, reject unselected schema fields and invalid pagination variables,
+and enforce nullable results/text. Component tests exercise empty/error/loading
+states, pagination and null-page merges, real recursive rendering with exact
+selected-field fixtures, and existing edit/report/vote/subscription interactions.
+The existing nested-comment browser flow runs in normal CI. Strict validation,
+offline generation/freshness, and existing resolver null-filter safeguards remain
+unchanged.
 
 ## Next milestones
 

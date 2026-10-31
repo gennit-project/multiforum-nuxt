@@ -1,6 +1,6 @@
 import { computed, type Ref, type ComputedRef } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
-import type { Comment } from '@/__generated__/graphql';
+import type { CommentView as Comment } from '@/types/Comment';
 import type { RouteLocationRaw } from 'vue-router';
 import { getFeedbackPermalinkObject } from '@/utils/routerUtils';
 import { getCommentPermalinkRoute } from '@/utils/commentPermalink';

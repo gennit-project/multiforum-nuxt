@@ -4,6 +4,8 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import { makeComment } from '@/tests/utils/factories';
 import type { Comment as CommentType } from '@/__generated__/graphql';
 
+import { makeReply } from '@/tests/utils/replyFixtures';
+
 import Comment from '@/components/comments/Comment.vue';
 
 vi.mock('nuxt/app', () => ({ useRoute: () => ({ params: {} }) }));
@@ -11,6 +13,29 @@ vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ({ value: 'alice' }),
 }));
 vi.mock('@vue/apollo-composable', () => ({
+  useQuery: (_document: unknown, variables: () => { commentId: string }) => {
+    const parent = variables().commentId;
+    const child = makeReply({
+      id: parent === 'root' ? 'child' : 'grandchild',
+      text:
+        parent === 'root' ? 'Selected child body' : 'Selected grandchild body',
+      ParentComment: { id: parent },
+      ChildCommentsConnection: {
+        aggregate: { count: { nodes: parent === 'root' ? 1 : 0 } },
+      },
+    });
+    return {
+      result: ref({
+        getCommentReplies: {
+          aggregateChildCommentCount: 1,
+          ChildComments: [child],
+        },
+      }),
+      error: ref(null),
+      loading: ref(false),
+      fetchMore: vi.fn(),
+    };
+  },
   useMutation: () => ({
     mutate: vi.fn(),
     loading: { value: false },
@@ -126,7 +151,9 @@ describe('Comment (real mount)', () => {
   it('shows the edit form and edit error for the active comment', () => {
     const wrapper = mountWithDefaults(Comment, {
       props: {
-        commentData: baseComment({ text: 'Original body' } as Partial<CommentType>),
+        commentData: baseComment({
+          text: 'Original body',
+        } as Partial<CommentType>),
         depth: 1,
         editFormOpenAtCommentID: 'c1',
         editCommentError: { message: 'Could not save' },
@@ -146,7 +173,9 @@ describe('Comment (real mount)', () => {
   it('emits edit text updates from the active edit form', async () => {
     const wrapper = mountWithDefaults(Comment, {
       props: {
-        commentData: baseComment({ text: 'Original body' } as Partial<CommentType>),
+        commentData: baseComment({
+          text: 'Original body',
+        } as Partial<CommentType>),
         depth: 1,
         editFormOpenAtCommentID: 'c1',
       },
@@ -306,5 +335,29 @@ describe('Comment (real mount)', () => {
       text: expect.stringContaining('Continue thread'),
       scroll: [[]],
     });
+  });
+});
+
+describe('generated recursive replies', () => {
+  it('renders selected fields through the real ChildComments and recursive Comment components', () => {
+    const wrapper = mountWithDefaults(Comment, {
+      props: {
+        commentData: makeReply({
+          id: 'root',
+          text: 'Selected root body',
+          ParentComment: null,
+          ChildCommentsConnection: { aggregate: { count: { nodes: 1 } } },
+        }),
+        depth: 1,
+      },
+      global: { stubs: { ...stubs, ChildComments: false } },
+    });
+    expect(
+      wrapper.findAll('[data-testid="comment"]').map((node) => node.text())
+    ).toEqual([
+      expect.stringContaining('Selected root body'),
+      expect.stringContaining('Selected child body'),
+      expect.stringContaining('Selected grandchild body'),
+    ]);
   });
 });

@@ -20,7 +20,7 @@ import {
 } from '@/graphQLData/issue/mutations';
 import { GET_ISSUE } from '@/graphQLData/issue/queries';
 import { SUSPEND_USER } from '@/graphQLData/mod/mutations';
-import type { Comment } from '@/__generated__/graphql';
+import type { CommentView as Comment } from '@/types/Comment';
 import SelectBrokenRules from '@/components/admin/SelectBrokenRules.vue';
 import ArchiveBox from '@/components/icons/ArchiveBox.vue';
 import { IS_ORIGINAL_POSTER_SUSPENDED } from '@/graphQLData/mod/queries';

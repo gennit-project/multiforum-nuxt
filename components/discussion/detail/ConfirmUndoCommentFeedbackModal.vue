@@ -6,7 +6,7 @@ import GenericModal from '@/components/GenericModal.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { DELETE_COMMENT } from '@/graphQLData/comment/mutations';
 import { GET_SPECIFIC_COMMENT_FEEDBACK as GET_FEEDBACK } from '@/graphQLData/comment/queries';
-import type { Comment } from '@/__generated__/graphql';
+import type { CommentView as Comment } from '@/types/Comment';
 import CommentHeader from '@/components/comments/CommentHeader.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 
@@ -63,7 +63,9 @@ const {
 } = useMutation(DELETE_COMMENT, {
   update: (cache, { data }) => {
     if (commentData.value && data?.deleteComments?.nodesDeleted > 0) {
-      cache.evict({ id: cache.identify(commentData.value) });
+      cache.evict({
+        id: cache.identify({ __typename: 'Comment', id: commentData.value.id }),
+      });
     }
   },
 });

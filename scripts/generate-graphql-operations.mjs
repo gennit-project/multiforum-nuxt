@@ -12,6 +12,7 @@ export const pilotDocuments = [
   'graphQLData/user/queries.js#GET_USER',
   'graphQLData/user/mutations.js#UPDATE_USER',
   'graphQLData/mod/queries.js#GET_COMMENT_ISSUE',
+  'graphQLData/comment/queries.js#GET_COMMENT_REPLIES',
   'graphQLData/comment/mutations.js#STICKY_COMMENT',
   'graphQLData/comment/mutations.js#UNSTICKY_COMMENT',
 ];

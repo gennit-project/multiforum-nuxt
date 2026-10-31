@@ -3,8 +3,10 @@ import { ref, computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import type { PropType } from 'vue';
 import type { ApolloError } from '@apollo/client/core';
-import type { Comment } from '@/__generated__/graphql';
-import type { CreateReplyInputData } from '@/types/Comment';
+import type {
+  CommentView as Comment,
+  CreateReplyInputData,
+} from '@/types/Comment';
 import TextEditor from '../TextEditor.vue';
 import ChildComments from './ChildComments.vue';
 import CommentButtons from './CommentButtons.vue';
@@ -43,12 +45,6 @@ type DeleteCommentInputData = {
   commentId: string;
   parentCommentId: string;
   replyCount: number;
-};
-
-type StickyCommentFields = Comment & {
-  isSticky?: boolean | null;
-  stickyAt?: string | null;
-  stickyByUsername?: string | null;
 };
 
 export type HandleFeedbackInput = {
@@ -323,7 +319,10 @@ const replyCount = computed(() => getCommentReplyCount(props.commentData));
 const textCopy = computed(() => props.commentData.text);
 const authorBadges = computed(() => {
   const author = props.commentData?.CommentAuthor;
-  const username = author?.__typename === 'User' ? author.username : null;
+  const username =
+    author?.__typename === 'User' && 'username' in author
+      ? author.username
+      : null;
   const modProfileName =
     author?.__typename === 'ModerationProfile' ? author.displayName : null;
 
@@ -339,7 +338,7 @@ const authorBadges = computed(() => {
 
 // Compute menu items using the utility function
 const commentMenuItems = computed(() => {
-  const commentData = props.commentData as StickyCommentFields;
+  const commentData = props.commentData;
   const isOwnComment = isCommentOwnedByUser(
     props.commentData,
     usernameVar.value

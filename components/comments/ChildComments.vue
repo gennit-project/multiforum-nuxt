@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_COMMENT_REPLIES } from '@/graphQLData/comment/queries';
+import { GetCommentWithRepliesDocument } from '@/__generated__/operations';
 import LoadMore from '../LoadMore.vue';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import { useRoute } from 'nuxt/app';
@@ -27,13 +27,13 @@ const {
   error: commentError,
   loading: commentLoading,
   fetchMore,
-} = useQuery(GET_COMMENT_REPLIES, {
+} = useQuery(GetCommentWithRepliesDocument, () => ({
   commentId: props.parentCommentId,
   modName: props.modName,
   limit: PAGE_LIMIT,
   offset: 0,
-  sort: activeSort,
-});
+  sort: activeSort.value,
+}));
 
 const aggregateChildCommentCount = computed(() => {
   if (commentLoading.value || commentError.value) {
@@ -48,15 +48,14 @@ const aggregateChildCommentCount = computed(() => {
 const loadMore = () => {
   fetchMore({
     variables: {
-      offset: commentResult.value?.getCommentReplies.ChildComments.length,
+      offset: commentResult.value?.getCommentReplies?.ChildComments.length ?? 0,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      if (!fetchMoreResult?.getCommentReplies) return previousResult;
+      if (!previousResult.getCommentReplies) return fetchMoreResult;
 
-      const prevCommentReplies =
-        previousResult.getCommentReplies.ChildComments;
-      const newCommentReplies =
-        fetchMoreResult.getCommentReplies.ChildComments;
+      const prevCommentReplies = previousResult.getCommentReplies.ChildComments;
+      const newCommentReplies = fetchMoreResult.getCommentReplies.ChildComments;
 
       return {
         ...previousResult,
@@ -81,7 +80,7 @@ const reachedEndOfResults = computed(() => {
     return false;
   }
   return (
-    commentResult.value?.getCommentReplies.ChildComments.length ===
+    (commentResult.value?.getCommentReplies?.ChildComments.length ?? 0) >=
     aggregateChildCommentCount.value
   );
 });

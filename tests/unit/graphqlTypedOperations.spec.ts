@@ -7,11 +7,13 @@ import {
   GetBasicUserInfoDocument,
   UpdateUserDocument,
   GetCommentIssueDocument,
+  GetCommentWithRepliesDocument,
   StickyCommentDocument,
   UnstickyCommentDocument,
 } from '@/__generated__/operations';
 import { GET_PUBLIC_USER_PROFILE, GET_USER } from '@/graphQLData/user/queries';
 import { UPDATE_USER } from '@/graphQLData/user/mutations';
+import { GET_COMMENT_REPLIES } from '@/graphQLData/comment/queries';
 import { GET_COMMENT_ISSUE } from '@/graphQLData/mod/queries';
 import {
   STICKY_COMMENT,
@@ -28,6 +30,7 @@ describe('generated operation runtime contracts', () => {
     ['account', GetBasicUserInfoDocument, GET_USER],
     ['update profile', UpdateUserDocument, UPDATE_USER],
     ['comment issue', GetCommentIssueDocument, GET_COMMENT_ISSUE],
+    ['comment replies', GetCommentWithRepliesDocument, GET_COMMENT_REPLIES],
     ['pin comment', StickyCommentDocument, STICKY_COMMENT],
     ['unpin comment', UnstickyCommentDocument, UNSTICKY_COMMENT],
   ])(

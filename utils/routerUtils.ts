@@ -10,9 +10,9 @@ type FeedbackPermalinkInput = {
   discussionId?: string;
   eventId?: string;
   commentId?: string;
-  GivesFeedbackOnComment?: Comment;
-  GivesFeedbackOnDiscussion?: Discussion;
-  GivesFeedbackOnEvent?: Event;
+  GivesFeedbackOnComment?: Pick<Comment, 'id'>;
+  GivesFeedbackOnDiscussion?: Pick<Discussion, 'id'>;
+  GivesFeedbackOnEvent?: Pick<Event, 'id'>;
 };
 
 type DiscussionCommentPermalinkInput = {

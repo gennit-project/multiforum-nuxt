@@ -1,5 +1,5 @@
 import { ref, type Ref } from 'vue';
-import type { Comment } from '@/__generated__/graphql';
+import type { CommentView as Comment } from '@/types/Comment';
 import { useModerationOutcomeUI } from './useModerationOutcomeUI';
 
 type DeleteCommentInputData = {

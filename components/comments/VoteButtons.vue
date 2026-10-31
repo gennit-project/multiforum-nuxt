@@ -8,7 +8,7 @@ import {
   UNDO_UPVOTE_COMMENT,
 } from '@/graphQLData/comment/mutations';
 import type { PropType } from 'vue';
-import type { Comment } from '@/__generated__/graphql';
+import type { CommentView as Comment } from '@/types/Comment';
 import VotesComponent from './Votes.vue';
 import SuperUpvoteModal from '@/components/superUpvote/SuperUpvoteModal.vue';
 import { UNDO_SUPER_UPVOTE } from '@/graphQLData/scratchpad/mutations';

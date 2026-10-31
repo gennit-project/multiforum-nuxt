@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onUnmounted, useId } from 'vue';
 import type { PropType } from 'vue';
-import type { Comment, TextVersion, User } from '@/__generated__/graphql';
+import type { CommentView as Comment } from '@/types/Comment';
 import {
   usePopoverPositioning,
   type PopoverPosition,
@@ -11,7 +11,6 @@ import {
   buildSequentialRevisionPairs,
   getRevisionAuthorName,
   type RevisionPair,
-  type RevisionAuthorLike,
 } from '@/utils/revisionHistory';
 import CommentRevisionDiffModal from './CommentRevisionDiffModal.vue';
 
@@ -32,6 +31,10 @@ const popoverPosition = ref<PopoverPosition>({
   left: 0,
   placement: 'below',
 });
+type HistoricalVersion = Comment['PastVersions'][number];
+type TextVersion = Omit<HistoricalVersion, 'Author'> & {
+  Author?: HistoricalVersion['Author'] | Comment['CommentAuthor'];
+};
 type EditItem = RevisionPair<TextVersion>;
 
 const activeRevision = ref<EditItem | null>(null);
@@ -52,19 +55,13 @@ const allEdits = computed(() => {
     id: 'current',
     body: props.comment.text,
     createdAt: props.comment.updatedAt || props.comment.createdAt,
-    Author: props.comment.CommentAuthor as User,
-    AuthorConnection: {
-      __typename: 'TextVersionAuthorConnection',
-      edges: [],
-      pageInfo: { hasNextPage: false, hasPreviousPage: false },
-      totalCount: 0,
-    },
+    Author: props.comment.CommentAuthor,
   };
 
   return buildSequentialRevisionPairs({
     pastVersions: props.comment?.PastVersions,
     currentVersion,
-    currentAuthor: props.comment.CommentAuthor as RevisionAuthorLike,
+    currentAuthor: props.comment.CommentAuthor,
     getHistoricalPairAuthor: ({ oldVersion }) =>
       getRevisionAuthorName(oldVersion.Author),
   });

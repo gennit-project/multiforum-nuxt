@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import type { Comment, User } from '@/__generated__/graphql';
+import type { CommentView as Comment } from '@/types/Comment';
 import { stableRelativeTime } from '@/utils';
 import {
   getPermalinkToDiscussionComment,
@@ -10,10 +10,6 @@ import {
   getPermalinkToEvent,
 } from '@/utils/routerUtils';
 import CommentEditsDropdown from './CommentEditsDropdown.vue';
-
-type StickyCommentFields = Comment & {
-  isSticky?: boolean | null;
-};
 
 // Props definition using defineProps
 const props = defineProps({
@@ -71,11 +67,17 @@ const props = defineProps({
   },
 });
 
-const commentAuthorUsername = computed(
-  () => (props.commentData.CommentAuthor as User)?.username
+const commentAuthorUsername = computed(() =>
+  props.commentData.CommentAuthor &&
+  'username' in props.commentData.CommentAuthor
+    ? props.commentData.CommentAuthor.username
+    : undefined
 );
-const commentAuthorProfilePic = computed(
-  () => (props.commentData.CommentAuthor as User)?.profilePicURL
+const commentAuthorProfilePic = computed(() =>
+  props.commentData.CommentAuthor &&
+  'profilePicURL' in props.commentData.CommentAuthor
+    ? props.commentData.CommentAuthor.profilePicURL
+    : undefined
 );
 const commentAuthorDisplayName = computed(
   () => props.commentData.CommentAuthor?.displayName
@@ -171,7 +173,7 @@ const contextLinkObject = computed(() => {
   if (GivesFeedbackOnEvent) {
     // If it's giving feedback on an event, the context is the event.
     return getPermalinkToEvent({
-      forumId: GivesFeedbackOnEvent.EventChannels[0]?.channelUniqueName || '',
+      forumId: GivesFeedbackOnEvent.EventChannels?.[0]?.channelUniqueName || '',
       eventId: GivesFeedbackOnEvent.id,
     });
   }
@@ -186,7 +188,7 @@ const contextLinkObject = computed(() => {
   if (ParentComment && Event) {
     // If the event comment has a parent comment, the context is the parent comment.
     return getPermalinkToEventComment({
-      forumId: Event.EventChannels[0]?.channelUniqueName || '',
+      forumId: Event.EventChannels?.[0]?.channelUniqueName || '',
       eventId: Event.id,
       commentId: ParentComment.id,
     });
@@ -207,9 +209,7 @@ const contextLinkObject = computed(() => {
   });
 });
 
-const isSticky = computed(
-  () => !!(props.commentData as StickyCommentFields).isSticky
-);
+const isSticky = computed(() => !!props.commentData.isSticky);
 </script>
 
 <template>

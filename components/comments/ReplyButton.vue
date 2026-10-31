@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { computed } from 'vue';
-import type { Comment } from '@/__generated__/graphql';
+import type { CommentView as Comment } from '@/types/Comment';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
 
