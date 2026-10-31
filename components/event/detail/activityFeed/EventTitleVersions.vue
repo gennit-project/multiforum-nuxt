@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
-import type { Event } from '@/__generated__/graphql';
+import type { EventPresentation as Event } from '@/types/EventPresentation';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import { timeAgo } from '@/utils';
 
@@ -80,7 +80,7 @@ const toggleOlderEdits = () => {
 </script>
 
 <template>
-  <div v-if="showActivityFeed" class="mb-6 mt-4">
+  <div v-if="showActivityFeed" class="mt-4 mb-6">
     <p class="mb-2 text-xs font-medium text-gray-500 dark:text-gray-400">
       Title Edit History
     </p>
@@ -145,7 +145,7 @@ const toggleOlderEdits = () => {
                 item.newTitle
               }}</span>
               <span
-                class="whitespace-nowrap text-xs text-gray-500 dark:text-gray-400"
+                class="text-xs whitespace-nowrap text-gray-500 dark:text-gray-400"
               >
                 {{ timeAgo(item.timestamp) }}
               </span>

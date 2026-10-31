@@ -387,6 +387,45 @@ profiles/mod/library producers, the remaining comment mutations/cache writes and
 backend/#701 work are still out of scope. The comprehensive call-site checklist
 is maintained in issue #700; this table inventories only this slice.
 
+## Phase 5, slice 5: event root-comment reads (#700)
+
+Four more operations are generated (twenty-three total): `GET_EVENT`,
+`GET_EVENT_COMMENTS`, `GET_EVENT_ROOT_COMMENT_AGGREGATE`, and
+`GET_EVENT_CHANNEL` (`getEventChannelID`). Their documents retain the exact
+source selections and use the same pinned offline generation/freshness checks.
+No backend projection or query selection was expanded.
+
+`EventDetail.vue` now infers these four reads, narrows reactive route IDs to
+scalars, and carries exact root selections through rendering and pagination.
+Page merges reject stale event/forum/sort contexts, ignore null rows and deduplicate
+IDs. Event detail/fallback, aggregate and archive state are matched to the current
+context. The initial query is not redundantly refetched on mount; authentication
+changes still refetch. The event create form uses the generated root read for its captured
+refetch variables; its mutation was already migrated in slice 4.
+
+Header, body, calendar, footer, channel links and revision presentation props use
+`EventPresentation` and selected revision/channel contracts. Presentation-only
+optional metadata supports the smaller root fallback and legacy callers; these
+contracts are never Apollo result or cache types. Poster display-name/avatar
+compatibility remains optional because these event reads do not select them.
+The unused channel-link comment-count prop was removed rather than asserting an
+unselected count.
+
+Negative type tests cover invalid scalar IDs/pagination variables, nullable detail
+and fallback, missing selected fields and root-renderer compatibility. Runtime
+coverage includes variable reactivity, stale pagination, archive context, null/error
+fallbacks and create-refetch snapshots. Browser coverage exercises overlapping
+pages, URL sort, forum navigation and empty/null/error roots. Browser fixtures
+supply selected event history and author fields plus normalized typenames so cache
+completeness is tested rather than masked by incomplete responses.
+
+This remains a partial #700 migration. Other `GET_EVENT` consumers (title editor,
+event edit page and moderation views), other event-channel consumers, event
+mutation/subscription cache helpers, event lists and profile/mod/library producers
+remain separate. Existing cache-helper compatibility assertions were not removed
+or extended. The comprehensive issue checklist remains the project-wide inventory;
+this section records only the four operations and five migrated call sites.
+
 ## Next milestones
 
 1. **Phase 2:** fix the recorded compatibility debt and remove the temporary

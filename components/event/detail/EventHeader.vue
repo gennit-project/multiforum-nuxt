@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import type { Event } from '@/__generated__/graphql';
+import type { EventPresentation as Event } from '@/types/EventPresentation';
 import { ADD_FEEDBACK_COMMENT_TO_EVENT } from '@/graphQLData/event/mutations';
 import EditScopeModal from '@/components/event/form/EditScopeModal.vue';
 import { useEventCancelDelete } from '@/composables/useEventCancelDelete';
@@ -72,10 +72,7 @@ const showFeedbackFormModal = ref(false);
 const showFeedbackSubmittedSuccessfully = ref(false);
 
 // Series-related state
-// Note: EventSeries is a new field that may not be in generated types yet
-const eventDataWithSeries = computed(
-  () => props.eventData as Event & { EventSeries?: { id?: string } }
-);
+const eventDataWithSeries = computed(() => props.eventData);
 const isPartOfSeries = computed(() =>
   Boolean(eventDataWithSeries.value?.EventSeries?.id)
 );
@@ -418,7 +415,7 @@ function openFeedbackFormModal() {
             <LinkIcon />
           </div>
           <a
-            class="min-w-0 flex-1 cursor-pointer break-all font-medium underline decoration-gray-400 underline-offset-2 dark:decoration-gray-500"
+            class="min-w-0 flex-1 cursor-pointer font-medium break-all underline decoration-gray-400 underline-offset-2 dark:decoration-gray-500"
             target="_blank"
             rel="noreferrer"
             :href="eventData.virtualEventUrl"

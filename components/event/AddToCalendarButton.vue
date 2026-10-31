@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { DateTime } from 'luxon';
-import type { Event as EventData } from '@/__generated__/graphql';
+import type { EventPresentation as EventData } from '@/types/EventPresentation';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 
 const props = defineProps({

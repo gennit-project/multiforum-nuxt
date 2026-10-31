@@ -1,4 +1,8 @@
 import {
+  GetEventDocument,
+  GetEventCommentsDocument,
+  GetEventRootCommentAggregateDocument,
+  GetEventChannelIdDocument,
   CreateCommentDocument,
   GetDiscussionDetailAnswersPageDocument,
   GetDiscussionDocument,
@@ -17,8 +21,20 @@ import {
   SubscribeToCommentDocument,
   UnsubscribeFromCommentDocument,
   StickyCommentDocument,
-  UnstickyCommentDocument,
+  UnstickyCommentDocument
 } from '@/__generated__/operations';
+import { GET_EVENT } from '@/graphQLData/event/queries';
+import {
+  GET_EVENT_COMMENTS,
+  GET_EVENT_ROOT_COMMENT_AGGREGATE,
+  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
+  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
+  GET_DISCUSSION_COMMENTS,
+  GET_COMMENT,
+  GET_COMMENT_REPLIES,
+  GET_COMMENT_AND_REPLIES
+} from '@/graphQLData/comment/queries';
+import { GET_EVENT_CHANNEL, GET_COMMENT_ISSUE  } from '@/graphQLData/mod/queries';
 import {
   CREATE_COMMENT,
   SUBSCRIBE_TO_COMMENT,
@@ -32,21 +48,12 @@ import {
   GET_DOWNLOAD_DETAIL,
   GET_DISCUSSION_DETAIL,
 } from '@/graphQLData/discussion/queries';
-import {
-  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-  GET_DISCUSSION_COMMENTS,
-  GET_COMMENT,
-  GET_COMMENT_REPLIES,
-  GET_COMMENT_AND_REPLIES,
-} from '@/graphQLData/comment/queries';
 import { describe, expect, it } from 'vitest';
 import { ApolloClient, InMemoryCache } from '@apollo/client/core';
 import { MockLink } from '@apollo/client/testing/core';
 import { Kind, print, type DocumentNode } from 'graphql';
 import { GET_PUBLIC_USER_PROFILE, GET_USER } from '@/graphQLData/user/queries';
 import { UPDATE_USER } from '@/graphQLData/user/mutations';
-import { GET_COMMENT_ISSUE } from '@/graphQLData/mod/queries';
 
 // Fragment order is immaterial; selection sets, variables and directives are not.
 const definitions = (document: DocumentNode) =>
@@ -54,6 +61,14 @@ const definitions = (document: DocumentNode) =>
 
 describe('generated operation runtime contracts', () => {
   it.each([
+    ['event detail', GetEventDocument, GET_EVENT],
+    ['event roots', GetEventCommentsDocument, GET_EVENT_COMMENTS],
+    [
+      'event root count',
+      GetEventRootCommentAggregateDocument,
+      GET_EVENT_ROOT_COMMENT_AGGREGATE,
+    ],
+    ['event archive channel', GetEventChannelIdDocument, GET_EVENT_CHANNEL],
     ['answer hydration', GetCommentDocument, GET_COMMENT],
     ['CREATE_COMMENT', CreateCommentDocument, CREATE_COMMENT],
     [

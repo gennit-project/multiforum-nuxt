@@ -27,11 +27,20 @@ import {
   CreateCommentDocument,
   GetDiscussionChannelCommentAggregateDocument,
   GetDiscussionChannelRootCommentAggregateDocument,
+  GetEventDocument,
+  GetEventCommentsDocument,
+  GetEventRootCommentAggregateDocument,
+  GetEventChannelIdDocument,
 } from '../../__generated__/operations';
 import type {
   RootComment,
   AnswerSummary,
 } from '../../types/DiscussionPresentation';
+
+import type {
+  EventRootComment,
+  EventDetailSelection,
+} from '../../types/EventPresentation';
 
 export function checkApolloInference() {
   const profile = useQuery(GetPublicUserProfileDocument, { username: 'alice' });
@@ -194,4 +203,45 @@ export function checkAnswerHydrationSelection() {
   void answer.result.value?.comments[0]?.ChildComments;
   const view: CommentView | undefined = answer.result.value?.comments[0];
   return view;
+}
+export function checkEventReadingContracts(
+  comment: EventRootComment,
+  event: EventDetailSelection
+) {
+  const detail = useQuery(GetEventDocument, {
+    id: 'e1',
+    channelUniqueName: 'cats',
+  });
+  const roots = useQuery(GetEventCommentsDocument, {
+    eventId: 'e1',
+    limit: 50,
+    offset: 0,
+  });
+  const count = useQuery(GetEventRootCommentAggregateDocument, {
+    eventId: 'e1',
+  });
+  const channel = useQuery(GetEventChannelIdDocument, {
+    eventId: 'e1',
+    channelUniqueName: 'cats',
+  });
+  // @ts-expect-error required event ID cannot be a Ref embedded in variables
+  roots.refetch({ eventId: { value: 'e1' } });
+  // @ts-expect-error array route parameters must be narrowed before querying
+  detail.refetch({ id: ['e1'], channelUniqueName: 'cats' });
+  // @ts-expect-error limit is an Int
+  roots.refetch({ eventId: 'e1', limit: '50' });
+  // @ts-expect-error root resolver can return null
+  void roots.result.value?.getEventComments.Comments;
+  // @ts-expect-error fallback does not select full event revision history
+  void roots.result.value?.getEventComments?.Event?.PastTitleVersions;
+  // @ts-expect-error the archive query selects no full Channel
+  void channel.result.value?.eventChannels[0]?.Channel;
+  // @ts-expect-error count query selects no title
+  void count.result.value?.events[0]?.title;
+  // @ts-expect-error poster display name is absent from this actual selection
+  void event.Poster?.displayName;
+  // @ts-expect-error event description can be null
+  const description: string = event.description;
+  const rendered: CommentView = comment;
+  return { detail, roots, count, channel, rendered, description };
 }

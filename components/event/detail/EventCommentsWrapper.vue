@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import type { PropType } from 'vue';
+import type { EventPresentation as Event } from '@/types/EventPresentation';
 import type {
-  Event,
-  Comment as CommentType,
-  OwnedCommentCreateInput,
-} from '@/__generated__/graphql';
+  CommentView as CommentType,
+  CreateEditCommentFormValues,
+} from '@/types/Comment';
+import type { PropType } from 'vue';
+import type { OwnedCommentCreateInput } from '@/__generated__/graphql';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
 import CommentSection from '@/components/comments/CommentSection.vue';
-import type { CreateEditCommentFormValues } from '@/types/Comment';
 import { useUsername } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
 import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
@@ -298,7 +298,10 @@ function decrementCommentCount(cache: ApolloCache<unknown>) {
             ...data,
             aggregate: {
               ...data.aggregate,
-              count: { ...data.aggregate?.count, nodes: Math.max(0, nodes - 1) },
+              count: {
+                ...data.aggregate?.count,
+                nodes: Math.max(0, nodes - 1),
+              },
             },
           };
         },
@@ -324,10 +327,7 @@ const isSubscribed = computed(() => {
 });
 
 const isSubscribedToEventUpdates = computed(() => {
-  const updateSubscribers =
-    ((props.event as Event & {
-      SubscribedToEventUpdates?: Array<{ username: string }>;
-    })?.SubscribedToEventUpdates || []);
+  const updateSubscribers = props.event?.SubscribedToEventUpdates || [];
 
   if (!usernameVar.value) {
     return false;
@@ -360,7 +360,8 @@ const {
 
 onSubscribeComplete(() => {
   notificationTitle.value = 'Comment notifications turned on';
-  notificationDetail.value = 'You will get updates for new comments on this event.';
+  notificationDetail.value =
+    'You will get updates for new comments on this event.';
   showSubscriptionNotification.value = true;
 });
 
@@ -388,7 +389,8 @@ const {
 
 onUnsubscribeComplete(() => {
   notificationTitle.value = 'Comment notifications turned off';
-  notificationDetail.value = 'You will stop getting updates for new comments on this event.';
+  notificationDetail.value =
+    'You will stop getting updates for new comments on this event.';
   showSubscriptionNotification.value = true;
 });
 

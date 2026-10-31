@@ -4,7 +4,6 @@ defineProps<{
   channelId: string;
   channelIcon: string;
   channelDisplayName: string;
-  commentCount: number;
 }>();
 </script>
 <template>

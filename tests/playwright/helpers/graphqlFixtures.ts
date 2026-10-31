@@ -1,3 +1,4 @@
+import type { GetEventQuery } from '../../../__generated__/operations';
 import type {
   Channel,
   ChannelRole,
@@ -30,6 +31,7 @@ export type UserFixture = Pick<
   User,
   | '__typename'
   | 'username'
+  | 'isBot'
   | 'displayName'
   | 'profilePicURL'
   | 'createdAt'
@@ -246,6 +248,7 @@ export const buildUser = (
   overrides: Override<UserFixture> = {}
 ): UserFixture => ({
   __typename: 'User',
+  isBot: false,
   username: DEFAULT_USERNAME,
   displayName: DEFAULT_USERNAME,
   profilePicURL: '',
@@ -668,7 +671,14 @@ export const buildComment = ({
   SuperUpvotedByUsers: [],
 });
 
-export type EventFixture = {
+export type EventFixture = Pick<
+  GetEventQuery['events'][number],
+  | 'PastTitleVersions'
+  | 'PastDescriptionVersions'
+  | 'DescriptionLastEditedBy'
+  | 'authorIsChannelModerator'
+> & {
+  __typename: 'Event';
   id: string;
   title: string;
   description: string;
@@ -729,9 +739,14 @@ export const buildEvent = ({
   posterUsername?: string;
   overrides?: Partial<EventFixture>;
 } = {}): EventFixture => ({
+  __typename: 'Event',
   id,
   title,
   description,
+  PastTitleVersions: [],
+  PastDescriptionVersions: [],
+  DescriptionLastEditedBy: null,
+  authorIsChannelModerator: false,
   startTime: '2030-01-01T18:00:00.000Z',
   endTime: '2030-01-01T20:00:00.000Z',
   locationName: 'Test Location',

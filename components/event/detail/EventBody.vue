@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { computed } from 'vue';
-import type { Event } from '@/__generated__/graphql';
+import type { EventPresentation as Event } from '@/types/EventPresentation';
 import { useUsername } from '@/composables/useAuthState';
 import EventDescriptionEditForm from './EventDescriptionEditForm.vue';
 

@@ -2,10 +2,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
 import EventRootCommentFormWrapper from './EventRootCommentFormWrapper.vue';
-import type { Mutation } from '@/__generated__/graphql';
+import {
+  GetEventCommentsDocument,
+  type CreateCommentMutation,
+} from '@/__generated__/operations';
+import { makeEventDetail } from '@/tests/utils/eventCommentFixtures';
+const mockMutation = vi.hoisted(() => vi.fn());
 
 type CreateCommentsResult = {
-  data?: Pick<Mutation, 'createCommentWithOwnedConnections'>;
+  data?: CreateCommentMutation;
+  errors?: Array<{ message: string }>;
 };
 
 const onDoneCallbacks: Array<(result: CreateCommentsResult) => void> = [];
@@ -23,13 +29,16 @@ vi.mock('@vue/apollo-composable', () => ({
   useQuery: () => ({
     result: ref(null),
   }),
-  useMutation: () => ({
-    mutate: vi.fn(),
-    error: ref(null),
-    onDone: (cb: (result: CreateCommentsResult) => void) => {
-      onDoneCallbacks.push(cb);
-    },
-  }),
+  useMutation: (document, options) => {
+    mockMutation(document, options);
+    return {
+      mutate: vi.fn(),
+      error: ref(null),
+      onDone: (cb: (result: CreateCommentsResult) => void) => {
+        onDoneCallbacks.push(cb);
+      },
+    };
+  },
 }));
 
 vi.mock('@/composables/useAuthState', async () => {
@@ -58,9 +67,7 @@ describe('EventRootCommentFormWrapper', () => {
     mount(EventRootCommentFormWrapper, {
       props: {
         previousOffset: 0,
-        event: {
-          id: 'event-1',
-        },
+        event: makeEventDetail({ id: 'event-1' }),
       },
       global: {
         stubs: {
@@ -101,5 +108,20 @@ describe('EventRootCommentFormWrapper', () => {
     await wrapper.vm.$nextTick();
 
     expect(wrapper.find('[data-testid="error-banner"]').exists()).toBe(true);
+  });
+  it('captures the generated root-read variables at mutation start', async () => {
+    const wrapper = buildWrapper();
+    const options = mockMutation.mock.calls.at(-1)![1];
+    const first = options().refetchQueries[0];
+    await wrapper.setProps({ event: makeEventDetail({ id: 'event-2' }) });
+    expect({
+      document: first.query,
+      first: first.variables,
+      next: options().refetchQueries[0].variables,
+    }).toEqual({
+      document: GetEventCommentsDocument,
+      first: { eventId: 'event-1', limit: 50, offset: 0, sort: 'hot' },
+      next: { eventId: 'event-2', limit: 50, offset: 0, sort: 'hot' },
+    });
   });
 });

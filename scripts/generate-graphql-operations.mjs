@@ -28,6 +28,10 @@ export const pilotDocuments = [
   'graphQLData/comment/mutations.js#UNSUBSCRIBE_FROM_COMMENT',
   'graphQLData/comment/mutations.js#STICKY_COMMENT',
   'graphQLData/comment/mutations.js#UNSTICKY_COMMENT',
+  'graphQLData/event/queries.js#GET_EVENT',
+  'graphQLData/comment/queries.js#GET_EVENT_COMMENTS',
+  'graphQLData/comment/queries.js#GET_EVENT_ROOT_COMMENT_AGGREGATE',
+  'graphQLData/mod/queries.js#GET_EVENT_CHANNEL',
 ];
 
 // Codegen's programmatic plugins expect shared definitions to be deduplicated.
