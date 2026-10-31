@@ -1,5 +1,8 @@
 @import 'tailwindcss' important;
 
+/* Build/audit scripts contain identifiers, not application utility classes. */
+@source not '../../scripts';
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 @plugin '@tailwindcss/forms';
