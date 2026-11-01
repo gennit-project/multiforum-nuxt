@@ -1,47 +1,27 @@
 ---
 name: graphql-codegen
-description: Regenerate or update the generated GraphQL types in __generated__/graphql.ts. Use whenever backend schema fields are missing from the frontend types, before running `pnpm run compile`, or when adding/fixing types like X / XCreateInput / XUpdateInput. Read this FIRST — the naive codegen run destroys the checked-in types.
+description: Regenerate or verify generated GraphQL schema and operation types using the pinned offline backend contract.
 ---
 
-# Regenerating GraphQL types (multiforum-nuxt)
+# GraphQL code generation
 
-**⚠️ Do not naively run `pnpm run compile` expecting it to rebuild the types — it deletes
-them.** `codegen.ts` uses the client preset with `documents: ['src/**/*.tsx']`, which matches
-**nothing** in this repo (there is no `src/**/*.tsx`). So `graphql-codegen` emits a ~3-line
-file and **wipes the checked-in `__generated__/graphql.ts`** (~82k lines) that the whole app
-imports from (`@/__generated__/graphql`). The checked-in artifact is also already behind the
-backend schema, so no script in the repo currently regenerates it faithfully.
+The schema is pinned in `graphql-schema/schema.graphql` with a verified backend
+provenance manifest. The previous client-preset warning is obsolete: `compile`
+now invokes the offline schema generator and production operation extractor.
+Do not hand-edit generated types or point generation at a live endpoint.
 
-## Choose the right path
+- `pnpm schema:check`: verify schema checksum and provenance.
+- `pnpm schema:update /path/to/backend-artifact`: select a reviewed backend
+  schema export, keeping SDL and manifest together.
+- `pnpm compile`: regenerate schema-wide and typed-operation artifacts.
+- `pnpm schema:types:check`: compare schema types without overwriting output.
+- `pnpm operations:check`: verify operation freshness and typed consumers.
+- `pnpm operations:contract:generate`: update the portable operation snapshot.
+- `pnpm operations:contract:check`: detect stale snapshot output.
+- `pnpm graphql:check` and `pnpm tsc`: validate operations and consumers.
 
-### A. Small change — add/fix a few fields (preferred, low-risk)
-Hand-edit `__generated__/graphql.ts` directly. Fields within a type are sorted
-**alphabetically**; add the field to the entity type **and** its input types where relevant:
-`X`, `XCreateInput`, `XUpdateInput` (and `…Where` / `…Options` if the field is queryable).
-This is the fastest safe way to unblock a missing backend field (e.g. a new
-`featuredWikiPageIds`).
-
-### B. Full regenerate from the backend schema (when many fields drift)
-The schema is the backend's, and it can be produced **DB-free** from `typeDefs`:
-1. On the backend, emit an introspection JSON from the schema
-   (`Neo4jGraphQL.getSchema()` + `introspectionFromSchema` — `build_scripts/generateTypes.ts`
-   does exactly this, though it deletes its output afterward). Capture that JSON.
-2. Point codegen's `schema` at the introspection JSON (or the running backend via
-   `GRAPHQL_URL_FOR_TYPES`) and run it to emit `__generated__/graphql.ts`.
-3. **Do not** rely on the default `pnpm run compile` until the `documents` glob is fixed
-   (see cleanup below), or it will emit an empty file.
-
-## Always verify before trusting the result
-```bash
-git diff --stat __generated__/graphql.ts
-```
-A regenerate that shows the file shrinking from ~82k lines to a handful is the failure mode
-above — discard it. A good run shows added/changed type fields, not mass deletion.
-
-## Known cleanup (not yet done)
-The real fix is to repoint `codegen.ts` `documents` at where this repo actually uses `gql`
-(its `.ts`/`.vue`/`graphQLData/**`), not `src/**/*.tsx`. Until then, treat `compile` as unsafe
-and prefer path A or the explicit path B above.
-
-## Related
-- Consuming these types correctly (inputs/responses, `Pick` for subsets): [apollo-data](../apollo-data/SKILL.md).
+Review generated diffs, source revision and schema hash before committing.
+Keep `SubmitIssueInput`, wiki authorship and other backend-owned input contracts
+aligned with the pinned schema; do not paper over errors with casts or handwritten
+schema types. See `docs/graphql-contract-campaign.md` and
+`docs/cross-repository-releases.md` for coordinated rollout and rollback.

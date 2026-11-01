@@ -31,6 +31,7 @@ export const excludedDirectories = [
   'node_modules',
   '__generated__',
   'graphql-schema',
+  'graphql-operations',
   'tests',
   'test',
   '__tests__',
