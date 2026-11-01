@@ -429,14 +429,14 @@ this section records only the four operations and five migrated call sites.
 ## Cumulative frontend migration (#700, draft PR #707)
 
 The cumulative branch migrates production consumers, not merely generated exports.
-It remains a **draft with backend-dependent input exceptions**, not a claim that
-all variable contracts are complete. Keep #700 open for review and follow-up.
+It remains a **draft pending final coordinated validation and review**. Keep #700
+open until review and merge.
 
-The consumer audit currently finds 557 primary boundaries: 546 generated-document
-consumers and 11 explicit legacy-variable boundaries; no unresolved document
-origins or generated-document generic overrides. It also traces 153 supplementary
-wrapper/cache calls and 30 refetch-document references. These counts reflect the
-current source, whereas the issue's original inventory records its earlier baseline.
+The current audit finds 555 primary boundaries, all generated-document consumers,
+with zero raw, unresolved or generic-override boundaries. It also traces 156
+supplementary wrapper/cache calls and 36 refetch-document references. Counts reflect
+current source; the issue inventory records its earlier baseline. The exception
+ledger is empty.
 
 | Area / commit | Focused validation before integration |
 | --- | --- |
@@ -452,98 +452,52 @@ current source, whereas the issue's original inventory records its earlier basel
 | Comment/discussion actions `d0be9122` | 1,411 component/helper tests; 128 page tests; final feedback navigation regressions |
 | Forums/shared consumers `0a6aac7f` | Forum, filter, scratchpad, navigation and permission suites; negative selected types |
 | Issue activity pagination `408489b1` | 31 tests; mutation responses larger than the loaded window |
+| Backend pin and generated inputs `cdbce807` | Exact export hash/commit; strict validation and schema checks |
+| Issue input completion `2d5f8f37` | 22 component tests and 7 actual-schema input tests |
+| Wiki input completion `f86a14ca` | 136 affected unit tests; four submitted browser flows |
+| Album/create completion `4b282ed3` | 88 album/coercion tests; 44 affected Apollo-state tests; 22 download-create tests |
+| Crosspost completion `6792cf5e` | Create variable coercion and navigation/repeated-completion regressions |
 
 The final PR records full integration and browser/build/CI outcomes. Focused counts
 overlap and must not be added together as a unique test total.
 
-### Remaining legacy input contracts
+### Coordinated input contract completion
 
-Every row below uses a generated selected result and infers variables from its
-actual payload builder. Read-only backend inspection and real schema-coercion tests
-confirm the remaining relationship payloads are rejected before resolver execution.
-They are **known blocked contracts, not working compatibility paths**. Frontend-only
-corrections remove obsolete author connections and fix scalar/filter operators. There are no new schema casts or broad adapters. The schema pin and strict
-GraphQL validation remain unchanged.
+The previous eleven exceptions exposed four real backend contract gaps; they were
+not working compatibility paths. Following authorization, the backend companion
+commit `fb711efdfcca9d7af5a18b10c592461c87f23ef8` defines supported application
+inputs and authorization/attribution handling. This frontend pins its reproducible
+schema export (SHA256 `48eeed7ac64bd5f82bb6f2eac1355e405bb844be03744a2ce7ff3ccab7ea50fb`,
+4,795,293 bytes), generated with Node 26 using the documented backend export workflow.
+The manifest records that exact revision; no hand-edited SDL or fabricated provenance.
 
-| Exact production boundary | Pinned input mismatch |
+| Former boundaries | Implemented contract |
 | --- | --- |
-| `components/discussion/detail/AlbumEditForm.vue` — `UPDATE_DISCUSSION` | `DiscussionUpdateInput.Album` absent |
-| `components/discussion/form/CreateDiscussion.vue` — `CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS` | `CrosspostedDiscussion.connect` absent; obsolete Author input removed (resolver derives authenticated author) |
-| `components/download/form/CreateDownload.vue` — create mutation | Same crosspost mismatch; author removed and downloadable-file filters corrected to `id.eq` |
-| `components/download/form/CreateDownload.vue` — `UPDATE_DISCUSSION` | `DiscussionUpdateInput.Album` absent |
-| `components/mod/CreateIssueForm.vue` — `CREATE_ISSUE` | Input requires `issueNumber` but existing frontend omits it; author/channel relationships absent |
-| `composables/useAlbumAutoSave.ts` — `UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS` | `DiscussionUpdateInput.Album` absent |
-| `pages/forums/[forumId]/downloads/edit/[discussionId].vue` — update mutation | `DiscussionUpdateInput.Album` absent |
-| `pages/forums/[forumId]/wiki/create-child.vue` — `CREATE_CHILD_WIKI_PAGE` | Existing `VersionAuthor.connect` absent |
-| `pages/forums/[forumId]/wiki/create.vue` — `CREATE_WIKI_PAGE` | `ChannelUpdateInput.WikiHomePage` absent |
-| `pages/forums/[forumId]/wiki/edit/[slug].vue` — `UPDATE_WIKI_PAGE` | Existing `VersionAuthor` update absent |
-| Same wiki edit page — `UPDATE_CHANNEL` | `ChannelUpdateInput.WikiHomePage` absent |
+| Discussion and download creation | Generated create document; wrapper `crosspostedDiscussionId`, authenticated server author, exact existing file/image filters |
+| Album edit form, autosave and download editing | Dedicated `DiscussionAlbumInput` with ordered existing IDs and changed metadata only; no nested schema-entity Album update |
+| Download creation album follow-up | Removed: the initial create now carries its album atomically; companion backend preserves reused-image uploaders |
+| Generic forum/server issue form | `SubmitIssueInput`, optional forum and authenticated persona choice; no client author, number or invented target |
+| Four wiki writes across three pages | Three generated `writeWikiPage` consumers; server attribution, exact page identity, optional home linking and captured-scope cache refetch |
 
-Owners: frontend and backend maintainers, tracked in frontend #700 and backend
-#413. Resolution: inspect the actual custom input contract, correct/publish the
-backend schema or coordinate the frontend payload correction, update the pin,
-replace each legacy boundary with generated variable inference, and remove its
-exact entry from `scripts/typed-operation-exceptions.json`. Backend changes are a
-separate authorization/scope. Negative type tests expose the missing fields.
+The generated discussion update result does not claim to return Album data: the
+custom backend projection does not include it. Album flows retain captured form
+state or refetch their actual selected reads. Unchanged reused-image metadata is
+omitted; changed metadata remains subject to backend uploader authorization.
+Wiki responses likewise use only the custom resolver's supported selection.
 
-`pnpm operations:check` additionally runs the consumer audit. New raw/unresolved
-consumers, erased document types and generated-document overrides fail this new
-check. Exceptions are exact call sites with reviewed fingerprints and owners. Fingerprints
-include normalized call/type syntax, referenced payload factories and transitive
-local/utility helpers, complete raw documents, and the pinned manifest. Changes to
-those contracts or stale entries fail; runtime state values are not static proof.
-The enforcement suite has 36 tests, including these change-detection cases. This is separate from `graphql:check`, which continues
-to reject every invalid authored GraphQL document without a suppression baseline.
+`pnpm operations:check` runs freshness plus the consumer audit. New raw/unresolved
+consumers, erased document types and generated-document overrides fail the check.
+The ledger is empty; fingerprint regression tests remain to ensure any future
+explicit exception cannot silently drift. `graphql:check` continues to reject every
+invalid authored GraphQL document without a suppression baseline. Negative types
+and actual pinned-schema coercion tests cover supported variables and reject legacy
+author/relationship fields, invalid IDs/personas and unauthorized metadata fields.
 
-### Backend inspection and required scope
-
-Backend sources were inspected read-only at `cb12a24c97a0fb68f804b2b569e773a9c4840db0`;
-the discussion create/update and album ownership implementations are identical at
-the pinned `1027843361dc88ec0e66b327d27f6f056afdb0c2` revision. No backend writes are
-included. These findings replace the earlier assumption that retaining old payloads
-preserved functioning flows.
-
-Frontend corrections implemented: remove `Author.connect` from discussion/download
-creation (the resolver uses authenticated context); use `id.eq` for downloadable
-file/image connections; use `.set` for wiki updates and `.eq` for wiki page/author
-filters. Real-schema coercion tests validate normal non-crosspost create payloads
-and isolate the remaining wiki relationship errors.
-
-Required backend scope, pending separate authorization:
-
-1. **Crosspost creation:** declare an existing crosspost ID input and wire the
-   relationship under the existing creation/visibility checks. The current input
-   exposes only nested create; duplicating a discussion or dropping the crosspost
-   would change behavior. [Creation resolver](https://github.com/gennit-project/multiforum-backend/blob/1027843361dc88ec0e66b327d27f6f056afdb0c2/customResolvers/mutations/createDiscussionWithChannelConnections.ts).
-2. **Album editing:** declare the album payload on an application-owned input or
-   argument and retain discussion-edit authorization. The current custom resolver
-   reads a field rejected by GraphQL coercion. Its helper also does not implement
-   existing-image connect/update intent. `updateAlbums` has different permissions;
-   inverse writes would bypass the discussion gate. Inline album creation grants
-   uploader relationships to reused images, so it is not a safe workaround. The
-   backend must preserve existing uploader ownership, validate references and
-   support order/connect/disconnect/authorized metadata writes with rollback.
-   [Update resolver](https://github.com/gennit-project/multiforum-backend/blob/1027843361dc88ec0e66b327d27f6f056afdb0c2/customResolvers/mutations/updateDiscussionWithChannelConnections.ts),
-   [ownership writer](https://github.com/gennit-project/multiforum-backend/blob/1027843361dc88ec0e66b327d27f6f056afdb0c2/services/persistence/discussionAlbumWrite.ts),
-   [permissions](https://github.com/gennit-project/multiforum-backend/blob/cb12a24c97a0fb68f804b2b569e773a9c4840db0/permissions.ts).
-3. **Issue creation:** declare an application input excluding the server-allocated
-   number, with supported identity/target fields, then order identity validation
-   and number allocation correctly. Earlier middleware requires the number and
-   author relationships that the public input cannot express. Generic/server-wide
-   issue behavior also needs an explicit supported contract; dummy numbers or
-   invented targets are not fixes. [Resolver](https://github.com/gennit-project/multiforum-backend/blob/cb12a24c97a0fb68f804b2b569e773a9c4840db0/customResolvers/mutations/createIssue.ts),
-   [identity middleware](https://github.com/gennit-project/multiforum-backend/blob/cb12a24c97a0fb68f804b2b569e773a9c4840db0/middleware/issueIdentityMiddleware.ts).
-4. **Wiki writes:** expose authorized home-page linking and set editor attribution
-   from authenticated context, preserving revision/report/contribution identity.
-   Existing hooks do not replace the rejected VersionAuthor input safely; some
-   expect scalar IDs or pre-coercion child shapes. Switching to another generated
-   mutation would leave wrong attribution/history. [Ownership middleware](https://github.com/gennit-project/multiforum-backend/blob/cb12a24c97a0fb68f804b2b569e773a9c4840db0/middleware/wikiPageOwnershipMiddleware.ts),
-   [revision hook](https://github.com/gennit-project/multiforum-backend/blob/cb12a24c97a0fb68f804b2b569e773a9c4840db0/hooks/wikiPageVersionHistoryHook.ts).
-
-For each family, test actual requests through GraphQL coercion and authorization,
-not only direct resolver calls; publish the corrected contract, repin, migrate the
-remaining frontend variables and remove the exact exception entries. #700 remains
-unfinished pending these contracts and review.
+This frontend requires the companion backend contract before deployment. Backend
+CI and integration results are tracked independently; a verified schema artifact
+is not evidence that backend CI has passed. Neither repository is merged or deployed
+by this work. See [contract handoff](graphql-contract-handoff.md) for the original
+boundary inventory and export acceptance criteria.
 
 ### Unused export cleanup and coverage limits
 

@@ -1,3 +1,10 @@
+> Completion checkpoint: the exact backend commit `fb711efdfcca9d7af5a18b10c592461c87f23ef8`
+> was exported locally with Node 26 and its hash/size verified, then pinned using
+> `schema:update`. All eleven former boundaries are migrated or eliminated;
+> the production audit reports 555 generated consumers and zero exceptions.
+> Final runtime/browser/CI validation is recorded in draft PR #707. The matrix
+> below preserves the original handoff requirements, not an outstanding blocker list.
+
 # Remaining #700 contract handoff
 
 Frontend baseline: `feat/700-typed-event-comments` at

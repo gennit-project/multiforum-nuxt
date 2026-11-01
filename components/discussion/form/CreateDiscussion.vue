@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
 import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
 import { appendCreatedDiscussion } from '@/utils/discussionCreateCache';
 import { useMutation, useQuery } from '@vue/apollo-composable';
@@ -241,6 +241,7 @@ const {
 
 let routeGeneration = 0;
 watch(channelId, () => { routeGeneration++; });
+onBeforeUnmount(() => { routeGeneration++; });
 let submittedGeneration = routeGeneration;
 let submittedRoute = channelId.value;
 let submittedChannel = channelId.value;

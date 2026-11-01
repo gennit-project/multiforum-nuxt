@@ -267,6 +267,16 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
+  it('does not redirect a completed creation after the form unmounts', async () => {
+    const wrapper = mountCD();
+    await wrapper.find('[data-testid="submit"]').trigger('click');
+    wrapper.unmount();
+    onDoneCallbacks[0]({ data: { createDiscussionWithChannelConnections: [
+      { DiscussionChannels: [{ Discussion: { id: 'created' } }] },
+    ] } });
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
   it('does not navigate twice for repeated creation completion', () => {
     mountCD();
     const response = { data: { createDiscussionWithChannelConnections: [
