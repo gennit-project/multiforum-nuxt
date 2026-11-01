@@ -124,13 +124,11 @@ describe('CreateIssueForm canSubmit', () => {
 });
 
 describe('CreateIssueForm issue input', () => {
-  it('connects the author as a user when only a username exists', async () => {
+  it('requests the authenticated user identity when only a username exists', async () => {
     const wrapper = mountForm();
     await fill(wrapper);
 
-    expect(input().Author).toMatchObject({
-      User: { connect: { where: { node: { username: 'alice' } } } },
-    });
+    expect(input()).toEqual({ title: 'T', body: 'B', asModerationProfile: false });
   });
 
   it('prefers the moderation profile as the author when present', async () => {
@@ -138,9 +136,7 @@ describe('CreateIssueForm issue input', () => {
     const wrapper = mountForm();
     await fill(wrapper);
 
-    expect(input().Author).toMatchObject({
-      ModerationProfile: { connect: { where: { node: { displayName: 'modAlice' } } } },
-    });
+    expect(input()).toEqual({ title: 'T', body: 'B', asModerationProfile: true });
   });
 
   it('attaches a channel connection when a channel is selected', async () => {
@@ -154,7 +150,7 @@ describe('CreateIssueForm issue input', () => {
     const wrapper = mountForm();
     await fill(wrapper);
 
-    expect(input().Channel).toBeUndefined();
+    expect(input()).not.toHaveProperty('channelUniqueName');
   });
 });
 
@@ -219,6 +215,27 @@ describe('CreateIssueForm navigation on success', () => {
         params: { issueNumber: 9 },
       })
     );
+  });
+});
+
+describe('CreateIssueForm pending completion', () => {
+  it('keeps a server result in server scope after the selected forum changes', async () => {
+    const wrapper = mountForm({ serverDetailRouteName: 'server-issues-issueNumber' });
+    await wrapper.setProps({ defaultChannelId: 'dogs' });
+    h.onDone?.({ data: { createIssue: { issueNumber: 9, channelUniqueName: null, Channel: null } } });
+    expect(h.push).toHaveBeenCalledWith(expect.objectContaining({ name: 'server-issues-issueNumber', params: { issueNumber: 9 } }));
+  });
+  it('does not navigate twice for a repeated completion', () => {
+    mountForm();
+    const response = { data: { createIssue: { issueNumber: 9 } } };
+    h.onDone?.(response);
+    h.onDone?.(response);
+    expect(h.push).toHaveBeenCalledTimes(1);
+  });
+  it('does not navigate for a null creation result', () => {
+    mountForm();
+    h.onDone?.({ data: { createIssue: null } });
+    expect(h.push).not.toHaveBeenCalled();
   });
 });
 

@@ -8,10 +8,8 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import type { CreateIssueMutation } from '@/__generated__/operations';
-import { CREATE_ISSUE } from '@/graphQLData/issue/mutations';
+import { CreateIssueDocument as CREATE_ISSUE, CountOpenIssuesDocument as COUNT_OPEN_ISSUES, CountIssuesByServerDocument as SERVER_SCOPED_ISSUE_COUNT   } from '@/__generated__/operations';
 
-import { CountOpenIssuesDocument as COUNT_OPEN_ISSUES, CountIssuesByServerDocument as SERVER_SCOPED_ISSUE_COUNT  } from '@/__generated__/operations';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 
 const modProfileNameVar = useModProfileName();
@@ -48,62 +46,16 @@ watch(
   }
 );
 
-const authorInput = computed(() => {
-  if (modProfileNameVar.value) {
-    return {
-      ModerationProfile: {
-        connect: {
-          where: { node: { displayName: modProfileNameVar.value } },
-        },
-      },
-    };
-  }
-  if (usernameVar.value) {
-    return {
-      User: {
-        connect: { where: { node: { username: usernameVar.value } } },
-      },
-    };
-  }
-  return null;
-});
-
-const authorName = computed(() => {
-  if (authorInput.value?.ModerationProfile?.connect?.where?.node?.displayName) {
-    return authorInput.value.ModerationProfile.connect.where.node.displayName;
-  }
-  if (authorInput.value?.User?.connect?.where?.node?.username) {
-    return authorInput.value.User.connect.where.node.username;
-  }
-  return '';
-});
-
-const issueInput = computed(
-  () =>
-    ({
-      title: formValues.value.title.trim(),
-      body: formValues.value.body.trim(),
-      isOpen: true,
-      flaggedServerRuleViolation: false,
-      channelUniqueName: selectedChannelId.value || undefined,
-      Channel: selectedChannelId.value
-        ? {
-            connect: {
-              where: { node: { uniqueName: selectedChannelId.value } },
-            },
-          }
-        : undefined,
-      Author: authorInput.value || undefined,
-      authorName: authorName.value || undefined,
-      // Legacy input contract exception: Author/Channel connects and server-assigned
-      // issueNumber disagree with the pinned IssueCreateInput. Tracked in #700
-      // and backend #413; preserve this request until the backend contract is fixed.
-    })
-);
+const issueInput = computed(() => ({
+  title: formValues.value.title.trim(),
+  body: formValues.value.body.trim(),
+  ...(selectedChannelId.value ? { channelUniqueName: selectedChannelId.value } : {}),
+  asModerationProfile: !!modProfileNameVar.value,
+}));
 
 const canSubmit = computed(() => {
   return (
-    !!authorInput.value &&
+    !!(modProfileNameVar.value || usernameVar.value) &&
     formValues.value.title.trim().length > 0 &&
     formValues.value.body.trim().length > 0
   );
@@ -114,7 +66,7 @@ const {
   loading: createIssueLoading,
   error: createIssueError,
   onDone: onCreateIssueDone,
-} = useMutation<CreateIssueMutation, { input: typeof issueInput.value }>(CREATE_ISSUE, () => {
+} = useMutation(CREATE_ISSUE, () => {
   const channelUniqueName = selectedChannelId.value;
   let applied = false;
   return {
@@ -173,14 +125,17 @@ const {
 };
 });
 
+const navigatedIssues = new Set<string>();
 onCreateIssueDone((result) => {
   const newIssue = result?.data?.createIssue;
   if (!newIssue) return;
+  const identity = `${newIssue.channelUniqueName || newIssue.Channel?.uniqueName || ""}:${newIssue.issueNumber}`;
+  if (navigatedIssues.has(identity)) return;
+  navigatedIssues.add(identity);
 
   const forumId =
     newIssue.Channel?.uniqueName ||
-    newIssue.channelUniqueName ||
-    selectedChannelId.value;
+    newIssue.channelUniqueName || '';
 
   if (forumId) {
     router.push({

@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import {
+  CreateIssueDocument,
   GetIssueDocument,
   GetIssueActivityDocument,
   UpdateIssueDocument,
@@ -23,4 +24,18 @@ export function checkModerationSelections() {
   edit.mutate({ issueWhere: { id: { eq: 'i1' } }, updateIssueInput: { body: 'text' } });
   edit.mutate({ issueWhere: { id: { eq: 'i1' } }, updateIssueInput: { body: { set: 'text' } } });
   return { issue, feed, invites, edit };
+}
+
+export function checkIssueCreationInput() {
+  const create = useMutation(CreateIssueDocument);
+  create.mutate({ input: { title: 'Request', body: 'Details' } });
+  create.mutate({ input: { title: 'Request', body: 'Details', channelUniqueName: 'cats', asModerationProfile: true } });
+  // @ts-expect-error identity and numbering are server assigned
+  create.mutate({ input: { title: 'Request', body: 'Details', issueNumber: 1 } });
+  // @ts-expect-error caller cannot supply author relationships
+  create.mutate({ input: { title: 'Request', body: 'Details', Author: {} } });
+  // @ts-expect-error body is required
+  create.mutate({ input: { title: 'Request' } });
+  // @ts-expect-error moderation persona is a boolean context selection
+  create.mutate({ input: { title: 'Request', body: 'Details', asModerationProfile: 'other-mod' } });
 }

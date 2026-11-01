@@ -103,3 +103,35 @@ test.describe('Forum issue lifecycle', () => {
     }
   });
 });
+
+for (const scope of ['forum', 'server'] as const) {
+  test(`submits a generic ${scope} request with context-owned identity`, async ({ context, page }) => {
+    await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
+    let submitted: unknown;
+    await installGraphqlMocks(page, {
+      ...base(),
+      getIssueActivity: () => ({ data: { issues: [] } }),
+      createIssue: ({ body }) => {
+        submitted = body.variables?.input;
+        return { data: { createIssue: {
+          __typename: 'Issue', id: 'created-request', issueNumber: 42,
+          title: 'Generic request', body: 'Please consider this request', isOpen: true,
+          flaggedServerRuleViolation: false, createdAt: '2026-11-01T00:00:00Z', updatedAt: '2026-11-01T00:00:00Z',
+          relatedCommentId: null, relatedDiscussionId: null, relatedEventId: null,
+          channelUniqueName: scope === 'forum' ? 'cats' : null,
+          Channel: scope === 'forum' ? { __typename: 'Channel', uniqueName: 'cats' } : null,
+          Author: { __typename: 'User', username: TEST_USER },
+        } } };
+      },
+    });
+    await page.goto(scope === 'forum' ? '/forums/cats/issues/create' : '/server/issues/create', { waitUntil: 'domcontentloaded' });
+    await page.getByPlaceholder('What do you need help with?').fill('Generic request');
+    await page.getByPlaceholder('Explain the request for the moderators').fill('Please consider this request');
+    await page.getByRole('button', { name: 'Create Issue', exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(scope === 'forum' ? '/forums/cats/issues/42' : '/server/issues/42'));
+    await expect.poll(() => submitted).toEqual({
+      title: 'Generic request', body: 'Please consider this request', asModerationProfile: false,
+      ...(scope === 'forum' ? { channelUniqueName: 'cats' } : {}),
+    });
+  });
+}
