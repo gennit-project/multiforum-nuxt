@@ -465,7 +465,7 @@ overlap and must not be added together as a unique test total.
 
 The previous eleven exceptions exposed four real backend contract gaps; they were
 not working compatibility paths. Following authorization, the backend companion
-commit `fb711efdfcca9d7af5a18b10c592461c87f23ef8` defines supported application
+commit `3d356e90aaaf11b44d0012e82d2c044a07ce4343` defines supported application
 inputs and authorization/attribution handling. This frontend pins its reproducible
 schema export (SHA256 `48eeed7ac64bd5f82bb6f2eac1355e405bb844be03744a2ce7ff3ccab7ea50fb`,
 4,795,293 bytes), generated with Node 26 using the documented backend export workflow.
