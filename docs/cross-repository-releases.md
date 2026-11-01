@@ -117,6 +117,25 @@ new wiki writes and album/crosspost inputs also require the new backend. Merely
 saying "backend first" does not prove either mixed pair works. A static operation
 pass does not prove variable values, authorization, persistence or attribution.
 
+An offline inventory comparison on 2026-11-01 reproduced the following for
+frontend `b9e7399a` (pre-#707) versus `cff508ff` (merged #707), and backend
+schemas `1027843361dc88ec0e66b327d27f6f056afdb0c2` versus
+`3d356e90aaaf11b44d0012e82d2c044a07ce4343`:
+
+| Frontend / schema | Static validation errors | Evidence                                                                       |
+| ----------------- | -----------------------: | ------------------------------------------------------------------------------ |
+| old / old         |                        0 | 374 inventoried documents                                                      |
+| old / new         |                        1 | `CREATE_ISSUE`: `IssueCreateInput!` used where `SubmitIssueInput!` is required |
+| new / old         |                        5 | Missing album input/argument, issue input and wiki input/mutation              |
+| new / new         |                        0 | 355 inventoried documents                                                      |
+
+The old inventory still contains one runtime interpolation in
+`GET_CHANNELS_DISCUSSIONS`; the new strict portable exporter correctly refuses
+to certify that historical inventory. These diagnostic comparisons establish
+that **both mixed pairs fail**; the two zero-error rows are only static evidence,
+not runtime or deployment verification. Crosspost variable values still need
+runtime validation even when the authored document validates.
+
 1. Record observed and target revisions, and run the compatibility matrix.
 2. Exercise crosspost references, album membership/metadata ownership, issue
    identity/numbering and wiki revisions/attribution against disposable Neo4j.
