@@ -3,6 +3,8 @@ import {
   UpdateCommentDocument,
   AddFeedbackCommentToCommentDocument,
   GetCrosspostPreviewDocument,
+  CreateDiscussionDocument,
+  UpdateDiscussionWithChannelConnectionsDocument,
 } from '@/__generated__/operations';
 import type {
   DiscussionUpdateInput,
@@ -20,7 +22,15 @@ export function checkCommentDiscussionContracts() {
   void preview.result.value?.discussions[0]?.bookmarkCount;
   // @ts-expect-error nullable author must be guarded
   void preview.result.value?.discussions[0]?.Author.username;
-  // Pinned schema exceptions remain explicit until backend #413 repairs these inputs.
+  const create = useMutation(CreateDiscussionDocument);
+  create.mutate({ input: [{ discussionCreateInput: { title: 'Title' }, channelConnections: ['forum'], crosspostedDiscussionId: 'source' }] });
+  // @ts-expect-error crossposts accept a scalar existing discussion ID
+  create.mutate({ input: [{ discussionCreateInput: { title: 'Title' }, channelConnections: ['forum'], crosspostedDiscussionId: ['source'] }] });
+  const updateDiscussion = useMutation(UpdateDiscussionWithChannelConnectionsDocument);
+  updateDiscussion.mutate({ updateDiscussionInput: {}, where: { id: { eq: 'discussion' } }, album: { imageIds: [] } });
+  // @ts-expect-error album metadata does not permit URL mutation
+  updateDiscussion.mutate({ updateDiscussionInput: {}, where: { id: { eq: 'discussion' } }, album: { imageIds: ['image'], imageUpdates: [{ id: 'image', url: 'https://example.com' }] } });
+  // Legacy relationship inputs remain forbidden; use the dedicated album argument.
   const album: DiscussionUpdateInput = {
     // @ts-expect-error legacy Album relationship is absent from the pinned update input
     Album: { create: { node: { imageOrder: [] } } },

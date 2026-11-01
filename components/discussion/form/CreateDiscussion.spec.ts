@@ -16,6 +16,7 @@ type CreateMutationOptions = {
     input: Array<{
       discussionCreateInput: DiscussionCreateInput;
       channelConnections: string[];
+      crosspostedDiscussionId?: string;
       channelFlairSelections: Array<{
         channelUniqueName: string;
         flairIds: string[];
@@ -51,7 +52,7 @@ let capturedCreateOptions: (() => CreateMutationOptions) | null = null;
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
-    params: { forumId: mockRouteForumId.value || undefined },
+    params: { get forumId() { return mockRouteForumId.value || undefined; } },
     query: {},
   }),
   useRouter: () => ({
@@ -256,6 +257,26 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     );
   });
 
+  it('does not redirect a completed creation after navigating to another forum', async () => {
+    const wrapper = mountCD();
+    await wrapper.find('[data-testid="submit"]').trigger('click');
+    mockRouteForumId.value = 'dogs';
+    onDoneCallbacks[0]({ data: { createDiscussionWithChannelConnections: [
+      { DiscussionChannels: [{ Discussion: { id: 'created' } }] },
+    ] } });
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('does not navigate twice for repeated creation completion', () => {
+    mountCD();
+    const response = { data: { createDiscussionWithChannelConnections: [
+      { DiscussionChannels: [{ Discussion: { id: 'created' } }] },
+    ] } };
+    onDoneCallbacks[0](response);
+    onDoneCallbacks[0](response);
+    expect(mockPush).toHaveBeenCalledTimes(1);
+  });
+
   it('builds the title and leaves author assignment to authenticated backend context', async () => {
     const wrapper = mountCD();
     await fields(wrapper).vm.$emit('update-form-values', { title: 'My Title' });
@@ -275,6 +296,7 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
       title: 'T',
       selectedTags: ['cats'],
       album: { images: [{ id: 'image-1' }], imageOrder: ['image-1'] },
+      crosspostId: 'source',
     });
     expect(
       variableErrors(
@@ -299,7 +321,7 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
       crosspostId: 'src-1',
     });
 
-    expect(buildInput().CrosspostedDiscussion).toBeTruthy();
+    expect(capturedCreateOptions!().variables.input[0].crosspostedDiscussionId).toBe('src-1');
   });
 
   it('submits the selected flair IDs for the routed channel', async () => {

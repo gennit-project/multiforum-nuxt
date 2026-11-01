@@ -1,15 +1,13 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
-import type { CreateDiscussionMutation } from '@/__generated__/operations';
+import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
 import { appendCreatedDiscussion } from '@/utils/discussionCreateCache';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import {
+  CreateDiscussionDocument as CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
   GetCrosspostPreviewDocument as GET_CROSSPOST_PREVIEW,
   GetChannelDiscussionFlairConfigDocument as GET_CHANNEL_DISCUSSION_FLAIR_CONFIG,
 } from '@/__generated__/operations';
-// Blocked #700 contract: CrosspostedDiscussion.connect is rejected by the pin.
-// Normal creation omits Author: the resolver derives it from authenticated context.
-import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
@@ -30,7 +28,7 @@ const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() =>
-  route.params.forumId ? String(route.params.forumId) : ''
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
 
 const crosspostDiscussionId = computed(() => {
@@ -172,54 +170,24 @@ const discussionCreateInput = computed(() => {
     // The pinned backend derives Author from authenticated context.
   };
 
-  const album = (() => {
-    if (formValues.value.album.images.length > 0) {
-      // If imageOrder is empty or doesn't match the images length, reconstruct it from the images
-      const imageIds = formValues.value.album.images.map((img) => img.id);
-
-      // Images already have IDs from when they were uploaded and created in the database
-      const validImages = formValues.value.album.images.filter(
-        (image): image is typeof image & { id: string } => Boolean(image.id)
-      );
-
-      const albumNode: {
-        imageOrder: string[];
+  const albumInput = buildAlbumUpdateInput({ albumData: formValues.value.album });
+  const album = albumInput && {
+    create: {
+      node: {
+        imageOrder: albumInput.imageIds,
         Images: {
-          connect: { where: { node: { id: { eq: string } } } }[];
-        };
-      } = {
-        // Use the explicit imageOrder if it's valid, otherwise generate from image IDs
-        imageOrder:
-          formValues.value.album.imageOrder.length === imageIds.length
-            ? formValues.value.album.imageOrder.filter((id) => id !== undefined)
-            : imageIds.filter((id) => id !== undefined),
-        Images: {
-          connect: validImages.map((image) => ({
-            where: { node: { id: { eq: image.id } } },
+          connect: albumInput.imageIds.map((id) => ({
+            where: { node: { id: { eq: id } } },
           })),
         },
-      };
-
-      return {
-        create: {
-          node: albumNode,
-        },
-      };
-    }
-
-    return undefined;
-  })();
+      },
+    },
+  };
 
   return {
     ...result,
     ...(album ? { Album: album } : {}),
-    ...(formValues.value.crosspostId
-      ? {
-          CrosspostedDiscussion: {
-            connect: { where: { node: { id: formValues.value.crosspostId } } },
-          },
-        }
-      : {}),
+
   };
 });
 
@@ -249,6 +217,7 @@ const createVariables = () => ({
     {
       discussionCreateInput: discussionCreateInput.value,
       channelConnections: channelConnections.value,
+      ...(formValues.value.crosspostId ? { crosspostedDiscussionId: formValues.value.crosspostId } : {}),
       channelFlairSelections: channelFlairSelections.value,
     },
   ],
@@ -259,7 +228,7 @@ const {
   loading: createDiscussionLoading,
   error: createDiscussionError,
   onDone,
-} = useMutation<CreateDiscussionMutation, ReturnType<typeof createVariables>>(
+} = useMutation(
   CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
   () => ({
     errorPolicy: 'all',
@@ -270,7 +239,14 @@ const {
   })
 );
 
+let routeGeneration = 0;
+watch(channelId, () => { routeGeneration++; });
+let submittedGeneration = routeGeneration;
+let submittedRoute = channelId.value;
+let submittedChannel = channelId.value;
+const completedDiscussionIds = new Set<string>();
 onDone((response) => {
+  if (routeGeneration !== submittedGeneration || channelId.value !== submittedRoute) return;
   const newDiscussionArray =
     response.data?.createDiscussionWithChannelConnections;
   const newDiscussion = newDiscussionArray?.[0]?.DiscussionChannels?.[0];
@@ -282,16 +258,19 @@ onDone((response) => {
     return;
   }
 
+  if (completedDiscussionIds.has(newDiscussionId)) return;
+  completedDiscussionIds.add(newDiscussionId);
   router.push({
     name: 'forums-forumId-discussions-discussionId',
     params: {
-      forumId: channelId.value || formValues.value.selectedChannels[0],
+      forumId: submittedChannel,
       discussionId: newDiscussionId,
     },
   });
 });
 
 function submit() {
+  if (createDiscussionLoading.value) return;
   if (!usernameVar.value) {
     console.error('No username found');
     return;
@@ -315,6 +294,9 @@ function submit() {
     submitError.value = `Select at least one flair for ${missingRequiredFlairConfig.value.channelUniqueName}.`;
     return;
   }
+  submittedGeneration = routeGeneration;
+  submittedRoute = channelId.value;
+  submittedChannel = channelId.value || formValues.value.selectedChannels[0] || '';
   createDiscussion();
 }
 
