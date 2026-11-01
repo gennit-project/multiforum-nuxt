@@ -78,30 +78,19 @@ describe('wiki create-child page', () => {
     expect(wrapper.findComponent(PrimaryButton).exists()).toBe(false);
     expect(wrapper.findComponent(SuspensionNotice).exists()).toBe(true);
   });
-  it('retains author intent with v7 username filtering in the blocked child write', async () => {
+  it('creates a child under the selected home without client author fields', async () => {
     const wrapper = await mountPage();
     wrapper.findAllComponents(TextInput)[0]!.vm.$emit('update', 'New page');
     wrapper.findComponent(TextEditor).vm.$emit('update', 'Body');
     await wrapper.find('form').trigger('submit');
-    expect(write).toHaveBeenCalledWith({
-      where: { id: { eq: 'home-1' } },
-      update: {
-        ChildPages: {
-          create: [
-            {
-              node: {
-                title: 'New page',
-                body: 'Body',
-                editReason: undefined,
-                slug: 'new-page',
-                channelUniqueName: 'cats',
-                VersionAuthor: {
-                  connect: { where: { node: { username: { eq: 'alice' } } } },
-                },
-              },
-            },
-          ],
-        },
+    expect(write.mock.calls[0][0]).toEqual({
+      input: {
+        title: 'New page',
+        body: 'Body',
+        editReason: null,
+        slug: 'new-page',
+        channelUniqueName: 'cats',
+        parentId: 'home-1',
       },
     });
   });

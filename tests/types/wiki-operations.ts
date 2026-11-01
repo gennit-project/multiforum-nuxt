@@ -1,13 +1,8 @@
-import { useMutation, useQuery  } from '@vue/apollo-composable';
-import type { CreateWikiPageMutation } from '@/__generated__/operations';
-import { CREATE_WIKI_PAGE } from '@/graphQLData/channel/mutations';
-import { legacyCreateWikiHomeVariables } from '@/utils/legacyWikiWrites';
-import { GetWikiPageDocument } from '@/__generated__/operations';
-import type {
-  ChannelUpdateInput,
-  WikiPageUpdateInput,
-  WikiPageVersionAuthorFieldInput,
-} from '@/__generated__/graphql';
+import { useMutation, useQuery } from '@vue/apollo-composable';
+import {
+  GetWikiPageDocument,
+  WriteWikiPageDocument,
+} from '@/__generated__/operations';
 export function checkWikiSelections() {
   const page = useQuery(GetWikiPageDocument, {
     channelUniqueName: 'cats',
@@ -21,37 +16,34 @@ export function checkWikiSelections() {
   const body: string = page.result.value!.wikiPages[0]!.body;
   return { page, body };
 }
-// These guards document the exact backend #413 blockers for legacy wiki writes.
-export const missingHomeInput: ChannelUpdateInput = {
-  // @ts-expect-error pinned schema omits the existing home-page write relationship
-  WikiHomePage: {},
-};
-export const missingAuthorUpdate: WikiPageUpdateInput = {
-  // @ts-expect-error pinned schema omits author attribution on update
-  VersionAuthor: {},
-};
-export const missingAuthorConnect: WikiPageVersionAuthorFieldInput = {
-  // @ts-expect-error pinned schema exposes create but not existing-author connect
-  connect: {},
-};
-
-// Raw documents are restricted to inferred legacy payloads and generated results.
-export function checkLegacyWikiWriteContracts() {
-  const mutation = useMutation<
-    CreateWikiPageMutation,
-    ReturnType<typeof legacyCreateWikiHomeVariables>
-  >(CREATE_WIKI_PAGE);
-  legacyCreateWikiHomeVariables(
-    { title: '', body: '', editReason: '', slug: '' },
-    // @ts-expect-error the legacy payload still requires a scalar forum ID
-    ['cats'],
-    'alice'
-  );
-  // @ts-expect-error no arbitrary input keys at the raw document boundary
-  mutation.mutate({ unknownInput: true });
+export function checkWikiWriteContract() {
+  const mutation = useMutation(WriteWikiPageDocument);
+  mutation.mutate({
+    input: {
+      channelUniqueName: 'cats',
+      id: 'selected-id',
+      title: 'New',
+      body: null,
+    },
+  });
+  mutation.mutate({
+    input: {
+      channelUniqueName: 'cats',
+      title: 'New',
+      // @ts-expect-error author is owned by authenticated server context
+      VersionAuthor: {},
+    },
+  });
+  // @ts-expect-error route arrays must be narrowed
+  mutation.mutate({ input: { channelUniqueName: ['cats'], title: 'New' } });
+  // @ts-expect-error title remains required
+  mutation.mutate({ input: { channelUniqueName: 'cats' } });
   mutation.onDone(({ data }) => {
-    // @ts-expect-error generated result has no arbitrary mutation fields
-    void data?.unknownResult;
+    // @ts-expect-error unselected fields cannot be consumed
+    void data?.writeWikiPage.Channel;
+    // @ts-expect-error body remains nullable
+    const body: string = data!.writeWikiPage.body;
+    void body;
   });
   return mutation;
 }

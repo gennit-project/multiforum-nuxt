@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import type { CreateChildWikiPageMutation } from '@/__generated__/operations';
-import { legacyCreateWikiChildVariables } from '@/utils/legacyWikiWrites';
+import {
+  WriteWikiPageDocument,
+  GetSiteWideWikiListDocument,
+  GetChannelDocument as GET_CHANNEL,
+} from '@/__generated__/operations';
+import {
+  createWikiChildVariables,
+  wikiWriteListVariables,
+  wikiWriteChannelVariables,
+} from '@/utils/wikiWrites';
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { GetChannelDocument as GET_CHANNEL } from '@/__generated__/operations';
-// #700/backend #413: pinned WikiPageVersionAuthorFieldInput lacks connect.
-// Preserve existing author attribution until the backend input contract is exposed.
-import { CREATE_CHILD_WIKI_PAGE } from '@/graphQLData/channel/mutations';
 import TextEditor from '@/components/TextEditor.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -66,31 +70,55 @@ const formValues = ref({
   slug: '',
 });
 
-// Create child wiki page mutation
+const submitting = ref(false);
 const {
-  mutate: createChildWikiPage,
-  loading: isCreating,
+  mutate: writeWikiPage,
+  loading: mutationLoading,
   error: createError,
-  onDone,
-} = useMutation<
-  CreateChildWikiPageMutation,
-  ReturnType<typeof legacyCreateWikiChildVariables>
->(CREATE_CHILD_WIKI_PAGE);
+} = useMutation(WriteWikiPageDocument);
+const isCreating = computed(() => submitting.value || mutationLoading.value);
 
-// Handle form submission
-function handleSubmit() {
-  if (wikiEditBlockedBySuspension.value) return;
-  if (!formValues.value.title || !formValues.value.body || !wikiHomePage.value)
+async function handleSubmit() {
+  if (
+    isCreating.value ||
+    !forumId.value ||
+    !usernameVar.value ||
+    wikiEditBlockedBySuspension.value
+  )
     return;
-
-  createChildWikiPage(
-    legacyCreateWikiChildVariables(
-      formValues.value,
-      forumId.value,
-      usernameVar.value,
-      wikiHomePage.value.id
-    )
-  );
+  if (!wikiHomePage.value || !wikiEnabled.value || channelLoading.value) return;
+  if (!formValues.value.title || !formValues.value.body) return;
+  const submittedForum = forumId.value;
+  submitting.value = true;
+  try {
+    const result = await writeWikiPage(
+      createWikiChildVariables(
+        formValues.value,
+        submittedForum,
+        wikiHomePage.value.id
+      ),
+      {
+        awaitRefetchQueries: true,
+        refetchQueries: [
+          {
+            query: GET_CHANNEL,
+            variables: wikiWriteChannelVariables(submittedForum),
+          },
+          {
+            query: GetSiteWideWikiListDocument,
+            variables: wikiWriteListVariables(submittedForum),
+          },
+        ],
+      }
+    );
+    if (result?.data?.writeWikiPage && forumId.value === submittedForum) {
+      await router.push(`/forums/${submittedForum}/wiki?t=${Date.now()}`);
+    }
+  } catch {
+    // Apollo's error ref supplies the existing form error banner.
+  } finally {
+    submitting.value = false;
+  }
 }
 
 // Derive slug from title
@@ -100,12 +128,6 @@ function updateSlug(value: string) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
-
-// Handle mutation completion
-onDone(() => {
-  // Navigate back to wiki home page
-  router.push(`/forums/${forumId.value}/wiki?t=${Date.now()}`);
-});
 
 // Check if wiki is enabled
 const wikiEnabled = computed(() => channel.value?.wikiEnabled);

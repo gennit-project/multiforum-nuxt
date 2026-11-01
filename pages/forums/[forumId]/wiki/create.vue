@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import type { CreateWikiPageMutation } from '@/__generated__/operations';
-import { legacyCreateWikiHomeVariables } from '@/utils/legacyWikiWrites';
+import {
+  WriteWikiPageDocument,
+  GetSiteWideWikiListDocument,
+  GetChannelDocument as GET_CHANNEL,
+} from '@/__generated__/operations';
+import {
+  createWikiHomeVariables,
+  wikiWriteListVariables,
+  wikiWriteChannelVariables,
+} from '@/utils/wikiWrites';
 import { computed, ref } from 'vue';
 import { DateTime } from 'luxon';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-// #700 exception: pinned ChannelUpdateInput omits WikiHomePage writes.
-// Owner: backend maintainers (#413); migrate this call after that input is exposed.
-import { CREATE_WIKI_PAGE } from '@/graphQLData/channel/mutations';
-import { GetChannelDocument as GET_CHANNEL } from '@/__generated__/operations';
 import TextEditor from '@/components/TextEditor.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -46,7 +50,7 @@ const {
 // A forum can turn its wiki off; the create page should explain that rather
 // than rendering an editor whose submit the backend will reject. Reuse the
 // forum layout's channel query (cache-first) to read the flag.
-const { result: channelResult } = useQuery(
+const { result: channelResult, loading: channelLoading } = useQuery(
   GET_CHANNEL,
   computed(() => ({
     uniqueName: forumId.value,
@@ -79,36 +83,57 @@ function updateSlug() {
   // This is intentional - the home page must have the slug "home"
 }
 
-// Create wiki page mutation
+const submitting = ref(false);
 const {
-  mutate: createWikiPage,
-  loading: isCreating,
+  mutate: writeWikiPage,
+  loading: mutationLoading,
   error: creationError,
-  onDone,
-} = useMutation<
-  CreateWikiPageMutation,
-  ReturnType<typeof legacyCreateWikiHomeVariables>
->(CREATE_WIKI_PAGE);
+} = useMutation(WriteWikiPageDocument);
+const isCreating = computed(() => submitting.value || mutationLoading.value);
 
-// Handle form submission
-function handleSubmit() {
-  if (wikiDisabled.value) return;
-  if (wikiEditBlockedBySuspension.value) return;
+async function handleSubmit() {
+  if (
+    isCreating.value ||
+    !forumId.value ||
+    !usernameVar.value ||
+    wikiEditBlockedBySuspension.value
+  )
+    return;
+  if (
+    !channelResult.value?.channels[0] ||
+    wikiDisabled.value ||
+    channelLoading.value
+  )
+    return;
   if (!formValues.value.title || !formValues.value.body) return;
-  createWikiPage(
-    legacyCreateWikiHomeVariables(
-      formValues.value,
-      forumId.value,
-      usernameVar.value
-    )
-  );
+  const submittedForum = forumId.value;
+  submitting.value = true;
+  try {
+    const result = await writeWikiPage(
+      createWikiHomeVariables(formValues.value, submittedForum),
+      {
+        awaitRefetchQueries: true,
+        refetchQueries: [
+          {
+            query: GET_CHANNEL,
+            variables: wikiWriteChannelVariables(submittedForum),
+          },
+          {
+            query: GetSiteWideWikiListDocument,
+            variables: wikiWriteListVariables(submittedForum),
+          },
+        ],
+      }
+    );
+    if (result?.data?.writeWikiPage && forumId.value === submittedForum) {
+      await router.push(`/forums/${submittedForum}/wiki?t=${Date.now()}`);
+    }
+  } catch {
+    // Apollo's error ref supplies the existing form error banner.
+  } finally {
+    submitting.value = false;
+  }
 }
-
-// Handle mutation completion
-onDone(() => {
-  // Navigate to the wiki page with a query parameter to avoid cached data
-  router.push(`/forums/${forumId.value}/wiki?t=${Date.now()}`);
-});
 </script>
 
 <template>
