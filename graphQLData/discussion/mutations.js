@@ -315,6 +315,7 @@ export const UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
     $channelConnections: [String!]
     $channelDisconnections: [String!]
     $albumImageDisconnections: [ID!]
+    $album: DiscussionAlbumInput
     $channelFlairSelections: [DiscussionChannelFlairSelectionInput!]
   ) {
     updateDiscussionWithChannelConnections(
@@ -323,6 +324,7 @@ export const UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
       channelConnections: $channelConnections
       channelDisconnections: $channelDisconnections
       albumImageDisconnections: $albumImageDisconnections
+      album: $album
       channelFlairSelections: $channelFlairSelections
     ) {
       id

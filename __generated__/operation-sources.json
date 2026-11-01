@@ -1107,39 +1107,6 @@
       ],
       "fragments": []
     },
-    "graphQLData/channel/mutations.js#CREATE_WIKI_PAGE": {
-      "operations": [
-        {
-          "name": "createWikiPage",
-          "document": "CreateWikiPageDocument",
-          "result": "CreateWikiPageMutation",
-          "variables": "CreateWikiPageMutationVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "graphQLData/channel/mutations.js#UPDATE_WIKI_PAGE": {
-      "operations": [
-        {
-          "name": "updateWikiPage",
-          "document": "UpdateWikiPageDocument",
-          "result": "UpdateWikiPageMutation",
-          "variables": "UpdateWikiPageMutationVariables"
-        }
-      ],
-      "fragments": []
-    },
-    "graphQLData/channel/mutations.js#CREATE_CHILD_WIKI_PAGE": {
-      "operations": [
-        {
-          "name": "createChildWikiPage",
-          "document": "CreateChildWikiPageDocument",
-          "result": "CreateChildWikiPageMutation",
-          "variables": "CreateChildWikiPageMutationVariables"
-        }
-      ],
-      "fragments": []
-    },
     "graphQLData/channel/mutations.js#PIN_WIKI_PAGE_TO_CHANNEL": {
       "operations": [
         {
@@ -4370,6 +4337,17 @@
           "document": "GetUserFavoriteCountsDocument",
           "result": "GetUserFavoriteCountsQuery",
           "variables": "GetUserFavoriteCountsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/wiki/mutations.ts#WRITE_WIKI_PAGE": {
+      "operations": [
+        {
+          "name": "writeWikiPage",
+          "document": "WriteWikiPageDocument",
+          "result": "WriteWikiPageMutation",
+          "variables": "WriteWikiPageMutationVariables"
         }
       ],
       "fragments": []
