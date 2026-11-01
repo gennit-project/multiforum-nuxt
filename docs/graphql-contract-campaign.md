@@ -508,6 +508,13 @@ operation name with an unused user export. Removing the obsolete plugin-name
 collision renamed one active generated symbol; its runtime operation is unchanged.
 Generation/equivalence, strict validation and affected plugin tests pass.
 
+The audit's 26 assertion-review hits were inspected separately: test-only chart
+fixtures, Vue `PropType` declarations, editable form/input contracts, a static
+pipeline-event list, and validated filter/sort values. They are not casts that
+turn incomplete GraphQL responses into full schema entities. Fixture-only uses
+were checked by import search rather than treating every scanner hit as a migrated
+production result boundary.
+
 Composition-only fragments remain generated and checked through their parent
 documents. The audit follows local aliases, selector branches, document props,
 cache calls, typed HTTP helpers and known Apollo wrappers; it is not a proof of
