@@ -2,58 +2,28 @@ import { describe, it, expect } from 'vitest';
 import { buildAlbumUpdateInput } from './albumUpdateInput';
 
 describe('buildAlbumUpdateInput', () => {
-  it('returns an empty object when there is no album data', () => {
-    expect(buildAlbumUpdateInput({ albumData: null })).toEqual({});
+  it('omits absent album data', () => {
+    expect(buildAlbumUpdateInput({ albumData: null })).toBeUndefined();
   });
-
-  it('creates a new album connecting existing images when none exists yet', () => {
-    const result = buildAlbumUpdateInput({
-      albumData: { images: [{ id: 'i1' }], imageOrder: ['i1'] },
-    });
-    expect(result.Album?.create?.node?.Images?.connect).toEqual([
-      { where: { node: { id: { eq: 'i1' } } } },
-    ]);
+  it('normalizes complete unique ordered membership', () => {
+    expect(buildAlbumUpdateInput({ albumData: { images: [{ id: 'a' }, { id: 'b' }, { id: 'a' }, { url: 'pending' }], imageOrder: ['b', 'b', 'missing'] } })).toEqual({ imageIds: ['b', 'a'] });
   });
-
-  it('returns an empty object when creating with no valid image ids', () => {
-    expect(
-      buildAlbumUpdateInput({ albumData: { images: [{ url: 'x' }] } })
-    ).toEqual({});
+  it('omits empty and whitespace image IDs from membership', () => {
+    expect(buildAlbumUpdateInput({ albumData: { images: [{ id: '' }, { id: ' ' }, { id: 'valid' }], imageOrder: ['', ' ', 'valid'] } })).toEqual({ imageIds: ['valid'] });
   });
-
-  it('connects images that are new to an existing album', () => {
-    const result = buildAlbumUpdateInput({
-      albumData: { images: [{ id: 'i2' }] },
-      existingAlbumId: 'a1',
-      existingImages: [{ id: 'i1' }],
-    });
-    expect(result.Album?.update?.node?.Images).toContainEqual({
-      connect: [{ where: { node: { id: { eq: 'i2' } } } }],
-    });
+  it('clears existing membership explicitly', () => {
+    expect(buildAlbumUpdateInput({ albumData: { images: [] }, existingImages: [{ id: 'a' }] })).toEqual({ imageIds: [] });
   });
-
-  it('persists a complete order when a connected image is missing from it', () => {
-    const result = buildAlbumUpdateInput({
-      albumData: {
-        images: [{ id: 'i1' }, { id: 'i2' }],
-        imageOrder: ['i1'],
-      },
-      existingAlbumId: 'a1',
-      existingImages: [{ id: 'i1' }],
-    });
-    expect(result.Album?.update?.node?.imageOrder).toEqual({
-      set: ['i1', 'i2'],
-    });
+  it('omits unchanged foreign image metadata normalized by form fields', () => {
+    expect(buildAlbumUpdateInput({ albumData: { images: [{ id: 'a', alt: '', caption: 'original', copyright: '' }] }, existingImages: [{ id: 'a', alt: null, caption: 'original', copyright: null }] })).toBeUndefined();
   });
-
-  it('disconnects images removed from an existing album', () => {
-    const result = buildAlbumUpdateInput({
-      albumData: { images: [], imageOrder: [] },
-      existingAlbumId: 'a1',
-      existingImages: [{ id: 'i1' }],
-    });
-    expect(result.Album?.update?.node?.Images).toContainEqual({
-      disconnect: [{ where: { node: { id: { eq: 'i1' } } } }],
-    });
+  it('sends only changed metadata and explicit null clears', () => {
+    expect(buildAlbumUpdateInput({ albumData: { images: [{ id: 'a', url: 'not-editable', alt: 'new', caption: null }] }, existingImages: [{ id: 'a', url: 'old', alt: 'old', caption: 'clear me' }] })).toEqual({ imageIds: ['a'], imageUpdates: [{ id: 'a', alt: 'new', caption: null }] });
+  });
+  it('does not rewrite metadata for newly reused images', () => {
+    expect(buildAlbumUpdateInput({ albumData: { images: [{ id: 'reused', alt: 'existing attribution', copyright: 'other owner' }] } })).toEqual({ imageIds: ['reused'] });
+  });
+  it('preserves a reorder without rewriting unchanged metadata', () => {
+    expect(buildAlbumUpdateInput({ albumData: { images: [{ id: 'a' }, { id: 'b' }], imageOrder: ['b', 'a'] }, existingImages: [{ id: 'a' }, { id: 'b' }], existingImageOrder: ['a', 'b'] })).toEqual({ imageIds: ['b', 'a'] });
   });
 });

@@ -1,378 +1,71 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { defineComponent, ref, nextTick } from 'vue';
+import { mount, flushPromises } from '@vue/test-utils';
 import { useAlbumAutoSave } from '@/composables/useAlbumAutoSave';
-import { makeAlbum } from '@/tests/utils/factories';
-
 const mockMutate = vi.fn();
-
-vi.mock('@vue/apollo-composable', () => ({
-  useMutation: () => ({
-    mutate: mockMutate,
-    error: { value: null },
-  }),
-}));
-
-vi.mock('@/graphQLData/discussion/mutations', () => ({
-  UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS: Symbol(
-    'UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS'
-  ),
-}));
-
-describe('useAlbumAutoSave', () => {
-  beforeEach(() => {
-    mockMutate.mockClear();
+vi.mock('@vue/apollo-composable', () => ({ useMutation: () => ({ mutate: mockMutate, error: ref(null), loading: ref(false) }) }));
+const saved = { data: { updateDiscussionWithChannelConnections: { id: 'd1' } } };
+const wrappers: ReturnType<typeof mount>[] = [];
+function setup() {
+  const id = ref<string | undefined>('d1');
+  const data = ref({ images: [{ id: 'a' }], imageOrder: ['a'] });
+  let api: ReturnType<typeof useAlbumAutoSave> | undefined;
+  const wrapper = mount(defineComponent({ setup() {
+    api = useAlbumAutoSave({ discussionId: id, existingAlbum: null, getAlbumData: () => data.value });
+    return () => null;
+  } }));
+  wrappers.push(wrapper);
+  if (!api) throw new Error('setup did not run');
+  return { api, id, data, wrapper };
+}
+beforeEach(() => { vi.useFakeTimers(); mockMutate.mockReset().mockResolvedValue(saved); });
+afterEach(() => { wrappers.splice(0).forEach((wrapper) => wrapper.unmount()); vi.useRealTimers(); });
+describe('typed album autosave', () => {
+  it('sends complete membership through the explicit album argument', async () => {
+    const { api } = setup(); await api.performAutoSave();
+    expect(mockMutate).toHaveBeenCalledWith({ where: { id: { eq: 'd1' } }, updateDiscussionInput: {}, album: { imageIds: ['a'] } });
   });
-
-  describe('album update input building', () => {
-    it('returns empty object when no album data', () => {
-      const { isAutoSaving } = useAlbumAutoSave({
-        discussionId: 'disc-1',
-        existingAlbum: null,
-        getAlbumData: () => ({ images: [], imageOrder: [] }),
-      });
-
-      // The composable doesn't expose getAlbumUpdateInput directly,
-      // but we can verify the behavior through performAutoSave
-      expect(isAutoSaving.value).toBe(false);
-    });
-
-    it('creates new album when existingAlbum is null and images have IDs', async () => {
-      const getAlbumData = () => ({
-        images: [
-          { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'test', caption: '', copyright: '' },
-        ],
-        imageOrder: ['img-1'],
-      });
-
-      const { performAutoSave } = useAlbumAutoSave({
-        discussionId: 'disc-1',
-        existingAlbum: null,
-        getAlbumData,
-      });
-
-      await performAutoSave();
-
-      expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: { eq: 'disc-1' } },
-        albumImageDisconnections: [],
-        updateDiscussionInput: {
-          Album: {
-            create: {
-              node: {
-                imageOrder: ['img-1'],
-                Images: {
-                  connect: [{ where: { node: { id: 'img-1' } } }],
-                },
-              },
-            },
-          },
-        },
-      });
-    });
-
-    it('does not call mutation when discussionId is undefined', async () => {
-      const { performAutoSave } = useAlbumAutoSave({
-        discussionId: undefined,
-        existingAlbum: null,
-        getAlbumData: () => ({
-          images: [{ id: 'img-1', url: 'test.jpg', alt: '', caption: '', copyright: '' }],
-          imageOrder: ['img-1'],
-        }),
-      });
-
-      await performAutoSave();
-
-      expect(mockMutate).not.toHaveBeenCalled();
-    });
-
-    it('does not call mutation when images array is empty', async () => {
-      const { performAutoSave } = useAlbumAutoSave({
-        discussionId: 'disc-1',
-        existingAlbum: null,
-        getAlbumData: () => ({ images: [], imageOrder: [] }),
-      });
-
-      await performAutoSave();
-
-      expect(mockMutate).not.toHaveBeenCalled();
-    });
-
-    it('builds connect array for new images added to existing album', async () => {
-      const existingAlbum = makeAlbum({
-        id: 'album-1',
-        Images: [
-          { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'existing', caption: '', copyright: '' },
-        ],
-        imageOrder: ['img-1'],
-      });
-
-      const getAlbumData = () => ({
-        images: [
-          { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'existing', caption: '', copyright: '' },
-          { id: 'img-2', url: 'http://example.com/2.jpg', alt: 'new', caption: '', copyright: '' },
-        ],
-        imageOrder: ['img-1', 'img-2'],
-      });
-
-      const { performAutoSave } = useAlbumAutoSave({
-        discussionId: 'disc-1',
-        existingAlbum,
-        getAlbumData,
-      });
-
-      await performAutoSave();
-
-      expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: { eq: 'disc-1' } },
-        albumImageDisconnections: [],
-        updateDiscussionInput: {
-          Album: {
-            update: {
-              node: {
-                imageOrder: ['img-1', 'img-2'],
-                Images: [
-                  {
-                    connect: [{ where: { node: { id: 'img-2' } } }],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      });
-    });
-
-    it('builds disconnect array for removed images', async () => {
-      const existingAlbum = makeAlbum({
-        id: 'album-1',
-        Images: [
-          { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'first', caption: '', copyright: '' },
-          { id: 'img-2', url: 'http://example.com/2.jpg', alt: 'second', caption: '', copyright: '' },
-        ],
-        imageOrder: ['img-1', 'img-2'],
-      });
-
-      const getAlbumData = () => ({
-        images: [
-          { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'first', caption: '', copyright: '' },
-        ],
-        imageOrder: ['img-1'],
-      });
-
-      const { performAutoSave } = useAlbumAutoSave({
-        discussionId: 'disc-1',
-        existingAlbum,
-        getAlbumData,
-      });
-
-      await performAutoSave();
-
-      expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: { eq: 'disc-1' } },
-        albumImageDisconnections: ['img-2'],
-        updateDiscussionInput: {
-          Album: {
-            update: {
-              node: {
-                imageOrder: ['img-1'],
-                Images: [
-                  {
-                    disconnect: [{ where: { node: { id: 'img-2' } } }],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      });
-    });
-
-    it('disconnects the final image when the album is emptied', async () => {
-      const existingAlbum = makeAlbum({
-        id: 'album-1',
-        Images: [
-          {
-            id: 'img-1',
-            url: 'http://example.com/1.jpg',
-            alt: 'only image',
-            caption: '',
-            copyright: '',
-          },
-        ],
-        imageOrder: ['img-1'],
-      });
-
-      const { performAutoSave } = useAlbumAutoSave({
-        discussionId: 'disc-1',
-        existingAlbum,
-        getAlbumData: () => ({ images: [], imageOrder: [] }),
-      });
-
-      await performAutoSave();
-
-      expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: { eq: 'disc-1' } },
-        albumImageDisconnections: ['img-1'],
-        updateDiscussionInput: {
-          Album: {
-            update: {
-              node: {
-                imageOrder: [],
-                Images: [
-                  {
-                    disconnect: [{ where: { node: { id: 'img-1' } } }],
-                  },
-                ],
-              },
-            },
-          },
-        },
-      });
-    });
-
-    it('builds update array when image properties change', async () => {
-      const existingAlbum = makeAlbum({
-        id: 'album-1',
-        Images: [
-          { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'old alt', caption: 'old caption', copyright: '' },
-        ],
-        imageOrder: ['img-1'],
-      });
-
-      const getAlbumData = () => ({
-        images: [
-          { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'new alt', caption: 'new caption', copyright: 'me' },
-        ],
-        imageOrder: ['img-1'],
-      });
-
-      const { performAutoSave } = useAlbumAutoSave({
-        discussionId: 'disc-1',
-        existingAlbum,
-        getAlbumData,
-      });
-
-      await performAutoSave();
-
-      expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: { eq: 'disc-1' } },
-        albumImageDisconnections: [],
-        updateDiscussionInput: {
-          Album: {
-            update: {
-              node: {
-                imageOrder: ['img-1'],
-                Images: [
-                  {
-                    where: { node: { id: 'img-1' } },
-                    update: {
-                      node: {
-                        url: 'http://example.com/1.jpg',
-                        alt: 'new alt',
-                        caption: 'new caption',
-                        copyright: 'me',
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-          },
-        },
-      });
-    });
-
-    it('does not include update operation when image properties unchanged', async () => {
-      const existingAlbum = makeAlbum({
-        id: 'album-1',
-        Images: [
-          { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'same', caption: '', copyright: '' },
-        ],
-        imageOrder: ['img-1'],
-      });
-
-      const getAlbumData = () => ({
-        images: [
-          { id: 'img-1', url: 'http://example.com/1.jpg', alt: 'same', caption: '', copyright: '' },
-        ],
-        imageOrder: ['img-1'],
-      });
-
-      const { performAutoSave } = useAlbumAutoSave({
-        discussionId: 'disc-1',
-        existingAlbum,
-        getAlbumData,
-      });
-
-      await performAutoSave();
-
-      // Should still be called to update imageOrder, but Images array should be empty
-      expect(mockMutate).toHaveBeenCalledWith({
-        where: { id: { eq: 'disc-1' } },
-        albumImageDisconnections: [],
-        updateDiscussionInput: {
-          Album: {
-            update: {
-              node: {
-                imageOrder: ['img-1'],
-                Images: [],
-              },
-            },
-          },
-        },
-      });
-    });
+  it('does not submit without a discussion ID', async () => {
+    const { api, id } = setup(); id.value = undefined; await nextTick(); await api.performAutoSave();
+    expect(mockMutate).not.toHaveBeenCalled();
   });
-
-  describe('auto-save state', () => {
-    it('sets isAutoSaving to true during save', async () => {
-      let resolvePromise: () => void;
-      const pendingPromise = new Promise<void>((resolve) => {
-        resolvePromise = resolve;
-      });
-
-      mockMutate.mockImplementation(() => pendingPromise);
-
-      const { performAutoSave, isAutoSaving } = useAlbumAutoSave({
-        discussionId: 'disc-1',
-        existingAlbum: makeAlbum({
-          id: 'album-1',
-          Images: [],
-          imageOrder: [],
-        }),
-        getAlbumData: () => ({
-          images: [{ id: 'img-1', url: 'test.jpg', alt: '', caption: '', copyright: '' }],
-          imageOrder: ['img-1'],
-        }),
-      });
-
-      const savePromise = performAutoSave();
-      expect(isAutoSaving.value).toBe(true);
-
-      resolvePromise!();
-      await savePromise;
-
-      expect(isAutoSaving.value).toBe(false);
-    });
-
-    it('sets autoSaveSuccess to true after successful save', async () => {
-      mockMutate.mockResolvedValue({});
-
-      const { performAutoSave, autoSaveSuccess } = useAlbumAutoSave({
-        discussionId: 'disc-1',
-        existingAlbum: makeAlbum({
-          id: 'album-1',
-          Images: [],
-          imageOrder: [],
-        }),
-        getAlbumData: () => ({
-          images: [{ id: 'img-1', url: 'test.jpg', alt: '', caption: '', copyright: '' }],
-          imageOrder: ['img-1'],
-        }),
-      });
-
-      await performAutoSave();
-
-      expect(autoSaveSuccess.value).toBe(true);
-    });
+  it('coalesces repeated debounce requests', async () => {
+    const { api } = setup(); api.debouncedAutoSave(); api.debouncedAutoSave(); await vi.advanceTimersByTimeAsync(500);
+    expect(mockMutate).toHaveBeenCalledTimes(1);
+  });
+  it('does not repeat an unchanged successful save', async () => {
+    const { api } = setup(); await api.performAutoSave(); await api.performAutoSave();
+    expect(mockMutate).toHaveBeenCalledTimes(1);
+  });
+  it('does not acknowledge a null result as persisted', async () => {
+    mockMutate.mockResolvedValue({ data: { updateDiscussionWithChannelConnections: null } });
+    const { api } = setup(); await api.performAutoSave();
+    expect(api.autoSaveSuccess.value).toBe(false);
+  });
+  it('keeps failed changes retryable', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockMutate.mockRejectedValueOnce(new Error('permission denied'));
+    const { api } = setup(); await api.performAutoSave(); await api.performAutoSave(); spy.mockRestore();
+    expect(mockMutate).toHaveBeenCalledTimes(2);
+  });
+  it('cancels a pending debounce after navigation', async () => {
+    const { api, id } = setup(); api.debouncedAutoSave(); id.value = 'd2'; await nextTick(); await vi.advanceTimersByTimeAsync(500);
+    expect(mockMutate).not.toHaveBeenCalled();
+  });
+  it('ignores completion from the previous discussion', async () => {
+    let finish: ((value: typeof saved) => void) | undefined;
+    mockMutate.mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+    const { api, id } = setup(); const pending = api.performAutoSave(); id.value = 'd2'; await nextTick(); finish?.(saved); await pending;
+    expect(api.autoSaveSuccess.value).toBe(false);
+  });
+  it('serializes pending changes using the newest snapshot', async () => {
+    let finish: ((value: typeof saved) => void) | undefined;
+    mockMutate.mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+    const { api, data } = setup(); const pending = api.performAutoSave(); data.value = { images: [{ id: 'b' }], imageOrder: ['b'] }; await api.performAutoSave(); finish?.(saved); await pending; await flushPromises();
+    expect(mockMutate.mock.calls.map(([variables]) => variables.album.imageIds)).toEqual([['a'], ['b']]);
+  });
+  it('cancels a debounce on unmount', async () => {
+    const { api, wrapper } = setup(); api.debouncedAutoSave(); wrapper.unmount(); await vi.advanceTimersByTimeAsync(500);
+    expect(mockMutate).not.toHaveBeenCalled();
   });
 });

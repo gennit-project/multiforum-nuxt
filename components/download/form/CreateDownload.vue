@@ -1,21 +1,12 @@
 <script setup lang="ts">
-// Reviewed #700 exceptions: the pin omits CrosspostedDiscussion.connect
-// and DiscussionUpdateInput.Album. These remaining payloads need a backend contract correction before they can validate.
-import {
-  CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
-  UPDATE_DISCUSSION,
-} from '@/graphQLData/discussion/mutations';
-import { computed, ref, watch } from 'vue';
+import { CreateDiscussionDocument as CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
+  UpdateDownloadLabelsDocument as UPDATE_DOWNLOAD_LABELS,
+  UpdateDownloadableFileSupportSettingsDocument as UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS, GetChannelDocument as GET_CHANNEL  } from '@/__generated__/operations';
+import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
+import { computed, ref, watch, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
-import {
-  type CreateDiscussionMutation,
-  type UpdateDiscussionMutation,
-  UpdateDownloadLabelsDocument as UPDATE_DOWNLOAD_LABELS,
-  UpdateDownloadableFileSupportSettingsDocument as UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS,
-} from '@/__generated__/operations';
-import { GetChannelDocument as GET_CHANNEL } from '@/__generated__/operations';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 
@@ -65,7 +56,7 @@ const createDownloadVariables = () => {
       where: { node: { id: { eq: file.id } } },
     }));
 
-  // Album will be created as a follow-up mutation after discussion creation
+  const album = buildAlbumUpdateInput({ albumData: formValues.value.album });
 
   const discussionCreateInput = {
     title: formValues.value.title,
@@ -77,13 +68,10 @@ const createDownloadVariables = () => {
         connect: downloadableFileConnections,
       },
     }),
-    ...(formValues.value.crosspostId && {
-      CrosspostedDiscussion: {
-        connect: {
-          where: { node: { id: formValues.value.crosspostId } },
-        },
-      },
-    }),
+    ...(album && { Album: { create: { node: {
+      imageOrder: album.imageIds,
+      Images: { connect: album.imageIds.map(id => ({ where: { node: { id: { eq: id } } } })) },
+    } } } }),
   };
 
   return {
@@ -91,37 +79,9 @@ const createDownloadVariables = () => {
       {
         discussionCreateInput,
         channelConnections: formValues.value.selectedChannels,
+        ...(formValues.value.crosspostId ? { crosspostedDiscussionId: formValues.value.crosspostId } : {}),
       },
     ],
-  };
-};
-
-const downloadAlbumVariables = (discussionId: string) => {
-  // Build the album node
-  const albumNode = {
-    imageOrder: formValues.value.album?.imageOrder || [],
-    Images: {
-      // Connect to existing images using their IDs
-      connect: (formValues.value.album?.images || [])
-        .filter((img): img is typeof img & { id: string } => Boolean(img.id))
-        .map((img) => ({
-          where: { node: { id: { eq: img.id } } },
-        })),
-    },
-  };
-
-  // Create album structure similar to getUpdateDiscussionInputForAlbum
-  const albumUpdateInput = {
-    Album: {
-      create: {
-        node: albumNode,
-      },
-    },
-  };
-
-  return {
-    where: { id: { eq: discussionId } },
-    updateDiscussionInput: albumUpdateInput,
   };
 };
 
@@ -129,11 +89,7 @@ const {
   mutate: createDownload,
   loading: createDownloadLoading,
   error: createDownloadError,
-  onDone,
-} = useMutation<
-  CreateDiscussionMutation,
-  ReturnType<typeof createDownloadVariables>
->(CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS);
+} = useMutation(CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS);
 
 const {
   mutate: updateDiscussionChannelLabels,
@@ -141,122 +97,20 @@ const {
   error: _updateLabelsError,
 } = useMutation(UPDATE_DOWNLOAD_LABELS);
 
-const {
-  mutate: updateDiscussion,
-  loading: _updateDiscussionLoading,
-  error: _updateDiscussionError,
-} = useMutation<
-  UpdateDiscussionMutation,
-  ReturnType<typeof downloadAlbumVariables>
->(UPDATE_DISCUSSION);
-
 const { mutate: updateDownloadableFileSupportSettings } = useMutation(
   UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS
 );
 
-onDone(async (response) => {
-  const newDiscussionId =
-    response.data?.createDiscussionWithChannelConnections?.[0]
-      ?.DiscussionChannels?.[0]?.Discussion?.id;
-
-  if (newDiscussionId) {
-    // Handle album if there are images
-    if (formValues.value.album?.images?.length > 0) {
-      await saveDownloadAlbum(newDiscussionId);
-    }
-
-    // Handle labels if they exist
-    if (
-      formValues.value.downloadLabels &&
-      Object.keys(formValues.value.downloadLabels).length > 0
-    ) {
-      await saveDownloadLabels(newDiscussionId);
-    }
-
-    await saveDownloadSupportSettings(newDiscussionId);
-
-    router.push({
-      name: 'forums-forumId-downloads-discussionId',
-      params: {
-        forumId: channelId.value,
-        discussionId: newDiscussionId,
-      },
-    });
-  } else {
-    console.error('No discussionId found in response');
-  }
+const getLabelOptionIds = () => Object.entries(formValues.value.downloadLabels ?? {}).flatMap(([key, values]) => {
+  const group = channelData.value?.FilterGroups?.find((item) => item.key === key);
+  return values.flatMap((value) => {
+    const option = group?.options?.find((item) => item.value === value);
+    return option?.id ? [option.id] : [];
+  });
 });
-
-// Helper function to save album after discussion creation
-const saveDownloadAlbum = async (discussionId: string) => {
-  try {
-    await updateDiscussion(downloadAlbumVariables(discussionId));
-  } catch (error) {
-    console.error('Error creating album:', error);
-  }
-};
-
-const saveDownloadSupportSettings = async (discussionId: string) => {
-  await Promise.all(
-    (formValues.value.downloadableFiles || [])
-      .filter((file): file is typeof file & { id: string } => Boolean(file.id))
-      .map((file) =>
-        updateDownloadableFileSupportSettings({
-          downloadableFileId: file.id,
-          discussionId,
-          input: {
-            attributionOverride: file.attributionOverride || null,
-            supportPatreonUrl: file.supportPatreonUrl || null,
-            supportBuyMeACoffeeUrl: file.supportBuyMeACoffeeUrl || null,
-            supportKoFiUrl: file.supportKoFiUrl || null,
-            supportPayPalMeUrl: file.supportPayPalMeUrl || null,
-          },
-        })
-      )
-  );
-};
-
-// Helper function to save download labels after discussion creation
-const saveDownloadLabels = async (discussionId: string) => {
-  try {
-    // Convert downloadLabels to FilterOption IDs
-    const labelOptionIds: string[] = [];
-
-    // We need the FilterGroups from channel data to map values to IDs
-    if (!channelData.value?.FilterGroups) {
-      console.warn('No FilterGroups found in channel data');
-      return;
-    }
-
-    Object.entries(formValues.value.downloadLabels || {}).forEach(
-      ([groupKey, selectedValues]) => {
-        const filterGroup = channelData.value?.FilterGroups?.find(
-          (fg) => fg.key === groupKey
-        );
-        if (filterGroup) {
-          selectedValues.forEach((value) => {
-            const option = filterGroup.options?.find(
-              (opt) => opt.value === value
-            );
-            if (option?.id) {
-              labelOptionIds.push(option.id);
-            }
-          });
-        }
-      }
-    );
-
-    if (labelOptionIds.length > 0) {
-      await updateDiscussionChannelLabels({
-        discussionId: discussionId,
-        channelUniqueName: channelId.value,
-        labelOptionIds: labelOptionIds,
-      });
-    }
-  } catch (error) {
-    console.error('Error saving download labels:', error);
-  }
-};
+let routeGeneration = 0;
+onBeforeUnmount(() => { routeGeneration++; });
+const submitting = ref(false);
 
 const updateFormValues = (
   newValues: Partial<CreateEditDiscussionFormValues>
@@ -265,31 +119,57 @@ const updateFormValues = (
 };
 
 const submitForm = async () => {
+  if (submitting.value || !channelId.value) return;
+  if (channelData.value?.downloadsEnabled === false) {
+    submitError.value = 'Downloads are disabled in this channel.';
+    return;
+  }
+  const scope = routeGeneration;
+  const channel = channelId.value;
+  const labelOptionIds = getLabelOptionIds();
+  const files = (formValues.value.downloadableFiles ?? []).flatMap((file) => file.id ? [{
+    downloadableFileId: file.id,
+    input: {
+      attributionOverride: file.attributionOverride || null,
+      supportPatreonUrl: file.supportPatreonUrl || null,
+      supportBuyMeACoffeeUrl: file.supportBuyMeACoffeeUrl || null,
+      supportKoFiUrl: file.supportKoFiUrl || null,
+      supportPayPalMeUrl: file.supportPayPalMeUrl || null,
+    },
+  }] : []);
+  const current = () => scope === routeGeneration && channel === channelId.value;
+  submitting.value = true;
+  submitError.value = '';
   try {
-    if (channelData.value?.downloadsEnabled === false) {
-      submitError.value = 'Downloads are disabled in this channel.';
-      return;
+    const response = await createDownload(createDownloadVariables());
+    if (!current()) return;
+    const discussionId = response?.data?.createDiscussionWithChannelConnections?.[0]?.id;
+    if (!discussionId) throw new Error('No discussionId found in response');
+    if (labelOptionIds.length) {
+      try {
+        await updateDiscussionChannelLabels({ discussionId, channelUniqueName: channel, labelOptionIds });
+      } catch (error) {
+        console.error('Error saving download labels:', error);
+      }
     }
-
-    submitError.value = '';
-    await createDownload(createDownloadVariables());
-
-    // Navigation is now handled in the onDone hook
+    if (!current()) return;
+    await Promise.all(files.map((file) => updateDownloadableFileSupportSettings({ ...file, discussionId })));
+    if (current()) router.push({ name: 'forums-forumId-downloads-discussionId', params: { forumId: channel, discussionId } });
   } catch (error) {
     console.error('Error creating download:', error);
-    submitError.value =
-      error instanceof Error ? error.message : 'Error creating download';
+    if (current()) submitError.value = error instanceof Error ? error.message : 'Error creating download';
+  } finally {
+    if (current()) submitting.value = false;
   }
 };
 
-watch(
-  () => route.params.forumId,
-  (newForumId) => {
-    if (typeof newForumId === 'string' && newForumId !== channelId.value) {
-      formValues.value.selectedChannels = [newForumId];
-    }
-  }
-);
+watch(channelId, (newForumId) => {
+  routeGeneration++;
+  submitting.value = false;
+  submitError.value = '';
+  formValues.value.selectedChannels = newForumId ? [newForumId] : [];
+});
+
 </script>
 
 <template>
@@ -301,7 +181,7 @@ watch(
         :edit-mode="false"
         :form-values="formValues"
         :create-discussion-error="createDownloadError"
-        :create-discussion-loading="createDownloadLoading"
+        :create-discussion-loading="createDownloadLoading || submitting"
         :download-mode="true"
         :channel-data="channelData"
         :locked-channel-name="channelId || undefined"

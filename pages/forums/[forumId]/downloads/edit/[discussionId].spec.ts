@@ -1,11 +1,10 @@
-import { UpdateDownloadLabelsDocument as UPDATE_DOWNLOAD_LABELS } from '@/__generated__/operations';
+import { UpdateDownloadLabelsDocument as UPDATE_DOWNLOAD_LABELS, UpdateDiscussionWithChannelConnectionsDocument as UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS  } from '@/__generated__/operations';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import { shallowMount } from '@vue/test-utils';
 import { ref, unref, defineComponent, h } from 'vue';
 import { useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 
 const routeHarness = vi.hoisted(() => ({ routerPush: vi.fn() }));
@@ -272,7 +271,7 @@ describe('download edit page', () => {
       where: { id: { eq: 'd1' } },
       channelConnections: ['dogs'],
       channelDisconnections: ['cats'],
-      albumImageDisconnections: [],
+      album: undefined,
       updateDiscussionInput: {
         title: { set: 'Cool model' },
         Tags: [
@@ -288,7 +287,7 @@ describe('download edit page', () => {
     });
   });
 
-  it('passes removed album image ids as explicit disconnections', async () => {
+  it('clears removed album images through the complete membership argument', async () => {
     const discussion = populatedDiscussion();
     discussion.Album = { ...discussion.Album, id: 'album-1' };
     const wrapper = await loadPage(RequireAuthStub, discussion);
@@ -304,9 +303,7 @@ describe('download edit page', () => {
     ) as {
       options: () => { variables: Record<string, unknown> };
     };
-    expect(tracker.options().variables.albumImageDisconnections).toEqual([
-      'i1',
-    ]);
+    expect(tracker.options().variables.album).toEqual({ imageIds: [] });
   });
 
   it('includes newly uploaded files in the final discussion update', async () => {
@@ -379,7 +376,8 @@ describe('download edit page', () => {
   });
 
   it('still redirects when the chained label update fails', async () => {
-    await loadPage(RequireAuthStub, populatedDiscussion());
+    const wrapper = await loadPage(RequireAuthStub, populatedDiscussion());
+    await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
     const discussionUpdate = mutationTrackers.get(
       UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS
     ) as { onDoneCb: () => Promise<void> };

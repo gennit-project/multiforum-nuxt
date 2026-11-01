@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import type { UpdateDiscussionWithChannelConnectionsMutation } from '@/__generated__/operations';
-// Reviewed #700 exception: existing album relationship updates require backend #413.
-import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
-import { config } from '@/config';
-import {
+import { UpdateDiscussionWithChannelConnectionsDocument as UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
   GetDiscussionDocument as GET_DISCUSSION,
   GetChannelDocument as GET_CHANNEL,
-  UpdateDownloadLabelsDocument as UPDATE_DOWNLOAD_LABELS,
-} from '@/__generated__/operations';
-import { computed, ref } from 'vue';
+  UpdateDownloadLabelsDocument as UPDATE_DOWNLOAD_LABELS } from '@/__generated__/operations';
+import { config } from '@/config';
+import { computed, ref, watch } from 'vue';
 import { useRouter, useRoute, useHead } from 'nuxt/app';
 import { buildEditDiscussionHead } from '@/utils/discussionSeo';
 import { useQuery, useMutation } from '@vue/apollo-composable';
@@ -24,7 +20,6 @@ import type {
 import { useModProfileName } from '@/composables/useAuthState';
 import { resolveSelectedLabelOptionIds } from '@/utils/downloadLabelUtils';
 import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
-import { getRemovedAlbumImageIds } from '@/utils/albumImageDisconnections';
 import { buildDiscussionEditFormValues } from '@/utils/discussionEditForm';
 import {
   extractDownloadLabels,
@@ -78,7 +73,7 @@ const discussion = computed(() => {
   if (getDiscussionError.value || getDiscussionLoading.value) {
     return null;
   }
-  return getDiscussionResult.value?.discussions[0] || null;
+  return getDiscussionResult.value?.discussions.find((item) => item.id === discussionId.value) || null;
 });
 
 const channelData = computed(() => {
@@ -203,6 +198,11 @@ const formValues = ref<CreateEditDiscussionFormValues>(getDefaultFormValues());
 
 const dataLoaded = ref(false);
 
+watch([discussionId, channelId], () => {
+  dataLoaded.value = false;
+  formValues.value = getDefaultFormValues();
+});
+
 // Page title and meta. Called once in setup with a computed so it stays
 // inside the component context on SSR; calling useHead from onResult throws.
 useHead(
@@ -221,7 +221,7 @@ onGetDiscussionResult((value) => {
     return;
   }
   const discussion = value.data?.discussions[0];
-  if (!discussion) return;
+  if (!discussion || discussion.id !== discussionId.value) return;
 
   // Preserve any existing downloadLabels the user might have changed; otherwise
   // derive them from the discussion's primary channel (utils/downloadEditForm).
@@ -263,7 +263,7 @@ const existingTags = computed(() => {
 const getAlbumUpdateInput = () =>
   buildAlbumUpdateInput({
     albumData: formValues.value.album,
-    existingAlbumId: discussion.value?.Album?.id,
+    existingImageOrder: discussion.value?.Album?.imageOrder,
     existingImages: discussion.value?.Album?.Images ?? [],
   });
 
@@ -289,8 +289,6 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
         };
       });
 
-  // Get album update input
-  const albumUpdateInput = getAlbumUpdateInput();
   const downloadableFilesUpdateInput = buildDownloadableFilesUpdateInput({
     originalFiles: discussion.value?.DownloadableFiles,
     currentFiles: formValues.value.downloadableFiles,
@@ -307,7 +305,6 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
         disconnect: tagDisconnections,
       },
     ],
-    ...albumUpdateInput, // Include album data
     ...downloadableFilesUpdateInput,
   };
   return result;
@@ -316,13 +313,6 @@ const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
 const channelConnections = computed(() => {
   return formValues.value.selectedChannels;
 });
-
-const albumImageDisconnections = computed(() =>
-  getRemovedAlbumImageIds({
-    existingImages: discussion.value?.Album?.Images,
-    currentImages: formValues.value.album?.images,
-  })
-);
 
 const updateVariables = () => ({
   where: { id: { eq: discussionId.value } },
@@ -335,7 +325,7 @@ const updateVariables = () => ({
     .map((dc) => {
       return dc.channelUniqueName;
     }),
-  albumImageDisconnections: albumImageDisconnections.value,
+  album: getAlbumUpdateInput(),
 });
 
 const {
@@ -343,10 +333,7 @@ const {
   error: updateDiscussionError,
   loading: updateDiscussionLoading,
   onDone,
-} = useMutation<
-  UpdateDiscussionWithChannelConnectionsMutation,
-  ReturnType<typeof updateVariables>
->(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
+} = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: updateVariables(),
 }));
 
@@ -369,26 +356,23 @@ const {
   },
 }));
 
+let pendingSave: { discussionId: string; channelId: string; destination: string | undefined; labelOptionIds: string[] } | undefined;
 onDone(async () => {
-  // After discussion is updated successfully, update the labels
+  const saved = pendingSave;
+  if (!saved || saved.discussionId !== discussionId.value || saved.channelId !== channelId.value) return;
   try {
-    await updateDiscussionChannelLabels();
+    await updateDiscussionChannelLabels({ channelUniqueName: saved.channelId, discussionId: saved.discussionId, labelOptionIds: saved.labelOptionIds });
   } catch (error) {
     console.error('Error updating labels:', error);
   }
-
-  router.push({
-    name: 'forums-forumId-downloads-discussionId',
-    params: {
-      forumId: formValues.value.selectedChannels[0],
-      discussionId: discussionId.value,
-    },
-  });
+  if (saved.discussionId !== discussionId.value || saved.channelId !== channelId.value) return;
+  router.push({ name: 'forums-forumId-downloads-discussionId', params: { forumId: saved.destination, discussionId: saved.discussionId } });
 });
 
-// Methods converted to regular functions
 async function submit() {
-  updateDiscussion();
+  if (!discussionId.value || updateDiscussionLoading.value) return;
+  pendingSave = { discussionId: discussionId.value, channelId: channelId.value, destination: formValues.value.selectedChannels[0], labelOptionIds: getSelectedLabelOptionIds() };
+  await updateDiscussion();
 }
 
 function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {

@@ -1,149 +1,28 @@
+import { readFileSync } from 'node:fs';
+import { buildSchema, coerceInputValue, isInputType, parse, validate } from 'graphql';
 import { describe, it, expect } from 'vitest';
 import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
-
-describe('buildAlbumUpdateInput', () => {
-  it('returns an empty object when there is no album data', () => {
-    expect(buildAlbumUpdateInput({ albumData: null })).toEqual({});
+const schema = buildSchema(readFileSync('graphql-schema/schema.graphql', 'utf8'));
+function coerceAlbum(value: unknown) {
+  const type = schema.getType('DiscussionAlbumInput');
+  if (!type || !isInputType(type)) throw new Error('Album contract missing from pin');
+  return coerceInputValue(value, type);
+}
+describe('album wire contract against pinned schema', () => {
+  it('accepts the actual builder payload with explicit null metadata', () => {
+    const value = buildAlbumUpdateInput({ albumData: { images: [{ id: 'a', caption: null }] }, existingImages: [{ id: 'a', caption: 'old' }] });
+    expect(coerceAlbum(value)).toEqual({ imageIds: ['a'], imageUpdates: [{ id: 'a', caption: null }] });
   });
-
-  it('returns an empty object when album has no images and no order', () => {
-    expect(
-      buildAlbumUpdateInput({ albumData: { images: [], imageOrder: [] } })
-    ).toEqual({});
+  it('accepts explicit empty membership', () => {
+    expect(coerceAlbum({ imageIds: [] })).toEqual({ imageIds: [] });
   });
-
-  describe('creating a new album', () => {
-    it('connects valid images under Album.create', () => {
-      const result = buildAlbumUpdateInput({
-        albumData: {
-          images: [{ id: 'img1' }, { id: 'img2' }],
-          imageOrder: ['img1', 'img2'],
-        },
-        existingAlbumId: null,
-      });
-      expect(result).toEqual({
-        Album: {
-          create: {
-            node: {
-              imageOrder: ['img1', 'img2'],
-              Images: {
-                connect: [
-                  { where: { node: { id: { eq: 'img1' } } } },
-                  { where: { node: { id: { eq: 'img2' } } } },
-                ],
-              },
-            },
-          },
-        },
-      });
-    });
-
-    it('returns an empty object when no images have ids', () => {
-      expect(
-        buildAlbumUpdateInput({
-          albumData: { images: [{ id: null }], imageOrder: ['x'] },
-          existingAlbumId: null,
-        })
-      ).toEqual({});
-    });
+  it('rejects an attempted uploader relationship', () => {
+    expect(() => coerceAlbum({ imageIds: ['a'], imageUpdates: [{ id: 'a', Uploader: { username: 'other' } }] })).toThrow();
   });
-
-  describe('updating an existing album', () => {
-    it('connects newly added images', () => {
-      const result = buildAlbumUpdateInput({
-        albumData: { images: [{ id: 'old1' }, { id: 'new1' }] },
-        existingAlbumId: 'album-1',
-        existingImages: [{ id: 'old1' }],
-      });
-      const ops = (
-        result as { Album: { update: { node: { Images: unknown[] } } } }
-      ).Album.update.node.Images;
-      expect(ops).toContainEqual({
-        connect: [{ where: { node: { id: { eq: 'new1' } } } }],
-      });
-    });
-
-    it('updates images that already exist', () => {
-      const result = buildAlbumUpdateInput({
-        albumData: {
-          images: [
-            {
-              id: 'old1',
-              alt: 'new alt',
-              url: 'u',
-              caption: 'c',
-              copyright: 'r',
-            },
-          ],
-        },
-        existingAlbumId: 'album-1',
-        existingImages: [{ id: 'old1' }],
-      });
-      const ops = (
-        result as { Album: { update: { node: { Images: unknown[] } } } }
-      ).Album.update.node.Images;
-      expect(ops).toContainEqual({
-        update: {
-          where: { node: { id: { eq: 'old1' } } },
-          node: {
-            url: { set: 'u' },
-            alt: { set: 'new alt' },
-            caption: { set: 'c' },
-            copyright: { set: 'r' },
-          },
-        },
-      });
-    });
-
-    it('disconnects images no longer present', () => {
-      const result = buildAlbumUpdateInput({
-        albumData: { images: [{ id: 'keep' }] },
-        existingAlbumId: 'album-1',
-        existingImages: [{ id: 'keep' }, { id: 'gone' }],
-      });
-      const ops = (
-        result as { Album: { update: { node: { Images: unknown[] } } } }
-      ).Album.update.node.Images;
-      expect(ops).toContainEqual({
-        disconnect: [{ where: { node: { id: { eq: 'gone' } } } }],
-      });
-    });
-
-    it('disconnects the final image when the album is emptied', () => {
-      const result = buildAlbumUpdateInput({
-        albumData: { images: [], imageOrder: [] },
-        existingAlbumId: 'album-1',
-        existingImages: [{ id: 'last-image' }],
-      });
-      const node = (
-        result as unknown as {
-          Album: {
-            update: { node: { imageOrder: unknown; Images: unknown[] } };
-          };
-        }
-      ).Album.update.node;
-      expect(node).toEqual({
-        imageOrder: { set: [] },
-        Images: [
-          {
-            disconnect: [{ where: { node: { id: { eq: 'last-image' } } } }],
-          },
-        ],
-      });
-    });
-
-    it('drops order ids that are not connected images', () => {
-      const result = buildAlbumUpdateInput({
-        albumData: { images: [{ id: 'a' }], imageOrder: ['a', 'b'] },
-        existingAlbumId: 'album-1',
-        existingImages: [{ id: 'a' }],
-      });
-      const order = (
-        result as unknown as {
-          Album: { update: { node: { imageOrder: unknown } } };
-        }
-      ).Album.update.node.imageOrder;
-      expect(order).toEqual({ set: ['a'] });
-    });
+  it('rejects URL edits', () => {
+    expect(() => coerceAlbum({ imageIds: ['a'], imageUpdates: [{ id: 'a', url: 'other' }] })).toThrow();
+  });
+  it('validates the album argument on the served update operation', () => {
+    expect(validate(schema, parse('mutation AlbumWrite($where: DiscussionWhere!, $album: DiscussionAlbumInput!) { updateDiscussionWithChannelConnections(where: $where, discussionUpdateInput: {}, album: $album) { id } }'))).toEqual([]);
   });
 });

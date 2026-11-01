@@ -12,7 +12,6 @@ const h = vi.hoisted(() => ({
   channelLoading: null as unknown,
   createDownload: null as unknown,
   updateLabels: null as unknown,
-  updateDiscussion: null as unknown,
   updateSupport: null as unknown,
   onDone: undefined as undefined | ((r: unknown) => void),
   push: null as unknown,
@@ -35,12 +34,6 @@ vi.mock('@vue/apollo-composable', () => ({
       };
     if (h.callIndex.n === 2)
       return { mutate: h.updateLabels, loading: ref(false), error: ref(null) };
-    if (h.callIndex.n === 3)
-      return {
-        mutate: h.updateDiscussion,
-        loading: ref(false),
-        error: ref(null),
-      };
     return { mutate: h.updateSupport, loading: ref(false), error: ref(null) };
   },
 }));
@@ -99,9 +92,8 @@ beforeEach(() => {
     channels: [{ downloadsEnabled: true, FilterGroups: [] }],
   });
   h.channelLoading = ref(false);
-  h.createDownload = vi.fn().mockResolvedValue({});
+  h.createDownload = vi.fn(() => new Promise((resolve) => { h.onDone = resolve; }));
   h.updateLabels = vi.fn().mockResolvedValue({});
-  h.updateDiscussion = vi.fn().mockResolvedValue({});
   h.updateSupport = vi.fn().mockResolvedValue({});
   h.push = vi.fn();
   h.onDone = undefined;
@@ -187,15 +179,13 @@ describe('CreateDownload submit', () => {
       input: [
         {
           channelConnections: ['cats'],
+          crosspostedDiscussionId: 'source',
           discussionCreateInput: {
             title: 'T',
             body: '',
             hasDownload: true,
             Tags: {
               connect: [{ where: { node: { text: { eq: 'models' } } } }],
-            },
-            CrosspostedDiscussion: {
-              connect: { where: { node: { id: 'source' } } },
             },
           },
         },
@@ -209,6 +199,8 @@ describe('CreateDownload submit', () => {
       title: 'T',
       selectedTags: ['models'],
       downloadableFiles: [{ id: 'file-1' }],
+      crosspostId: 'source',
+      album: { images: [{ id: 'reused' }], imageOrder: ['reused'] },
     });
     const variables = (h.createDownload as ReturnType<typeof vi.fn>).mock
       .calls[0][0];
@@ -234,7 +226,7 @@ describe('CreateDownload onDone follow-ups', () => {
   const respond = (id = 'newD') => ({
     data: {
       createDiscussionWithChannelConnections: [
-        { DiscussionChannels: [{ Discussion: { id } }] },
+        { id, DiscussionChannels: [{ Discussion: { id } }] },
       ],
     },
   });
@@ -263,7 +255,7 @@ describe('CreateDownload onDone follow-ups', () => {
     expect(h.push).not.toHaveBeenCalled();
   });
 
-  it('creates the album when images were attached', async () => {
+  it('creates the album in the initial request without a follow-up mutation', async () => {
     const wrapper = mountCreate();
     await submit(wrapper, {
       title: 'T',
@@ -273,7 +265,7 @@ describe('CreateDownload onDone follow-ups', () => {
     await h.onDone?.(respond());
     await flushPromises();
 
-    expect(h.updateDiscussion).toHaveBeenCalled();
+    expect((h.createDownload as ReturnType<typeof vi.fn>).mock.calls[0][0].input[0].discussionCreateInput.Album.create.node.imageOrder).toEqual(['img1']);
   });
 
   it('preserves the album payload and excludes images without IDs', async () => {
@@ -286,20 +278,11 @@ describe('CreateDownload onDone follow-ups', () => {
     await h.onDone?.(respond());
     await flushPromises();
 
-    expect(h.updateDiscussion).toHaveBeenCalledWith({
-      where: { id: { eq: 'newD' } },
-      updateDiscussionInput: {
-        Album: {
-          create: {
-            node: {
-              imageOrder: ['img1'],
-              Images: {
-                connect: [{ where: { node: { id: { eq: 'img1' } } } }],
-              },
-            },
-          },
-        },
-      },
+    expect((h.createDownload as ReturnType<typeof vi.fn>).mock.calls[0][0].input[0].discussionCreateInput.Album).toEqual({
+      create: { node: {
+        imageOrder: ['img1'],
+        Images: { connect: [{ where: { node: { id: { eq: 'img1' } } } }] },
+      } },
     });
   });
 
@@ -323,6 +306,51 @@ describe('CreateDownload onDone follow-ups', () => {
     expect(h.updateLabels).toHaveBeenCalledWith(
       expect.objectContaining({ labelOptionIds: ['opt-red'] })
     );
+  });
+
+  it('does not write labels or redirect after navigation during creation', async () => {
+    const wrapper = mountCreate();
+    await submit(wrapper, { title: 'T', downloadableFiles: [{ id: 'f1' }] });
+    const route = h.route as { params: { forumId: string } };
+    route.params.forumId = 'dogs';
+    await flushPromises();
+    await h.onDone?.(respond());
+    await flushPromises();
+    expect([h.updateLabels, h.updateSupport, h.push].map((mock) => (mock as ReturnType<typeof vi.fn>).mock.calls.length)).toEqual([0, 0, 0]);
+  });
+
+  it('does not redirect after the form unmounts during creation', async () => {
+    const wrapper = mountCreate();
+    await submit(wrapper, { title: 'T' });
+    wrapper.unmount();
+    await h.onDone?.(respond());
+    await flushPromises();
+    expect(h.push).not.toHaveBeenCalled();
+  });
+
+  it('submits only once while creation is pending', async () => {
+    const wrapper = mountCreate();
+    await submit(wrapper, { title: 'T' });
+    await submit(wrapper, { title: 'Repeated' });
+    expect(h.createDownload).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses captured support settings after the form changes', async () => {
+    const wrapper = mountCreate();
+    await submit(wrapper, { title: 'T', downloadableFiles: [{ id: 'original', supportPatreonUrl: 'original-url' }] });
+    await fields(wrapper).vm.$emit('update-form-values', { downloadableFiles: [{ id: 'later', supportPatreonUrl: 'later-url' }] });
+    await h.onDone?.(respond());
+    await flushPromises();
+    expect(h.updateSupport).toHaveBeenCalledWith(expect.objectContaining({ downloadableFileId: 'original', input: expect.objectContaining({ supportPatreonUrl: 'original-url' }) }));
+  });
+
+  it('does not run follow-ups twice for the same resolution', async () => {
+    const wrapper = mountCreate();
+    await submit(wrapper, { title: 'T' });
+    await h.onDone?.(respond());
+    await h.onDone?.(respond());
+    await flushPromises();
+    expect(h.push).toHaveBeenCalledTimes(1);
   });
 
   it('saves support settings for files with ids', async () => {
