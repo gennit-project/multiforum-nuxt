@@ -384,3 +384,27 @@ test('requires flair selections independently in the sitewide form', async ({
     { channelUniqueName: 'dogs', flairIds: ['dog-topic'] },
   ]);
 });
+
+test('creates a crosspost using the existing discussion ID contract', async ({ page, setupMockedPage }) => {
+  const state = createDiscussionState();
+  const handlers = createDiscussionHandlers(state, { channelId: TEST_CHANNEL, username: 'cluse' });
+  let submitted: unknown;
+  await setupMockedPage({ handlers: {
+    ...handlers,
+    getCrosspostPreview: () => ({ data: { discussions: [] } }),
+    createDiscussion: (context) => {
+      submitted = context.body.variables;
+      return handlers.createDiscussion(context);
+    },
+  } });
+  await page.goto('/forums/cats/discussions/create?crosspost=existing-source');
+  await page.getByTestId('title-input').fill('Crosspost contract');
+  await page.getByTestId('body-input').fill('A reference to an existing discussion');
+  await page.getByRole('button', { name: 'Save', exact: true }).first().click();
+  await expect(page).toHaveURL(/\/forums\/cats\/discussions\/discussion-1$/);
+  expect(submitted).toMatchObject({ input: [{
+    crosspostedDiscussionId: 'existing-source',
+    channelConnections: ['cats'],
+    discussionCreateInput: { title: 'Crosspost contract' },
+  }] });
+});

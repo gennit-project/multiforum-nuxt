@@ -5,7 +5,7 @@ import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { useRouter } from 'nuxt/app';
 import { config } from '@/config';
 import { useAppTheme } from '@/composables/useTheme';
-import type { Event } from '@/__generated__/graphql';
+import type { EventListPresentation as Event } from '@/types/EventPresentation';
 import {
   groupEventsByLocation,
   buildMarkerTitle,

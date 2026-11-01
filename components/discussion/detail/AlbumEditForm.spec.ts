@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { mount, flushPromises } from '@vue/test-utils';
-import type { Discussion } from '@/__generated__/graphql';
+import type { DiscussionAlbumInput } from '@/__generated__/graphql';
 
 import AlbumEditForm from '@/components/discussion/detail/AlbumEditForm.vue';
 
@@ -65,9 +65,9 @@ const editor = (w: ReturnType<typeof mount>) =>
 const updateInput = () =>
   (
     h.mutationOptions?.().variables as {
-      updateDiscussionInput: Record<string, unknown>;
+      album?: DiscussionAlbumInput;
     }
-  ).updateDiscussionInput;
+  ).album;
 
 const editDiscussion = () =>
   ({
@@ -79,7 +79,7 @@ const editDiscussion = () =>
         { id: 'img1', url: 'u1', caption: 'c1', alt: 'a1', copyright: '' },
       ],
     },
-  }) as unknown as Discussion;
+  });
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -170,12 +170,12 @@ describe('AlbumEditForm save', () => {
     );
   });
 
-  it('runs the update mutation when saving a new (non-temp) album', async () => {
+  it('does not submit an absent route ID', async () => {
     const wrapper = mountForm({ discussion: undefined });
 
     await wrapper.getComponent({ name: 'PrimaryButton' }).vm.$emit('click');
 
-    expect(h.updateDiscussion).toHaveBeenCalled();
+    expect(h.updateDiscussion).not.toHaveBeenCalled();
   });
 
   it('closes the editor when the mutation completes', () => {
@@ -184,6 +184,13 @@ describe('AlbumEditForm save', () => {
     h.onDone?.();
 
     expect(wrapper.emitted('closeEditor')).toBeTruthy();
+  });
+
+  it('ignores a previous discussion completion after navigation', async () => {
+    const wrapper = mountForm({ discussion: editDiscussion() });
+    await wrapper.setProps({ discussion: { ...editDiscussion(), id: 'd2' } });
+    h.onDone?.();
+    expect(wrapper.emitted('closeEditor')).toBeUndefined();
   });
 
   it('shows an error banner when the mutation errors', () => {
@@ -195,32 +202,19 @@ describe('AlbumEditForm save', () => {
 });
 
 describe('AlbumEditForm update input', () => {
-  it('builds an Album.create input in create mode', () => {
+  it('omits an untouched empty album', () => {
     mountForm({ discussion: undefined });
-
-    expect(updateInput().Album).toHaveProperty('create');
+    expect(updateInput()).toBeUndefined();
   });
-
-  it('builds an Album.update input for an existing album', async () => {
+  it('omits unchanged existing album metadata', async () => {
     mountForm({ discussion: editDiscussion() });
     await flushPromises();
-
-    expect(updateInput().Album).toHaveProperty('update');
+    expect(updateInput()).toBeUndefined();
   });
-
-  it('disconnects images removed from an existing album', async () => {
+  it('clears images through complete membership', async () => {
     const wrapper = mountForm({ discussion: editDiscussion() });
     await flushPromises();
-
-    await editor(wrapper).vm.$emit('update-form-values', {
-      album: { images: [], imageOrder: [] },
-    });
-
-    const ops = (
-      updateInput().Album as { update: { node: { Images: unknown[] } } }
-    ).update.node.Images;
-    expect(
-      ops.some((op) => Object.prototype.hasOwnProperty.call(op, 'disconnect'))
-    ).toBe(true);
+    await editor(wrapper).vm.$emit('update-form-values', { album: { images: [], imageOrder: [] } });
+    expect(updateInput()).toEqual({ imageIds: [] });
   });
 });

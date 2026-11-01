@@ -1,3 +1,4 @@
+import { print } from 'graphql';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 
@@ -13,7 +14,7 @@ const h = vi.hoisted(() => ({
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (fn: any) => {
-    const source = fn?.loc?.source?.body || '';
+    const source = fn ? print(fn) : '';
     let mutate = h.generic;
     if (source.includes('reportImage')) mutate = h.reportImage;
     else if (source.includes('archiveImage')) mutate = h.archiveImage;

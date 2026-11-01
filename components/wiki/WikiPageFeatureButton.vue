@@ -2,8 +2,10 @@
 import { computed } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { config } from '@/config';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import { SET_FEATURED_WIKI_PAGES } from '@/graphQLData/admin/mutations';
+import {
+  GetSiteWideWikiListDocument,
+  GetServerConfigDocument as GET_SERVER_CONFIG, SetFeaturedWikiPagesDocument as SET_FEATURED_WIKI_PAGES
+} from '@/__generated__/operations';
 import { useIsAuthenticated, useUsername } from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { useToast } from '@/composables/useToast';
@@ -42,7 +44,7 @@ const {
   onDone,
   onError,
 } = useMutation(SET_FEATURED_WIKI_PAGES, {
-  refetchQueries: ['getSiteWideWikiList'],
+  refetchQueries: [GetSiteWideWikiListDocument],
 });
 
 onDone((result) => {

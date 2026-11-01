@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GET_OWNED_CHANNELS } from '@/graphQLData/user/queries';
+import { GetOwnedChannelsDocument as GET_OWNED_CHANNELS } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import ChannelList from '@/components/channel/ChannelList.vue';
 import { useRoute } from 'nuxt/app';
@@ -31,15 +31,15 @@ const { result, loading, error } = useQuery(
     <div
       v-else-if="
         result?.users?.length === 0 ||
-        result.users[0]?.AdminOfChannels?.length === 0
+        result?.users?.[0]?.AdminOfChannels?.length === 0
       "
     >
       This user is not a forum owner.
     </div>
     <ChannelList
       v-else
-      :channels="result.users[0].AdminOfChannels"
-      :result-count="result.users[0].AdminOfChannelsConnection.aggregate.count.nodes"
+      :channels="result?.users?.[0]?.AdminOfChannels"
+      :result-count="result?.users?.[0]?.AdminOfChannelsConnection.aggregate.count.nodes"
     />
   </div>
 </template>

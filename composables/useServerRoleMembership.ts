@@ -1,6 +1,7 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GetServerConfigDocument as GET_SERVER_CONFIG } from '@/__generated__/operations';
+
 import { config } from '@/config';
 
 export const useServerRoleMembership = () => {
@@ -28,7 +29,7 @@ export const useServerRoleMembership = () => {
     return (
       result.value?.serverConfigs?.[0]?.Moderators?.map(
         (moderator: { displayName?: string | null }) => moderator.displayName
-      ).filter(Boolean) || []
+      ).filter((value): value is string => typeof value === 'string' && value.length > 0) || []
     );
   });
 

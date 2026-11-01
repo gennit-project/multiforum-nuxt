@@ -1,33 +1,10 @@
+import { GetOwnEmailSource3c35564c1eDocument as GET_OWN_EMAIL } from '@/__generated__/operations';
+import { requestGraphql } from '@/server/utils/typed-graphql';
 // server/api/session/profile.get.ts
 //
 // Same-origin session-backed profile fallback for embedded browsers where
 // localStorage-backed token flows are unreliable or unavailable.
-import type { OwnEmail } from '@/__generated__/graphql';
 import { getServerGraphqlUrl } from '@/server/utils/local-auth';
-
-type OwnEmailResponse = {
-  errors?: readonly unknown[];
-  data?: {
-    getOwnEmail?: Pick<
-      OwnEmail,
-      | 'username'
-      | 'profilePicURL'
-      | 'modProfileName'
-      | 'unreadNotificationCount'
-    > | null;
-  };
-};
-
-const GET_OWN_EMAIL = /* GraphQL */ `
-  query getOwnEmail {
-    getOwnEmail {
-      username
-      profilePicURL
-      modProfileName
-      unreadNotificationCount
-    }
-  }
-`;
 
 export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Cache-Control', 'no-store');
@@ -59,16 +36,17 @@ export default defineEventHandler(async (event) => {
       return session;
     }
 
-    const res = await $fetch<OwnEmailResponse>(graphqlUrl, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        authorization: `Bearer ${accessToken}`,
-      },
-      body: {
-        query: GET_OWN_EMAIL,
-      },
-    });
+    const res = await requestGraphql(
+      graphqlUrl,
+      GET_OWN_EMAIL,
+      {},
+      {
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
     // An empty username is only conclusive after a successful, complete lookup.
     if (res.errors?.length || !res.data || !('getOwnEmail' in res.data)) {

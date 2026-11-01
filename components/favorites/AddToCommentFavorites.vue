@@ -1,12 +1,12 @@
 <script setup lang="ts">
+import {
+  GetUserFavoriteCommentDocument as GET_USER_FAVORITE_COMMENT,
+  AddFavoriteCommentDocument as ADD_FAVORITE_COMMENT,
+  RemoveFavoriteCommentDocument as REMOVE_FAVORITE_COMMENT,
+} from '@/__generated__/operations';
 import { computed } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { gql } from '@apollo/client/core';
-import {
-  ADD_FAVORITE_COMMENT,
-  REMOVE_FAVORITE_COMMENT,
-} from '@/graphQLData/user/mutations';
 import { useUsername } from '@/composables/useAuthState';
 import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
 import { useFavoritedState } from '@/composables/useFavoritedState';
@@ -37,12 +37,6 @@ const props = defineProps({
   },
 });
 
-const GET_USER_FAVORITE_COMMENT = gql`
-  query getUserFavoriteComment($commentId: ID!) {
-    getUserFavoriteComment(commentId: $commentId)
-  }
-`;
-
 const shouldLookupFavorite = computed(() => props.isFavorited === null);
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
@@ -51,7 +45,8 @@ const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
     commentId: props.commentId,
   }),
   () => ({
-    enabled: shouldLookupFavorite.value && !!props.commentId && !!usernameVar.value,
+    enabled:
+      shouldLookupFavorite.value && !!props.commentId && !!usernameVar.value,
   })
 );
 
@@ -78,7 +73,7 @@ const { isLoading, handleToggleFavorite } = useFavoriteToggle({
   removedMessage: () => `${props.entityName} removed from favorites.`,
   addFavorite,
   removeFavorite,
-  mutationItemKey: 'commentId',
+  variables: (itemId, username) => ({ commentId: itemId, username }),
   onAfterToggle: () => {
     if (shouldLookupFavorite.value) {
       refetchFavorites();

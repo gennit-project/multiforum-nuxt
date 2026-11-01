@@ -210,7 +210,7 @@ describe('EventListItem', () => {
         ],
       });
 
-    it('builds a per-channel detail option with a pluralized comment count', () => {
+    it('builds a per-channel detail option without inventing unselected counts', () => {
       const wrapper = mountItem(multiChannelEvent());
       const options = (
         wrapper.vm as unknown as {
@@ -218,7 +218,7 @@ describe('EventListItem', () => {
         }
       ).eventDetailOptions;
       expect(options).toContainEqual({
-        label: '1 comment in cats',
+        label: 'View in cats',
         value: '/forums/cats/events/e5',
         event: '',
       });

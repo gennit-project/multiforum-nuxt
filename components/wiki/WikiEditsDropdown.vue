@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import type { PropType } from 'vue';
-import type { WikiPage, TextVersion } from '@/__generated__/graphql';
+import type {
+  WikiPageSelection as WikiPage,
+  WikiRevisionSelection as TextVersion,
+} from '@/types/Wiki';
 import {
   usePopoverPositioning,
   type PopoverPosition,
@@ -15,7 +18,6 @@ import {
 import WikiRevisionDiffModal from './WikiRevisionDiffModal.vue';
 
 type WikiRevisionData = RevisionPair<TextVersion>;
-type WikiPageWithEditReason = WikiPage & { editReason?: string | null };
 
 const props = defineProps({
   wikiPage: {
@@ -49,14 +51,9 @@ const allEdits = computed(() => {
   const currentVersion: TextVersion = {
     id: 'current',
     body: props.wikiPage.body,
-    editReason: (props.wikiPage as WikiPageWithEditReason).editReason,
+    editReason: props.wikiPage.editReason,
     createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
     Author: props.wikiPage.VersionAuthor,
-    AuthorConnection: {
-      edges: [],
-      pageInfo: { hasNextPage: false, hasPreviousPage: false },
-      totalCount: 0,
-    },
   };
 
   return buildSequentialRevisionPairs({

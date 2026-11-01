@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, reactive } from 'vue';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import {
   asMock,
@@ -189,6 +189,24 @@ describe('SitewideDiscussionList', () => {
     const wrapper = mountList();
     await wrapper.find('.load-more-stub').trigger('click');
     expect(fetchMore).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not merge a page after changing the search filter', async () => {
+    const fetchMore = vi.fn();
+    setupQueries({
+      ...createQueryMock(listResult([makeDiscussion('1')], 5)),
+      fetchMore,
+    });
+    const query = reactive({ searchInput: '' });
+    const wrapper = mountList({ query });
+    await wrapper.find('.load-more-stub').trigger('click');
+    const previous = listResult([makeDiscussion('1')]);
+    query.searchInput = 'new search';
+    expect(
+      fetchMore.mock.calls[0][0].updateQuery(previous, {
+        fetchMoreResult: listResult([makeDiscussion('2')]),
+      })
+    ).toBe(previous);
   });
 
   it('loads the next discussion page from the returned cursor', async () => {

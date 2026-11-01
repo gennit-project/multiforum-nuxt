@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {
-  DiscussionPresentation as Discussion,
+  DiscussionPresentation,
   PresentationRevision as TextVersion,
 } from '@/types/DiscussionPresentation';
 import {
@@ -18,6 +18,7 @@ import {
   type PopoverPosition,
 } from '@/composables/usePopoverPositioning';
 import { timeAgo } from '@/utils';
+type Discussion = Partial<Pick<DiscussionPresentation, 'body' | 'createdAt' | 'updatedAt' | 'PastBodyVersions' | 'BodyLastEditedBy'>>;
 type User = NonNullable<TextVersion['Author']>;
 
 const RevisionDiffModal = defineAsyncComponent(

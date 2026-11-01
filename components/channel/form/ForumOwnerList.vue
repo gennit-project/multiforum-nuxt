@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GET_CHANNEL_OWNERS_BY_CHANNEL } from '@/graphQLData/mod/queries';
+import { GetChannelOwnersByChannelDocument as GET_CHANNEL_OWNERS_BY_CHANNEL } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 
@@ -32,7 +32,7 @@ defineEmits(['click-remove-owner']);
     <div
       v-else-if="
         result?.channels?.length === 0 ||
-        result.channels[0]?.Admins?.length === 0
+        result?.channels[0]?.Admins?.length === 0
       "
     >
       This forum has no owners.

@@ -3,17 +3,9 @@ import { computed, ref } from 'vue';
 import { useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import removeMarkdown from 'remove-markdown';
-import type {
-  Album,
-  Channel,
-  Comment,
-  Discussion,
-  DiscussionChannel,
-  Image,
-  User,
-} from '@/__generated__/graphql';
+import type { GetUnifiedLibraryFavoritesQuery } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
-import { GET_UNIFIED_LIBRARY_FAVORITES } from '@/graphQLData/library/queries';
+import { GetUnifiedLibraryFavoritesDocument as GET_UNIFIED_LIBRARY_FAVORITES } from '@/__generated__/operations';
 import { getCommentPermalink } from '@/utils/commentUtils';
 import {
   getDiscussionLink,
@@ -28,66 +20,12 @@ import type {
   LibraryFavoriteSource,
 } from '@/types/library';
 
-type UserSummary = Pick<User, 'username' | 'displayName' | 'profilePicURL'>;
-type ChannelSummary = Pick<
-  Channel,
-  'uniqueName' | 'displayName' | 'channelIconURL'
+type FavoritesUser = GetUnifiedLibraryFavoritesQuery['users'][number];
+type FavoriteDiscussion = FavoritesUser['FavoriteDiscussions'][number];
+type UserSummary = NonNullable<FavoriteDiscussion['Author']>;
+type ChannelSummary = NonNullable<
+  FavoriteDiscussion['DiscussionChannels'][number]['Channel']
 >;
-type DiscussionChannelSummary = Pick<DiscussionChannel, 'channelUniqueName'> & {
-  Channel?: ChannelSummary | null;
-};
-type AlbumImageSummary = Pick<Image, 'id' | 'url'>;
-type FavoriteDiscussion = Pick<
-  Discussion,
-  'id' | 'title' | 'body' | 'createdAt' | 'hasDownload'
-> & {
-  Author?: UserSummary | null;
-  DiscussionChannels?: DiscussionChannelSummary[] | null;
-  Album?:
-    | (Pick<Album, 'id' | 'imageOrder'> & {
-        Images?: AlbumImageSummary[] | null;
-      })
-    | null;
-};
-type FavoriteImage = Pick<
-  Image,
-  'id' | 'url' | 'alt' | 'caption' | 'createdAt'
-> & {
-  Uploader?: UserSummary | null;
-  Albums?: Array<{
-    id: string;
-    Discussions?: Array<{
-      DiscussionChannels?: DiscussionChannelSummary[] | null;
-    }> | null;
-  }> | null;
-};
-type FavoriteComment = Pick<Comment, 'id' | 'text' | 'createdAt'> & {
-  CommentAuthor?:
-    | ({ __typename?: 'User' } & UserSummary)
-    | { __typename?: 'ModerationProfile'; displayName?: string | null }
-    | null;
-  DiscussionChannel?:
-    | (Pick<DiscussionChannel, 'discussionId' | 'channelUniqueName'> & {
-        Channel?: ChannelSummary | null;
-        Discussion?: Pick<Discussion, 'title' | 'hasDownload'> | null;
-      })
-    | null;
-  Channel?: ChannelSummary | null;
-};
-type FavoriteChannel = Pick<
-  Channel,
-  'uniqueName' | 'displayName' | 'description' | 'channelIconURL' | 'createdAt'
-> & {
-  Admins?: UserSummary[] | null;
-};
-type UnifiedFavoritesResult = {
-  users?: Array<{
-    FavoriteDiscussions?: FavoriteDiscussion[] | null;
-    FavoriteImages?: FavoriteImage[] | null;
-    FavoriteComments?: FavoriteComment[] | null;
-    FavoriteChannels?: FavoriteChannel[] | null;
-  }> | null;
-};
 
 type FilterOption = {
   key: 'all' | LibraryFavoriteKind;
@@ -110,7 +48,7 @@ const filterOptions: FilterOption[] = [
   { key: 'channel', label: 'Forums' },
 ];
 
-const { result, loading, error } = useQuery<UnifiedFavoritesResult>(
+const { result, loading, error } = useQuery(
   GET_UNIFIED_LIBRARY_FAVORITES,
   () => ({ username: username.value }),
   () => ({
@@ -207,7 +145,7 @@ const commentItems = computed<LibraryFavoriteItem[]>(() =>
   (result.value?.users?.[0]?.FavoriteComments || []).map((comment) => {
     const forum = comment.DiscussionChannel?.Channel || comment.Channel;
     const uploader =
-      comment.CommentAuthor?.__typename === 'User'
+      comment.CommentAuthor && 'username' in comment.CommentAuthor
         ? comment.CommentAuthor
         : null;
     const contextTitle =

@@ -1,11 +1,11 @@
 import { ref, computed, watch } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import type { Ref, ComputedRef } from 'vue';
-import { UPDATE_ISSUE } from '@/graphQLData/issue/mutations';
-import type { Issue } from '@/__generated__/graphql';
+import { UpdateIssueDocument as UPDATE_ISSUE } from '@/__generated__/operations';
+import type { IssueView as Issue } from '@/types/Issue';
 
 type UseIssueBodyEditParams = {
-  activeIssue: Ref<Issue | null> | ComputedRef<Issue | null>;
+  activeIssue: Ref<Partial<Pick<Issue, 'body'>> | null> | ComputedRef<Partial<Pick<Issue, 'body'>> | null>;
   activeIssueId: Ref<string> | ComputedRef<string>;
   isIssueAuthor: Ref<boolean> | ComputedRef<boolean>;
   isLocked: Ref<boolean> | ComputedRef<boolean>;
@@ -38,8 +38,8 @@ export function useIssueBodyEdit({
     error: updateIssueBodyError,
   } = useMutation(UPDATE_ISSUE, () => ({
     variables: {
-      issueWhere: { id: activeIssueId.value },
-      updateIssueInput: { body: editedIssueBody.value },
+      issueWhere: { id: { eq: activeIssueId.value } },
+      updateIssueInput: { body: { set: editedIssueBody.value } },
     },
   }));
 

@@ -2,7 +2,7 @@
 import { computed, ref, onMounted } from 'vue';
 import type { PropType } from 'vue';
 import type { ApolloError } from '@apollo/client/errors';
-import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import type { ServerSettingsFormValues } from '@/types/ServerSettings';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import TailwindForm from '@/components/FormComponent.vue';
 import SaveStatus from '@/components/settings/SaveStatus.vue';
@@ -35,7 +35,7 @@ const props = defineProps({
     default: false,
   },
   formValues: {
-    type: Object as PropType<ServerConfigUpdateInput | null>,
+    type: Object as PropType<ServerSettingsFormValues | null>,
     required: false,
     default: null,
   },

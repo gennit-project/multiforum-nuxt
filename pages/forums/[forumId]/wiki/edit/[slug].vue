@@ -1,12 +1,18 @@
 <script setup lang="ts">
+import {
+  WriteWikiPageDocument,
+  GetSiteWideWikiListDocument,
+  GetWikiPageDocument as GET_WIKI_PAGE,
+  GetChannelDocument as GET_CHANNEL,
+} from '@/__generated__/operations';
+import {
+  updateWikiPageVariables,
+  wikiWriteListVariables,
+  wikiWriteChannelVariables,
+} from '@/utils/wikiWrites';
 import { ref, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { GET_WIKI_PAGE, GET_CHANNEL } from '@/graphQLData/channel/queries';
-import {
-  UPDATE_WIKI_PAGE,
-  UPDATE_CHANNEL,
-} from '@/graphQLData/channel/mutations';
 import TextEditor from '@/components/TextEditor.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -22,23 +28,25 @@ const usernameVar = useUsername();
 
 const route = useRoute();
 const router = useRouter();
-const forumId = route.params.forumId as string;
-const slug = route.params.slug as string;
+const forumId = computed(() =>
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
+);
+const slug = computed(() =>
+  typeof route.params.slug === 'string' ? route.params.slug : ''
+);
 
-// Determine if we're editing the home page
-const isHomePage = computed(() => slug === 'home');
-
-// Query wiki page data for non-home pages
+// Load the selected page, including lock state, for both home and child editors.
 const {
   result: wikiPageResult,
   loading: wikiPageLoading,
   error: wikiPageError,
 } = useQuery(
   GET_WIKI_PAGE,
-  { channelUniqueName: forumId, slug: slug },
+  () => ({ channelUniqueName: forumId.value, slug: slug.value }),
   {
     errorPolicy: 'all',
-    enabled: !isHomePage.value, // Only run this query for non-home pages
+    enabled: computed(() => !!forumId.value && !!slug.value),
+    keepPreviousResult: false,
   }
 );
 
@@ -47,33 +55,17 @@ const {
   result: channelResult,
   loading: channelLoading,
   error: channelError,
-} = useQuery(
-  GET_CHANNEL,
-  { uniqueName: forumId },
-  {
-    errorPolicy: 'all',
-  }
-);
+} = useQuery(GET_CHANNEL, () => ({ uniqueName: forumId.value }), {
+  errorPolicy: 'all',
+});
 
 const channel = computed(() => channelResult.value?.channels?.[0] ?? null);
 
-// Computed property for the wiki page data
-const wikiPage = computed(() => {
-  if (isHomePage.value) {
-    return channel.value?.WikiHomePage;
-  } else {
-    return wikiPageResult.value?.wikiPages?.[0];
-  }
-});
-
-// Computed loading and error states
-const loading = computed(() => {
-  return isHomePage.value ? channelLoading.value : wikiPageLoading.value;
-});
-
-const error = computed(() => {
-  return isHomePage.value ? channelError.value : wikiPageError.value;
-});
+const wikiPage = computed(() =>
+  wikiPageResult.value?.wikiPages.find((page) => page.slug === slug.value)
+);
+const loading = computed(() => wikiPageLoading.value || channelLoading.value);
+const error = computed(() => wikiPageError.value || channelError.value);
 
 const {
   activeSuspension,
@@ -110,6 +102,14 @@ const formValues = ref({
 // Initialize form with existing wiki data when available
 const dataLoaded = ref(false);
 watch(
+  [forumId, slug],
+  () => {
+    dataLoaded.value = false;
+    formValues.value = { title: '', body: '', editReason: '', slug: '' };
+  },
+  { flush: 'sync' }
+);
+watch(
   wikiPage,
   (newWikiPage) => {
     if (newWikiPage && !dataLoaded.value) {
@@ -125,90 +125,62 @@ watch(
   { immediate: true }
 );
 
-// Update wiki page mutation (for non-home pages)
+const submitting = ref(false);
 const {
-  mutate: updateWikiPage,
-  loading: isUpdatingWikiPage,
-  error: updateWikiPageError,
-  onDone: onWikiPageDone,
-} = useMutation(UPDATE_WIKI_PAGE);
+  mutate: writeWikiPage,
+  loading: mutationLoading,
+  error: updateError,
+} = useMutation(WriteWikiPageDocument);
+const isUpdating = computed(() => submitting.value || mutationLoading.value);
 
-// Update channel mutation (for home page)
-const {
-  mutate: updateChannel,
-  loading: isUpdatingChannel,
-  error: updateChannelError,
-  onDone: onChannelDone,
-} = useMutation(UPDATE_CHANNEL);
-
-// Computed loading and error states for mutations
-const isUpdating = computed(() => {
-  return isHomePage.value ? isUpdatingChannel.value : isUpdatingWikiPage.value;
-});
-
-const updateError = computed(() => {
-  return isHomePage.value
-    ? updateChannelError.value
-    : updateWikiPageError.value;
-});
-
-// Handle form submission
-function handleSubmit() {
-  if (wikiEditBlockedBySuspension.value) return;
-  if (wikiEditBlockedByLock.value) return;
+async function handleSubmit() {
+  if (
+    isUpdating.value ||
+    !forumId.value ||
+    !usernameVar.value ||
+    !wikiPage.value ||
+    loading.value ||
+    wikiEditBlockedBySuspension.value ||
+    wikiEditBlockedByLock.value
+  )
+    return;
   if (!formValues.value.title || !formValues.value.body) return;
-
-  if (isHomePage.value) {
-    // Update home page via channel
-    const updateInput = {
-      WikiHomePage: {
-        update: {
-          node: {
-            title: formValues.value.title,
-            body: formValues.value.body,
-            editReason: formValues.value.editReason || null,
-            VersionAuthor: {
-              connect: {
-                where: {
-                  node: {
-                    username: usernameVar.value,
-                  },
-                },
-              },
-            },
+  const submittedForum = forumId.value;
+  const submittedSlug = slug.value;
+  const pageId = wikiPage.value.id;
+  submitting.value = true;
+  try {
+    const result = await writeWikiPage(
+      updateWikiPageVariables(formValues.value, submittedForum, pageId),
+      {
+        awaitRefetchQueries: true,
+        refetchQueries: [
+          {
+            query: GET_CHANNEL,
+            variables: wikiWriteChannelVariables(submittedForum),
           },
-        },
-      },
-    };
-
-    updateChannel({
-      where: { uniqueName: { eq: forumId } },
-      update: updateInput,
-    });
-  } else {
-    // Update regular wiki page
-    const updateInput = {
-      title: formValues.value.title,
-      body: formValues.value.body,
-      editReason: formValues.value.editReason || null,
-      VersionAuthor: {
-        connect: {
-          where: {
-            node: {
-              username: usernameVar.value,
-            },
+          {
+            query: GetSiteWideWikiListDocument,
+            variables: wikiWriteListVariables(submittedForum),
           },
-        },
-      },
-    };
-
-    updateWikiPage({
-      where: {
-        channelUniqueName: forumId,
-        slug: slug,
-      },
-      update: updateInput,
-    });
+        ],
+      }
+    );
+    if (
+      result?.data?.writeWikiPage &&
+      forumId.value === submittedForum &&
+      slug.value === submittedSlug
+    ) {
+      const target =
+        submittedSlug === 'home' ? '' : `/${result.data.writeWikiPage.slug}`;
+      await router.push(
+        `/forums/${submittedForum}/wiki${target}?t=${Date.now()}`
+      );
+    }
+  } catch {
+    // Apollo's error ref supplies the existing form error banner.
+  } finally {
+    submitting.value = false;
   }
 }
 
@@ -221,21 +193,6 @@ function updateSlug(value: string) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
-
-// Handle mutation completion
-const handleDone = () => {
-  // Navigate back to the correct wiki page based on the slug
-  if (slug === 'home') {
-    // Navigate to wiki home page
-    router.push(`/forums/${forumId}/wiki?t=${Date.now()}`);
-  } else {
-    // Navigate to the child wiki page
-    router.push(`/forums/${forumId}/wiki/${slug}?t=${Date.now()}`);
-  }
-};
-
-onWikiPageDone(handleDone);
-onChannelDone(handleDone);
 </script>
 
 <template>

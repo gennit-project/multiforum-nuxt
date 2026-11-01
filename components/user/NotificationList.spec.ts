@@ -46,6 +46,8 @@ const notification = (overrides: Record<string, unknown> = {}) => ({
 const userData = (notifications: unknown[], count?: number) => ({
   users: [
     {
+      username: 'alice',
+      profilePicURL: null,
       Notifications: notifications,
       NotificationsAggregate: {
         aggregate: { count: { nodes: count ?? notifications.length } },
@@ -177,14 +179,14 @@ describe('NotificationList actions', () => {
     expect(h.fetchMore).toHaveBeenCalled();
   });
 
-  it('merges fetched pages via updateQuery', async () => {
+  it('merges overlapping fetched pages without duplicate notifications', async () => {
     h.result = ref(userData([notification({ id: 'n1' })], 10));
     const wrapper = mountList();
     await wrapper.getComponent({ name: 'LoadMore' }).vm.$emit('load-more');
 
     const { updateQuery } = h.fetchMore.mock.calls[0][0];
     const merged = updateQuery(userData([notification({ id: 'n1' })]), {
-      fetchMoreResult: userData([notification({ id: 'n2' })]),
+      fetchMoreResult: userData([notification({ id: 'n1' }), notification({ id: 'n2' })]),
     });
 
     expect(merged.users[0].Notifications).toHaveLength(2);

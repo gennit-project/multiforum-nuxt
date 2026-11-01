@@ -11,14 +11,12 @@ import WarningModal from '@/components/WarningModal.vue';
 import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
-  type SignedStorageUrlPayload,
 } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
 import type { EditAccountSettingsFormValues } from '@/types/User';
 import FormComponent from '../FormComponent.vue';
 import { MAX_CHARS_IN_USER_BIO } from '@/utils/constants';
-import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
-import { PERMANENTLY_DELETE_PROFILE_IMAGE } from '@/graphQLData/user/mutations';
+import { CreateSignedUrlDocument as CREATE_SIGNED_STORAGE_URL, PermanentlyDeleteProfileImageDocument as PERMANENTLY_DELETE_PROFILE_IMAGE  } from '@/__generated__/operations';
 import { isFileSizeValid } from '@/utils/index';
 
 type FileChangeInput = {
@@ -94,7 +92,7 @@ const upload = async (file: File) => {
     });
 
     const signedUpload = signedUrlResult?.data
-      ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+      ?.createSignedStorageURL;
     const signedStorageURL = signedUpload?.url || '';
 
     const embeddedLink = await uploadAndGetEmbeddedLink({

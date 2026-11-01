@@ -206,12 +206,12 @@ describe('event edit page', () => {
     wrapper.findComponent(CreateEditEventFields).vm.$emit('submit');
     await wrapper.vm.$nextTick();
 
-    wrapper.findComponent(EditScopeModal).vm.$emit('confirm', 'future');
+    wrapper.findComponent(EditScopeModal).vm.$emit('confirm', 'THIS_AND_FUTURE');
 
     expect(mockState.updateSeries).toHaveBeenCalledWith(
       expect.objectContaining({
         eventId: 'e1',
-        scope: 'future',
+        scope: 'THIS_AND_FUTURE',
       })
     );
   });

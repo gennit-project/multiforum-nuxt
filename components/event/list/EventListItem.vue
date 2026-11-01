@@ -9,7 +9,7 @@ import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
 import SeriesOccurrenceButtons from './SeriesOccurrenceButtons.vue';
 import type { PropType } from 'vue';
-import type { Event } from '@/__generated__/graphql';
+import type { EventListPresentation as Event } from '@/types/EventPresentation';
 import type { SearchEventValues } from '@/types/Event';
 import { useRoute, useRouter } from 'nuxt/app';
 import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
@@ -92,9 +92,8 @@ const eventDetailOptions = computed(() => {
     return [];
   }
   return props.event.EventChannels.map((dc) => {
-    const commentCount = dc.CommentsConnection?.aggregate?.count?.nodes || 0;
     return {
-      label: `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
+      label: `View in ${dc.channelUniqueName}`,
       value: `/forums/${dc.channelUniqueName}/events/${props.event.id}`,
       event: '',
     };
@@ -195,16 +194,7 @@ const commentCount = computed(() => props.event?.CommentsConnection?.aggregate?.
 const channelCount = computed(() => props.event?.EventChannels.length || 0);
 
 // Series-related computed properties
-// Note: EventSeries is a new field that may not be in generated types yet
-const eventWithSeries = computed(
-  () =>
-    props.event as Event & {
-      EventSeries?: {
-        id?: string;
-        Occurrences?: Array<{ id: string; startTime: string }>;
-      };
-    }
-);
+const eventWithSeries = computed(() => props.event);
 const isPartOfSeries = computed(() =>
   Boolean(eventWithSeries.value?.EventSeries?.id)
 );

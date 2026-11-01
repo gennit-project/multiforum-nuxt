@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GetChannelDocument as GET_CHANNEL, GetServerConfigDocument as GET_SERVER_CONFIG  } from '@/__generated__/operations';
+
+
 import LockChannelDialog from '@/components/mod/LockChannelDialog.vue';
 import UnlockChannelDialog from '@/components/mod/UnlockChannelDialog.vue';
 import LockClosedIcon from '@/components/icons/LockClosedIcon.vue';

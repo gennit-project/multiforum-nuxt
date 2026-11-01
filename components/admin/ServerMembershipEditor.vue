@@ -3,14 +3,7 @@ import { computed, ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { config } from '@/config';
 import WarningModal from '@/components/WarningModal.vue';
-import {
-  REMOVE_SERVER_ADMIN,
-  REMOVE_SERVER_MODERATOR,
-  INVITE_SERVER_ADMIN,
-  CANCEL_INVITE_SERVER_ADMIN,
-  INVITE_SERVER_MOD,
-  CANCEL_INVITE_SERVER_MOD,
-} from '@/graphQLData/admin/mutations';
+import { RemoveServerAdminDocument as REMOVE_SERVER_ADMIN, RemoveServerModeratorDocument as REMOVE_SERVER_MODERATOR, InviteServerAdminDocument as INVITE_SERVER_ADMIN, CancelInviteServerAdminDocument as CANCEL_INVITE_SERVER_ADMIN, InviteServerModDocument as INVITE_SERVER_MOD, CancelInviteServerModDocument as CANCEL_INVITE_SERVER_MOD } from '@/__generated__/operations';
 
 type ServerUser = {
   username?: string | null;

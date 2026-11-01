@@ -1,3 +1,5 @@
+import { CreateDiscussionDocument } from '@/__generated__/operations';
+import { variableErrors } from '@/tests/utils/operationVariables';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -14,6 +16,7 @@ type CreateMutationOptions = {
     input: Array<{
       discussionCreateInput: DiscussionCreateInput;
       channelConnections: string[];
+      crosspostedDiscussionId?: string;
       channelFlairSelections: Array<{
         channelUniqueName: string;
         flairIds: string[];
@@ -49,7 +52,7 @@ let capturedCreateOptions: (() => CreateMutationOptions) | null = null;
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
-    params: { forumId: mockRouteForumId.value || undefined },
+    params: { get forumId() { return mockRouteForumId.value || undefined; } },
     query: {},
   }),
   useRouter: () => ({
@@ -69,15 +72,17 @@ vi.mock('@vue/apollo-composable', () => ({
       },
     };
   }),
-  useQuery: vi.fn((document: { definitions?: Array<{ name?: { value?: string } }> }) => ({
-    result:
-      document.definitions?.[0]?.name?.value ===
-      'getChannelDiscussionFlairConfig'
-        ? mockFlairConfigResult
-        : ref(null),
-    loading: ref(false),
-    error: ref(null),
-  })),
+  useQuery: vi.fn(
+    (document: { definitions?: Array<{ name?: { value?: string } }> }) => ({
+      result:
+        document.definitions?.[0]?.name?.value ===
+        'getChannelDiscussionFlairConfig'
+          ? mockFlairConfigResult
+          : ref(null),
+      loading: ref(false),
+      error: ref(null),
+    })
+  ),
   useApolloClient: () => ({
     resolveClient: () => ({ query: mockApolloClientQuery }),
   }),
@@ -252,14 +257,63 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     );
   });
 
-  it('builds the title and author into the create input', async () => {
+  it('does not redirect a completed creation after navigating to another forum', async () => {
+    const wrapper = mountCD();
+    await wrapper.find('[data-testid="submit"]').trigger('click');
+    mockRouteForumId.value = 'dogs';
+    onDoneCallbacks[0]({ data: { createDiscussionWithChannelConnections: [
+      { DiscussionChannels: [{ Discussion: { id: 'created' } }] },
+    ] } });
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('does not redirect a completed creation after the form unmounts', async () => {
+    const wrapper = mountCD();
+    await wrapper.find('[data-testid="submit"]').trigger('click');
+    wrapper.unmount();
+    onDoneCallbacks[0]({ data: { createDiscussionWithChannelConnections: [
+      { DiscussionChannels: [{ Discussion: { id: 'created' } }] },
+    ] } });
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('does not navigate twice for repeated creation completion', () => {
+    mountCD();
+    const response = { data: { createDiscussionWithChannelConnections: [
+      { DiscussionChannels: [{ Discussion: { id: 'created' } }] },
+    ] } };
+    onDoneCallbacks[0](response);
+    onDoneCallbacks[0](response);
+    expect(mockPush).toHaveBeenCalledTimes(1);
+  });
+
+  it('builds the title and leaves author assignment to authenticated backend context', async () => {
     const wrapper = mountCD();
     await fields(wrapper).vm.$emit('update-form-values', { title: 'My Title' });
 
-    expect(buildInput()).toMatchObject({
+    expect({
+      title: buildInput().title,
+      suppliesAuthor: 'Author' in buildInput(),
+    }).toEqual({
       title: 'My Title',
-      Author: { connect: { where: { node: { username: 'alice' } } } },
+      suppliesAuthor: false,
     });
+  });
+
+  it('sends a schema-valid normal create payload without obsolete author connections', async () => {
+    const wrapper = mountCD();
+    await fields(wrapper).vm.$emit('update-form-values', {
+      title: 'T',
+      selectedTags: ['cats'],
+      album: { images: [{ id: 'image-1' }], imageOrder: ['image-1'] },
+      crosspostId: 'source',
+    });
+    expect(
+      variableErrors(
+        CreateDiscussionDocument,
+        capturedCreateOptions!().variables
+      )
+    ).toEqual([]);
   });
 
   it('adds an Album to the create input when images are present', async () => {
@@ -273,9 +327,11 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
 
   it('connects a crossposted discussion when a crosspost id is set', async () => {
     const wrapper = mountCD();
-    await fields(wrapper).vm.$emit('update-form-values', { crosspostId: 'src-1' });
+    await fields(wrapper).vm.$emit('update-form-values', {
+      crosspostId: 'src-1',
+    });
 
-    expect(buildInput().CrosspostedDiscussion).toBeTruthy();
+    expect(capturedCreateOptions!().variables.input[0].crosspostedDiscussionId).toBe('src-1');
   });
 
   it('submits the selected flair IDs for the routed channel', async () => {
@@ -350,8 +406,8 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     expect({
       configs: fields(wrapper)
         .props('discussionFlairConfigs')
-        .map((config: { channelUniqueName: string }) =>
-          config.channelUniqueName
+        .map(
+          (config: { channelUniqueName: string }) => config.channelUniqueName
         ),
       selections: buildChannelFlairSelections(),
     }).toEqual({
@@ -428,27 +484,28 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
       selectedChannels: ['cats'],
     });
 
-    expect(fields(wrapper).props('formValues').selectedFlairIdsByChannel).toEqual({
+    expect(
+      fields(wrapper).props('formValues').selectedFlairIdsByChannel
+    ).toEqual({
       cats: ['cats-flair'],
     });
   });
 
-  it('writes the new discussion into the channel list cache', () => {
+  it('updates existing scoped channel lists without fabricating a cache miss', () => {
     mountCD();
     const cache = {
-      readQuery: vi.fn(() => null),
-      writeQuery: vi.fn(),
+      modify: vi.fn(),
     };
     capturedCreateOptions!().update(cache, {
       data: {
-        createDiscussionWithChannelConnections: {
-          DiscussionChannels: [
-            { Channel: { uniqueName: 'cats' }, id: 'dc-1' },
-          ],
-        },
+        createDiscussionWithChannelConnections: [
+          {
+            DiscussionChannels: [{ channelUniqueName: 'cats', id: 'dc-1' }],
+          },
+        ],
       },
     });
 
-    expect(cache.writeQuery).toHaveBeenCalledTimes(1);
+    expect(cache.modify).toHaveBeenCalledTimes(1);
   });
 });

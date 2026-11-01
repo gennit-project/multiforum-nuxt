@@ -2,7 +2,10 @@
 import { config } from '@/config';
 import { computed } from 'vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
-import { GET_CHANNEL, GET_WIKI_PAGE } from '@/graphQLData/channel/queries';
+import {
+  GetChannelDocument as GET_CHANNEL,
+  GetWikiPageDocument as GET_WIKI_PAGE,
+} from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -21,8 +24,12 @@ import { useWikiPageLockPermissions } from '@/composables/useWikiPageLockPermiss
 
 const route = useRoute();
 const router = useRouter();
-const forumId = route.params.forumId as string;
-const slug = route.params.slug as string;
+const forumId = computed(() =>
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
+);
+const slug = computed(() =>
+  typeof route.params.slug === 'string' ? route.params.slug : ''
+);
 const uiStore = useUIStore();
 const { fontSize } = storeToRefs(uiStore);
 
@@ -34,15 +41,21 @@ const {
   refetch: refetchWikiPage,
 } = useQuery(
   GET_WIKI_PAGE,
+  () => ({
+    channelUniqueName: forumId.value,
+    slug: slug.value,
+  }),
   {
-    channelUniqueName: forumId,
-    slug: slug,
-  },
-  { errorPolicy: 'all' }
+    errorPolicy: 'all',
+    keepPreviousResult: false,
+    enabled: computed(() => !!forumId.value && !!slug.value),
+  }
 );
 
 // Computed property for the wiki page data
-const wikiPage = computed(() => wikiPageResult.value?.wikiPages?.[0]);
+const wikiPage = computed(() =>
+  wikiPageResult.value?.wikiPages.find((page) => page.slug === slug.value)
+);
 
 // Query channel to check if wiki is enabled
 const {
@@ -50,7 +63,11 @@ const {
   loading: channelLoading,
   error: channelError,
   refetch: refetchChannel,
-} = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: 'all' });
+} = useQuery(GET_CHANNEL, () => ({ uniqueName: forumId.value }), {
+  errorPolicy: 'all',
+  keepPreviousResult: false,
+  enabled: computed(() => !!forumId.value && !!slug.value),
+});
 
 // Computed property for the channel data
 const channel = computed(() => channelResult.value?.channels?.[0]);
@@ -64,7 +81,7 @@ const wikiEnabled = computed(() => channel.value?.wikiEnabled);
 
 // Navigate to wiki home
 function goToWikiHome() {
-  router.push(`/forums/${forumId}/wiki`);
+  router.push(`/forums/${forumId.value}/wiki`);
 }
 
 // SEO metadata. Built from the page query's result in a computed and passed
@@ -75,8 +92,8 @@ useHead(
     () =>
       buildWikiPageHead({
         wikiPages: wikiPageResult.value?.wikiPages,
-        forumId,
-        slug,
+        forumId: forumId.value,
+        slug: slug.value,
         serverDisplayName: config.serverDisplayName,
         baseUrl: import.meta.env.VITE_BASE_URL,
       }) ?? {}
@@ -227,7 +244,7 @@ useHead(
 
       <!-- Mobile On This Page Dropdown -->
       <div class="mb-4 block xl:hidden">
-        <OnThisPage :markdown-content="wikiPage.body" :is-mobile="true" />
+        <OnThisPage :markdown-content="wikiPage.body || ''" :is-mobile="true" />
       </div>
 
       <div class="flex flex-col gap-6 xl:flex-row">
@@ -235,7 +252,10 @@ useHead(
         <div class="min-w-0 flex-1 xl:order-2">
           <div class="flex w-full justify-center">
             <div class="w-full max-w-[70ch] min-w-0">
-              <MarkdownRenderer :text="wikiPage.body" :font-size="fontSize" />
+              <MarkdownRenderer
+                :text="wikiPage.body || ''"
+                :font-size="fontSize"
+              />
             </div>
           </div>
 
@@ -266,7 +286,10 @@ useHead(
           class="sticky top-0 hidden max-h-screen w-64 shrink-0 overflow-y-auto xl:order-1 xl:flex"
         >
           <!-- On This Page Navigation -->
-          <OnThisPage :markdown-content="wikiPage.body" :is-mobile="false" />
+          <OnThisPage
+            :markdown-content="wikiPage.body || ''"
+            :is-mobile="false"
+          />
         </div>
 
         <!-- Right sidebar - controls (desktop only) -->

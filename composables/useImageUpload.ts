@@ -1,10 +1,9 @@
 import { ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
+import { CreateSignedUrlDocument as CREATE_SIGNED_STORAGE_URL } from '@/__generated__/operations';
 import {
   uploadAndGetEmbeddedLink,
   getUploadFileName,
-  type SignedStorageUrlPayload,
 } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
 import { isFileSizeValid } from '@/utils/index';
@@ -79,7 +78,7 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
 
       const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
       const signedUpload = signedUrlResult?.data
-        ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
+        ?.createSignedStorageURL;
       const signedStorageURL = signedUpload?.url;
 
       if (!signedStorageURL) {

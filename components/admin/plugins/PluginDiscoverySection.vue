@@ -2,7 +2,7 @@
 import { useMutation } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
 import { useToast } from '@/composables/useToast';
-import { REFRESH_PLUGINS } from '@/graphQLData/admin/mutations';
+import { RefreshPluginsDocument as REFRESH_PLUGINS } from '@/__generated__/operations';
 
 const toast = useToast();
 

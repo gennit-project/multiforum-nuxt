@@ -105,10 +105,10 @@ export type Role = {
 
 // Channel data containing role assignments
 export type PermissionData = {
-  Admins?: Array<{ username: string }> | null;
-  Moderators?: Array<{ displayName: string }> | null;
-  SuspendedMods?: Array<{ modProfileName: string }> | null;
-  SuspendedUsers?: Array<{ username: string }> | null;
+  Admins?: Array<{ username?: string | null } | null> | null;
+  Moderators?: Array<{ displayName?: string | null } | null> | null;
+  SuspendedMods?: Array<{ modProfileName?: string | null } | null> | null;
+  SuspendedUsers?: Array<{ username?: string | null } | null> | null;
   uniqueName?: string | null;
   [key: string]: unknown;
 };
@@ -171,7 +171,7 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
     // ---------- STEP 2: Check if user is a channel owner/admin ----------
     // Channel owners/admins bypass all permission checks and can do anything
     const isChannelOwner =
-      permissionData.Admins?.some((admin) => admin.username === username) ||
+      permissionData.Admins?.some((admin) => !!username && admin?.username === username) ||
       false;
 
     if (isChannelOwner) {
@@ -182,7 +182,7 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
     // Check if the user is a suspended moderator
     const isSuspendedMod =
       permissionData.SuspendedMods?.some(
-        (mod) => mod.modProfileName === modProfileName
+        (mod) => !!modProfileName && mod?.modProfileName === modProfileName
       ) || false;
 
     // Suspended mods generally can't perform moderation actions
@@ -193,7 +193,7 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
     // Check if user is suspended in this channel
     const isSuspendedUser =
       permissionData.SuspendedUsers?.some(
-        (user) => user.username === username
+        (user) => !!username && user?.username === username
       ) || false;
 
     if (isSuspendedUser) {
@@ -205,7 +205,7 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
     // ---------- STEP 4: Check if user is an elevated mod ----------
     const isElevatedMod =
       permissionData.Moderators?.some(
-        (mod) => mod.displayName === modProfileName
+        (mod) => !!modProfileName && mod?.displayName === modProfileName
       ) || false;
 
     // If the user is an elevated mod, use elevated mod role permissions
@@ -299,22 +299,22 @@ export const getAllPermissions = (
 
   // Add role information
   permissions.isChannelOwner =
-    permissionData?.Admins?.some((admin) => admin.username === username) ||
+    permissionData?.Admins?.some((admin) => !!username && admin?.username === username) ||
     false;
 
   permissions.isElevatedMod =
     permissionData?.Moderators?.some(
-      (mod) => mod.displayName === modProfileName
+      (mod) => !!modProfileName && mod?.displayName === modProfileName
     ) || false;
 
   permissions.isSuspendedMod =
     permissionData?.SuspendedMods?.some(
-      (mod) => mod.modProfileName === modProfileName
+      (mod) => !!modProfileName && mod?.modProfileName === modProfileName
     ) || false;
 
   permissions.isSuspendedUser =
     permissionData?.SuspendedUsers?.some(
-      (user) => user.username === username
+      (user) => !!username && user?.username === username
     ) || false;
 
   return permissions;

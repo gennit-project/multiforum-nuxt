@@ -5,9 +5,7 @@ import FormRow from '@/components/FormRow.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginPipelineEditor from '@/components/plugins/PluginPipelineEditor.vue';
 import { useToast } from '@/composables/useToast';
-import { GET_CHANNEL_PLUGIN_PIPELINES } from '@/graphQLData/channel/queries';
-import { UPDATE_CHANNEL_PLUGIN_PIPELINES } from '@/graphQLData/channel/mutations';
-import { GET_INSTALLED_PLUGINS } from '@/graphQLData/admin/queries';
+import { GetChannelPluginPipelinesDocument as GET_CHANNEL_PLUGIN_PIPELINES, UpdateChannelPluginPipelinesDocument as UPDATE_CHANNEL_PLUGIN_PIPELINES , GetInstalledPluginsDocument as GET_INSTALLED_PLUGINS  } from '@/__generated__/operations';
 import type { PipelineConfig } from '@/utils/pipelineSchema';
 import {
   parsePipelinesFromBackend,

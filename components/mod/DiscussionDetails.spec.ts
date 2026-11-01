@@ -4,7 +4,7 @@ import { mount } from '@vue/test-utils';
 
 import DiscussionDetails from '@/components/mod/DiscussionDetails.vue';
 import type { Issue } from '@/__generated__/graphql';
-import { GET_ISSUE_RELATED_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GetIssueRelatedDiscussionDocument as GET_ISSUE_RELATED_DISCUSSION } from '@/__generated__/operations';
 
 const h = vi.hoisted(() => ({
   result: null as unknown,

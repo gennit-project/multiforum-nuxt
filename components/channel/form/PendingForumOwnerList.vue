@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL } from '@/graphQLData/mod/queries';
+import { GetPendingChannelOwnersByChannelDocument as GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 
@@ -34,7 +34,7 @@ defineEmits(['click-cancel-invite']);
     <div
       v-else-if="
         result?.channels?.length === 0 ||
-        result.channels[0]?.PendingOwnerInvites?.length === 0
+        result?.channels[0]?.PendingOwnerInvites?.length === 0
       "
       class="text-sm"
     >

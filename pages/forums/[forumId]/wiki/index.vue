@@ -2,10 +2,9 @@
 import { computed, ref } from 'vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import type { User, WikiPage } from '@/__generated__/graphql';
+import type { WikiSearchSelection as WikiSearchPage } from '@/types/Wiki';
 import { config } from '@/config';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SITE_WIDE_WIKI_LIST } from '@/graphQLData/wiki/queries';
+import { GetChannelDocument as GET_CHANNEL, GetSiteWideWikiListDocument as GET_SITE_WIDE_WIKI_LIST  } from '@/__generated__/operations';
 import ArrowUpRightIcon from '@/components/icons/ArrowUpRightIcon.vue';
 import BookIcon from '@/components/icons/BookIcon.vue';
 import DocumentIcon from '@/components/icons/DocumentIcon.vue';
@@ -27,33 +26,21 @@ import { relativeTime } from '@/utils';
 
 const WIKI_PAGE_LIMIT = 100;
 
-type WikiSearchPage = Pick<
-  WikiPage,
-  | 'id'
-  | 'title'
-  | 'body'
-  | 'slug'
-  | 'channelUniqueName'
-  | 'createdAt'
-  | 'updatedAt'
-> & {
-  VersionAuthor?: Pick<
-    User,
-    'username' | 'displayName' | 'profilePicURL'
-  > | null;
-};
-
 const usernameVar = useUsername();
 const route = useRoute();
 const router = useRouter();
-const forumId = route.params.forumId as string;
+const forumId = computed(() =>
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
+);
 const searchInput = ref('');
 
 const {
   result: channelResult,
   loading: channelLoading,
   error: channelError,
-} = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: 'all' });
+} = useQuery(GET_CHANNEL, () => ({ uniqueName: forumId.value }), {
+  errorPolicy: 'all',
+});
 
 const channel = computed(() => channelResult.value?.channels?.[0]);
 const wikiEnabled = computed(() => channel.value?.wikiEnabled);
@@ -64,15 +51,14 @@ const {
   result: wikiResult,
   loading: wikiLoading,
   error: wikiError,
-} = useQuery(GET_SITE_WIDE_WIKI_LIST, {
-  searchInput,
-  selectedChannels: [forumId],
+} = useQuery(GET_SITE_WIDE_WIKI_LIST, () => ({
+  searchInput: searchInput.value,
+  selectedChannels: [forumId.value],
   options: { limit: WIKI_PAGE_LIMIT, offset: 0 },
-});
+}));
 
 const wikiPages = computed<WikiSearchPage[]>(() => {
-  return (wikiResult.value?.getSiteWideWikiList?.wikiPages ||
-    []) as WikiSearchPage[];
+  return wikiResult.value?.getSiteWideWikiList?.wikiPages || [];
 });
 
 const aggregateWikiPageCount = computed(() => {
@@ -80,11 +66,7 @@ const aggregateWikiPageCount = computed(() => {
 });
 
 const pinnedWikiPageIds = computed(() => {
-  return new Set(
-    (channel.value?.PinnedWikiPages || []).map(
-      (page: Pick<WikiPage, 'id'>) => page.id
-    )
-  );
+  return new Set((channel.value?.PinnedWikiPages || []).map((page) => page.id));
 });
 
 const homePageId = computed(() => wikiHomePage.value?.id);
@@ -138,17 +120,17 @@ const wikiEditSuspensionMessage =
 
 function createWikiPage() {
   if (wikiEditBlockedBySuspension.value) return;
-  router.push(`/forums/${forumId}/wiki/create`);
+  router.push(`/forums/${forumId.value}/wiki/create`);
 }
 
 function createChildWikiPage() {
   if (wikiEditBlockedBySuspension.value) return;
-  router.push(`/forums/${forumId}/wiki/create-child`);
+  router.push(`/forums/${forumId.value}/wiki/create-child`);
 }
 
 function editWikiPage(slug: string) {
   if (wikiEditBlockedBySuspension.value) return;
-  router.push(`/forums/${forumId}/wiki/edit/${slug}`);
+  router.push(`/forums/${forumId.value}/wiki/edit/${slug}`);
 }
 
 function updateSearchInput(value: string) {
@@ -162,7 +144,7 @@ useHead(
     () =>
       buildWikiHomeHead({
         channels: channelResult.value?.channels,
-        forumId,
+        forumId: forumId.value,
         serverDisplayName: config.serverDisplayName,
         baseUrl: import.meta.env.VITE_BASE_URL,
       }) ?? {}
@@ -263,7 +245,7 @@ useHead(
                   data-testid="wiki-page-title"
                   class="mt-1 text-2xl font-semibold tracking-tight wrap-anywhere wrap-break-word sm:text-3xl"
                 >
-                  Explore the {{ channel.displayName || forumId }} wiki
+                  Explore the {{ channel?.displayName || forumId }} wiki
                 </h1>
                 <p
                   class="mt-2 max-w-2xl text-sm leading-6 text-gray-600 sm:text-base dark:text-gray-300"
@@ -343,7 +325,7 @@ useHead(
 
       <div v-else class="mt-8 space-y-10">
         <section
-          v-if="showIntroduction"
+          v-if="showIntroduction && wikiHomePage"
           data-testid="wiki-introduction"
           class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
         >

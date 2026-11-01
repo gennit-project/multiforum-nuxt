@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
+import { GetImageDetailsDocument as GET_IMAGE_DETAILS } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '../ErrorBanner.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
@@ -66,27 +66,9 @@ const formattedDate = computed(() => {
   return stableRelativeTime(image.value.createdAt);
 });
 
-const albumContext = computed(() => {
-  const album = image.value?.Album;
-  if (!album) return null;
-
-  const discussion = album.Discussions?.[0];
-  if (!discussion) return null;
-
-  const channelUniqueName =
-    discussion.DiscussionChannels?.[0]?.channelUniqueName;
-  if (!channelUniqueName) return null;
-
-  return {
-    discussionId: discussion.id,
-    discussionTitle: discussion.title,
-    channelUniqueName,
-  };
-});
-
 onImageResult(({ data }) => {
   if (data?.images?.length) {
-    const uploader = data.images[0].Uploader;
+    const uploader = data.images[0]?.Uploader;
     if (uploader?.username) {
       emit('fetchedOriginalAuthorUsername', uploader.username);
     }
@@ -198,23 +180,7 @@ onImageResult(({ data }) => {
               </p>
               <p>{{ image.copyright }}</p>
             </div>
-            <div v-if="albumContext" class="mt-2">
-              <p class="text-xs font-medium text-gray-500 dark:text-gray-400">
-                Context
-              </p>
-              <nuxt-link
-                :to="{
-                  name: 'forums-forumId-discussions-discussionId',
-                  params: {
-                    forumId: albumContext.channelUniqueName,
-                    discussionId: albumContext.discussionId,
-                  },
-                }"
-                class="text-brand-500 hover:underline"
-              >
-                {{ albumContext.discussionTitle }}
-              </nuxt-link>
-            </div>
+
           </div>
         </div>
       </div>

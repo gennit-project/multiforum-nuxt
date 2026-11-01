@@ -1,20 +1,18 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 import { useCollectionQueries } from '@/composables/useCollectionQueries';
-import * as queries from '@/graphQLData/collection/queries';
-
-vi.mock('@/graphQLData/collection/queries', () => ({
-  GET_USER_COLLECTIONS_DISCUSSIONS: Symbol('GET_USER_COLLECTIONS_DISCUSSIONS'),
-  GET_USER_COLLECTIONS_COMMENTS: Symbol('GET_USER_COLLECTIONS_COMMENTS'),
-  GET_USER_COLLECTIONS_IMAGES: Symbol('GET_USER_COLLECTIONS_IMAGES'),
-  GET_USER_COLLECTIONS_CHANNELS: Symbol('GET_USER_COLLECTIONS_CHANNELS'),
-  GET_USER_COLLECTIONS_DOWNLOADS: Symbol('GET_USER_COLLECTIONS_DOWNLOADS'),
-  CHECK_DISCUSSION_IN_COLLECTIONS: Symbol('CHECK_DISCUSSION_IN_COLLECTIONS'),
-  CHECK_COMMENT_IN_COLLECTIONS: Symbol('CHECK_COMMENT_IN_COLLECTIONS'),
-  CHECK_DOWNLOAD_IN_COLLECTIONS: Symbol('CHECK_DOWNLOAD_IN_COLLECTIONS'),
-  CHECK_IMAGE_IN_COLLECTIONS: Symbol('CHECK_IMAGE_IN_COLLECTIONS'),
-  CHECK_CHANNEL_IN_COLLECTIONS: Symbol('CHECK_CHANNEL_IN_COLLECTIONS'),
-}));
+import {
+  GetUserCollectionsDownloadsDocument as GET_USER_COLLECTIONS_DOWNLOADS,
+  GetUserCollectionsChannelsDocument as GET_USER_COLLECTIONS_CHANNELS,
+  CheckDiscussionInCollectionsDocument as CHECK_DISCUSSION_IN_COLLECTIONS,
+  GetUserCollectionsDiscussionsDocument as GET_USER_COLLECTIONS_DISCUSSIONS,
+  GetUserCollectionsImagesDocument as GET_USER_COLLECTIONS_IMAGES,
+  CheckCommentInCollectionsDocument as CHECK_COMMENT_IN_COLLECTIONS,
+  GetUserCollectionsCommentsDocument as GET_USER_COLLECTIONS_COMMENTS,
+  CheckImageInCollectionsDocument as CHECK_IMAGE_IN_COLLECTIONS,
+  CheckDownloadInCollectionsDocument as CHECK_DOWNLOAD_IN_COLLECTIONS,
+  CheckChannelInCollectionsDocument as CHECK_CHANNEL_IN_COLLECTIONS,
+} from '@/__generated__/operations';
 
 describe('useCollectionQueries', () => {
   const collectionTypeCases: Array<{
@@ -63,27 +61,27 @@ describe('useCollectionQueries', () => {
     {
       name: 'discussion maps to discussion collections query',
       itemType: 'discussion',
-      expected: queries.GET_USER_COLLECTIONS_DISCUSSIONS,
+      expected: GET_USER_COLLECTIONS_DISCUSSIONS,
     },
     {
       name: 'comment maps to comment collections query',
       itemType: 'comment',
-      expected: queries.GET_USER_COLLECTIONS_COMMENTS,
+      expected: GET_USER_COLLECTIONS_COMMENTS,
     },
     {
       name: 'image maps to image collections query',
       itemType: 'image',
-      expected: queries.GET_USER_COLLECTIONS_IMAGES,
+      expected: GET_USER_COLLECTIONS_IMAGES,
     },
     {
       name: 'channel maps to channel collections query',
       itemType: 'channel',
-      expected: queries.GET_USER_COLLECTIONS_CHANNELS,
+      expected: GET_USER_COLLECTIONS_CHANNELS,
     },
     {
       name: 'download maps to download collections query',
       itemType: 'download',
-      expected: queries.GET_USER_COLLECTIONS_DOWNLOADS,
+      expected: GET_USER_COLLECTIONS_DOWNLOADS,
     },
   ];
 
@@ -101,27 +99,27 @@ describe('useCollectionQueries', () => {
     {
       name: 'discussion maps to discussion check query',
       itemType: 'discussion',
-      expected: queries.CHECK_DISCUSSION_IN_COLLECTIONS,
+      expected: CHECK_DISCUSSION_IN_COLLECTIONS,
     },
     {
       name: 'comment maps to comment check query',
       itemType: 'comment',
-      expected: queries.CHECK_COMMENT_IN_COLLECTIONS,
+      expected: CHECK_COMMENT_IN_COLLECTIONS,
     },
     {
       name: 'download maps to download check query',
       itemType: 'download',
-      expected: queries.CHECK_DOWNLOAD_IN_COLLECTIONS,
+      expected: CHECK_DOWNLOAD_IN_COLLECTIONS,
     },
     {
       name: 'image maps to image check query',
       itemType: 'image',
-      expected: queries.CHECK_IMAGE_IN_COLLECTIONS,
+      expected: CHECK_IMAGE_IN_COLLECTIONS,
     },
     {
       name: 'channel maps to channel check query',
       itemType: 'channel',
-      expected: queries.CHECK_CHANNEL_IN_COLLECTIONS,
+      expected: CHECK_CHANNEL_IN_COLLECTIONS,
     },
   ];
 

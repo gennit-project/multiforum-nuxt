@@ -5,9 +5,8 @@ import GenericModal from '@/components/GenericModal.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import BrokenRuleListItem from '@/components/admin/BrokenRuleListItem.vue';
-import { REPORT_PROFILE_PICTURE } from '@/graphQLData/issue/mutations';
-import { GET_SERVER_RULES } from '@/graphQLData/admin/queries';
-import { config } from '@/config';
+import { ReportProfilePictureDocument as REPORT_PROFILE_PICTURE, GetServerRulesDocument as GET_SERVER_RULES  } from '@/__generated__/operations';
+import { parseRuleOptions as getRules } from '@/utils/parseRuleOptions';
 
 type RuleOption = {
   summary: string;
@@ -39,25 +38,9 @@ const {
   loading: serverRulesLoading,
   error: serverRulesError,
   result: serverRulesResult,
-} = useQuery(GET_SERVER_RULES, {
-  serverName: config.serverName,
-});
+} = useQuery(GET_SERVER_RULES);
 
-const getRules = (rulesJSON: string): RuleOption[] => {
-  const rules: RuleOption[] = [];
-  try {
-    const rulesArray = JSON.parse(rulesJSON) || [];
-    for (const rule of rulesArray) {
-      rules.push({
-        detail: rule.detail,
-        summary: rule.summary,
-      });
-    }
-  } catch (e) {
-    console.error('Error parsing server rules', e);
-  }
-  return rules;
-};
+
 
 const serverRuleOptions = computed<RuleOption[]>(() => {
   const serverConfig = serverRulesResult.value?.serverConfigs?.[0];

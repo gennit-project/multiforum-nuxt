@@ -1,12 +1,11 @@
+import type { ChannelFilterGroup as FilterGroup, ChannelFilterOption as FilterOption } from '@/types/ChannelPresentation';
 import type {
   ChannelFilterGroupsCreateFieldInput,
   ChannelFilterGroupsDeleteFieldInput,
   ChannelFilterGroupsUpdateFieldInput,
-  FilterGroup,
   FilterGroupOptionsCreateFieldInput,
   FilterGroupOptionsUpdateFieldInput,
   FilterGroupUpdateInput,
-  FilterOption,
 } from '@/__generated__/graphql';
 
 /*

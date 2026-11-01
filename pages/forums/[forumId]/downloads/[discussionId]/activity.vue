@@ -2,11 +2,12 @@
 import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DOWNLOAD_ACTIVITY } from '@/graphQLData/discussion/queries';
+import { GetDownloadActivityDocument as GET_DOWNLOAD_ACTIVITY } from '@/__generated__/operations';
 import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed/DiscussionTitleVersions.vue';
 import LabelChangeHistory from '@/components/discussion/detail/activityFeed/LabelChangeHistory.vue';
-import type { Discussion } from '@/__generated__/graphql';
+import type { GetDownloadActivityQuery } from '@/__generated__/operations';
 import { useSharedDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
+type Discussion = GetDownloadActivityQuery['discussions'][number];
 
 const props = defineProps<{
   discussion?: Discussion;
@@ -36,7 +37,7 @@ const { result: getDiscussionResult } = useQuery(
   }
 );
 
-const discussion = computed<Discussion | null>(() => {
+const discussion = computed(() => {
   const initialDiscussion = props.discussion || null;
   const activity = getDiscussionResult.value?.discussions?.[0] || null;
 

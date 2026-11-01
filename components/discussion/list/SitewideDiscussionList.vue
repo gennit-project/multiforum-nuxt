@@ -4,8 +4,10 @@ import ErrorBanner from '../../ErrorBanner.vue';
 import SitewideDiscussionListItem from './SitewideDiscussionListItem.vue';
 import LoadMore from '../../LoadMore.vue';
 import DiscussionDetailEmptyState from '@/components/discussion/list/DiscussionDetailEmptyState.vue';
-import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import {
+  GetSiteWideDiscussionListDocument as GET_SITE_WIDE_DISCUSSION_LIST,
+  GetServerConfigDocument as GET_SERVER_CONFIG,
+} from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
@@ -16,8 +18,9 @@ import {
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
+import { mergeUniqueById } from '@/utils/mergeUniqueById';
 import { config } from '@/config';
-import type { Discussion } from '@/__generated__/graphql';
+import type { SitewideListItem } from '@/types/DiscussionList';
 import { useUsername } from '@/composables/useAuthState';
 import ForumSubmissions from '@/components/discovery/ForumSubmissions.vue';
 import { useFocusTrap } from '@/composables/useFocusTrap';
@@ -45,7 +48,7 @@ const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
-const filterValues = ref(
+const filterValues = computed(() =>
   getDiscussionFilterValuesFromParams({ route, channelId: channelId.value })
 );
 const isSitewideSidebarOpen = ref(false);
@@ -86,6 +89,24 @@ const activeTimeFrame = computed(() => {
   return getTimeFrameFromQuery(route.query);
 });
 
+const listScope = computed(() =>
+  JSON.stringify([
+    searchInputComputed.value,
+    selectedChannelsComputed.value,
+    selectedTagsComputed.value,
+    activeSort.value,
+    activeTimeFrame.value,
+  ])
+);
+const resultScope = ref(listScope.value);
+watch(
+  listScope,
+  () => {
+    resultScope.value = '';
+  },
+  { flush: 'sync' }
+);
+
 const {
   result: discussionResult,
   error: discussionError,
@@ -108,8 +129,17 @@ const {
     },
   }),
   {
-    keepPreviousResult: true,
+    keepPreviousResult: false,
   }
+);
+
+watch([discussionResult, discussionLoading], ([result, loading]) => {
+  if (!loading && result) resultScope.value = listScope.value;
+});
+const currentList = computed(() =>
+  resultScope.value === listScope.value
+    ? discussionResult.value?.getSiteWideDiscussionList
+    : null
 );
 
 // Refetch when user logs in/out to update isFavorited status
@@ -139,10 +169,9 @@ const serverConfig = computed(() => {
 // collapse the list back to the skeleton. Read directly from Apollo when a
 // result exists so SSR can render the server-fetched page without waiting for
 // a watcher-populated cache.
-type SiteWideDiscussion = Discussion & { score: number };
+type SiteWideDiscussion = SitewideListItem;
 
-const getLiveDiscussionList = () =>
-  discussionResult.value?.getSiteWideDiscussionList ?? null;
+const getLiveDiscussionList = () => currentList.value ?? null;
 
 const loadedDiscussions = ref<SiteWideDiscussion[]>(
   getLiveDiscussionList()?.discussions ?? []
@@ -158,8 +187,9 @@ const loadedPageInfo = ref(
 );
 
 watch(
-  discussionResult,
-  (result) => {
+  [discussionResult, discussionLoading],
+  ([result, loading]) => {
+    if (loading || resultScope.value !== listScope.value) return;
     const list = result?.getSiteWideDiscussionList;
     if (!list) return;
     loadedDiscussions.value = list.discussions ?? [];
@@ -172,9 +202,18 @@ watch(
   { immediate: true }
 );
 
+watch(
+  listScope,
+  () => {
+    loadedDiscussions.value = [];
+    loadedAggregateCount.value = 0;
+    loadedPageInfo.value = { endCursor: null, hasNextPage: false };
+  },
+  { flush: 'sync' }
+);
+
 const discussions = computed<SiteWideDiscussion[]>(() => {
-  const liveDiscussions =
-    discussionResult.value?.getSiteWideDiscussionList?.discussions;
+  const liveDiscussions = currentList.value?.discussions;
   if (liveDiscussions) {
     return liveDiscussions;
   }
@@ -185,11 +224,11 @@ const shouldShowLoadingSkeleton = computed(() => {
   return discussionLoading.value && discussions.value.length === 0;
 });
 
-const selectedDiscussion = computed<Discussion | null>(() => {
+const selectedDiscussion = computed<SitewideListItem | null>(() => {
   if (!selectedDiscussionId.value) return null;
   return (
     discussions.value.find(
-      (discussion: Discussion) => discussion.id === selectedDiscussionId.value
+      (discussion) => discussion.id === selectedDiscussionId.value
     ) || null
   );
 });
@@ -216,8 +255,7 @@ const selectedDiscussionChannels = computed(() => {
 });
 
 const aggregateDiscussionCount = computed(() => {
-  const liveAggregateCount =
-    discussionResult.value?.getSiteWideDiscussionList?.aggregateDiscussionCount;
+  const liveAggregateCount = currentList.value?.aggregateDiscussionCount;
   if (liveAggregateCount !== undefined && liveAggregateCount !== null) {
     return liveAggregateCount;
   }
@@ -225,10 +263,7 @@ const aggregateDiscussionCount = computed(() => {
 });
 
 const pageInfo = computed(() => {
-  return (
-    discussionResult.value?.getSiteWideDiscussionList?.pageInfo ??
-    loadedPageInfo.value
-  );
+  return currentList.value?.pageInfo ?? loadedPageInfo.value;
 });
 
 const hasNextPage = computed(() => {
@@ -237,6 +272,8 @@ const hasNextPage = computed(() => {
 });
 
 const loadMore = () => {
+  if (discussionLoading.value) return;
+  const scope = listScope.value;
   const endCursor = pageInfo.value?.endCursor;
   if (
     !discussionResult.value?.getSiteWideDiscussionList?.discussions ||
@@ -255,7 +292,12 @@ const loadMore = () => {
       },
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      if (
+        scope !== listScope.value ||
+        !fetchMoreResult?.getSiteWideDiscussionList ||
+        !previousResult.getSiteWideDiscussionList
+      )
+        return previousResult;
 
       return {
         getSiteWideDiscussionList: {
@@ -263,10 +305,10 @@ const loadMore = () => {
           aggregateDiscussionCount:
             previousResult.getSiteWideDiscussionList.aggregateDiscussionCount,
           pageInfo: fetchMoreResult.getSiteWideDiscussionList.pageInfo,
-          discussions: [
-            ...previousResult.getSiteWideDiscussionList.discussions,
-            ...fetchMoreResult.getSiteWideDiscussionList.discussions,
-          ],
+          discussions: mergeUniqueById(
+            previousResult.getSiteWideDiscussionList.discussions,
+            fetchMoreResult.getSiteWideDiscussionList.discussions
+          ),
         },
       };
     },
@@ -277,12 +319,6 @@ const loadMore = () => {
 watch(
   () => route.query,
   () => {
-    if (route.query) {
-      filterValues.value = getDiscussionFilterValuesFromParams({
-        route,
-        channelId: channelId.value,
-      });
-    }
     if (
       discussionResult.value?.getSiteWideDiscussionList?.discussions?.length ===
       0
@@ -373,7 +409,6 @@ const filterByChannel = (channel: string) => {
                   :default-expanded="expandSitewideDiscussions"
                   :discussion="discussion"
                   :is-selectable="true"
-                  :score="discussion.score"
                   :search-input="filterValues.searchInput"
                   :selected-channels="filterValues.channels"
                   :selected-discussion-id="selectedDiscussionId"

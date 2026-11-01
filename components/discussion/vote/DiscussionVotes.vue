@@ -5,13 +5,13 @@ import { useMutation } from '@vue/apollo-composable';
 import type { Reference, StoreObject } from '@apollo/client/core';
 import type { User } from '@/__generated__/graphql';
 import {
-  UPVOTE_DISCUSSION_CHANNEL,
-  UNDO_UPVOTE_DISCUSSION_CHANNEL,
-} from '@/graphQLData/discussion/mutations';
+  UpvoteDiscussionChannelDocument as UPVOTE_DISCUSSION_CHANNEL,
+  UndoUpvoteDiscussionChannelDocument as UNDO_UPVOTE_DISCUSSION_CHANNEL,
+  UndoSuperUpvoteDocument as UNDO_SUPER_UPVOTE,
+} from '@/__generated__/operations';
 import VoteButtons from '@/components/discussion/vote/VoteButtons.vue';
 import NewEmojiButton from '@/components/comments/NewEmojiButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { UNDO_SUPER_UPVOTE } from '@/graphQLData/scratchpad/mutations';
 import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
@@ -160,16 +160,17 @@ const loggedInUserDownvoted = computed(
   () => props.discussion?.FeedbackComments?.length > 0 || false
 );
 const upvoteCount = computed(
-  () => props.discussionChannel?.UpvotedByUsersConnection?.aggregate?.count?.nodes || 0
+  () =>
+    props.discussionChannel?.UpvotedByUsersConnection?.aggregate?.count
+      ?.nodes || 0
 );
 const downvoteCount = computed(
-  () => props.discussion?.FeedbackCommentsConnection?.aggregate?.count?.nodes || 0
+  () =>
+    props.discussion?.FeedbackCommentsConnection?.aggregate?.count?.nodes || 0
 );
 const upvoteIcon = computed(() => {
   if (props.useHeartIcon) {
-    return loggedInUserUpvoted.value
-      ? 'heart-filled'
-      : 'heart-outline';
+    return loggedInUserUpvoted.value ? 'heart-filled' : 'heart-outline';
   }
   return 'arrow-up';
 });
@@ -279,7 +280,12 @@ async function handleUndoSuperUpvote() {
 
 <template>
   <ErrorBanner
-    v-if="voteError || upvoteDiscussionChannelError || undoUpvoteDiscussionChannelError || undoSuperUpvoteError"
+    v-if="
+      voteError ||
+      upvoteDiscussionChannelError ||
+      undoUpvoteDiscussionChannelError ||
+      undoSuperUpvoteError
+    "
     :text="
       voteError ||
       upvoteDiscussionChannelError?.message ||

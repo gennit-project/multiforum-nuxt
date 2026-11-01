@@ -14,14 +14,14 @@ type CommentWithContext = {
   DiscussionChannel?: {
     channelUniqueName?: string;
     discussionId?: string;
-    Discussion?: { hasDownload?: boolean | null; title?: string | null };
-  };
-  Channel?: { uniqueName?: string; displayName?: string | null };
+    Discussion?: { hasDownload?: boolean | null; title?: string | null } | null;
+  } | null;
+  Channel?: { uniqueName?: string; displayName?: string | null } | null;
   Event?: {
     id?: string;
     title?: string | null;
     EventChannels?: Array<{ channelUniqueName: string }>;
-  };
+  } | null;
   CommentAuthor?: {
     __typename?: string;
     username?: string;

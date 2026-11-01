@@ -1,9 +1,11 @@
 import { computed, type Ref, type ComputedRef } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
+import {
+  GetChannelDocument as GET_CHANNEL,
+  GetServerConfigDocument as GET_SERVER_CONFIG,
+  UserIsModInChannelDocument as USER_IS_MOD_OR_OWNER_IN_CHANNEL,
+} from '@/__generated__/operations';
 import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import type { PermissionFlags } from '@/utils/permissionUtils';
 import { config } from '@/config';
@@ -62,15 +64,15 @@ export function useCommentPermissions(
     {
       enabled: computed(
         () =>
-          !!modProfileNameVar.value &&
-          !!usernameVar.value &&
-          !!forumId.value
+          !!modProfileNameVar.value && !!usernameVar.value && !!forumId.value
       ),
       fetchPolicy: 'cache-first',
     }
   );
 
-  const channelData = computed(() => getChannelResult.value?.channels?.[0] ?? null);
+  const channelData = computed(
+    () => getChannelResult.value?.channels?.[0] ?? null
+  );
   const serverConfig = computed(
     () => getServerResult.value?.serverConfigs?.[0] ?? null
   );
@@ -88,8 +90,7 @@ export function useCommentPermissions(
 
   // Combined loading state
   const loading = computed(
-    () =>
-      channelLoading.value || serverLoading.value || permissionLoading.value
+    () => channelLoading.value || serverLoading.value || permissionLoading.value
   );
 
   return {

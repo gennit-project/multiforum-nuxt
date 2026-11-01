@@ -16,7 +16,9 @@ vi.mock('@/composables/useAuthState', () => ({
 }));
 
 const { mockUserPermissions } = vi.hoisted(() => ({
-  mockUserPermissions: { value: { canDeleteWiki: false } as Record<string, boolean> },
+  mockUserPermissions: {
+    value: { canDeleteWiki: false } as Record<string, boolean>,
+  },
 }));
 
 vi.mock('@/composables/useResolvedModPermissions', () => ({
@@ -33,7 +35,9 @@ describe('useWikiPageLockPermissions', () => {
 
   // The `channelData` handed to useResolvedModPermissions is the internal
   // `normalizedChannel` computed; capturing it lets us assert the normalization.
-  const normalizedChannelOf = (channel: unknown) => {
+  const normalizedChannelOf = (
+    channel: Parameters<typeof useWikiPageLockPermissions>[0]['value']
+  ) => {
     useWikiPageLockPermissions(computed(() => channel));
     const params = (useResolvedModPermissions as any).mock.calls[0][0];
     return params.channelData.value;
@@ -41,7 +45,9 @@ describe('useWikiPageLockPermissions', () => {
 
   it('exposes canManageWikiPageLock from the resolved canDeleteWiki permission', () => {
     mockUserPermissions.value = { canDeleteWiki: true };
-    const { canManageWikiPageLock } = useWikiPageLockPermissions(computed(() => ({})));
+    const { canManageWikiPageLock } = useWikiPageLockPermissions(
+      computed(() => ({}))
+    );
     expect(canManageWikiPageLock.value).toBe(true);
   });
 
@@ -84,6 +90,11 @@ describe('useWikiPageLockPermissions', () => {
       Moderators: result.Moderators,
       SuspendedMods: result.SuspendedMods,
       SuspendedUsers: result.SuspendedUsers,
-    }).toEqual({ Admins: [], Moderators: [], SuspendedMods: [], SuspendedUsers: [] });
+    }).toEqual({
+      Admins: [],
+      Moderators: [],
+      SuspendedMods: [],
+      SuspendedUsers: [],
+    });
   });
 });

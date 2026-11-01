@@ -3,7 +3,7 @@ import { config } from '@/config';
 import { buildUserProfileHead } from '@/utils/profileSeo';
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_PUBLIC_USER_PROFILE } from '@/graphQLData/user/queries';
+import { GetPublicUserProfileDocument as GET_PUBLIC_USER_PROFILE } from '@/__generated__/operations';
 import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
 import { useHead, useRoute } from 'nuxt/app';
 import UserContributionChart from '@/components/charts/UserContributionChart.vue';
@@ -42,12 +42,13 @@ const {
 
 const user = computed(() => {
   if (userError.value) return null;
-  if (userResult.value && userResult.value.users.length > 0) {
+  const selectedUser = userResult.value?.users[0];
+  if (selectedUser) {
     return {
-      ...userResult.value.users[0],
+      ...selectedUser,
       wikiEditsCount:
-        userResult.value.getUserWikiEditsCount ??
-        userResult.value.users[0].AuthoredWikiPageVersionsConnection?.aggregate?.count?.nodes ??
+        userResult.value?.getUserWikiEditsCount ??
+        selectedUser.AuthoredWikiPageVersionsConnection?.aggregate?.count?.nodes ??
         0,
     };
   }
@@ -78,7 +79,7 @@ const serverRoleBadge = computed(() => {
   return getServerRoleBadge({
     username: user.value.username,
     adminUsernames: serverAdminUsernames.value,
-    modProfileNames: serverModProfileNames.value,
+    modProfileNames: serverModProfileNames.value.filter((name): name is string => typeof name === 'string' && !!name),
   });
 });
 

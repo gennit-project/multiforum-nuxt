@@ -4,7 +4,8 @@ import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
 import { useToastStore } from '@/stores/toastStore';
-import type { CollectionVisibility, Collection } from '@/__generated__/graphql';
+import { CollectionVisibility } from '@/__generated__/graphql';
+import type { GetUserCollectionsDiscussionsQuery } from '@/__generated__/operations';
 import { useCollectionMutations } from '@/composables/useCollectionMutations';
 import { useCollectionQueries } from '@/composables/useCollectionQueries';
 import {
@@ -16,6 +17,8 @@ import {
   filterCollectionsBySearch,
 } from '@/utils/collectionFilters';
 import { useFocusTrap } from '@/composables/useFocusTrap';
+type Collection =
+  GetUserCollectionsDiscussionsQuery['users'][number]['Collections'][number];
 
 const usernameVar = useUsername();
 
@@ -33,7 +36,7 @@ const props = defineProps({
     required: true,
   },
   itemType: {
-    type: String,
+    type: String as PropType<ItemType>,
     required: true,
     validator: (value: string) =>
       ['discussion', 'comment', 'image', 'channel', 'download'].includes(value),
@@ -66,7 +69,7 @@ const searchTerm = ref('');
 const isCreatingNew = ref(false);
 const newCollectionName = ref('');
 const newCollectionVisibility = ref<CollectionVisibility>(
-  'PRIVATE' as CollectionVisibility
+  CollectionVisibility.Private
 );
 const isCreatingCollection = ref(false);
 const pendingCollectionId = ref<string | null>(null);
@@ -80,14 +83,14 @@ const popoverDescriptionId = `${popoverIdBase}-description`;
 
 // Use composables
 const { collectionType, getCollectionQuery, getCheckItemQuery } =
-  useCollectionQueries(props.itemType as ItemType);
+  useCollectionQueries(props.itemType);
 const {
   createCollection,
   getAddMutation,
   getRemoveMutation,
   getAddFavoriteMutation,
   getRemoveFavoriteMutation,
-} = useCollectionMutations(props.itemType as ItemType);
+} = useCollectionMutations(props.itemType);
 
 // Fetch user collections
 // Use cache-and-network to prevent cache collision with itemInCollections query
@@ -142,31 +145,31 @@ const favoritesList = computed(() => {
       return {
         id: 'favorites-discussions',
         name: 'Favorites',
-        items: user.FavoriteDiscussions || [],
+        items: 'FavoriteDiscussions' in user ? user.FavoriteDiscussions : [],
       };
     case 'comment':
       return {
         id: 'favorites-comments',
         name: 'Favorites',
-        items: user.FavoriteComments || [],
+        items: 'FavoriteComments' in user ? user.FavoriteComments : [],
       };
     case 'image':
       return {
         id: 'favorites-images',
         name: 'Favorites',
-        items: user.FavoriteImages || [],
+        items: 'FavoriteImages' in user ? user.FavoriteImages : [],
       };
     case 'channel':
       return {
         id: 'favorites-channels',
         name: 'Favorites',
-        items: user.FavoriteChannels || [],
+        items: 'FavoriteChannels' in user ? user.FavoriteChannels : [],
       };
     case 'download':
       return {
         id: 'favorites-downloads',
         name: 'Favorites',
-        items: user.FavoriteDiscussions || [],
+        items: 'FavoriteDiscussions' in user ? user.FavoriteDiscussions : [],
       };
     default:
       return defaultFavorites;
@@ -214,7 +217,7 @@ useFocusTrap(popoverRef, {
 const resetCreateCollectionForm = () => {
   isCreatingNew.value = false;
   newCollectionName.value = '';
-  newCollectionVisibility.value = 'PRIVATE' as CollectionVisibility;
+  newCollectionVisibility.value = CollectionVisibility.Private;
 };
 
 // Search functionality
@@ -276,15 +279,7 @@ const handleToggleInCollection = async (collection: CollectionListItem) => {
       if (isCurrentlyFavorited) {
         // Remove from favorites
         const removeMutation = getRemoveFavoriteMutation();
-        const params =
-          props.itemType === 'channel'
-            ? { channel: props.itemId, username: usernameVar.value }
-            : props.itemType === 'download'
-              ? { discussionId: props.itemId, username: usernameVar.value }
-              : {
-                  [`${props.itemType}Id`]: props.itemId,
-                  username: usernameVar.value,
-                };
+        const params = { itemId: props.itemId, username: usernameVar.value };
 
         await removeMutation(params);
         toastStore.showToast(`Removed from "${collection.name}"`);
@@ -292,15 +287,7 @@ const handleToggleInCollection = async (collection: CollectionListItem) => {
       } else {
         // Add to favorites
         const addMutation = getAddFavoriteMutation();
-        const params =
-          props.itemType === 'channel'
-            ? { channel: props.itemId, username: usernameVar.value }
-            : props.itemType === 'download'
-              ? { discussionId: props.itemId, username: usernameVar.value }
-              : {
-                  [`${props.itemType}Id`]: props.itemId,
-                  username: usernameVar.value,
-                };
+        const params = { itemId: props.itemId, username: usernameVar.value };
 
         await addMutation(params);
         toastStore.showToast(`Added to "${collection.name}"`);

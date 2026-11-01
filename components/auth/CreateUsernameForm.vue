@@ -14,10 +14,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import DatePicker from '@/components/event/form/DatePicker.vue';
 import CharCounter from '@/components/CharCounter.vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { DOES_USER_EXIST } from '@/graphQLData/user/queries';
-import { GET_AGE_POLICY } from '@/graphQLData/age/queries';
-import { CREATE_EMAIL_AND_USER } from '@/graphQLData/email/mutations';
-import type { AgePolicy } from '@/__generated__/graphql';
+import { DoesUserExistDocument as DOES_USER_EXIST, GetAgePolicyDocument as GET_AGE_POLICY , CreateEmailAndUserDocument as CREATE_EMAIL_AND_USER  } from '@/__generated__/operations';
 import {
   setUsername,
   setModProfileName,
@@ -71,7 +68,7 @@ const {
   result: agePolicyResult,
   error: agePolicyError,
   loading: agePolicyLoading,
-} = useQuery<{ getAgePolicy: AgePolicy }>(GET_AGE_POLICY);
+} = useQuery(GET_AGE_POLICY);
 
 const agePolicy = computed(() => agePolicyResult.value?.getAgePolicy);
 const birthdayRequired = computed(
@@ -90,9 +87,7 @@ const {
   error: getUserError,
   result: getUserResult,
   loading: getUserLoading,
-} = useQuery(DOES_USER_EXIST, {
-  username: newUsername,
-});
+} = useQuery(DOES_USER_EXIST, () => ({ username: newUsername.value || '' }), () => ({ enabled: !!newUsername.value }));
 
 const {
   mutate: createEmailAndUser,
@@ -102,7 +97,7 @@ const {
 } = useMutation(CREATE_EMAIL_AND_USER, () => ({
   variables: {
     emailAddress: props.email,
-    username: newUsername.value,
+    username: newUsername.value || '',
     birthday: birthday.value || null,
   },
 }));
@@ -111,7 +106,7 @@ const usernameIsTaken = computed(() => {
   if (getUserError.value || getUserLoading.value) {
     return false;
   }
-  if (getUserResult && getUserResult.value?.users?.length > 0) {
+  if ((getUserResult.value?.users?.length ?? 0) > 0) {
     return true;
   }
   return false;
@@ -159,7 +154,7 @@ const confirmedAvailable = computed(
 const emit = defineEmits(['emailAndUserCreated']);
 
 onEmailAndUserCreated((result) => {
-  const user = result.data.createEmailAndUser;
+  const user = result.data?.createEmailAndUser;
 
   if (user) {
     clearSignupDraft(props.email);

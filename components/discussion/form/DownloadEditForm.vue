@@ -1,30 +1,22 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue';
+import { StorageUploadTarget, PriceModel } from '@/__generated__/graphql';
 import type { PropType } from 'vue';
-import type {
-  Discussion,
-  DownloadableFile,
-  DiscussionUpdateInput,
-  FilterGroup,
-} from '@/__generated__/graphql';
+import type { DiscussionUpdateInput } from '@/__generated__/graphql';
 // Using string literals instead of importing enums from massive generated file
 import FormRow from '@/components/FormRow.vue';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 import { useMutation } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import {
-  UPDATE_DISCUSSION,
-  CREATE_SIGNED_STORAGE_URL,
-  CREATE_DOWNLOADABLE_FILE,
-  PERMANENTLY_DELETE_DOWNLOADABLE_FILE,
-} from '@/graphQLData/discussion/mutations';
+  UpdateDiscussionDocument as UPDATE_DISCUSSION,
+  CreateSignedUrlDocument as CREATE_SIGNED_STORAGE_URL,
+  CreateDownloadableFileDocument as CREATE_DOWNLOADABLE_FILE,
+  PermanentlyDeleteDownloadableFileDocument as PERMANENTLY_DELETE_DOWNLOADABLE_FILE,
+} from '@/__generated__/operations';
 import Notification from '@/components/NotificationComponent.vue';
 import WarningModal from '@/components/WarningModal.vue';
-import {
-  uploadAndGetEmbeddedLink,
-  getUploadFileName,
-  type SignedStorageUrlPayload,
-} from '@/utils';
+import { uploadAndGetEmbeddedLink, getUploadFileName } from '@/utils';
 import DownloadLabelPicker from '@/components/download/DownloadLabelPicker.vue';
 import {
   validateDownloadFileType,
@@ -39,18 +31,23 @@ import {
 } from '@/utils/downloadFileHelpers';
 import { useUsername } from '@/composables/useAuthState';
 
+import type {
+  GetDiscussionQuery,
+  GetChannelQuery,
+} from '@/__generated__/operations';
+import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
+
 const usernameVar = useUsername();
-
-type DownloadableFileSupportFields = {
-  attributionOverride?: string | null;
-  supportPatreonUrl?: string | null;
-  supportBuyMeACoffeeUrl?: string | null;
-  supportKoFiUrl?: string | null;
-  supportPayPalMeUrl?: string | null;
+type SelectedFile =
+  GetDiscussionQuery['discussions'][number]['DownloadableFiles'][number];
+type FormFile = NonNullable<
+  CreateEditDiscussionFormValues['downloadableFiles']
+>[number];
+type Discussion = {
+  id: string;
+  DownloadableFiles: Array<SelectedFile | FormFile>;
 };
-
-type DownloadableFileWithSupport = DownloadableFile &
-  DownloadableFileSupportFields;
+type FilterGroup = GetChannelQuery['channels'][number]['FilterGroups'][number];
 
 const props = defineProps({
   discussion: {
@@ -79,14 +76,17 @@ const emit = defineEmits(['closeEditor', 'updateFormValues']);
 const downloadableFiles = computed(() => {
   if (!props.discussion?.DownloadableFiles) return [];
   return props.discussion.DownloadableFiles.map((file) => {
-    const supportFile = file as DownloadableFileWithSupport;
+    const supportFile = file;
     return {
       id: supportFile.id || '',
       fileName: supportFile.fileName || '',
       url: supportFile.url || '',
       kind: supportFile.kind || 'OTHER',
       size: supportFile.size || 0,
-      license: supportFile.license?.id || '',
+      license:
+        typeof supportFile.license === 'string'
+          ? supportFile.license
+          : supportFile.license?.id || '',
       priceModel: supportFile.priceModel || 'FREE',
       priceCents: supportFile.priceCents || 0,
       priceCurrency: supportFile.priceCurrency || 'USD',
@@ -320,13 +320,12 @@ const uploadFile = async (file: File): Promise<boolean> => {
       filename,
       contentType: fileType,
       channelConnections: currentChannelConnections.value,
-      uploadTarget: 'PRIVATE_DOWNLOAD' as const,
+      uploadTarget: StorageUploadTarget.PrivateDownload,
     };
 
     // Ask the server for a signed storage URL
     const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
-    const signedUpload = signedUrlResult?.data?.createSignedStorageURL as
-      SignedStorageUrlPayload | undefined;
+    const signedUpload = signedUrlResult?.data?.createSignedStorageURL;
     const signedStorageURL = signedUpload?.url;
 
     if (!signedStorageURL) {
@@ -352,7 +351,7 @@ const uploadFile = async (file: File): Promise<boolean> => {
       url: fileUrl,
       kind: getFileKind(file),
       size: file.size,
-      priceModel: 'FREE',
+      priceModel: PriceModel.Free,
       priceCents: 0,
       priceCurrency: 'USD',
       storageObjectName: signedUpload?.storageObjectName,
@@ -372,7 +371,7 @@ const uploadFile = async (file: File): Promise<boolean> => {
       fileName: createdFile.fileName,
       url: createdFile.url,
       kind: createdFile.kind,
-      size: createdFile.size,
+      size: createdFile.size || 0,
       license: createdFile.license?.id || '',
       priceModel: createdFile.priceModel || 'FREE',
       priceCents: createdFile.priceCents || 0,
@@ -399,7 +398,7 @@ const uploadFile = async (file: File): Promise<boolean> => {
 const getFileTypeFromName = (filename: string): string | null =>
   getDownloadFileMimeType(filename);
 
-const getFileKind = (file: File): string => getDownloadFileKind(file.name);
+const getFileKind = (file: File) => getDownloadFileKind(file.name);
 
 const removeFileFromForm = (index: number) => {
   formValues.value.downloadableFiles.splice(index, 1);

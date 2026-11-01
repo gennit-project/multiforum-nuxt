@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 import type { PropType } from 'vue';
-import type { Event } from '@/__generated__/graphql';
+import type { EventPresentation as Event } from '@/types/EventPresentation';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import { useMutation } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
+import { UpdateEventsDocument as UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/__generated__/operations';
 import { MAX_CHARS_IN_EVENT_DESCRIPTION } from '@/utils/constants';
 
 const props = defineProps({
@@ -28,7 +28,7 @@ const {
 } = useMutation(UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: {
     where: { id: { eq: props.event.id } },
-    updateEventInput: formValues.value,
+    updateEventInput: { description: { set: formValues.value.description } },
     channelConnections: [],
     channelDisconnections: [],
   },
@@ -41,7 +41,7 @@ onDone(() => {
 
 <template>
   <div class="w-full">
-    <div class="mb-3 mt-3 flex w-full flex-col">
+    <div class="mt-3 mb-3 flex w-full flex-col">
       <TextEditor
         class="mb-3"
         :test-id="'body-input'"

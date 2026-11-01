@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import { isPluginRecord } from '@/utils/pluginManifestUtils';
 import { computed, nextTick, ref, toRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
-import type {
-  PublicPluginPipelineRunPage,
-  QueryGetPipelineRunPageArgs,
-} from '@/__generated__/graphql';
+import type { PublicPluginPipelineRunPage } from '@/composables/usePipelineHistory';
+import type { GetInternalPluginPipelineRunQuery } from '@/__generated__/operations';
 import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
 import {
   getApplicablePipelineStatus,
@@ -18,50 +17,10 @@ import {
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useChannelPermissions } from '@/composables/useCommentPermissions';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
-import {
-  RERUN_PLUGIN_PIPELINE,
-  START_PLUGIN_PIPELINE,
-} from '@/graphQLData/admin/mutations';
+import { RerunPluginPipelineDocument as RERUN_PLUGIN_PIPELINE, StartPluginPipelineDocument as START_PLUGIN_PIPELINE, GetInternalPluginPipelineRunDocument as GET_INTERNAL_PLUGIN_PIPELINE_RUN, GetPipelineRunPageDocument as GET_PLUGIN_PIPELINE_RUN_PAGE  } from '@/__generated__/operations';
 import PipelineJobPage from './PipelineJobPage.vue';
-import {
-  GET_INTERNAL_PLUGIN_PIPELINE_RUN,
-  GET_PLUGIN_PIPELINE_RUN_PAGE,
-} from '@/graphQLData/admin/queries';
 
-interface InternalPipelineJob {
-  id: string;
-  pluginId: string;
-  pluginName: string;
-  version: string;
-  status: string;
-  message?: string | null;
-  durationMs?: number | null;
-  payload?: unknown;
-  executionOrder: number;
-  skippedReason?: string | null;
-  leaseId?: string | null;
-  queuedAt?: string | null;
-  startedAt?: string | null;
-  heartbeatAt?: string | null;
-  timeoutAt?: string | null;
-  finishedAt?: string | null;
-  updatedAt: string;
-}
-
-interface InternalPipelineRunDetail {
-  attempt: {
-    id: string;
-    pipelineId: string;
-    status: string;
-    queuedAt?: string | null;
-    startedAt?: string | null;
-    heartbeatAt?: string | null;
-    timeoutAt?: string | null;
-    finishedAt?: string | null;
-    updatedAt: string;
-  };
-  jobs: InternalPipelineJob[];
-}
+type InternalPipelineRunDetail = NonNullable<GetInternalPluginPipelineRunQuery['getInternalPluginPipelineRun']>;
 
 interface PublicDetailEntry {
   key: string;
@@ -114,10 +73,7 @@ const {
   result: permalinkResult,
   error: permalinkError,
   loading: permalinkLoading,
-} = useQuery<
-  { getPipelineRunPage: PublicPluginPipelineRunPage | null },
-  QueryGetPipelineRunPageArgs
->(
+} = useQuery(
   GET_PLUGIN_PIPELINE_RUN_PAGE,
   () => ({ pipelineRunId: permalinkId.value }),
   () => ({
@@ -337,8 +293,8 @@ const formatDetails = (details: unknown) => {
 };
 
 const detailRecord = (details: unknown): Record<string, unknown> | null =>
-  typeof details === 'object' && details !== null && !Array.isArray(details)
-    ? (details as Record<string, unknown>)
+  isPluginRecord(details)
+    ? details
     : null;
 
 const diagnosticCorrelationId = (details: unknown) => {
@@ -380,9 +336,7 @@ const loadTechnicalDetails = async (pipelineId: string) => {
   };
 
   try {
-    const result = await client.query<{
-      getInternalPluginPipelineRun: InternalPipelineRunDetail | null;
-    }>({
+    const result = await client.query({
       query: GET_INTERNAL_PLUGIN_PIPELINE_RUN,
       variables: { pipelineRunId: pipelineId },
       fetchPolicy: 'network-only',
@@ -429,7 +383,7 @@ const technicalReportText = (detail: InternalPipelineRunDetail) =>
     `Finished: ${detail.attempt.finishedAt || 'Not recorded'}`,
     ...detail.jobs.flatMap((job) => [
       '',
-      `${job.executionOrder + 1}. ${job.pluginName} (${job.status})`,
+      `${(job.executionOrder ?? 0) + 1}. ${job.pluginName} (${job.status})`,
       `Plugin: ${job.pluginId}@${job.version}`,
       `Message: ${job.message || job.skippedReason || 'Not recorded'}`,
       `Execution lease: ${job.leaseId || 'Not recorded'}`,
@@ -856,7 +810,7 @@ watch(
                 <div class="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <h5 class="font-medium text-gray-900 dark:text-white">
-                      {{ job.executionOrder + 1 }}. {{ job.pluginName }}
+                      {{ (job.executionOrder ?? 0) + 1 }}. {{ job.pluginName }}
                     </h5>
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       v{{ job.version }}
@@ -1044,7 +998,7 @@ watch(
                 >
                   <div class="flex flex-wrap justify-between gap-2">
                     <h6 class="font-medium text-gray-900 dark:text-white">
-                      {{ job.executionOrder + 1 }}. {{ job.pluginName }}
+                      {{ (job.executionOrder ?? 0) + 1 }}. {{ job.pluginName }}
                     </h6>
                     <span class="text-sm text-gray-600 dark:text-gray-300">{{
                       job.status

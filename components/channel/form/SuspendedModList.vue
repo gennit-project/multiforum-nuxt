@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GET_SUSPENDED_MODS_BY_CHANNEL } from '@/graphQLData/mod/queries';
+import { GetModsByChannelDocument as GET_SUSPENDED_MODS_BY_CHANNEL } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 import { DateTime } from 'luxon';
@@ -29,7 +29,8 @@ const aggregateCount = computed(
   () => result.value?.channels?.[0]?.SuspendedModsConnection?.aggregate?.count?.nodes ?? 0
 );
 
-const humanReadableDate = (dateISO: string): string => {
+const humanReadableDate = (dateISO: string | null | undefined): string => {
+  if (!dateISO) return "Unknown";
   return DateTime.fromISO(dateISO).toLocaleString(DateTime.DATETIME_MED);
 };
 defineEmits(['click-remove-mod']);
@@ -41,7 +42,7 @@ defineEmits(['click-remove-mod']);
     <div
       v-else-if="
         result?.channels?.length === 0 ||
-        result.channels[0]?.SuspendedMods?.length === 0
+        result?.channels[0]?.SuspendedMods?.length === 0
       "
       class="text-sm"
     >
@@ -54,7 +55,7 @@ defineEmits(['click-remove-mod']);
       </div>
       <div
         v-for="suspension in suspensions"
-        :key="suspension.username"
+        :key="suspension.id"
         class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         <div class="w-full flex-col">

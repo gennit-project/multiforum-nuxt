@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
 import type { TestingPinia } from '@pinia/testing';
@@ -67,9 +67,13 @@ const mountList = () => {
       stubs: {
         ChannelDiscussionListItem: itemStub,
         LoadMore: loadMoreStub,
-        ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err" />' },
+        ErrorBanner: {
+          name: 'ErrorBanner',
+          props: ['text'],
+          template: '<div class="err" />',
+        },
         RequireAuth: { template: '<div><slot name="has-auth" /></div>' },
-        'SkeletonLoader': { template: '<div class="skeleton" />' },
+        SkeletonLoader: { template: '<div class="skeleton" />' },
       },
     },
   });
@@ -192,5 +196,53 @@ describe('ChannelDiscussionList selected discussion sync', () => {
     const store = useUIStore(pinia);
 
     expect(store.clearSelectedChannelDiscussion).toHaveBeenCalled();
+  });
+});
+
+describe('channel pagination isolation', () => {
+  it('deduplicates overlapping pages', async () => {
+    const wrapper = mountList();
+    await wrapper.getComponent({ name: 'LoadMore' }).vm.$emit('load-more');
+    const previous = resultWith([discussionChannel('d1', 'First')]);
+    const merged = h.fetchMore.mock.calls[0][0].updateQuery(previous, {
+      fetchMoreResult: resultWith([
+        discussionChannel('d1', 'First'),
+        discussionChannel('d2', 'Second'),
+      ]),
+    });
+    expect(
+      merged.getDiscussionsInChannel.discussionChannels.map(
+        (row: { id: string }) => row.id
+      )
+    ).toEqual(['dc-d1', 'dc-d2']);
+  });
+  it('ignores an old page after forum navigation', async () => {
+    const route = reactive({ params: { forumId: 'cats' }, query: {} });
+    h.route = route;
+    const wrapper = mountList();
+    await wrapper.getComponent({ name: 'LoadMore' }).vm.$emit('load-more');
+    const previous = resultWith([discussionChannel('d1', 'First')]);
+    route.params.forumId = 'dogs';
+    expect(
+      h.fetchMore.mock.calls[0][0].updateQuery(previous, {
+        fetchMoreResult: resultWith([discussionChannel('d2', 'Second')]),
+      })
+    ).toBe(previous);
+  });
+  it('retains results when a nullable page arrives', async () => {
+    const wrapper = mountList();
+    await wrapper.getComponent({ name: 'LoadMore' }).vm.$emit('load-more');
+    const previous = resultWith([discussionChannel('d1', 'First')]);
+    expect(
+      h.fetchMore.mock.calls[0][0].updateQuery(previous, {
+        fetchMoreResult: { getDiscussionsInChannel: null },
+      })
+    ).toBe(previous);
+  });
+  it('does not request another page while loading', async () => {
+    h.loading = ref(true);
+    const wrapper = mountList();
+    await wrapper.getComponent({ name: 'LoadMore' }).vm.$emit('load-more');
+    expect(h.fetchMore).not.toHaveBeenCalled();
   });
 });

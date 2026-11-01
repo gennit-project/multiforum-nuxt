@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
-import type { LabelChangeHistory as LabelChangeHistoryItem } from '@/__generated__/graphql';
+import type { GetDownloadActivityQuery } from '@/__generated__/operations';
 import MinusIcon from '@/components/icons/MinusIcon.vue';
 import PlusIcon from '@/components/icons/PlusIcon.vue';
 import { timeAgo } from '@/utils';
+type LabelChangeHistoryItem =
+  GetDownloadActivityQuery['discussions'][number]['DiscussionChannels'][number]['LabelChangeHistory'][number];
 
 interface LabelChange {
   id: string;
@@ -73,7 +75,7 @@ const toggleOlderChanges = () => {
 </script>
 
 <template>
-  <div v-if="showLabelChanges" class="mb-6 mt-4">
+  <div v-if="showLabelChanges" class="mt-4 mb-6">
     <p class="mb-2 text-xs font-medium text-gray-500 dark:text-gray-400">
       Label Change History
     </p>
@@ -145,7 +147,9 @@ const toggleOlderChanges = () => {
                 item.actorName
               }}</span>
               <span class="text-gray-500 dark:text-gray-400">
-                {{ item.actionType === 'added' ? ' added the ' : ' removed the ' }}
+                {{
+                  item.actionType === 'added' ? ' added the ' : ' removed the '
+                }}
               </span>
               <span
                 class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
@@ -159,7 +163,7 @@ const toggleOlderChanges = () => {
               </span>
               <span class="text-gray-500 dark:text-gray-400"> label </span>
               <span
-                class="whitespace-nowrap text-xs text-gray-500 dark:text-gray-400"
+                class="text-xs whitespace-nowrap text-gray-500 dark:text-gray-400"
               >
                 {{ timeAgo(item.timestamp) }}
               </span>

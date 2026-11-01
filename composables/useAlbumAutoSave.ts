@@ -1,243 +1,89 @@
-import { ref } from 'vue';
+import { ref, computed, onBeforeUnmount, toValue, watch, type MaybeRefOrGetter } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
-import type {
-  PresentationAlbum as Album,
-  PresentationImage as Image,
-} from '@/types/DiscussionPresentation';
-import { normalizeImageOrder } from '@/utils/albumImageOrder';
-import { getRemovedAlbumImageIds } from '@/utils/albumImageDisconnections';
-
-type AlbumFormData = {
-  images: {
-    id?: string;
-    url: string;
-    alt: string;
-    caption: string;
-    copyright: string;
-  }[];
-  imageOrder: string[];
-};
+import { UpdateDiscussionWithChannelConnectionsDocument } from '@/__generated__/operations';
+import type { PresentationAlbum } from '@/types/DiscussionPresentation';
+import { buildAlbumUpdateInput, type AlbumFormData, type ExistingAlbumImage } from '@/utils/albumUpdateInput';
 
 type UseAlbumAutoSaveParams = {
-  discussionId: string | undefined;
-  existingAlbum: Album | null | undefined;
-  getAlbumData: () => AlbumFormData;
+  discussionId: MaybeRefOrGetter<string | undefined>;
+  existingAlbum: MaybeRefOrGetter<PresentationAlbum | null | undefined>;
+  getAlbumData: () => NonNullable<AlbumFormData>;
 };
 
-/**
- * Composable for auto-saving album changes to the server.
- * Handles debounced saves and builds the correct GraphQL update input.
- */
+/** Serializes debounced saves and rejects completion state from an old route. */
 export function useAlbumAutoSave(params: UseAlbumAutoSaveParams) {
-  const { discussionId, existingAlbum, getAlbumData } = params;
-
-  // GraphQL Mutation
-  const { mutate: updateDiscussion, error: updateDiscussionError } =
-    useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS);
-
-  // Auto-save state
-  const isAutoSaving = ref(false);
+  const { mutate: updateDiscussion, loading: mutationLoading, error: mutationError } = useMutation(UpdateDiscussionWithChannelConnectionsDocument);
+  const generation = ref(0);
+  const requestScope = ref(-1);
+  const unconfirmedSave = ref<Error | null>(null);
+  const isAutoSaving = computed(() => requestScope.value === generation.value && mutationLoading.value);
+  const updateDiscussionError = computed(() => requestScope.value === generation.value ? mutationError.value ?? unconfirmedSave.value : null);
   const autoSaveSuccess = ref(false);
-  let autoSaveTimeout: NodeJS.Timeout | null = null;
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let successTimer: ReturnType<typeof setTimeout> | undefined;
+  let active = false;
+  let queued = false;
+  let stopped = false;
+  let savedBaseline: { images: ExistingAlbumImage[]; imageOrder: string[] } | undefined;
 
-  /**
-   * Build the GraphQL update input for the album.
-   * Handles creating new albums or updating existing ones.
-   */
-  const getAlbumUpdateInput = () => {
-    const albumData = getAlbumData();
+  watch(() => toValue(params.discussionId), () => {
+    generation.value++;
+    if (timer) clearTimeout(timer);
+    if (successTimer) clearTimeout(successTimer);
+    savedBaseline = undefined;
+    queued = false;
+    autoSaveSuccess.value = false;
+    unconfirmedSave.value = null;
+  });
 
-    if (!albumData) {
-      return {}; // No album data to update
-    }
-
-    const albumId = existingAlbum?.id;
-
-    // If the album doesn't exist yet, CREATE it and connect to existing images
-    if (!albumId) {
-      const newImages = albumData.images || [];
-      const validImages = newImages.filter(
-        (img): img is typeof img & { id: string } => Boolean(img.id)
-      );
-
-      if (validImages.length === 0) {
-        return {}; // No valid images to connect
-      }
-
-      const normalizedImageOrder = normalizeImageOrder({
-        images: validImages,
-        imageOrder: albumData.imageOrder,
-      });
-
-      const albumNode: {
-        imageOrder: string[];
-        Images: {
-          connect: { where: { node: { id: string } } }[];
-        };
-      } = {
-        imageOrder: normalizedImageOrder,
-        Images: {
-          connect: validImages.map((img) => ({
-            where: { node: { id: img.id } },
-          })),
-        },
-      };
-
-      return {
-        Album: {
-          create: {
-            node: albumNode,
-          },
-        },
-      };
-    }
-
-    // If the album already exists, build the connect/update/disconnect arrays
-    const oldImages: Image[] = existingAlbum?.Images ?? [];
-    const newImages = albumData.images || [];
-    const normalizedImageOrder = normalizeImageOrder({
-      images: newImages,
-      imageOrder: albumData.imageOrder,
-    });
-
-    // CONNECT array: new images that need to be connected to this album
-    const connectImageArray = newImages
-      .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
-      .map((img) => ({
-        connect: [
-          {
-            where: { node: { id: img.id } },
-          },
-        ],
-      }));
-
-    // UPDATE array: existing images that need updates (only if properties changed)
-    const updateImageArray = newImages
-      .filter((img) => {
-        if (!img.id) return false;
-        const oldImage = oldImages.find((old) => old.id === img.id);
-        if (!oldImage) return false;
-
-        // Only update if properties have actually changed
-        return (
-          oldImage.url !== img.url ||
-          oldImage.alt !== img.alt ||
-          oldImage.caption !== img.caption ||
-          oldImage.copyright !== img.copyright
-        );
-      })
-      .map((img) => ({
-        where: { node: { id: img.id } },
-        update: {
-          node: {
-            url: img.url,
-            alt: img.alt,
-            caption: img.caption,
-            copyright: img.copyright,
-          },
-        },
-      }));
-
-    // DISCONNECT array: old images that are no longer present
-    const disconnectImageArray = oldImages
-      .filter((old) => !newImages.some((img) => img.id === old.id))
-      .map((old) => ({
-        disconnect: [
-          {
-            where: { node: { id: old.id } },
-          },
-        ],
-      }));
-
-    // Combine all operations
-    const imagesOps = [
-      ...connectImageArray,
-      ...updateImageArray,
-      ...disconnectImageArray,
-    ];
-
-    return {
-      Album: {
-        update: {
-          node: {
-            imageOrder: normalizedImageOrder,
-            Images: imagesOps,
-          },
-        },
-      },
+  const performAutoSave = async (): Promise<void> => {
+    const discussionId = toValue(params.discussionId);
+    if (!discussionId || stopped) return;
+    if (active) { queued = true; return; }
+    const scope = generation.value;
+    const existing = toValue(params.existingAlbum);
+    const data = params.getAlbumData();
+    const snapshot = {
+      images: (data.images ?? []).map((image) => ({ ...image })),
+      imageOrder: [...(data.imageOrder ?? [])],
     };
-  };
-
-  /**
-   * Perform the auto-save operation.
-   */
-  const performAutoSave = async () => {
-    if (!discussionId) {
-      return;
-    }
-
+    const album = buildAlbumUpdateInput({
+      albumData: snapshot,
+      existingImages: savedBaseline?.images ?? existing?.Images ?? [],
+      existingImageOrder: savedBaseline?.imageOrder ?? existing?.imageOrder,
+    });
+    if (!album) return;
+    unconfirmedSave.value = null;
+    active = true;
+    requestScope.value = scope;
+    autoSaveSuccess.value = false;
     try {
-      isAutoSaving.value = true;
-      autoSaveSuccess.value = false;
-
-      const albumUpdateInput = getAlbumUpdateInput();
-      const albumImageDisconnections = getRemovedAlbumImageIds({
-        existingImages: existingAlbum?.Images,
-        currentImages: getAlbumData().images,
-      });
-
-      if (Object.keys(albumUpdateInput).length === 0) {
-        return;
+      const result = await updateDiscussion({ where: { id: { eq: discussionId } }, updateDiscussionInput: {}, album });
+      if (!stopped && generation.value === scope && toValue(params.discussionId) === discussionId && result?.data?.updateDiscussionWithChannelConnections) {
+        savedBaseline = { images: snapshot.images, imageOrder: album.imageIds.map(String) };
+        autoSaveSuccess.value = true;
+        successTimer = setTimeout(() => { autoSaveSuccess.value = false; }, 2000);
+      } else if (!stopped && generation.value === scope) {
+        unconfirmedSave.value = new Error('The album save was not confirmed. Please retry.');
       }
-
-      await updateDiscussion({
-        where: { id: { eq: discussionId } },
-        updateDiscussionInput: albumUpdateInput,
-        albumImageDisconnections,
-      });
-
-      autoSaveSuccess.value = true;
-
-      // Hide success indicator after 2 seconds
-      setTimeout(() => {
-        autoSaveSuccess.value = false;
-      }, 2000);
     } catch (error) {
       console.error('Auto-save failed:', error);
     } finally {
-      isAutoSaving.value = false;
+      active = false;
+      if (queued && !stopped) { queued = false; await performAutoSave(); }
     }
   };
 
-  /**
-   * Trigger a debounced auto-save.
-   * Only saves if we have a discussionId (edit mode).
-   */
   const debouncedAutoSave = () => {
-    if (!discussionId) {
-      return;
-    }
-
-    // Clear existing timeout
-    if (autoSaveTimeout) {
-      clearTimeout(autoSaveTimeout);
-    }
-
-    // Set new timeout for debounced save
-    autoSaveTimeout = setTimeout(() => {
-      performAutoSave();
-    }, 500); // 500ms debounce
+    if (!toValue(params.discussionId) || stopped) return;
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => { void performAutoSave(); }, 500);
   };
-
-  return {
-    // State
-    isAutoSaving,
-    autoSaveSuccess,
-    updateDiscussionError,
-
-    // Methods
-    debouncedAutoSave,
-    performAutoSave,
-  };
+  onBeforeUnmount(() => {
+    stopped = true;
+    generation.value++;
+    if (timer) clearTimeout(timer);
+    if (successTimer) clearTimeout(successTimer);
+  });
+  return { isAutoSaving, autoSaveSuccess, updateDiscussionError, debouncedAutoSave, performAutoSave };
 }

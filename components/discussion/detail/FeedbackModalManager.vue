@@ -2,7 +2,7 @@
 import type { CommentChannelView as DiscussionChannel } from '@/types/DiscussionPresentation';
 import { computed, ref, defineAsyncComponent } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { ADD_FEEDBACK_COMMENT_TO_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import { AddFeedbackCommentToDiscussionDocument as ADD_FEEDBACK_COMMENT_TO_DISCUSSION } from '@/__generated__/operations';
 
 import Notification from '@/components/NotificationComponent.vue';
 

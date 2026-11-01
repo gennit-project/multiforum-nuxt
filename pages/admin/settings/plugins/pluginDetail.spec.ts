@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
+vi.mock('@/__generated__/operations', () => ({
+GetPluginsDocument: 'mock-query',
+GetInstalledPluginsDocument: 'mock-query',
+GetServerPluginSecretsDocument: 'mock-query',
+InstallPluginVersionDocument: 'mock-mutation',
+EnableServerPluginDocument: 'mock-mutation',
+SetServerPluginSecretDocument: 'mock-mutation'
+}));
 
 // Mock vue-router
 vi.mock('vue-router', () => ({
@@ -30,17 +38,9 @@ vi.mock('@vue/apollo-composable', () => ({
 }));
 
 // Mock GraphQL queries and mutations
-vi.mock('@/graphQLData/admin/queries', () => ({
-  GET_AVAILABLE_PLUGINS: 'mock-query',
-  GET_INSTALLED_PLUGINS: 'mock-query',
-  GET_SERVER_PLUGIN_SECRETS: 'mock-query',
-}));
 
-vi.mock('@/graphQLData/admin/mutations', () => ({
-  INSTALL_PLUGIN_VERSION: 'mock-mutation',
-  ENABLE_SERVER_PLUGIN: 'mock-mutation',
-  SET_SERVER_PLUGIN_SECRET: 'mock-mutation',
-}));
+
+
 
 // Mock useToast
 const mockToast = {

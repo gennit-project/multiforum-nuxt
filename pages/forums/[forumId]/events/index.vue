@@ -2,8 +2,7 @@
 import { computed } from 'vue';
 import EventListView from '@/components/event/list/EventListView.vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GetChannelDocument as GET_CHANNEL, GetServerConfigDocument as GET_SERVER_CONFIG  } from '@/__generated__/operations';
 import { useRoute } from 'nuxt/app';
 import { config } from '@/config';
 import { DateTime } from 'luxon';

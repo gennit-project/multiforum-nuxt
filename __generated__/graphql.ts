@@ -1250,6 +1250,8 @@ export type QueryServerConfigsArgs = {
 export type Mutation = {
   __typename?: 'Mutation';
   createIssue?: Maybe<Issue>;
+  writeWikiPage: WikiPage;
+  setWikiHomePage: Scalars['Boolean']['output'];
   addToCollection: Scalars['Boolean']['output'];
   removeFromCollection: Scalars['Boolean']['output'];
   reorderCollectionItem: Scalars['Boolean']['output'];
@@ -1519,7 +1521,18 @@ export type Mutation = {
 
 
 export type MutationCreateIssueArgs = {
-  input: IssueCreateInput;
+  input: SubmitIssueInput;
+};
+
+
+export type MutationWriteWikiPageArgs = {
+  input: WriteWikiPageInput;
+};
+
+
+export type MutationSetWikiHomePageArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  pageId: Scalars['ID']['input'];
 };
 
 
@@ -1696,6 +1709,7 @@ export type MutationUpdateDiscussionWithChannelConnectionsArgs = {
   channelConnections?: InputMaybe<Array<Scalars['String']['input']>>;
   channelDisconnections?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   albumImageDisconnections?: InputMaybe<Array<Scalars['ID']['input']>>;
+  album?: InputMaybe<DiscussionAlbumInput>;
   channelFlairSelections?: InputMaybe<Array<DiscussionChannelFlairSelectionInput>>;
 };
 
@@ -34481,6 +34495,22 @@ export type DiscussionAlbumFieldInput = {
   create?: InputMaybe<DiscussionAlbumCreateFieldInput>;
 };
 
+export type DiscussionAlbumImageUpdateInput = {
+  id: Scalars['ID']['input'];
+  alt?: InputMaybe<Scalars['String']['input']>;
+  caption?: InputMaybe<Scalars['String']['input']>;
+  copyright?: InputMaybe<Scalars['String']['input']>;
+};
+
+/**
+ * Ordered IDs of already uploaded images. Omitted IDs are disconnected.
+ * Metadata edits require uploader ownership; reusing an image never transfers it.
+ */
+export type DiscussionAlbumInput = {
+  imageIds: Array<Scalars['ID']['input']>;
+  imageUpdates?: InputMaybe<Array<DiscussionAlbumImageUpdateInput>>;
+};
+
 export type DiscussionAuthorConnectionWhere = {
   AND?: InputMaybe<Array<DiscussionAuthorConnectionWhere>>;
   OR?: InputMaybe<Array<DiscussionAuthorConnectionWhere>>;
@@ -39170,6 +39200,7 @@ export type DiscussionCreateInput = {
 
 export type DiscussionCreateInputWithChannels = {
   discussionCreateInput: DiscussionCreateInput;
+  crosspostedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
   channelConnections: Array<Scalars['String']['input']>;
   channelFlairSelections?: InputMaybe<Array<DiscussionChannelFlairSelectionInput>>;
 };
@@ -68662,6 +68693,30 @@ export type StringScalarMutations = {
   set?: InputMaybe<Scalars['String']['input']>;
 };
 
+/**
+ * A user-submitted request. Identity and numbering are assigned by the server.
+ * Omit channelUniqueName for a server-wide request. Target fields are optional.
+ */
+export type SubmitIssueInput = {
+  title: Scalars['String']['input'];
+  body: Scalars['String']['input'];
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  asModerationProfile?: InputMaybe<Scalars['Boolean']['input']>;
+  relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
+  relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId?: InputMaybe<Scalars['ID']['input']>;
+  relatedWikiPageId?: InputMaybe<Scalars['ID']['input']>;
+  relatedWikiRevisionId?: InputMaybe<Scalars['ID']['input']>;
+  relatedImageId?: InputMaybe<Scalars['ID']['input']>;
+  relatedAlbumId?: InputMaybe<Scalars['ID']['input']>;
+  relatedUsername?: InputMaybe<Scalars['String']['input']>;
+  relatedModProfileName?: InputMaybe<Scalars['String']['input']>;
+  relatedProfilePicUserId?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelIconName?: InputMaybe<Scalars['String']['input']>;
+  relatedChannelBannerName?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type SuspensionConnectWhere = {
   node: SuspensionWhere;
 };
@@ -87627,5 +87682,16 @@ export type WikiPageWhere = {
   ChildPagesConnection?: InputMaybe<WikiPageChildPagesConnectionFilters>;
   /** @deprecated Aggregate filters are moved inside the ChildPagesConnection filter, please use { ChildPagesConnection: { aggregate: {...} } } instead */
   ChildPagesAggregate?: InputMaybe<WikiPageChildPagesAggregateInput>;
+};
+
+export type WriteWikiPageInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  channelUniqueName: Scalars['String']['input'];
+  slug?: InputMaybe<Scalars['String']['input']>;
+  parentId?: InputMaybe<Scalars['ID']['input']>;
+  title: Scalars['String']['input'];
+  body?: InputMaybe<Scalars['String']['input']>;
+  editReason?: InputMaybe<Scalars['String']['input']>;
+  setAsHome?: InputMaybe<Scalars['Boolean']['input']>;
 };
 

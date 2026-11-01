@@ -1,31 +1,22 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onBeforeUnmount } from 'vue';
+import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
+import { appendCreatedDiscussion } from '@/utils/discussionCreateCache';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import type {
-  DiscussionChannel,
-  DiscussionCreateInput,
-  DiscussionAuthorFieldInput,
-  DiscussionCrosspostedDiscussionFieldInput,
-} from '@/__generated__/graphql';
 import {
-  GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
-  GET_CROSSPOST_PREVIEW,
-} from '@/graphQLData/discussion/queries';
-import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
+  CreateDiscussionDocument as CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
+  GetCrosspostPreviewDocument as GET_CROSSPOST_PREVIEW,
+  GetChannelDiscussionFlairConfigDocument as GET_CHANNEL_DISCUSSION_FLAIR_CONFIG,
+} from '@/__generated__/operations';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AccessDeniedMessage from '@/components/auth/AccessDeniedMessage.vue';
 import 'md-editor-v3/lib/style.css';
-import {
-  getSortFromQuery,
-  getTimeFrameFromQuery,
-} from '@/utils/getSortFromQuery';
 import { useRouter, useRoute } from 'nuxt/app';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useForumLock } from '@/composables/useForumLock';
 import { useUsername } from '@/composables/useAuthState';
-import { GET_CHANNEL_DISCUSSION_FLAIR_CONFIG } from '@/graphQLData/channel/queries';
 import {
   useChannelDiscussionFlairConfigs,
   type ChannelDiscussionFlairConfig,
@@ -33,12 +24,11 @@ import {
 
 const usernameVar = useUsername();
 
-const DISCUSSION_PAGE_LIMIT = 10;
 const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() =>
-  route.params.forumId ? String(route.params.forumId) : ''
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
 
 const crosspostDiscussionId = computed(() => {
@@ -129,9 +119,8 @@ const missingRequiredFlairConfig = computed(() =>
   effectiveFlairConfigs.value.find(
     (config) =>
       config.flairRequired &&
-      (formValues.value.selectedFlairIdsByChannel?.[
-        config.channelUniqueName
-      ]?.length || 0) === 0
+      (formValues.value.selectedFlairIdsByChannel?.[config.channelUniqueName]
+        ?.length || 0) === 0
   )
 );
 
@@ -152,7 +141,7 @@ const {
 } = useQuery(
   GET_CROSSPOST_PREVIEW,
   () => ({
-    id: crosspostDiscussionId.value,
+    id: crosspostDiscussionId.value || '',
   }),
   {
     enabled: computed(() => !!crosspostDiscussionId.value),
@@ -164,12 +153,12 @@ const crosspostPreviewDiscussion = computed(() => {
   return crosspostPreviewResult.value?.discussions?.[0] || null;
 });
 
-const discussionCreateInput = computed<DiscussionCreateInput>(() => {
+const discussionCreateInput = computed(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
     where: { node: { text: { eq: tag } } },
   }));
 
-  const result: DiscussionCreateInput = {
+  const result = {
     title: formValues.value.title,
     body: formValues.value.body,
     hasDownload: false,
@@ -178,64 +167,28 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
     Tags: {
       connect: tagConnections,
     },
-    // v7 Author input no longer exposes `connect`; preserve the existing
-    // connect payload the custom resolver expects via a cast.
-    Author: {
-      connect: {
-        where: {
-          node: { username: usernameVar.value },
-        },
-      },
-    } as unknown as DiscussionAuthorFieldInput,
+    // The pinned backend derives Author from authenticated context.
   };
 
-  if (formValues.value.album.images.length > 0) {
-    // If imageOrder is empty or doesn't match the images length, reconstruct it from the images
-    const imageIds = formValues.value.album.images.map((img) => img.id);
-
-    // Images already have IDs from when they were uploaded and created in the database
-    const validImages = formValues.value.album.images.filter(
-      (image): image is (typeof image & { id: string }) => Boolean(image.id)
-    );
-
-    const albumNode: {
-      imageOrder: string[];
-      Images: {
-        connect: { where: { node: { id: { eq: string } } } }[];
-      };
-    } = {
-      // Use the explicit imageOrder if it's valid, otherwise generate from image IDs
-      imageOrder:
-        formValues.value.album.imageOrder.length === imageIds.length
-          ? formValues.value.album.imageOrder.filter((id) => id !== undefined)
-          : imageIds.filter((id) => id !== undefined),
-      Images: {
-        connect: validImages.map((image) => ({
-          where: { node: { id: { eq: image.id } } },
-        })),
-      },
-    };
-
-    result.Album = {
-      create: {
-        node: albumNode,
-      },
-    };
-  }
-
-  if (formValues.value.crosspostId) {
-    // v7 CrosspostedDiscussion input no longer exposes `connect`; preserve the
-    // existing connect payload the custom resolver expects via a cast.
-    result.CrosspostedDiscussion = {
-      connect: {
-        where: {
-          node: { id: formValues.value.crosspostId },
+  const albumInput = buildAlbumUpdateInput({ albumData: formValues.value.album });
+  const album = albumInput && {
+    create: {
+      node: {
+        imageOrder: albumInput.imageIds,
+        Images: {
+          connect: albumInput.imageIds.map((id) => ({
+            where: { node: { id: { eq: id } } },
+          })),
         },
       },
-    } as unknown as DiscussionCrosspostedDiscussionFieldInput;
-  }
+    },
+  };
 
-  return result;
+  return {
+    ...result,
+    ...(album ? { Album: album } : {}),
+
+  };
 });
 
 const channelConnections = computed(() => formValues.value.selectedChannels);
@@ -259,83 +212,42 @@ const showSuspensionNotice = computed(() => {
   return submitAttempted.value && !!suspensionIssueNumber.value;
 });
 
+const createVariables = () => ({
+  input: [
+    {
+      discussionCreateInput: discussionCreateInput.value,
+      channelConnections: channelConnections.value,
+      ...(formValues.value.crosspostId ? { crosspostedDiscussionId: formValues.value.crosspostId } : {}),
+      channelFlairSelections: channelFlairSelections.value,
+    },
+  ],
+});
+
 const {
   mutate: createDiscussion,
   loading: createDiscussionLoading,
   error: createDiscussionError,
   onDone,
-} = useMutation(CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
-  errorPolicy: 'all',
-  variables: {
-    input: [
-      {
-        discussionCreateInput: discussionCreateInput.value,
-        channelConnections: channelConnections.value,
-        channelFlairSelections: channelFlairSelections.value,
-      },
-    ],
-  },
-  update: (cache, result) => {
-    const discussionChannels =
-      result.data?.createDiscussionWithChannelConnections?.DiscussionChannels ||
-      [];
-    const discussionChannelInCurrentChannel = discussionChannels.filter(
-      (dc: DiscussionChannel) => dc?.Channel?.uniqueName === channelId.value
-    );
+} = useMutation(
+  CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
+  () => ({
+    errorPolicy: 'all',
+    variables: createVariables(),
+    update: (cache, result) => {
+      appendCreatedDiscussion(cache, result.data);
+    },
+  })
+);
 
-    const existingData: {
-      getDiscussionsInChannel?: {
-        aggregateDiscussionChannelsCount?: number;
-        discussionChannels?: DiscussionChannel[];
-      };
-    } | null = cache.readQuery({
-      query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
-      variables: {
-        channelUniqueName: channelId.value,
-        searchInput: '',
-        selectedTags: [],
-        options: {
-          limit: DISCUSSION_PAGE_LIMIT,
-          offset: 0,
-          sort: getSortFromQuery(route.query),
-          timeFrame: getTimeFrameFromQuery(route.query),
-        },
-      },
-    });
-
-    const existingNumberOfDiscussionChannels =
-      existingData?.getDiscussionsInChannel?.aggregateDiscussionChannelsCount ||
-      0;
-
-    cache.writeQuery({
-      query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
-      variables: {
-        channelUniqueName: channelId.value,
-        searchInput: '',
-        selectedTags: [],
-        options: {
-          limit: DISCUSSION_PAGE_LIMIT,
-          offset: 0,
-          sort: getSortFromQuery(route.query),
-          timeFrame: getTimeFrameFromQuery(route.query),
-        },
-      },
-      data: {
-        getDiscussionsInChannel: {
-          aggregateDiscussionChannelsCount:
-            existingNumberOfDiscussionChannels + 1,
-          discussionChannels: [
-            ...discussionChannelInCurrentChannel,
-            ...(existingData?.getDiscussionsInChannel?.discussionChannels ||
-              []),
-          ],
-        },
-      },
-    });
-  },
-}));
-
+let routeGeneration = 0;
+watch(channelId, () => { routeGeneration++; });
+onBeforeUnmount(() => { routeGeneration++; });
+let submittedGeneration = routeGeneration;
+let submittedRoute = channelId.value;
+let submittedChannel = channelId.value;
+const completedDiscussionIds = new Set<string>();
 onDone((response) => {
+  if (routeGeneration !== submittedGeneration || channelId.value !== submittedRoute) return;
   const newDiscussionArray =
     response.data?.createDiscussionWithChannelConnections;
   const newDiscussion = newDiscussionArray?.[0]?.DiscussionChannels?.[0];
@@ -347,16 +259,19 @@ onDone((response) => {
     return;
   }
 
+  if (completedDiscussionIds.has(newDiscussionId)) return;
+  completedDiscussionIds.add(newDiscussionId);
   router.push({
     name: 'forums-forumId-discussions-discussionId',
     params: {
-      forumId: channelId.value || formValues.value.selectedChannels[0],
+      forumId: submittedChannel,
       discussionId: newDiscussionId,
     },
   });
 });
 
 function submit() {
+  if (createDiscussionLoading.value) return;
   if (!usernameVar.value) {
     console.error('No username found');
     return;
@@ -380,26 +295,27 @@ function submit() {
     submitError.value = `Select at least one flair for ${missingRequiredFlairConfig.value.channelUniqueName}.`;
     return;
   }
+  submittedGeneration = routeGeneration;
+  submittedRoute = channelId.value;
+  submittedChannel = channelId.value || formValues.value.selectedChannels[0] || '';
   createDiscussion();
 }
 
 function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
-
   if (data.selectedChannels) {
     const selectedChannels = new Set(data.selectedChannels);
     data = {
       ...data,
       selectedFlairIdsByChannel: Object.fromEntries(
-        Object.entries(
-          formValues.value.selectedFlairIdsByChannel || {}
-        ).filter(([channel]) => selectedChannels.has(channel))
+        Object.entries(formValues.value.selectedFlairIdsByChannel || {}).filter(
+          ([channel]) => selectedChannels.has(channel)
+        )
       ),
     };
   }
 
   // Handle album updates specially to avoid overwriting the entire album object
   if (data.album) {
-
     // Explicitly handle images and imageOrder to ensure they stay in sync
     if (data.album.images) {
       formValues.value.album.images = data.album.images;
@@ -417,7 +333,6 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
       ...formValues.value,
       ...restData,
     };
-
   } else {
     // If no album data, just update normally
     formValues.value = {
@@ -441,9 +356,7 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
         :suspension-issue-number="
           showSuspensionNotice ? suspensionIssueNumber : null
         "
-        :suspension-channel-id="
-          showSuspensionNotice ? suspensionChannelId : ''
-        "
+        :suspension-channel-id="showSuspensionNotice ? suspensionChannelId : ''"
         :suspension-until="showSuspensionNotice ? suspensionUntil : null"
         :suspension-indefinitely="
           showSuspensionNotice ? suspensionIndefinitely : null
@@ -458,12 +371,8 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
         :discussion-flairs-loading="scopedDiscussionFlairsLoading"
         :discussion-flairs-error="scopedDiscussionFlairsQueryError?.message"
         :discussion-flair-configs="sitewideFlairConfigs"
-        :discussion-flairs-loading-channels="
-          sitewideFlairsLoadingChannels
-        "
-        :discussion-flairs-errors-by-channel="
-          sitewideFlairsErrorsByChannel
-        "
+        :discussion-flairs-loading-channels="sitewideFlairsLoadingChannels"
+        :discussion-flairs-errors-by-channel="sitewideFlairsErrorsByChannel"
         @submit="submit"
         @update-form-values="updateFormValues"
       />

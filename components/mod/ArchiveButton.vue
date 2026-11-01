@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import type { Issue } from '@/__generated__/graphql';
+import type { IssueView as Issue } from '@/types/Issue';
 import ArchiveBox from '@/components/icons/ArchiveBox.vue';
 import ArchiveBoxXMark from '@/components/icons/ArchiveBoxXMark.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
@@ -8,12 +8,8 @@ import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import { useQuery } from '@vue/apollo-composable';
-import {
-  GET_DISCUSSION_CHANNEL,
-  GET_EVENT_CHANNEL,
-} from '@/graphQLData/mod/queries';
-import { GET_COMMENT_ARCHIVED } from '@/graphQLData/comment/queries';
-import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
+import { GetDiscussionChannelIdDocument as GET_DISCUSSION_CHANNEL, GetEventChannelIdDocument as GET_EVENT_CHANNEL, GetCommentSource06938535b8Document as GET_COMMENT_ARCHIVED , GetImageDetailsDocument as GET_IMAGE_DETAILS  } from '@/__generated__/operations';
+
 
 const props = defineProps({
   issue: {

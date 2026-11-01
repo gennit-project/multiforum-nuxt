@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 import { computed } from 'vue';
-import type { Channel, Tag as TagData } from '@/__generated__/graphql';
+import type { ChannelListEntry as Channel } from '@/types/ChannelPresentation';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import Tag from '@/components/TagComponent.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
@@ -27,7 +27,7 @@ const props = defineProps({
   },
 });
 
-const tags = computed(() => props.channel.Tags.map((tag: TagData) => tag.text));
+const tags = computed(() => props.channel.Tags.map((tag) => tag.text));
 
 defineEmits(['filterByTag']);
 </script>

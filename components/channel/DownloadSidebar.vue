@@ -11,9 +11,9 @@ import DownloadPipelineStatusSummary from '@/components/plugins/DownloadPipeline
 import { computed, ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import {
-  REQUEST_DOWNLOADABLE_FILE_REVIEW,
-  RETRY_DOWNLOADABLE_FILE_SCAN,
-} from '@/graphQLData/discussion/mutations';
+  RequestDownloadableFileReviewDocument as REQUEST_DOWNLOADABLE_FILE_REVIEW,
+  RetryDownloadableFileScanDocument as RETRY_DOWNLOADABLE_FILE_SCAN,
+} from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 
 type DownloadScanStatus =

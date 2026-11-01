@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GET_USER_EVENTS } from '@/graphQLData/user/queries';
+import { GetUserEventsDocument as GET_USER_EVENTS } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import EventListItemInProfile from '@/components/user/EventItemInProfile.vue';
 import { useRoute } from 'nuxt/app';
@@ -54,7 +54,7 @@ const { result, loading, error } = useQuery(
       class="flex flex-col gap-3"
     >
       <EventListItemInProfile
-        v-for="event in result.users[0].Events"
+        v-for="event in result?.users?.[0]?.Events"
         :key="event.id"
         :current-channel-id="''"
         :event="event"

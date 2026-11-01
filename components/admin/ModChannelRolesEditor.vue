@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { GET_MOD_CHANNEL_ROLES } from '@/graphQLData/admin/queries';
-import { UPDATE_MOD_CHANNEL_ROLE } from '@/graphQLData/admin/mutations';
+import { GetModChannelRolesDocument as GET_MOD_CHANNEL_ROLES, UpdateModChannelRoleDocument as UPDATE_MOD_CHANNEL_ROLE  } from '@/__generated__/operations';
 
-type RoleRecord = Record<string, boolean | string | null | undefined> & {
-  name?: string | null;
-  description?: string | null;
-  channelUniqueName?: string | null;
-};
+import type { GetModChannelRolesQuery } from '@/__generated__/operations';
+type RoleRecord = GetModChannelRolesQuery['modChannelRoles'][number];
 
 const permissionKeys = [
   'canEditComments',
@@ -35,7 +31,7 @@ const { mutate } = useMutation(UPDATE_MOD_CHANNEL_ROLE);
 
 const roles = computed<RoleRecord[]>(() => {
   if (!result.value?.modChannelRoles) return [];
-  return (result.value.modChannelRoles as RoleRecord[]).slice();
+  return result.value.modChannelRoles.slice();
 });
 
 const sortedRoles = computed(() => {
@@ -89,7 +85,7 @@ const onTogglePermission = async (
     await mutate({
       name: role.name,
       input: {
-        [permission]: value,
+        [permission]: { set: value },
       },
     });
   } catch {

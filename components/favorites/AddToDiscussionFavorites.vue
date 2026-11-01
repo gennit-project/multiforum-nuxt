@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useMutation, useQuery } from '@vue/apollo-composable';
-import { gql } from '@apollo/client/core';
 import {
-  ADD_FAVORITE_DISCUSSION,
-  REMOVE_FAVORITE_DISCUSSION,
-} from '@/graphQLData/user/mutations';
+  GetUserFavoriteDiscussionDocument as GET_USER_FAVORITE_DISCUSSION,
+  AddFavoriteDiscussionDocument as ADD_FAVORITE_DISCUSSION,
+  RemoveFavoriteDiscussionDocument as REMOVE_FAVORITE_DISCUSSION,
+} from '@/__generated__/operations';
+import { computed, type PropType } from 'vue';
+import { useMutation, useQuery } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
 import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
 import { useFavoritedState } from '@/composables/useFavoritedState';
@@ -31,7 +31,7 @@ const props = defineProps({
     default: 'Discussion',
   },
   entityType: {
-    type: String,
+    type: String as PropType<'discussion' | 'download'>,
     default: 'discussion',
   },
   allowAddToList: {
@@ -50,22 +50,13 @@ const props = defineProps({
   },
 });
 
-const GET_USER_FAVORITE_DISCUSSION = gql`
-  query getUserFavoriteDiscussion($username: String!, $discussionId: ID!) {
-    users(where: { username: { eq: $username } }) {
-      username
-      FavoriteDiscussions(where: { id: { eq: $discussionId } }) {
-        id
-        title
-      }
-    }
-  }
-`;
-
 // Use initial value if provided, otherwise default to false
 // Only fetch if initialIsFavorited was not provided
-const shouldFetchFavorite = computed(() =>
-  props.initialIsFavorited === undefined && !!usernameVar.value && !!props.discussionId
+const shouldFetchFavorite = computed(
+  () =>
+    props.initialIsFavorited === undefined &&
+    !!usernameVar.value &&
+    !!props.discussionId
 );
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
@@ -103,7 +94,7 @@ const { isLoading, handleToggleFavorite } = useFavoriteToggle({
   removedMessage: () => `${props.entityName} removed from favorites.`,
   addFavorite,
   removeFavorite,
-  mutationItemKey: 'discussionId',
+  variables: (itemId, username) => ({ discussionId: itemId, username }),
   // Only refetch if we're managing our own query (parent didn't provide isFavorited)
   onAfterToggle: () => {
     if (shouldFetchFavorite.value) {

@@ -1,3 +1,4 @@
+import { PipelineApplicability } from '@/__generated__/graphql';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { computed, defineComponent, h, ref } from 'vue';
 import { mount } from '@vue/test-utils';
@@ -9,6 +10,9 @@ import {
   type ApplicablePublicPipeline,
   type PublicPipelineAttempt,
 } from './useDownloadPipelineOverview';
+vi.mock('@/__generated__/operations', () => ({
+GetDownloadPipelineOverviewDocument: 'download-pipeline-overview'
+}));
 
 const mockQueryResult = ref<Record<string, unknown>>({});
 const mockRefetch = vi.fn();
@@ -60,9 +64,7 @@ vi.mock('./usePipelineHistory', () => ({
   },
 }));
 
-vi.mock('@/graphQLData/admin/queries', () => ({
-  GET_DOWNLOAD_PIPELINE_OVERVIEW: 'download-pipeline-overview',
-}));
+
 
 const applicable = (
   overrides: Partial<ApplicablePublicPipeline> = {}
@@ -71,8 +73,10 @@ const applicable = (
   targetType: 'DownloadableFile',
   eventType: 'downloadableFile.created',
   scope: 'SERVER',
+  channelId: null,
+  effectiveAt: null,
   configured: true,
-  applicability: 'ALL_FILES_IMMEDIATE',
+  applicability: PipelineApplicability.AllFilesImmediate,
   required: true,
   reason: 'APPLICABLE',
   expectedJobs: [],

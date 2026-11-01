@@ -3,8 +3,11 @@ import { computed } from 'vue';
 import { relativeTime } from '@/utils';
 import Tag from '@/components/TagComponent.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
-import type { Event } from '@/__generated__/graphql';
-import type { TagData } from '../../types/Tag';
+import type { GetUserEventsQuery } from '@/__generated__/operations';
+
+import type { NullableSelection } from '@/types/Comment';
+import type { UserContributionActivity } from '@/types/contribution';
+type Event = NullableSelection<GetUserEventsQuery['users'][number]['Events'][number] | UserContributionActivity['Events'][number]>;
 
 const props = defineProps({
   event: {
@@ -38,15 +41,17 @@ const defaultUniqueName = computed(() => {
 // Primary link target for the card title, so it is keyboard-reachable instead
 // of relying on a click handler on the whole <li>.
 const titleLink = computed(() =>
-  defaultUniqueName.value
+  defaultUniqueName.value && props.event.id
     ? `/forums/${defaultUniqueName.value}/events/${props.event.id}`
     : ''
 );
 
-const title = props.event.title;
-const relativeTimeText = relativeTime(props.event.createdAt);
+const title = computed(() => props.event.title || '');
+const relativeTimeText = relativeTime(props.event.createdAt || '');
 const poster = props.event.Poster ? props.event.Poster.username : 'Deleted';
-const tags = (props.event.Tags ?? []).map((tag: TagData) => tag.text);
+const tags = computed(() => ('Tags' in props.event ? props.event.Tags ?? [] : []).map((tag) => tag.text));
+const channels = computed(() => (props.event.EventChannels || []).filter((item) => item !== null));
+const channelName = (channel: (typeof channels.value)[number]) => ('Channel' in channel ? channel.Channel?.uniqueName : null) || channel.channelUniqueName || '';
 </script>
 
 <template>
@@ -88,22 +93,22 @@ const tags = (props.event.Tags ?? []).map((tag: TagData) => tag.text);
     </p>
 
     <div
-      v-for="(ec, i) in event.EventChannels"
+      v-for="(ec, i) in channels"
       :key="i"
       class="my-2 space-x-2 text-sm"
     >
       <nuxt-link
-        v-if="ec.Channel"
+        v-if="channelName(ec)"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
         :to="{
           name: 'forums-forumId-events-eventId',
           params: {
-            forumId: ec.Channel.uniqueName,
+            forumId: channelName(ec),
             eventId: event.id,
           },
         }"
       >
-        {{ `c/${ec.Channel.uniqueName}` }}
+        {{ `c/${channelName(ec)}` }}
       </nuxt-link>
     </div>
   </li>

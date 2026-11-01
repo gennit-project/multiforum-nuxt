@@ -20,7 +20,7 @@ const COMMENT_TEXT = 'A comment authored by the moderation profile.';
 const FORUM_RULE = 'Be kind';
 
 // Shape mirrors GET_MOD_COMMENTS' AuthoredComments selection: a Comment whose
-// author is a ModerationProfile, plus the extra fields Comment.vue renders.
+// author is a ModerationProfile. Interactive controls hydrate through GET_COMMENT.
 const modAuthoredComment = {
   ...buildComment({
     comment: { id: COMMENT_ID, text: COMMENT_TEXT, parentCommentId: null },
@@ -59,6 +59,7 @@ test('reports a comment from a moderation profile comments page', async ({
   setupMockedPage,
 }) => {
   let reportVariables: ReportCommentVariables | null = null;
+  const hydratedIds: unknown[] = [];
 
   await setupMockedPage({
     username: TEST_USER,
@@ -97,6 +98,10 @@ test('reports a comment from a moderation profile comments page', async ({
         },
       }),
       getModContributions: () => ({ data: { getModContributions: [] } }),
+      getComment: ({ body }) => {
+        hydratedIds.push(body.variables?.id);
+        return { data: { comments: [modAuthoredComment] } };
+      },
       reportComment: ({ body }) => {
         reportVariables = body.variables as ReportCommentVariables;
         return { data: { reportComment: { id: 'issue-1', issueNumber: 1 } } };
@@ -111,6 +116,7 @@ test('reports a comment from a moderation profile comments page', async ({
 
   // Open the comment context menu and choose Report.
   await page.getByTestId('commentMenu').first().click();
+  expect(hydratedIds).toEqual([COMMENT_ID]);
   await page.getByTestId('commentMenu-item-Report').click();
 
   // The report modal opens for a comment.

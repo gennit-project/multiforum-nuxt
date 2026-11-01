@@ -9,8 +9,10 @@ import {
 } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import type { NativeEmoji, SkinTone } from 'emoji-picker-element/shared';
-import { ADD_EMOJI_TO_COMMENT } from '@/graphQLData/comment/mutations';
-import { ADD_EMOJI_TO_DISCUSSION_CHANNEL } from '@/graphQLData/discussion/mutations';
+import {
+  AddEmojiToCommentDocument as ADD_EMOJI_TO_COMMENT,
+  AddEmojiToDiscussionChannelDocument as ADD_EMOJI_TO_DISCUSSION_CHANNEL,
+} from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 import {
   useEmojiCatalog,
@@ -312,10 +314,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer));
           class="grid grid-cols-8 justify-items-center"
           @keydown="onGridKeydown"
         >
-          <div
-            v-for="(emoji, index) in searchResults"
-            :key="emoji.unicode"
-          >
+          <div v-for="(emoji, index) in searchResults" :key="emoji.unicode">
             <button
               type="button"
               data-emoji-button
@@ -345,10 +344,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer));
             class="grid grid-cols-8 justify-items-center"
             @keydown="onGridKeydown"
           >
-            <div
-              v-for="(emoji, index) in recents"
-              :key="emoji.unicode"
-            >
+            <div v-for="(emoji, index) in recents" :key="emoji.unicode">
               <button
                 type="button"
                 data-emoji-button
@@ -382,10 +378,7 @@ onBeforeUnmount(() => clearTimeout(searchTimer));
             class="grid grid-cols-8 justify-items-center"
             @keydown="onGridKeydown"
           >
-            <div
-              v-for="(emoji, index) in category.emojis"
-              :key="emoji.unicode"
-            >
+            <div v-for="(emoji, index) in category.emojis" :key="emoji.unicode">
               <button
                 type="button"
                 data-emoji-button

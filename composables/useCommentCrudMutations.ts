@@ -1,14 +1,13 @@
 import { incrementCreatedCommentCount } from '@/utils/rootCommentCache';
-import { CreateCommentDocument as CREATE_COMMENT } from '@/__generated__/operations';
+import {
+  CreateCommentDocument as CREATE_COMMENT,
+  UpdateCommentDocument as UPDATE_COMMENT,
+  DeleteCommentDocument as DELETE_COMMENT,
+  SoftDeleteCommentDocument as SOFT_DELETE_COMMENT,
+} from '@/__generated__/operations';
 import type { Ref } from 'vue';
 import type { Reference } from '@apollo/client/core';
 import { useMutation } from '@vue/apollo-composable';
-import type { Comment as CommentType } from '@/__generated__/graphql';
-import {
-  UPDATE_COMMENT,
-  DELETE_COMMENT,
-  SOFT_DELETE_COMMENT,
-} from '@/graphQLData/comment/mutations';
 
 type UseCommentCrudMutationsParams = {
   discussionId: Ref<string | undefined>;
@@ -201,9 +200,9 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
             id: parentOfCommentToDelete.value,
           }),
           fields: {
-            ChildComments(existing = []) {
+            ChildComments(existing: readonly Reference[] = [], { readField }) {
               return existing.filter(
-                (reply: CommentType) => reply.id !== commentToDeleteId.value
+                (reply) => readField('id', reply) !== commentToDeleteId.value
               );
             },
             ChildCommentsConnection(existing) {
@@ -229,9 +228,10 @@ export function useCommentCrudMutations(params: UseCommentCrudMutationsParams) {
             id: discussionId.value,
           }),
           fields: {
-            Comments(existing = []) {
+            Comments(existing: readonly Reference[] = [], { readField }) {
               return existing.filter(
-                (comment: CommentType) => comment.id !== commentToDeleteId.value
+                (comment) =>
+                  readField('id', comment) !== commentToDeleteId.value
               );
             },
             CommentsConnection(existing) {

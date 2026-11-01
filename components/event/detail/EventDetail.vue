@@ -1,22 +1,19 @@
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import Tag from '@/components/TagComponent.vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_EVENT } from '@/graphQLData/event/queries';
 import {
-  GET_EVENT_COMMENTS,
-  GET_EVENT_ROOT_COMMENT_AGGREGATE,
-} from '@/graphQLData/comment/queries';
-import { GET_EVENT_CHANNEL } from '@/graphQLData/mod/queries';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+  GetEventDocument as GET_EVENT,
+  GetEventCommentsDocument as GET_EVENT_COMMENTS,
+  GetEventRootCommentAggregateDocument as GET_EVENT_ROOT_COMMENT_AGGREGATE,
+  GetEventChannelIdDocument as GET_EVENT_CHANNEL, GetChannelDocument as GET_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG
+} from '@/__generated__/operations';
 import { DateTime } from 'luxon';
 import { config } from '@/config';
 import type {
-  Comment,
-  EventChannel,
-  Event as EventData,
-} from '@/__generated__/graphql';
+  EventPresentation,
+  EventRootComment,
+} from '@/types/EventPresentation';
 import { stableRelativeTime } from '@/utils';
 import { isEventInThePast, hasEventStarted } from '@/utils/eventTiming';
 import { formatEventDate, buildEventHead } from '@/utils/eventSeo';
@@ -106,24 +103,11 @@ const props = defineProps({
 const emit = defineEmits(['fetchedOriginalPosterUsername']);
 
 const route = useRoute();
-const offset = ref(0);
-
-// Instead of a computed property, make it a ref
-const eventId = ref(
-  props.eventId ||
+const eventId = computed(
+  () =>
+    props.eventId ||
     props.issueEventId ||
     (typeof route.params.eventId === 'string' ? route.params.eventId : '')
-);
-
-// Add a watcher for the route params and props
-watch(
-  [() => props.eventId, () => props.issueEventId, () => route.params.eventId],
-  ([newEventIdProp, newIssueEventId, newRouteEventId]) => {
-    eventId.value =
-      newEventIdProp ||
-      newIssueEventId ||
-      (typeof newRouteEventId === 'string' ? newRouteEventId : '');
-  }
 );
 
 const channelId = computed(() => {
@@ -143,43 +127,38 @@ const {
   result: eventResult,
   error: eventError,
   loading: eventLoading,
-  refetch: loadEvent,
   onResult: onEventResult,
 } = useQuery(
   GET_EVENT,
-  {
-    id: eventId,
+  () => ({
+    id: eventId.value,
     channelUniqueName: channelId.value,
     loggedInModName: loggedInUserModName.value,
-  },
+  }),
   {
     fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
+    enabled: computed(() => !!eventId.value),
+    keepPreviousResult: false,
   }
 );
 
-onEventResult(({ data }) => {
-  if (data?.events?.length) {
-    const author = getOriginalPoster({ Event: data.events[0] });
+onEventResult(({ data, loading }) => {
+  const current = data?.events?.find((item) => item.id === eventId.value);
+  if (!loading && current) {
+    const author = getOriginalPoster({ Event: current });
     if (author.username) {
       emit('fetchedOriginalPosterUsername', author.username);
     }
   }
 });
 
-const event = computed<EventData | null>(() => {
-  const loadedEvent = eventResult.value?.events?.[0];
-  if (eventLoading.value && !loadedEvent?.title) {
-    return (
-      (getEventCommentsResult.value?.getEventComments?.Event as EventData) ||
-      null
-    );
-  }
-  return (
-    loadedEvent ||
-    (getEventCommentsResult.value?.getEventComments?.Event as EventData) ||
-    null
-  );
+const event = computed<EventPresentation | null>(() => {
+  const loadedEvent = !eventLoading.value
+    ? eventResult.value?.events?.find((item) => item.id === eventId.value)
+    : null;
+  const fallback = getEventCommentsResult.value?.getEventComments?.Event;
+  return loadedEvent || (fallback?.id === eventId.value ? fallback : null);
 });
 
 const commentSort = computed(() => getSortFromQuery(route.query));
@@ -187,17 +166,21 @@ const commentSort = computed(() => getSortFromQuery(route.query));
 const {
   result: getEventCommentsResult,
   loading: getEventCommentsLoading,
+  error: getEventCommentsError,
   fetchMore: fetchMoreComments,
   refetch: loadEventComments,
-} = useQuery(GET_EVENT_COMMENTS, {
-  eventId: eventId,
-  offset: offset.value,
-  limit: COMMENT_LIMIT,
-  sort: commentSort.value,
-});
-
-watch(commentSort, () =>
-  fetchMoreComments({ variables: { sort: commentSort.value } })
+} = useQuery(
+  GET_EVENT_COMMENTS,
+  () => ({
+    eventId: eventId.value,
+    offset: 0,
+    limit: COMMENT_LIMIT,
+    sort: commentSort.value,
+  }),
+  {
+    enabled: computed(() => !!eventId.value),
+    keepPreviousResult: false,
+  }
 );
 
 watch(
@@ -208,30 +191,39 @@ watch(
   }
 );
 
-onMounted(() => {
-  if (usernameVar.value) {
-    loadEventComments();
-  }
+const comments = computed<EventRootComment[]>(() => {
+  const section = getEventCommentsResult.value?.getEventComments;
+  if (getEventCommentsLoading.value || section?.Event?.id !== eventId.value)
+    return [];
+  return section.Comments.filter((item) => item?.id);
 });
 
-const comments = computed<Comment[]>(
-  () => getEventCommentsResult.value?.getEventComments?.Comments || []
+const {
+  result: getEventChannelResult,
+  loading: eventChannelLoading,
+  error: eventChannelError,
+  refetch: refetchEventChannel,
+} = useQuery(
+  GET_EVENT_CHANNEL,
+  () => ({ eventId: eventId.value, channelUniqueName: channelId.value }),
+  {
+    enabled: computed(() => !!eventId.value && !!channelId.value),
+    keepPreviousResult: false,
+  }
 );
 
-const { result: getEventChannelResult, refetch: refetchEventChannel } =
-  useQuery(GET_EVENT_CHANNEL, {
-    eventId: eventId,
-    channelUniqueName: channelId.value,
-  });
-
-const activeEventChannel = computed<EventChannel | null>(() => {
-  if (!getEventChannelResult.value) {
-    return null;
-  }
-  if (!getEventChannelResult.value.eventChannels?.length) {
-    return null;
-  }
-  return getEventChannelResult.value.eventChannels[0];
+const selectedEventChannel = computed(() =>
+  event.value?.EventChannels.find(
+    (channel) => channel.channelUniqueName === channelId.value
+  )
+);
+const activeEventChannel = computed(() => {
+  if (eventChannelLoading.value || eventChannelError.value) return null;
+  return (
+    getEventChannelResult.value?.eventChannels.find(
+      (channel) => channel.id === selectedEventChannel.value?.id
+    ) || null
+  );
 });
 
 const isArchived = computed(() => {
@@ -246,10 +238,11 @@ const {
   result: getEventRootCommentAggregateResult,
   error: getEventRootCommentAggregateError,
   loading: getEventRootCommentAggregateLoading,
-  refetch: loadEventRootCommentAggregate,
-} = useQuery(GET_EVENT_ROOT_COMMENT_AGGREGATE, {
-  eventId: eventId,
-});
+} = useQuery(
+  GET_EVENT_ROOT_COMMENT_AGGREGATE,
+  () => ({ eventId: eventId.value }),
+  { enabled: computed(() => !!eventId.value), keepPreviousResult: false }
+);
 
 // Prefetch channel + server config in this first query wave. EventHeader issues
 // these same queries, but it only mounts after the event loads (it sits behind
@@ -260,10 +253,10 @@ const {
 // prefetch.
 useQuery(
   GET_CHANNEL,
-  {
+  () => ({
     uniqueName: channelId.value,
     now: DateTime.local().startOf('hour').toISO(),
-  },
+  }),
   {
     fetchPolicy: 'cache-first',
     enabled: computed(() => !!channelId.value),
@@ -280,14 +273,6 @@ useQuery(
   }
 );
 
-watch([eventId, channelId], ([newEventId, newChannelId]) => {
-  if (newEventId && newChannelId !== undefined) {
-    loadEvent();
-    loadEventComments();
-    loadEventRootCommentAggregate();
-  }
-});
-
 const loadedRootCommentCount = computed(() => comments.value.length);
 
 const aggregateRootCommentCount = computed(() => {
@@ -297,27 +282,47 @@ const aggregateRootCommentCount = computed(() => {
   )
     return 0;
   const events = getEventRootCommentAggregateResult.value?.events || [];
-  return events[0]?.CommentsConnection?.aggregate?.count?.nodes || 0;
+  return (
+    events.find((item) => item.id === eventId.value)?.CommentsConnection
+      ?.aggregate?.count?.nodes || 0
+  );
 });
-const previousOffset = ref(0);
+const previousOffset = 0;
+const paginationScope = computed(() =>
+  JSON.stringify([eventId.value, channelId.value, commentSort.value])
+);
 const loadMore = () => {
-  fetchMoreComments({
+  if (getEventCommentsLoading.value || !eventId.value) return;
+  const scope = paginationScope.value;
+  const id = eventId.value;
+  return fetchMoreComments({
     variables: {
-      offset:
-        getEventCommentsResult.value?.getEventComments?.Comments?.length || 0,
+      eventId: id,
+      sort: commentSort.value,
+      offset: comments.value.length,
+      limit: COMMENT_LIMIT,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
-      offset.value += fetchMoreResult.getEventComments.Comments.length;
+      const previous = previousResult.getEventComments;
+      const next = fetchMoreResult?.getEventComments;
+      if (
+        scope !== paginationScope.value ||
+        previous?.Event?.id !== id ||
+        next?.Event?.id !== id
+      )
+        return previousResult;
+      const merged = new Map(
+        previous.Comments.filter((item) => item?.id).map((item) => [
+          item.id,
+          item,
+        ])
+      );
+      next.Comments.forEach((item) => {
+        if (item?.id) merged.set(item.id, item);
+      });
       return {
         ...previousResult,
-        getEventComments: {
-          ...previousResult.getEventComments,
-          Comments: [
-            ...previousResult.getEventComments.Comments,
-            ...fetchMoreResult.getEventComments.Comments,
-          ],
-        },
+        getEventComments: { ...previous, Comments: [...merged.values()] },
       };
     },
   });
@@ -330,7 +335,7 @@ const reachedEndOfResults = computed(
 const channelsExceptCurrent = computed(() => {
   if (!event.value?.EventChannels) return [];
   return event.value.EventChannels.filter(
-    (ec: EventChannel) => ec.channelUniqueName !== channelId.value
+    (ec) => ec.channelUniqueName !== channelId.value
   );
 });
 
@@ -353,6 +358,9 @@ const editedAt = computed(() => {
 });
 
 const eventDescriptionEditMode = ref(false);
+watch([eventId, channelId], () => {
+  eventDescriptionEditMode.value = false;
+});
 
 const handleClickEditEventDescription = () => {
   eventDescriptionEditMode.value = true;
@@ -365,7 +373,9 @@ useHead(
       event: event.value,
       channelId: channelId.value,
       forumName:
-        activeEventChannel.value?.Channel?.displayName || channelId.value || '',
+        selectedEventChannel.value?.Channel?.displayName ||
+        channelId.value ||
+        '',
       serverDisplayName: config.serverDisplayName,
       baseUrl: import.meta.env.VITE_BASE_URL,
     })
@@ -560,9 +570,7 @@ useHead(
               </div>
             </div>
             <div v-if="event && showAddToCalendar" class="pt-1">
-              <AddToCalendarButton
-                :event="event"
-              />
+              <AddToCalendarButton :event="event" />
             </div>
             <EventFooter
               :event-data="event"
@@ -582,9 +590,13 @@ useHead(
               />
             </div>
             <div v-if="showComments">
+              <ErrorBanner
+                v-if="getEventCommentsError"
+                :text="getEventCommentsError.message"
+              />
               <div class="my-6 mb-2 rounded-lg">
                 <EventCommentsWrapper
-                  :key="event?.id"
+                  :key="`${eventId}:${channelId}`"
                   :loading="getEventCommentsLoading"
                   :event="event"
                   :comments="comments"
@@ -596,7 +608,7 @@ useHead(
                 >
                   <EventRootCommentFormWrapper
                     v-if="event && !isArchived"
-                    :key="`${eventId}`"
+                    :key="`${eventId}:${channelId}`"
                     :event="event"
                     :previous-offset="previousOffset"
                   />

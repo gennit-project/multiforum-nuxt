@@ -254,4 +254,29 @@ describe('forums index page', () => {
 
     expect(updateChannels(previous, { fetchMoreResult: null })).toBe(previous);
   });
+  it('rejects pages from a previous search in both queries', async () => {
+    const wrapper = await mountWith({ channels: [{ uniqueName: 'cats' }] });
+    wrapper.findComponent(ChannelList).vm.$emit('load-more');
+    wrapper.findComponent(SearchBar).vm.$emit('update-search-input', 'new search');
+    const previous = { getSortedChannels: { channels: [{ uniqueName: 'cats' }] } };
+    const next = { getSortedChannels: { channels: [{ uniqueName: 'dogs' }] } };
+    expect([mockState.fetchMoreChannels, mockState.fetchMoreDownloads].map(fetch => fetch.mock.calls[0][0].updateQuery(previous, { fetchMoreResult: next }))).toEqual([previous, previous]);
+  });
+
+  it('deduplicates overlapping pages and ignores null rows', async () => {
+    const wrapper = await mountWith({ channels: [{ uniqueName: 'cats' }] });
+    wrapper.findComponent(ChannelList).vm.$emit('load-more');
+    const update = mockState.fetchMoreChannels.mock.calls[0][0].updateQuery;
+    const previous = { getSortedChannels: { channels: [{ uniqueName: 'cats' }, null] } };
+    const next = { getSortedChannels: { channels: [{ uniqueName: 'cats' }, { uniqueName: 'dogs' }, null] } };
+    expect(update(previous, { fetchMoreResult: next }).getSortedChannels.channels).toEqual([{ uniqueName: 'cats' }, { uniqueName: 'dogs' }]);
+  });
+
+  it('supplies a timestamp and reactive scalar filters to the generated document', async () => {
+    const wrapper = await mountWith({ channels: [] });
+    wrapper.findComponent(SearchBar).vm.$emit('update-search-input', 'cats');
+    const variables = mockedUseQuery.mock.calls[0][1]();
+    expect({ ...variables, now: typeof variables.now }).toEqual({ now: 'string', limit: 25, offset: 0, tags: [], searchInput: 'cats', loggedInUsername: 'viewer' });
+  });
+
 });

@@ -4,15 +4,7 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
 import PluginDiscoverySection from '@/components/admin/plugins/PluginDiscoverySection.vue';
 import { useToast } from '@/composables/useToast';
-import {
-  ALLOW_PLUGIN,
-  DISALLOW_PLUGIN,
-  INSTALL_PLUGIN_VERSION,
-} from '@/graphQLData/admin/mutations';
-import {
-  GET_PLUGIN_MANAGEMENT_DATA,
-  GET_INSTALLED_PLUGINS,
-} from '@/graphQLData/admin/queries';
+import { AllowPluginDocument as ALLOW_PLUGIN, DisallowPluginDocument as DISALLOW_PLUGIN, InstallPluginVersionDocument as INSTALL_PLUGIN_VERSION, GetPluginManagementDataDocument as GET_PLUGIN_MANAGEMENT_DATA, GetInstalledPluginsDocument as GET_INSTALLED_PLUGINS  } from '@/__generated__/operations';
 import { config } from '@/config';
 import {
   buildPluginStates,

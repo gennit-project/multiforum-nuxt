@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
-import { GET_IMAGE_REPORTS } from '@/graphQLData/issue/queries';
+import { GetImageReportsDocument as GET_IMAGE_REPORTS } from '@/__generated__/operations';
 
 const showOpenOnly = ref(true);
 

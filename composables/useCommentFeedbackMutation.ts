@@ -1,13 +1,16 @@
+import type { Reference } from '@apollo/client/core';
 import type { Ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import type { Comment } from '@/__generated__/graphql';
+import type { AddFeedbackCommentToCommentMutation } from '@/__generated__/operations';
 import type { CommentView } from '@/types/Comment';
-import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from '@/graphQLData/comment/mutations';
+import { AddFeedbackCommentToCommentDocument as ADD_FEEDBACK_COMMENT_TO_COMMENT } from '@/__generated__/operations';
+export type FeedbackCreatedComment =
+  AddFeedbackCommentToCommentMutation['createCommentWithOwnedConnections']['comments'][number];
 
 type CacheUpdateParams = {
   cache: unknown;
   commentToAddFeedbackTo: CommentView | null;
-  newFeedbackComment: Comment;
+  newFeedbackComment: FeedbackCreatedComment;
 };
 
 type UseCommentFeedbackMutationParams = {
@@ -43,36 +46,50 @@ export function useCommentFeedbackMutation(
     loading: addFeedbackLoading,
     error: addFeedbackError,
     onDone: onAddFeedbackDone,
-  } = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, {
-    update: (cache, result) => {
-      const parentId = JSON.parse(
-        JSON.stringify(parentIdOfCommentToGiveFeedbackOn.value)
-      );
-      const newFeedbackComment =
-        result.data.createCommentWithOwnedConnections.comments[0];
-      const commentWeGaveFeedbackOn = commentToGiveFeedbackOn.value;
+  } = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, () => {
+    const parentId = parentIdOfCommentToGiveFeedbackOn.value;
+    const commentWeGaveFeedbackOn = commentToGiveFeedbackOn.value;
+    return {
+      update: (cache, result) => {
+        const newFeedbackComment =
+          result.data?.createCommentWithOwnedConnections.comments[0];
+        if (!newFeedbackComment) return;
 
-      if (parentId && commentWeGaveFeedbackOn) {
-        // Modify the comment to add feedback
-        cache.modify({
-          id: cache.identify({
-            __typename: 'Comment',
-            id: commentWeGaveFeedbackOn.id,
-          }),
-          fields: {
-            FeedbackComments(existing = []) {
-              return [...existing, newFeedbackComment];
+        if (parentId && commentWeGaveFeedbackOn) {
+          // Modify the comment to add feedback
+          cache.modify({
+            id: cache.identify({
+              __typename: 'Comment',
+              id: commentWeGaveFeedbackOn.id,
+            }),
+            fields: {
+              FeedbackComments(existing = [], { readField, toReference }) {
+                if (
+                  existing.some(
+                    (item: Reference) =>
+                      readField('id', item) === newFeedbackComment.id
+                  )
+                )
+                  return existing;
+                return [
+                  ...existing,
+                  toReference({
+                    __typename: 'Comment',
+                    id: newFeedbackComment.id,
+                  }),
+                ];
+              },
             },
-          },
-        });
-      } else if (onUpdateQueryResult) {
-        onUpdateQueryResult({
-          cache,
-          commentToAddFeedbackTo: commentToGiveFeedbackOn.value,
-          newFeedbackComment,
-        });
-      }
-    },
+          });
+        } else if (onUpdateQueryResult) {
+          onUpdateQueryResult({
+            cache,
+            commentToAddFeedbackTo: commentWeGaveFeedbackOn,
+            newFeedbackComment,
+          });
+        }
+      },
+    };
   });
 
   onAddFeedbackDone(() => {

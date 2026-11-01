@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GET_SERVER_PERMISSIONS } from '@/graphQLData/admin/queries';
+import { GetServerConfigSource8a6aa06bf0Document as GET_SERVER_PERMISSIONS } from '@/__generated__/operations';
+
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { config } from '@/config';

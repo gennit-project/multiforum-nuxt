@@ -7,7 +7,7 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import { useMutation } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import { UpdateDiscussionDocument as UPDATE_DISCUSSION } from '@/__generated__/operations';
 import { MAX_CHARS_IN_DISCUSSION_BODY } from '@/utils/constants';
 
 const props = defineProps({

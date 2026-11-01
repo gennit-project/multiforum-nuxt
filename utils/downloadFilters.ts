@@ -1,5 +1,6 @@
 import type { RouteLocationNormalizedLoaded } from 'vue-router';
-import type { FilterGroup } from '@/__generated__/graphql';
+import type { GetChannelQuery } from '@/__generated__/operations';
+type FilterGroup = GetChannelQuery['channels'][number]['FilterGroups'][number];
 
 export type LabelFilterInput = {
   groupKey: string;

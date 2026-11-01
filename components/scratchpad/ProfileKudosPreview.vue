@@ -1,23 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_PUBLIC_SCRATCHPAD_ENTRIES } from '@/graphQLData/scratchpad/queries';
+import { GetPublicScratchpadEntriesDocument as GET_PUBLIC_SCRATCHPAD_ENTRIES } from '@/__generated__/operations';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { relativeTime } from '@/utils';
 
 const PREVIEW_LIMIT = 4;
 const VISIBLE_PREVIEW_LIMIT = 3;
-
-type ScratchpadPreviewEntry = {
-  id: string;
-  createdAt: string;
-  text: string;
-  Author?: {
-    username?: string;
-    displayName?: string;
-  } | null;
-};
 
 const props = defineProps<{
   username: string;
@@ -36,9 +26,7 @@ const { result, loading, error } = useQuery(
   }
 );
 
-const publicEntries = computed<ScratchpadPreviewEntry[]>(() => {
-  return (result.value?.scratchpadEntries ?? []) as ScratchpadPreviewEntry[];
-});
+const publicEntries = computed(() => result.value?.scratchpadEntries ?? []);
 
 const publicKudosCount = computed(() => {
   return (

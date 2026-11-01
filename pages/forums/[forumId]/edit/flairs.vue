@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import type { GetChannelDiscussionFlairConfigQuery } from '@/__generated__/operations';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 import CheckBox from '@/components/CheckBox.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { useToast } from '@/composables/useToast';
-import { SET_CHANNEL_DISCUSSION_FLAIR_CONFIG } from '@/graphQLData/channel/mutations';
-import { GET_CHANNEL_DISCUSSION_FLAIR_CONFIG } from '@/graphQLData/channel/queries';
+import { SetChannelDiscussionFlairConfigDocument as SET_CHANNEL_DISCUSSION_FLAIR_CONFIG, GetChannelDiscussionFlairConfigDocument as GET_CHANNEL_DISCUSSION_FLAIR_CONFIG  } from '@/__generated__/operations';
 
 type FlairOption = {
   id?: string;
@@ -18,20 +18,7 @@ type FlairOption = {
   archived: boolean;
 };
 
-type FlairConfig = {
-  flairRequired: boolean;
-  flairs: Array<{
-    id: string;
-    displayName: string;
-    color?: string | null;
-    order: number;
-    archived: boolean;
-  }>;
-};
-
-type FlairConfigResult = {
-  data?: { getChannelDiscussionFlairConfig?: FlairConfig };
-};
+type FlairConfig = GetChannelDiscussionFlairConfigQuery['getChannelDiscussionFlairConfig'];
 
 const route = useRoute();
 const toast = useToast();
@@ -78,7 +65,7 @@ const {
   { enabled: computed(() => Boolean(channelUniqueName.value)) }
 );
 
-onResult((result: FlairConfigResult) => {
+onResult((result) => {
   applyConfig(result.data?.getChannelDiscussionFlairConfig);
 });
 
@@ -89,8 +76,8 @@ const {
   onDone,
 } = useMutation(SET_CHANNEL_DISCUSSION_FLAIR_CONFIG);
 
-onDone((result: FlairConfigResult) => {
-  applyConfig(result.data?.getChannelDiscussionFlairConfig);
+onDone((result) => {
+  applyConfig(result.data?.setChannelDiscussionFlairConfig);
   validationMessage.value = '';
   toast.success('Post flair settings saved');
 });
@@ -173,7 +160,7 @@ const submit = async () => {
         color: flair.color || null,
         order: flair.archived
           ? activeFlairs.value.length + index
-          : activeOrder.get(flair.clientId),
+          : (activeOrder.get(flair.clientId) ?? index),
         archived: flair.archived,
       })),
     });

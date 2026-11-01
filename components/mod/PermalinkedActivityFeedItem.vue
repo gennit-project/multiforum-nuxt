@@ -1,25 +1,25 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_ACTIVITY_FEED_COMMENT } from '@/graphQLData/comment/queries';
+import { GetActivityFeedCommentDocument as GET_ACTIVITY_FEED_COMMENT } from '@/__generated__/operations';
 import ErrorBanner from '../ErrorBanner.vue';
 import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 
-const commentId = computed(() => route.params.commentId as string);
+const commentId = computed(() => typeof route.params.commentId === 'string' ? route.params.commentId : '');
 
 const {
   result: commentResult,
   error: commentError,
   loading: commentLoading,
-} = useQuery(GET_ACTIVITY_FEED_COMMENT, {
-  id: commentId,
-});
+} = useQuery(GET_ACTIVITY_FEED_COMMENT, () => ({
+  id: commentId.value,
+}));
 
 const moderationAction = computed(() => {
   if (!commentResult.value?.comments) return null;
-  return commentResult.value?.comments?.[0]?.ModerationAction;
+  return commentResult.value?.comments?.[0]?.ModerationAction?.[0] || null;
 });
 </script>
 

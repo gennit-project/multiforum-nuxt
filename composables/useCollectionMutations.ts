@@ -1,27 +1,25 @@
 import { useMutation } from '@vue/apollo-composable';
 import {
-  CREATE_COLLECTION,
-  ADD_DISCUSSION_TO_COLLECTION,
-  ADD_COMMENT_TO_COLLECTION,
-  ADD_IMAGE_TO_COLLECTION,
-  ADD_CHANNEL_TO_COLLECTION,
-  ADD_DOWNLOAD_TO_COLLECTION,
-  REMOVE_DISCUSSION_FROM_COLLECTION,
-  REMOVE_COMMENT_FROM_COLLECTION,
-  REMOVE_IMAGE_FROM_COLLECTION,
-  REMOVE_CHANNEL_FROM_COLLECTION,
-  REMOVE_DOWNLOAD_FROM_COLLECTION,
-} from '@/graphQLData/collection/mutations';
-import {
-  ADD_FAVORITE_DISCUSSION,
-  REMOVE_FAVORITE_DISCUSSION,
-  ADD_FAVORITE_COMMENT,
-  REMOVE_FAVORITE_COMMENT,
-  ADD_FAVORITE_IMAGE,
-  REMOVE_FAVORITE_IMAGE,
-  ADD_FAVORITE_CHANNEL,
-  REMOVE_FAVORITE_CHANNEL,
-} from '@/graphQLData/user/mutations';
+  CreateCollectionDocument as CREATE_COLLECTION,
+  AddDiscussionToCollectionDocument as ADD_DISCUSSION_TO_COLLECTION,
+  AddCommentToCollectionDocument as ADD_COMMENT_TO_COLLECTION,
+  AddImageToCollectionDocument as ADD_IMAGE_TO_COLLECTION,
+  AddChannelToCollectionDocument as ADD_CHANNEL_TO_COLLECTION,
+  AddDownloadToCollectionDocument as ADD_DOWNLOAD_TO_COLLECTION,
+  RemoveDiscussionFromCollectionDocument as REMOVE_DISCUSSION_FROM_COLLECTION,
+  RemoveCommentFromCollectionDocument as REMOVE_COMMENT_FROM_COLLECTION,
+  RemoveImageFromCollectionDocument as REMOVE_IMAGE_FROM_COLLECTION,
+  RemoveChannelFromCollectionDocument as REMOVE_CHANNEL_FROM_COLLECTION,
+  RemoveDownloadFromCollectionDocument as REMOVE_DOWNLOAD_FROM_COLLECTION,
+  AddFavoriteDiscussionDocument as ADD_FAVORITE_DISCUSSION,
+  RemoveFavoriteDiscussionDocument as REMOVE_FAVORITE_DISCUSSION,
+  AddFavoriteCommentDocument as ADD_FAVORITE_COMMENT,
+  RemoveFavoriteCommentDocument as REMOVE_FAVORITE_COMMENT,
+  AddFavoriteImageDocument as ADD_FAVORITE_IMAGE,
+  RemoveFavoriteImageDocument as REMOVE_FAVORITE_IMAGE,
+  AddFavoriteChannelDocument as ADD_FAVORITE_CHANNEL,
+  RemoveFavoriteChannelDocument as REMOVE_FAVORITE_CHANNEL,
+} from '@/__generated__/operations';
 
 type ItemType = 'discussion' | 'comment' | 'image' | 'channel' | 'download';
 
@@ -112,32 +110,36 @@ export function useCollectionMutations(itemType: ItemType) {
   /**
    * Get the appropriate add favorite mutation based on item type
    */
-  const getAddFavoriteMutation = () => {
-    const mutationMap = {
-      discussion: addFavoriteDiscussion,
-      comment: addFavoriteComment,
-      image: addFavoriteImage,
-      channel: addFavoriteChannel,
-      download: addFavoriteDiscussion, // Downloads use the same mutation as discussions
+  // Keep the item discriminator next to its variable shape. Returning a union
+  // of Apollo mutate functions loses that relationship at the call site.
+  const getAddFavoriteMutation =
+    () => (params: { itemId: string; username: string }) => {
+      const { itemId, username } = params;
+      switch (itemType) {
+        case 'channel':
+          return addFavoriteChannel({ channel: itemId, username });
+        case 'comment':
+          return addFavoriteComment({ commentId: itemId, username });
+        case 'image':
+          return addFavoriteImage({ imageId: itemId, username });
+        default:
+          return addFavoriteDiscussion({ discussionId: itemId, username });
+      }
     };
-
-    return mutationMap[itemType];
-  };
-
-  /**
-   * Get the appropriate remove favorite mutation based on item type
-   */
-  const getRemoveFavoriteMutation = () => {
-    const mutationMap = {
-      discussion: removeFavoriteDiscussion,
-      comment: removeFavoriteComment,
-      image: removeFavoriteImage,
-      channel: removeFavoriteChannel,
-      download: removeFavoriteDiscussion, // Downloads use the same mutation as discussions
+  const getRemoveFavoriteMutation =
+    () => (params: { itemId: string; username: string }) => {
+      const { itemId, username } = params;
+      switch (itemType) {
+        case 'channel':
+          return removeFavoriteChannel({ channel: itemId, username });
+        case 'comment':
+          return removeFavoriteComment({ commentId: itemId, username });
+        case 'image':
+          return removeFavoriteImage({ imageId: itemId, username });
+        default:
+          return removeFavoriteDiscussion({ discussionId: itemId, username });
+      }
     };
-
-    return mutationMap[itemType];
-  };
 
   return {
     createCollection,

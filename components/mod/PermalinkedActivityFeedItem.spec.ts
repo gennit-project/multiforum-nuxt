@@ -65,7 +65,7 @@ describe('PermalinkedActivityFeedItem', () => {
 
   it('renders the moderation-action slot when a moderation action is present', () => {
     h.result.value = {
-      comments: [{ ModerationAction: { id: 'a1', __typename: 'ModerationAction' } }],
+      comments: [{ ModerationAction: [{ id: 'a1', __typename: 'ModerationAction' }] }],
     };
 
     const wrapper = mountItem();
@@ -74,7 +74,7 @@ describe('PermalinkedActivityFeedItem', () => {
 
   it('shows the not-found state when the comment has no moderation action', () => {
     h.result.value = {
-      comments: [{ ModerationAction: null }],
+      comments: [{ ModerationAction: [] }],
     };
 
     expect(mountItem().text()).toContain('Mod action not found');

@@ -387,6 +387,139 @@ profiles/mod/library producers, the remaining comment mutations/cache writes and
 backend/#701 work are still out of scope. The comprehensive call-site checklist
 is maintained in issue #700; this table inventories only this slice.
 
+## Phase 5, slice 5: event root-comment reads (#700)
+
+Four more operations are generated (twenty-three total): `GET_EVENT`,
+`GET_EVENT_COMMENTS`, `GET_EVENT_ROOT_COMMENT_AGGREGATE`, and
+`GET_EVENT_CHANNEL` (`getEventChannelID`). Their documents retain the exact
+source selections and use the same pinned offline generation/freshness checks.
+No backend projection or query selection was expanded.
+
+`EventDetail.vue` now infers these four reads, narrows reactive route IDs to
+scalars, and carries exact root selections through rendering and pagination.
+Page merges reject stale event/forum/sort contexts, ignore null rows and deduplicate
+IDs. Event detail/fallback, aggregate and archive state are matched to the current
+context. The initial query is not redundantly refetched on mount; authentication
+changes still refetch. The event create form uses the generated root read for its captured
+refetch variables; its mutation was already migrated in slice 4.
+
+Header, body, calendar, footer, channel links and revision presentation props use
+`EventPresentation` and selected revision/channel contracts. Presentation-only
+optional metadata supports the smaller root fallback and legacy callers; these
+contracts are never Apollo result or cache types. Poster display-name/avatar
+compatibility remains optional because these event reads do not select them.
+The unused channel-link comment-count prop was removed rather than asserting an
+unselected count.
+
+Negative type tests cover invalid scalar IDs/pagination variables, nullable detail
+and fallback, missing selected fields and root-renderer compatibility. Runtime
+coverage includes variable reactivity, stale pagination, archive context, null/error
+fallbacks and create-refetch snapshots. Browser coverage exercises overlapping
+pages, URL sort, forum navigation and empty/null/error roots. Browser fixtures
+supply selected event history and author fields plus normalized typenames so cache
+completeness is tested rather than masked by incomplete responses.
+
+This remains a partial #700 migration. Other `GET_EVENT` consumers (title editor,
+event edit page and moderation views), other event-channel consumers, event
+mutation/subscription cache helpers, event lists and profile/mod/library producers
+remain separate. Existing cache-helper compatibility assertions were not removed
+or extended. The comprehensive issue checklist remains the project-wide inventory;
+this section records only the four operations and five migrated call sites.
+
+## Cumulative frontend migration (#700, draft PR #707)
+
+The cumulative branch migrates production consumers, not merely generated exports.
+It remains a **draft pending final coordinated validation and review**. Keep #700
+open until review and merge.
+
+The current audit finds 555 primary boundaries, all generated-document consumers,
+with zero raw, unresolved or generic-override boundaries. It also traces 156
+supplementary wrapper/cache calls and 36 refetch-document references. Counts reflect
+current source; the issue inventory records its earlier baseline. The exception
+ledger is empty.
+
+| Area / commit | Focused validation before integration |
+| --- | --- |
+| Generation `901c0368` | Source/AST equivalence, offline freshness and generator tests |
+| Server HTTP `0427b181` | 28 tests; typed envelopes and negative variables/results |
+| Collections/library `5c129ccc` | 321 tests; identity changes, pagination and repeated actions |
+| Administration `aaf3a550` | 742 tests plus 18 regression tests |
+| Moderation `ac3d3d75` | 746 tests plus membership/cache/navigation regressions |
+| Profiles/events `df3a7a3b` | 861 tests plus notification regressions |
+| Wiki `53b800d0` | 112 tests; selected lock state and explicit legacy builders |
+| Discussion lists `683fef5d` | 122 tests plus 19 profile-download compatibility tests |
+| Media `bb911159` | 127 tests; signed storage names, selection-safe albums and autosave |
+| Comment/discussion actions `d0be9122` | 1,411 component/helper tests; 128 page tests; final feedback navigation regressions |
+| Forums/shared consumers `0a6aac7f` | Forum, filter, scratchpad, navigation and permission suites; negative selected types |
+| Issue activity pagination `408489b1` | 31 tests; mutation responses larger than the loaded window |
+| Backend pin and generated inputs `cdbce807` | Exact export hash/commit; strict validation and schema checks |
+| Issue input completion `2d5f8f37` | 22 component tests and 7 actual-schema input tests |
+| Wiki input completion `f86a14ca` | 136 affected unit tests; four submitted browser flows |
+| Album/create completion `4b282ed3` | 88 album/coercion tests; 44 affected Apollo-state tests; 22 download-create tests |
+| Crosspost completion `6792cf5e` | Create variable coercion and navigation/repeated-completion regressions |
+
+The final PR records full integration and browser/build/CI outcomes. Focused counts
+overlap and must not be added together as a unique test total.
+
+### Coordinated input contract completion
+
+The previous eleven exceptions exposed four real backend contract gaps; they were
+not working compatibility paths. Following authorization, the backend companion
+commit `3d356e90aaaf11b44d0012e82d2c044a07ce4343` defines supported application
+inputs and authorization/attribution handling. This frontend pins its reproducible
+schema export (SHA256 `48eeed7ac64bd5f82bb6f2eac1355e405bb844be03744a2ce7ff3ccab7ea50fb`,
+4,795,293 bytes), generated with Node 26 using the documented backend export workflow.
+The manifest records that exact revision; no hand-edited SDL or fabricated provenance.
+
+| Former boundaries | Implemented contract |
+| --- | --- |
+| Discussion and download creation | Generated create document; wrapper `crosspostedDiscussionId`, authenticated server author, exact existing file/image filters |
+| Album edit form, autosave and download editing | Dedicated `DiscussionAlbumInput` with ordered existing IDs and changed metadata only; no nested schema-entity Album update |
+| Download creation album follow-up | Removed: the initial create now carries its album atomically; companion backend preserves reused-image uploaders |
+| Generic forum/server issue form | `SubmitIssueInput`, optional forum and authenticated persona choice; no client author, number or invented target |
+| Four wiki writes across three pages | Three generated `writeWikiPage` consumers; server attribution, exact page identity, optional home linking and captured-scope cache refetch |
+
+The generated discussion update result does not claim to return Album data: the
+custom backend projection does not include it. Album flows retain captured form
+state or refetch their actual selected reads. Unchanged reused-image metadata is
+omitted; changed metadata remains subject to backend uploader authorization.
+Wiki responses likewise use only the custom resolver's supported selection.
+
+`pnpm operations:check` runs freshness plus the consumer audit. New raw/unresolved
+consumers, erased document types and generated-document overrides fail the check.
+The ledger is empty; fingerprint regression tests remain to ensure any future
+explicit exception cannot silently drift. `graphql:check` continues to reject every
+invalid authored GraphQL document without a suppression baseline. Negative types
+and actual pinned-schema coercion tests cover supported variables and reject legacy
+author/relationship fields, invalid IDs/personas and unauthorized metadata fields.
+
+This frontend requires the companion backend contract before deployment. Backend
+CI and integration results are tracked independently; a verified schema artifact
+is not evidence that backend CI has passed. Neither repository is merged or deployed
+by this work. See [contract handoff](graphql-contract-handoff.md) for the original
+boundary inventory and export acceptance criteria.
+
+### Unused export cleanup and coverage limits
+
+Removed all 15 unused operation exports after checking production AST imports,
+namespace exports, dynamic registries, generated-symbol references and named
+refetches. The active channel-favorites operation was retained despite sharing an
+operation name with an unused user export. Removing the obsolete plugin-name
+collision renamed one active generated symbol; its runtime operation is unchanged.
+Generation/equivalence, strict validation and affected plugin tests pass.
+
+The audit's 26 assertion-review hits were inspected separately: test-only chart
+fixtures, Vue `PropType` declarations, editable form/input contracts, a static
+pipeline-event list, and validated filter/sort values. They are not casts that
+turn incomplete GraphQL responses into full schema entities. Fixture-only uses
+were checked by import search rather than treating every scanner hit as a migrated
+production result boundary.
+
+Composition-only fragments remain generated and checked through their parent
+documents. The audit follows local aliases, selector branches, document props,
+cache calls, typed HTTP helpers and known Apollo wrappers; it is not a proof of
+arbitrary constructed HTTP traffic or runtime backend response completeness.
+
 ## Next milestones
 
 1. **Phase 2:** fix the recorded compatibility debt and remove the temporary

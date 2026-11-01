@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import {
-  PENDING_FORUM_OWNER_INVITE_EXISTS,
-  PENDING_FORUM_MOD_INVITE_EXISTS,
-} from '@/graphQLData/mod/queries';
-import {
-  ACCEPT_FORUM_OWNER_INVITE,
-  ACCEPT_FORUM_MOD_INVITE,
-} from '@/graphQLData/mod/mutations';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { PendingInviteExistsDocument as PENDING_FORUM_OWNER_INVITE_EXISTS, PendingModInviteExistsDocument as PENDING_FORUM_MOD_INVITE_EXISTS, AcceptInviteForumOwnerDocument as ACCEPT_FORUM_OWNER_INVITE, AcceptInviteForumModDocument as ACCEPT_FORUM_MOD_INVITE , GetChannelDocument as GET_CHANNEL  } from '@/__generated__/operations';
+
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
@@ -25,10 +18,10 @@ const channelId = computed(() => {
 
 const { result: pendingOwnerInviteResult } = useQuery(
   PENDING_FORUM_OWNER_INVITE_EXISTS,
-  {
-    username: usernameVar,
-    channelId,
-  },
+  () => ({
+    username: usernameVar.value,
+    channelId: channelId.value,
+  }),
   {
     enabled: computed(() => !!usernameVar.value && !!channelId.value),
   }
@@ -36,10 +29,10 @@ const { result: pendingOwnerInviteResult } = useQuery(
 
 const { result: pendingModInviteResult } = useQuery(
   PENDING_FORUM_MOD_INVITE_EXISTS,
-  {
-    username: usernameVar,
-    channelId,
-  },
+  () => ({
+    username: usernameVar.value,
+    channelId: channelId.value,
+  }),
   {
     enabled: computed(() => !!usernameVar.value && !!channelId.value),
   }

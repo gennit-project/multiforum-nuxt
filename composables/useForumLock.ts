@@ -1,7 +1,8 @@
 import { computed, unref, type ComputedRef, type Ref } from 'vue';
 import { DateTime } from 'luxon';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { GetChannelDocument as GET_CHANNEL } from '@/__generated__/operations';
+
 import { useUsername } from '@/composables/useAuthState';
 
 // Shared copy for the "creation blocked because the forum is locked" notice, so

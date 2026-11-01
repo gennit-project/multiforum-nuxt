@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { GET_SERVER_PERMISSIONS } from '@/graphQLData/admin/queries';
+import { GetServerConfigSource8a6aa06bf0Document as GET_SERVER_PERMISSIONS } from '@/__generated__/operations';
+
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { config } from '@/config';
@@ -44,36 +45,36 @@ const serverConfig = computed(() => {
           <RoleSection
             v-if="serverConfig.DefaultServerRole"
             :section-title="'Default Server Role'"
-            :role-title="serverConfig.DefaultServerRole.name"
-            :role-description="serverConfig.DefaultServerRole.description"
+            :role-title="serverConfig.DefaultServerRole.name || ''"
+            :role-description="serverConfig.DefaultServerRole.description || ''"
             :permissions="serverConfig.DefaultServerRole"
           />
           <RoleSection
             v-if="serverConfig.DefaultModRole"
             :section-title="'Default Mod Role'"
-            :role-title="serverConfig.DefaultModRole.name"
-            :role-description="serverConfig.DefaultModRole.description"
+            :role-title="serverConfig.DefaultModRole.name || ''"
+            :role-description="serverConfig.DefaultModRole.description || ''"
             :permissions="serverConfig.DefaultModRole"
           />
           <RoleSection
             v-if="serverConfig.DefaultElevatedModRole"
             :section-title="'Default Elevated Mod Role'"
-            :role-title="serverConfig.DefaultElevatedModRole.name"
-            :role-description="serverConfig.DefaultElevatedModRole.description"
+            :role-title="serverConfig.DefaultElevatedModRole.name || ''"
+            :role-description="serverConfig.DefaultElevatedModRole.description || ''"
             :permissions="serverConfig.DefaultElevatedModRole"
           />
           <RoleSection
             v-if="serverConfig.DefaultSuspendedRole"
             :section-title="'Default Suspended Role'"
-            :role-title="serverConfig.DefaultSuspendedRole.name"
-            :role-description="serverConfig.DefaultSuspendedRole.description"
+            :role-title="serverConfig.DefaultSuspendedRole.name || ''"
+            :role-description="serverConfig.DefaultSuspendedRole.description || ''"
             :permissions="serverConfig.DefaultSuspendedRole"
           />
           <RoleSection
             v-if="serverConfig.DefaultSuspendedModRole"
             :section-title="'Default Suspended Mod Role'"
-            :role-title="serverConfig.DefaultSuspendedModRole.name"
-            :role-description="serverConfig.DefaultSuspendedModRole.description"
+            :role-title="serverConfig.DefaultSuspendedModRole.name || ''"
+            :role-description="serverConfig.DefaultSuspendedModRole.description || ''"
             :permissions="serverConfig.DefaultSuspendedModRole"
           />
         </div>

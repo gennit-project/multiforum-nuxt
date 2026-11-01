@@ -8,10 +8,11 @@ import CogIcon from '@/components/icons/CogIcon.vue';
 import PlugIcon from '@/components/icons/PlugIcon.vue';
 import InfoIcon from '@/components/icons/InfoIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
-import type { Channel } from '@/__generated__/graphql';
+import type { GetServerConfigQuery } from '@/__generated__/operations';
 import { useRoute } from 'nuxt/app';
 import { LayoutDashboard, ListChecks } from 'lucide-vue-next';
 import { useDisplay } from '@/composables/useDisplay';
+type ServerConfig = GetServerConfigQuery['serverConfigs'][number];
 
 const Popper = defineAsyncComponent(() => import('vue3-popper'));
 
@@ -20,7 +21,6 @@ type Tab = {
   routeSuffix: string;
   label: string;
   icon: Component;
-  countProperty: keyof Channel | null;
 };
 
 type TabRoutes = {
@@ -29,7 +29,7 @@ type TabRoutes = {
 
 const props = defineProps({
   serverConfig: {
-    type: Object as () => Channel,
+    type: Object as () => ServerConfig,
     required: true,
   },
   vertical: {
@@ -72,56 +72,48 @@ const tabs = computed((): Tab[] => {
       routeSuffix: 'dashboard',
       label: 'Dashboard',
       icon: LayoutDashboard,
-      countProperty: null,
     },
     {
       name: 'issues',
       routeSuffix: 'issues',
       label: 'Issues',
       icon: FlagIcon,
-      countProperty: 'IssuesConnection',
     },
     {
       name: 'channelReports',
       routeSuffix: 'channel-reports',
       label: 'Channel Reports',
       icon: LockClosedIcon,
-      countProperty: null,
     },
     {
       name: 'setup',
       routeSuffix: 'setup',
       label: 'Setup',
       icon: ListChecks,
-      countProperty: null,
     },
     {
       name: 'settings',
       routeSuffix: 'settings',
       label: 'Settings',
       icon: CogIcon,
-      countProperty: null,
     },
     {
       name: 'suspensions',
       routeSuffix: 'suspensions',
       label: 'Suspensions',
       icon: UserIcon,
-      countProperty: null,
     },
     {
       name: 'plugins',
       routeSuffix: 'plugins',
       label: 'Plugins',
       icon: PlugIcon,
-      countProperty: null,
     },
     {
       name: 'about',
       routeSuffix: 'about',
       label: 'About',
       icon: InfoIcon,
-      countProperty: null,
     },
   ];
 

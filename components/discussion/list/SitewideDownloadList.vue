@@ -8,17 +8,21 @@ import SitewideDiscussionSidebar from './SitewideDiscussionSidebar.vue';
 import SitewideDownloadListItem from './SitewideDownloadListItem.vue';
 import DownloadSkeletonCard from '@/components/download/DownloadSkeletonCard.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import { GET_SITE_WIDE_DISCUSSION_LIST } from '@/graphQLData/discussion/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import {
+  GetSiteWideDiscussionListDocument as GET_SITE_WIDE_DISCUSSION_LIST,
+  GetServerConfigDocument as GET_SERVER_CONFIG,
+} from '@/__generated__/operations';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
 } from '@/utils/getSortFromQuery';
+import { mergeUniqueById } from '@/utils/mergeUniqueById';
 import { config } from '@/config';
 import { useUsername } from '@/composables/useAuthState';
 import type { SearchDiscussionValues } from '@/types/Discussion';
-import type { Album, Discussion } from '@/__generated__/graphql';
+import type { DownloadListPresentation as Discussion } from '@/types/DiscussionList';
+type Album = Discussion['Album'];
 
 const DiscussionAlbum = defineAsyncComponent(
   () => import('@/components/discussion/detail/DiscussionAlbum.vue')
@@ -36,7 +40,7 @@ type AlbumData = {
 const route = useRoute();
 const router = useRouter();
 
-const filterValues = ref(
+const filterValues = computed(() =>
   getDiscussionFilterValuesFromParams({
     route,
     channelId: '',
@@ -49,6 +53,24 @@ const searchInput = computed(() => filterValues.value.searchInput || '');
 
 const activeSort = computed(() => getSortFromQuery(route.query));
 const activeTimeFrame = computed(() => getTimeFrameFromQuery(route.query));
+
+const listScope = computed(() =>
+  JSON.stringify([
+    searchInput.value,
+    selectedChannels.value,
+    selectedTags.value,
+    activeSort.value,
+    activeTimeFrame.value,
+  ])
+);
+const resultScope = ref(listScope.value);
+watch(
+  listScope,
+  () => {
+    resultScope.value = '';
+  },
+  { flush: 'sync' }
+);
 
 const {
   result: discussionResult,
@@ -72,8 +94,17 @@ const {
     },
   }),
   {
-    keepPreviousResult: true,
+    keepPreviousResult: false,
   }
+);
+
+watch([discussionResult, discussionLoading], ([result, loading]) => {
+  if (!loading && result) resultScope.value = listScope.value;
+});
+const currentList = computed(() =>
+  resultScope.value === listScope.value
+    ? discussionResult.value?.getSiteWideDiscussionList
+    : null
 );
 
 // Refetch when user logs in/out to update isFavorited status
@@ -99,25 +130,20 @@ const serverConfig = computed(() => {
 });
 
 const discussions = computed(() => {
-  if (!discussionResult.value?.getSiteWideDiscussionList) {
+  if (!currentList.value) {
     return [];
   }
-  return discussionResult.value.getSiteWideDiscussionList.discussions || [];
+  return currentList.value.discussions || [];
 });
 
 const aggregateDiscussionCount = computed(() => {
-  if (!discussionResult.value?.getSiteWideDiscussionList) {
+  if (!currentList.value) {
     return 0;
   }
-  return (
-    discussionResult.value.getSiteWideDiscussionList.aggregateDiscussionCount ||
-    0
-  );
+  return currentList.value.aggregateDiscussionCount || 0;
 });
 
-const pageInfo = computed(
-  () => discussionResult.value?.getSiteWideDiscussionList?.pageInfo ?? null
-);
+const pageInfo = computed(() => currentList.value?.pageInfo ?? null);
 
 const hasNextPage = computed(() => {
   if (pageInfo.value) return pageInfo.value.hasNextPage;
@@ -129,6 +155,8 @@ const isInitialLoading = computed(
 );
 
 const loadMore = () => {
+  if (discussionLoading.value) return;
+  const scope = listScope.value;
   const endCursor = pageInfo.value?.endCursor;
   if (
     !discussionResult.value?.getSiteWideDiscussionList?.discussions ||
@@ -147,17 +175,22 @@ const loadMore = () => {
       },
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      if (
+        scope !== listScope.value ||
+        !fetchMoreResult?.getSiteWideDiscussionList ||
+        !previousResult.getSiteWideDiscussionList
+      )
+        return previousResult;
       return {
         getSiteWideDiscussionList: {
           ...previousResult.getSiteWideDiscussionList,
           aggregateDiscussionCount:
             fetchMoreResult.getSiteWideDiscussionList.aggregateDiscussionCount,
           pageInfo: fetchMoreResult.getSiteWideDiscussionList.pageInfo,
-          discussions: [
-            ...previousResult.getSiteWideDiscussionList.discussions,
-            ...fetchMoreResult.getSiteWideDiscussionList.discussions,
-          ],
+          discussions: mergeUniqueById(
+            previousResult.getSiteWideDiscussionList.discussions,
+            fetchMoreResult.getSiteWideDiscussionList.discussions
+          ),
         },
       };
     },
@@ -241,12 +274,6 @@ const isAlbumLightboxOpen = ref(false);
 watch(
   () => route.query,
   () => {
-    if (route.query) {
-      filterValues.value = getDiscussionFilterValuesFromParams({
-        route,
-        channelId: '',
-      });
-    }
     if (
       discussionResult?.value?.getSiteWideDiscussionList?.discussions
         ?.length === 0

@@ -4,7 +4,7 @@ import MapEventCard from '../map/MapEventCard.vue';
 import EventListItem from './EventListItem.vue';
 import LoadMore from '../../LoadMore.vue';
 import { useRoute, useRouter } from 'nuxt/app';
-import type { Event } from '@/__generated__/graphql';
+import type { EventListPresentation as Event } from '@/types/EventPresentation';
 import { sideNavIsOpenVar } from '@/cache';
 import type { PropType } from 'vue';
 

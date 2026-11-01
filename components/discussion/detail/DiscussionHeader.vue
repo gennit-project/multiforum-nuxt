@@ -1,23 +1,23 @@
 <script lang="ts" setup>
-import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
+import type { DiscussionPresentation } from '@/types/DiscussionPresentation';
 import { ref, computed, defineAsyncComponent } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import { DateTime } from 'luxon';
 import { stableRelativeTime, ALLOWED_ICONS } from '@/utils';
 import {
-  DELETE_DISCUSSION,
-  UPDATE_DISCUSSION_SENSITIVE_CONTENT,
-} from '@/graphQLData/discussion/mutations';
+  DeleteDiscussionDocument as DELETE_DISCUSSION,
+  UpdateDiscussionSensitiveContentDocument as UPDATE_DISCUSSION_SENSITIVE_CONTENT,
+  GetChannelDocument as GET_CHANNEL,
+  UserIsModInChannelDocument as USER_IS_MOD_OR_OWNER_IN_CHANNEL,
+  GetServerConfigDocument as GET_SERVER_CONFIG,
+} from '@/__generated__/operations';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
 import { getDiscussionHeaderMenuItems } from '@/utils/headerPermissionUtils';
 import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 
@@ -43,6 +43,30 @@ const EditsDropdown = defineAsyncComponent(
 
 const usernameVar = useUsername();
 const modProfileNameVar = useModProfileName();
+
+type Discussion = Pick<DiscussionPresentation, 'id' | 'title'> &
+  Partial<
+    Pick<
+      DiscussionPresentation,
+      | 'createdAt'
+      | 'updatedAt'
+      | 'hasDownload'
+      | 'hasSensitiveContent'
+      | 'DiscussionChannels'
+      | 'isFavorited'
+      | 'PastBodyVersions'
+      | 'BodyLastEditedBy'
+      | 'body'
+    >
+  > & {
+    Album?: { Images: readonly unknown[] } | null;
+    Author?:
+      | (Pick<NonNullable<DiscussionPresentation['Author']>, 'username'> &
+          Partial<
+            Omit<NonNullable<DiscussionPresentation['Author']>, 'username'>
+          >)
+      | null;
+  };
 
 const props = defineProps<{
   discussion: Discussion | null;
@@ -86,7 +110,7 @@ const {
   onDone: onDoneDeleting,
 } = useMutation(DELETE_DISCUSSION, {
   update: (cache, { data }) => {
-    if (data?.deleteDiscussions?.nodesDeleted > 0) {
+    if ((data?.deleteDiscussions?.nodesDeleted || 0) > 0) {
       cache.evict({
         id: cache.identify({
           __typename: 'Discussion',
@@ -190,11 +214,11 @@ const { result: getServerResult } = useQuery(
 // Query user's permissions in the channel
 const { result: getPermissionResult } = useQuery(
   USER_IS_MOD_OR_OWNER_IN_CHANNEL,
-  {
-    modDisplayName: modProfileNameVar,
-    username: usernameVar,
+  () => ({
+    modDisplayName: modProfileNameVar.value,
+    username: usernameVar.value,
     channelUniqueName: props.channelId || defaultChannel.value || '',
-  },
+  }),
   {
     // enable if the username and modDisplayName are set
     enabled: computed(

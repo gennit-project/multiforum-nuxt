@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
 
-type ChannelOption = {
-  uniqueName: string;
-  displayName: string;
-  icon: string;
-  description: string;
-};
+import type { GetChannelNamesQuery } from '@/__generated__/operations';
+type ChannelOption = Pick<
+  GetChannelNamesQuery['channels'][number],
+  'uniqueName'
+> &
+  Partial<Pick<GetChannelNamesQuery['channels'][number], 'displayName'>>;
 
 defineProps({
   channel: {

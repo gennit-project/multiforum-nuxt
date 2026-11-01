@@ -6,7 +6,7 @@ import EventList from './EventList.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import 'md-editor-v3/lib/style.css';
-import { GET_EVENTS } from '@/graphQLData/event/queries';
+import { GetEventsSourcef3f666cbeeDocument as GET_EVENTS } from '@/__generated__/operations';
 import getEventWhere from '@/utils/getEventWhere';
 import EventDetail from '@/components/event/detail/EventDetail.vue';
 import type { SearchEventValues } from '@/types/Event';
@@ -26,7 +26,7 @@ import MapIcon from '@/components/icons/MapIcon.vue';
 import { LocationFilterTypes } from './filters/locationFilterTypes';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
-import type { Event } from '@/__generated__/graphql';
+import type { EventListPresentation as Event } from '@/types/EventPresentation';
 import { isEventSearchRoute as getIsEventSearchRoute } from '@/utils/isEventSearchRoute';
 
 const route = useRoute();
@@ -90,6 +90,7 @@ const {
 const previewIsOpen = ref(false);
 
 const loadMore = () => {
+  const scope = JSON.stringify([eventWhere.value, resultsOrder.value]);
   fetchMore({
     variables: {
       where: eventWhere.value,
@@ -99,12 +100,12 @@ const loadMore = () => {
     },
     // Prevent cache clearing which causes content shift
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      if (!fetchMoreResult || scope !== JSON.stringify([eventWhere.value, resultsOrder.value])) return previousResult;
 
       // Merge the results while preserving existing data
       return {
         ...previousResult,
-        events: [...(previousResult?.events || []), ...fetchMoreResult.events],
+        events: [...new Map([...(previousResult?.events || []), ...fetchMoreResult.events].map((item) => [item.id, item])).values()],
         eventsConnection: fetchMoreResult.eventsConnection, // Update the aggregate count
       };
     },

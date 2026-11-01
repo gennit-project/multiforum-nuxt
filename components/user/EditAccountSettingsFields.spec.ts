@@ -1,3 +1,4 @@
+import { PermanentlyDeleteProfileImageDocument } from '@/__generated__/operations';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { mount, flushPromises } from '@vue/test-utils';
@@ -14,15 +15,12 @@ const h = vi.hoisted(() => ({
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (operation: unknown) => ({
     mutate:
-      operation === 'PERMANENTLY_DELETE_PROFILE_IMAGE'
+      operation === PermanentlyDeleteProfileImageDocument
         ? h.permanentlyDeleteProfileImage
         : h.createSignedStorageUrl,
     loading: ref(false),
     error: ref(null),
   }),
-}));
-vi.mock('@/graphQLData/user/mutations', () => ({
-  PERMANENTLY_DELETE_PROFILE_IMAGE: 'PERMANENTLY_DELETE_PROFILE_IMAGE',
 }));
 vi.mock('@/composables/useAuthState', () => ({ useUsername: () => h.username }));
 vi.mock('@/utils', async (orig) => {

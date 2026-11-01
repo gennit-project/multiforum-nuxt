@@ -8,12 +8,8 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import type { IssueCreateInput } from '@/__generated__/graphql';
-import { CREATE_ISSUE } from '@/graphQLData/issue/mutations';
-import {
-  COUNT_OPEN_ISSUES,
-  SERVER_SCOPED_ISSUE_COUNT,
-} from '@/graphQLData/mod/queries';
+import { CreateIssueDocument as CREATE_ISSUE, CountOpenIssuesDocument as COUNT_OPEN_ISSUES, CountIssuesByServerDocument as SERVER_SCOPED_ISSUE_COUNT   } from '@/__generated__/operations';
+
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 
 const modProfileNameVar = useModProfileName();
@@ -50,71 +46,16 @@ watch(
   }
 );
 
-const authorInput = computed(() => {
-  if (modProfileNameVar.value) {
-    return {
-      ModerationProfile: {
-        connect: {
-          where: { node: { displayName: modProfileNameVar.value } },
-        },
-      },
-    };
-  }
-  if (usernameVar.value) {
-    return {
-      User: {
-        connect: { where: { node: { username: usernameVar.value } } },
-      },
-    };
-  }
-  return null;
-});
-
-const authorName = computed(() => {
-  if (authorInput.value?.ModerationProfile?.connect?.where?.node?.displayName) {
-    return authorInput.value.ModerationProfile.connect.where.node.displayName;
-  }
-  if (authorInput.value?.User?.connect?.where?.node?.username) {
-    return authorInput.value.User.connect.where.node.username;
-  }
-  return '';
-});
-
-const issueInput = computed<IssueCreateInput>(
-  () =>
-    ({
-      title: formValues.value.title.trim(),
-      body: formValues.value.body.trim(),
-      isOpen: true,
-      flaggedServerRuleViolation: false,
-      channelUniqueName: selectedChannelId.value || undefined,
-      Channel: selectedChannelId.value
-        ? {
-            connect: {
-              where: { node: { uniqueName: selectedChannelId.value } },
-            },
-          }
-        : undefined,
-      Author: authorInput.value || undefined,
-      authorName: authorName.value || undefined,
-      // The custom `createIssue` resolver accepts Channel/Author connect
-      // portions that the generated `IssueCreateInput` no longer models, so
-      // narrow through `unknown`.
-    }) as unknown as IssueCreateInput
-);
-
-// Shape of the open-issue count queries after the v7 migration
-// (`issuesConnection { aggregate { count { nodes } } }`). Kept loose so the
-// optimistic cache write does not need to supply every connection field.
-type IssueCountCache = {
-  issuesConnection?: {
-    aggregate?: { count?: { nodes?: number | null } | null } | null;
-  } | null;
-};
+const issueInput = computed(() => ({
+  title: formValues.value.title.trim(),
+  body: formValues.value.body.trim(),
+  ...(selectedChannelId.value ? { channelUniqueName: selectedChannelId.value } : {}),
+  asModerationProfile: !!modProfileNameVar.value,
+}));
 
 const canSubmit = computed(() => {
   return (
-    !!authorInput.value &&
+    !!(modProfileNameVar.value || usernameVar.value) &&
     formValues.value.title.trim().length > 0 &&
     formValues.value.body.trim().length > 0
   );
@@ -125,26 +66,30 @@ const {
   loading: createIssueLoading,
   error: createIssueError,
   onDone: onCreateIssueDone,
-} = useMutation(CREATE_ISSUE, () => ({
+} = useMutation(CREATE_ISSUE, () => {
+  const channelUniqueName = selectedChannelId.value;
+  let applied = false;
+  return {
   variables: {
     input: issueInput.value,
   },
   update: (cache, { data }) => {
     const createdIssue = data?.createIssue;
-    if (!createdIssue) return;
+    if (!createdIssue || applied) return;
+    applied = true;
 
-    if (selectedChannelId.value) {
+    if (channelUniqueName) {
       try {
-        const openCount = cache.readQuery<IssueCountCache>({
+        const openCount = cache.readQuery({
           query: COUNT_OPEN_ISSUES,
-          variables: { channelUniqueName: selectedChannelId.value },
+          variables: { channelUniqueName: channelUniqueName },
         });
         const currentCount =
           openCount?.issuesConnection?.aggregate?.count?.nodes;
         if (typeof currentCount === 'number') {
-          cache.writeQuery<IssueCountCache>({
+          cache.writeQuery({
             query: COUNT_OPEN_ISSUES,
-            variables: { channelUniqueName: selectedChannelId.value },
+            variables: { channelUniqueName: channelUniqueName },
             data: {
               issuesConnection: {
                 aggregate: { count: { nodes: currentCount + 1 } },
@@ -158,13 +103,13 @@ const {
     }
 
     try {
-      const serverCount = cache.readQuery<IssueCountCache>({
+      const serverCount = cache.readQuery({
         query: SERVER_SCOPED_ISSUE_COUNT,
       });
       const currentServerCount =
         serverCount?.issuesConnection?.aggregate?.count?.nodes;
       if (typeof currentServerCount === 'number') {
-        cache.writeQuery<IssueCountCache>({
+        cache.writeQuery({
           query: SERVER_SCOPED_ISSUE_COUNT,
           data: {
             issuesConnection: {
@@ -177,16 +122,20 @@ const {
       // Cache might not have this query yet; ignore.
     }
   },
-}));
+};
+});
 
+const navigatedIssues = new Set<string>();
 onCreateIssueDone((result) => {
   const newIssue = result?.data?.createIssue;
   if (!newIssue) return;
+  const identity = `${newIssue.channelUniqueName || newIssue.Channel?.uniqueName || ""}:${newIssue.issueNumber}`;
+  if (navigatedIssues.has(identity)) return;
+  navigatedIssues.add(identity);
 
   const forumId =
     newIssue.Channel?.uniqueName ||
-    newIssue.channelUniqueName ||
-    selectedChannelId.value;
+    newIssue.channelUniqueName || '';
 
   if (forumId) {
     router.push({

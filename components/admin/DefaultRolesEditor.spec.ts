@@ -130,7 +130,7 @@ describe('DefaultRolesEditor', () => {
     await saveBtn.trigger('click');
     expect(updateServerRole).toHaveBeenCalledWith({
       name: 'ServerRole',
-      input: expect.objectContaining({ name: 'ServerRoleUpdated' }),
+      input: expect.objectContaining({ name: { set: 'ServerRoleUpdated' } }),
     });
     expect(refetchMock).toHaveBeenCalled();
   });

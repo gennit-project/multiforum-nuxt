@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import IssueListItem from '@/components/mod/ModIssueListItem.vue';
-import { GET_MOD, GET_MOD_ISSUES } from '@/graphQLData/mod/queries';
+import { GetModDocument as GET_MOD, GetModIssuesDocument as GET_MOD_ISSUES } from '@/__generated__/operations';
 
 const PAGE_LIMIT = 25;
 const route = useRoute();
@@ -46,22 +46,27 @@ const {
 const loadMore = () => {
   if (!issueResult.value?.moderationProfiles?.[0]?.AuthoredIssues) return;
 
+  const requestedProfile = modProfileName.value;
   fetchMore({
     variables: {
+      displayName: requestedProfile,
       limit: PAGE_LIMIT,
       offset: issueResult.value.moderationProfiles[0].AuthoredIssues.length,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      if (!fetchMoreResult || requestedProfile !== modProfileName.value) return previousResult;
       const prevModProfile = previousResult.moderationProfiles[0];
+      const nextModProfile = fetchMoreResult.moderationProfiles[0];
+      if (!prevModProfile || !nextModProfile) return previousResult;
       const prevAuthoredIssues = prevModProfile.AuthoredIssues || [];
       const newComments =
-        fetchMoreResult.moderationProfiles[0].AuthoredIssues || [];
+        nextModProfile.AuthoredIssues || [];
       return {
+        ...previousResult,
         moderationProfiles: [
           {
             ...prevModProfile,
-            AuthoredIssues: [...prevAuthoredIssues, ...newComments],
+            AuthoredIssues: [...new Map([...prevAuthoredIssues, ...newComments].map(item => [item.id, item])).values()],
           },
         ],
       };

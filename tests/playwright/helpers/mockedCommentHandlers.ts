@@ -1,4 +1,5 @@
 import type { OwnedCommentCreateInput } from '@/__generated__/graphql';
+import type { UpdateCommentMutationVariables } from '@/__generated__/operations';
 import {
   buildComment,
   buildDiscussion,
@@ -28,10 +29,7 @@ export type CreateCommentVariables = {
   createCommentInput?: OwnedCommentCreateInput | OwnedCommentCreateInput[];
 };
 
-export type UpdateCommentVariables = {
-  commentWhere?: { id?: string };
-  updateCommentInput?: { text?: string };
-};
+export type UpdateCommentVariables = UpdateCommentMutationVariables;
 
 const buildCommentFixture = (
   comment: MockCommentState,
@@ -223,8 +221,8 @@ export const createCommentHandlers = (
     }: {
       body: { variables?: UpdateCommentVariables };
     }) => {
-      const commentId = body.variables?.commentWhere?.id;
-      const text = body.variables?.updateCommentInput?.text ?? '';
+      const commentId = body.variables?.commentWhere?.id?.eq;
+      const text = body.variables?.updateCommentInput?.text?.set ?? '';
 
       if (!commentId) {
         throw new Error('Missing commentWhere.id');

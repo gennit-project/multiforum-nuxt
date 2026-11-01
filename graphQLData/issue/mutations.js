@@ -2,7 +2,7 @@ import { gql } from '@apollo/client/core';
 import { ISSUE_FIELDS } from './queries';
 
 export const CREATE_ISSUE = gql`
-  mutation createIssue($input: IssueCreateInput!) {
+  mutation createIssue($input: SubmitIssueInput!) {
     createIssue(input: $input) {
       id
       issueNumber

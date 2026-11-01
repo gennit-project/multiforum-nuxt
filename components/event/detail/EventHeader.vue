@@ -2,8 +2,8 @@
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import type { Event } from '@/__generated__/graphql';
-import { ADD_FEEDBACK_COMMENT_TO_EVENT } from '@/graphQLData/event/mutations';
+import type { EventPresentation as Event } from '@/types/EventPresentation';
+import { AddFeedbackCommentToEventDocument as ADD_FEEDBACK_COMMENT_TO_EVENT, GetChannelDocument as GET_CHANNEL , UserIsModInChannelDocument as USER_IS_MOD_OR_OWNER_IN_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG , GetIssueSource003ac8783fDocument as CHECK_EVENT_ISSUE_EXISTENCE  } from '@/__generated__/operations';
 import EditScopeModal from '@/components/event/form/EditScopeModal.vue';
 import { useEventCancelDelete } from '@/composables/useEventCancelDelete';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
@@ -25,11 +25,7 @@ import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute, useRouter } from 'nuxt/app';
 import InfoBanner from '@/components/InfoBanner.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
-import { CHECK_EVENT_ISSUE_EXISTENCE } from '@/graphQLData/issue/queries';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { getAuthorBadges } from '@/utils/roleBadges';
@@ -72,10 +68,7 @@ const showFeedbackFormModal = ref(false);
 const showFeedbackSubmittedSuccessfully = ref(false);
 
 // Series-related state
-// Note: EventSeries is a new field that may not be in generated types yet
-const eventDataWithSeries = computed(
-  () => props.eventData as Event & { EventSeries?: { id?: string } }
-);
+const eventDataWithSeries = computed(() => props.eventData);
 const isPartOfSeries = computed(() =>
   Boolean(eventDataWithSeries.value?.EventSeries?.id)
 );
@@ -292,7 +285,7 @@ const posterBadges = computed(() =>
   getAuthorBadges({
     username: props.eventData.Poster?.username,
     serverAdminUsernames: serverAdminUsernames.value,
-    serverModProfileNames: serverModProfileNames.value,
+    serverModProfileNames: serverModProfileNames.value.filter((name): name is string => typeof name === 'string' && !!name),
     forumAdminUsernames: forumAdminUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
   })
@@ -418,7 +411,7 @@ function openFeedbackFormModal() {
             <LinkIcon />
           </div>
           <a
-            class="min-w-0 flex-1 cursor-pointer break-all font-medium underline decoration-gray-400 underline-offset-2 dark:decoration-gray-500"
+            class="min-w-0 flex-1 cursor-pointer font-medium break-all underline decoration-gray-400 underline-offset-2 dark:decoration-gray-500"
             target="_blank"
             rel="noreferrer"
             :href="eventData.virtualEventUrl"

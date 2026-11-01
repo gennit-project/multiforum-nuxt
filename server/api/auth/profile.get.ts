@@ -1,31 +1,11 @@
+import { GetOwnEmailSource3c35564c1eDocument as GET_OWN_EMAIL } from '@/__generated__/operations';
+import { requestGraphql } from '@/server/utils/typed-graphql';
 // server/api/auth/profile.get.ts
 //
 // Returns the current session-backed auth profile for the browser. This is a
 // same-origin fallback for embedded browsers where localStorage-backed token
 // sync is unreliable or unavailable.
 import { getServerGraphqlUrl } from '@/server/utils/local-auth';
-
-type OwnEmailResponse = {
-  data?: {
-    getOwnEmail?: {
-      username?: string | null;
-      profilePicURL?: string | null;
-      modProfileName?: string | null;
-      unreadNotificationCount?: number | null;
-    } | null;
-  };
-};
-
-const GET_OWN_EMAIL = /* GraphQL */ `
-  query getOwnEmail {
-    getOwnEmail {
-      username
-      profilePicURL
-      modProfileName
-      unreadNotificationCount
-    }
-  }
-`;
 
 export default defineEventHandler(async (event) => {
   setResponseHeader(event, 'Cache-Control', 'no-store');
@@ -55,16 +35,17 @@ export default defineEventHandler(async (event) => {
       return session;
     }
 
-    const res = await $fetch<OwnEmailResponse>(graphqlUrl, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        authorization: `Bearer ${accessToken}`,
-      },
-      body: {
-        query: GET_OWN_EMAIL,
-      },
-    });
+    const res = await requestGraphql(
+      graphqlUrl,
+      GET_OWN_EMAIL,
+      {},
+      {
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
 
     const ownEmail = res?.data?.getOwnEmail;
     if (!ownEmail?.username) {

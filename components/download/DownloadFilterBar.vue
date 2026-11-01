@@ -8,7 +8,7 @@ import SortButtons from '@/components/SortButtons.vue';
 import { getTagLabel } from '@/utils';
 import { getDiscussionFilterValuesFromParams } from '@/utils/getDiscussionFilterValuesFromParams';
 import type { SearchDiscussionValues } from '@/types/Discussion';
-import type { FilterGroup } from '@/__generated__/graphql';
+import type { GetChannelQuery } from '@/__generated__/operations';
 import { updateFilters } from '@/utils/routerUtils';
 import { useRoute, useRouter } from 'nuxt/app';
 import FilterIcon from '@/components/icons/FilterIcon.vue';
@@ -17,6 +17,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import SearchIcon from '@/components/icons/SearchIcon.vue';
 import DownloadFilters from './DownloadFilters.vue';
 import CheckBox from '@/components/CheckBox.vue';
+type FilterGroup = GetChannelQuery['channels'][number]['FilterGroups'][number];
 
 const props = defineProps({
   filterGroups: {

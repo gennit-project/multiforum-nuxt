@@ -1,4 +1,5 @@
-import type { PluginField, PluginFormSection } from '@/types/pluginForms';
+import { getPluginFormSections, getSettingsDefaults } from './pluginManifestUtils';
+import type { PluginField } from '@/types/pluginForms';
 
 export interface PluginUpgradeReport {
   carried: string[];
@@ -11,16 +12,6 @@ export interface PluginUpgradePreview {
   settings: Record<string, unknown>;
   report: PluginUpgradeReport;
 }
-
-interface UpgradeManifest {
-  settingsDefaults?: Record<string, unknown>;
-  ui?: { forms?: { server?: PluginFormSection[] } };
-}
-
-const asRecord = (value: unknown): Record<string, unknown> =>
-  value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : {};
 
 const isCompatibleValue = (field: PluginField, value: unknown): boolean => {
   if (value === undefined || value === null) return true;
@@ -81,11 +72,11 @@ const isCompatibleValue = (field: PluginField, value: unknown): boolean => {
 
 export function buildPluginUpgradePreview(params: {
   oldSettings: Record<string, unknown>;
-  newManifest?: UpgradeManifest | null;
+  newManifest?: unknown;
 }): PluginUpgradePreview {
   const { oldSettings, newManifest } = params;
-  const defaults = asRecord(newManifest?.settingsDefaults?.server);
-  const fields = (newManifest?.ui?.forms?.server || [])
+  const defaults = getSettingsDefaults(newManifest, 'server');
+  const fields = getPluginFormSections(newManifest, 'server')
     .flatMap((section) => section.fields)
     .filter((field) => field.type !== 'secret');
   const fieldsByKey = new Map(fields.map((field) => [field.key, field]));

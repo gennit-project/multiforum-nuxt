@@ -1,3 +1,5 @@
+import { GetOwnEmailNotificationCountDocument as GET_NOTIFICATION_COUNT } from '@/__generated__/operations';
+import { requestGraphql } from '@/server/utils/typed-graphql';
 // server/api/session/token.get.ts
 //
 // Alias for the session access token endpoint. Some embedded browsers are more
@@ -9,22 +11,6 @@ import {
   isLocalDevAuth,
   LOCAL_AUTH_COOKIE,
 } from '@/server/utils/local-auth';
-
-const GET_NOTIFICATION_COUNT = /* GraphQL */ `
-  query getOwnEmailNotificationCount {
-    getOwnEmail {
-      unreadNotificationCount
-    }
-  }
-`;
-
-type NotificationCountResponse = {
-  data?: {
-    getOwnEmail?: {
-      unreadNotificationCount?: number | null;
-    } | null;
-  };
-};
 
 const getNotificationCount = async (event: H3Event, accessToken: string) => {
   const runtimeConfig = useRuntimeConfig(event);
@@ -42,14 +28,17 @@ const getNotificationCount = async (event: H3Event, accessToken: string) => {
   if (!graphqlUrl) return event.context.authSession?.notificationCount ?? 0;
 
   try {
-    const response = await $fetch<NotificationCountResponse>(graphqlUrl, {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        authorization: `Bearer ${accessToken}`,
-      },
-      body: { query: GET_NOTIFICATION_COUNT },
-    });
+    const response = await requestGraphql(
+      graphqlUrl,
+      GET_NOTIFICATION_COUNT,
+      {},
+      {
+        headers: {
+          'content-type': 'application/json',
+          authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
     return response?.data?.getOwnEmail?.unreadNotificationCount ?? 0;
   } catch {
     // Token synchronization still succeeds if the non-critical count lookup

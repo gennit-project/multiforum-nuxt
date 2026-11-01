@@ -7,7 +7,7 @@ import ImageDetails from '@/components/mod/ImageDetails.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import SuspendModButton from '@/components/mod/SuspendModButton.vue';
 import PermanentlyRemoveImageButton from '@/components/mod/PermanentlyRemoveImageButton.vue';
-import type { Issue } from '@/__generated__/graphql';
+import type { IssueView as Issue } from '@/types/Issue';
 
 const props = defineProps<{
   activeIssue: Issue;

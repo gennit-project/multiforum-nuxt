@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import type { Album } from '@/__generated__/graphql';
 import {
   getMainImageHeight,
   getExpandedThumbnailDimensions,
@@ -42,7 +41,7 @@ describe('getExpandedThumbnailDimensions', () => {
 
 describe('getFirstAlbumImage', () => {
   it('returns null when the album has no images', () => {
-    expect(getFirstAlbumImage({ Images: [] } as unknown as Album)).toBeNull();
+    expect(getFirstAlbumImage({ Images: [] })).toBeNull();
   });
 
   it('returns null for a null album', () => {
@@ -56,7 +55,7 @@ describe('getFirstAlbumImage', () => {
         { id: 'a', url: 'a.png' },
         { id: 'b', url: 'b.png' },
       ],
-    } as unknown as Album;
+    };
     expect(getFirstAlbumImage(album)).toBe('b.png');
   });
 
@@ -67,14 +66,14 @@ describe('getFirstAlbumImage', () => {
         { id: 'a', url: 'a.png' },
         { id: 'b', url: '' },
       ],
-    } as unknown as Album;
+    };
     expect(getFirstAlbumImage(album)).toBe('a.png');
   });
 
   it('uses the first stored image when there is no imageOrder', () => {
     const album = {
       Images: [{ id: 'a', url: 'a.png' }],
-    } as unknown as Album;
+    };
     expect(getFirstAlbumImage(album)).toBe('a.png');
   });
 });

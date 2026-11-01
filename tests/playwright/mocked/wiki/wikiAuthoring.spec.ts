@@ -3,118 +3,125 @@ import { buildChannel } from '../../helpers/graphqlFixtures';
 import { createBaseHandlers } from '../../helpers/baseHandlers';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
+import { makeWikiPage } from '../../../utils/wikiFixtures';
+import type {
+  WriteWikiPageMutation,
+  WriteWikiPageMutationVariables,
+  GetWikiPageQuery,
+  GetSiteWideWikiListQuery,
+} from '../../../../__generated__/operations';
 
-// Wiki authoring pages (create / create-child / edit). Only wiki moderation was
-// previously covered; these exercise the authoring forms.
-const TEST_USER = 'alice';
-const TEST_CHANNEL = 'cats';
-
-const base = () =>
-  createBaseHandlers({
-    username: TEST_USER,
-    channelId: TEST_CHANNEL,
-    channelOverrides: { wikiEnabled: true },
-  });
-
-test.describe('Wiki authoring', () => {
-  test('wiki create page renders the create form', async ({
+const scenarios = [
+  {
+    name: 'home creation',
+    route: 'create',
+    slug: 'home',
+    id: 'created-home',
+    extra: { slug: 'home', setAsHome: true },
+  },
+  {
+    name: 'child creation',
+    route: 'create-child',
+    slug: 'new-title',
+    id: 'created-child',
+    extra: { slug: 'new-title', parentId: 'wiki-home' },
+  },
+  {
+    name: 'home edit',
+    route: 'edit/home',
+    slug: 'home',
+    id: 'wiki-home',
+    extra: { id: 'wiki-home' },
+  },
+  {
+    name: 'regular edit',
+    route: 'edit/intro',
+    slug: 'intro',
+    id: 'wiki-intro',
+    extra: { id: 'wiki-intro' },
+  },
+];
+for (const scenario of scenarios) {
+  test(`submits ${scenario.name} with the typed authenticated write contract`, async ({
     context,
     page,
-  }, testInfo) => {
-    await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
-    const diagnostics = await installGraphqlMocks(page, { ...base() });
-
-    try {
-      await page.goto(`/forums/${TEST_CHANNEL}/wiki/create`, { waitUntil: 'domcontentloaded' });
-      await expect(
-        page.getByRole('heading', { name: 'Create Wiki Page' })
-      ).toBeVisible();
-    } finally {
-      await testInfo.attach('graphql-operations.json', {
-        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
-        contentType: 'application/json',
-      });
-    }
-  });
-
-  test('wiki create-child page renders the add-page form', async ({
-    context,
-    page,
-  }, testInfo) => {
-    await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
-    // create-child shows "Add Wiki Page" only when a wiki home page already
-    // exists; otherwise it prompts to create the home page first. Seed a
-    // WikiHomePage on the channel (spread buildChannel to keep the shell fields).
-    const diagnostics = await installGraphqlMocks(page, {
-      ...base(),
+  }) => {
+    await installMockAuth(context, page, {
+      username: 'alice',
+      email: 'alice@example.com',
+    });
+    const requests: unknown[] = [];
+    const result: WriteWikiPageMutation = {
+      writeWikiPage: {
+        id: scenario.id,
+        slug: scenario.slug,
+        channelUniqueName: 'cats',
+        title: 'New title',
+        body: 'New body',
+        editReason: 'Browser edit',
+        createdAt: '2026-10-01T00:00:00Z',
+        updatedAt: '2026-11-01T00:00:00Z',
+        locked: false,
+        OriginalAuthor: { username: 'alice' },
+        VersionAuthor: { username: 'alice' },
+        PastVersions: [],
+      },
+    };
+    const wiki: GetWikiPageQuery = {
+      wikiPages: [makeWikiPage({ id: scenario.id, slug: scenario.slug })],
+    };
+    const list: GetSiteWideWikiListQuery = {
+      getSiteWideWikiList: {
+        aggregateWikiPageCount: 0,
+        featuredWikiPages: [],
+        wikiPages: [],
+      },
+    };
+    await installGraphqlMocks(page, {
+      ...createBaseHandlers({
+        username: 'alice',
+        channelId: 'cats',
+        channelOverrides: { wikiEnabled: true },
+      }),
       getChannel: () => ({
         data: {
           channels: [
             {
               ...buildChannel({
-                uniqueName: TEST_CHANNEL,
+                uniqueName: 'cats',
                 overrides: { wikiEnabled: true },
               }),
-              WikiHomePage: {
-                __typename: 'WikiPage',
-                id: 'wiki-home',
-                title: 'Home',
-                slug: 'home',
-                body: '',
-                ChildPages: [],
-              },
+              WikiHomePage: makeWikiPage({ id: 'wiki-home', slug: 'home' }),
             },
           ],
         },
       }),
+      getWikiPage: () => ({ data: wiki }),
+      getSiteWideWikiList: () => ({ data: list }),
+      writeWikiPage: ({ body }) => {
+        requests.push(body.variables);
+        return { data: result };
+      },
     });
-
-    try {
-      await page.goto(`/forums/${TEST_CHANNEL}/wiki/create-child`, { waitUntil: 'domcontentloaded' });
-      await expect(
-        page.getByRole('heading', { name: 'Add Wiki Page' })
-      ).toBeVisible();
-    } finally {
-      await testInfo.attach('graphql-operations.json', {
-        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
-        contentType: 'application/json',
-      });
-    }
-  });
-
-  test('wiki edit page renders the edit form for an existing page', async ({
-    context,
-    page,
-  }, testInfo) => {
-    await installMockAuth(context, page, { username: TEST_USER, email: 'alice@example.com' });
-    const diagnostics = await installGraphqlMocks(page, {
-      ...base(),
-      getWikiPage: () => ({
-        data: {
-          wikiPages: [
-            {
-              __typename: 'WikiPage',
-              title: 'Test Wiki Page',
-              body: 'Body content',
-              slug: 'test-page',
-              VersionAuthor: null,
-              ChildPages: [],
-            },
-          ],
-        },
-      }),
+    await page.goto(`/forums/cats/wiki/${scenario.route}`, {
+      waitUntil: 'domcontentloaded',
     });
-
-    try {
-      await page.goto(`/forums/${TEST_CHANNEL}/wiki/edit/test-page`, { waitUntil: 'domcontentloaded' });
-      await expect(
-        page.getByRole('heading', { name: 'Edit Wiki Page' })
-      ).toBeVisible();
-    } finally {
-      await testInfo.attach('graphql-operations.json', {
-        body: Buffer.from(JSON.stringify(diagnostics.seenOperations, null, 2)),
-        contentType: 'application/json',
-      });
-    }
+    await page.getByTestId('title-input').fill('New title');
+    await page.getByTestId('content-input').fill('New body');
+    await page.getByTestId('edit-reason-input').fill('Browser edit');
+    await page.locator('button[type="submit"]').last().click();
+    const expected: WriteWikiPageMutationVariables = {
+      input: {
+        channelUniqueName: 'cats',
+        title: 'New title',
+        body: 'New body',
+        editReason: 'Browser edit',
+        ...scenario.extra,
+      },
+    };
+    await expect.poll(() => requests).toEqual([expected]);
+    await expect(page).toHaveURL(
+      scenario.route === 'edit/intro' ? /\/wiki\/intro\?t=/ : /\/wiki\?t=/
+    );
   });
-});
+}

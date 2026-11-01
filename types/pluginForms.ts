@@ -1,3 +1,4 @@
+import type { GetServerPluginSecretsQuery } from '@/__generated__/operations';
 // Types for plugin UI form schema
 
 export interface PluginFieldValidation {
@@ -63,7 +64,7 @@ export type PluginSettings = Record<string, unknown>;
 // Secret status from the backend
 export interface PluginSecretStatus {
   key: string;
-  status: 'NOT_SET' | 'SET_UNTESTED' | 'VALID' | 'INVALID';
+  status: GetServerPluginSecretsQuery['getServerPluginSecrets'][number]['status'];
   lastValidatedAt?: string;
   validationError?: string;
 }

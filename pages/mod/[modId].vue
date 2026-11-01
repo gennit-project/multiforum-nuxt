@@ -2,7 +2,7 @@
 import { config } from '@/config';
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_MOD } from '@/graphQLData/mod/queries';
+import { GetModDocument as GET_MOD } from '@/__generated__/operations';
 import ModProfileSidebar from '@/components/mod/ModProfileSidebar.vue';
 import { useHead, useRoute } from 'nuxt/app';
 import ModProfileTabs from '../../components/mod/ModProfileTabs.vue';

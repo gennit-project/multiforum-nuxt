@@ -1,16 +1,12 @@
 import { computed, ref, watch, type Ref } from 'vue';
 import { useApolloClient } from '@vue/apollo-composable';
-import { GET_CHANNEL_DISCUSSION_FLAIR_CONFIG } from '@/graphQLData/channel/queries';
+import { GetChannelDiscussionFlairConfigDocument as GET_CHANNEL_DISCUSSION_FLAIR_CONFIG } from '@/__generated__/operations';
 import type { DiscussionFlairOption } from '@/components/discussion/form/DiscussionFlairPicker.vue';
 
 export type ChannelDiscussionFlairConfig = {
   channelUniqueName: string;
   flairRequired: boolean;
   flairs: DiscussionFlairOption[];
-};
-
-type FlairConfigQueryResult = {
-  getChannelDiscussionFlairConfig?: ChannelDiscussionFlairConfig;
 };
 
 export const useChannelDiscussionFlairConfigs = (
@@ -31,7 +27,7 @@ export const useChannelDiscussionFlairConfigs = (
       channelUniqueName,
     ]);
     try {
-      const response = await resolveClient().query<FlairConfigQueryResult>({
+      const response = await resolveClient().query({
         query: GET_CHANNEL_DISCUSSION_FLAIR_CONFIG,
         variables: { channelUniqueName, includeArchived: false },
         fetchPolicy: 'cache-first',

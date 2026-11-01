@@ -207,3 +207,15 @@ describe('buildEnabledPluginsInput', () => {
     ).toEqual([]);
   });
 });
+
+describe('untrusted manifest selections', () => {
+  it.each([[], 'not-an-object', null, { ui: { forms: { server: [null, { title: 'Unsafe', fields: [{ key: 'x', type: 'text', label: 12 }] }] } } }])('rejects malformed manifest form data', (manifest) => {
+    expect(getPluginFormSections(manifest, 'server')).toEqual([]);
+  });
+  it('retains valid nullable-independent sections beside malformed ones', () => {
+    expect(getPluginFormSections({ ui: { forms: { server: [null, { title: 'Valid', fields: [{ key: 'enabled', type: 'boolean', label: 'Enabled', default: false }] }] } } }, 'server')).toEqual([{ title: 'Valid', fields: [{ key: 'enabled', type: 'boolean', label: 'Enabled', default: false }] }]);
+  });
+  it.each([[], '[1,2]', 'null', '12'])('does not treat array or scalar settings as a settings map', (value) => {
+    expect(parseSettingsJson(value)).toEqual({});
+  });
+});

@@ -1,4 +1,5 @@
-import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
+import type { GetChannelQuery } from '@/__generated__/operations';
+type FilterGroup = GetChannelQuery['channels'][number]['FilterGroups'][number];
 
 /**
  * Pure helper extracted from the download edit page
@@ -27,9 +28,7 @@ export function resolveSelectedLabelOptionIds(params: {
     if (!group?.options) return;
 
     (selectedValues || []).forEach((value) => {
-      const option = group.options?.find(
-        (opt: FilterOption) => opt.value === value
-      );
+      const option = group.options?.find((opt) => opt.value === value);
       if (option?.id) {
         selectedIds.push(option.id);
       }

@@ -2,10 +2,7 @@ import { computed, ref } from 'vue';
 import type { ComputedRef, Ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
-import {
-  SUBSCRIBE_TO_ISSUE,
-  UNSUBSCRIBE_FROM_ISSUE,
-} from '@/graphQLData/issue/mutations';
+import { SubscribeToIssueDocument as SUBSCRIBE_TO_ISSUE, UnsubscribeFromIssueDocument as UNSUBSCRIBE_FROM_ISSUE } from '@/__generated__/operations';
 import { useAutoUnsubscribe } from '@/composables/useAutoUnsubscribe';
 
 type MaybeRef<T> = Ref<T> | ComputedRef<T>;

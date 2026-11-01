@@ -6,11 +6,7 @@ import { useRouter } from 'nuxt/app';
 import SearchBar from '@/components/SearchBar.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import ForumQuickSwitcherOption from '@/components/nav/ForumQuickSwitcherOption.vue';
-import {
-  GET_CHANNEL_NAMES,
-  GET_USER_FAVORITE_CHANNELS,
-} from '@/graphQLData/channel/queries';
-import { GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS } from '@/graphQLData/collection/queries';
+import { GetChannelNamesDocument as GET_CHANNEL_NAMES, GetUserFavoriteChannelsDocument as GET_USER_FAVORITE_CHANNELS, GetUserChannelCollectionsWithChannelsDocument as GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS  } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 import { getLocalStorageItem } from '@/utils/localStorageUtils';

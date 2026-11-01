@@ -22,6 +22,7 @@ const mockPush = vi.fn();
 const mockMutate = vi.fn();
 const onDoneCallbacks: Array<(result: CreateEventResult) => void> = [];
 const mutationOptions: Array<{
+  refetchQueries?: string[];
   update?: (
     cache: { modify: ReturnType<typeof vi.fn> },
     result: unknown
@@ -211,15 +212,9 @@ describe('CreateEvent', () => {
     });
   });
 
-  it('updates the Apollo event list when creation returns an event', () => {
+  it('refetches active event lists instead of appending partial data to unrelated filters', () => {
     mountCreateEvent();
-    const cache = { modify: vi.fn() };
-    const created = { id: 'event-1' };
-    mutationOptions[0].update?.(cache, {
-      data: { createEventWithChannelConnections: created },
-    });
-    const fields = cache.modify.mock.calls[0][0].fields;
-    expect(fields.events([{ id: 'old' }])).toEqual([created, { id: 'old' }]);
+    expect({ refetchQueries: mutationOptions[0]?.refetchQueries, update: mutationOptions[0]?.update }).toEqual({ refetchQueries: ['getEvents'], update: undefined });
   });
 
   it('shows a submit error when routed forum events are disabled', () => {

@@ -1,15 +1,11 @@
 import { computed, inject, provide, type InjectionKey, type Ref } from 'vue';
 import { usePipelineHistory } from './usePipelineHistory';
-import type {
-  Query,
-  PublicPluginPipelineRunPage,
-  QueryGetApplicablePluginPipelineArgs,
-} from '@/__generated__/graphql';
+import type { GetDownloadPipelineOverviewQuery } from '@/__generated__/operations';
+import type { PublicPluginPipelineRunPage } from './usePipelineHistory';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_DOWNLOAD_PIPELINE_OVERVIEW } from '@/graphQLData/admin/queries';
+import { GetDownloadPipelineOverviewDocument as GET_DOWNLOAD_PIPELINE_OVERVIEW } from '@/__generated__/operations';
 import type {
   PipelineRun,
-  PipelineScope,
   PublicPipelineDiagnostic,
 } from '@/composables/usePluginPipeline';
 
@@ -28,29 +24,8 @@ export type PublicPipelineDisplayStatus =
   | 'CANCELLED'
   | 'MANUALLY_APPROVED';
 
-export interface PublicExpectedPipelineJob {
-  pluginId: string;
-  pluginName: string;
-  version: string;
-  order: number;
-  condition: 'ALWAYS' | 'PREVIOUS_SUCCEEDED' | 'PREVIOUS_FAILED';
-  continueOnError: boolean;
-}
-
-export interface ApplicablePublicPipeline {
-  targetId: string;
-  targetType: string;
-  eventType: string;
-  scope: PipelineScope;
-  channelId?: string | null;
-  configured: boolean;
-  applicability: 'NEW_FILES_ONLY' | 'ALL_FILES_GRADUAL' | 'ALL_FILES_IMMEDIATE';
-  effectiveAt?: string | null;
-  policyId?: string | null;
-  required: boolean;
-  reason: 'APPLICABLE' | 'UPLOADED_BEFORE_POLICY' | 'NO_APPLICABLE_PLUGINS';
-  expectedJobs: PublicExpectedPipelineJob[];
-}
+export type ApplicablePublicPipeline = Omit<GetDownloadPipelineOverviewQuery['serverApplicable'], 'policyId'> & { policyId?: string | null };
+export type PublicExpectedPipelineJob = ApplicablePublicPipeline['expectedJobs'][number];
 
 export interface PublicPipelineJob extends Omit<
   PipelineRun,
@@ -66,7 +41,7 @@ export interface PublicPipelineAttempt {
   targetId: string;
   targetType: string;
   eventType: string;
-  scope: PipelineScope;
+  scope: PublicPluginPipelineRunPage['run']['scope'];
   channelId?: string | null;
   status: PublicPipelineAttemptStatus;
   trigger:
@@ -143,10 +118,10 @@ export const toPublicPipelineAttempt = (
 ): PublicPipelineAttempt => ({
   ...page.run,
   page,
-  scope: page.run.scope as PipelineScope,
+  scope: page.run.scope,
   jobs: page.run.jobs.map((job) => ({
     ...job,
-    scope: job.scope as PipelineScope,
+    scope: job.scope,
     channelId: job.channelId ?? undefined,
     message: job.message ?? undefined,
     durationMs: job.durationMs ?? undefined,
@@ -179,20 +154,7 @@ export function useDownloadPipelineOverview(
       !!channelUniqueName.value
   );
 
-  type ApplicableData = {
-    serverApplicable: Query['getApplicablePluginPipeline'];
-    channelApplicable: Query['getApplicablePluginPipeline'];
-  };
-  type ApplicableVariables = Required<
-    Pick<
-      QueryGetApplicablePluginPipelineArgs,
-      'downloadableFileId' | 'discussionId' | 'channelUniqueName'
-    >
-  >;
-  const { result, loading, error, refetch } = useQuery<
-    ApplicableData,
-    ApplicableVariables
-  >(
+  const { result, loading, error, refetch } = useQuery(
     GET_DOWNLOAD_PIPELINE_OVERVIEW,
     () => ({
       downloadableFileId: downloadableFileId.value || '',
@@ -216,8 +178,8 @@ export function useDownloadPipelineOverview(
           ? [
               {
                 ...pipeline,
-                scope: pipeline.scope as PipelineScope,
-                reason: pipeline.reason as ApplicablePublicPipeline['reason'],
+                scope: pipeline.scope,
+                reason: pipeline.reason,
               },
             ]
           : []

@@ -2,48 +2,12 @@
 import { computed, ref } from 'vue';
 import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
 import type { EventPipeline } from '@/utils/pipelineSchema';
-import {
-  GET_PLUGIN_PIPELINE_CAMPAIGNS,
-  GET_PLUGIN_PIPELINE_CAMPAIGN_FAILURES,
-  PREVIEW_PLUGIN_PIPELINE_CAMPAIGN,
-} from '@/graphQLData/admin/queries';
-import {
-  CREATE_PLUGIN_PIPELINE_CAMPAIGN,
-  PAUSE_PLUGIN_PIPELINE_CAMPAIGN,
-  RESUME_PLUGIN_PIPELINE_CAMPAIGN,
-} from '@/graphQLData/admin/mutations';
+import { GetPluginPipelineCampaignsDocument as GET_PLUGIN_PIPELINE_CAMPAIGNS, GetPluginPipelineCampaignFailuresDocument as GET_PLUGIN_PIPELINE_CAMPAIGN_FAILURES, PreviewPluginPipelineCampaignDocument as PREVIEW_PLUGIN_PIPELINE_CAMPAIGN, CreatePluginPipelineCampaignDocument as CREATE_PLUGIN_PIPELINE_CAMPAIGN, PausePluginPipelineCampaignDocument as PAUSE_PLUGIN_PIPELINE_CAMPAIGN, ResumePluginPipelineCampaignDocument as RESUME_PLUGIN_PIPELINE_CAMPAIGN  } from '@/__generated__/operations';
 
-type CampaignPreview = {
-  policyId: string;
-  eventType: string;
-  applicability: string;
-  enforcementBehavior: string;
-  affectedFileCount: number;
-  accessibleFileCount: number;
-  unavailableFileCount: number;
-  estimatedProviderRuns: number;
-};
-
-type Campaign = CampaignPreview & {
-  id: string;
-  status: 'RUNNING' | 'PAUSED' | 'COMPLETED' | 'CANCELLED' | 'DRAFT';
-  concurrency: number;
-  rateLimitPerMinute: number;
-  completedCount: number;
-  runningCount: number;
-  failedCount: number;
-  timedOutCount: number;
-  createdByUsername: string;
-};
-
-type CampaignFailure = {
-  pipelineId: string;
-  targetId: string;
-  discussionId: string;
-  channelId: string;
-  status: string;
-  attemptNumber: number;
-};
+import type { PreviewPluginPipelineCampaignQuery, GetPluginPipelineCampaignsQuery, GetPluginPipelineCampaignFailuresQuery } from '@/__generated__/operations';
+type CampaignPreview = PreviewPluginPipelineCampaignQuery['previewPluginPipelineCampaign'];
+type Campaign = GetPluginPipelineCampaignsQuery['getPluginPipelineCampaigns'][number];
+type CampaignFailure = GetPluginPipelineCampaignFailuresQuery['getPluginPipelineCampaignFailures'][number];
 
 const props = defineProps<{ pipelines?: EventPipeline[] }>();
 const { resolveClient } = useApolloClient();
@@ -90,9 +54,7 @@ const preview = async (policyId: string) => {
   busyPolicyId.value = policyId;
   errorMessage.value = '';
   try {
-    const response = await resolveClient().query<{
-      previewPluginPipelineCampaign: CampaignPreview;
-    }>({
+    const response = await resolveClient().query({
       query: PREVIEW_PLUGIN_PIPELINE_CAMPAIGN,
       variables: { policyId },
       fetchPolicy: 'network-only',
@@ -141,9 +103,7 @@ const changeStatus = async (campaign: Campaign) => {
 };
 
 const loadFailures = async (campaignId: string) => {
-  const response = await resolveClient().query<{
-    getPluginPipelineCampaignFailures: CampaignFailure[];
-  }>({
+  const response = await resolveClient().query({
     query: GET_PLUGIN_PIPELINE_CAMPAIGN_FAILURES,
     variables: { campaignId },
     fetchPolicy: 'network-only',

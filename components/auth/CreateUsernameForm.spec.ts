@@ -1,3 +1,4 @@
+import { GetAgePolicyDocument } from '@/__generated__/operations';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -52,7 +53,7 @@ vi.mock('@/composables/useServerLogout', () => ({
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: (query: unknown) => ({
-    result: query === 'GET_AGE_POLICY' ? h.agePolicyResult : h.userResult,
+    result: query === GetAgePolicyDocument ? h.agePolicyResult : h.userResult,
     error: h.getError,
     loading: h.getLoading,
   }),
@@ -67,9 +68,6 @@ vi.mock('@vue/apollo-composable', () => ({
       },
     };
   },
-}));
-vi.mock('@/graphQLData/age/queries', () => ({
-  GET_AGE_POLICY: 'GET_AGE_POLICY',
 }));
 vi.mock('@/composables/useAuthState', () => ({
   setUsername: h.setUsername,

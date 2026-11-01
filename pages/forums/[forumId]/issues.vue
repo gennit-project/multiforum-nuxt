@@ -2,10 +2,7 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
-import {
-  COUNT_CLOSED_ISSUES,
-  COUNT_OPEN_ISSUES,
-} from '@/graphQLData/mod/queries';
+import { CountClosedIssuesDocument as COUNT_CLOSED_ISSUES, CountOpenIssuesDocument as COUNT_OPEN_ISSUES } from '@/__generated__/operations';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import DotCircleIcon from '@/components/icons/DotCircleIcon.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';

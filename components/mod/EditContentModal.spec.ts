@@ -3,14 +3,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import { useQuery } from '@vue/apollo-composable';
 import EditContentModal from './EditContentModal.vue';
-import {
-  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
-  UPDATE_ISSUE,
-} from '@/graphQLData/issue/mutations';
-import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
-import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
-import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
-import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
+import { AddIssueActivityFeedItemWithCommentAsModDocument as ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD, UpdateIssueDocument as UPDATE_ISSUE, UpdateCommentDocument as UPDATE_COMMENT , UpdateDiscussionDocument as UPDATE_DISCUSSION , GetDiscussionDocument as GET_DISCUSSION , UpdateEventsDocument as UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS  } from '@/__generated__/operations';
 
 const mockMutate = vi.fn(() => Promise.resolve());
 const mockAddFeed = vi.fn(() => Promise.resolve());

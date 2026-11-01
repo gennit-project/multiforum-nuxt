@@ -4,8 +4,8 @@
 // and closed admin issue pages are identical except for the `isOpen` flag they
 // query on, so both consume this composable and render the same IssueFilterBar.
 import { computed, ref, watch } from 'vue';
-import type { Issue } from '@/__generated__/graphql';
-import { GET_SITE_WIDE_ISSUE_LIST } from '@/graphQLData/issue/queries';
+import type { IssueListItem } from '@/types/Issue';
+import { GetSiteWideIssueListDocument as GET_SITE_WIDE_ISSUE_LIST } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import { getChannelLabel } from '@/utils';
@@ -16,12 +16,7 @@ import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import { getIssueSortLabel } from '@/utils/issueSortOptions';
 
-export type SiteWideIssueListItem = Issue & {
-  channelUniqueName?: string | null;
-  channelIconURL?: string | null;
-  authorName?: string | null;
-  reportCount?: number | null;
-};
+export type SiteWideIssueListItem = IssueListItem;
 
 export type InvolvementFilterKey =
   | 'filterCreatedByMe'

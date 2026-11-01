@@ -1,23 +1,27 @@
 <script setup lang="ts">
 import { computed, type PropType } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import type { Channel, WikiPage } from '@/__generated__/graphql';
+import type {
+  GetWikiPinChannelsQuery,
+  GetWikiPageQuery,
+} from '@/__generated__/operations';
 import {
-  PIN_WIKI_PAGE_TO_CHANNEL,
-  UNPIN_WIKI_PAGE_FROM_CHANNEL,
-} from '@/graphQLData/channel/mutations';
+  PinWikiPageToChannelDocument as PIN_WIKI_PAGE_TO_CHANNEL,
+  UnpinWikiPageFromChannelDocument as UNPIN_WIKI_PAGE_FROM_CHANNEL,
+} from '@/__generated__/operations';
 import { useIsAuthenticated, useUsername } from '@/composables/useAuthState';
 import { useToast } from '@/composables/useToast';
 
-type WikiPin = Pick<WikiPage, 'id' | 'title' | 'slug'>;
-type ChannelWithWikiPins = Channel & {
-  PinnedWikiPages?: WikiPin[] | null;
-};
+type WikiPin = Pick<
+  GetWikiPageQuery['wikiPages'][number],
+  'id' | 'title' | 'slug'
+>;
+type ChannelWithWikiPins = GetWikiPinChannelsQuery['channels'][number];
 
 const props = defineProps({
   channel: {
-    type: Object as PropType<ChannelWithWikiPins>,
-    required: true,
+    type: Object as PropType<ChannelWithWikiPins | null>,
+    default: null,
   },
   wikiPage: {
     type: Object as PropType<WikiPin>,
@@ -45,34 +49,46 @@ const { mutate: unpinWikiPage, loading: unpinLoading } = useMutation(
 );
 
 const isPinned = computed(() =>
-  (props.channel.PinnedWikiPages || []).some((page) => page.id === props.wikiPage.id)
+  (props.channel?.PinnedWikiPages || []).some(
+    (page) => page.id === props.wikiPage.id
+  )
 );
 
 const isChannelOwner = computed(() =>
-  (props.channel.Admins || []).some((admin) => admin.username === username.value)
+  (props.channel?.Admins || []).some(
+    (admin) => admin.username === username.value
+  )
 );
 
 const isSuspendedUser = computed(() =>
-  (props.channel.SuspendedUsers || []).some((user) => user.username === username.value)
+  (props.channel?.SuspendedUsers || []).some(
+    (user) => user.username === username.value
+  )
 );
 
 const canUpdateChannel = computed(() => {
-  if (!isAuthenticated.value || !username.value || isSuspendedUser.value) {
+  if (
+    !props.channel ||
+    !isAuthenticated.value ||
+    !username.value ||
+    isSuspendedUser.value
+  ) {
     return false;
   }
 
   if (isChannelOwner.value) {
-    return props.channel.ElevatedChannelRole
-      ? props.channel.ElevatedChannelRole.canUpdateChannel === true
+    return props.channel?.ElevatedChannelRole
+      ? props.channel?.ElevatedChannelRole.canUpdateChannel === true
       : true;
   }
 
-  return props.channel.DefaultChannelRole?.canUpdateChannel === true;
+  return props.channel?.DefaultChannelRole?.canUpdateChannel === true;
 });
 
 const isSaving = computed(() => pinLoading.value || unpinLoading.value);
 
 const togglePin = async () => {
+  if (!canUpdateChannel.value || isSaving.value) return;
   const mutate = isPinned.value ? unpinWikiPage : pinWikiPage;
 
   try {

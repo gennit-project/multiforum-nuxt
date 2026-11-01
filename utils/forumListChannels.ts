@@ -17,11 +17,11 @@ type ChannelCountLike = {
  * in the downloads query).
  */
 export function buildChannelCountMap(
-  channels: ChannelCountLike[] | null | undefined
+  channels: (ChannelCountLike | null)[] | null | undefined
 ): Map<string, number> {
   const map = new Map<string, number>();
   for (const channel of channels || []) {
-    if (channel.uniqueName) {
+    if (channel?.uniqueName) {
       map.set(
         channel.uniqueName,
         channel.DiscussionChannelsConnection?.aggregate?.count?.nodes || 0
@@ -32,7 +32,7 @@ export function buildChannelCountMap(
 }
 
 export type MergeChannelCountsParams<T extends ChannelCountLike> = {
-  baseChannels: T[] | null | undefined;
+  baseChannels: (T | null)[] | null | undefined;
   discussionCountMap: Map<string, number>;
   downloadCountMap: Map<string, number>;
 };
@@ -45,7 +45,7 @@ export function mergeChannelCounts<T extends ChannelCountLike>(
   params: MergeChannelCountsParams<T>
 ): Array<T & { downloadCount: number }> {
   const { baseChannels, discussionCountMap, downloadCountMap } = params;
-  return (baseChannels || []).map((channel) => {
+  return (baseChannels || []).filter((channel): channel is T => channel !== null).map((channel) => {
     const key = channel.uniqueName ?? '';
     return {
       ...channel,

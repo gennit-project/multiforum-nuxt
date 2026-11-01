@@ -20,11 +20,18 @@ import {
 } from '@/utils/discussionFormValidation';
 import AlbumEditForm from '../detail/AlbumEditForm.vue';
 import DownloadEditForm from './DownloadEditForm.vue';
-import type { Channel, Discussion } from '@/__generated__/graphql';
+import type {
+  GetChannelQuery,
+  GetDiscussionQuery,
+  GetCrosspostPreviewQuery,
+} from '@/__generated__/operations';
 import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
 import DiscussionFlairPicker from '@/components/discussion/form/DiscussionFlairPicker.vue';
 import type { DiscussionFlairOption } from '@/components/discussion/form/DiscussionFlairPicker.vue';
 import type { ChannelDiscussionFlairConfig } from '@/composables/useChannelDiscussionFlairConfigs';
+type Channel = GetChannelQuery['channels'][number];
+type Discussion = GetDiscussionQuery['discussions'][number];
+type Crosspost = GetCrosspostPreviewQuery['discussions'][number];
 
 const props = defineProps<{
   editMode: boolean;
@@ -41,9 +48,9 @@ const props = defineProps<{
   discussionLoading?: boolean;
   createDiscussionLoading?: boolean;
   updateDiscussionLoading?: boolean;
-  channelData?: Channel;
-  discussion?: Discussion;
-  crosspostedDiscussion?: Discussion | null;
+  channelData?: Channel | null;
+  discussion?: Discussion | null;
+  crosspostedDiscussion?: Crosspost | null;
   crosspostError?: ApolloError | null;
   crosspostLoading?: boolean;
   lockedChannelName?: string;
@@ -115,9 +122,8 @@ const missingRequiredFlairConfig = computed(() =>
   effectiveFlairConfigs.value.find(
     (config) =>
       config.flairRequired &&
-      (props.formValues?.selectedFlairIdsByChannel?.[
-        config.channelUniqueName
-      ]?.length || 0) === 0
+      (props.formValues?.selectedFlairIdsByChannel?.[config.channelUniqueName]
+        ?.length || 0) === 0
   )
 );
 
@@ -126,11 +132,9 @@ const discussionFormValidationInput = computed(() => ({
   title: props.formValues?.title || '',
   body: props.formValues?.body || '',
   flairSelectionPending: flairLoadingChannels.value.length > 0,
-  flairSelectionUnavailable:
-    Object.keys(flairErrorsByChannel.value).length > 0,
+  flairSelectionUnavailable: Object.keys(flairErrorsByChannel.value).length > 0,
   missingRequiredFlair: Boolean(missingRequiredFlairConfig.value),
-  requiredFlairChannelName:
-    missingRequiredFlairConfig.value?.channelUniqueName,
+  requiredFlairChannelName: missingRequiredFlairConfig.value?.channelUniqueName,
 }));
 
 const flairPickerChannels = computed(() =>
@@ -154,7 +158,7 @@ const needsChanges = computed(() =>
   discussionFormNeedsChanges(discussionFormValidationInput.value)
 );
 
-const embeddedCrosspost = computed<Discussion | null>(() => {
+const embeddedCrosspost = computed<Crosspost | null>(() => {
   return (
     props.crosspostedDiscussion ||
     props.discussion?.CrosspostedDiscussion ||
@@ -320,10 +324,10 @@ onMounted(() => {
                   :discussion="
                     editMode && discussion
                       ? discussion
-                      : ({
+                      : {
                           id: 'temp-id',
                           DownloadableFiles: formValues.downloadableFiles || [],
-                        } as unknown as Discussion)
+                        }
                   "
                   :channel-data="
                     channelData
@@ -405,9 +409,7 @@ onMounted(() => {
                   :model-value="
                     formValues.selectedFlairIdsByChannel?.[flairChannel] || []
                   "
-                  :required="
-                    flairConfigsByChannel[flairChannel]?.flairRequired
-                  "
+                  :required="flairConfigsByChannel[flairChannel]?.flairRequired"
                   :loading="flairLoadingChannels.includes(flairChannel)"
                   :error-message="flairErrorsByChannel[flairChannel]"
                   @update:model-value="

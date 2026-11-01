@@ -196,7 +196,7 @@ describe('EventTitleEditForm edit flow', () => {
   it('syncs the form title from the query result', async () => {
     const wrapper = mountForm();
 
-    h.onResult?.({ data: { events: [{ title: 'Loaded Event' }] } });
+    h.onResult?.({ data: { events: [{ id: 'ev1', title: 'Loaded Event' }] } });
     await button(wrapper, 'Edit')!.trigger('click');
 
     expect(wrapper.getComponent({ name: 'TextInput' }).props('value')).toBe(

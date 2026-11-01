@@ -1,12 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 
-vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { modId: 'coolmod' } }),
-}));
+const routeState = vi.hoisted(() => ({ params: { modId: 'coolmod' } }));
+vi.mock('nuxt/app', () => ({ useRoute: () => reactive(routeState) }));
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
@@ -54,6 +53,7 @@ const mountWith = async (options: {
 };
 
 beforeEach(() => {
+  routeState.params.modId = 'coolmod';
   vi.clearAllMocks();
 });
 
@@ -84,10 +84,28 @@ describe('mod profile issues page', () => {
     expect(fetchMore).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: {
+          displayName: 'coolmod',
           limit: 25,
           offset: 2,
         },
       })
     );
   });
+  it('rejects a page completed after navigating to another moderator', async () => {
+    const { wrapper, fetchMore } = await mountWith({ authoredIssues: [{ id: 'i1' }] });
+    await wrapper.get('.load-more').trigger('click');
+    const previous = { moderationProfiles: [{ AuthoredIssues: [{ id: 'i1' }] }] };
+    reactive(routeState).params.modId = 'other';
+    const options = fetchMore.mock.calls[0]?.[0];
+    expect(options.updateQuery(previous, { fetchMoreResult: { moderationProfiles: [{ AuthoredIssues: [{ id: 'i2' }] }] } })).toBe(previous);
+  });
+
+  it('deduplicates repeated issue pagination results', async () => {
+    const { wrapper, fetchMore } = await mountWith({ authoredIssues: [{ id: 'i1' }] });
+    await wrapper.get('.load-more').trigger('click');
+    const previous = { moderationProfiles: [{ AuthoredIssues: [{ id: 'i1' }] }] };
+    const options = fetchMore.mock.calls[0]?.[0];
+    expect(options.updateQuery(previous, { fetchMoreResult: previous }).moderationProfiles[0].AuthoredIssues).toEqual([{ id: 'i1' }]);
+  });
+
 });

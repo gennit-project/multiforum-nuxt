@@ -2,9 +2,10 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
-import type { Album, Image } from '@/__generated__/graphql';
-import { GET_USER_ALBUMS } from '@/graphQLData/image/queries';
+import type { GetUserAlbumsQuery } from '@/__generated__/operations';
+import { GetUserAlbumsDocument as GET_USER_ALBUMS } from '@/__generated__/operations';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
+type Album = GetUserAlbumsQuery['albums'][number];
 
 const route = useRoute();
 const { selectedChannels, hasSelectedChannels } = useSelectedChannelsFromQuery();
@@ -16,8 +17,8 @@ const username = computed(() => {
 const albumsWhere = computed(() => {
   const userMatchWhere = {
     OR: [
-      { Owner: { username: username.value } },
-      { Images_SOME: { Uploader: { username: username.value } } },
+      { Owner: { username: { eq: username.value } } },
+      { Images_SOME: { Uploader: { username: { eq: username.value } } } },
     ],
   };
 
@@ -94,7 +95,7 @@ const otherAlbums = computed(() => {
 const getAlbumThumbnail = (album: Album) => {
   if (album.imageOrder && album.imageOrder.length > 0 && album.Images) {
     const firstImageId = album.imageOrder[0];
-    const firstImage = album.Images.find((img: Image) => img.id === firstImageId);
+    const firstImage = album.Images.find((img) => img.id === firstImageId);
     return firstImage?.url || album.Images[0]?.url || '';
   }
   return album.Images?.[0]?.url || '';

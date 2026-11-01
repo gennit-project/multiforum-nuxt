@@ -4,15 +4,27 @@ import { useMutation } from '@vue/apollo-composable';
 import type { Reference, StoreObject } from '@apollo/client/core';
 import ErrorBanner from '../ErrorBanner.vue';
 import {
-  UPVOTE_COMMENT,
-  UNDO_UPVOTE_COMMENT,
-} from '@/graphQLData/comment/mutations';
+  UpvoteCommentDocument as UPVOTE_COMMENT,
+  UndoUpvoteCommentDocument as UNDO_UPVOTE_COMMENT,
+  UndoSuperUpvoteDocument as UNDO_SUPER_UPVOTE,
+} from '@/__generated__/operations';
 import type { PropType } from 'vue';
-import type { CommentView as Comment } from '@/types/Comment';
+import type { CommentView, CommentHeaderView } from '@/types/Comment';
 import VotesComponent from './Votes.vue';
 import SuperUpvoteModal from '@/components/superUpvote/SuperUpvoteModal.vue';
-import { UNDO_SUPER_UPVOTE } from '@/graphQLData/scratchpad/mutations';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
+type Comment = Pick<CommentView, 'id'> &
+  Pick<CommentHeaderView, 'CommentAuthor'> &
+  Partial<
+    Pick<
+      CommentView,
+      | 'UpvotedByUsers'
+      | 'SuperUpvotedByUsers'
+      | 'UpvotedByUsersConnection'
+      | 'FeedbackComments'
+      | 'FeedbackCommentsConnection'
+    >
+  >;
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -217,7 +229,12 @@ const handleUndoSuperUpvote = async () => {
   <div class="flex items-center">
     <ErrorBanner
       v-if="upvoteCommentError || undoUpvoteError || undoSuperUpvoteError"
-      :text="upvoteCommentError?.message || undoUpvoteError?.message || undoSuperUpvoteError?.message || ''"
+      :text="
+        upvoteCommentError?.message ||
+        undoUpvoteError?.message ||
+        undoSuperUpvoteError?.message ||
+        ''
+      "
     />
     <VotesComponent
       :show-downvote-count="false"

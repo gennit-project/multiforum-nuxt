@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import type { CommentView as Comment } from '@/types/Comment';
+import type { CommentHeaderView as Comment } from '@/types/Comment';
 import { stableRelativeTime } from '@/utils';
 import {
   getPermalinkToDiscussionComment,

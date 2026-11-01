@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import type { Event as EventData, EventChannel } from '@/__generated__/graphql';
+import type {
+  EventPresentation as EventData,
+  EventChannelPresentation as EventChannel,
+} from '@/types/EventPresentation';
 import { DateTime } from 'luxon';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import { stableRelativeTime } from '@/utils';
@@ -24,14 +27,13 @@ const props = withDefaults(
 
 const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();
-const { forumAdminUsernames, forumModProfileNames } =
-  useForumRoleMembership();
+const { forumAdminUsernames, forumModProfileNames } = useForumRoleMembership();
 
 const posterBadges = computed(() =>
   getAuthorBadges({
     username: props.eventData.Poster?.username,
     serverAdminUsernames: serverAdminUsernames.value,
-    serverModProfileNames: serverModProfileNames.value,
+    serverModProfileNames: serverModProfileNames.value.filter((name): name is string => typeof name === 'string' && !!name),
     forumAdminUsernames: forumAdminUsernames.value,
     forumModProfileNames: forumModProfileNames.value,
   })
@@ -63,7 +65,10 @@ function getTimeZone(startTime: string) {
     class="border-t border-gray-200 pt-3 text-xs leading-5 text-gray-500 dark:border-gray-800 dark:text-gray-400"
     :class="compactMode ? 'mt-0' : 'mt-1'"
   >
-    <div v-if="showPoster" class="organizer flex flex-wrap items-center gap-x-1">
+    <div
+      v-if="showPoster"
+      class="organizer flex flex-wrap items-center gap-x-1"
+    >
       <UsernameWithTooltip
         v-if="eventData.Poster?.username"
         :is-server-admin="posterBadges.isServerAdmin"

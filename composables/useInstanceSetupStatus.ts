@@ -1,6 +1,7 @@
+import type { GetInstanceSetupStatusQuery } from '@/__generated__/operations';
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_INSTANCE_SETUP_STATUS } from '@/graphQLData/admin/queries';
+import { GetInstanceSetupStatusDocument as GET_INSTANCE_SETUP_STATUS } from '@/__generated__/operations';
 
 export const instanceCapabilityKeys = [
   'auth',
@@ -15,26 +16,12 @@ export const instanceCapabilityKeys = [
 
 export type InstanceCapabilityKey = (typeof instanceCapabilityKeys)[number];
 
-export interface InstanceCapabilityStatus {
-  configured: boolean;
-  enabled: boolean;
-  requiredEnvVarsMissing: string[];
-  setupUrl: string;
-  docsPath: string;
-}
-
-export type InstanceSetupStatus = Record<
-  InstanceCapabilityKey,
-  InstanceCapabilityStatus
->;
-
-interface InstanceSetupQueryResult {
-  getInstanceSetupStatus: InstanceSetupStatus;
-}
+export type InstanceSetupStatus = GetInstanceSetupStatusQuery['getInstanceSetupStatus'];
+export type InstanceCapabilityStatus = InstanceSetupStatus[InstanceCapabilityKey];
 
 export function useInstanceSetupStatus() {
   const { result, loading, error, refetch } =
-    useQuery<InstanceSetupQueryResult>(GET_INSTANCE_SETUP_STATUS, undefined, {
+    useQuery(GET_INSTANCE_SETUP_STATUS, undefined, {
       fetchPolicy: 'cache-and-network',
       // Capability checks control interaction-only features such as uploads,
       // maps, and geocoding. Fetch them after hydration instead of delaying

@@ -109,7 +109,7 @@ describe('useCommentFeedbackMutation', () => {
 
       // Verify useMutation was called with an options object containing update
       const callArgs = (useMutation as any).mock.calls[0];
-      expect(callArgs[1]).toHaveProperty('update');
+      expect(callArgs[1]()).toHaveProperty('update');
     });
   });
 
@@ -117,14 +117,16 @@ describe('useCommentFeedbackMutation', () => {
     // Grab the `update` function handed to useMutation so we can invoke it
     // with a fake cache + mutation result, exercising the real cache logic.
     const getUpdateFn = () =>
-      (useMutation as any).mock.calls[0][1].update as (
+      (useMutation as any).mock.calls[0][1]().update as (
         cache: unknown,
         result: unknown
       ) => void;
 
     const feedbackComment = { id: 'feedback-1', __typename: 'Comment' };
     const mutationResult = {
-      data: { createCommentWithOwnedConnections: { comments: [feedbackComment] } },
+      data: {
+        createCommentWithOwnedConnections: { comments: [feedbackComment] },
+      },
     };
 
     it('should call cache.modify when parent id and target comment exist', () => {
@@ -144,8 +146,30 @@ describe('useCommentFeedbackMutation', () => {
       );
     });
 
+    it('keeps the original target when selection changes before completion', () => {
+      const target = ref({ id: 'original' } as Comment);
+      const cache = {
+        identify: vi.fn(() => 'Comment:original'),
+        modify: vi.fn(),
+      };
+      useCommentFeedbackMutation({
+        parentIdOfCommentToGiveFeedbackOn: ref('parent'),
+        commentToGiveFeedbackOn: target,
+      });
+      const update = getUpdateFn();
+      target.value = { id: 'next' } as Comment;
+      update(cache, mutationResult);
+      expect(cache.identify).toHaveBeenCalledWith({
+        __typename: 'Comment',
+        id: 'original',
+      });
+    });
+
     it('should append the new feedback comment to existing FeedbackComments', () => {
-      let fieldModifier: (existing: unknown[]) => unknown[] = () => [];
+      let fieldModifier: (
+        existing: unknown[],
+        details: unknown
+      ) => unknown[] = () => [];
       const cache = {
         identify: vi.fn(() => 'Comment:comment-123'),
         modify: vi.fn((opts: any) => {
@@ -159,14 +183,21 @@ describe('useCommentFeedbackMutation', () => {
       });
       getUpdateFn()(cache, mutationResult);
 
-      expect(fieldModifier([{ id: 'old' }])).toEqual([
-        { id: 'old' },
-        feedbackComment,
-      ]);
+      expect(
+        fieldModifier([{ id: 'old' }], {
+          readField: (_: string, item: { id: string }) => item.id,
+          toReference: (item: { id: string }) => ({
+            __ref: `Comment:${item.id}`,
+          }),
+        })
+      ).toEqual([{ id: 'old' }, { __ref: `Comment:${feedbackComment.id}` }]);
     });
 
     it('should default FeedbackComments to an empty array when none exist', () => {
-      let fieldModifier: (existing?: unknown[]) => unknown[] = () => [];
+      let fieldModifier: (
+        existing: unknown[] | undefined,
+        details: unknown
+      ) => unknown[] = () => [];
       const cache = {
         identify: vi.fn(() => 'Comment:comment-123'),
         modify: vi.fn((opts: any) => {
@@ -180,7 +211,14 @@ describe('useCommentFeedbackMutation', () => {
       });
       getUpdateFn()(cache, mutationResult);
 
-      expect(fieldModifier()).toEqual([feedbackComment]);
+      expect(
+        fieldModifier(undefined, {
+          readField: () => undefined,
+          toReference: (item: { id: string }) => ({
+            __ref: `Comment:${item.id}`,
+          }),
+        })
+      ).toEqual([{ __ref: `Comment:${feedbackComment.id}` }]);
     });
 
     it('should call onUpdateQueryResult when there is no target comment', () => {

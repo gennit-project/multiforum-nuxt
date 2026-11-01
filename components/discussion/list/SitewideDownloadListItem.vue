@@ -12,8 +12,8 @@ import DownloadQuarantineBadge from '@/components/download/DownloadQuarantineBad
 import AppImage from '@/components/image/AppImage.vue';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
 import { relativeTime } from '@/utils';
-import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
-import type { DiscussionWithFavorited } from '@/types/Discussion';
+import type { DownloadListPresentation as Discussion } from '@/types/DiscussionList';
+type DiscussionChannel = Discussion['DiscussionChannels'][number];
 
 type AlbumPayload = {
   discussion: Discussion;
@@ -77,11 +77,20 @@ const defaultLink = computed(() => {
 const commentCount = computed(() => {
   if (!props.discussion?.DiscussionChannels?.length) return 0;
   return props.discussion.DiscussionChannels.reduce((total, channel) => {
-    return (
-      total + (channel.CommentsConnection?.aggregate?.count?.nodes || 0)
-    );
+    return total + (channel.CommentsConnection?.aggregate?.count?.nodes || 0);
   }, 0);
 });
+
+const downloadableFiles = computed(() =>
+  'DownloadableFiles' in props.discussion
+    ? props.discussion.DownloadableFiles
+    : []
+);
+const isFavorited = computed(() =>
+  'isFavorited' in props.discussion
+    ? (props.discussion.isFavorited ?? false)
+    : false
+);
 
 const channelCount = computed(
   () => props.discussion?.DiscussionChannels?.length || 0
@@ -239,13 +248,8 @@ const handleOpenAlbum = () => {
       </div>
 
       <!-- Top right buttons container -->
-      <div
-        v-if="discussion.DownloadableFiles?.[0]"
-        class="absolute top-2 left-2 z-10"
-      >
-        <DownloadQuarantineBadge
-          :status="discussion.DownloadableFiles[0].scanStatus"
-        />
+      <div v-if="downloadableFiles[0]" class="absolute top-2 left-2 z-10">
+        <DownloadQuarantineBadge :status="downloadableFiles[0].scanStatus" />
       </div>
       <div class="absolute top-2 right-2 z-10 flex gap-2">
         <!-- Add to Favorites Button -->
@@ -257,9 +261,7 @@ const handleOpenAlbum = () => {
             :allow-add-to-list="true"
             :discussion-id="discussion.id"
             :discussion-title="discussion.title || ''"
-            :initial-is-favorited="
-              (discussion as Discussion & DiscussionWithFavorited).isFavorited
-            "
+            :initial-is-favorited="isFavorited"
             entity-name="Download"
             size="small"
             overlay-style

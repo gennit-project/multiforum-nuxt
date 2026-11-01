@@ -100,22 +100,24 @@ beforeEach(() => {
   hState.onResultCb = null as unknown as (value: unknown) => void;
   hState.onDoneCb = null as unknown as () => void;
   hState.flairConfigs = {};
-  hState.flairQuery.mockReset().mockImplementation(
-    ({ variables }: { variables: { channelUniqueName: string } }) => {
-      const config = hState.flairConfigs[variables.channelUniqueName] || {
-        flairRequired: false,
-        flairs: [],
-      };
-      return Promise.resolve({
-        data: {
-          getChannelDiscussionFlairConfig: {
-            channelUniqueName: variables.channelUniqueName,
-            ...config,
+  hState.flairQuery
+    .mockReset()
+    .mockImplementation(
+      ({ variables }: { variables: { channelUniqueName: string } }) => {
+        const config = hState.flairConfigs[variables.channelUniqueName] || {
+          flairRequired: false,
+          flairs: [],
+        };
+        return Promise.resolve({
+          data: {
+            getChannelDiscussionFlairConfig: {
+              channelUniqueName: variables.channelUniqueName,
+              ...config,
+            },
           },
-        },
-      });
-    }
-  );
+        });
+      }
+    );
   mockedUseQuery.mockReturnValue({
     result: hState.queryResult,
     onResult: (cb: (value: unknown) => void) => {
@@ -174,7 +176,9 @@ describe('discussion edit page', () => {
             title: 'Hello',
             body: 'Body',
             Tags: [],
-            DiscussionChannels: [{ Channel: { uniqueName: 'cats' } }],
+            DiscussionChannels: [
+              { channelUniqueName: 'cats', Channel: { uniqueName: 'cats' } },
+            ],
             Author: { username: 'alice' },
             Album: { Images: [], imageOrder: [] },
           },
@@ -197,7 +201,9 @@ describe('discussion edit page', () => {
             title: 'Hello',
             body: 'Body',
             Tags: [{ text: 'news' }],
-            DiscussionChannels: [{ Channel: { uniqueName: 'cats' } }],
+            DiscussionChannels: [
+              { channelUniqueName: 'cats', Channel: { uniqueName: 'cats' } },
+            ],
             Author: { username: 'alice' },
             Album: { Images: [], imageOrder: [] },
           },
@@ -228,7 +234,9 @@ describe('discussion edit page', () => {
             title: 'Hello',
             body: '',
             Tags: [],
-            DiscussionChannels: [{ Channel: { uniqueName: 'cats' } }],
+            DiscussionChannels: [
+              { channelUniqueName: 'cats', Channel: { uniqueName: 'cats' } },
+            ],
             Author: { username: 'alice' },
             Album: { Images: [], imageOrder: [] },
           },
@@ -267,7 +275,9 @@ describe('discussion edit page', () => {
             title: 'Hello',
             body: '',
             Tags: [],
-            DiscussionChannels: [{ Channel: { uniqueName: 'cats' } }],
+            DiscussionChannels: [
+              { channelUniqueName: 'cats', Channel: { uniqueName: 'cats' } },
+            ],
             Author: { username: 'alice' },
             Album: { Images: [], imageOrder: [] },
           },
@@ -306,9 +316,9 @@ describe('discussion edit page', () => {
       },
     });
 
-    expect(
-      wrapper.findComponent(AccessDeniedMessage).props('action')
-    ).toBe('edit this discussion');
+    expect(wrapper.findComponent(AccessDeniedMessage).props('action')).toBe(
+      'edit this discussion'
+    );
   });
 
   it('ignores query callback updates while the discussion is loading', async () => {
@@ -332,8 +342,8 @@ describe('discussion edit page', () => {
             body: 'Body',
             Tags: [{ text: 'old-tag' }],
             DiscussionChannels: [
-              { Channel: { uniqueName: 'cats' } },
-              { Channel: { uniqueName: 'dogs' } },
+              { channelUniqueName: 'cats', Channel: { uniqueName: 'cats' } },
+              { channelUniqueName: 'dogs', Channel: { uniqueName: 'dogs' } },
             ],
             Author: { username: 'alice' },
             Album: { Images: [], imageOrder: [] },
@@ -417,12 +427,12 @@ describe('discussion edit page', () => {
     await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
 
     expect(
-      (hState.mutationOptions?.().variables as {
-        channelFlairSelections: unknown;
-      }).channelFlairSelections
-    ).toEqual([
-      { channelUniqueName: 'cats', flairIds: ['question'] },
-    ]);
+      (
+        hState.mutationOptions?.().variables as {
+          channelFlairSelections: unknown;
+        }
+      ).channelFlairSelections
+    ).toEqual([{ channelUniqueName: 'cats', flairIds: ['question'] }]);
   });
 
   it('submits an explicit empty selection when an optional flair is cleared', async () => {
@@ -467,9 +477,11 @@ describe('discussion edit page', () => {
     await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('submit');
 
     expect(
-      (hState.mutationOptions?.().variables as {
-        channelFlairSelections: unknown;
-      }).channelFlairSelections
+      (
+        hState.mutationOptions?.().variables as {
+          channelFlairSelections: unknown;
+        }
+      ).channelFlairSelections
     ).toEqual([{ channelUniqueName: 'cats', flairIds: [] }]);
   });
 

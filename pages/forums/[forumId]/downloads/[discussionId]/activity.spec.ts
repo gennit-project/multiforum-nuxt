@@ -5,7 +5,7 @@ import type { Discussion } from '@/__generated__/graphql';
 import ActivityPage from './activity.vue';
 import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed/DiscussionTitleVersions.vue';
 import LabelChangeHistory from '@/components/discussion/detail/activityFeed/LabelChangeHistory.vue';
-import { GET_DOWNLOAD_ACTIVITY } from '@/graphQLData/discussion/queries';
+import { GetDownloadActivityDocument as GET_DOWNLOAD_ACTIVITY } from '@/__generated__/operations';
 
 const mockUseQuery = vi.hoisted(() => vi.fn());
 

@@ -1,3 +1,4 @@
+import { getOperationAST, type DocumentNode } from 'graphql';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { mount } from '@vue/test-utils';
 import PluginPipelineCampaigns from './PluginPipelineCampaigns.vue';
@@ -16,8 +17,8 @@ vi.mock('@vue/apollo-composable', () => ({
     result: state.result,
     refetch: state.refetch,
   }),
-  useMutation: (document: { loc?: { source?: { body?: string } } }) => {
-    const body = document.loc?.source?.body || '';
+  useMutation: (document: DocumentNode) => {
+    const body = getOperationAST(document)?.name?.value || '';
     return {
       mutate: body.includes('PausePluginPipelineCampaign')
         ? state.pause

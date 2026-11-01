@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
-import { GET_CHANNEL_REPORTS } from '@/graphQLData/issue/queries';
+import { GetChannelReportsDocument as GET_CHANNEL_REPORTS } from '@/__generated__/operations';
 import LockChannelDialog from '@/components/mod/LockChannelDialog.vue';
 import UnlockChannelDialog from '@/components/mod/UnlockChannelDialog.vue';
 

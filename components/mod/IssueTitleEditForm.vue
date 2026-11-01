@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { ref, nextTick, computed } from 'vue';
-import type { Issue } from '@/__generated__/graphql';
+import type { IssueView as Issue } from '@/types/Issue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import TextInput from '@/components/TextInput.vue';
-import { UPDATE_ISSUE } from '@/graphQLData/issue/mutations';
+import { UpdateIssueDocument as UPDATE_ISSUE, GetIssueDocument as GET_ISSUE  } from '@/__generated__/operations';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { GET_ISSUE } from '@/graphQLData/issue/queries';
+
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
 import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
@@ -37,7 +37,7 @@ const {
   GET_ISSUE,
   () => ({
     channelUniqueName: channelId.value,
-    issueNumber: issueNumber.value,
+    issueNumber: issueNumber.value ?? 0,
   }),
   () => ({
     enabled: issueNumber.value !== null,
@@ -55,12 +55,12 @@ const issue = computed<Issue | null>(() => {
   return issue || null;
 });
 const authorIsLoggedInUser = computed(
-  () => issue.value?.Author?.displayName === modProfileNameVar.value
+  () => (issue.value?.Author && 'displayName' in issue.value.Author ? issue.value.Author.displayName : null) === modProfileNameVar.value
 );
 
 const titleInputRef = ref<HTMLElement | null>(null);
 const formValues = ref({
-  title: getIssueResult.value?.issue?.title || '',
+  title: getIssueResult.value?.issues?.[0]?.title || '',
 });
 onGetIssueResult(
   (result) => (formValues.value.title = result?.data?.issues?.[0]?.title || '')
@@ -73,8 +73,8 @@ const {
   onDone,
 } = useMutation(UPDATE_ISSUE, () => ({
   variables: {
-    issueWhere: { id: getIssueResult.value?.issues?.[0]?.id },
-    updateIssueInput: formValues.value,
+    issueWhere: { id: { eq: getIssueResult.value?.issues?.[0]?.id } },
+    updateIssueInput: { title: { set: formValues.value.title } },
   },
 }));
 
@@ -102,9 +102,6 @@ const issueAuthorLabel = computed(() => {
   const author = issue.value?.Author;
   if (author?.__typename === 'User') return author.username;
   if (author?.__typename === 'ModerationProfile') return author.displayName;
-  if (author && 'displayName' in author && author.displayName) {
-    return author.displayName;
-  }
   return '[Deleted]';
 });
 

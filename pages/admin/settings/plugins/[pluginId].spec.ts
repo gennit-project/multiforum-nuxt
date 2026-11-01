@@ -3,6 +3,16 @@ import { flushPromises } from '@vue/test-utils';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 import PluginDetailPage from './[pluginId].vue';
+vi.mock('@/__generated__/operations', () => ({
+GetPluginsDocument: 'AVAILABLE',
+GetInstalledPluginsDocument: 'INSTALLED',
+GetServerPluginSecretsDocument: 'SECRETS',
+GetPluginConfigStatusDocument: 'CONFIG_STATUS',
+GetPluginDetailDocument: 'DETAIL',
+InstallPluginVersionDocument: 'INSTALL_M',
+EnableServerPluginDocument: 'ENABLE_M',
+SetServerPluginSecretDocument: 'SET_SECRET_M'
+}));
 
 vi.stubGlobal('definePageMeta', vi.fn());
 
@@ -19,18 +29,8 @@ vi.mock('vue-router', () => ({
   }),
 }));
 
-vi.mock('@/graphQLData/admin/queries', () => ({
-  GET_AVAILABLE_PLUGINS: 'AVAILABLE',
-  GET_INSTALLED_PLUGINS: 'INSTALLED',
-  GET_SERVER_PLUGIN_SECRETS: 'SECRETS',
-  GET_PLUGIN_CONFIG_STATUS: 'CONFIG_STATUS',
-  GET_PLUGIN_DETAIL: 'DETAIL',
-}));
-vi.mock('@/graphQLData/admin/mutations', () => ({
-  INSTALL_PLUGIN_VERSION: 'INSTALL_M',
-  ENABLE_SERVER_PLUGIN: 'ENABLE_M',
-  SET_SERVER_PLUGIN_SECRET: 'SET_SECRET_M',
-}));
+
+
 
 const h = vi.hoisted(() => ({
   q: {} as Record<
@@ -323,7 +323,7 @@ describe('Plugin detail page', () => {
         .findComponent({ name: 'PluginSettingsSection' })
         .props('sections')[0].fields,
     }).toEqual({
-      secrets: [{ key: 'API_KEY', status: 'NOT_SET', required: true }],
+      secrets: [{ key: 'API_KEY', status: 'NOT_SET', required: true, lastValidatedAt: null, validationError: null }],
       fields: [{ key: 'serviceUrl', label: 'Service URL', type: 'text' }],
     });
   });

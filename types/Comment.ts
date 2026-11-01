@@ -96,5 +96,27 @@ export type CommentView = Omit<SelectedComment, 'CommentAuthor' | 'Event'> & {
     'id'
   > | null;
   GivesFeedbackOnEvent?: EventContext | null;
-} & Partial<Pick<ReplyComment, 'FeedbackComments'>> &
-  Partial<Pick<SchemaComment, 'FeedbackCommentsConnection'>>;
+} & Partial<Pick<ReplyComment, 'FeedbackComments'>> & {
+    FeedbackCommentsConnection?: {
+      aggregate?: { count?: { nodes: number } | null } | null;
+    } | null;
+  };
+
+// Header-only presentation accepts sparse feedback selections. Interactive
+// Comment rendering retains the complete CommentView contract above.
+export type CommentHeaderView = Pick<CommentView, 'id' | 'createdAt'> &
+  Partial<Omit<CommentView, 'id' | 'createdAt' | 'CommentAuthor'>> & {
+    CommentAuthor?: Partial<NonNullable<CommentView['CommentAuthor']>> | null;
+  };
+
+export type FeedbackCommentView = Pick<CommentHeaderView, 'id' | 'createdAt'> &
+  Pick<
+    CommentHeaderView,
+    | 'CommentAuthor'
+    | 'text'
+    | 'archived'
+    | 'Channel'
+    | 'GivesFeedbackOnComment'
+    | 'GivesFeedbackOnDiscussion'
+    | 'GivesFeedbackOnEvent'
+  >;

@@ -15,7 +15,7 @@ const makeChannel = (overrides: Record<string, unknown> = {}) =>
     discussionId: 'd1',
     channelUniqueName: 'cats',
     createdAt: '2024-01-01T00:00:00Z',
-    CommentsConnection: { aggregate: { count: { nodes: 3 } } },
+    CommentsAggregate: { count: 3 },
     archived: false,
     answered: false,
     isFavorited: false,
@@ -56,10 +56,22 @@ const mountItem = (
       stubs: {
         NuxtLink: nuxtLinkStub,
         'nuxt-link': nuxtLinkStub,
-        HighlightedSearchTerms: { props: ['text', 'searchInput'], template: '<span>{{ text }}</span>' },
+        HighlightedSearchTerms: {
+          props: ['text', 'searchInput'],
+          template: '<span>{{ text }}</span>',
+        },
         TagComponent: stub('TagComponent', ['tag', 'active'], ['click']),
-        UsernameWithTooltip: stub('UsernameWithTooltip', ['username', 'variantSource', 'isServerAdmin', 'isServerMod', 'isForumAdmin', 'isForumMod']),
-        AddToDiscussionFavorites: stub('AddToDiscussionFavorites', ['discussionId']),
+        UsernameWithTooltip: stub('UsernameWithTooltip', [
+          'username',
+          'variantSource',
+          'isServerAdmin',
+          'isServerMod',
+          'isForumAdmin',
+          'isForumMod',
+        ]),
+        AddToDiscussionFavorites: stub('AddToDiscussionFavorites', [
+          'discussionId',
+        ]),
         DiscussionVotes: true,
         ErrorBanner: true,
         CheckCircleIcon: true,
@@ -153,19 +165,28 @@ describe('ChannelDownloadListItem album image', () => {
 
 describe('ChannelDownloadListItem metadata', () => {
   it('shows the comment count', () => {
-    const wrapper = mountItem(makeDiscussion(), makeChannel({ CommentsConnection: { aggregate: { count: { nodes: 7 } } } }));
+    const wrapper = mountItem(
+      makeDiscussion(),
+      makeChannel({ CommentsAggregate: { count: 7 } })
+    );
 
     expect(wrapper.text()).toContain('7');
   });
 
   it('shows an archived badge when archived', () => {
-    const wrapper = mountItem(makeDiscussion(), makeChannel({ archived: true }));
+    const wrapper = mountItem(
+      makeDiscussion(),
+      makeChannel({ archived: true })
+    );
 
     expect(wrapper.text()).toContain('Archived');
   });
 
   it('shows an answered badge when answered', () => {
-    const wrapper = mountItem(makeDiscussion(), makeChannel({ answered: true }));
+    const wrapper = mountItem(
+      makeDiscussion(),
+      makeChannel({ answered: true })
+    );
 
     expect(wrapper.text()).toContain('Answered');
   });
@@ -191,16 +212,14 @@ describe('ChannelDownloadListItem metadata', () => {
 });
 
 describe('ChannelDownloadListItem author badges', () => {
-  it.each([
-    'isServerAdmin',
-    'isServerMod',
-    'isForumAdmin',
-    'isForumMod',
-  ])('does not pass the %s role badge to the author', (badgeProp) => {
-    const wrapper = mountItem(makeDiscussion());
+  it.each(['isServerAdmin', 'isServerMod', 'isForumAdmin', 'isForumMod'])(
+    'does not pass the %s role badge to the author',
+    (badgeProp) => {
+      const wrapper = mountItem(makeDiscussion());
 
-    expect(author(wrapper).props(badgeProp)).toBeUndefined();
-  });
+      expect(author(wrapper).props(badgeProp)).toBeUndefined();
+    }
+  );
 });
 
 describe('ChannelDownloadListItem tags and actions', () => {
@@ -236,9 +255,11 @@ describe('ChannelDownloadListItem links', () => {
     const wrapper = mountItem(makeDiscussion());
 
     expect(
-      (wrapper.getComponent({ name: 'NuxtLink' }).props('to') as {
-        params: { forumId: string };
-      }).params.forumId
+      (
+        wrapper.getComponent({ name: 'NuxtLink' }).props('to') as {
+          params: { forumId: string };
+        }
+      ).params.forumId
     ).toBe('cats');
   });
 
@@ -247,9 +268,11 @@ describe('ChannelDownloadListItem links', () => {
     const wrapper = mountItem(makeDiscussion());
 
     expect(
-      (wrapper.getComponent({ name: 'NuxtLink' }).props('to') as {
-        query: Record<string, string>;
-      }).query
+      (
+        wrapper.getComponent({ name: 'NuxtLink' }).props('to') as {
+          query: Record<string, string>;
+        }
+      ).query
     ).toEqual({ a: '1' });
   });
 });

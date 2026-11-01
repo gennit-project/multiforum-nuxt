@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import type { PropType } from 'vue';
-import type { DiscussionUpdateInput } from '@/__generated__/graphql';
+import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
 import {
   mapAlbumImagesToForm,
   getInitialImageOrder,
@@ -11,11 +11,11 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import { useMutation } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import { UpdateDiscussionWithChannelConnectionsDocument } from '@/__generated__/operations';
 import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useRoute } from 'vue-router';
-import { normalizeImageOrder } from '@/utils/albumImageOrder';
+
 
 // Define a simplified type for images used in the form
 type AlbumFormImage = {
@@ -45,7 +45,7 @@ interface AlbumFormData {
 const route = useRoute();
 const discussionIdInParams = computed(() => {
   // If the discussion ID is provided in the route params, use it
-  return route.params.discussionId ? String(route.params.discussionId) : '';
+  return typeof route.params.discussionId === 'string' ? route.params.discussionId : '';
 });
 
 const props = defineProps({
@@ -96,14 +96,6 @@ const isCreateMode = computed(() => {
   return !hasExistingImages;
 });
 
-const albumId = computed(() => {
-  // In create mode, we use an empty string to indicate there's no album yet
-  if (isCreateMode.value) {
-    return '';
-  }
-  return props.discussion?.Album?.id || '';
-});
-
 const images = computed(() =>
   mapAlbumImagesToForm(props.discussion?.Album?.Images)
 );
@@ -132,125 +124,30 @@ onMounted(() => {
   formValues.value.album.imageOrder = [...initialImageOrder.value];
 });
 
-function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
-  // 1) If the album doesn't exist yet, CREATE it and connect to existing images
-  if (!albumId.value) {
-    const newImages = formValues.value.album.images;
-    const normalizedImageOrder = normalizeImageOrder({
-      images: newImages,
-      imageOrder: formValues.value.album.imageOrder,
-    });
+watch(() => [props.discussion?.id, discussionIdInParams.value], () => {
+  formValues.value.album = { images: [...images.value], imageOrder: [...initialImageOrder.value] };
+  savedSuccessfully.value = false;
+});
+let submittedId = props.discussion?.id || discussionIdInParams.value;
 
-    // Build the album node with Owner if user is logged in
-    const albumNode = {
-      imageOrder: normalizedImageOrder,
-      Images: {
-        // Connect to existing images using their IDs
-        connect: newImages
-          .filter((img): img is AlbumFormImage => Boolean(img.id))
-          .map((img) => ({
-            where: { node: { id: img.id } },
-          })),
-      },
-    };
-
-    // All images should already have IDs since they're created when uploaded
-    // v7 dropped the `Album` relation from `DiscussionUpdateInput`; keep the
-    // existing payload shape and cast until the album write is migrated.
-    return {
-      Album: {
-        create: {
-          node: albumNode,
-        },
-      },
-    } as unknown as DiscussionUpdateInput;
-  }
-
-  // 2) If the album already exists, we build the connect/update/delete arrays
-  const oldImages = props.discussion?.Album?.Images ?? [];
-  const newImages = formValues.value.album.images;
-  const normalizedImageOrder = normalizeImageOrder({
-    images: newImages,
-    imageOrder: formValues.value.album.imageOrder,
-  });
-
-  // CONNECT array: any new image in `newImages` that has NO matching ID in `oldImages`
-  // These are images that already exist in the database but need to be connected to this album
-  const connectImageArray = newImages
-    .filter((img): img is AlbumFormImage => Boolean(img.id))
-    .filter((img) => !oldImages.some((old) => old.id === img.id))
-    .map((img) => ({
-      connect: [
-        {
-          where: { node: { id: img.id } },
-        },
-      ],
-    }));
-
-  // UPDATE array: any image in `newImages` whose ID already exists in `oldImages`
-  const updateImageArray = newImages
-    .filter((img): img is AlbumFormImage => Boolean(img.id))
-    .filter((img) => oldImages.some((old) => old.id === img.id))
-    .map((img) => ({
-      where: { node: { id: img.id } },
-      update: {
-        node: {
-          url: img.url,
-          alt: img.alt,
-          caption: img.caption,
-          copyright: img.copyright,
-        },
-      },
-    }));
-
-  // DISCONNECT array: any old image that is no longer present in `newImages`
-  const disconnectImageArray = oldImages
-    .filter(
-      (old) => !newImages.some((img) => Boolean(img.id) && img.id === old.id)
-    )
-    .map((old) => ({
-      disconnect: [
-        {
-          where: { node: { id: old.id } },
-        },
-      ],
-    }));
-
-  // Combine all operations into a single array. Each object is one "Images" operation.
-  const imagesOps = [
-    ...connectImageArray,
-    ...updateImageArray,
-    ...disconnectImageArray,
-  ];
-
-  // Wrap them in the correct update shape
-  // v7 dropped the `Album` relation from `DiscussionUpdateInput`; keep the
-  // existing payload shape and cast until the album write is migrated.
-  return {
-    Album: {
-      update: {
-        node: {
-          imageOrder: normalizedImageOrder,
-          Images: imagesOps,
-        },
-      },
-    },
-  } as unknown as DiscussionUpdateInput;
-}
-
+const buildAlbumVariables = () => ({
+  where: { id: { eq: props.discussion?.id || discussionIdInParams.value } },
+  updateDiscussionInput: {},
+  album: buildAlbumUpdateInput({
+    albumData: formValues.value.album,
+    existingImages: props.discussion?.Album?.Images ?? [],
+    existingImageOrder: props.discussion?.Album?.imageOrder,
+  }),
+});
 const {
   mutate: updateDiscussion,
   error: updateDiscussionError,
   loading: updateDiscussionLoading,
   onDone,
-} = useMutation(UPDATE_DISCUSSION, () => ({
-  variables: {
-    where: { id: { eq: props.discussion?.id || discussionIdInParams.value } },
-    updateDiscussionInput: getUpdateDiscussionInputForAlbum(),
-  },
-}));
+} = useMutation(UpdateDiscussionWithChannelConnectionsDocument, () => ({ variables: buildAlbumVariables() }));
 
 onDone(() => {
+  if (submittedId !== (props.discussion?.id || discussionIdInParams.value)) return;
   emit('closeEditor');
 });
 
@@ -269,7 +166,12 @@ function handleSave() {
     }, 3000); // Hide after 3 seconds
   } else {
     // In actual edit mode for an existing discussion, perform the API mutation
-    updateDiscussion();
+    const variables = buildAlbumVariables();
+    if (variables.where.id.eq && variables.album) {
+      submittedId = variables.where.id.eq;
+      updateDiscussion(variables);
+    }
+    else emit('closeEditor');
   }
 }
 

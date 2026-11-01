@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client/core';
+import { NewTagFragmentDoc, type NewTagFragment } from '@/__generated__/operations';
 import type { ApolloCache, Reference } from '@apollo/client/core';
 import { config } from '@/config';
 import type { Duration } from 'luxon';
@@ -16,7 +16,7 @@ import UserPlus from '@/components/icons/UserPlus.vue';
 import UserMinus from '@/components/icons/UserMinus.vue';
 import BellIcon from '@/components/icons/BellIcon.vue';
 import BellSlashIcon from '@/components/icons/BellSlashIcon.vue';
-import type { Event, Tag as TagData } from '@/__generated__/graphql';
+import type { Event } from '@/__generated__/graphql';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import CheckCircle from '@/components/icons/CheckCircle.vue';
 
@@ -395,19 +395,15 @@ export const getChannelLabel = (selectedChannels: Array<string>) => {
   return `Forums (${selectedChannels.length})`;
 };
 
-export const updateTagsInCache = (cache: ApolloCache<unknown>, updatedTags: Array<TagData>) => {
+export const updateTagsInCache = (cache: ApolloCache<unknown>, updatedTags: Array<NewTagFragment>) => {
   cache.modify({
     fields: {
       tags(existingTagRefs: readonly Reference[] = [], { readField }) {
 
-        const tagRefsOnDiscussion = updatedTags.map((tagData: TagData) => {
+        const tagRefsOnDiscussion = updatedTags.map((tagData) => {
           return cache.writeFragment({
             data: tagData,
-            fragment: gql`
-              fragment NewTag on Tag {
-                text
-              }
-            `,
+            fragment: NewTagFragmentDoc,
           });
         });
 

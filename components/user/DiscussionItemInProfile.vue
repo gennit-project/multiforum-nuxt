@@ -3,7 +3,10 @@ import { computed } from 'vue';
 import { relativeTime } from '@/utils';
 import Tag from '@/components/TagComponent.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
-import type { Discussion } from '@/__generated__/graphql';
+import type { GetUserDiscussionsQuery } from '@/__generated__/operations';
+import type { NullableSelection } from '@/types/Comment';
+import type { UserContributionActivity } from '@/types/contribution';
+type Discussion = NullableSelection<GetUserDiscussionsQuery['users'][number]['Discussions'][number] | UserContributionActivity['Discussions'][number]>;
 
 const props = defineProps({
   discussion: {
@@ -33,25 +36,28 @@ const defaultUniqueName = computed(() => {
   ) {
     return '';
   }
-  return props.discussion.DiscussionChannels[0].Channel?.uniqueName;
+  const channel = props.discussion.DiscussionChannels[0];
+  return channel.channelUniqueName || '';
 });
 
-const isDownload = computed(() => !!props.discussion.hasDownload);
+const isDownload = computed(() => 'hasDownload' in props.discussion && !!props.discussion.hasDownload);
 
 // Primary link target for the card title, so it is reachable by keyboard
 // instead of relying on a click handler on the whole <li>.
 const titleLink = computed(() => {
-  if (!defaultUniqueName.value) return '';
+  if (!defaultUniqueName.value || !props.discussion.id) return '';
   const basePath = isDownload.value ? 'downloads' : 'discussions';
   return `/forums/${defaultUniqueName.value}/${basePath}/${props.discussion.id}`;
 });
 
-const title = props.discussion.title;
-const relativeTimeText = relativeTime(props.discussion.createdAt);
+const title = computed(() => props.discussion.title || '');
+const relativeTimeText = relativeTime(props.discussion.createdAt || '');
 const authorUsername = props.discussion.Author
   ? props.discussion.Author.username
   : 'Deleted';
-const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
+const tags = computed(() => ('Tags' in props.discussion ? props.discussion.Tags ?? [] : []).map((tag) => tag.text));
+const channels = computed(() => (props.discussion.DiscussionChannels || []).filter((item) => item !== null));
+const channelName = (channel: (typeof channels.value)[number]) => channel.channelUniqueName || '';
 </script>
 
 <template>
@@ -86,7 +92,7 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
     </p>
     <div class="my-2 space-x-2 text-sm">
       <nuxt-link
-        v-for="(discussionChannel, i) in discussion.DiscussionChannels"
+        v-for="(discussionChannel, i) in channels"
         :key="i"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
         :to="{
@@ -95,15 +101,14 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
             : 'forums-forumId-discussions-discussionId',
           params: {
             forumId:
-              discussionChannel.Channel?.uniqueName ||
-              discussionChannel.channelUniqueName,
+              channelName(discussionChannel),
             discussionId: discussion.id,
           },
         }"
       >
         View this {{ isDownload ? 'download' : 'post' }} in
         {{
-          `c/${discussionChannel.Channel?.uniqueName || discussionChannel.channelUniqueName}`
+          `c/${channelName(discussionChannel)}`
         }}
       </nuxt-link>
     </div>

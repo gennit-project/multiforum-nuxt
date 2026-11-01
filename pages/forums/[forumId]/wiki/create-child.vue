@@ -1,9 +1,17 @@
 <script setup lang="ts">
+import {
+  WriteWikiPageDocument,
+  GetSiteWideWikiListDocument,
+  GetChannelDocument as GET_CHANNEL,
+} from '@/__generated__/operations';
+import {
+  createWikiChildVariables,
+  wikiWriteListVariables,
+  wikiWriteChannelVariables,
+} from '@/utils/wikiWrites';
 import { ref, computed } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { CREATE_CHILD_WIKI_PAGE } from '@/graphQLData/channel/mutations';
 import TextEditor from '@/components/TextEditor.vue';
 import TextInput from '@/components/TextInput.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
@@ -18,14 +26,18 @@ const usernameVar = useUsername();
 
 const route = useRoute();
 const router = useRouter();
-const forumId = route.params.forumId as string;
+const forumId = computed(() =>
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
+);
 
 // Query channel to get the wiki home page
 const {
   result: channelResult,
   loading: channelLoading,
   error: channelError,
-} = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: 'all' });
+} = useQuery(GET_CHANNEL, () => ({ uniqueName: forumId.value }), {
+  errorPolicy: 'all',
+});
 
 // Computed property for the channel data
 const channel = computed(() => channelResult.value?.channels?.[0]);
@@ -58,50 +70,55 @@ const formValues = ref({
   slug: '',
 });
 
-// Create child wiki page mutation
+const submitting = ref(false);
 const {
-  mutate: createChildWikiPage,
-  loading: isCreating,
+  mutate: writeWikiPage,
+  loading: mutationLoading,
   error: createError,
-  onDone,
-} = useMutation(CREATE_CHILD_WIKI_PAGE);
+} = useMutation(WriteWikiPageDocument);
+const isCreating = computed(() => submitting.value || mutationLoading.value);
 
-// Handle form submission
-function handleSubmit() {
-  if (wikiEditBlockedBySuspension.value) return;
-  if (!formValues.value.title || !formValues.value.body || !wikiHomePage.value)
+async function handleSubmit() {
+  if (
+    isCreating.value ||
+    !forumId.value ||
+    !usernameVar.value ||
+    wikiEditBlockedBySuspension.value
+  )
     return;
-
-  const childPageInput = {
-    title: formValues.value.title,
-    body: formValues.value.body,
-    editReason: formValues.value.editReason || undefined,
-    slug: formValues.value.slug,
-    channelUniqueName: forumId,
-    VersionAuthor: {
-      connect: {
-        where: {
-          node: {
-            username: usernameVar.value,
-          },
-        },
-      },
-    },
-  };
-
-  createChildWikiPage({
-    // Connect by parent page ID
-    where: { id: { eq: wikiHomePage.value.id } },
-    update: {
-      ChildPages: {
-        create: [
+  if (!wikiHomePage.value || !wikiEnabled.value || channelLoading.value) return;
+  if (!formValues.value.title || !formValues.value.body) return;
+  const submittedForum = forumId.value;
+  submitting.value = true;
+  try {
+    const result = await writeWikiPage(
+      createWikiChildVariables(
+        formValues.value,
+        submittedForum,
+        wikiHomePage.value.id
+      ),
+      {
+        awaitRefetchQueries: true,
+        refetchQueries: [
           {
-            node: childPageInput,
+            query: GET_CHANNEL,
+            variables: wikiWriteChannelVariables(submittedForum),
+          },
+          {
+            query: GetSiteWideWikiListDocument,
+            variables: wikiWriteListVariables(submittedForum),
           },
         ],
-      },
-    },
-  });
+      }
+    );
+    if (result?.data?.writeWikiPage && forumId.value === submittedForum) {
+      await router.push(`/forums/${submittedForum}/wiki?t=${Date.now()}`);
+    }
+  } catch {
+    // Apollo's error ref supplies the existing form error banner.
+  } finally {
+    submitting.value = false;
+  }
 }
 
 // Derive slug from title
@@ -111,12 +128,6 @@ function updateSlug(value: string) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '');
 }
-
-// Handle mutation completion
-onDone(() => {
-  // Navigate back to wiki home page
-  router.push(`/forums/${forumId}/wiki?t=${Date.now()}`);
-});
 
 // Check if wiki is enabled
 const wikiEnabled = computed(() => channel.value?.wikiEnabled);
@@ -175,7 +186,7 @@ const hasWikiHomePage = computed(() => !!wikiHomePage.value);
       <div class="mb-6">
         <h1 class="text-2xl font-bold dark:text-white">Add Wiki Page</h1>
         <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-          Create a new page in the {{ channel.displayName || forumId }} wiki.
+          Create a new page in the {{ channel?.displayName || forumId }} wiki.
         </p>
       </div>
 

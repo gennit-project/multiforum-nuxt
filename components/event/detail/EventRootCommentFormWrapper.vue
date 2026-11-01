@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import { CreateCommentDocument as CREATE_COMMENT } from '@/__generated__/operations';
+import { CreateCommentDocument as CREATE_COMMENT, GetBasicUserInfoDocument as GET_USER  } from '@/__generated__/operations';
 import { ref, computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import CreateRootCommentForm from '@/components/comments/CreateRootCommentForm.vue';
 
-import { GET_EVENT_COMMENTS } from '@/graphQLData/comment/queries';
-import { GET_USER } from '@/graphQLData/user/queries';
+import {
+  GetEventCommentsDocument as GET_EVENT_COMMENTS,
+  type GetEventCommentsQueryVariables,
+} from '@/__generated__/operations';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
-import type { Event, OwnedCommentCreateInput } from '@/__generated__/graphql';
+import type { OwnedCommentCreateInput } from '@/__generated__/graphql';
+import type { EventPresentation as Event } from '@/types/EventPresentation';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 import { useUsername } from '@/composables/useAuthState';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
@@ -135,11 +138,11 @@ const {
     {
       query: GET_EVENT_COMMENTS,
       variables: {
-        eventId: props.event?.id,
+        eventId: props.event?.id || '',
         limit: COMMENT_LIMIT,
         offset: props.previousOffset,
         sort: getSortFromQuery(route.query),
-      },
+      } satisfies GetEventCommentsQueryVariables,
     },
   ],
   awaitRefetchQueries: true,

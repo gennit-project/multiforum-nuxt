@@ -5,69 +5,13 @@ import { useRoute } from 'nuxt/app';
 import { useUIStore } from '@/stores/uiStore';
 import GithubContributionChart from './GithubContributionChart.vue';
 import ContributionChartSkeleton from './ContributionChartSkeleton.vue';
-import { GET_MOD, GET_MOD_CONTRIBUTIONS } from '@/graphQLData/mod/queries';
-import type { DayData, Activity } from '@/types/contribution';
+import { GetModDocument as GET_MOD, GetModContributionsDocument as GET_MOD_CONTRIBUTIONS } from '@/__generated__/operations';
+import type { GetModContributionsQuery } from '@/__generated__/operations';
 import { getModActivityLinks } from '@/utils/modContributionLinks';
 
-type IssueInfo = {
-  id?: string;
-  issueNumber?: number;
-  channelUniqueName?: string;
-  relatedDiscussionId?: string;
-  relatedEventId?: string;
-  relatedCommentId?: string;
-  title?: string;
-  isOpen?: boolean;
-};
-
-type DiscussionChannelInfo = {
-  id?: string;
-  discussionId?: string;
-  channelUniqueName?: string;
-};
-
-type EventChannelInfo = {
-  id?: string;
-  eventId?: string;
-  channelUniqueName?: string;
-};
-
-type DiscussionInfo = {
-  id?: string;
-  title?: string;
-  createdAt?: string;
-  DiscussionChannels?: DiscussionChannelInfo[];
-};
-
-type EventInfo = {
-  id?: string;
-  title?: string;
-  createdAt?: string;
-  EventChannels?: EventChannelInfo[];
-};
-
-type CommentInfo = {
-  id?: string;
-  text?: string;
-  createdAt?: string;
-  DiscussionChannel?: DiscussionChannelInfo | null;
-  Event?: EventInfo | null;
-};
-
-type ModActivity = Activity & {
-  actionType?: string | null;
-  actionDescription?: string | null;
-  createdAt?: string | null;
-  Issue?: IssueInfo | null;
-  Comment?: CommentInfo | null;
-  RelatedDiscussion?: DiscussionInfo | null;
-  RelatedEvent?: EventInfo | null;
-  RelatedComment?: CommentInfo | null;
-};
-
-type ModDayData = DayData & {
-  activities: ModActivity[];
-};
+type SelectedModDay = GetModContributionsQuery['getModContributions'][number];
+type ModActivity = SelectedModDay['activities'][number] & { type: string; description: string };
+type ModDayData = Omit<SelectedModDay, 'activities'> & { activities: ModActivity[] };
 
 const uiStore = useUIStore();
 const isDarkMode = computed(() => uiStore.theme === 'dark');
@@ -82,9 +26,7 @@ const displayYear = ref(new Date().getFullYear());
 
 const { result: modResult } = useQuery(
   GET_MOD,
-  {
-    displayName: modProfileName,
-  },
+  () => ({ displayName: modProfileName.value }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -100,10 +42,7 @@ const minYear = computed(() => {
 
 const { result: contributionsResult, loading } = useQuery(
   GET_MOD_CONTRIBUTIONS,
-  {
-    displayName: modProfileName,
-    year: queryYear,
-  },
+  () => ({ displayName: modProfileName.value, year: queryYear.value }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -120,7 +59,7 @@ const contributions = computed<ModDayData[]>(() => {
       .map((day) => {
         if (!day) return null;
         const activities = Array.isArray(day.activities)
-          ? day.activities.map((activity: ModActivity) => ({
+          ? day.activities.map((activity) => ({
               ...activity,
               type: activity.actionType || 'moderation',
               description: activity.actionDescription || '',
@@ -135,7 +74,7 @@ const contributions = computed<ModDayData[]>(() => {
           activities,
         };
       })
-      .filter((day) => day !== null) as ModDayData[];
+      .filter((day) => day !== null);
   } catch (error) {
     console.error('Error processing mod contribution data:', error);
   }

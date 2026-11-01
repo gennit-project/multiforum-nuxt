@@ -7,7 +7,6 @@ import {
   navigateCarousel,
   detectSwipeDirection,
 } from '@/utils/albumUtils';
-import type { Album, Image } from '@/__generated__/graphql';
 
 describe('albumUtils', () => {
   describe('getMainImageHeight', () => {
@@ -65,8 +64,8 @@ describe('albumUtils', () => {
       const images = [
         { id: '1', url: 'url1' },
         { id: '2', url: 'url2' },
-      ] as unknown as Image[];
-      const album = { Images: images, imageOrder: [] } as unknown as Album;
+      ];
+      const album = { Images: images, imageOrder: [] };
 
       const result = getOrderedAlbumImages({ album });
       expect(result.map((img) => img.id)).toEqual(['1', '2']);
@@ -77,8 +76,8 @@ describe('albumUtils', () => {
         { id: '1', url: 'url1' },
         { id: '2', url: 'url2' },
         { id: '3', url: 'url3' },
-      ] as unknown as Image[];
-      const album = { Images: images, imageOrder: ['3', '1', '2'] } as unknown as Album;
+      ];
+      const album = { Images: images, imageOrder: ['3', '1', '2'] };
 
       const result = getOrderedAlbumImages({ album });
       expect(result.map((img) => img.id)).toEqual(['3', '1', '2']);
@@ -88,16 +87,16 @@ describe('albumUtils', () => {
       const images = [
         { id: '1', url: 'url1' },
         { id: '2', url: 'url2' },
-      ] as unknown as Image[];
-      const album = { Images: images, imageOrder: ['3', '1', '2'] } as unknown as Album;
+      ];
+      const album = { Images: images, imageOrder: ['3', '1', '2'] };
 
       const result = getOrderedAlbumImages({ album });
       expect(result.map((img) => img.id)).toEqual(['1', '2']);
     });
 
     it('appends STL files as synthetic images', () => {
-      const images = [{ id: '1', url: 'url1' }] as unknown as Image[];
-      const album = { Images: images, imageOrder: [] } as unknown as Album;
+      const images = [{ id: '1', url: 'url1' }];
+      const album = { Images: images, imageOrder: [] };
       const stlFiles = [
         { id: 'stl1', url: 'model.stl', fileName: 'model.stl' },
       ];
@@ -105,7 +104,8 @@ describe('albumUtils', () => {
       const result = getOrderedAlbumImages({ album, stlFiles });
       expect(result).toHaveLength(2);
       expect(result[1]!.id).toBe('stl-stl1');
-      expect(result[1]!.isStlFile).toBe(true);
+      const model = result[1];
+      expect(model && 'isStlFile' in model && model.isStlFile).toBe(true);
     });
 
     it('generates STL IDs from index when id is not provided', () => {
@@ -126,7 +126,7 @@ describe('albumUtils', () => {
     });
 
     it('returns null for album with no images', () => {
-      const album = { Images: [] } as unknown as Album;
+      const album = { Images: [] };
       expect(getFirstAlbumImage(album)).toBeNull();
     });
 
@@ -137,7 +137,7 @@ describe('albumUtils', () => {
           { id: '2', url: 'url2' },
         ],
         imageOrder: [],
-      } as unknown as unknown as Album;
+      };
 
       expect(getFirstAlbumImage(album)).toBe('url1');
     });
@@ -149,7 +149,7 @@ describe('albumUtils', () => {
           { id: '2', url: 'url2' },
         ],
         imageOrder: ['2', '1'],
-      } as unknown as unknown as Album;
+      };
 
       expect(getFirstAlbumImage(album)).toBe('url2');
     });
@@ -161,7 +161,7 @@ describe('albumUtils', () => {
           { id: '2', url: 'url2' },
         ],
         imageOrder: ['3', '1'],
-      } as unknown as unknown as Album;
+      };
 
       expect(getFirstAlbumImage(album)).toBe('url1');
     });

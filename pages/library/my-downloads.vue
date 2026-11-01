@@ -5,12 +5,15 @@ import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
-import type { Collection, Discussion } from '@/__generated__/graphql';
+import type {
+  GetCollectionItemsQuery,
+  GetUserOwnedDownloadsQuery,
+} from '@/__generated__/operations';
 import {
-  GET_ALL_USER_COLLECTIONS,
-  GET_COLLECTION_ITEMS,
-} from '@/graphQLData/collection/queries';
-import { GET_USER_OWNED_DOWNLOADS } from '@/graphQLData/user/queries';
+  GetAllUserCollectionsDocument as GET_ALL_USER_COLLECTIONS,
+  GetCollectionItemsDocument as GET_COLLECTION_ITEMS,
+  GetUserOwnedDownloadsDocument as GET_USER_OWNED_DOWNLOADS,
+} from '@/__generated__/operations';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import {
   getDownloadLink,
@@ -24,27 +27,9 @@ import {
 
 const usernameVar = useUsername();
 
-interface AlbumImage {
-  id: string;
-  url?: string;
-}
-
-type Download = Pick<Discussion, 'id' | 'title' | 'createdAt' | 'Tags'> & {
-  isFavorited?: boolean;
-  DiscussionChannels?: Array<{ channelUniqueName?: string }>;
-  Author?: {
-    username?: string;
-    displayName?: string;
-    profilePicURL?: string;
-    commentKarma?: number;
-    discussionKarma?: number;
-    createdAt?: string;
-  };
-  Album?: {
-    Images?: AlbumImage[];
-    imageOrder?: string[];
-  };
-};
+type Download =
+  | GetCollectionItemsQuery['collections'][number]['Downloads'][number]
+  | GetUserOwnedDownloadsQuery['users'][number]['OwnedDownloads'][number];
 
 useHead({
   title: 'My Downloads - Library',
@@ -66,7 +51,7 @@ const {
 
 const downloadsCollection = computed(() => {
   const collections = collectionsResult.value?.users?.[0]?.Collections || [];
-  return collections.find((collection: Collection) =>
+  return collections.find((collection) =>
     isAutoSavedDownloadsCollection(collection)
   );
 });
@@ -78,7 +63,7 @@ const {
 } = useQuery(
   GET_COLLECTION_ITEMS,
   () => ({
-    collectionId: downloadsCollection.value?.id,
+    collectionId: downloadsCollection.value?.id || '',
     loggedInUsername: usernameVar.value,
   }),
   () => ({
@@ -145,15 +130,13 @@ const getFirstAlbumImage = (download: Download): string | undefined => {
   const album = download?.Album;
   if (!album?.Images?.length) return undefined;
 
-  if (album.imageOrder?.length && album.imageOrder.length > 0) {
+  if ('imageOrder' in album && album.imageOrder?.length) {
     const firstImageId = album.imageOrder[0];
-    const orderedImage = album.Images.find(
-      (img: AlbumImage) => img.id === firstImageId
-    );
-    return orderedImage?.url;
+    const orderedImage = album.Images.find((img) => img.id === firstImageId);
+    return orderedImage?.url || undefined;
   }
 
-  return album.Images[0]?.url;
+  return album.Images[0]?.url || undefined;
 };
 </script>
 

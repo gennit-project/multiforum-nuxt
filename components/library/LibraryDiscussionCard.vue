@@ -5,7 +5,7 @@ import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
-import type { Album } from '@/__generated__/graphql';
+import type { PresentationAlbum } from '@/types/DiscussionPresentation';
 import { relativeTime } from '@/utils';
 
 type AuthorInfo = {
@@ -25,9 +25,7 @@ type DiscussionItem = {
   createdAt: string;
   hasSensitiveContent?: boolean | null;
   Tags?: Array<{ text?: string | null }> | null;
-  Album?: {
-    Images?: Array<unknown> | null;
-  } | null;
+  Album?: PresentationAlbum | null;
 };
 
 const props = withDefaults(
@@ -65,7 +63,7 @@ const visibleTags = computed(() =>
   (props.discussion.Tags || []).filter((tag) => !!tag?.text).slice(0, 5)
 );
 
-const albumForDisplay = computed(() => props.discussion.Album as Album | null);
+const albumForDisplay = computed(() => props.discussion.Album ?? null);
 </script>
 
 <template>

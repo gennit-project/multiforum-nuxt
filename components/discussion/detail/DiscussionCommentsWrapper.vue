@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { appendCreatedFeedback } from '@/utils/feedbackCommentCache';
+import type { FeedbackCreatedComment } from '@/composables/useCommentFeedbackMutation';
 import type {
   CommentView as CommentType,
   CreateEditCommentFormValues,
@@ -16,10 +18,10 @@ import CommentSection from '@/components/comments/CommentSection.vue';
 import { useRoute } from 'nuxt/app';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import {
-  SUBSCRIBE_TO_DISCUSSION_CHANNEL,
-  UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL,
-} from '@/graphQLData/discussion/mutations';
-import { GET_USER } from '@/graphQLData/user/queries';
+  SubscribeToDiscussionChannelDocument as SUBSCRIBE_TO_DISCUSSION_CHANNEL,
+  UnsubscribeFromDiscussionChannelDocument as UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL,
+  GetBasicUserInfoDocument as GET_USER,
+} from '@/__generated__/operations';
 import Notification from '@/components/NotificationComponent.vue';
 import SubscribeButton from '@/components/SubscribeButton.vue';
 import InlineCommentForm from '@/components/discussion/form/InlineCommentForm.vue';
@@ -37,7 +39,7 @@ type CommentSectionQueryUpdateInput = {
   cache: ApolloCache<NormalizedCacheObject>;
   commentToDeleteId: string;
   commentToAddFeedbackTo?: CommentType;
-  newFeedbackComment?: CommentType;
+  newFeedbackComment?: FeedbackCreatedComment;
 };
 
 const props = defineProps({
@@ -178,17 +180,7 @@ const formDiscussionChannel = computed(
 );
 
 const botSuggestions = computed(() => {
-  const channel = formDiscussionChannel.value as DiscussionChannel & {
-    Channel?: {
-      uniqueName?: string | null;
-      Bots?: Array<{
-        username: string;
-        displayName?: string | null;
-        botProfileId?: string | null;
-        isDeprecated?: boolean | null;
-      }>;
-    };
-  };
+  const channel = formDiscussionChannel.value;
 
   return buildBotMentionOptions({
     channelUniqueName:
@@ -199,13 +191,7 @@ const botSuggestions = computed(() => {
 });
 
 const modSuggestions = computed(() => {
-  const channel = formDiscussionChannel.value as DiscussionChannel & {
-    Channel?: {
-      Moderators?: Array<{
-        displayName?: string | null;
-      }>;
-    };
-  };
+  const channel = formDiscussionChannel.value;
 
   return buildModMentionOptions({
     mods: (channel?.Channel?.Moderators || [])
@@ -219,13 +205,7 @@ const modSuggestions = computed(() => {
 
 // Extract bot usernames to identify bot-authored comments
 const botUsernames = computed(() => {
-  const channel = formDiscussionChannel.value as DiscussionChannel & {
-    Channel?: {
-      Bots?: Array<{
-        username: string;
-      }>;
-    };
-  };
+  const channel = formDiscussionChannel.value;
 
   return (channel?.Channel?.Bots || []).map((bot) => bot.username);
 });
@@ -233,12 +213,8 @@ const botUsernames = computed(() => {
 // Query for user data to get notification preferences
 const { result: getUserResult } = useQuery(
   GET_USER,
-  {
-    username: usernameVar.value,
-  },
-  {
-    enabled: !!usernameVar.value,
-  }
+  () => ({ username: usernameVar.value }),
+  () => ({ enabled: !!usernameVar.value, keepPreviousResult: false })
 );
 
 // Get user's notification preference for comment replies
@@ -349,17 +325,7 @@ const updateCommentSectionQueryResult = (
   }
 
   if (commentToAddFeedbackTo && newFeedbackComment) {
-    cache.modify({
-      id: cache.identify({
-        __typename: 'Comment',
-        id: commentToAddFeedbackTo.id,
-      }),
-      fields: {
-        FeedbackComments(existing = []) {
-          return [...existing, newFeedbackComment];
-        },
-      },
-    });
+    appendCreatedFeedback(cache, commentToAddFeedbackTo.id, newFeedbackComment);
   }
 };
 
@@ -452,10 +418,8 @@ const {
   onDone: onSubscribeComplete,
 } = useMutation(SUBSCRIBE_TO_DISCUSSION_CHANNEL, {
   update: (cache, result) => {
-    if (
-      result.data?.subscribeToDiscussionChannel &&
-      props.discussionChannel?.id
-    ) {
+    const subscribed = result.data?.subscribeToDiscussionChannel;
+    if (subscribed && props.discussionChannel?.id) {
       cache.modify({
         id: cache.identify({
           __typename: 'DiscussionChannel',
@@ -463,8 +427,7 @@ const {
         }),
         fields: {
           SubscribedToNotifications(_) {
-            return result.data.subscribeToDiscussionChannel
-              .SubscribedToNotifications;
+            return subscribed.SubscribedToNotifications;
           },
         },
       });
@@ -482,10 +445,8 @@ const {
   onDone: onUnsubscribeComplete,
 } = useMutation(UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL, {
   update: (cache, result) => {
-    if (
-      result.data?.unsubscribeFromDiscussionChannel &&
-      props.discussionChannel?.id
-    ) {
+    const unsubscribed = result.data?.unsubscribeFromDiscussionChannel;
+    if (unsubscribed && props.discussionChannel?.id) {
       cache.modify({
         id: cache.identify({
           __typename: 'DiscussionChannel',
@@ -493,8 +454,7 @@ const {
         }),
         fields: {
           SubscribedToNotifications(_) {
-            return result.data.unsubscribeFromDiscussionChannel
-              .SubscribedToNotifications;
+            return unsubscribed.SubscribedToNotifications;
           },
         },
       });

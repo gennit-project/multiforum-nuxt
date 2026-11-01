@@ -1,13 +1,16 @@
 <script setup lang="ts">
+import HydratedProfileComment from '@/components/user/HydratedProfileComment.vue';
 import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
-import { GET_MOD, GET_MOD_COMMENTS } from '@/graphQLData/mod/queries';
+import { GetModDocument as GET_MOD, GetModCommentsDocument as GET_MOD_COMMENTS } from '@/__generated__/operations';
 import Comment from '@/components/comments/Comment.vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
-import type { Comment as CommentType } from '@/__generated__/graphql';
+import type { GetCommentQuery } from '@/__generated__/operations';
+type CommentType = GetCommentQuery['comments'][number];
+
 
 const PAGE_LIMIT = 25;
 
@@ -37,11 +40,11 @@ const {
   fetchMore,
 } = useQuery(
   GET_MOD_COMMENTS,
-  {
+  () => ({
     displayName: modProfileName.value,
     limit: PAGE_LIMIT,
     offset: 0,
-  },
+  }),
   {
     fetchPolicy: 'cache-first',
   }
@@ -50,22 +53,27 @@ const {
 const loadMore = () => {
   if (!commentResult.value?.moderationProfiles?.[0]?.AuthoredComments) return;
 
+  const requestedProfile = modProfileName.value;
   fetchMore({
     variables: {
+      displayName: requestedProfile,
       limit: PAGE_LIMIT,
       offset: commentResult.value.moderationProfiles[0].AuthoredComments.length,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      if (!fetchMoreResult || requestedProfile !== modProfileName.value) return previousResult;
       const prevModProfile = previousResult.moderationProfiles[0];
+      const nextModProfile = fetchMoreResult.moderationProfiles[0];
+      if (!prevModProfile || !nextModProfile) return previousResult;
       const prevAuthoredComments = prevModProfile.AuthoredComments || [];
       const newComments =
-        fetchMoreResult.moderationProfiles[0].AuthoredComments || [];
+        nextModProfile.AuthoredComments || [];
       return {
+        ...previousResult,
         moderationProfiles: [
           {
             ...prevModProfile,
-            AuthoredComments: [...prevAuthoredComments, ...newComments],
+            AuthoredComments: [...new Map([...prevAuthoredComments, ...newComments].map(item => [item.id, item])).values()],
           },
         ],
       };
@@ -117,12 +125,12 @@ const handleClickReport = (comment: CommentType) => {
       {{ getModError.message }}
     </ErrorBanner>
     <div v-else-if="commentCount === 0">No comments yet</div>
-    <Comment
-      v-for="comment in comments"
-      :key="comment.id"
-      :comment-data="comment"
+    <HydratedProfileComment v-for="comment in comments" :key="comment.id" :comment="comment">
+      <template #default="{ commentData }">
+      <Comment
+      :comment-data="commentData"
       :parent-comment-id="
-        comment.ParentComment ? comment.ParentComment.id : null
+        commentData.ParentComment?.id || undefined
       "
       :depth="0"
       :show-channel="true"
@@ -131,6 +139,8 @@ const handleClickReport = (comment: CommentType) => {
       :go-to-permalink-on-click="true"
       @click-report="handleClickReport"
     />
+      </template>
+    </HydratedProfileComment>
     <div v-if="commentCount">
       <LoadMore
         class="justify-self-center"

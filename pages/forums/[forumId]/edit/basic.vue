@@ -16,12 +16,7 @@ import {
 } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
 import { ref, nextTick, computed } from 'vue';
-import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
-import {
-  PERMANENTLY_DELETE_CHANNEL_BANNER,
-  SET_CHANNEL_ICON,
-} from '@/graphQLData/channel/mutations';
-import { REMOVE_FORUM_OWNER } from '@/graphQLData/mod/mutations';
+import { CreateSignedUrlDocument as CREATE_SIGNED_STORAGE_URL, PermanentlyDeleteChannelBannerDocument as PERMANENTLY_DELETE_CHANNEL_BANNER, SetChannelIconDocument as SET_CHANNEL_ICON , RemoveForumOwnerDocument as REMOVE_FORUM_OWNER  } from '@/__generated__/operations';
 import { useMutation } from '@vue/apollo-composable';
 import { isFileSizeValid } from '@/utils/index';
 import { useRoute, useRouter } from 'nuxt/app';

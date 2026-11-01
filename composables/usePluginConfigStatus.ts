@@ -4,26 +4,13 @@ import {
   type MaybeRefOrGetter,
 } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_PLUGIN_CONFIG_STATUS } from '@/graphQLData/admin/queries';
-import type { PluginConfigFieldKind } from '@/types/pluginForms';
+import { GetPluginConfigStatusDocument as GET_PLUGIN_CONFIG_STATUS } from '@/__generated__/operations';
+import type { GetPluginConfigStatusQuery } from '@/__generated__/operations';
 
 export type PluginConfigScope = 'server' | 'channel';
 
-export interface PluginConfigFieldStatus {
-  key: string;
-  label: string;
-  scope: PluginConfigScope;
-  kind: PluginConfigFieldKind;
-  required: boolean;
-  isSet: boolean;
-  isValid: boolean;
-  message?: string | null;
-}
-
-export interface PluginConfigStatus {
-  isFullyConfigured: boolean;
-  fields: PluginConfigFieldStatus[];
-}
+export type PluginConfigStatus = GetPluginConfigStatusQuery['getPluginConfigStatus'];
+export type PluginConfigFieldStatus = PluginConfigStatus['fields'][number];
 
 interface UsePluginConfigStatusOptions {
   pluginId: MaybeRefOrGetter<string | null | undefined>;

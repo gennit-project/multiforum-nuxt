@@ -5,13 +5,8 @@ import { useApolloClient, useMutation } from '@vue/apollo-composable';
 import GenericModal from '@/components/GenericModal.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import ArchiveBoxXMark from '../icons/ArchiveBoxXMark.vue';
-import {
-  UNARCHIVE_DISCUSSION,
-  UNARCHIVE_EVENT,
-  UNARCHIVE_COMMENT,
-  UNARCHIVE_IMAGE,
-} from '@/graphQLData/issue/mutations';
-import { GET_ISSUE } from '@/graphQLData/issue/queries';
+import { UnarchiveDiscussionDocument as UNARCHIVE_DISCUSSION, UnarchiveEventDocument as UNARCHIVE_EVENT, UnarchiveCommentDocument as UNARCHIVE_COMMENT, UnarchiveImageDocument as UNARCHIVE_IMAGE, GetIssueDocument as GET_ISSUE  } from '@/__generated__/operations';
+
 
 const props = defineProps({
   open: {

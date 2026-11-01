@@ -12,14 +12,9 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import { stableRelativeTime } from '@/utils';
 import type {
-  Discussion,
-  DiscussionChannel,
-  Tag,
-} from '@/__generated__/graphql';
-import type {
-  DiscussionChannelWithFavorited,
-  DiscussionChannelWithFlairs,
-} from '@/types/Discussion';
+  ChannelDiscussionPresentation as Discussion,
+  ChannelListPresentation as DiscussionChannel,
+} from '@/types/DiscussionList';
 import DiscussionFlairBadges from '@/components/discussion/DiscussionFlairBadges.vue';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
@@ -27,12 +22,13 @@ import ExpandIcon from '@/components/icons/ExpandIcon.vue';
 import { storeToRefs } from 'pinia';
 import { useUIStore } from '@/stores/uiStore';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_USER } from '@/graphQLData/user/queries';
+import { GetBasicUserInfoDocument as GET_USER } from '@/__generated__/operations';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { getAuthorBadges } from '@/utils/roleBadges';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
+type Tag = Discussion['Tags'][number];
 
 const usernameVar = useUsername();
 const isAuthenticatedVar = useIsAuthenticated();
@@ -61,7 +57,7 @@ const props = defineProps({
     required: true,
   },
   discussion: {
-    type: Object as PropType<Discussion>,
+    type: Object as PropType<Discussion | null>,
     default: null,
   },
   searchInput: {
@@ -111,8 +107,7 @@ const defaultUniqueName = computed(
   () => channelIdInParams.value || props.discussionChannel.channelUniqueName
 );
 const commentCount = computed(
-  () =>
-    props.discussionChannel?.CommentsConnection?.aggregate?.count?.nodes || 0
+  () => props.discussionChannel?.CommentsAggregate?.count || 0
 );
 
 const authorBadges = computed(() =>
@@ -171,9 +166,7 @@ const relativeTimeAgo = computed(() =>
 const tags = computed(
   () => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []
 );
-const flairs = computed(
-  () => (props.discussionChannel as DiscussionChannelWithFlairs).Flairs || []
-);
+const flairs = computed(() => props.discussionChannel.Flairs || []);
 
 const filteredQuery = computed(() => {
   const query = { ...route.query };
@@ -350,12 +343,7 @@ const revealSensitiveContent = () => {
                   :allow-add-to-list="true"
                   :discussion-id="discussion.id"
                   :discussion-title="discussion.title"
-                  :initial-is-favorited="
-                    (
-                      discussionChannel as DiscussionChannel &
-                        DiscussionChannelWithFavorited
-                    ).isFavorited
-                  "
+                  :initial-is-favorited="discussionChannel.isFavorited ?? false"
                   size="small"
                 />
               </div>

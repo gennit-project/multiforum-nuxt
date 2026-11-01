@@ -5,9 +5,9 @@ import { getPluginConfigFieldId } from '@/utils/pluginConfigFieldIds';
 
 interface PluginSecretStatus {
   key: string;
-  status: 'NOT_SET' | 'SET_UNTESTED' | 'VALID' | 'INVALID';
-  lastValidatedAt?: string;
-  validationError?: string;
+  status: string;
+  lastValidatedAt?: string | null;
+  validationError?: string | null;
   required?: boolean;
 }
 

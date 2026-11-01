@@ -9,7 +9,7 @@ import DownloadSkeletonCard from '@/components/download/DownloadSkeletonCard.vue
 import LoadMore from '../LoadMore.vue';
 import ErrorBanner from '../ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
+import { GetDiscussionsInChannelDocument as GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
 import { provideForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
@@ -18,7 +18,11 @@ import {
   getTimeFrameFromQuery,
 } from '@/utils/getSortFromQuery';
 import { convertUrlParamsToLabelFilters } from '@/utils/downloadFilters';
-import type { Discussion, Album, FilterGroup } from '@/__generated__/graphql';
+import type { GetChannelQuery } from '@/__generated__/operations';
+import type { ChannelDiscussionPresentation } from '@/types/DiscussionList';
+type FilterGroup = GetChannelQuery['channels'][number]['FilterGroups'][number];
+type Discussion = ChannelDiscussionPresentation;
+type Album = NonNullable<Discussion['Album']>;
 
 const DiscussionAlbum = defineAsyncComponent(
   () => import('@/components/discussion/detail/DiscussionAlbum.vue')
@@ -90,20 +94,24 @@ const {
   loading: downloadLoading,
   refetch: refetchDownloads,
   fetchMore,
-} = useQuery(GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA, {
-  channelUniqueName: channelId,
-  searchInput,
-  selectedTags,
-  showArchived,
-  hasDownload: true,
-  labelFilters,
-  options: {
-    limit: DOWNLOAD_PAGE_LIMIT,
-    offset: 0,
-    sort: activeSort,
-    timeFrame: activeTimeFrame,
-  },
-});
+} = useQuery(
+  GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
+  () => ({
+    channelUniqueName: channelId.value,
+    searchInput: searchInput.value || '',
+    selectedTags: selectedTags.value || [],
+    showArchived: showArchived.value || false,
+    hasDownload: true,
+    labelFilters: labelFilters.value,
+    options: {
+      limit: DOWNLOAD_PAGE_LIMIT,
+      offset: 0,
+      sort: activeSort.value,
+      timeFrame: activeTimeFrame.value,
+    },
+  }),
+  () => ({ enabled: !!channelId.value, keepPreviousResult: false })
+);
 
 // Refetch when user logs in/out to update isFavorited and upvote status
 watch(
@@ -114,19 +122,45 @@ watch(
 );
 
 const loadMore = () => {
+  const scope = JSON.stringify([
+    channelId.value,
+    searchInput.value,
+    selectedTags.value,
+    showArchived.value,
+    labelFilters.value,
+    activeSort.value,
+    activeTimeFrame.value,
+  ]);
   fetchMore({
     variables: {
       options: {
         limit: DOWNLOAD_PAGE_LIMIT,
         offset:
           downloadChannelResult.value?.getDiscussionsInChannel
-            .discussionChannels.length,
+            ?.discussionChannels.length,
         sort: activeSort.value,
         timeFrame: activeTimeFrame.value,
       },
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
+      if (
+        scope !==
+        JSON.stringify([
+          channelId.value,
+          searchInput.value,
+          selectedTags.value,
+          showArchived.value,
+          labelFilters.value,
+          activeSort.value,
+          activeTimeFrame.value,
+        ])
+      )
+        return previousResult;
+      if (
+        !fetchMoreResult?.getDiscussionsInChannel ||
+        !previousResult.getDiscussionsInChannel
+      )
+        return previousResult;
       return {
         getDiscussionsInChannel: {
           ...previousResult.getDiscussionsInChannel,
@@ -134,8 +168,12 @@ const loadMore = () => {
             fetchMoreResult.getDiscussionsInChannel
               .aggregateDiscussionChannelsCount,
           discussionChannels: [
-            ...previousResult.getDiscussionsInChannel.discussionChannels,
-            ...fetchMoreResult.getDiscussionsInChannel.discussionChannels,
+            ...new Map(
+              [
+                ...previousResult.getDiscussionsInChannel.discussionChannels,
+                ...fetchMoreResult.getDiscussionsInChannel.discussionChannels,
+              ].map((item) => [item.id, item])
+            ).values(),
           ],
         },
       };
@@ -166,7 +204,7 @@ const handleCloseAlbum = () => {
 
 onMounted(() => {
   if (
-    downloadChannelResult.value?.getDiscussionsInChannel.discussionChannels
+    downloadChannelResult.value?.getDiscussionsInChannel?.discussionChannels
       .length === 0
   ) {
     refetchDownloads();
@@ -205,7 +243,7 @@ const filteredDownloads = computed(() => {
 const reachedEndOfResults = computed(() => {
   return (
     downloadChannelResult.value?.getDiscussionsInChannel
-      .aggregateDiscussionChannelsCount === filteredDownloads.value.length
+      ?.aggregateDiscussionChannelsCount === filteredDownloads.value.length
   );
 });
 </script>
@@ -271,8 +309,8 @@ const reachedEndOfResults = computed(() => {
     <!-- Filtered results message -->
     <div
       v-else-if="
-        downloadChannelResult?.getDiscussionsInChannel?.discussionChannels
-          ?.length > 0 && filteredDownloads.length === 0
+        (downloadChannelResult?.getDiscussionsInChannel?.discussionChannels
+          .length || 0) > 0 && filteredDownloads.length === 0
       "
       class="p-4 text-center"
     >

@@ -30,7 +30,7 @@ describe('buildCommentSearchWhere', () => {
       searchInput: '',
       selectedChannels: [],
     });
-    expect(where).toMatchObject({ isFeedbackComment_NOT: true, Issue: null });
+    expect(where).toMatchObject({ NOT: { isFeedbackComment: { eq: true } }, Issue: null });
   });
 
   it('adds a case-insensitive text match for the search term', () => {

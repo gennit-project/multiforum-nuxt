@@ -6,11 +6,11 @@ import { useUsername } from '@/composables/useAuthState';
 import { useAddToListModalStore } from '@/stores/addToListModalStore';
 import { useToastStore } from '@/stores/toastStore';
 import {
-  REMOVE_FAVORITE_CHANNEL,
-  REMOVE_FAVORITE_COMMENT,
-  REMOVE_FAVORITE_DISCUSSION,
-  REMOVE_FAVORITE_IMAGE,
-} from '@/graphQLData/user/mutations';
+  RemoveFavoriteChannelDocument as REMOVE_FAVORITE_CHANNEL,
+  RemoveFavoriteCommentDocument as REMOVE_FAVORITE_COMMENT,
+  RemoveFavoriteDiscussionDocument as REMOVE_FAVORITE_DISCUSSION,
+  RemoveFavoriteImageDocument as REMOVE_FAVORITE_IMAGE,
+} from '@/__generated__/operations';
 import type { LibraryFavoriteKind } from '@/types/library';
 
 const props = defineProps<{

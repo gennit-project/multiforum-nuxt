@@ -354,6 +354,7 @@ describe('GithubContributionChart', () => {
   // Test activity summary for selected day
   it('shows activity summary when a day with activities is selected', async () => {
     const wrapper = mount(GithubContributionChart, {
+      global: { stubs: { HydratedProfileComment: true } },
       props: {
         contributionData: allTypesContributionData,
         year: 2023,

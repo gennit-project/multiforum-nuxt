@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GET_USER } from '@/graphQLData/user/queries';
+import { GetBasicUserInfoDocument as GET_USER } from '@/__generated__/operations';
 import AvatarComponent from '../AvatarComponent.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { computed } from 'vue';

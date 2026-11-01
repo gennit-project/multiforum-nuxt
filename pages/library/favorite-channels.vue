@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
-import { GET_USER_FAVORITE_CHANNELS } from '@/graphQLData/user/queries';
+import { GetUserFavoriteChannelsDocument as GET_USER_FAVORITE_CHANNELS } from '@/__generated__/operations';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 

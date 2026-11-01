@@ -5,13 +5,18 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
 
 const harness = vi.hoisted(() => ({
+  route: { params: { collectionId: 'col-1' } },
   routerPush: undefined as unknown as ReturnType<typeof vi.fn>,
 }));
 
-vi.mock('vue-router', () => ({
-  useRoute: () => ({ params: { collectionId: 'col-1' } }),
-  useRouter: () => ({ push: harness.routerPush }),
-}));
+vi.mock('vue-router', async () => {
+  const { reactive } = await import('vue');
+  harness.route = reactive(harness.route);
+  return {
+    useRoute: () => harness.route,
+    useRouter: () => ({ push: harness.routerPush }),
+  };
+});
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
@@ -88,11 +93,19 @@ let queryError: Error | null = null;
 beforeEach(() => {
   vi.clearAllMocks();
   harness.routerPush = vi.fn();
+  harness.route.params.collectionId = 'col-1';
   queryLoading = false;
   queryError = null;
 });
 
 const mountWith = async (collection: unknown) => {
+  if (
+    collection &&
+    typeof collection === 'object' &&
+    'id' in collection &&
+    typeof collection.id === 'string'
+  )
+    harness.route.params.collectionId = collection.id;
   refetchCollection = vi.fn();
   mutationMocks.update.mockResolvedValue({});
   mutationMocks.delete.mockResolvedValue({});
@@ -693,4 +706,39 @@ describe('library collection detail page', () => {
       wrapper.findComponent(LibraryCommentCardStub).props('contextType')
     ).toBe('Discussion');
   });
+});
+
+it('does not redirect to a shared discussion after leaving its collection', async () => {
+  const wrapper = await mountWith({
+    id: 'col-1',
+    name: 'Public list',
+    collectionType: 'DISCUSSIONS',
+    visibility: 'PUBLIC',
+    Discussions: [],
+    itemCount: 0,
+  });
+  let finish = (_result: unknown) => {};
+  mutationMocks.share.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      })
+  );
+  await wrapper
+    .find('[data-testid="share-collection-button"]')
+    .trigger('click');
+  await wrapper.find('[data-testid="forum-picker"]').trigger('click');
+  await wrapper.find('[data-testid="modal-primary"]').trigger('click');
+  harness.route.params.collectionId = 'col-2';
+  await wrapper.vm.$nextTick();
+  finish({
+    data: {
+      shareCollectionAsDiscussion: {
+        id: 'old-discussion',
+        DiscussionChannels: [{ channelUniqueName: 'cats' }],
+      },
+    },
+  });
+  await wrapper.vm.$nextTick();
+  expect(harness.routerPush).not.toHaveBeenCalled();
 });

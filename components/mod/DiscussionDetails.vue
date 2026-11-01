@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_ISSUE_RELATED_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GetIssueRelatedDiscussionDocument as GET_ISSUE_RELATED_DISCUSSION } from '@/__generated__/operations';
 import { DateTime } from 'luxon';
 import { useRoute } from 'nuxt/app';
 import { stableRelativeTime } from '@/utils';
-import type { Issue } from '@/__generated__/graphql';
+import type { IssueView as Issue } from '@/types/Issue';
 
 /* component imports that were previously declared in `components:`.
    Adjust the paths if yours are different. */
@@ -42,7 +42,7 @@ const {
 } = useQuery(
   GET_ISSUE_RELATED_DISCUSSION,
   () => ({
-    id: discussionId.value,
+    id: discussionId.value || '',
   }),
   {
     fetchPolicy: 'cache-first',
@@ -137,8 +137,8 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
         >
           <span class="flex items-center">
             <AvatarComponent
-              :text="discussion?.Author.username"
-              :src="discussion?.Author.profilePicURL ?? ''"
+              :text="discussion?.Author?.username || '[Deleted]'"
+              :src="discussion?.Author?.profilePicURL ?? ''"
               :variant-source="discussion?.Author || null"
               class="mr-2 h-6 w-6"
             />
@@ -147,7 +147,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
             <UsernameWithTooltip
               v-if="discussion?.Author?.username"
               :username="discussion?.Author?.username"
-              :src="discussion?.Author.profilePicURL ?? ''"
+              :src="discussion?.Author?.profilePicURL ?? ''"
               :variant-source="discussion?.Author || null"
               :display-name="discussion?.Author.displayName ?? ''"
               :comment-karma="discussion?.Author.commentKarma ?? 0"

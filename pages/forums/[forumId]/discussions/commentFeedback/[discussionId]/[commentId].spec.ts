@@ -1,3 +1,4 @@
+import { makeFeedbackPageCache } from '@/tests/utils/feedbackCacheFixtures';
 import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { defineComponent, ref } from 'vue';
@@ -21,7 +22,8 @@ const mockState = vi.hoisted(() => ({
   fetchMore: vi.fn(),
   queryDone: null as null | (() => void),
   mutationDone: null as null | (() => void),
-  mutationUpdate: null as null | ((cache: unknown, result: unknown) => void),
+  mutationUpdate: null as
+    null | ((cache: unknown, result: unknown, options?: unknown) => void),
   addFeedback: vi.fn(),
   mutationError: null as unknown as { value: unknown },
   mutationLoading: null as unknown as { value: boolean },
@@ -77,7 +79,9 @@ const mountWith = async (
   mockedUseMutation.mockImplementation(
     (
       _document: unknown,
-      options: { update: (cache: unknown, result: unknown) => void }
+      options: {
+        update: (cache: unknown, result: unknown, options?: unknown) => void;
+      }
     ) => {
       mockState.mutationUpdate = options.update;
       return {
@@ -155,13 +159,17 @@ describe('comment feedback page', () => {
     });
   });
 
-  it('shows a parent-comment context link', async () => {
-    const wrapper = await mountWith({
-      ...baseComment,
-      ParentComment: { id: 'parent-1' },
+  it('links to the original comment using the selected comment identity', async () => {
+    const wrapper = await mountWith(baseComment);
+    expect(
+      wrapper
+        .findAllComponents(NuxtLinkStub)
+        .find((link) => link.text() === 'View original context')
+        ?.props('to')
+    ).toEqual({
+      name: 'forums-forumId-discussions-discussionId-comments-commentId',
+      params: { discussionId: 'd1', commentId: 'c1' },
     });
-
-    expect(wrapper.text()).toContain('View Context');
   });
 
   it('reports feedback list state to the section', async () => {
@@ -191,7 +199,9 @@ describe('comment feedback page', () => {
     const previous = {
       comments: [{ id: 'c1', FeedbackComments: [{ id: 'f1' }] }],
     };
-    const next = { comments: [{ id: 'c1', FeedbackComments: [{ id: 'f2' }] }] };
+    const next = {
+      comments: [{ id: 'c1', FeedbackComments: [{ id: 'f1' }, { id: 'f2' }] }],
+    };
 
     expect({
       variables: request.variables,
@@ -258,28 +268,31 @@ describe('comment feedback page', () => {
     wrapper
       .findComponent(FeedbackSection)
       .vm.$emit('update-comment-to-give-feedback-on', nested);
-    const cache = {
-      readQuery: vi.fn(() => ({
-        comments: [
-          { FeedbackCommentsConnection: { aggregate: { count: { nodes: 1 } } } },
-        ],
-      })),
-      writeQuery: vi.fn(),
-    };
-
-    mockState.mutationUpdate?.(cache, {
-      data: { createCommentWithOwnedConnections: { comments: [{ id: 'new' }] } },
-    });
-
-    const written = cache.writeQuery.mock.calls[0]?.[0].data.comments[0];
-    expect(written.FeedbackComments).toEqual([
-      { id: 'f2' },
+    const { cache, read } = makeFeedbackPageCache('f1', 'old');
+    mockState.mutationUpdate?.(
+      cache,
       {
-        id: 'f1',
-        FeedbackComments: [{ id: 'old' }, { id: 'new' }],
-        FeedbackCommentsConnection: {
-          aggregate: { count: { nodes: 2 } },
+        data: {
+          createCommentWithOwnedConnections: { comments: [{ id: 'new' }] },
         },
+      },
+      { variables: { commentId: 'f1' } }
+    );
+    expect([read('f1'), read('sibling')]).toEqual([
+      {
+        __typename: 'Comment',
+        id: 'f1',
+        FeedbackComments: [
+          { __typename: 'Comment', id: 'old' },
+          { __typename: 'Comment', id: 'new' },
+        ],
+        FeedbackCommentsConnection: { aggregate: { count: { nodes: 2 } } },
+      },
+      {
+        __typename: 'Comment',
+        id: 'sibling',
+        FeedbackComments: [],
+        FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
       },
     ]);
   });

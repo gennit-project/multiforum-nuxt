@@ -3,11 +3,14 @@ import { ref } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import GenericModal from '@/components/GenericModal.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import { DELETE_COMMENT } from '@/graphQLData/comment/mutations';
-import { GET_SPECIFIC_DISCUSSION_FEEDBACK as GET_FEEDBACK } from '@/graphQLData/discussion/queries';
-import type { Comment } from '@/__generated__/graphql';
+import {
+  DeleteCommentDocument as DELETE_COMMENT,
+  GetSpecificDiscussionFeedbackDocument as GET_FEEDBACK,
+} from '@/__generated__/operations';
+import type { GetSpecificDiscussionFeedbackQuery } from '@/__generated__/operations';
 import CommentHeader from '@/components/comments/CommentHeader.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
+type Comment = GetSpecificDiscussionFeedbackQuery['comments'][number];
 
 const props = defineProps({
   discussionId: {
@@ -58,7 +61,7 @@ const {
   onDone: onFeedbackDeleted,
 } = useMutation(DELETE_COMMENT, {
   update: (cache, { data }) => {
-    if (commentData.value && data?.deleteComments?.nodesDeleted > 0) {
+    if (commentData.value && (data?.deleteComments?.nodesDeleted || 0) > 0) {
       cache.evict({ id: cache.identify(commentData.value) });
     }
   },

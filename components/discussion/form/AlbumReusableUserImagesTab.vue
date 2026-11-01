@@ -1,11 +1,10 @@
 <script lang="ts" setup>
+import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
+import type { GetReusableUserImagesQuery, GetReusableFavoriteImagesQuery, GetReusableUserImagesQueryVariables } from '@/__generated__/operations';
 import { computed, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useUsername } from '@/composables/useAuthState';
-import {
-  GET_REUSABLE_USER_IMAGES,
-  GET_REUSABLE_FAVORITE_IMAGES,
-} from '@/graphQLData/image/queries';
+import { GetReusableUserImagesDocument as GET_REUSABLE_USER_IMAGES, GetReusableFavoriteImagesDocument as GET_REUSABLE_FAVORITE_IMAGES } from '@/__generated__/operations';
 import AlbumReusableImageGrid from './AlbumReusableImageGrid.vue';
 import LoadMore from '@/components/LoadMore.vue';
 import { buildReusableImageWhere } from './reusableImageTypes';
@@ -13,18 +12,7 @@ import type { ReusableImage } from './reusableImageTypes';
 
 const PAGE_SIZE = 24;
 
-type ImagesCountConnection = {
-  aggregate?: { count?: { nodes?: number | null } | null } | null;
-} | null;
-
-type UserImagesResult = {
-  users?: Array<{
-    Images?: ReusableImage[] | null;
-    ImagesConnection?: ImagesCountConnection;
-    FavoriteImages?: ReusableImage[] | null;
-    FavoriteImagesConnection?: ImagesCountConnection;
-  }> | null;
-};
+type UserImagesResult = GetReusableUserImagesQuery | GetReusableFavoriteImagesQuery;
 
 const props = defineProps<{
   source: 'uploads' | 'favorites';
@@ -44,7 +32,7 @@ const isLoadingMore = ref(false);
 
 const isFavorites = computed(() => props.source === 'favorites');
 
-const query = computed(() =>
+const query = computed<TypedDocumentNode<UserImagesResult, GetReusableUserImagesQueryVariables>>(() =>
   isFavorites.value ? GET_REUSABLE_FAVORITE_IMAGES : GET_REUSABLE_USER_IMAGES
 );
 
@@ -55,7 +43,7 @@ const buildVariables = (offset: number) => ({
   limit: PAGE_SIZE,
 });
 
-const { result, loading, error, fetchMore } = useQuery<UserImagesResult>(
+const { result, loading, error, fetchMore } = useQuery(
   query,
   () => buildVariables(0),
   () => ({
@@ -67,14 +55,12 @@ const { result, loading, error, fetchMore } = useQuery<UserImagesResult>(
 const user = computed(() => result.value?.users?.[0] ?? null);
 
 const images = computed<ReusableImage[]>(
-  () => (isFavorites.value ? user.value?.FavoriteImages : user.value?.Images) || []
+  () => (user.value ? (isFavorites.value && 'FavoriteImages' in user.value ? user.value.FavoriteImages : 'Images' in user.value ? user.value.Images : []) : []).map((image) => ({ ...image, url: image.url || '' }))
 );
 
 const totalCount = computed(
   () =>
-    (isFavorites.value
-      ? user.value?.FavoriteImagesConnection?.aggregate?.count?.nodes
-      : user.value?.ImagesConnection?.aggregate?.count?.nodes) ?? 0
+    (user.value ? (isFavorites.value && 'FavoriteImagesConnection' in user.value ? user.value.FavoriteImagesConnection.aggregate.count?.nodes : 'ImagesConnection' in user.value ? user.value.ImagesConnection.aggregate.count?.nodes : 0) : 0) ?? 0
 );
 
 const hasMore = computed(() => images.value.length < totalCount.value);
@@ -90,7 +76,7 @@ const emptyMessage = computed(() =>
 // A new search restarts paging from the first page; the base query refetches at
 // offset 0, so reset our paging cursor to match.
 watch(
-  () => props.searchTerm,
+  () => [props.searchTerm, props.source, usernameVar.value],
   () => {
     currentOffset.value = 0;
   }
@@ -99,19 +85,21 @@ watch(
 const loadMore = async () => {
   if (!hasMore.value || isLoadingMore.value) return;
 
+  const scope = JSON.stringify([props.searchTerm, props.source, usernameVar.value]);
+  const sameScope = () => scope === JSON.stringify([props.searchTerm, props.source, usernameVar.value]);
   const newOffset = currentOffset.value + PAGE_SIZE;
   isLoadingMore.value = true;
 
   try {
     await fetchMore({
       variables: buildVariables(newOffset),
-      updateQuery: (previous: UserImagesResult, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return previous;
+      updateQuery: (previous, { fetchMoreResult }) => {
+        if (!fetchMoreResult || !sameScope()) return previous;
         const prevUser = previous.users?.[0];
         const nextUser = fetchMoreResult.users?.[0];
         if (!prevUser || !nextUser) return previous;
 
-        if (isFavorites.value) {
+        if (isFavorites.value && 'FavoriteImages' in prevUser && 'FavoriteImages' in nextUser) {
           return {
             ...previous,
             users: [
@@ -119,7 +107,7 @@ const loadMore = async () => {
                 ...prevUser,
                 FavoriteImages: [
                   ...(prevUser.FavoriteImages || []),
-                  ...(nextUser.FavoriteImages || []),
+                  ...nextUser.FavoriteImages.filter((image) => !prevUser.FavoriteImages.some((old) => old.id === image.id)),
                 ],
                 FavoriteImagesConnection: nextUser.FavoriteImagesConnection,
               },
@@ -127,12 +115,13 @@ const loadMore = async () => {
           };
         }
 
+        if (!('Images' in prevUser) || !('Images' in nextUser)) return previous;
         return {
           ...previous,
           users: [
             {
               ...prevUser,
-              Images: [...(prevUser.Images || []), ...(nextUser.Images || [])],
+              Images: [...(prevUser.Images || []), ...nextUser.Images.filter((image) => !prevUser.Images.some((old) => old.id === image.id))],
               ImagesConnection: nextUser.ImagesConnection,
             },
           ],
@@ -140,7 +129,7 @@ const loadMore = async () => {
       },
     });
 
-    currentOffset.value = newOffset;
+    if (sameScope()) currentOffset.value = newOffset;
   } finally {
     isLoadingMore.value = false;
   }

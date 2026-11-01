@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import EventChannelLink from '@/components/event/detail/EventChannelLink.vue';
-import type { EventChannel } from '@/__generated__/graphql';
+import type { EventChannelPresentation as EventChannel } from '@/types/EventPresentation';
 
 const props = withDefaults(
   defineProps<{
@@ -32,7 +32,6 @@ const channelsExceptActive = computed(() => {
           :channel-id="eventChannel.channelUniqueName"
           :channel-icon="eventChannel.Channel?.channelIconURL || ''"
           :channel-display-name="eventChannel.Channel?.displayName || ''"
-          :comment-count="eventChannel.CommentsConnection?.aggregate?.count?.nodes || 0"
           :event-id="eventChannel.eventId"
         />
       </ul>
@@ -48,7 +47,6 @@ const channelsExceptActive = computed(() => {
             :channel-id="dc.channelUniqueName"
             :channel-icon="dc.Channel?.channelIconURL || ''"
             :channel-display-name="dc.Channel?.displayName || ''"
-            :comment-count="dc.CommentsConnection?.aggregate?.count?.nodes || 0"
             :event-id="dc.eventId"
           />
         </ul>

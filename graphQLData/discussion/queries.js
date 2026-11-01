@@ -271,28 +271,6 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
   ${DISCUSSION_FLAIR_FIELDS}
 `;
 
-export const IS_DISCUSSION_ANSWERED = gql`
-  query isDiscussionAnswered($channelUniqueName: String!, $discussionId: ID!) {
-    discussionChannels(
-      where: {
-        channelUniqueName: { eq: $channelUniqueName }
-        discussionId: { eq: $discussionId }
-      }
-    ) {
-      id
-      discussionId
-      channelUniqueName
-      weightedVotesCount
-      archived
-      answered
-      locked
-      Channel {
-        uniqueName
-      }
-    }
-  }
-`;
-
 export const GET_DOWNLOAD_DETAIL = gql`
   ${AUTHOR_FIELDS}
   ${CROSSPOST_PREVIEW_FIELDS}
@@ -1035,28 +1013,6 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
         }
         ... on User {
           username
-        }
-      }
-    }
-  }
-`;
-
-export const GET_DOWNLOAD_LABELS = gql`
-  query getDownloadLabels($discussionId: ID!, $channelUniqueName: String!) {
-    discussions(where: { id: { eq: $discussionId } }) {
-      id
-      DiscussionChannels(where: { channelUniqueName: { eq: $channelUniqueName } }) {
-        channelUniqueName
-        LabelOptions {
-          id
-          value
-          displayName
-          order
-          group {
-            id
-            key
-            displayName
-          }
         }
       }
     }

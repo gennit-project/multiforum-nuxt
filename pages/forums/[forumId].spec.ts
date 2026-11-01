@@ -213,7 +213,7 @@ const mountWith = async (
       result: ref({
         channels: [
           {
-            DiscussionChannelsAggregate: { count: options.downloadCount ?? 0 },
+            DiscussionChannelsConnection: { aggregate: { count: { nodes: options.downloadCount ?? 0 } } },
           },
         ],
       }),

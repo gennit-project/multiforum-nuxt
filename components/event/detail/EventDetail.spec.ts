@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { ref, unref } from 'vue';
+import { reactive, ref, unref } from 'vue';
 import { useHead } from 'nuxt/app';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import {
@@ -7,17 +7,37 @@ import {
   createQueryMock,
   configureApolloMocks,
 } from '@/tests/utils/mockApollo';
-import { makeEvent, makeUser } from '@/tests/utils/factories';
-import type { Event, EventChannel } from '@/__generated__/graphql';
+import { makeUser } from '@/tests/utils/factories';
+import {
+  makeEventDetail as makeEvent,
+  makeEventSection,
+  makeEventRoot,
+} from '@/tests/utils/eventCommentFixtures';
+import type {
+  EventDetailSelection as Event,
+  EventChannelPresentation,
+} from '@/types/EventPresentation';
+import type { GetEventChannelIdQuery } from '@/__generated__/operations';
+import {
+  GetEventDocument,
+  GetEventCommentsDocument,
+  GetEventRootCommentAggregateDocument,
+  GetEventChannelIdDocument,
+} from '@/__generated__/operations';
 
 import { useQuery } from '@vue/apollo-composable';
 
 import EventDetail from '@/components/event/detail/EventDetail.vue';
+type EventChannel = EventChannelPresentation &
+  GetEventChannelIdQuery['eventChannels'][number];
 
 const h = vi.hoisted(() => ({
   route: {
-    params: { eventId: 'e1', forumId: 'cats' },
-    query: {},
+    params: { eventId: 'e1', forumId: 'cats' } as Record<
+      string,
+      string | string[]
+    >,
+    query: {} as Record<string, unknown>,
     name: undefined as string | undefined,
   },
   username: null as unknown as { value: string },
@@ -43,11 +63,11 @@ vi.mock('@/composables/useAuthState', async () => {
 
 const eventChannel = {
   id: 'ec1',
+  eventId: 'e1',
   channelUniqueName: 'cats',
   archived: false,
-  Channel: { uniqueName: 'cats', displayName: 'Cats', __typename: 'Channel' },
-  __typename: 'EventChannel',
-} as unknown as EventChannel;
+  Channel: { uniqueName: 'cats', displayName: 'Cats', channelIconURL: null },
+} satisfies EventChannel;
 
 const stubs = {
   ErrorBanner: {
@@ -75,6 +95,8 @@ const stubs = {
   EventFooter: { template: '<div class="event-footer-stub" />' },
   ExpandableImage: { template: '<div class="expandable-image-stub" />' },
   EventCommentsWrapper: {
+    name: 'EventCommentsWrapper',
+    props: ['comments', 'reachedEndOfResults', 'loading'],
     template:
       '<div class="event-comments-stub"><slot /><button class="load-more-stub" @click="$emit(\'load-more\')" /></div>',
   },
@@ -99,6 +121,8 @@ const setup = (
     eventLoading?: boolean;
     eventError?: Error | null;
     comments?: Array<Record<string, unknown>>;
+    commentsLoading?: boolean;
+    commentsError?: Error | null;
     routeName?: string;
     routeQuery?: Record<string, unknown>;
     username?: string;
@@ -119,6 +143,8 @@ const setup = (
     eventLoading = false,
     eventError = null,
     comments = [],
+    commentsLoading = false,
+    commentsError = null,
     routeName,
     routeQuery = {},
     username = '',
@@ -134,11 +160,11 @@ const setup = (
     issueEventId = '',
   } = params;
 
-  h.route = {
+  h.route = reactive({
     params: { eventId: 'e1', forumId: 'cats' },
     query: routeQuery,
     name: routeName,
-  };
+  });
   h.username.value = username;
   h.modProfileName.value = modProfileName;
 
@@ -153,7 +179,12 @@ const setup = (
         Event: event,
       },
     },
-    { fetchMore: vi.fn(), refetch: vi.fn(), loading: ref(false) }
+    {
+      fetchMore: vi.fn(),
+      refetch: vi.fn(),
+      loading: ref(commentsLoading),
+      error: ref(commentsError),
+    }
   );
   const channelQuery = createQueryMock({
     eventChannels: eventChannels ?? [],
@@ -162,8 +193,9 @@ const setup = (
     {
       events: [
         {
-          CommentsAggregate: {
-            count: rootCommentCount,
+          id: 'e1',
+          CommentsConnection: {
+            aggregate: { count: { nodes: rootCommentCount } },
           },
         },
       ],
@@ -225,8 +257,12 @@ describe('EventDetail', () => {
     setup();
     const head = unref(asMock(useHead).mock.calls[0][0]);
     expect(
-      head.meta.map((m: { name?: string; property?: string }) => m.name || m.property)
-    ).toEqual(expect.arrayContaining(['description', 'og:title', 'og:description']));
+      head.meta.map(
+        (m: { name?: string; property?: string }) => m.name || m.property
+      )
+    ).toEqual(
+      expect.arrayContaining(['description', 'og:title', 'og:description'])
+    );
   });
 
   it('emits schema.org Event JSON-LD in the script body', () => {
@@ -410,19 +446,36 @@ describe('EventDetail', () => {
     expect(commentsQuery.refetch).toHaveBeenCalledOnce();
   });
 
-  it('reloads comments on mount for an already signed-in user', () => {
+  it('uses the initial query without a duplicate signed-in mount refetch', () => {
     const { commentsQuery } = setup({ username: 'alice' });
-    expect(commentsQuery.refetch).toHaveBeenCalledOnce();
+    expect(commentsQuery.refetch).not.toHaveBeenCalled();
   });
 
-  it('reloads event data after its ID changes', async () => {
-    const { wrapper, eventQuery, commentsQuery, aggregateQuery } = setup();
-    await wrapper.setProps({ eventId: 'e2' });
-    expect([
-      eventQuery.refetch.mock.calls.length,
-      commentsQuery.refetch.mock.calls.length,
-      aggregateQuery.refetch.mock.calls.length,
-    ]).toEqual([1, 1, 1]);
+  it('updates inferred query variables and hides the old event after navigation', async () => {
+    const { wrapper } = setup();
+    await wrapper.setProps({ eventId: 'e2', channelUniqueName: 'dogs' });
+    const calls = asMock(useQuery).mock.calls;
+    expect({
+      variables: calls
+        .filter((call) =>
+          [
+            GetEventDocument,
+            GetEventCommentsDocument,
+            GetEventRootCommentAggregateDocument,
+            GetEventChannelIdDocument,
+          ].includes(call[0])
+        )
+        .map((call) => call[1]()),
+      oldEventVisible: wrapper.find('.event-header-stub').exists(),
+    }).toEqual({
+      variables: [
+        { id: 'e2', channelUniqueName: 'dogs', loggedInModName: '' },
+        { eventId: 'e2', offset: 0, limit: 50, sort: 'hot' },
+        { eventId: 'e2', channelUniqueName: 'dogs' },
+        { eventId: 'e2' },
+      ],
+      oldEventVisible: false,
+    });
   });
 
   it('merges a fetched page of event comments', async () => {
@@ -430,11 +483,15 @@ describe('EventDetail', () => {
     await wrapper.find('.load-more-stub').trigger('click');
     const options = commentsQuery.fetchMore.mock.calls[0][0];
     const merged = options.updateQuery(
-      { getEventComments: { Comments: [{ id: 'one' }] } },
-      { fetchMoreResult: { getEventComments: { Comments: [{ id: 'two' }] } } }
+      { getEventComments: { Event: { id: 'e1' }, Comments: [{ id: 'one' }] } },
+      {
+        fetchMoreResult: {
+          getEventComments: { Event: { id: 'e1' }, Comments: [{ id: 'two' }] },
+        },
+      }
     );
     expect([options.variables, merged.getEventComments.Comments]).toEqual([
-      { offset: 1 },
+      { eventId: 'e1', sort: 'hot', limit: 50, offset: 1 },
       [{ id: 'one' }, { id: 'two' }],
     ]);
   });
@@ -442,7 +499,9 @@ describe('EventDetail', () => {
   it('keeps the prior event comments when fetchMore returns nothing', async () => {
     const { wrapper, commentsQuery } = setup({ comments: [{ id: 'one' }] });
     await wrapper.find('.load-more-stub').trigger('click');
-    const previous = { getEventComments: { Comments: [{ id: 'one' }] } };
+    const previous = {
+      getEventComments: { Event: { id: 'e1' }, Comments: [{ id: 'one' }] },
+    };
     expect(
       commentsQuery.fetchMore.mock.calls[0][0].updateQuery(previous, {})
     ).toBe(previous);
@@ -466,5 +525,194 @@ describe('EventDetail', () => {
       usernameOnTop: true,
     });
     expect(wrapper.text()).toContain('Edited');
+  });
+  it('uses only generated documents for all four migrated reads', () => {
+    setup();
+    expect(
+      asMock(useQuery)
+        .mock.calls.filter((call) =>
+          [
+            GetEventDocument,
+            GetEventCommentsDocument,
+            GetEventChannelIdDocument,
+            GetEventRootCommentAggregateDocument,
+          ].includes(call[0])
+        )
+        .map((call) => call[0])
+    ).toEqual([
+      GetEventDocument,
+      GetEventCommentsDocument,
+      GetEventChannelIdDocument,
+      GetEventRootCommentAggregateDocument,
+    ]);
+  });
+
+  it('refreshes scalar sort and moderator variables without appending old pages', async () => {
+    const { wrapper, commentsQuery } = setup();
+    h.route.query.sort = 'new';
+    h.modProfileName.value = 'mod-alice';
+    await wrapper.vm.$nextTick();
+    const calls = asMock(useQuery).mock.calls;
+    expect({
+      detail: calls.find((call) => call[0] === GetEventDocument)![1](),
+      roots: calls.find((call) => call[0] === GetEventCommentsDocument)![1](),
+      pages: commentsQuery.fetchMore.mock.calls.length,
+    }).toEqual({
+      detail: {
+        id: 'e1',
+        channelUniqueName: 'cats',
+        loggedInModName: 'mod-alice',
+      },
+      roots: { eventId: 'e1', limit: 50, offset: 0, sort: 'new' },
+      pages: 0,
+    });
+  });
+
+  it.each([undefined, ['e1', 'e2']])(
+    'disables the reads for an invalid route ID: %s',
+    async (value) => {
+      const { wrapper } = setup();
+      if (value === undefined) delete h.route.params.eventId;
+      else h.route.params.eventId = value;
+      await wrapper.setProps({ eventId: '' });
+      const calls = asMock(useQuery).mock.calls.filter((call) =>
+        [
+          GetEventDocument,
+          GetEventCommentsDocument,
+          GetEventChannelIdDocument,
+          GetEventRootCommentAggregateDocument,
+        ].includes(call[0])
+      );
+      expect(
+        calls.map((call) => [
+          call[1]().id ?? call[1]().eventId,
+          unref(call[2].enabled),
+        ])
+      ).toEqual([
+        ['', false],
+        ['', false],
+        ['', false],
+        ['', false],
+      ]);
+    }
+  );
+
+  it('renders a nullable selected fallback while the detail read loads', async () => {
+    const { wrapper, commentsQuery } = setup({
+      event: null,
+      eventLoading: true,
+    });
+    commentsQuery.result.value = { getEventComments: makeEventSection() };
+    await wrapper.vm.$nextTick();
+    expect([
+      wrapper.find('.event-header-stub').exists(),
+      wrapper.find('.event-body-stub').exists(),
+    ]).toEqual([true, false]);
+  });
+
+  it('surfaces a root-read error while retaining the event detail', () => {
+    const { wrapper } = setup({
+      commentsError: new Error('Comments unavailable'),
+    });
+    expect([
+      wrapper.text().includes('Comments unavailable'),
+      wrapper.find('.event-header-stub').exists(),
+    ]).toEqual([true, true]);
+  });
+
+  it('does not merge a late page after switching forums', async () => {
+    const { wrapper, commentsQuery } = setup();
+    await wrapper.find('.load-more-stub').trigger('click');
+    const options = commentsQuery.fetchMore.mock.calls[0][0];
+    await wrapper.setProps({ channelUniqueName: 'dogs' });
+    const previous = {
+      getEventComments: makeEventSection('e1', [makeEventRoot('one')]),
+    };
+    expect(
+      options.updateQuery(previous, {
+        fetchMoreResult: {
+          getEventComments: makeEventSection('e1', [makeEventRoot('two')]),
+        },
+      })
+    ).toBe(previous);
+  });
+
+  it('does not merge a late page after changing the sort', async () => {
+    const { wrapper, commentsQuery } = setup();
+    await wrapper.find('.load-more-stub').trigger('click');
+    const options = commentsQuery.fetchMore.mock.calls[0][0];
+    h.route.query.sort = 'new';
+    await wrapper.vm.$nextTick();
+    const previous = { getEventComments: makeEventSection() };
+    expect(
+      options.updateQuery(previous, {
+        fetchMoreResult: {
+          getEventComments: makeEventSection('e1', [makeEventRoot()]),
+        },
+      })
+    ).toBe(previous);
+  });
+
+  it.each([null, { Event: null, Comments: [] }, makeEventSection('other')])(
+    'rejects missing or mismatched pagination context',
+    async (section) => {
+      const { wrapper, commentsQuery } = setup();
+      await wrapper.find('.load-more-stub').trigger('click');
+      const previous = { getEventComments: makeEventSection() };
+      expect(
+        commentsQuery.fetchMore.mock.calls[0][0].updateQuery(previous, {
+          fetchMoreResult: { getEventComments: section },
+        })
+      ).toBe(previous);
+    }
+  );
+
+  it('deduplicates overlapping repeated pages and ignores null rows', async () => {
+    const { wrapper, commentsQuery } = setup();
+    await wrapper.find('.load-more-stub').trigger('click');
+    const options = commentsQuery.fetchMore.mock.calls[0][0];
+    const previous = {
+      getEventComments: makeEventSection('e1', [makeEventRoot('one')]),
+    };
+    const page = {
+      getEventComments: {
+        ...makeEventSection('e1', [makeEventRoot('one'), makeEventRoot('two')]),
+        Comments: [makeEventRoot('one'), null, makeEventRoot('two')],
+      },
+    };
+    const first = options.updateQuery(previous, { fetchMoreResult: page });
+    expect(
+      options
+        .updateQuery(first, { fetchMoreResult: page })
+        .getEventComments.Comments.map((item: { id: string }) => item.id)
+    ).toEqual(['one', 'two']);
+  });
+
+  it('keeps archived state isolated to the selected forum', async () => {
+    const { wrapper } = setup({
+      eventChannels: [{ ...eventChannel, archived: true }],
+    });
+    await wrapper.setProps({ channelUniqueName: 'dogs' });
+    expect(wrapper.find('.archived-banner-stub').exists()).toBe(false);
+  });
+
+  it('does not emit an author from a stale event response', async () => {
+    const { wrapper, eventQuery } = setup();
+    await wrapper.setProps({ eventId: 'e2' });
+    eventQuery.onResult.mock.calls[0][0]({
+      data: {
+        events: [
+          makeEvent({
+            Poster: {
+              username: 'alice',
+              createdAt: '',
+              commentKarma: null,
+              discussionKarma: null,
+            },
+          }),
+        ],
+      },
+    });
+    expect(wrapper.emitted('fetchedOriginalPosterUsername')).toBeUndefined();
   });
 });

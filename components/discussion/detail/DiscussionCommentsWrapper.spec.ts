@@ -1,3 +1,4 @@
+import { print, type DocumentNode } from 'graphql';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 import {
@@ -17,11 +18,15 @@ vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
   useMutation: vi.fn(),
 }));
-vi.mock('nuxt/app', () => ({ useRoute: vi.fn(() => ({ params: {}, query: {} })) }));
+vi.mock('nuxt/app', () => ({
+  useRoute: vi.fn(() => ({ params: {}, query: {} })),
+}));
 vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => ({ value: 'alice' }),
 }));
-vi.mock('@/composables/useAutoUnsubscribe', () => ({ useAutoUnsubscribe: vi.fn() }));
+vi.mock('@/composables/useAutoUnsubscribe', () => ({
+  useAutoUnsubscribe: vi.fn(),
+}));
 
 const CommentSectionStub = {
   name: 'CommentSection',
@@ -58,19 +63,18 @@ const stubs = {
 // to useMutation for a given operation, matched on its gql source body.
 const mutationOptions = (op: string) => {
   const call = asMock(useMutation).mock.calls.find((c) =>
-    String(
-      (c[0] as { loc?: { source?: { body?: string } } })?.loc?.source?.body ?? ''
-    ).includes(op)
+    print(c[0] as DocumentNode).includes(op)
   );
   return call?.[1] as
-    | { update?: (cache: unknown, result: unknown) => void }
-    | undefined;
+    { update?: (cache: unknown, result: unknown) => void } | undefined;
 };
 
 const makeComment = (id: string): Comment =>
   ({ id, text: `comment ${id}`, __typename: 'Comment' }) as unknown as Comment;
 
-const makeChannel = (overrides: Record<string, unknown> = {}): DiscussionChannel =>
+const makeChannel = (
+  overrides: Record<string, unknown> = {}
+): DiscussionChannel =>
   ({
     id: 'dc1',
     discussionId: 'd1',
@@ -117,7 +121,9 @@ describe('DiscussionCommentsWrapper', () => {
 
   it('passes the comments through to CommentSection in order', () => {
     const wrapper = mountWrapper();
-    const passed = wrapper.findComponent(CommentSectionStub).props('comments') as Comment[];
+    const passed = wrapper
+      .findComponent(CommentSectionStub)
+      .props('comments') as Comment[];
     expect(passed.map((c) => c.id)).toEqual(['a', 'b']);
   });
 
@@ -145,7 +151,9 @@ describe('DiscussionCommentsWrapper', () => {
   it('subscribes when toggled while not subscribed', async () => {
     const wrapper = mountWrapper();
     await wrapper.find('.subscribe-stub').trigger('click');
-    expect(subscribeMock.mutate).toHaveBeenCalledWith({ discussionChannelId: 'dc1' });
+    expect(subscribeMock.mutate).toHaveBeenCalledWith({
+      discussionChannelId: 'dc1',
+    });
   });
 
   it('unsubscribes when toggled while subscribed', async () => {
@@ -155,11 +163,15 @@ describe('DiscussionCommentsWrapper', () => {
       }),
     });
     await wrapper.find('.subscribe-stub').trigger('click');
-    expect(unsubscribeMock.mutate).toHaveBeenCalledWith({ discussionChannelId: 'dc1' });
+    expect(unsubscribeMock.mutate).toHaveBeenCalledWith({
+      discussionChannelId: 'dc1',
+    });
   });
 
   it('does nothing when there is no discussion channel id', async () => {
-    const wrapper = mountWrapper({ discussionChannel: makeChannel({ id: '' }) });
+    const wrapper = mountWrapper({
+      discussionChannel: makeChannel({ id: '' }),
+    });
     await wrapper.find('.subscribe-stub').trigger('click');
     expect(subscribeMock.mutate).not.toHaveBeenCalled();
   });
@@ -205,10 +217,22 @@ describe('DiscussionCommentsWrapper — comment-section cache handlers', () => {
   // cache.modify stub that runs the field policies so their bodies are covered.
   const fakeCache = () => ({
     identify: vi.fn(() => 'DiscussionChannel:dc1'),
-    modify: vi.fn(({ fields }: { fields: Record<string, (e?: unknown) => unknown> }) =>
-      // Call with no arg so each field policy applies its own default
-      // (CommentsAggregate -> {count:0}, FeedbackComments -> []).
-      Object.values(fields).forEach((fn) => fn())
+    modify: vi.fn(
+      ({
+        fields,
+      }: {
+        fields: Record<string, (e?: unknown, details?: unknown) => unknown>;
+      }) =>
+        // Call with no arg so each field policy applies its own default
+        // (CommentsAggregate -> {count:0}, FeedbackComments -> []).
+        Object.values(fields).forEach((fn) =>
+          fn(undefined, {
+            readField: vi.fn(),
+            toReference: (value: { id: string }) => ({
+              __ref: `Comment:${value.id}`,
+            }),
+          })
+        )
     ),
     evict: vi.fn(),
   });
@@ -222,7 +246,9 @@ describe('DiscussionCommentsWrapper — comment-section cache handlers', () => {
   });
 
   it('does not increment when there is no discussion channel id', async () => {
-    const wrapper = mountWrapper({ discussionChannel: makeChannel({ id: '' }) });
+    const wrapper = mountWrapper({
+      discussionChannel: makeChannel({ id: '' }),
+    });
     const cache = fakeCache();
     await commentSection(wrapper).vm.$emit('increment-comment-count', cache);
 
@@ -240,10 +266,13 @@ describe('DiscussionCommentsWrapper — comment-section cache handlers', () => {
   it('evicts a deleted comment from the cache', async () => {
     const wrapper = mountWrapper();
     const cache = fakeCache();
-    await commentSection(wrapper).vm.$emit('update-comment-section-query-result', {
-      cache,
-      commentToDeleteId: 'comment-9',
-    });
+    await commentSection(wrapper).vm.$emit(
+      'update-comment-section-query-result',
+      {
+        cache,
+        commentToDeleteId: 'comment-9',
+      }
+    );
 
     expect(cache.evict).toHaveBeenCalledTimes(1);
   });
@@ -251,21 +280,27 @@ describe('DiscussionCommentsWrapper — comment-section cache handlers', () => {
   it('appends a feedback comment to the cache', async () => {
     const wrapper = mountWrapper();
     const cache = fakeCache();
-    await commentSection(wrapper).vm.$emit('update-comment-section-query-result', {
-      cache,
-      commentToAddFeedbackTo: { id: 'comment-9' },
-      newFeedbackComment: { id: 'fb-1', __typename: 'Comment' },
-    });
+    await commentSection(wrapper).vm.$emit(
+      'update-comment-section-query-result',
+      {
+        cache,
+        commentToAddFeedbackTo: { id: 'comment-9' },
+        newFeedbackComment: { id: 'fb-1', __typename: 'Comment' },
+      }
+    );
 
-    expect(cache.modify).toHaveBeenCalledTimes(1);
+    expect(cache.modify).toHaveBeenCalledTimes(2);
   });
 
   it('rejects a reply input without a parent comment id', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const wrapper = mountWrapper();
-    await commentSection(wrapper).vm.$emit('update-create-reply-comment-input', {
-      text: 'orphan reply',
-    });
+    await commentSection(wrapper).vm.$emit(
+      'update-create-reply-comment-input',
+      {
+        text: 'orphan reply',
+      }
+    );
     const called = errorSpy.mock.calls.some((c) =>
       String(c[0]).includes('Parent comment id is required')
     );
@@ -276,18 +311,23 @@ describe('DiscussionCommentsWrapper — comment-section cache handlers', () => {
 
   it('accepts a reply input that has a parent comment id', async () => {
     const wrapper = mountWrapper();
-    await commentSection(wrapper).vm.$emit('update-create-reply-comment-input', {
-      text: 'a reply',
-      parentCommentId: 'comment-1',
-      depth: 2,
-    });
+    await commentSection(wrapper).vm.$emit(
+      'update-create-reply-comment-input',
+      {
+        text: 'a reply',
+        parentCommentId: 'comment-1',
+        depth: 2,
+      }
+    );
 
     expect(commentSection(wrapper).exists()).toBe(true);
   });
 
   it('does not decrement when there is no discussion channel id', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const wrapper = mountWrapper({ discussionChannel: makeChannel({ id: '' }) });
+    const wrapper = mountWrapper({
+      discussionChannel: makeChannel({ id: '' }),
+    });
     const cache = fakeCache();
     await commentSection(wrapper).vm.$emit('decrement-comment-count', cache);
     errorSpy.mockRestore();
@@ -305,7 +345,10 @@ describe('DiscussionCommentsWrapper — comment-section cache handlers', () => {
       }),
       evict: vi.fn(),
     };
-    await commentSection(wrapper).vm.$emit('increment-comment-count', throwingCache);
+    await commentSection(wrapper).vm.$emit(
+      'increment-comment-count',
+      throwingCache
+    );
     const logged = errorSpy.mock.calls.some((c) =>
       String(c[0]).includes('Error incrementing comment count')
     );
@@ -372,9 +415,10 @@ describe('DiscussionCommentsWrapper — subscription effects', () => {
     const shownAfterDone = toast(wrapper, 'subscribed to').props('show');
 
     await toast(wrapper, 'subscribed to').vm.$emit('close-notification');
-    expect([shownAfterDone, toast(wrapper, 'subscribed to').props('show')]).toEqual(
-      [true, false]
-    );
+    expect([
+      shownAfterDone,
+      toast(wrapper, 'subscribed to').props('show'),
+    ]).toEqual([true, false]);
   });
 
   it('shows then dismisses the unsubscribed notification', async () => {

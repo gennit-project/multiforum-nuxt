@@ -542,24 +542,6 @@ export const DOES_USER_EXIST = gql`
   }
 `;
 
-export const GET_USER_FAVORITE_CHANNELS = gql`
-  query getUserFavoriteChannels($username: String!) {
-    users(where: { username: { eq: $username } }) {
-      username
-      FavoriteChannels {
-        uniqueName
-        displayName
-        description
-        ...ChannelIconFields
-        Tags {
-          text
-        }
-      }
-    }
-  }
-  ${CHANNEL_ICON_FIELDS}
-`;
-
 export const GET_MODDED_CHANNELS = gql`
   query getModdedChannels($username: String!) {
     users(where: { username: { eq: $username } }) {

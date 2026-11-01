@@ -1,20 +1,5 @@
-import type {
-  AlbumUpdateInput,
-  DiscussionAlbumCreateFieldInput,
-  AlbumImagesConnectFieldInput,
-  AlbumImagesUpdateFieldInput,
-} from '@/__generated__/graphql';
+import type { DiscussionAlbumInput, DiscussionAlbumImageUpdateInput } from '@/__generated__/graphql';
 import { normalizeImageOrder } from '@/utils/albumImageOrder';
-
-/**
- * Pure builder extracted from the download edit page
- * (pages/forums/[forumId]/downloads/edit/[discussionId].vue). Produces the
- * `Album` portion of a discussion update input, choosing between creating a new
- * album and updating an existing one (connect/update/disconnect images).
- *
- * The return type is `Pick<DiscussionUpdateInput, 'Album'>`, so the generated
- * GraphQL schema validates the produced shape at compile time.
- */
 
 export type AlbumUpdateImageInput = {
   id?: string | null;
@@ -23,116 +8,39 @@ export type AlbumUpdateImageInput = {
   caption?: string | null;
   copyright?: string | null;
 };
+export type AlbumFormData = {
+  images?: AlbumUpdateImageInput[];
+  imageOrder?: string[];
+} | null | undefined;
+export type ExistingAlbumImage = AlbumUpdateImageInput;
 
-export type AlbumFormData =
-  | {
-      images?: AlbumUpdateImageInput[];
-      imageOrder?: string[];
-    }
-  | null
-  | undefined;
-
-export type ExistingAlbumImage = { id?: string | null };
-
-// v7's generated `DiscussionUpdateInput` no longer exposes the nested `Album`
-// relationship, but the custom `updateDiscussionWithChannelConnections` resolver
-// still accepts an `Album` create/update portion on the discussion update input.
-// Describe that portion here from the generated Album input types.
-export type AlbumUpdatePortion = {
-  Album?: {
-    create?: DiscussionAlbumCreateFieldInput;
-    update?: { node: AlbumUpdateInput };
-  };
-};
-
+/** Complete membership plus changed metadata; never writes uploader or URL fields. */
 export function buildAlbumUpdateInput(params: {
   albumData: AlbumFormData;
-  existingAlbumId?: string | null;
   existingImages?: ExistingAlbumImage[];
-}): AlbumUpdatePortion {
-  const { albumData, existingAlbumId, existingImages = [] } = params;
-
-  if (!albumData) {
-    return {}; // No album data to update
-  }
-
-  // If the album doesn't exist yet, CREATE it and connect to existing images.
-  if (!existingAlbumId) {
-    const newImages = albumData.images || [];
-    const validImages = newImages.filter(
-      (img): img is AlbumUpdateImageInput & { id: string } => Boolean(img.id)
-    );
-
-    if (validImages.length === 0) {
-      return {}; // No valid images to connect
+  existingImageOrder?: (string | null | undefined)[] | null;
+}): DiscussionAlbumInput | undefined {
+  const { albumData, existingImages = [], existingImageOrder } = params;
+  if (!albumData) return undefined;
+  const images = (albumData.images ?? []).filter((image) => typeof image.id === 'string' && image.id.trim().length > 0);
+  const imageIds = normalizeImageOrder({ images, imageOrder: albumData.imageOrder });
+  const previousIds = normalizeImageOrder({ images: existingImages.filter((image) => typeof image.id === 'string' && image.id.trim().length > 0), imageOrder: existingImageOrder });
+  const imageUpdates: DiscussionAlbumImageUpdateInput[] = [];
+  for (const id of imageIds) {
+    const image = images.find((item) => item.id === id);
+    const previous = existingImages.find((item) => item.id === id);
+    // Newly uploaded/reused images already exist; their metadata was not edited
+    // against this album's baseline. Membership must not grant uploader rights.
+    if (!image || !previous) continue;
+    const update: DiscussionAlbumImageUpdateInput = { id };
+    for (const field of ['alt', 'caption', 'copyright'] as const) {
+      const value = image[field];
+      const old = previous[field];
+      if (value === undefined || value === old || (value === '' && old == null)) continue;
+      update[field] = value;
     }
-
-    const connect: AlbumImagesConnectFieldInput[] = validImages.map((img) => ({
-      where: { node: { id: { eq: img.id } } },
-    }));
-    const normalizedImageOrder = normalizeImageOrder({
-      images: validImages,
-      imageOrder: albumData.imageOrder,
-    });
-
-    return {
-      Album: {
-        create: {
-          node: {
-            imageOrder: normalizedImageOrder,
-            Images: { connect },
-          },
-        },
-      },
-    };
+    if (Object.keys(update).length > 1) imageUpdates.push(update);
   }
-
-  // Existing album: build connect/update/disconnect operations.
-  const oldImages = existingImages;
-  const newImages = albumData.images || [];
-  const normalizedImageOrder = normalizeImageOrder({
-    images: newImages,
-    imageOrder: albumData.imageOrder,
-  });
-
-  const connectImageArray: AlbumImagesUpdateFieldInput[] = newImages
-    .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
-    .map((img) => ({ connect: [{ where: { node: { id: { eq: img.id } } } }] }));
-
-  const updateImageArray: AlbumImagesUpdateFieldInput[] = newImages
-    .filter((img) => img.id && oldImages.some((old) => old.id === img.id))
-    .map((img) => ({
-      update: {
-        where: { node: { id: { eq: img.id } } },
-        node: {
-          url: { set: img.url },
-          alt: { set: img.alt },
-          caption: { set: img.caption },
-          copyright: { set: img.copyright },
-        },
-      },
-    }));
-
-  const disconnectImageArray: AlbumImagesUpdateFieldInput[] = oldImages
-    .filter((old) => !newImages.some((img) => img.id === old.id))
-    .map((old) => ({
-      disconnect: [{ where: { node: { id: { eq: old.id } } } }],
-    }));
-
-  const imagesOps: AlbumImagesUpdateFieldInput[] = [
-    ...connectImageArray,
-    ...updateImageArray,
-    ...disconnectImageArray,
-  ];
-
-  return {
-    Album: {
-      update: {
-        node: {
-          imageOrder: { set: normalizedImageOrder },
-          Images: imagesOps,
-        },
-      },
-    },
-  };
+  if (imageIds.length === previousIds.length && imageIds.every((id, index) => id === previousIds[index]) && imageUpdates.length === 0) return undefined;
+  return imageUpdates.length ? { imageIds, imageUpdates } : { imageIds };
 }

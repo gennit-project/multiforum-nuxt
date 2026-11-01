@@ -3,17 +3,17 @@ import { flushPromises } from '@vue/test-utils';
 import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 import PluginsIndexPage from './index.vue';
-
-vi.mock('@/graphQLData/admin/queries', () => ({
-  GET_PLUGIN_MANAGEMENT_DATA: 'GET_PLUGIN_MANAGEMENT_DATA',
-  GET_INSTALLED_PLUGINS: 'GET_INSTALLED_PLUGINS',
+vi.mock('@/__generated__/operations', () => ({
+GetPluginManagementDataDocument: 'GET_PLUGIN_MANAGEMENT_DATA',
+GetInstalledPluginsDocument: 'GET_INSTALLED_PLUGINS',
+AllowPluginDocument: 'ALLOW_PLUGIN',
+DisallowPluginDocument: 'DISALLOW_PLUGIN',
+InstallPluginVersionDocument: 'INSTALL_PLUGIN_VERSION'
 }));
 
-vi.mock('@/graphQLData/admin/mutations', () => ({
-  ALLOW_PLUGIN: 'ALLOW_PLUGIN',
-  DISALLOW_PLUGIN: 'DISALLOW_PLUGIN',
-  INSTALL_PLUGIN_VERSION: 'INSTALL_PLUGIN_VERSION',
-}));
+
+
+
 
 const mockToast = vi.hoisted(() => ({
   success: vi.fn(),

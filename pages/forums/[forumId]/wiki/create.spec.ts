@@ -126,8 +126,7 @@ describe('wiki create page', () => {
     await wrapper.find('form').trigger('submit');
 
     expect(createMutate).toHaveBeenCalledTimes(1);
-    const node =
-      createMutate.mock.calls[0][0].update.WikiHomePage.create.node;
+    const node = createMutate.mock.calls[0][0].input;
     expect(node.title).toBe('My Title');
     expect(node.body).toBe('Body content');
     expect(node.editReason).toBe('Fixed wording');

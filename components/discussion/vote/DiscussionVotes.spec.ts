@@ -1,3 +1,4 @@
+import { print, type DocumentNode } from 'graphql';
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -16,23 +17,28 @@ vi.mock('nuxt/app', () => ({
 // Route each mutation to a per-operation tracker (matched on the operation name
 // in the gql source body) and capture the update callback so the undoSuperUpvote
 // cache logic can be invoked directly.
-type DVTracker = { mutate: ReturnType<typeof vi.fn>; update: ((cache: unknown, res: unknown) => void) | null };
+type DVTracker = {
+  mutate: ReturnType<typeof vi.fn>;
+  update: ((cache: unknown, res: unknown) => void) | null;
+};
 const dvOps = new Map<string, DVTracker>();
 const trackDV = (name: string): DVTracker => {
   if (!dvOps.has(name)) dvOps.set(name, { mutate: vi.fn(), update: null });
   return dvOps.get(name)!;
 };
 const detectDV = (src: string) =>
-  ['undoSuperUpvote', 'undoUpvoteDiscussionChannel', 'upvoteDiscussionChannel'].find(
-    (n) => src.includes(n)
-  ) || 'generic';
+  [
+    'undoSuperUpvote',
+    'undoUpvoteDiscussionChannel',
+    'upvoteDiscussionChannel',
+  ].find((n) => src.includes(n)) || 'generic';
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (
-    doc: { loc?: { source?: { body?: string } } },
+    doc: DocumentNode,
     options?: { update?: (cache: unknown, res: unknown) => void }
   ) => {
-    const t = trackDV(detectDV(doc?.loc?.source?.body || ''));
+    const t = trackDV(detectDV(print(doc)));
     if (options?.update) t.update = options.update;
     return {
       mutate: t.mutate,
@@ -106,11 +112,13 @@ const defaultDiscussion = () => ({
   FeedbackCommentsAggregate: { count: 0 },
 });
 
-const mountVotes = (overrides: {
-  channel?: Record<string, unknown>;
-  discussion?: Record<string, unknown>;
-  props?: Record<string, unknown>;
-} = {}) =>
+const mountVotes = (
+  overrides: {
+    channel?: Record<string, unknown>;
+    discussion?: Record<string, unknown>;
+    props?: Record<string, unknown>;
+  } = {}
+) =>
   mount(DiscussionVotes, {
     props: {
       discussionChannel: { ...defaultChannel(), ...overrides.channel },
@@ -226,21 +234,27 @@ describe('DiscussionVotes', () => {
       },
     });
 
-    expect(wrapper.find('[data-testid="suspension-notice"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="suspension-notice"]').exists()).toBe(
+      false
+    );
 
     await wrapper.find('[data-testid="emoji-button"]').trigger('click');
 
-    expect(wrapper.find('[data-testid="suspension-notice"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="suspension-notice"]').exists()).toBe(
+      true
+    );
   });
 
   describe('vote handlers', () => {
     it('upvotes when the user has not yet upvoted', async () => {
       const wrapper = mountVotes();
       await voteBtns(wrapper)[0]!.vm.$emit('click-up');
-      expect(dvOps.get('upvoteDiscussionChannel')!.mutate).toHaveBeenCalledWith({
-        id: 'dc-1',
-        username: 'alice',
-      });
+      expect(dvOps.get('upvoteDiscussionChannel')!.mutate).toHaveBeenCalledWith(
+        {
+          id: 'dc-1',
+          username: 'alice',
+        }
+      );
     });
 
     it('undoes the upvote when the user has already upvoted', async () => {
@@ -256,14 +270,18 @@ describe('DiscussionVotes', () => {
     it('opens the super-upvote modal on super-upvote', async () => {
       const wrapper = mountVotes();
       await voteBtns(wrapper)[0]!.vm.$emit('super-upvote');
-      expect(wrapper.findComponent(SuperUpvoteModalStub).props('show')).toBe(true);
+      expect(wrapper.findComponent(SuperUpvoteModalStub).props('show')).toBe(
+        true
+      );
     });
 
     it('closes the super-upvote modal on modal success', async () => {
       const wrapper = mountVotes();
       await voteBtns(wrapper)[0]!.vm.$emit('super-upvote');
       await wrapper.findComponent(SuperUpvoteModalStub).vm.$emit('success');
-      expect(wrapper.findComponent(SuperUpvoteModalStub).props('show')).toBe(false);
+      expect(wrapper.findComponent(SuperUpvoteModalStub).props('show')).toBe(
+        false
+      );
     });
 
     it('calls undo-super-upvote with the discussion source', async () => {
@@ -332,31 +350,43 @@ describe('DiscussionVotes', () => {
 
     it('passes the forum display name to the super-upvote modal', () => {
       const wrapper = mountVotes();
-      expect(wrapper.findComponent(SuperUpvoteModalStub).props('forumName')).toBe(
-        'Cats Forum'
-      );
+      expect(
+        wrapper.findComponent(SuperUpvoteModalStub).props('forumName')
+      ).toBe('Cats Forum');
     });
   });
 
   describe('undoSuperUpvote cache update', () => {
-    const runUpdate = (existing: Array<{ username: string }>, success = true) => {
+    const runUpdate = (
+      existing: Array<{ username: string }>,
+      success = true
+    ) => {
       mountVotes();
       const update = dvOps.get('undoSuperUpvote')!.update!;
       let filtered: unknown[] = [];
       const cache = {
         identify: vi.fn(() => 'DiscussionChannel:dc-1'),
-        modify: vi.fn(({ fields }: { fields: Record<string, (e: unknown[], h: unknown) => unknown[]> }) => {
-          filtered = fields.SuperUpvotedByUsers(existing, {
-            readField: (_f: string, u: { username: string }) => u.username,
-          });
-        }),
+        modify: vi.fn(
+          ({
+            fields,
+          }: {
+            fields: Record<string, (e: unknown[], h: unknown) => unknown[]>;
+          }) => {
+            filtered = fields.SuperUpvotedByUsers(existing, {
+              readField: (_f: string, u: { username: string }) => u.username,
+            });
+          }
+        ),
       };
       update(cache, { data: { undoSuperUpvote: { success } } });
       return { cache, filtered };
     };
 
     it('drops the current user from the super-upvoter list', () => {
-      const { filtered } = runUpdate([{ username: 'alice' }, { username: 'bob' }]);
+      const { filtered } = runUpdate([
+        { username: 'alice' },
+        { username: 'bob' },
+      ]);
       expect(filtered).toEqual([{ username: 'bob' }]);
     });
 

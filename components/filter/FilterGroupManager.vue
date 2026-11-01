@@ -4,23 +4,9 @@ import {
   serializeFilterGroupsToYaml,
   parseFilterGroupsYaml,
 } from '@/utils/filterGroupYaml';
-import type {
-  FilterGroup,
-  Channel,
-  FilterGroupChannelConnection,
-  FilterGroupOptionsConnection,
-  FilterOptionGroupConnection,
-} from '@/__generated__/graphql';
+import type { ChannelFilterGroup as FilterGroup } from '@/types/ChannelPresentation';
 import { FilterMode, FilterSelection } from '@/__generated__/graphql';
 import FilterOptionManager from './FilterOptionManager.vue';
-
-// Stub types for required GraphQL fields that aren't used in this form context
-const emptyChannel = {} as Channel;
-const emptyChannelConnection = {} as FilterGroupChannelConnection;
-const emptyOptionsConnection = {} as FilterGroupOptionsConnection;
-const emptyGroupConnection = {} as FilterOptionGroupConnection;
-const emptyFilterGroup = {} as FilterGroup;
-// import CheckBox from "@/components/CheckBox.vue"; // Unused for now
 
 const props = defineProps({
   filterGroups: {
@@ -86,8 +72,8 @@ const preserveExistingIds = (
       id: existingGroup?.id || createLocalId('group', index),
       key: group.key,
       displayName: group.displayName,
-      mode: group.mode as FilterMode,
-      uploadSelection: group.uploadSelection as FilterSelection,
+      mode: group.mode === FilterMode.Exclude ? FilterMode.Exclude : FilterMode.Include,
+      uploadSelection: group.uploadSelection === FilterSelection.Single ? FilterSelection.Single : FilterSelection.Multiple,
       order: group.order ?? index,
       options: (group.options || []).map((option, optionIndex) => {
         const existingOption = existingOptionsByValue.get(
@@ -99,20 +85,8 @@ const preserveExistingIds = (
           value: option.value,
           displayName: option.displayName,
           order: option.order ?? optionIndex,
-          // Required GraphQL fields
-          __typename: 'FilterOption' as const,
-          group: emptyFilterGroup, // Will be populated by parent
-          groupAggregate: null,
-          groupConnection: emptyGroupConnection,
         };
       }),
-      // Required GraphQL fields
-      __typename: 'FilterGroup' as const,
-      channel: emptyChannel,
-      channelAggregate: null,
-      channelConnection: emptyChannelConnection,
-      optionsAggregate: null,
-      optionsConnection: emptyOptionsConnection,
     };
   });
 };
@@ -145,11 +119,6 @@ const addNewGroup = () => {
     uploadSelection: newGroupForm.value.uploadSelection,
     order: props.filterGroups.length,
     options: [],
-    // Required fields for GraphQL type but not used in this context
-    __typename: 'FilterGroup' as const,
-    channel: emptyChannel,
-    channelConnection: emptyChannelConnection,
-    optionsConnection: emptyOptionsConnection,
   };
 
   const updatedGroups = [...props.filterGroups, newGroup];

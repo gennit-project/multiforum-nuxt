@@ -1,10 +1,8 @@
-import type { DiscussionChannel } from '@/__generated__/graphql';
-
-type Submission = Pick<DiscussionChannel, 'channelUniqueName'> & {
-  CommentsConnection?: Pick<
-    NonNullable<DiscussionChannel['CommentsConnection']>,
-    'aggregate'
-  > | null;
+type Submission = {
+  channelUniqueName: string;
+  CommentsConnection?: {
+    aggregate?: { count?: { nodes?: number | null } | null } | null;
+  } | null;
 };
 
 /** Explicit selections win, including empty forums. Otherwise prefer a conversation. */

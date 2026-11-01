@@ -9,7 +9,7 @@ import CogIcon from '@/components/icons/CogIcon.vue';
 import InfoIcon from '@/components/icons/InfoIcon.vue';
 import BookIcon from '@/components/icons/BookIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
-import type { Channel } from '@/__generated__/graphql';
+import type { ChannelDetail as Channel } from '@/types/ChannelPresentation';
 import {
   useModProfileName,
   useUsername,
@@ -18,7 +18,7 @@ import {
 import { preloadRouteComponents, useRoute } from 'nuxt/app';
 import { useDisplay } from '@/composables/useDisplay';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { GetServerConfigDocument as GET_SERVER_CONFIG } from '@/__generated__/operations';
 import { config } from '@/config';
 // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
 import { defineAsyncComponent } from 'vue';
@@ -33,7 +33,7 @@ type Tab = {
   routeSuffix: string;
   label: string;
   icon: Component;
-  countProperty: keyof Channel | '__DOWNLOAD_COUNT__' | null;
+  countProperty: 'DiscussionChannelsConnection' | 'EventChannelsConnection' | 'IssuesConnection' | '__DOWNLOAD_COUNT__' | null;
 };
 
 type TabRoutes = {

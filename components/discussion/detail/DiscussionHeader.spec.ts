@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { computed, ref } from 'vue';
 import { mount } from '@vue/test-utils';
 import DiscussionHeader from './DiscussionHeader.vue';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { GetChannelDocument as GET_CHANNEL } from '@/__generated__/operations';
 
 const serverAdminUsernames = ref<string[]>([]);
 const apollo = vi.hoisted(() => ({ useQuery: vi.fn() }));

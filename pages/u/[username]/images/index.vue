@@ -2,8 +2,8 @@
 import { computed, ref, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
-import { GET_USER_IMAGES } from '@/graphQLData/image/queries';
-import type { Image } from '@/__generated__/graphql';
+import { GetUserImagesDocument as GET_USER_IMAGES } from '@/__generated__/operations';
+import type { GetUserImagesQuery } from '@/__generated__/operations';
 import ImageListItem from '@/components/image/ImageListItem.vue';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
 import { useUsername } from '@/composables/useAuthState';
@@ -12,9 +12,7 @@ const route = useRoute();
 const loggedInUsername = useUsername();
 const { selectedChannels, hasSelectedChannels } = useSelectedChannelsFromQuery();
 
-type ImageWithFavoriteState = Image & {
-  isFavorited?: boolean | null;
-};
+type ImageWithFavoriteState = GetUserImagesQuery['users'][number]['Images'][number];
 
 const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
@@ -23,8 +21,7 @@ const username = computed(() => {
 const imagesWhere = computed(() => {
   // Always filter out archived/removed images
   const baseFilter = {
-    archived_NOT: true,
-    permanentlyRemoved_NOT: true,
+    NOT: { OR: [{ archived: { eq: true } }, { permanentlyRemoved: { eq: true } }] },
   };
 
   if (!hasSelectedChannels.value) {
@@ -63,6 +60,8 @@ const {
   }),
   {
     fetchPolicy: 'cache-first',
+    enabled: computed(() => !!username.value),
+    keepPreviousResult: false,
   }
 );
 
@@ -101,6 +100,7 @@ watch([imagesWhere, username], () => {
 const loadMoreImages = async () => {
   if (!hasMoreImages.value || isLoadingMore.value) return;
 
+  const scope = JSON.stringify([username.value, imagesWhere.value]);
   const newOffset = currentOffset.value + pageSize;
   isLoadingMore.value = true;
 
@@ -114,24 +114,25 @@ const loadMoreImages = async () => {
         where: imagesWhere.value,
       },
       updateQuery: (previousResult, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return previousResult;
-
-        const newImages = fetchMoreResult.users[0].Images;
+        const previous = previousResult.users[0];
+        const next = fetchMoreResult?.users[0];
+        if (scope !== JSON.stringify([username.value, imagesWhere.value]) || !previous || !next || previous.username !== username.value || next.username !== username.value) return previousResult;
+        const newImages = next.Images;
 
         return {
           ...previousResult,
           users: [
             {
-              ...previousResult.users[0],
-              Images: [...previousResult.users[0].Images, ...newImages],
-              ImagesConnection: fetchMoreResult.users[0].ImagesConnection,
+              ...previous,
+              Images: [...previous.Images, ...newImages],
+              ImagesConnection: next.ImagesConnection,
             },
           ],
         };
       },
     });
 
-    currentOffset.value = newOffset;
+    if (scope === JSON.stringify([username.value, imagesWhere.value])) currentOffset.value = newOffset;
   } catch (error) {
     console.error('Error loading more images:', error);
   } finally {

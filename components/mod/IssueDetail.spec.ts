@@ -3,12 +3,7 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, ref, nextTick } from 'vue';
 import IssueDetail from './IssueDetail.vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { GET_ISSUE, GET_ISSUE_ACTIVITY } from '@/graphQLData/issue/queries';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
-import { GET_ISSUE_RELATED_DISCUSSION } from '@/graphQLData/discussion/queries';
-import { GET_EVENT } from '@/graphQLData/event/queries';
-import { GET_COMMENT } from '@/graphQLData/comment/queries';
+import { GetIssueDocument as GET_ISSUE, GetIssueActivityDocument as GET_ISSUE_ACTIVITY, GetChannelDocument as GET_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG , GetIssueRelatedDiscussionDocument as GET_ISSUE_RELATED_DISCUSSION , GetEventDocument as GET_EVENT , GetCommentDocument as GET_COMMENT  } from '@/__generated__/operations';
 
 const routerReplace = vi.fn();
 const refetchIssue = vi.fn();

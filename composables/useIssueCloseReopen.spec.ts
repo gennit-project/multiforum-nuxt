@@ -107,4 +107,25 @@ describe('useIssueCloseReopen', () => {
       ],
     });
   });
+  it('keeps an in-flight close scoped to its original issue and forum', () => {
+    const activeIssueId = ref('issue-1');
+    const channelId = ref('cats');
+    useIssueCloseReopen({ activeIssueId, channelId });
+    const options = mockedUseMutation().mock.calls[0]![1]();
+    activeIssueId.value = 'issue-2';
+    channelId.value = 'dogs';
+    const cache = { identify: vi.fn((value) => value.id), modify: vi.fn(), readQuery: vi.fn((_options: { variables: { channelUniqueName: string } }) => null), writeQuery: vi.fn() };
+    options.update(cache);
+    expect({ issue: cache.identify.mock.calls[0]?.[0].id, forums: cache.readQuery.mock.calls.map((call) => call[0].variables.channelUniqueName), writes: cache.writeQuery.mock.calls.length }).toEqual({ issue: 'issue-1', forums: ['cats', 'cats'], writes: 0 });
+  });
+
+  it('does not apply the same completion to count caches twice', () => {
+    useIssueCloseReopen({ activeIssueId: ref('issue-1'), channelId: ref('cats') });
+    const options = mockedUseMutation().mock.calls[0]![1]();
+    const cache = { identify: vi.fn(() => 'Issue:issue-1'), modify: vi.fn(), readQuery: vi.fn(() => ({ issuesConnection: { aggregate: { count: { nodes: 0 } } } })), writeQuery: vi.fn() };
+    options.update(cache);
+    options.update(cache);
+    expect(cache.writeQuery.mock.calls.map((call) => call[0].data.issuesConnection.aggregate.count.nodes)).toEqual([1, 0]);
+  });
+
 });

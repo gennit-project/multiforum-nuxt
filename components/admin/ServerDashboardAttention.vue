@@ -1,21 +1,11 @@
 <script setup lang="ts">
+import type { GetDownloadScanReviewQueueQuery } from '@/__generated__/operations';
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { Flag, ShieldX } from 'lucide-vue-next';
-import { GET_DOWNLOAD_SCAN_REVIEW_QUEUE } from '@/graphQLData/admin/queries';
+import { GetDownloadScanReviewQueueDocument as GET_DOWNLOAD_SCAN_REVIEW_QUEUE } from '@/__generated__/operations';
 
-type ReviewItem = {
-  downloadableFileId: string;
-  fileName: string;
-  scanStatus: 'SUSPICIOUS' | 'INFECTED' | 'FAILED';
-  scanReason?: string | null;
-  reviewRequestedAt?: string | null;
-  reviewRequestReason?: string | null;
-  uploaderUsername?: string | null;
-  discussionId: string;
-  discussionTitle?: string | null;
-  channelUniqueName?: string | null;
-};
+type ReviewItem = GetDownloadScanReviewQueueQuery['getDownloadScanReviewQueue'][number];
 
 const props = defineProps<{
   openIssueCount: number;
@@ -25,7 +15,7 @@ const props = defineProps<{
   oldestOpenIssueChannel?: string | null;
 }>();
 
-const SCAN_STATUS_LABELS: Record<ReviewItem['scanStatus'], string> = {
+const SCAN_STATUS_LABELS: Record<string, string> = {
   INFECTED: 'Infected',
   FAILED: 'Scan failed',
   SUSPICIOUS: 'Suspicious',

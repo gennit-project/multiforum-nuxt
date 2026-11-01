@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import {
+  GetUserFavoriteImageDocument as GET_USER_FAVORITE_IMAGE,
+  AddFavoriteImageDocument as ADD_FAVORITE_IMAGE,
+  RemoveFavoriteImageDocument as REMOVE_FAVORITE_IMAGE,
+} from '@/__generated__/operations';
 import { computed } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { gql } from '@apollo/client/core';
-import {
-  ADD_FAVORITE_IMAGE,
-  REMOVE_FAVORITE_IMAGE,
-} from '@/graphQLData/user/mutations';
 import { useUsername } from '@/composables/useAuthState';
 import { useFavoriteToggle } from '@/composables/useFavoriteToggle';
 import { useFavoritedState } from '@/composables/useFavoritedState';
@@ -31,18 +31,6 @@ const props = defineProps({
     default: false,
   },
 });
-
-const GET_USER_FAVORITE_IMAGE = gql`
-  query getUserFavoriteImage($username: String!, $imageId: ID!) {
-    users(where: { username: { eq: $username } }) {
-      username
-      FavoriteImages(where: { id: { eq: $imageId } }) {
-        id
-        url
-      }
-    }
-  }
-`;
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITE_IMAGE,
@@ -78,7 +66,7 @@ const { isLoading, handleToggleFavorite } = useFavoriteToggle({
   removedMessage: () => 'Image removed from favorites.',
   addFavorite,
   removeFavorite,
-  mutationItemKey: 'imageId',
+  variables: (itemId, username) => ({ imageId: itemId, username }),
   onAfterToggle: () => {
     refetchFavorites();
   },

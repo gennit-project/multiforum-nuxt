@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue';
 import TabButton from '@/components/channel/TabButton.vue';
-import type { User } from '@/__generated__/graphql';
+import type { GetPublicUserProfileQuery } from '@/__generated__/operations';
 // import { usernameVar, isAuthenticatedVar } from "@/cache"; // Unused for now
 import { useRoute } from 'nuxt/app';
 import type { RouteLocationRaw } from 'vue-router';
@@ -16,13 +16,7 @@ type TabData = {
   count?: number | null;
 };
 
-type UserProfileCounts = User & {
-  // `DownloadsConnection` is an alias of `DiscussionsConnection` (hasDownload)
-  // added by the profile query; it is not a field on the generated User type.
-  DownloadsConnection?: User['DiscussionsConnection'] | null;
-  // Provided by the separate `getUserWikiEditsCount` root field, not on User.
-  wikiEditsCount?: number | null;
-};
+type UserProfileCounts = Pick<GetPublicUserProfileQuery['users'][number], 'username'> & Partial<GetPublicUserProfileQuery['users'][number]> & { wikiEditsCount?: number | null };
 
 const props = defineProps({
   vertical: {

@@ -227,8 +227,8 @@ const {
   updateDiscussionError,
   debouncedAutoSave,
 } = useAlbumAutoSave({
-  discussionId: props.discussionId,
-  existingAlbum: props.existingAlbum,
+  discussionId: () => props.discussionId,
+  existingAlbum: () => props.existingAlbum,
   getAlbumData: () => props.formValues.album,
 });
 

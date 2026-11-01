@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import type { PropType } from 'vue';
-import type { Event, TextVersion, User } from '@/__generated__/graphql';
+import type {
+  EventPresentation as Event,
+  EventRevision as TextVersion,
+} from '@/types/EventPresentation';
 import {
   usePopoverPositioning,
   type PopoverPosition,
 } from '@/composables/usePopoverPositioning';
 import { timeAgo } from '@/utils';
-import { DELETE_EVENT_DESCRIPTION_REVISION } from '@/graphQLData/event/mutations';
+import { DeleteEventDescriptionRevisionDocument as DELETE_EVENT_DESCRIPTION_REVISION } from '@/__generated__/operations';
 import RevisionDiffModal from '@/components/discussion/detail/activityFeed/RevisionDiffModal.vue';
+type User = NonNullable<TextVersion['Author']>;
 
 const props = defineProps({
   event: {
@@ -36,7 +40,7 @@ interface RevisionData {
     | TextVersion
     | {
         id: string;
-        body?: string;
+        body?: string | null;
         createdAt: string;
         Author?: User | null;
       };
@@ -44,7 +48,7 @@ interface RevisionData {
     | TextVersion
     | {
         id: string;
-        body?: string;
+        body?: string | null;
         createdAt: string;
         Author?: User | null;
       };
@@ -66,23 +70,22 @@ const hasEdits = computed(() => {
 const allEdits = computed(() => {
   const edits: RevisionData[] = [];
 
-  if (props.event?.PastDescriptionVersions?.length) {
+  const versions = props.event.PastDescriptionVersions;
+  if (versions?.length) {
     const currentVersionBody = {
       id: 'current',
       body: props.event.description ?? undefined,
       createdAt: String(props.event.updatedAt || props.event.createdAt),
     };
 
-    props.event.PastDescriptionVersions.forEach((version, index) => {
+    versions.forEach((version, index) => {
       const authorOfNewContent =
         index === 0
           ? props.event.DescriptionLastEditedBy
-          : props.event.PastDescriptionVersions[index - 1]?.Author;
+          : versions[index - 1]?.Author;
 
       const nextVersionBody =
-        index === 0
-          ? currentVersionBody
-          : props.event.PastDescriptionVersions[index - 1];
+        index === 0 ? currentVersionBody : versions[index - 1];
 
       if (!nextVersionBody) {
         return;

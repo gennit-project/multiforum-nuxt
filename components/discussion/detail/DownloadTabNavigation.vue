@@ -9,7 +9,7 @@ import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import DownloadMetadata from '@/components/download/DownloadMetadata.vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD } from '@/graphQLData/collection/queries';
+import { GetPublicCollectionsForDownloadDocument as GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD } from '@/__generated__/operations';
 import PublicCollectionListItem from '@/components/collection/PublicCollectionListItem.vue';
 import { useUsername } from '@/composables/useAuthState';
 

@@ -1,18 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { PropType } from 'vue';
-import type { Collection, Discussion } from '@/__generated__/graphql';
+import type { GetPublicCollectionsForDownloadQuery } from '@/__generated__/operations';
 import CollectionDownloadListItem from '@/components/collection/CollectionDownloadListItem.vue';
+type Collection =
+  GetPublicCollectionsForDownloadQuery['publicCollectionsContaining'][number];
 
 const props = defineProps({
   collection: {
-    type: Object as PropType<Partial<Collection>>,
+    type: Object as PropType<Collection>,
     required: true,
   },
 });
 
-const firstDownloads = computed<Discussion[]>(() => {
-  return (props.collection?.Downloads || []).slice(0, 5) as Discussion[];
+const firstDownloads = computed(() => {
+  return (props.collection?.Downloads || []).slice(0, 5);
 });
 
 const creatorLabel = computed(() => {

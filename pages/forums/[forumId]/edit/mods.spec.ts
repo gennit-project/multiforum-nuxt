@@ -1,3 +1,5 @@
+import { getOperationAST } from 'graphql';
+import type { DocumentNode } from 'graphql';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -6,7 +8,7 @@ import PendingForumModList from '@/components/channel/form/PendingForumModList.v
 
 const h = vi.hoisted(() => ({
   mutations: new Map<unknown, ReturnType<typeof vi.fn>>(),
-  options: new Map<unknown, { update?: (...args: unknown[]) => void }>(),
+  options: new Map<unknown, () => { refetchQueries: Array<{ query: DocumentNode; variables: { channelUniqueName: string } }>; awaitRefetchQueries: boolean }>(),
   done: new Map<unknown, () => void>(),
 }));
 
@@ -14,17 +16,15 @@ vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: { forumId: 'cats' } }),
 }));
 
-vi.mock('@/graphQLData/mod/mutations', () => ({
-  INVITE_FORUM_MOD: 'invite',
-  CANCEL_INVITE_FORUM_MOD: 'cancel',
-  REMOVE_FORUM_MOD: 'remove',
-}));
+
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (
-    operation: unknown,
-    options: { update?: (...args: unknown[]) => void }
+    document: DocumentNode,
+    options: () => { refetchQueries: Array<{ query: DocumentNode; variables: { channelUniqueName: string } }>; awaitRefetchQueries: boolean }
   ) => {
+    const name = getOperationAST(document)?.name?.value;
+    const operation = name === 'inviteForumMod' ? 'invite' : name === 'cancelInviteForumMod' ? 'cancel' : 'remove';
     const mutate = vi.fn();
     h.mutations.set(operation, mutate);
     h.options.set(operation, options);
@@ -120,57 +120,17 @@ describe('forum mods edit page', () => {
     });
   });
 
-  it('updates cached pending invitations after an invite', async () => {
-    const wrapper = await mountPage();
-    wrapper.findComponent({ name: 'TextInput' }).vm.$emit('update', 'bob');
-    const cache = {
-      readQuery: vi.fn().mockReturnValue({
-        channels: [{ PendingModInvites: [{ username: 'alice' }] }],
-      }),
-      writeQuery: vi.fn(),
-    };
-    h.options.get('invite')?.update?.(cache);
-    expect(
-      cache.writeQuery.mock.calls[0][0].data.channels[0].PendingModInvites
-    ).toEqual([{ username: 'alice' }, { displayName: 'bob' }]);
-  });
-
-  it('filters cached invitations after cancelling an invite', async () => {
+  it.each(['invite', 'cancel', 'remove'])('refetches the exact selected forum after %s', async (operation) => {
     await mountPage();
-    const cache = {
-      readQuery: vi.fn().mockReturnValue({
-        channels: [
-          { PendingModInvites: [{ username: 'alice' }, { username: '' }] },
-        ],
-      }),
-      writeQuery: vi.fn(),
-    };
-    h.options.get('cancel')?.update?.(cache);
-    expect(cache.writeQuery.mock.calls[0][0].data.channels[0]).toEqual({
-      PendingModInvites: [{ username: 'alice' }],
-    });
-  });
-
-  it('drops only the removed moderator from the cached channel', async () => {
-    const wrapper = await mountPage();
-    wrapper.findComponent(ModList).vm.$emit('click-remove-mod', 'ModBob');
-    const cache = {
-      readQuery: vi.fn().mockReturnValue({
-        channels: [
-          {
-            uniqueName: 'cats',
-            Admins: [{ username: 'alice' }],
-            Moderators: [{ displayName: 'ModBob' }, { displayName: 'ModCarol' }],
-          },
-        ],
-      }),
-      writeQuery: vi.fn(),
-    };
-    h.options.get('remove')?.update?.(cache, { data: null });
-    expect(cache.writeQuery.mock.calls[0][0].data.channels[0]).toEqual({
-      uniqueName: 'cats',
-      Admins: [{ username: 'alice' }],
-      Moderators: [{ displayName: 'ModCarol' }],
+    const options = h.options.get(operation)?.();
+    expect({
+      query: getOperationAST(options!.refetchQueries[0]!.query)?.name?.value,
+      variables: options?.refetchQueries[0]?.variables,
+      awaitRefetchQueries: options?.awaitRefetchQueries,
+    }).toEqual({
+      query: operation === 'remove' ? 'getModsByChannel' : 'getPendingChannelModsByChannel',
+      variables: { channelUniqueName: 'cats' },
+      awaitRefetchQueries: true,
     });
   });
 

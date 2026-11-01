@@ -2,14 +2,13 @@
 import { ref, computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL_CONTRIBUTIONS } from '@/graphQLData/channel/queries';
+import { GetChannelContributionsDocument as GET_CHANNEL_CONTRIBUTIONS } from '@/__generated__/operations';
 import ChannelContributionChart from '@/components/charts/ChannelContributionChart.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import IconButtonDropdown from '@/components/IconButtonDropdown.vue';
 import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import { DateTime } from 'luxon';
-import type { UserContributionData } from '@/__generated__/graphql';
 import UserGroupIcon from '@/components/icons/UserGroupIcon.vue';
 import {
   getMaxDayCount,
@@ -17,7 +16,7 @@ import {
 } from '@/utils/contributorStats';
 
 const route = useRoute();
-const forumId = computed(() => route.params.forumId as string);
+const forumId = computed(() => typeof route.params.forumId === 'string' ? route.params.forumId : '');
 
 // Time period selector - default to last 3 months
 const timeOptions: MenuItemType[] = [
@@ -65,16 +64,7 @@ const dateRange = computed(() => {
 });
 
 // Fetch channel contributors
-const { result, loading, error } = useQuery<
-  { getChannelContributions: UserContributionData[] },
-  {
-    channelUniqueName: string;
-    startDate: string;
-    endDate: string;
-    limit: number;
-  }
->(
-  GET_CHANNEL_CONTRIBUTIONS,
+const { result, loading, error } = useQuery(  GET_CHANNEL_CONTRIBUTIONS,
   () => ({
     channelUniqueName: forumId.value,
     startDate: dateRange.value.startDate,
@@ -87,7 +77,7 @@ const { result, loading, error } = useQuery<
   })
 );
 
-const contributors = computed<UserContributionData[]>(() => {
+const contributors = computed(() => {
   return result.value?.getChannelContributions ?? [];
 });
 

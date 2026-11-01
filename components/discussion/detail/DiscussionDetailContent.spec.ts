@@ -3,6 +3,14 @@ import {
   GetDownloadDetailDocument as GET_DOWNLOAD_DETAIL,
   GetDiscussionDetailDocument as GET_DISCUSSION_DETAIL,
   GetCommentSectionDocument as GET_DISCUSSION_COMMENTS,
+  GetDiscussionChannelCommentAggregateDocument as GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
+  GetDiscussionChannelRootCommentAggregateDocument as GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
+  GetIssueSource3f1ebf796bDocument as CHECK_DISCUSSION_ISSUE_EXISTENCE,
+  GetDiscussionCommentIssueDocument as CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
+  GetChannelDocument as GET_CHANNEL,
+  GetDiscussionActivityDocument as GET_DISCUSSION_ACTIVITY,
+  GetDiscussionDetailFilesPageDocument as GET_DISCUSSION_DETAIL_FILES_PAGE,
+  GetDiscussionDetailImagesPageDocument as GET_DISCUSSION_DETAIL_IMAGES_PAGE,
 } from '@/__generated__/operations';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { unref, type ref } from 'vue';
@@ -20,20 +28,6 @@ import { makeReply } from '@/tests/utils/replyFixtures';
 import { useQuery } from '@vue/apollo-composable';
 
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
-import {
-  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-} from '@/graphQLData/comment/queries';
-import {
-  CHECK_DISCUSSION_ISSUE_EXISTENCE,
-  CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
-} from '@/graphQLData/issue/queries';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import {
-  GET_DISCUSSION_ACTIVITY,
-  GET_DISCUSSION_DETAIL_FILES_PAGE,
-  GET_DISCUSSION_DETAIL_IMAGES_PAGE,
-} from '@/graphQLData/discussion/queries';
 
 const mockApolloClientQuery = vi.hoisted(() => vi.fn());
 const mockRoute = vi.hoisted(() => ({

@@ -8,10 +8,7 @@
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
-import {
-  SERVER_SCOPED_ISSUE_COUNT,
-  SERVER_SCOPED_CLOSED_ISSUE_COUNT,
-} from '@/graphQLData/mod/queries';
+import { CountIssuesByServerDocument as SERVER_SCOPED_ISSUE_COUNT, CountClosedIssuesByServerDocument as SERVER_SCOPED_CLOSED_ISSUE_COUNT } from '@/__generated__/operations';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';

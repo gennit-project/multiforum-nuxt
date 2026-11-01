@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { GetUserFavoriteImagesDocument as GET_USER_FAVORITE_IMAGES } from '@/__generated__/operations';
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { gql } from '@apollo/client/core';
 import { useHead } from 'nuxt/app';
 import { useUsername } from '@/composables/useAuthState';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
@@ -13,30 +13,6 @@ const usernameVar = useUsername();
 useHead({
   title: 'Favorite Images - Library',
 });
-
-const GET_USER_FAVORITE_IMAGES = gql`
-  query getUserFavoriteImages($username: String!) {
-    users(where: { username: { eq: $username } }) {
-      username
-      FavoriteImages(sort: [{ createdAt: DESC }]) {
-        id
-        url
-        alt
-        caption
-        copyright
-        longDescription
-        hasSensitiveContent
-        hasSpoiler
-        createdAt
-        Uploader {
-          username
-          displayName
-          profilePicURL
-        }
-      }
-    }
-  }
-`;
 
 const { result, loading, error } = useQuery(
   GET_USER_FAVORITE_IMAGES,

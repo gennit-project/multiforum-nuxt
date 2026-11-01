@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { mount } from '@vue/test-utils';
 
 import SelectBrokenRules from '@/components/admin/SelectBrokenRules.vue';
-import { GET_CHANNEL_RULES } from '@/graphQLData/channel/queries';
+import { GetChannelRulesDocument as GET_CHANNEL_RULES } from '@/__generated__/operations';
 
 const h = vi.hoisted(() => ({
   // useQuery is called twice: [0] server rules, [1] channel rules.

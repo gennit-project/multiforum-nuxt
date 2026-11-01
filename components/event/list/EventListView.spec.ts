@@ -260,4 +260,22 @@ describe('EventListView — filters and navigation', () => {
 
     expect(fetchMoreMock).toHaveBeenCalled();
   });
+  it('deduplicates overlapping event pages', async () => {
+    const wrapper = mountView();
+    await wrapper.get('[data-testid="more"]').trigger('click');
+    const update = fetchMoreMock.mock.calls[0][0].updateQuery;
+    const previous = { events: [{ id: 'one' }], eventsConnection: { aggregate: { count: { nodes: 2 } } } };
+    const next = { ...previous, events: [{ id: 'one' }, { id: 'two' }] };
+    expect(update(previous, { fetchMoreResult: next }).events).toEqual([{ id: 'one' }, { id: 'two' }]);
+  });
+
+  it('rejects a page after changing the event filter', async () => {
+    const wrapper = mountView();
+    await wrapper.get('[data-testid="more"]').trigger('click');
+    const update = fetchMoreMock.mock.calls[0][0].updateQuery;
+    await wrapper.get('[data-testid="tag"]').trigger('click');
+    const previous = { events: [{ id: 'one' }] };
+    expect(update(previous, { fetchMoreResult: { events: [{ id: 'two' }] } })).toBe(previous);
+  });
+
 });

@@ -8,7 +8,7 @@ import Notification from '../NotificationComponent.vue';
 import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
 import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue';
 import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
-import type { Comment } from '@/__generated__/graphql';
+import type { FeedbackCommentView as Comment } from '@/types/Comment';
 import type { PropType } from 'vue';
 import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';

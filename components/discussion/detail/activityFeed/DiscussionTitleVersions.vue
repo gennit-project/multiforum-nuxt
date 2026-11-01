@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
+import type { DiscussionPresentation } from '@/types/DiscussionPresentation';
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
 
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import { timeAgo } from '@/utils';
+
+type Discussion = Partial<Pick<DiscussionPresentation, 'title' | 'PastTitleVersions'>>;
 
 interface TitleTransition {
   id: string;

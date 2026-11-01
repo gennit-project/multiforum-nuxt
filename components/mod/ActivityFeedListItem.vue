@@ -7,12 +7,8 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { ref, computed, watch, type PropType, type Component } from 'vue';
 import { timeAgo, ALLOWED_ICONS } from '@/utils';
-import type {
-  Discussion,
-  Issue,
-  ModerationAction,
-  TextVersion,
-} from '@/__generated__/graphql';
+import type { IssueRelatedDiscussion as Discussion, IssueView as Issue, ActivityPresentation as ModerationAction  } from '@/types/Issue';
+import type { TextVersion } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import ArchiveBox from '../icons/ArchiveBox.vue';
 import ArchiveBoxXMark from '../icons/ArchiveBoxXMark.vue';
@@ -28,7 +24,7 @@ import TrashIcon from '../icons/TrashIcon.vue';
 import TagIcon from '../icons/TagIcon.vue';
 import { ActionType } from '@/types/Comment';
 import { useMutation } from '@vue/apollo-composable';
-import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
+import { UpdateCommentDocument as UPDATE_COMMENT } from '@/__generated__/operations';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import RevisionDiffInline from '@/components/mod/RevisionDiffInline.vue';
 import { getAuthorBadges } from '@/utils/roleBadges';
@@ -260,11 +256,11 @@ const usePassiveDescription = computed(() => {
 // Version data compatible with RevisionDiffInline component
 interface VersionData {
   id: string;
-  body?: string;
+  body?: string | null;
   title?: string;
   createdAt: string;
   Author?: { username?: string } | null;
-  editReason?: string;
+  editReason?: string | null;
 }
 
 type DiscussionRevisionContent = {
@@ -460,8 +456,8 @@ const {
   onDone: onUpdateDone,
 } = useMutation(UPDATE_COMMENT, () => ({
   variables: {
-    commentWhere: { id: props.activityItem.Comment?.id },
-    updateCommentInput: { text: editedComment.value },
+    commentWhere: { id: { eq: props.activityItem.Comment?.id } },
+    updateCommentInput: { text: { set: editedComment.value } },
   },
 }));
 
