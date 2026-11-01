@@ -539,3 +539,5 @@ Generated documents share identical precompiled AST node constants to keep route
 bundles within existing budgets. Every exported document still contains its complete
 fragment definitions; generation does not add runtime GraphQL parsing. Source/document
 equivalence tests cover the shared output as well as the migrated operations.
+
+Phase 6 implementation and release procedure: [cross-repository releases](cross-repository-releases.md).

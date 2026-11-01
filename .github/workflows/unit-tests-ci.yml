@@ -210,8 +210,22 @@ jobs:
       - name: Check committed typed operation freshness
         run: pnpm run operations:check
 
-      - name: Generate types from the pinned backend revision (no server)
-        run: pnpm run compile
+      - name: Check schema type freshness without overwriting committed output
+        run: pnpm run schema:types:check
+
+      - name: Check portable frontend operation contract
+        run: |
+          pnpm run compatibility:test
+          pnpm run operations:contract:check
+          pnpm run operations:export
+          pnpm run compatibility:check --schema graphql-schema --baseline graphql-schema --operations artifacts/frontend-operations --backend-revision "$(node -p 'require("./graphql-schema/manifest.json").source.revision')" --frontend-revision "$(git rev-parse HEAD)"
+
+      - name: Preserve revision-bound frontend operation contract
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-operations-${{ github.sha }}
+          path: artifacts/frontend-operations/
+          if-no-files-found: error
 
       - name: Test GraphQL operation extraction and validation
         run: pnpm run graphql:test

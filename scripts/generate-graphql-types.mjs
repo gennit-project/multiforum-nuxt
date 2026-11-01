@@ -29,7 +29,16 @@ async function main() {
       ? result
       : [result.prepend?.join('\n'), result.content].filter(Boolean).join('\n');
 
-  fs.writeFileSync(OUT, `/* eslint-disable */\n${content}\n`);
+  const output = `/* eslint-disable */\n${content}\n`;
+  if (process.argv.includes('--check')) {
+    if (fs.readFileSync(OUT, 'utf8') !== output)
+      throw new Error(
+        'Stale schema types. Run pnpm compile and commit __generated__/graphql.ts.'
+      );
+    console.log('Generated schema types are fresh.');
+    return;
+  }
+  fs.writeFileSync(OUT, output);
   console.log(
     `Wrote ${path.relative(process.cwd(), OUT)} (${content.length} chars).`
   );

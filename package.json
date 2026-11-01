@@ -52,7 +52,13 @@
     "verify": "pnpm run tsc && pnpm run test:unit:run",
     "lint-verify": "pnpm run test:unit:run && pnpm run lint:a11y",
     "operations:generate": "node scripts/generate-graphql-operations.mjs",
-    "operations:check": "node scripts/generate-graphql-operations.mjs --check && node scripts/typed-operation-consumers.mjs --report artifacts/graphql/typed-consumers.json"
+    "operations:check": "node scripts/generate-graphql-operations.mjs --check && node scripts/typed-operation-consumers.mjs --report artifacts/graphql/typed-consumers.json",
+    "schema:types:check": "node scripts/generate-graphql-types.mjs --check",
+    "operations:contract:generate": "node scripts/frontend-operation-contract.mjs --generate",
+    "operations:contract:check": "node scripts/frontend-operation-contract.mjs --check",
+    "operations:export": "node scripts/frontend-operation-contract.mjs --export",
+    "compatibility:test": "node --test scripts/frontend-operation-contract.test.mjs",
+    "compatibility:check": "node scripts/check-backend-compatibility.mjs"
   },
   "dependencies": {
     "@apollo/client": "^3.13.5",
