@@ -298,7 +298,7 @@
     },
     {
       "file": "components/channel/form/CreateEditChannelFields.vue",
-      "sha256": "caa564d4b1ea46f58e505b665da3ae37c929f6bd198e71cf1ea9d62c8a463f73"
+      "sha256": "7064a04ab1b3691c76a9bae9448b41f928dfc14a8ffc61171fc69c4875c1bde4"
     },
     {
       "file": "components/channel/form/ForumOwnerList.vue",
