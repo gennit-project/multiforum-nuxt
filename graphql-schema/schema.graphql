@@ -569,6 +569,10 @@ enum PluginConfigurationChangeKind {
   DISABLE_PLUGIN
   SET_SECRET
   REPLACE_SECRET
+  UPDATE_REGISTRIES
+  ENABLE_CHANNEL_PLUGIN
+  DISABLE_CHANNEL_PLUGIN
+  UPDATE_CHANNEL_SETTINGS
   UPDATE_PIPELINES
 }
 
@@ -603,6 +607,11 @@ enum PluginPipelineRunTrigger {
   MODERATOR_RETRY
   AUTOMATIC_RETRY
   CAMPAIGN
+}
+
+enum PluginRegistryManagementMode {
+  MERGE
+  REPLACE
 }
 
 enum PluginRunStatus {
@@ -22685,6 +22694,19 @@ input DateTimeScalarMutations {
   set: DateTime
 }
 
+input DesiredChannelPluginInput {
+  channelUniqueName: String!
+  pluginId: String!
+  version: String!
+  enabled: Boolean!
+  settingsJson: JSON
+}
+
+input DesiredPluginRegistriesInput {
+  mode: PluginRegistryManagementMode! = MERGE
+  urls: [String!]!
+}
+
 input DesiredServerPluginInput {
   pluginId: String!
   version: String!
@@ -40506,6 +40528,12 @@ input PipelineStepInput {
 input PluginConfigurationDesiredStateInput {
   apiVersion: String!
   plugins: [DesiredServerPluginInput!]!
+
+  """Omit to leave plugin registry configuration unmanaged."""
+  registries: DesiredPluginRegistriesInput
+
+  """Omit to leave channel plugin enablement unmanaged."""
+  channelPlugins: [DesiredChannelPluginInput!]
 
   """
   Omit to leave server pipelines unmanaged; pass an empty list to clear them.

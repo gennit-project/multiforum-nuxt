@@ -4,8 +4,8 @@
   "lockfileSha256": "7c5e77f6ab917360eac30eef4fca011fc9494514d154e064b88d3aa46136dc28",
   "pinnedSchema": {
     "repository": "gennit-project/multiforum-backend",
-    "revision": "3d356e90aaaf11b44d0012e82d2c044a07ce4343",
-    "sha256": "48eeed7ac64bd5f82bb6f2eac1355e405bb844be03744a2ce7ff3ccab7ea50fb"
+    "revision": "73ef18440e5742a91b6d210b12bde30a121791af",
+    "sha256": "1c5d9582d1e40d52f5784162f133ea85a17c87bb390b0d184f17399786f6ddac"
   },
   "sources": [
     {
@@ -3423,6 +3423,10 @@
     {
       "file": "server/api/session/verification.post.ts",
       "sha256": "056986843cad6515a5238898d69767181c9d071eed3f9f0d50cf791b704db549"
+    },
+    {
+      "file": "server/config/runtime.ts",
+      "sha256": "0bdb2a52c4e08d54cc9de3404f2eb22e04540a8d43c29b06d04a5da0acc1d9cb"
     },
     {
       "file": "server/middleware/1.cache-control.ts",
