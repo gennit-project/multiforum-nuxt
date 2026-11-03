@@ -78,6 +78,19 @@ export function discoverOperationSources(root) {
         )
       )
         return false;
+      // An unstaged directory replacement can leave child paths in the index.
+      // Do not follow a parent symlink to sources outside the tracked tree.
+      for (let depth = 1; depth < parts.length; depth++) {
+        const parent = parts.slice(0, depth).join('/');
+        if (
+          lstatSync(path.join(root, parent), {
+            throwIfNoEntry: false,
+          })?.isSymbolicLink()
+        )
+          throw new Error(
+            `Source symlinks require an explicit inventory decision: ${parent}`
+          );
+      }
       const stat = lstatSync(path.join(root, file), { throwIfNoEntry: false });
       // A locally deleted tracked file must disappear from the inventory too.
       if (!stat) return false;

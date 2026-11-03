@@ -610,3 +610,13 @@ test('reports source and standalone GraphQL parse errors at their real lines', (
     { file: 'broken.graphql', line: 4, column: 1 }
   );
 });
+
+test('rejects an unstaged parent-directory symlink replacing tracked source', (t) => {
+  const root = workspace(t, {
+    'real/q.ts': 'const Q=gql`{ user { id } }`;',
+    'replacement/q.ts': 'const Q=gql`{ user { name } }`;',
+  });
+  rmSync(path.join(root, 'real'), { recursive: true });
+  symlinkSync('replacement', path.join(root, 'real'), 'dir');
+  assert.throws(() => discoverOperationSources(root), /Source symlinks/);
+});
