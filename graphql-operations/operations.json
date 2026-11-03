@@ -3425,10 +3425,6 @@
       "sha256": "056986843cad6515a5238898d69767181c9d071eed3f9f0d50cf791b704db549"
     },
     {
-      "file": "server/config/runtime.ts",
-      "sha256": "0bdb2a52c4e08d54cc9de3404f2eb22e04540a8d43c29b06d04a5da0acc1d9cb"
-    },
-    {
       "file": "server/middleware/1.cache-control.ts",
       "sha256": "d4d681fea2b46e58014cb155366cde4872125f57336e9b1a2f7b873094c63af9"
     },
