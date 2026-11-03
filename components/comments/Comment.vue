@@ -486,7 +486,7 @@ const label = computed(() =>
               : isMarkedAsAnswer
                 ? 'rounded-md border border-green-600 bg-green-100 p-2 dark:bg-green-950'
                 : depth === 1
-                  ? 'rounded-lg p-2 dark:bg-gray-900 dark:ring-1 dark:ring-gray-700'
+                  ? 'rounded-lg p-2 dark:bg-gray-900'
                   : '',
           ]"
           class="flex w-full"

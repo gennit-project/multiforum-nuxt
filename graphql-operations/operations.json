@@ -426,7 +426,7 @@
     },
     {
       "file": "components/comments/Comment.vue",
-      "sha256": "682fc9553466efe23f3fec1461e15e3e3bb1963779080506914daf1144e8dd94"
+      "sha256": "52cda4d1e815b19c1bb11bcc2997d31388d195d8538045c3fe5f0743c176442f"
     },
     {
       "file": "components/comments/CommentButtons.vue",
