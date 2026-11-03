@@ -122,7 +122,7 @@ describe('ActivityFeedListItem bot badge', () => {
       createdAt: '2024-01-01T00:00:00.000Z',
       ModerationProfile: {
         displayName: 'moderation-bot',
-        User: { isBot: true },
+        BotUser: { username: 'moderation-bot', isBot: true },
       },
     });
 
@@ -147,13 +147,13 @@ describe('ActivityFeedListItem bot badge', () => {
       actor: {
         ModerationProfile: {
           displayName: 'mod-bob',
-          User: { isBot: false },
+          BotUser: null,
         },
       },
     },
     {
       label: 'legacy moderation profile without a user',
-      actor: { ModerationProfile: { displayName: 'mod-legacy', User: null } },
+      actor: { ModerationProfile: { displayName: 'mod-legacy', BotUser: null } },
     },
   ])('does not show a Bot badge for a $label', ({ actor }) => {
     const wrapper = mountItem({

@@ -388,7 +388,7 @@ const actorBadges = computed(() => {
 const actorIsBot = computed(() => {
   return (
     props.activityItem.User?.isBot === true ||
-    props.activityItem.ModerationProfile?.User?.isBot === true
+    props.activityItem.ModerationProfile?.BotUser?.isBot === true
   );
 });
 

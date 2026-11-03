@@ -3183,6 +3183,10 @@ export enum PluginConfigurationChangeKind {
   DisablePlugin = 'DISABLE_PLUGIN',
   SetSecret = 'SET_SECRET',
   ReplaceSecret = 'REPLACE_SECRET',
+  UpdateRegistries = 'UPDATE_REGISTRIES',
+  EnableChannelPlugin = 'ENABLE_CHANNEL_PLUGIN',
+  DisableChannelPlugin = 'DISABLE_CHANNEL_PLUGIN',
+  UpdateChannelSettings = 'UPDATE_CHANNEL_SETTINGS',
   UpdatePipelines = 'UPDATE_PIPELINES'
 }
 
@@ -3217,6 +3221,11 @@ export enum PluginPipelineRunTrigger {
   ModeratorRetry = 'MODERATOR_RETRY',
   AutomaticRetry = 'AUTOMATIC_RETRY',
   Campaign = 'CAMPAIGN'
+}
+
+export enum PluginRegistryManagementMode {
+  Merge = 'MERGE',
+  Replace = 'REPLACE'
 }
 
 export enum PluginRunStatus {
@@ -10444,6 +10453,7 @@ export type ModerationProfile = {
   __typename?: 'ModerationProfile';
   createdAt: Scalars['DateTime']['output'];
   displayName?: Maybe<Scalars['String']['output']>;
+  BotUser?: Maybe<User>;
   User?: Maybe<User>;
   UserConnection: ModerationProfileUserConnection;
   AuthoredIssues: Array<Issue>;
@@ -34464,6 +34474,19 @@ export type DateTimeScalarFilters = {
 /** DateTime mutations */
 export type DateTimeScalarMutations = {
   set?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type DesiredChannelPluginInput = {
+  channelUniqueName: Scalars['String']['input'];
+  pluginId: Scalars['String']['input'];
+  version: Scalars['String']['input'];
+  enabled: Scalars['Boolean']['input'];
+  settingsJson?: InputMaybe<Scalars['JSON']['input']>;
+};
+
+export type DesiredPluginRegistriesInput = {
+  mode?: PluginRegistryManagementMode;
+  urls: Array<Scalars['String']['input']>;
 };
 
 export type DesiredServerPluginInput = {
@@ -59116,6 +59139,10 @@ export type PipelineStepInput = {
 export type PluginConfigurationDesiredStateInput = {
   apiVersion: Scalars['String']['input'];
   plugins: Array<DesiredServerPluginInput>;
+  /** Omit to leave plugin registry configuration unmanaged. */
+  registries?: InputMaybe<DesiredPluginRegistriesInput>;
+  /** Omit to leave channel plugin enablement unmanaged. */
+  channelPlugins?: InputMaybe<Array<DesiredChannelPluginInput>>;
   /** Omit to leave server pipelines unmanaged; pass an empty list to clear them. */
   pipelines?: InputMaybe<Array<EventPipelineInput>>;
   /** When present, reconcile only these pipeline events and preserve all others. */
