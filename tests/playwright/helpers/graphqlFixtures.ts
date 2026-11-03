@@ -835,7 +835,7 @@ export type ModerationActionFixture = {
   recommendationRationale: string | null;
   ModerationProfile: {
     displayName: string;
-    User: { isBot: boolean } | null;
+    BotUser: { username: string; isBot: boolean } | null;
   } | null;
   User: { username: string; isBot: boolean } | null;
   Revision: null;
@@ -878,7 +878,9 @@ export const buildModerationAction = ({
   ModerationProfile: moderatorDisplayName
     ? {
         displayName: moderatorDisplayName,
-        User: { isBot: actorIsBot },
+        BotUser: actorIsBot
+          ? { username: moderatorDisplayName, isBot: true }
+          : null,
       }
     : null,
   User: null,
@@ -916,7 +918,7 @@ export const buildModCommentActivityItem = ({
   recommendationRationale: null,
   ModerationProfile: {
     displayName: modDisplayName,
-    User: { isBot: false },
+    BotUser: null,
   },
   User: null,
   Revision: null,
