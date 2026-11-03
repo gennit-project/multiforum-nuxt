@@ -83,6 +83,33 @@ describe('RecentForumsDrawer visibility', () => {
   });
 });
 
+describe('RecentForumsDrawer layering', () => {
+  // The fixed top nav (h-14) must stay fully visible above the drawer, so the
+  // panel and backdrop open below it rather than starting at the top of the
+  // viewport where they would cover/clip the nav bar.
+  it('opens the panel below the top nav', () => {
+    const wrapper = mountDrawer();
+
+    const panelClasses = wrapper.get('[role="dialog"]').classes();
+
+    expect({
+      offsetBelowNav: panelClasses.includes('top-14'),
+      coversNav: panelClasses.includes('top-0'),
+    }).toEqual({ offsetBelowNav: true, coversNav: false });
+  });
+
+  it('offsets the backdrop below the top nav', () => {
+    const wrapper = mountDrawer();
+
+    const backdropClasses = wrapper.find('[class~="bg-black/50"]').classes();
+
+    expect({
+      offsetBelowNav: backdropClasses.includes('top-14'),
+      coversNav: backdropClasses.includes('inset-0'),
+    }).toEqual({ offsetBelowNav: true, coversNav: false });
+  });
+});
+
 describe('RecentForumsDrawer actions', () => {
   it('emits close from the backdrop', async () => {
     const wrapper = mountDrawer();

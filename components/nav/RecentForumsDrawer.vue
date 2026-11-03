@@ -58,10 +58,12 @@ const goToForum = (uniqueName: string) => {
 
 <template>
   <ClientOnly>
-    <!-- Backdrop -->
+    <!-- Backdrop. Offset below the fixed top nav (h-14) so the nav bar stays
+         fully visible and on top while the drawer is open, rather than being
+         covered or dimmed. -->
     <div
       v-if="isOpen"
-      class="fixed inset-0 z-30 bg-black/50"
+      class="fixed inset-x-0 top-14 bottom-0 z-30 bg-black/50"
       @click="closeDrawer"
     />
 
@@ -80,7 +82,7 @@ const goToForum = (uniqueName: string) => {
         role="dialog"
         aria-modal="true"
         aria-labelledby="recent-forums-drawer-title"
-        class="fixed top-0 left-0 z-40 h-full w-80 overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+        class="fixed top-14 bottom-0 left-0 z-40 w-80 overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
       >
         <!-- Header -->
         <div
