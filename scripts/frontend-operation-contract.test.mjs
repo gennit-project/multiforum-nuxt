@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import {
   copyFileSync,
+  cpSync,
   mkdirSync,
   symlinkSync,
   mkdtempSync,
@@ -16,6 +17,7 @@ import { buildSchema, extendSchema, parse } from 'graphql';
 import { readSchemaContract } from './graphql-schema-contract.mjs';
 import {
   assertFreshOperationContract,
+  createOperationContract,
   checkOperationsAgainstSchema,
   serialize,
   sha256,
@@ -272,4 +274,211 @@ test('schema type freshness detects stale output without overwriting it', () => 
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
+});
+
+function contractWorkspace(t) {
+  const directory = mkdtempSync(path.join(os.tmpdir(), 'contract-sources-'));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const repositoryRoot = new URL('../', import.meta.url).pathname;
+  cpSync(
+    path.join(repositoryRoot, 'graphql-schema'),
+    path.join(directory, 'graphql-schema'),
+    { recursive: true }
+  );
+  writeFileSync(path.join(directory, 'pnpm-lock.yaml'), 'fixture lockfile');
+  writeFileSync(path.join(directory, '.gitignore'), 'local/\n');
+  const component =
+    '<template><div class="red">Hello</div></template>\n<script setup>\nconst Q = gql`query Sample { __typename }`;\n</script>\n<style>.red { color: red; }</style>\n';
+  writeFileSync(path.join(directory, 'Page.vue'), component);
+  const git = (...args) =>
+    execFileSync('git', args, { cwd: directory, stdio: 'pipe' });
+  git('init', '-q');
+  git('add', '.');
+  return {
+    directory,
+    component,
+    git,
+    generate: () => createOperationContract(directory),
+  };
+}
+
+test('CSS, template, script comments and GraphQL formatting do not make the contract stale', (t) => {
+  const { directory, component, generate } = contractWorkspace(t);
+  const expected = serialize(generate());
+  writeFileSync(
+    path.join(directory, 'Page.vue'),
+    component
+      .replace('color: red', 'color: blue')
+      .replace('Hello', 'Hello\nworld')
+      .replace('const Q', '// unrelated script comment\nconst Q')
+      .replace(
+        'query Sample { __typename }',
+        'query Sample { # GraphQL comment\n __typename }'
+      )
+  );
+  assert.doesNotThrow(() => assertFreshOperationContract(expected, generate()));
+});
+
+for (const [label, operation] of [
+  ['alias', 'query Sample { name: __typename }'],
+  ['directive', 'query Sample { __typename @skip(if: true) }'],
+  [
+    'variable default',
+    'query Sample($skip: Boolean! = true) { __typename @skip(if: $skip) }',
+  ],
+]) {
+  test(`an unstaged real operation change (${label}) still causes drift`, (t) => {
+    const { directory, component, generate } = contractWorkspace(t);
+    const expected = serialize(generate());
+    writeFileSync(
+      path.join(directory, 'Page.vue'),
+      component.replace('query Sample { __typename }', operation)
+    );
+    assert.throws(
+      () => assertFreshOperationContract(expected, generate()),
+      /Stale frontend/
+    );
+  });
+}
+
+test('untracked and ignored operations cannot change the contract; staging opts a new source in', (t) => {
+  const { directory, git, generate } = contractWorkspace(t);
+  const expected = serialize(generate());
+  mkdirSync(path.join(directory, 'local'));
+  writeFileSync(
+    path.join(directory, 'local/invalid.ts'),
+    'const Q=gql`{ nonexistent }`;'
+  );
+  writeFileSync(
+    path.join(directory, 'new.graphql'),
+    'query Added { __typename }'
+  );
+  assert.equal(serialize(generate()), expected);
+  git('add', 'new.graphql');
+  assert.throws(
+    () => assertFreshOperationContract(expected, generate()),
+    /Stale frontend/
+  );
+});
+
+test('deleted tracked operations cause drift', (t) => {
+  const { directory, git, generate } = contractWorkspace(t);
+  writeFileSync(
+    path.join(directory, 'other.gql'),
+    'query Other { __typename }'
+  );
+  git('add', 'other.gql');
+  const expected = serialize(generate());
+  rmSync(path.join(directory, 'other.gql'));
+  assert.throws(
+    () => assertFreshOperationContract(expected, generate()),
+    /Stale frontend/
+  );
+});
+
+test('resolved fragment changes cause drift and invalid tracked operations fail closed', (t) => {
+  const { directory, git, generate } = contractWorkspace(t);
+  writeFileSync(
+    path.join(directory, 'fragment.ts'),
+    'export const F=gql`fragment Fields on Query { __typename }`;'
+  );
+  writeFileSync(
+    path.join(directory, 'Page.vue'),
+    '<script setup>import {F} from "./fragment"; const Q=gql`query Sample { ...Fields } ${F}`;</script>'
+  );
+  git('add', 'fragment.ts');
+  const expected = serialize(generate());
+  writeFileSync(
+    path.join(directory, 'fragment.ts'),
+    'export const F=gql`fragment Fields on Query { name: __typename }`;'
+  );
+  assert.throws(
+    () => assertFreshOperationContract(expected, generate()),
+    /Stale frontend/
+  );
+  writeFileSync(
+    path.join(directory, 'fragment.ts'),
+    'export const F=gql`fragment Fields on Query { nonexistent }`;'
+  );
+  assert.throws(generate, /clean graphql:check/);
+});
+
+test('local generation agrees byte-for-byte with a clean checkout', (t) => {
+  const { directory, git, generate } = contractWorkspace(t);
+  git(
+    '-c',
+    'user.name=Contract Test',
+    '-c',
+    'user.email=contract@example.invalid',
+    'commit',
+    '-qm',
+    'fixture'
+  );
+  const clone = path.join(directory, 'clean');
+  git('clone', '-q', '--local', directory, clone);
+  writeFileSync(
+    path.join(directory, 'scratch.ts'),
+    'const Q=gql`{ nonexistent }`;'
+  );
+  mkdirSync(path.join(directory, 'local'));
+  writeFileSync(
+    path.join(directory, 'local/runtime.ts'),
+    'invalid local configuration'
+  );
+  assert.equal(
+    serialize(generate()),
+    serialize(createOperationContract(clone))
+  );
+});
+
+test('contract generation leaves schema types alone in either generator order', (t) => {
+  const { directory } = contractWorkspace(t);
+  const repositoryRoot = new URL('../', import.meta.url).pathname;
+  cpSync(
+    path.join(repositoryRoot, 'scripts'),
+    path.join(directory, 'scripts'),
+    { recursive: true }
+  );
+  symlinkSync(
+    path.join(repositoryRoot, 'node_modules'),
+    path.join(directory, 'node_modules')
+  );
+  mkdirSync(path.join(directory, '__generated__'));
+  const types = path.join(directory, '__generated__/graphql.ts');
+  const run = (file, ...args) =>
+    execFileSync(
+      process.execPath,
+      [path.join(directory, 'scripts', file), ...args],
+      { cwd: directory, stdio: 'pipe' }
+    );
+  writeFileSync(types, 'schema type sentinel');
+  run('frontend-operation-contract.mjs', '--generate');
+  assert.equal(readFileSync(types, 'utf8'), 'schema type sentinel');
+  run('generate-graphql-types.mjs');
+  const pinnedTypes = readFileSync(types, 'utf8');
+  run('frontend-operation-contract.mjs', '--generate');
+  run('generate-graphql-types.mjs', '--check');
+  assert.equal(readFileSync(types, 'utf8'), pinnedTypes);
+});
+
+test('tracked non-GraphQL files are scanned without becoming contract inputs', (t) => {
+  const { directory, git, generate } = contractWorkspace(t);
+  const expected = serialize(generate());
+  writeFileSync(
+    path.join(directory, 'config.ts'),
+    'export const title = "Local title";'
+  );
+  git('add', 'config.ts');
+  assert.equal(serialize(generate()), expected);
+  writeFileSync(
+    path.join(directory, 'config.ts'),
+    'const Q = gql`{ nonexistent }`;'
+  );
+  assert.throws(generate, /clean graphql:check/);
+});
+
+test('source discovery fails closed without a Git repository', (t) => {
+  const { directory, generate } = contractWorkspace(t);
+  rmSync(path.join(directory, '.git'), { recursive: true });
+  assert.throws(generate, /not a git repository/);
 });

@@ -54,6 +54,7 @@
     "operations:generate": "node scripts/generate-graphql-operations.mjs",
     "operations:check": "node scripts/generate-graphql-operations.mjs --check && node scripts/typed-operation-consumers.mjs --report artifacts/graphql/typed-consumers.json",
     "schema:types:check": "node scripts/generate-graphql-types.mjs --check",
+    "fix:contracts": "pnpm compile && pnpm operations:contract:generate",
     "operations:contract:generate": "node scripts/frontend-operation-contract.mjs --generate",
     "operations:contract:check": "node scripts/frontend-operation-contract.mjs --check",
     "operations:export": "node scripts/frontend-operation-contract.mjs --export",

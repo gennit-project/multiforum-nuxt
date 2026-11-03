@@ -9,7 +9,7 @@ import {
 } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import test from 'node:test';
 import { buildSchema } from 'graphql';
 import {
@@ -33,6 +33,8 @@ function workspace(t, files) {
     mkdirSync(path.dirname(path.join(root, name)), { recursive: true });
     writeFileSync(path.join(root, name), text);
   }
+  execFileSync('git', ['init', '-q'], { cwd: root });
+  execFileSync('git', ['add', '.'], { cwd: root });
   return root;
 }
 const extract = (t, files) => inventoryOperations(workspace(t, files), schema);
@@ -548,6 +550,7 @@ test('supports CommonJS GraphQL tags in production source extensions', (t) => {
 test('does not silently skip symlinked source directories', (t) => {
   const root = workspace(t, { 'real/q.ts': 'const Q=gql`{ user { id } }`;' });
   symlinkSync('real', path.join(root, 'linked'), 'dir');
+  execFileSync('git', ['add', 'linked'], { cwd: root });
   assert.throws(() => discoverOperationSources(root), /Source symlinks/);
 });
 
@@ -567,6 +570,7 @@ test('cyclic imports through local aliases fail cleanly without recursion overfl
 test('CLI writes a diagnostic report when source discovery fails', (t) => {
   const root = workspace(t, { 'real/q.ts': 'const Q=gql`{ user { id } }`;' });
   symlinkSync('real', path.join(root, 'linked'), 'dir');
+  execFileSync('git', ['add', 'linked'], { cwd: root });
   const output = path.join(root, 'report.json');
   assert.equal(
     runCli('--root', root, '--report-only', '--report', output).status,

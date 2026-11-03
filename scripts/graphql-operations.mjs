@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, lstatSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import ts from 'typescript';
 import { parse as parseVue } from 'vue/compiler-sfc';
@@ -56,37 +57,44 @@ const slash = (value) => value.split(path.sep).join('/');
 const mask = (value) => value.replace(/[^\r\n]/g, ' ');
 
 export function discoverOperationSources(root) {
-  const files = [];
-  function walk(directory) {
-    for (const entry of readdirSync(directory, { withFileTypes: true }).sort(
-      (a, b) => a.name.localeCompare(b.name)
-    )) {
-      if (
-        entry.name.startsWith('.') ||
-        excludedDirectories.includes(entry.name)
-      )
-        continue;
-      const absolute = path.join(directory, entry.name);
-      if (
-        entry.isSymbolicLink() &&
-        (!path.extname(entry.name) ||
-          extensions.includes(path.extname(entry.name)))
-      ) {
-        throw new Error(
-          `Source symlinks require an explicit inventory decision: ${absolute}`
-        );
-      }
-      if (entry.isDirectory()) walk(absolute);
-      else if (
-        extensions.includes(path.extname(entry.name)) &&
-        !/\.(?:spec|test|d)\.[^.]+$/.test(entry.name)
-      ) {
-        files.push(slash(path.relative(root, absolute)));
-      }
+  // Use the index only for membership; read working-tree content below so
+  // unstaged operation edits are still checked. Newly authored files need git add.
+  // Fail closed outside Git rather than silently exporting local-only sources.
+  const tracked = execFileSync(
+    'git',
+    ['ls-files', '--cached', '-z', '--', '.'],
+    {
+      cwd: root,
+      encoding: 'utf8',
+      maxBuffer: 16 * 1024 * 1024,
     }
-  }
-  walk(root);
-  return files;
+  );
+  return [...new Set(tracked.split('\0').filter(Boolean))]
+    .filter((file) => {
+      const parts = file.split('/');
+      if (
+        parts.some(
+          (part) => part.startsWith('.') || excludedDirectories.includes(part)
+        )
+      )
+        return false;
+      const stat = lstatSync(path.join(root, file), { throwIfNoEntry: false });
+      // A locally deleted tracked file must disappear from the inventory too.
+      if (!stat) return false;
+      if (
+        stat.isSymbolicLink() &&
+        (!path.extname(file) || extensions.includes(path.extname(file)))
+      )
+        throw new Error(
+          `Source symlinks require an explicit inventory decision: ${file}`
+        );
+      return (
+        stat.isFile() &&
+        extensions.includes(path.extname(file)) &&
+        !/\.(?:spec|test|d)\.[^.]+$/.test(file)
+      );
+    })
+    .sort();
 }
 
 // Map cooked JS template/string characters back to their original source.

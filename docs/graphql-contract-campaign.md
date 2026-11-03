@@ -130,6 +130,37 @@ pnpm graphql:check      # strict CI gate and inventory report
 pnpm graphql:validate   # strict check without writing a report
 ```
 
+Source discovery uses Git-tracked production files (including newly staged files),
+while reading their current working-tree content. Run `git add` for new source
+files before validation or generation. Untracked and ignored local files do not
+enter the inventory; a Git checkout is required. Existing production/test/generated
+boundaries and rejection of tracked source symlinks still apply.
+
+### Refresh generated contracts
+
+```sh
+git add path/to/new-operation.ts  # for newly authored source files
+pnpm fix:contracts              # compile pinned types, then refresh operations.json
+```
+
+`fix:contracts` is the single local repair command after intentional GraphQL or
+schema changes. It does not update the schema pin or contact a live backend.
+The fast pre-commit hook remains lint-only; CI still rejects real contract drift.
+
+`graphql-operations/operations.json` fingerprints normalized extracted GraphQL
+(including resolved fragments), rather than whole source files. Its `sources`
+list contains only files with documents; each source checksum covers the ordered
+`{ id, sha256 }` document entries serialized as indented JSON with a trailing
+newline. Every tracked production source is still scanned for extraction errors.
+CSS, template, unrelated script edits, and GraphQL whitespace/comments therefore
+need no regeneration. Operation additions, removals, selections, arguments,
+directives, and fragment changes still affect freshness.
+
+Line and column values are diagnostic metadata and do not participate in the
+freshness comparison. Export re-extracts current locations from the clean checkout
+and binds the artifact to its exact commit. Schema-pin and lockfile provenance,
+document checksums, and compatibility validation remain enforced.
+
 The CI gate validates every discovered document and fails on any schema
 diagnostic, extraction error, or schema pin/hash mismatch. Fix invalid documents
 before merging; do not use a baseline to suppress failures in CI.
