@@ -46,10 +46,20 @@ export function createOperationContract(directory = root) {
       ...manifest.source,
       sha256: manifest.files['schema.graphql'].sha256,
     },
-    sources: inventory.sourceFiles.map((file) => ({
-      file,
-      sha256: sha256(readFileSync(path.join(directory, file))),
-    })),
+    // Only extracted GraphQL contributes to source identity. The inventory still
+    // validates every tracked production source, including files without documents.
+    sources: [...new Set(inventory.documents.map(({ file }) => file))].map(
+      (file) => ({
+        file,
+        sha256: sha256(
+          serialize(
+            inventory.documents
+              .filter((document) => document.file === file)
+              .map(({ id, hash }) => ({ id, sha256: hash }))
+          )
+        ),
+      })
+    ),
     documents: inventory.documents.map(
       ({ id, file, line, column, hash, source }) => ({
         id,
@@ -116,9 +126,23 @@ export function checkOperationsAgainstSchema(contract, schema) {
 }
 
 export function assertFreshOperationContract(expected, actual) {
-  if (expected !== serialize(actual)) {
+  // Locations are diagnostics, not contract semantics: moving an unchanged
+  // operation down a few lines must not force a snapshot refresh. Export uses
+  // the freshly extracted locations for the exact committed revision.
+  const semantics = (contract) => ({
+    ...contract,
+    documents: contract.documents.map((document) => {
+      const semanticDocument = { ...document };
+      delete semanticDocument.line;
+      delete semanticDocument.column;
+      return semanticDocument;
+    }),
+  });
+  if (
+    serialize(semantics(JSON.parse(expected))) !== serialize(semantics(actual))
+  ) {
     throw new Error(
-      'Stale frontend operation contract. Run pnpm operations:contract:generate and commit graphql-operations/operations.json.'
+      'Stale frontend operation contract. Run pnpm fix:contracts and commit graphql-operations/operations.json.'
     );
   }
 }
