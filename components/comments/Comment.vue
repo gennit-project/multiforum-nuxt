@@ -473,7 +473,7 @@ const label = computed(() =>
     <div
       :class="[
         depth > 1
-          ? 'ml-1 border-l border-gray-300 pt-2 pl-2 sm:pl-4 dark:border-gray-600'
+          ? 'ml-1 border-l border-gray-300 pt-2 pl-2 sm:pl-4 dark:border-gray-700'
           : '',
       ]"
       class="flex w-full"
@@ -485,7 +485,9 @@ const label = computed(() =>
               ? 'border-brand-600 bg-brand-100 dark:bg-brand-950 rounded-md border p-2'
               : isMarkedAsAnswer
                 ? 'rounded-md border border-green-600 bg-green-100 p-2 dark:bg-green-950'
-                : 'dark:bg-gray-950',
+                : depth === 1
+                  ? 'rounded-lg p-2 dark:bg-gray-900'
+                  : '',
           ]"
           class="flex w-full"
           data-testid="comment"
@@ -507,7 +509,7 @@ const label = computed(() =>
               :is-forum-mod="authorBadges.isForumMod"
             />
             <div
-              class="ml-2 grow border-l border-gray-300 pl-2 sm:ml-4 sm:pl-4 dark:border-gray-600"
+              class="ml-2 grow border-l border-gray-300 pl-2 sm:ml-4 sm:pl-4 dark:border-gray-700"
             >
               <div class="w-full dark:text-gray-200">
                 <div class="w-full overflow-auto">
@@ -754,7 +756,7 @@ const label = computed(() =>
         <div
           v-else-if="replyCount > 0 && showReplies"
           id="childComments"
-          class="ml-1 w-full border-gray-300 sm:ml-3 dark:border-gray-600"
+          class="ml-1 w-full border-gray-300 sm:ml-3 dark:border-gray-700"
         >
           <ChildComments
             v-slot="slotProps"

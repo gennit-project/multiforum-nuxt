@@ -426,7 +426,7 @@
     },
     {
       "file": "components/comments/Comment.vue",
-      "sha256": "07d075e7474a639c6b85433cee269d38317722bbf71b796f9b02afb7bb289b4a"
+      "sha256": "52cda4d1e815b19c1bb11bcc2997d31388d195d8538045c3fe5f0743c176442f"
     },
     {
       "file": "components/comments/CommentButtons.vue",
@@ -438,7 +438,7 @@
     },
     {
       "file": "components/comments/CommentHeader.vue",
-      "sha256": "f7ffaeee24be6136cf5d34840601168bae5fcfc7f6c8b659ec0d73f34111a44d"
+      "sha256": "09da0d39147d49aa0c89e05841a9914ced308f4d16ab89c3591fb0e6d1b8510c"
     },
     {
       "file": "components/comments/CommentOnFeedbackPage.vue",
@@ -450,7 +450,7 @@
     },
     {
       "file": "components/comments/CommentSection.vue",
-      "sha256": "716073781feedc39bb22e9cc3fbda0ee27d1b6fd1ea0c434dfaf373477977b32"
+      "sha256": "be00a4600138acea00083553d888f70a978e5cdd07bfde3a046f5e20ba5893f0"
     },
     {
       "file": "components/comments/CreateRootCommentForm.vue",

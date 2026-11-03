@@ -240,7 +240,7 @@ const isSticky = computed(() => !!props.commentData.isSticky);
 
     <div
       :class="!commentAuthorUsername ? '-ml-5' : '-ml-4 border-l'"
-      class="grow border-gray-300 pl-4 dark:border-gray-600"
+      class="grow border-gray-300 pl-4 dark:border-gray-700"
     >
       <div
         v-if="
