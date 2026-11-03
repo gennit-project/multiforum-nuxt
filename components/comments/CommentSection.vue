@@ -766,7 +766,7 @@ const commentPassThroughProps = computed(() => ({
         >
           No comments match "{{ searchText }}"
         </div>
-        <div :key="activeSort">
+        <div :key="activeSort" class="space-y-3">
           <div
             v-for="(comment, index) in filteredComments"
             :key="comment?.id || index"
