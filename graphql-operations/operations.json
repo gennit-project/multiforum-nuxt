@@ -4,8 +4,8 @@
   "lockfileSha256": "7c5e77f6ab917360eac30eef4fca011fc9494514d154e064b88d3aa46136dc28",
   "pinnedSchema": {
     "repository": "gennit-project/multiforum-backend",
-    "revision": "871a01abac568e3d4bf2ac5024f0ef1ed707c574",
-    "sha256": "0df76ca9933dfe9424dfc56bfa18fe22f614e0f47645937542e042bd1c7ca63c"
+    "revision": "8b46c0df591b7952e1b935d7e9dac3df9ff2e778",
+    "sha256": "1948fe219029cab6af40703f794b9f5a9e41a735fb9652e17330559454e6dfff"
   },
   "sources": [
     {
