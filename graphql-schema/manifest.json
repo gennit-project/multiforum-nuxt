@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "source": {
     "repository": "gennit-project/multiforum-backend",
-    "revision": "34dec0ce28867027a5cf8a7e1688d2f2f98743d0"
+    "revision": "c8b6d8fdce2e3fbb33a7beb8ce2f502ae06b3460"
   },
   "dependencies": {
     "@neo4j/graphql": "7.6.4",
