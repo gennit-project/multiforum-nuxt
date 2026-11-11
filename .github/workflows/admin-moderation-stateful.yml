@@ -1,9 +1,10 @@
 name: Stateful admin moderation
 
 # This suite exercises the complete browser -> GraphQL -> Neo4j path. Keep it
-# separate from the fast mocked PR suite, but run it regularly so cross-repo
-# moderation regressions cannot remain hidden.
+# separate from the fast mocked suite, and run it on PRs as well as regularly
+# so both frontend changes and cross-repo moderation regressions are checked.
 on:
+  pull_request:
   workflow_dispatch:
   schedule:
     - cron: '0 7 * * 2' # weekly, Tuesdays 07:00 UTC

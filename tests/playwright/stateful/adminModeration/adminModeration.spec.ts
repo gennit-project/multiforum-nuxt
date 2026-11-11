@@ -42,6 +42,9 @@ test.describe('real backend admin moderation workflows', () => {
     ).toBeVisible();
 
     await page
+      .getByRole('button', { name: 'Review resolution options' })
+      .click();
+    await page
       .getByRole('button', { name: 'Unsuspend Author' })
       .first()
       .click();
