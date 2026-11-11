@@ -6,11 +6,11 @@ import {
 } from './serverIssueFilters';
 
 describe('getDefaultServerRuleViolationsFilter', () => {
-  it('defaults to true when the query param is absent', () => {
-    expect(getDefaultServerRuleViolationsFilter(undefined)).toBe(true);
+  it('defaults to all issues so governance requests remain discoverable', () => {
+    expect(getDefaultServerRuleViolationsFilter(undefined)).toBe(false);
   });
 
-  it('is false only when explicitly set to "false"', () => {
+  it('is false when explicitly set to "false"', () => {
     expect(getDefaultServerRuleViolationsFilter('false')).toBe(false);
   });
 

@@ -37,7 +37,7 @@ describe('useIssueActivityFeed', () => {
     ]);
   });
 
-  it('updates a cached issue when mutation data contains an updated issue', () => {
+  it.each(['general', null])('updates the cached issue using its scope %s', (channelUniqueName) => {
     useIssueActivityFeed({
       channelId: ref('general'),
       activityFeedLimit: 20,
@@ -61,7 +61,7 @@ describe('useIssueActivityFeed', () => {
             {
               id: 'issue-1',
               issueNumber: 1,
-              channelUniqueName: 'general',
+              channelUniqueName,
               ActivityFeed: [{ id: 'new-activity' }],
               ActivityFeedConnection: { aggregate: { count: { nodes: 1 } } },
             },
@@ -73,7 +73,7 @@ describe('useIssueActivityFeed', () => {
     expect(cache.writeQuery).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: {
-          channelUniqueName: 'general',
+          channelUniqueName,
           issueNumber: 1,
           activityFeedLimit: 20,
           activityFeedOffset: 0,

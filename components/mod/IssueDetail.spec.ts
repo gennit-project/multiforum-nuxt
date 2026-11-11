@@ -54,6 +54,7 @@ const buildIssueResult = () => ({
 });
 
 const issueResult = ref(buildIssueResult());
+const issueActivityResult = ref(buildIssueResult());
 const channelResult = ref({ channels: [] });
 const serverResult = ref({ serverConfigs: [] });
 const relatedDiscussionResult = ref({
@@ -238,6 +239,7 @@ describe('IssueDetail', () => {
     mockRoute.name = undefined;
     mockedPermissionFlags.isSuspendedMod = false;
     issueResult.value = buildIssueResult();
+    issueActivityResult.value = buildIssueResult();
     refetchIssue.mockResolvedValue(undefined);
     queryError.value = null;
     queryLoading.value = false;
@@ -246,7 +248,7 @@ describe('IssueDetail', () => {
 
     const queryResults = new Map<unknown, unknown>([
       [GET_ISSUE, issueResult],
-      [GET_ISSUE_ACTIVITY, issueResult],
+      [GET_ISSUE_ACTIVITY, issueActivityResult],
       [GET_CHANNEL, channelResult],
       [GET_SERVER_CONFIG, serverResult],
       [GET_ISSUE_RELATED_DISCUSSION, relatedDiscussionResult],
@@ -302,6 +304,7 @@ describe('IssueDetail', () => {
           PageNotFound: {
             template: '<div data-testid="page-not-found">not found</div>',
           },
+          ChannelRuleApproval: true,
           ModerationWizard: true,
           OriginalPosterActions: true,
           ActivityFeed: true,
@@ -330,6 +333,22 @@ describe('IssueDetail', () => {
         },
       },
     });
+
+  it('does not merge a previous issue timeline after changing selection', () => {
+    issueActivityResult.value.issues[0]!.id = 'previous-issue';
+    issueActivityResult.value.issues[0]!.ActivityFeed = [{ id: 'stale-action' }] as any;
+    const wrapper = buildWrapper();
+    expect(wrapper.findComponent({ name: 'ActivityFeed' }).props('feedItems')).toEqual([]);
+  });
+
+  it('loads server-scoped issue details and activity with a null channel', () => {
+    mockRoute.params.forumId = '';
+    buildWrapper();
+    const calls = vi.mocked(useQuery).mock.calls.filter(([document]) => document === GET_ISSUE || document === GET_ISSUE_ACTIVITY);
+    const variables = calls.map(([, values]) => typeof values === 'function' ? values() : values);
+    mockRoute.params.forumId = 'toDelete';
+    expect(variables.map((value) => value.channelUniqueName)).toEqual([null, null]);
+  });
 
   it('keeps issue activity out of SSR prefetch', () => {
     buildWrapper();

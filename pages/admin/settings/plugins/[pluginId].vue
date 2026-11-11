@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { hasRuleGovernance, supportsRuleGovernance, selectGovernanceAdminInstallation, getGovernanceServerSections, initializeGovernanceSettings, requiresGovernanceMigration } from '@/utils/pluginGovernance';
 import type { GetServerPluginSecretsQuery } from '@/__generated__/operations';
 import { ref, computed, nextTick, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -117,7 +118,10 @@ const { mutate: setSecretMutation } = useMutation(SET_SERVER_PLUGIN_SECRET);
 
 // Core computed properties needed for secrets query
 const plugin = computed(() => pluginsResult.value?.plugins.find((p) => p.id === pluginId.value));
-const installedPlugin = computed(() => installedResult.value?.getInstalledPlugins.find((p) => p.plugin.id === pluginId.value) || null);
+const installedPlugin = computed(() => {
+  const matches = installedResult.value?.getInstalledPlugins.filter((p) => p.plugin.id === pluginId.value) || [];
+  return (hasRuleGovernance(matches[0]?.plugin.name || '') ? selectGovernanceAdminInstallation({ plugins: matches, selectedVersion: selectedVersion.value }) : matches[0]) || null;
+});
 
 // Plugin slug (name) used for secrets - must be defined before secrets query
 const pluginSlug = computed(() => {
@@ -222,7 +226,9 @@ const pluginReadme = computed(() =>
 
 // Extract server settings form sections from the plugin manifest
 const serverSettingsSections = computed((): PluginFormSection[] =>
-  getPluginFormSections(installedPlugin.value?.manifest, 'server')
+  (hasRuleGovernance(installedPlugin.value?.plugin.name || '')
+    ? (supportsRuleGovernance(installedVersion.value) ? getGovernanceServerSections(installedPlugin.value?.manifest) : [])
+    : getPluginFormSections(installedPlugin.value?.manifest, 'server'))
     .map((section) => ({
       ...section,
       fields: section.fields.filter(
@@ -369,8 +375,10 @@ watch(
 watch(
   installedPlugin,
   (newInstalledPlugin) => {
-    if (newInstalledPlugin?.settingsJson) {
-      settingsValues.value = parseSettingsJson(newInstalledPlugin.settingsJson);
+    if (newInstalledPlugin) {
+      settingsValues.value = hasRuleGovernance(newInstalledPlugin.plugin.name) && supportsRuleGovernance(newInstalledPlugin.version)
+        ? initializeGovernanceSettings(newInstalledPlugin.settingsJson)
+        : parseSettingsJson(newInstalledPlugin.settingsJson);
     }
   },
   { immediate: true }
@@ -717,6 +725,21 @@ const handleSaveSettings = async () => {
               Loading secrets...
             </div>
           </div>
+
+          <p
+            v-if="isInstalled && hasRuleGovernance(installedPlugin?.plugin.name || '') && !supportsRuleGovernance(installedVersion)"
+            role="status"
+            class="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-200"
+          >
+            Upgrade this moderation plugin to version 0.8.0 or later to configure global server-rule enforcement and channel-rule eligibility. Existing settings remain unchanged until you upgrade and save the new policy.
+          </p>
+          <p
+            v-if="isInstalled && supportsRuleGovernance(installedVersion) && hasRuleGovernance(installedPlugin?.plugin.name || '') && requiresGovernanceMigration(installedPlugin?.settingsJson)"
+            role="status"
+            class="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-200"
+          >
+            The legacy setting checks server rules only in selected forums. Choose global On or Off before saving. The existing server-rule allowlist will not become a channel-rule eligibility allowlist.
+          </p>
 
           <!-- Server Settings Section -->
           <PluginSettingsSection

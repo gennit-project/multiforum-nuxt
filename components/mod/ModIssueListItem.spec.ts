@@ -178,11 +178,13 @@ describe('ModIssueListItem selection', () => {
     ]);
   });
 
-  it('does not emit select without a channel', async () => {
+  it('selects a server-scoped request without a channel', async () => {
     const wrapper = mountItem({ issue: issue({ Channel: null }) });
 
-    // With no Channel the title renders as plain text, not a button.
-    expect(wrapper.findAll('button')).toHaveLength(0);
+    await selectButton(wrapper).trigger('click');
+    expect(wrapper.emitted('select')?.[0]).toEqual([
+      { issueNumber: 7, title: 'A reported thing', channelId: '' },
+    ]);
   });
 
   it('emits select using top-level channelUniqueName when Channel is absent', async () => {

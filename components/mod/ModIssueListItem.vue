@@ -72,13 +72,20 @@ const reportCountLabel = computed(() => {
 const handleSelect = () => {
   const channelId =
     props.issue.Channel?.uniqueName || props.issue.channelUniqueName;
-  if (!props.issue?.issueNumber || !channelId) return;
+  if (!props.issue?.issueNumber) return;
   emit('select', {
     issueNumber: props.issue.issueNumber,
     title: props.issue.title || '',
-    channelId,
+    channelId: channelId || '',
   });
 };
+
+const issueRoute = computed(() => {
+  const forumId = props.issue.Channel?.uniqueName || props.issue.channelUniqueName;
+  return forumId
+    ? { name: 'forums-forumId-issues-issueNumber', params: { forumId, issueNumber: props.issue.issueNumber } }
+    : { name: 'server-issues-issueNumber', params: { issueNumber: props.issue.issueNumber } };
+});
 
 const isSelected = computed(() => {
   return props.selectedIssueNumber === props.issue?.issueNumber;
@@ -145,19 +152,12 @@ const relatedChannelNames = computed(() =>
 
       <div class="flex-col">
         <span
-          v-if="issue.Channel || issue.channelUniqueName"
           class="flex flex-wrap items-center gap-2"
         >
           <nuxt-link
             v-if="issue.issueNumber"
             class="text-gray-900 hover:underline dark:text-gray-200 lg:hidden"
-            :to="{
-              name: 'forums-forumId-issues-issueNumber',
-              params: {
-                issueNumber: issue.issueNumber,
-                forumId: issue.Channel?.uniqueName || issue.channelUniqueName,
-              },
-            }"
+            :to="issueRoute"
             @click="handleSelect"
           >
             {{ issue.title }}
@@ -223,7 +223,6 @@ const relatedChannelNames = computed(() =>
             Wiki Edit
           </span>
         </span>
-        <div v-else class="text-gray-900 dark:text-gray-200">{{ issue.title }}</div>
         <div
           v-if="relatedChannelNames.length"
           class="mt-2 flex flex-wrap gap-1"
@@ -242,7 +241,7 @@ const relatedChannelNames = computed(() =>
           {{
             `Opened on ${formatDate(issue.createdAt)} by ${issueAuthorName(
               issue
-            )} in ${issue.Channel?.uniqueName || issue.channelUniqueName || '[Deleted]'}`
+            )} in ${issue.Channel?.uniqueName || issue.channelUniqueName || 'server'}`
           }}
         </div>
       </div>

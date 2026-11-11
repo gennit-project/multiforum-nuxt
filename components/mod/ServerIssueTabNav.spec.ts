@@ -73,7 +73,6 @@ describe('ServerIssueTabNav', () => {
 
     expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
       isOpen: true,
-      flaggedServerRuleViolation: true,
       createdAt_GTE: '2026-05-01T00:00:00.000Z',
       createdAt_LTE: '2026-07-01T23:59:59.999Z',
     });

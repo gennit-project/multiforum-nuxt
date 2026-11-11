@@ -20,7 +20,7 @@ describe('getServerIssueFilterValuesFromParams', () => {
       searchInput: '',
       startDate: '',
       endDate: '',
-      showOnlyServerRuleViolations: true,
+      showOnlyServerRuleViolations: false,
       filterCreatedByMe: false,
       filterIAmOP: false,
       filterIReported: false,
@@ -76,7 +76,7 @@ describe('getServerIssueFilterValuesFromParams', () => {
     });
   });
 
-  it('defaults server-rule violations filter to true unless explicitly false', () => {
+  it('respects an explicit server-rule violations filter', () => {
     expect(
       getServerIssueFilterValuesFromParams({
         route: createMockRoute({

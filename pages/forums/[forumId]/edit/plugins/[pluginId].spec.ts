@@ -10,6 +10,7 @@ UpdateChannelEnabledPluginsDocument: 'UPDATE'
 }));
 
 const h = vi.hoisted(() => ({
+  route: { params: { forumId: 'cats', pluginId: 'scanner' } },
   channelResult: null as unknown as { value: any },
   channelLoading: null as unknown as { value: boolean },
   channelError: null as unknown as { value: any },
@@ -33,7 +34,7 @@ h.mutationLoading = ref(false);
 h.mutationError = ref(null);
 
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { forumId: 'cats', pluginId: 'scanner' } }),
+  useRoute: () => h.route,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -67,6 +68,7 @@ vi.mock('@/composables/useToast', () => ({
 
 
 const stubs = {
+  ChannelRuleGovernance: { name: 'ChannelRuleGovernance', props: ['pluginId', 'channelUniqueName'], template: '<div data-testid="governance-panel" />' },
   FormRow: {
     name: 'FormRow',
     props: ['sectionTitle'],
@@ -106,6 +108,7 @@ const setChannel = (edges: unknown[] = [], bots: unknown[] = []) => {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  h.route.params.pluginId = 'scanner';
   h.channelResult.value = null;
   h.channelLoading.value = false;
   h.channelError.value = null;
@@ -279,5 +282,34 @@ describe('Forum plugin detail page', () => {
     };
 
     expect(mountPage().text()).toContain('Bot name not configured');
+  });
+});
+
+
+describe('Governed plugin route integration', () => {
+  const setModeration = (versions: Array<{ version: string; enabled: boolean }>) => {
+    h.route.params.pluginId = 'database-uuid';
+    setChannel();
+    h.installedResult.value = { getInstalledPlugins: versions.map(version => ({
+      plugin: { id: 'database-uuid', name: 'llm-moderation', displayName: 'Moderation', tags: [] },
+      ...version, manifest: {}, settingsJson: {},
+    })) };
+  };
+
+  it('passes the canonical plugin slug rather than its database route ID', () => {
+    setModeration([{ version: '0.8.0', enabled: true }]);
+    const panel = mountPage().findComponent({ name: 'ChannelRuleGovernance' });
+    expect(panel.props()).toMatchObject({ pluginId: 'llm-moderation', channelUniqueName: 'cats' });
+  });
+
+  it('chooses an enabled compatible installation despite older installed records', () => {
+    setModeration([{ version: '0.7.1', enabled: false }, { version: '0.8.0', enabled: true }]);
+    expect(mountPage().findComponent({ name: 'ChannelRuleGovernance' }).exists()).toBe(true);
+  });
+
+  it('keeps unsupported active runtimes gated despite a newer disabled record', () => {
+    setModeration([{ version: '0.8.0', enabled: false }, { version: '0.7.1', enabled: true }]);
+    const wrapper = mountPage();
+    expect({ panel: wrapper.findComponent({ name: 'ChannelRuleGovernance' }).exists(), upgrade: wrapper.text().includes('must upgrade this moderation plugin') }).toEqual({ panel: false, upgrade: true });
   });
 });

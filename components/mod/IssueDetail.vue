@@ -18,6 +18,7 @@ import IssueLockDialog from '@/components/mod/IssueLockDialog.vue';
 import IssueCommentForm from '@/components/mod/IssueCommentForm.vue';
 import IssueBodyEditor from '@/components/mod/IssueBodyEditor.vue';
 import IssueRelatedContent from '@/components/mod/IssueRelatedContent.vue';
+import ChannelRuleApproval from '@/components/mod/ChannelRuleApproval.vue';
 import IssueRelatedChannel from '@/components/mod/IssueRelatedChannel.vue';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
@@ -103,7 +104,7 @@ const {
 } = useQuery(
   GET_ISSUE,
   () => ({
-    channelUniqueName: channelId.value,
+    channelUniqueName: channelId.value || null,
     issueNumber: issueNumber.value ?? 0,
   }),
   () => ({
@@ -123,7 +124,7 @@ const {
 } = useQuery(
   GET_ISSUE_ACTIVITY,
   () => ({
-    channelUniqueName: channelId.value,
+    channelUniqueName: channelId.value || null,
     issueNumber: issueNumber.value ?? 0,
     activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE,
     activityFeedOffset: 0,
@@ -164,7 +165,8 @@ const activeIssue = computed<Issue | null>(() => {
   const issueSummary = getIssueResult.value.issues[0];
   if (!issueSummary) return null;
 
-  const issueActivity = getIssueActivityResult.value?.issues?.[0];
+  const activityResult = getIssueActivityResult.value?.issues?.[0];
+  const issueActivity = activityResult?.id === issueSummary.id ? activityResult : null;
   return {
     ...issueSummary,
     ActivityFeed: issueActivity?.ActivityFeed ?? [],
@@ -286,6 +288,12 @@ const { userPermissions: modPermissions } = useResolvedModPermissions({
   username: computed(() => usernameVar.value),
   modProfileName: computed(() => modProfileNameVar.value),
 });
+
+const isServerAdmin = computed(() =>
+  !!usernameVar.value && !!serverConfig.value?.Admins?.some(
+    (admin) => admin.username === usernameVar.value
+  )
+);
 
 const isSuspendedMod = computed(() => {
   return modPermissions.value.isSuspendedMod ?? false;
@@ -512,6 +520,14 @@ const handleLockReasonUpdate = (value: string) => {
       @toggle-close-open="toggleCloseOpenIssue"
       @open-lock-dialog="openLockDialog"
       @unlock-issue="handleUnlockIssue"
+    />
+
+    <ChannelRuleApproval
+      v-if="activeIssue"
+      :key="activeIssue.id"
+      :issue="activeIssue"
+      :is-server-admin="isServerAdmin"
+      @approved="resetIssueDetail"
     />
 
     <!-- Lock Status Banner -->

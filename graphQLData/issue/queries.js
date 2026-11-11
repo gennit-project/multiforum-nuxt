@@ -17,6 +17,8 @@ export const ISSUE_BASE_FIELDS = gql`
     relatedWikiPageId
     relatedWikiRevisionId
     relatedChannelUniqueName
+    requestKind
+    requestedPluginId
     relatedModProfileName
     channelUniqueName
     Author {
@@ -130,7 +132,7 @@ export const ISSUE_FIELDS = gql`
 
 export const GET_ISSUE = gql`
   ${ISSUE_BASE_FIELDS}
-  query getIssue($channelUniqueName: String!, $issueNumber: Int!) {
+  query getIssue($channelUniqueName: String, $issueNumber: Int!) {
     issues(
       where: {
         channelUniqueName: { eq: $channelUniqueName }
@@ -145,7 +147,7 @@ export const GET_ISSUE = gql`
 export const GET_ISSUE_ACTIVITY = gql`
   ${COMMENT_VOTE_FIELDS}
   query getIssueActivity(
-    $channelUniqueName: String!
+    $channelUniqueName: String
     $issueNumber: Int!
     $activityFeedLimit: Int
     $activityFeedOffset: Int

@@ -18,6 +18,7 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
+  getChannelRuleGovernance: ChannelRuleGovernance;
   /** Return public collections that include the specified item (e.g. downloads are Discussions with hasDownload=true). */
   publicCollectionsContaining: Array<Collection>;
   /**
@@ -189,6 +190,12 @@ export type Query = {
   pluginRuns: Array<PluginRun>;
   serverConfigsConnection: ServerConfigsConnection;
   serverConfigs: Array<ServerConfig>;
+};
+
+
+export type QueryGetChannelRuleGovernanceArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  pluginId: Scalars['String']['input'];
 };
 
 
@@ -1377,6 +1384,9 @@ export type Mutation = {
   resumePluginPipelineCampaign: PluginPipelineCampaign;
   clearDownloadableFileScan: DownloadableFile;
   requestDownloadableFileReview: DownloadableFile;
+  setChannelRuleEnforcement: Scalars['Boolean']['output'];
+  requestChannelRuleEnforcement: ChannelRuleEnforcementRequest;
+  approveChannelRuleEnforcement: ChannelRuleEnforcementRequest;
   enableServerPlugin: InstalledPlugin;
   setServerPluginSecret: Scalars['Boolean']['output'];
   updatePluginPipelines: Scalars['JSON']['output'];
@@ -2292,6 +2302,24 @@ export type MutationClearDownloadableFileScanArgs = {
 export type MutationRequestDownloadableFileReviewArgs = {
   downloadableFileId: Scalars['ID']['input'];
   reason?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationSetChannelRuleEnforcementArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  pluginId: Scalars['String']['input'];
+  enabled: Scalars['Boolean']['input'];
+};
+
+
+export type MutationRequestChannelRuleEnforcementArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  pluginId: Scalars['String']['input'];
+};
+
+
+export type MutationApproveChannelRuleEnforcementArgs = {
+  issueId: Scalars['ID']['input'];
 };
 
 
@@ -4336,6 +4364,10 @@ export type ChannelIssueIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -4551,6 +4583,30 @@ export type ChannelRolesConnection = {
   totalCount: Scalars['Int']['output'];
   pageInfo: PageInfo;
   aggregate: ChannelRoleAggregate;
+};
+
+export type ChannelRuleEnforcementRequest = {
+  __typename?: 'ChannelRuleEnforcementRequest';
+  id: Scalars['ID']['output'];
+  issueNumber: Scalars['Int']['output'];
+  channelUniqueName: Scalars['String']['output'];
+  pluginId: Scalars['String']['output'];
+  isOpen: Scalars['Boolean']['output'];
+};
+
+export type ChannelRuleGovernance = {
+  __typename?: 'ChannelRuleGovernance';
+  pluginId: Scalars['String']['output'];
+  version?: Maybe<Scalars['String']['output']>;
+  serverRuleEnforcement: Scalars['String']['output'];
+  channelRuleEligibility: Scalars['String']['output'];
+  channelRuleAllowlist: Array<Scalars['String']['output']>;
+  eligible: Scalars['Boolean']['output'];
+  ownerEnabled: Scalars['Boolean']['output'];
+  canRequest: Scalars['Boolean']['output'];
+  pendingRequestId?: Maybe<Scalars['ID']['output']>;
+  pendingRequestNumber?: Maybe<Scalars['Int']['output']>;
+  migrationRequired: Scalars['Boolean']['output'];
 };
 
 export type ChannelsConnection = {
@@ -5708,6 +5764,10 @@ export type CommentIssueRelatedIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -6983,6 +7043,10 @@ export type DiscussionChannelIssueRelatedIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -8366,6 +8430,10 @@ export type EventChannelIssueRelatedIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -8551,6 +8619,10 @@ export type EventIssueRelatedIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -9535,6 +9607,10 @@ export type ImageIssueRelatedIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -9693,6 +9769,10 @@ export type Issue = {
   relatedChannelBannerName?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  requestKind?: Maybe<Scalars['String']['output']>;
+  requestedPluginId?: Maybe<Scalars['String']['output']>;
+  channelRuleApprovedAt?: Maybe<Scalars['DateTime']['output']>;
+  channelRuleApprovedBy?: Maybe<Scalars['String']['output']>;
   flaggedServerRuleViolation?: Maybe<Scalars['Boolean']['output']>;
   locked?: Maybe<Scalars['Boolean']['output']>;
   lockedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -9802,6 +9882,10 @@ export type IssueAggregateNode = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -10683,6 +10767,10 @@ export type ModerationProfileIssueAuthoredIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -20779,6 +20867,120 @@ export type ChannelIssuesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'updatedAt: { max: { lte: ... } } }' instead. */
   updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { eq: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { eq: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { eq: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestKind?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { eq: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { eq: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { eq: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestedPluginId?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  channelRuleApprovedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelRuleApprovedBy?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { min: { eq: ... } } }' instead. */
   lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { max: { eq: ... } } }' instead. */
@@ -31009,6 +31211,120 @@ export type CommentRelatedIssuesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'updatedAt: { max: { lte: ... } } }' instead. */
   updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { eq: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { eq: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { eq: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestKind?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { eq: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { eq: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { eq: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestedPluginId?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  channelRuleApprovedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelRuleApprovedBy?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { min: { eq: ... } } }' instead. */
   lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { max: { eq: ... } } }' instead. */
@@ -36383,6 +36699,120 @@ export type DiscussionChannelRelatedIssuesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'updatedAt: { max: { lte: ... } } }' instead. */
   updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { eq: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { eq: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { eq: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestKind?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { eq: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { eq: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { eq: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestedPluginId?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  channelRuleApprovedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelRuleApprovedBy?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { min: { eq: ... } } }' instead. */
   lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { max: { eq: ... } } }' instead. */
@@ -44729,6 +45159,120 @@ export type EventChannelRelatedIssuesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'updatedAt: { max: { lte: ... } } }' instead. */
   updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { eq: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { eq: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { eq: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestKind?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { eq: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { eq: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { eq: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestedPluginId?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  channelRuleApprovedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelRuleApprovedBy?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { min: { eq: ... } } }' instead. */
   lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { max: { eq: ... } } }' instead. */
@@ -46821,6 +47365,120 @@ export type EventRelatedIssuesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'updatedAt: { max: { lte: ... } } }' instead. */
   updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { eq: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { eq: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { eq: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestKind?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { eq: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { eq: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { eq: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestedPluginId?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  channelRuleApprovedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelRuleApprovedBy?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { min: { eq: ... } } }' instead. */
   lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { max: { eq: ... } } }' instead. */
@@ -52494,6 +53152,120 @@ export type ImageRelatedIssuesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'updatedAt: { max: { lte: ... } } }' instead. */
   updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { eq: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { eq: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { eq: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestKind?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { eq: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { eq: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { eq: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestedPluginId?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  channelRuleApprovedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelRuleApprovedBy?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { min: { eq: ... } } }' instead. */
   lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { max: { eq: ... } } }' instead. */
@@ -53729,6 +54501,10 @@ export type IssueSort = {
   relatedChannelBannerName?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
+  requestKind?: InputMaybe<SortDirection>;
+  requestedPluginId?: InputMaybe<SortDirection>;
+  channelRuleApprovedAt?: InputMaybe<SortDirection>;
+  channelRuleApprovedBy?: InputMaybe<SortDirection>;
   flaggedServerRuleViolation?: InputMaybe<SortDirection>;
   locked?: InputMaybe<SortDirection>;
   lockedAt?: InputMaybe<SortDirection>;
@@ -54829,6 +55605,58 @@ export type IssueWhere = {
   updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter updatedAt: { gte: ... } */
   updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  requestKind?: InputMaybe<StringScalarFilters>;
+  /** @deprecated Please use the relevant generic filter requestKind: { eq: ... } */
+  requestKind_EQ?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter requestKind: { in: ... } */
+  requestKind_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** @deprecated Please use the relevant generic filter requestKind: { contains: ... } */
+  requestKind_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter requestKind: { startsWith: ... } */
+  requestKind_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter requestKind: { endsWith: ... } */
+  requestKind_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter requestKind: { matches: ... } */
+  requestKind_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  requestedPluginId?: InputMaybe<StringScalarFilters>;
+  /** @deprecated Please use the relevant generic filter requestedPluginId: { eq: ... } */
+  requestedPluginId_EQ?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter requestedPluginId: { in: ... } */
+  requestedPluginId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** @deprecated Please use the relevant generic filter requestedPluginId: { contains: ... } */
+  requestedPluginId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter requestedPluginId: { startsWith: ... } */
+  requestedPluginId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter requestedPluginId: { endsWith: ... } */
+  requestedPluginId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter requestedPluginId: { matches: ... } */
+  requestedPluginId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelRuleApprovedAt?: InputMaybe<DateTimeScalarFilters>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedAt: { eq: ... } */
+  channelRuleApprovedAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedAt: { in: ... } */
+  channelRuleApprovedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedAt: { lt: ... } */
+  channelRuleApprovedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedAt: { lte: ... } */
+  channelRuleApprovedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedAt: { gt: ... } */
+  channelRuleApprovedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedAt: { gte: ... } */
+  channelRuleApprovedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  channelRuleApprovedBy?: InputMaybe<StringScalarFilters>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedBy: { eq: ... } */
+  channelRuleApprovedBy_EQ?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedBy: { in: ... } */
+  channelRuleApprovedBy_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedBy: { contains: ... } */
+  channelRuleApprovedBy_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedBy: { startsWith: ... } */
+  channelRuleApprovedBy_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedBy: { endsWith: ... } */
+  channelRuleApprovedBy_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter channelRuleApprovedBy: { matches: ... } */
+  channelRuleApprovedBy_MATCHES?: InputMaybe<Scalars['String']['input']>;
   flaggedServerRuleViolation?: InputMaybe<BooleanScalarFilters>;
   /** @deprecated Please use the relevant generic filter flaggedServerRuleViolation: { eq: ... } */
   flaggedServerRuleViolation_EQ?: InputMaybe<Scalars['Boolean']['input']>;
@@ -56958,6 +57786,120 @@ export type ModerationProfileAuthoredIssuesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'updatedAt: { max: { lte: ... } } }' instead. */
   updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { eq: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { eq: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { eq: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { gte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { gte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { gte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lt: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lt: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lt: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { averageLength: { lte: ... } } }' instead. */
+  requestKind_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { longestLength: { lte: ... } } }' instead. */
+  requestKind_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestKind: { shortestLength: { lte: ... } } }' instead. */
+  requestKind_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestKind?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { eq: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { eq: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { eq: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { gte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { gte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { gte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lt: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lt: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lt: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { averageLength: { lte: ... } } }' instead. */
+  requestedPluginId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { longestLength: { lte: ... } } }' instead. */
+  requestedPluginId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'requestedPluginId: { shortestLength: { lte: ... } } }' instead. */
+  requestedPluginId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  requestedPluginId?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { eq: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { gte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lt: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { min: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedAt: { max: { lte: ... } } }' instead. */
+  channelRuleApprovedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  channelRuleApprovedAt?: InputMaybe<DateTimeScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { eq: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { gte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lt: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { averageLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { longestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'channelRuleApprovedBy: { shortestLength: { lte: ... } } }' instead. */
+  channelRuleApprovedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelRuleApprovedBy?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { min: { eq: ... } } }' instead. */
   lockedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'lockedAt: { max: { eq: ... } } }' instead. */

@@ -37,7 +37,7 @@ export const getServerIssueFilterValuesFromParams = (
     searchInput: '',
     startDate: '',
     endDate: '',
-    showOnlyServerRuleViolations: true,
+    showOnlyServerRuleViolations: false,
     filterCreatedByMe: false,
     filterIAmOP: false,
     filterIReported: false,

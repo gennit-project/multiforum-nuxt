@@ -38,7 +38,7 @@ const { selectedIssueNumber, selectedIssueTitle, selectedIssueChannelId } =
         class="hidden lg:flex lg:w-1/2 lg:overflow-y-auto"
       >
         <div
-          v-if="selectedIssueNumber && selectedIssueChannelId"
+          v-if="selectedIssueNumber"
           class="flex w-full flex-col rounded-lg border border-gray-200 p-4 dark:border-gray-700"
         >
           <div class="mb-3 flex items-start justify-between gap-3">
@@ -51,7 +51,7 @@ const { selectedIssueNumber, selectedIssueTitle, selectedIssueChannelId } =
               </h2>
             </div>
             <a
-              :href="`/forums/${selectedIssueChannelId}/issues/${selectedIssueNumber}`"
+              :href="selectedIssueChannelId ? `/forums/${selectedIssueChannelId}/issues/${selectedIssueNumber}` : `/server/issues/${selectedIssueNumber}`"
               target="_blank"
               rel="noopener noreferrer"
               class="text-brand-600 dark:text-brand-400 text-xs font-medium hover:underline"

@@ -10,13 +10,13 @@ import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 type RouteQueryValue = string | null | undefined | (string | null)[];
 
 /**
- * The "show only server rule violations" filter defaults to on. It is only off
- * when the query string explicitly opts out with `showOnlyServerRuleViolations=false`.
+ * Show all issues by default, including governance requests that are not rule
+ * violations. The violation-only view is an explicit filter.
  */
 export function getDefaultServerRuleViolationsFilter(
   showOnlyServerRuleViolations: RouteQueryValue
 ): boolean {
-  return showOnlyServerRuleViolations !== 'false';
+  return showOnlyServerRuleViolations === 'true';
 }
 
 export type ServerIssuesWhereParams = {
