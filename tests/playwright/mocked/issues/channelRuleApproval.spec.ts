@@ -26,6 +26,9 @@ test('server admin approves a server-scoped request without changing owner opt-i
   const issue = requestIssue();
   const diagnostics = await installGraphqlMocks(page, {
     ...getIssueDetailBaseMocks({ username: 'alice' }),
+    GetPluginManagementCapability: () => ({
+      data: { getPluginManagementCapability: true },
+    }),
     getIssue: () => ({ data: { issues: [issue] } }),
     getIssueActivity: () => ({ data: { issues: [issue] } }),
     approveChannelRuleEnforcement: () => {
@@ -76,13 +79,21 @@ test('server admin approves a server-scoped request without changing owner opt-i
   ).toBe(true);
 });
 
-test('ordinary users cannot approve eligibility', async ({ context, page }) => {
+test('listed admins without plugin-management capability cannot approve eligibility', async ({
+  context,
+  page,
+}) => {
   await installMockAuth(context, page, { username: 'alice' });
   const issue = requestIssue();
-  await installGraphqlMocks(page, {
+  const diagnostics = await installGraphqlMocks(page, {
     ...getIssueDetailBaseMocks({ username: 'alice' }),
+    GetPluginManagementCapability: () => ({
+      data: { getPluginManagementCapability: false },
+    }),
     getServerConfig: () => ({
-      data: { serverConfigs: [buildServerConfig({ Admins: [] })] },
+      data: {
+        serverConfigs: [buildServerConfig({ Admins: [{ username: 'alice' }] })],
+      },
     }),
     getIssue: () => ({ data: { issues: [issue] } }),
     getIssueActivity: () => ({ data: { issues: [issue] } }),
@@ -91,7 +102,35 @@ test('ordinary users cannot approve eligibility', async ({ context, page }) => {
   await expect(
     page.getByRole('heading', { name: 'Forum-rule enforcement request' })
   ).toBeVisible();
+  await expect.poll(() => diagnostics.completedOperations.some(
+    (operation) => operation.operationName === 'GetPluginManagementCapability'
+  )).toBe(true);
   await expect(
     page.getByRole('button', { name: 'Approve eligibility' })
   ).toHaveCount(0);
 });
+
+for (const role of ['root', 'super-admin']) {
+  test(`${role} with resolved capability sees approval without Admins membership`, async ({
+    context,
+    page,
+  }) => {
+    await installMockAuth(context, page, { username: 'alice' });
+    const issue = requestIssue();
+    await installGraphqlMocks(page, {
+      ...getIssueDetailBaseMocks({ username: 'alice' }),
+      getServerConfig: () => ({
+        data: { serverConfigs: [buildServerConfig({ Admins: [] })] },
+      }),
+      GetPluginManagementCapability: () => ({
+        data: { getPluginManagementCapability: true },
+      }),
+      getIssue: () => ({ data: { issues: [issue] } }),
+      getIssueActivity: () => ({ data: { issues: [issue] } }),
+    });
+    await page.goto('/server/issues/1');
+    await expect(
+      page.getByRole('button', { name: 'Approve eligibility' })
+    ).toBeVisible();
+  });
+}

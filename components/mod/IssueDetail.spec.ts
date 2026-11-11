@@ -3,7 +3,8 @@ import { mount } from '@vue/test-utils';
 import { defineComponent, h, ref, nextTick } from 'vue';
 import IssueDetail from './IssueDetail.vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
-import { GetIssueDocument as GET_ISSUE, GetIssueActivityDocument as GET_ISSUE_ACTIVITY, GetChannelDocument as GET_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG , GetIssueRelatedDiscussionDocument as GET_ISSUE_RELATED_DISCUSSION , GetEventDocument as GET_EVENT , GetCommentDocument as GET_COMMENT  } from '@/__generated__/operations';
+import { useUsername } from '@/composables/useAuthState';
+import { GetPluginManagementCapabilityDocument, GetIssueDocument as GET_ISSUE, GetIssueActivityDocument as GET_ISSUE_ACTIVITY, GetChannelDocument as GET_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG , GetIssueRelatedDiscussionDocument as GET_ISSUE_RELATED_DISCUSSION , GetEventDocument as GET_EVENT , GetCommentDocument as GET_COMMENT  } from '@/__generated__/operations';
 
 const routerReplace = vi.fn();
 const refetchIssue = vi.fn();
@@ -41,6 +42,8 @@ const buildIssueResult = () => ({
       relatedEventId: '',
       relatedCommentId: '',
       relatedChannelUniqueName: '',
+      requestKind: null as string | null,
+      requestedPluginId: null as string | null,
       flaggedServerRuleViolation: false,
       SubscribedToNotifications: [],
       ActivityFeed: [],
@@ -56,7 +59,10 @@ const buildIssueResult = () => ({
 const issueResult = ref(buildIssueResult());
 const issueActivityResult = ref(buildIssueResult());
 const channelResult = ref({ channels: [] });
-const serverResult = ref({ serverConfigs: [] });
+const serverResult = ref({ serverConfigs: [] as Array<{ Admins: Array<{ username: string }> }> });
+const pluginCapabilityResult = ref<{ getPluginManagementCapability: boolean } | undefined>({ getPluginManagementCapability: false });
+const pluginCapabilityError = ref<Error | null>(null);
+const pluginCapabilityLoading = ref(false);
 const relatedDiscussionResult = ref({
   discussions: [] as Record<string, unknown>[],
 });
@@ -84,7 +90,7 @@ vi.mock('nuxt/app', () => ({
 vi.mock('@/composables/useAuthState', async () => {
   const { ref } = await import('vue');
   return {
-    useUsername: () => ref('alice'),
+    useUsername: vi.fn(() => ref('alice')),
     useModProfileName: () => ref('mod-alice'),
     useIsAuthenticated: () => ref(true),
     setUsername: vi.fn(),
@@ -236,6 +242,7 @@ const PassThroughStub = defineComponent({
 describe('IssueDetail', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useUsername).mockReturnValue(ref('alice'));
     mockRoute.name = undefined;
     mockedPermissionFlags.isSuspendedMod = false;
     issueResult.value = buildIssueResult();
@@ -243,10 +250,15 @@ describe('IssueDetail', () => {
     refetchIssue.mockResolvedValue(undefined);
     queryError.value = null;
     queryLoading.value = false;
+    pluginCapabilityResult.value = { getPluginManagementCapability: false };
+    pluginCapabilityError.value = null;
+    pluginCapabilityLoading.value = false;
+    serverResult.value = { serverConfigs: [] };
     hasMoreActivityFeed.value = false;
     deleteReasonError.value = '';
 
     const queryResults = new Map<unknown, unknown>([
+      [GetPluginManagementCapabilityDocument, pluginCapabilityResult],
       [GET_ISSUE, issueResult],
       [GET_ISSUE_ACTIVITY, issueActivityResult],
       [GET_CHANNEL, channelResult],
@@ -265,8 +277,8 @@ describe('IssueDetail', () => {
         const result = queryResults.get(document) ?? ref(null);
         return {
           result,
-          error: queryError,
-          loading: queryLoading,
+          error: document === GetPluginManagementCapabilityDocument ? pluginCapabilityError : queryError,
+          loading: document === GetPluginManagementCapabilityDocument ? pluginCapabilityLoading : queryLoading,
           refetch: refetchIssue,
           fetchMore: vi.fn(),
           onResult: vi.fn(),
@@ -333,6 +345,73 @@ describe('IssueDetail', () => {
         },
       },
     });
+
+  it.each([
+    { role: 'root outside the Admins list', capability: true, member: false },
+    { role: 'super-admin outside the Admins list', capability: true, member: false },
+    { role: 'restricted admin', capability: false, member: true },
+    { role: 'suspended admin', capability: false, member: true },
+  ])('uses the resolved plugin capability for $role', ({ capability, member }) => {
+    Object.assign(issueResult.value.issues[0]!, { requestKind: 'CHANNEL_RULE_ENFORCEMENT', requestedPluginId: 'llm-moderation', channelUniqueName: null, relatedChannelUniqueName: 'cats' });
+    serverResult.value = { serverConfigs: [{ Admins: member ? [{ username: 'alice' }] : [] }] };
+    pluginCapabilityResult.value = { getPluginManagementCapability: capability };
+    expect(buildWrapper().findComponent({ name: 'ChannelRuleApproval' }).props('canManagePlugins')).toBe(capability);
+  });
+
+  it.each(['loading', 'error'])('fails closed while plugin capability is %s', (state) => {
+    Object.assign(issueResult.value.issues[0]!, { requestKind: 'CHANNEL_RULE_ENFORCEMENT', requestedPluginId: 'llm-moderation', channelUniqueName: null, relatedChannelUniqueName: 'cats' });
+    pluginCapabilityResult.value = { getPluginManagementCapability: true };
+    pluginCapabilityLoading.value = state === 'loading';
+    pluginCapabilityError.value = state === 'error' ? new Error('Capability lookup failed') : null;
+    expect(buildWrapper().findComponent({ name: 'ChannelRuleApproval' }).props('canManagePlugins')).toBe(false);
+  });
+
+  it('fails closed when the capability result is missing', () => {
+    Object.assign(issueResult.value.issues[0]!, {
+      requestKind: 'CHANNEL_RULE_ENFORCEMENT',
+      requestedPluginId: 'llm-moderation',
+      channelUniqueName: null,
+      relatedChannelUniqueName: 'cats',
+    });
+    pluginCapabilityResult.value = undefined;
+    expect(buildWrapper().findComponent({ name: 'ChannelRuleApproval' }).props('canManagePlugins')).toBe(false);
+  });
+
+  it('does not reuse a prior capability after logging out', () => {
+    Object.assign(issueResult.value.issues[0]!, {
+      requestKind: 'CHANNEL_RULE_ENFORCEMENT',
+      requestedPluginId: 'llm-moderation',
+      channelUniqueName: null,
+      relatedChannelUniqueName: 'cats',
+    });
+    vi.mocked(useUsername).mockReturnValue(ref(''));
+    pluginCapabilityResult.value = { getPluginManagementCapability: true };
+    expect(buildWrapper().findComponent({ name: 'ChannelRuleApproval' }).props('canManagePlugins')).toBe(false);
+  });
+
+  it('resolves authenticated capability without shared or server-side caching', () => {
+    Object.assign(issueResult.value.issues[0]!, {
+      requestKind: 'CHANNEL_RULE_ENFORCEMENT',
+      requestedPluginId: 'llm-moderation',
+      channelUniqueName: null,
+      relatedChannelUniqueName: 'cats',
+    });
+    buildWrapper();
+    const call = vi.mocked(useQuery).mock.calls.find(([document]) => document === GetPluginManagementCapabilityDocument);
+    const options = call?.[2];
+    expect(typeof options === 'function' ? options() : options).toEqual({
+      enabled: true,
+      fetchPolicy: 'no-cache',
+      prefetch: false,
+    });
+  });
+
+  it('does not fetch plugin-management capability for unrelated issues', () => {
+    buildWrapper();
+    const call = vi.mocked(useQuery).mock.calls.find(([document]) => document === GetPluginManagementCapabilityDocument);
+    const options = call?.[2];
+    expect(typeof options === 'function' ? options().enabled : options?.enabled).toBe(false);
+  });
 
   it('does not merge a previous issue timeline after changing selection', () => {
     issueActivityResult.value.issues[0]!.id = 'previous-issue';

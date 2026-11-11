@@ -15,7 +15,7 @@ const props = defineProps<{
     | 'requestKind'
     | 'requestedPluginId'
   >;
-  isServerAdmin: boolean;
+  canManagePlugins: boolean;
 }>();
 const emit = defineEmits<{ approved: [] }>();
 const isRequest = computed(
@@ -58,7 +58,7 @@ onDone(({ data }) => {
 const approve = () => {
   if (
     !isRequest.value ||
-    !props.isServerAdmin ||
+    !props.canManagePlugins ||
     !props.issue.isOpen ||
     loading.value ||
     approved.value
@@ -91,7 +91,7 @@ const approve = () => {
     </p>
     <ClientOnly>
       <PrimaryButton
-        v-if="isServerAdmin && issue.isOpen && !approved"
+        v-if="canManagePlugins && issue.isOpen && !approved"
         :label="loading ? 'Approving…' : 'Approve eligibility'"
         :loading="loading"
         :disabled="loading"

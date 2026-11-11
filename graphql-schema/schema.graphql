@@ -1,4 +1,5 @@
 type Query {
+  getPluginManagementCapability: Boolean!
   getChannelRuleGovernance(channelUniqueName: String!, pluginId: String!): ChannelRuleGovernance!
 
   """

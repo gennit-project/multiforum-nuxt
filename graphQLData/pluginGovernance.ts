@@ -55,3 +55,9 @@ export const REQUEST_CHANNEL_RULE_ENFORCEMENT = gql`
     }
   }
 `;
+
+export const GET_PLUGIN_MANAGEMENT_CAPABILITY = gql`
+  query GetPluginManagementCapability {
+    getPluginManagementCapability
+  }
+`;

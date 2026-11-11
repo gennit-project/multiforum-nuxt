@@ -32,9 +32,9 @@ const issue = {
   requestKind: 'CHANNEL_RULE_ENFORCEMENT',
   requestedPluginId: 'llm-moderation',
 };
-const mountApproval = (overrides = {}, isServerAdmin = true) =>
+const mountApproval = (overrides = {}, canManagePlugins = true) =>
   mount(ChannelRuleApproval, {
-    props: { issue: { ...issue, ...overrides }, isServerAdmin },
+    props: { issue: { ...issue, ...overrides }, canManagePlugins },
     global: { stubs: { ClientOnly: { template: '<slot />' } } },
   });
 beforeEach(() => {
@@ -48,7 +48,7 @@ describe('ChannelRuleApproval', () => {
     await wrapper.get('button').trigger('click');
     expect(mockMutation.mutate).toHaveBeenCalledWith({ issueId: 'request-1' });
   });
-  it('does not offer approval to non-admins', () => {
+  it('does not offer approval without plugin-management capability', () => {
     expect(mountApproval({}, false).find('button').exists()).toBe(false);
   });
   it.each([

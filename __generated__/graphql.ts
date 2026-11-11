@@ -18,6 +18,7 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
+  getPluginManagementCapability: Scalars['Boolean']['output'];
   getChannelRuleGovernance: ChannelRuleGovernance;
   /** Return public collections that include the specified item (e.g. downloads are Discussions with hasDownload=true). */
   publicCollectionsContaining: Array<Collection>;

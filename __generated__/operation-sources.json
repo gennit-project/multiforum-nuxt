@@ -3942,6 +3942,17 @@
       ],
       "fragments": []
     },
+    "graphQLData/pluginGovernance.ts#GET_PLUGIN_MANAGEMENT_CAPABILITY": {
+      "operations": [
+        {
+          "name": "GetPluginManagementCapability",
+          "document": "GetPluginManagementCapabilityDocument",
+          "result": "GetPluginManagementCapabilityQuery",
+          "variables": "GetPluginManagementCapabilityQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
     "graphQLData/scratchpad/mutations.js#CREATE_SCRATCHPAD_ENTRY": {
       "operations": [
         {

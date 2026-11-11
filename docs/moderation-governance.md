@@ -33,9 +33,12 @@ migration automatically and does not copy `serverRuleForumAllowlist` into
 `channelRuleAllowlist`. Flat settings override legacy nested `server` settings.
 
 The backend is authoritative for permission, current eligibility, deduplicating
-requests and opt-in state. The frontend does not use generated channel-plugin
-connect/update mutations for the governed plugin. It also resolves the newest
-server-enabled installation rather than depending on query ordering.
+requests and opt-in state. Approval uses the backend-resolved `canManagePlugins`
+capability, including root, tier-role and suspension rules; membership in the
+public Admins list is not sufficient. Capability lookup failures hide approval.
+The frontend does not use generated channel-plugin connect/update mutations for
+the governed plugin. It also resolves the newest server-enabled installation
+rather than depending on query ordering.
 
 ## Coordinated release
 

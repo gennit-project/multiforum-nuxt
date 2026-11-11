@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GetIssueDocument as GET_ISSUE, GetIssueActivityDocument as GET_ISSUE_ACTIVITY , GetIssueRelatedDiscussionDocument as GET_ISSUE_RELATED_DISCUSSION , GetEventDocument as GET_EVENT , GetCommentDocument as GET_COMMENT , GetChannelDocument as GET_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG  } from '@/__generated__/operations';
+import { GetIssueDocument as GET_ISSUE, GetIssueActivityDocument as GET_ISSUE_ACTIVITY , GetIssueRelatedDiscussionDocument as GET_ISSUE_RELATED_DISCUSSION , GetEventDocument as GET_EVENT , GetCommentDocument as GET_COMMENT , GetChannelDocument as GET_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG, GetPluginManagementCapabilityDocument  } from '@/__generated__/operations';
 
 
 
@@ -289,10 +289,23 @@ const { userPermissions: modPermissions } = useResolvedModPermissions({
   modProfileName: computed(() => modProfileNameVar.value),
 });
 
-const isServerAdmin = computed(() =>
-  !!usernameVar.value && !!serverConfig.value?.Admins?.some(
-    (admin) => admin.username === usernameVar.value
-  )
+// Resolve plugin-management authority on the backend: root, tier roles and
+// suspension rules cannot be inferred from public Admins membership.
+const {
+  result: pluginCapabilityResult,
+  error: pluginCapabilityError,
+  loading: pluginCapabilityLoading,
+} = useQuery(GetPluginManagementCapabilityDocument, null, () => ({
+  enabled: !!usernameVar.value &&
+    activeIssue.value?.requestKind === 'CHANNEL_RULE_ENFORCEMENT' &&
+    activeIssue.value.requestedPluginId === 'llm-moderation',
+  fetchPolicy: 'no-cache',
+  prefetch: false,
+}));
+const canManagePlugins = computed(() =>
+  !!usernameVar.value && activeIssue.value?.requestKind === 'CHANNEL_RULE_ENFORCEMENT' &&
+  !pluginCapabilityLoading.value && !pluginCapabilityError.value &&
+  pluginCapabilityResult.value?.getPluginManagementCapability === true
 );
 
 const isSuspendedMod = computed(() => {
@@ -526,7 +539,7 @@ const handleLockReasonUpdate = (value: string) => {
       v-if="activeIssue"
       :key="activeIssue.id"
       :issue="activeIssue"
-      :is-server-admin="isServerAdmin"
+      :can-manage-plugins="canManagePlugins"
       @approved="resetIssueDetail"
     />
 
