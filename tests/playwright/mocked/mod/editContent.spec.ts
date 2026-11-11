@@ -86,6 +86,7 @@ for (const target of ['comment', 'discussion'] as const) {
         .getByRole('button', { name: 'Review resolution options' })
         .click();
       await page
+        .locator('#issue-resolution-options')
         .getByRole('button', { name: editButtonName, exact: true })
         .click();
       const dialog = page.getByRole('dialog');
@@ -101,6 +102,7 @@ for (const target of ['comment', 'discussion'] as const) {
       await expect(dialog).toHaveCount(0);
       await expect(page).toHaveURL(/\/forums\/cats\/issues\/1$/);
       await page
+        .locator('#issue-resolution-options')
         .getByRole('button', { name: editButtonName, exact: true })
         .click();
       releaseContent();
@@ -114,6 +116,7 @@ for (const target of ['comment', 'discussion'] as const) {
       await body.fill('Cancelled draft');
       await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
       await page
+        .locator('#issue-resolution-options')
         .getByRole('button', { name: editButtonName, exact: true })
         .click();
       await expect(body).toHaveValue('Original body');
