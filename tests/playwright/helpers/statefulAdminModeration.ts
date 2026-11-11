@@ -27,7 +27,7 @@ export const seedAdminModerationScenario = () => {
 
   execFileSync(
     process.execPath,
-    ['--loader', 'ts-node/esm', 'tests/e2e/seedAdminModerationScenario.ts'],
+    ['--import', 'tsx', 'tests/e2e/seedAdminModerationScenario.ts'],
     {
       cwd: backendRoot,
       env: {
