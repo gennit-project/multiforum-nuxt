@@ -3,7 +3,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { flushPromises, mount } from '@vue/test-utils';
 import { useQuery } from '@vue/apollo-composable';
 import EditContentModal from './EditContentModal.vue';
-import { AddIssueActivityFeedItemWithCommentAsModDocument as ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD, UpdateIssueDocument as UPDATE_ISSUE, UpdateCommentDocument as UPDATE_COMMENT , UpdateDiscussionDocument as UPDATE_DISCUSSION , GetDiscussionDocument as GET_DISCUSSION , UpdateEventsDocument as UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS  } from '@/__generated__/operations';
+import {
+  AddIssueActivityFeedItemWithCommentAsModDocument as ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
+  UpdateIssueDocument as UPDATE_ISSUE,
+  UpdateCommentDocument as UPDATE_COMMENT,
+  UpdateDiscussionDocument as UPDATE_DISCUSSION,
+  GetDiscussionDocument as GET_DISCUSSION,
+  UpdateEventsDocument as UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS,
+} from '@/__generated__/operations';
 
 const mockMutate = vi.fn(() => Promise.resolve());
 const mockAddFeed = vi.fn(() => Promise.resolve());
@@ -22,19 +29,35 @@ const { errors, queryData } = vi.hoisted(() => ({
   },
   queryData: {
     value: {
-      comments: [{ text: 'original comment body' }],
-      discussions: [{ title: 'discussion title', body: 'discussion body' }],
-      events: [{ title: 'event title', description: 'event description' }],
+      comments: [{ id: 'comment-1', text: 'original comment body' }],
+      discussions: [
+        { id: 'disc-1', title: 'discussion title', body: 'discussion body' },
+      ],
+      events: [
+        {
+          id: 'event-1',
+          title: 'event title',
+          description: 'event description',
+        },
+      ],
     },
   },
 }));
+
+const mockQueryResult = ref(queryData.value);
+const mockQueryLoading = ref(false);
+const mockQueryError = ref<Error | null>(null);
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn((_doc, variables, options) => {
     // Exercise the reactive variables/options factories (and the computeds they read).
     if (typeof variables === 'function') variables();
     if (typeof options === 'function') options();
-    return { result: queryData };
+    return {
+      result: mockQueryResult,
+      loading: mockQueryLoading,
+      error: mockQueryError,
+    };
   }),
   useMutation: vi.fn((mutation) => {
     const build = (
@@ -42,8 +65,7 @@ vi.mock('@vue/apollo-composable', () => ({
       error: { value: { message: string } | null }
     ) => ({
       mutate: (...args: any[]) => {
-        spy(...args);
-        return Promise.resolve();
+        return spy(...args);
       },
       loading: { value: false },
       error,
@@ -119,7 +141,10 @@ vi.mock('@/components/TextEditor.vue', () => ({
 
 describe('EditContentModal', () => {
   beforeEach(() => {
-    mockMutate.mockClear();
+    mockQueryResult.value = structuredClone(queryData.value);
+    mockQueryLoading.value = false;
+    mockQueryError.value = null;
+    mockMutate.mockReset().mockResolvedValue(undefined);
     mockAddFeed.mockClear();
     mockUpdateIssue.mockClear();
     errors.comment.value = null;
@@ -178,6 +203,19 @@ describe('EditContentModal', () => {
     return exposed;
   };
 
+  it('updates text and reason without changing comment authorship', async () => {
+    const wrapper = mountModal();
+    withRule(wrapper);
+    await (wrapper.vm as any).saveEdits();
+    expect(mockMutate).toHaveBeenCalledWith({
+      updateCommentInput: {
+        text: { set: 'updated body' },
+        editReason: { set: 'Forum rules: Rule 1' },
+      },
+      commentWhere: { id: { eq: 'comment-1' } },
+    });
+  });
+
   it('logs an activity-feed item when editing an event', async () => {
     const wrapper = mountModal({
       targetType: 'event',
@@ -227,6 +265,113 @@ describe('EditContentModal', () => {
     expect((wrapper.vm as any).$?.exposed?.bodyValue.value).toBe(
       'original comment body'
     );
+  });
+
+  it('initializes an already-open modal from matching cached content', () => {
+    const wrapper = mountModal();
+    expect((wrapper.vm as any).bodyValue).toBe('original comment body');
+  });
+
+  it('waits for a cold query before mounting the content editor', async () => {
+    mockQueryResult.value = { comments: [], discussions: [], events: [] };
+    mockQueryLoading.value = true;
+    const wrapper = mountModal();
+    expect(wrapper.findComponent({ name: 'TextEditor' }).exists()).toBe(false);
+  });
+
+  it('initializes from content arriving after the modal opens', async () => {
+    mockQueryResult.value = { comments: [], discussions: [], events: [] };
+    mockQueryLoading.value = true;
+    const wrapper = mountModal();
+    mockQueryResult.value = structuredClone(queryData.value);
+    mockQueryLoading.value = false;
+    await flushPromises();
+    expect(
+      wrapper
+        .findAllComponents({ name: 'TextEditor' })
+        .at(-1)
+        ?.props('initialValue')
+    ).toBe('original comment body');
+  });
+
+  it('does not overwrite a draft when the cache refreshes', async () => {
+    const wrapper = mountModal();
+    await wrapper
+      .findAllComponents({ name: 'TextEditor' })
+      .at(-1)!
+      .vm.$emit('update', 'draft');
+    mockQueryResult.value.comments[0]!.text = 'remote update';
+    await flushPromises();
+    expect((wrapper.vm as any).bodyValue).toBe('draft');
+  });
+
+  it('resets a cancelled draft when reopened', async () => {
+    const wrapper = mountModal();
+    await wrapper
+      .findAllComponents({ name: 'TextEditor' })
+      .at(-1)!
+      .vm.$emit('update', 'draft');
+    await wrapper.setProps({ open: false });
+    await wrapper.setProps({ open: true });
+    expect((wrapper.vm as any).bodyValue).toBe('original comment body');
+  });
+
+  it('does not initialize a different target from stale query data', async () => {
+    const wrapper = mountModal();
+    await wrapper.setProps({ commentId: 'comment-2' });
+    expect(wrapper.findComponent({ name: 'TextEditor' }).exists()).toBe(false);
+  });
+
+  it('does not save while the requested content is loading', async () => {
+    mockQueryLoading.value = true;
+    const wrapper = mountModal();
+    await (wrapper.vm as any).saveEdits();
+    expect(mockMutate).not.toHaveBeenCalled();
+  });
+
+  it('shows content-query errors', () => {
+    mockQueryError.value = new Error('Unable to load comment');
+    const wrapper = mountModal();
+    expect(wrapper.text()).toContain('Unable to load comment');
+  });
+
+  it('keeps cancellation available while content is loading', async () => {
+    mockQueryLoading.value = true;
+    const wrapper = mountModal();
+    await wrapper.find('button').trigger('click');
+    expect(wrapper.emitted('close')).toHaveLength(1);
+  });
+
+  it('finishes a pending save on its original issue without closing a new editor', async () => {
+    let finishSave!: () => void;
+    mockMutate.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          finishSave = resolve;
+        })
+    );
+    const wrapper = mountModal();
+    withRule(wrapper);
+    const pending = (wrapper.vm as any).saveEdits();
+    await wrapper.setProps({ issueId: 'issue-2', commentId: 'comment-2' });
+    finishSave();
+    await pending;
+    expect({
+      issueUpdates: mockUpdateIssue.mock.calls,
+      saved: wrapper.emitted('saved'),
+      closed: wrapper.emitted('close'),
+    }).toEqual({
+      issueUpdates: [
+        [
+          {
+            issueWhere: { id: { eq: 'issue-1' } },
+            updateIssueInput: { flaggedServerRuleViolation: { set: true } },
+          },
+        ],
+      ],
+      saved: undefined,
+      closed: undefined,
+    });
   });
 
   it('defers discussion content until the edit modal opens', () => {

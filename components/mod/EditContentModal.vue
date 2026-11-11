@@ -9,7 +9,16 @@ import PencilIcon from '@/components/icons/PencilIcon.vue';
 import ButtonContent from '@/components/ButtonContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import type { PropType } from 'vue';
-import { GetDiscussionDocument as GET_DISCUSSION, GetEventDocument as GET_EVENT , GetCommentDocument as GET_COMMENT , UpdateCommentDocument as UPDATE_COMMENT , UpdateDiscussionDocument as UPDATE_DISCUSSION , UpdateEventsDocument as UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS , AddIssueActivityFeedItemWithCommentAsModDocument as ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD, UpdateIssueDocument as UPDATE_ISSUE  } from '@/__generated__/operations';
+import {
+  GetDiscussionDocument as GET_DISCUSSION,
+  GetEventDocument as GET_EVENT,
+  GetCommentDocument as GET_COMMENT,
+  UpdateCommentDocument as UPDATE_COMMENT,
+  UpdateDiscussionDocument as UPDATE_DISCUSSION,
+  UpdateEventsDocument as UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS,
+  AddIssueActivityFeedItemWithCommentAsModDocument as ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
+  UpdateIssueDocument as UPDATE_ISSUE,
+} from '@/__generated__/operations';
 
 import { useModProfileName } from '@/composables/useAuthState';
 
@@ -45,7 +54,11 @@ const bodyValue = ref('');
 const validationError = ref('');
 
 // Fetch content per target
-const { result: commentResult } = useQuery(
+const {
+  result: commentResult,
+  loading: commentLoading,
+  error: commentError,
+} = useQuery(
   GET_COMMENT,
   () => ({ id: props.commentId }),
   () => ({
@@ -54,7 +67,11 @@ const { result: commentResult } = useQuery(
   })
 );
 
-const { result: discussionResult } = useQuery(
+const {
+  result: discussionResult,
+  loading: discussionLoading,
+  error: discussionError,
+} = useQuery(
   GET_DISCUSSION,
   () => ({
     id: props.discussionId,
@@ -70,7 +87,11 @@ const { result: discussionResult } = useQuery(
   })
 );
 
-const { result: eventResult } = useQuery(
+const {
+  result: eventResult,
+  loading: eventLoading,
+  error: eventError,
+} = useQuery(
   GET_EVENT,
   () => ({
     id: props.eventId,
@@ -100,18 +121,76 @@ const initialBody = computed(() => {
   return discussionResult.value?.discussions?.[0]?.body || '';
 });
 
+const contentReady = ref(false);
+const editSession = ref(0);
+const contentLoading = computed(() => {
+  if (props.targetType === 'comment') return commentLoading.value;
+  if (props.targetType === 'event') return eventLoading.value;
+  return discussionLoading.value;
+});
+const contentError = computed(() => {
+  if (props.targetType === 'comment') return commentError.value;
+  if (props.targetType === 'event') return eventError.value;
+  return discussionError.value;
+});
+const loadedContentId = computed(() => {
+  if (props.targetType === 'comment')
+    return commentResult.value?.comments?.[0]?.id;
+  if (props.targetType === 'event') return eventResult.value?.events?.[0]?.id;
+  return discussionResult.value?.discussions?.[0]?.id;
+});
+const targetId = computed(() => {
+  if (props.targetType === 'comment') return props.commentId;
+  if (props.targetType === 'event') return props.eventId;
+  return props.discussionId;
+});
+
 watch(
-  () => props.open,
-  (open) => {
-    if (open) {
-      titleValue.value = initialTitle.value;
-      bodyValue.value = initialBody.value;
-      selectedForumRules.value = [];
-      selectedServerRules.value = [];
-      editReason.value = '';
-      validationError.value = '';
-    }
-  }
+  () => [
+    props.open,
+    props.issueId,
+    props.channelUniqueName,
+    props.targetType,
+    targetId.value,
+  ],
+  () => {
+    editSession.value += 1;
+    contentReady.value = false;
+    titleValue.value = '';
+    bodyValue.value = '';
+    selectedForumRules.value = [];
+    selectedServerRules.value = [];
+    editReason.value = '';
+    validationError.value = '';
+  },
+  { immediate: true }
+);
+
+// Initialize each editing session only after the requested content is available.
+// Later cache updates must not overwrite a moderator's in-progress draft.
+watch(
+  [
+    () => props.open,
+    contentReady,
+    loadedContentId,
+    contentLoading,
+    contentError,
+  ],
+  () => {
+    if (
+      !props.open ||
+      contentReady.value ||
+      contentLoading.value ||
+      contentError.value ||
+      !targetId.value ||
+      loadedContentId.value !== targetId.value
+    )
+      return;
+    titleValue.value = initialTitle.value;
+    bodyValue.value = initialBody.value;
+    contentReady.value = true;
+  },
+  { immediate: true }
 );
 
 const toggleSelection = (target: 'forum' | 'server', rule: string) => {
@@ -215,12 +294,26 @@ const buildActivityComment = () => {
 };
 
 const saveEdits = async () => {
+  if (
+    !contentReady.value ||
+    contentLoading.value ||
+    contentError.value ||
+    isLoading.value
+  )
+    return;
   validationError.value = '';
   if (!hasRequiredRules.value) {
     validationError.value = 'Select at least one broken rule.';
     return;
   }
 
+  // Finish an accepted save against its original issue even if navigation or
+  // dismissal starts a new editor while the content mutation is in flight.
+  const session = editSession.value;
+  const issueId = props.issueId;
+  const targetType = props.targetType;
+  const channelUniqueName = props.channelUniqueName;
+  const moderatorName = modProfileNameVar.value || '';
   const editDetails = buildActivityComment();
   if (props.targetType === 'comment') {
     await updateComment({
@@ -258,29 +351,31 @@ const saveEdits = async () => {
     if (updateEventError.value) return;
   }
 
-  if (props.targetType === 'event') {
+  if (targetType === 'event') {
     const actionSummary = 'edited the event.';
 
     await addFeedItem({
-      issueId: props.issueId,
-      actionDescription: `${modProfileNameVar.value} ${actionSummary}`,
+      issueId,
+      actionDescription: `${moderatorName} ${actionSummary}`,
       actionType: 'EDIT_CONTENT',
-      displayName: modProfileNameVar.value || '',
+      displayName: moderatorName,
       commentText: editDetails,
-      channelUniqueName: props.channelUniqueName,
+      channelUniqueName,
       flaggedServerRuleViolation: true,
     });
     if (addFeedItemError.value) return;
   } else {
     await updateIssue({
-      issueWhere: { id: { eq: props.issueId } },
+      issueWhere: { id: { eq: issueId } },
       updateIssueInput: { flaggedServerRuleViolation: { set: true } },
     });
     if (updateIssueError.value) return;
   }
 
-  emit('saved');
-  emit('close');
+  if (session === editSession.value && props.open) {
+    emit('saved');
+    emit('close');
+  }
 };
 
 defineExpose({
@@ -304,7 +399,10 @@ defineExpose({
       <PencilIcon class="h-6 w-6 text-blue-600" />
     </template>
     <template #content>
-      <div class="space-y-4">
+      <p v-if="contentLoading" role="status">Loading content…</p>
+      <ErrorBanner v-else-if="contentError" :text="contentError.message" />
+      <p v-else-if="!contentReady" role="status">Content could not be found.</p>
+      <div v-if="contentReady" :key="editSession" class="space-y-4">
         <div class="space-y-1">
           <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">
             Select broken rules
@@ -366,29 +464,29 @@ defineExpose({
           {{ validationError }}
         </p>
         <ErrorBanner v-if="mutationError" :text="mutationError" />
-
-        <div class="flex justify-end gap-2 pt-2">
-          <button
-            type="button"
-            class="rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
-            @click="emit('close')"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-gray-500"
-            :disabled="isLoading"
-            @click="saveEdits"
-          >
-            <ButtonContent :loading="isLoading">
-              <span class="inline-flex items-center gap-2">
-                <PencilIcon class="h-4 w-4" />
-                Save edits
-              </span>
-            </ButtonContent>
-          </button>
-        </div>
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button
+          type="button"
+          class="rounded border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-200 dark:hover:bg-gray-800"
+          @click="emit('close')"
+        >
+          Cancel
+        </button>
+        <button
+          v-if="contentReady"
+          type="button"
+          class="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-gray-500"
+          :disabled="isLoading || contentLoading || !!contentError"
+          @click="saveEdits"
+        >
+          <ButtonContent :loading="isLoading">
+            <span class="inline-flex items-center gap-2">
+              <PencilIcon class="h-4 w-4" />
+              Save edits
+            </span>
+          </ButtonContent>
+        </button>
       </div>
     </template>
   </GenericModal>

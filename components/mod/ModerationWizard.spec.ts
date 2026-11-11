@@ -369,6 +369,21 @@ describe('ModerationWizard', () => {
     ).toBeDefined();
   });
 
+  it.each([
+    { isSuspendedMod: true },
+    { isLocked: true },
+    { canEditComments: false },
+  ])(
+    'does not open the comment editor for restricted actors/state %o',
+    async (restriction) => {
+      const wrapper = mountWrapper({ ...reportedComment, ...restriction });
+      await wrapper.get('[data-test="edit-comment"]').trigger('click');
+      expect(
+        wrapper.find('[data-testid="edit-modal"][data-open="true"]').exists()
+      ).toBe(false);
+    }
+  );
+
   it('opens the edit modal when the edit action is clicked', async () => {
     const wrapper = mountWrapper(reportedComment);
     await wrapper.get('[data-test="edit-comment"]').trigger('click');
