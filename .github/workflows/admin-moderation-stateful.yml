@@ -2,7 +2,8 @@ name: Stateful admin moderation
 
 # This suite exercises the complete browser -> GraphQL -> Neo4j path. Keep it
 # separate from the fast mocked suite, and run it on PRs as well as regularly
-# so both frontend changes and cross-repo moderation regressions are checked.
+# against the immutable backend revision that produced the frontend schema pin.
+# A companion draft backend may be tested here without merging or deploying it.
 on:
   pull_request:
   workflow_dispatch:
@@ -23,12 +24,23 @@ jobs:
     steps:
       - name: Checkout frontend
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Resolve pinned backend
+        id: backend
+        run: node scripts/stateful-backend-contract.mjs
 
       - name: Checkout backend
         uses: actions/checkout@v4
         with:
           repository: gennit-project/multiforum-backend
+          ref: ${{ steps.backend.outputs.revision }}
           path: .stateful/gennit-backend
+          persist-credentials: false
+
+      - name: Verify backend checkout provenance
+        run: node scripts/stateful-backend-contract.mjs --verify-checkout .stateful/gennit-backend
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -46,6 +58,11 @@ jobs:
 
       - name: Install frontend dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Verify schema pin and stateful checkout tooling
+        run: |
+          pnpm run schema:check
+          node --test scripts/stateful-backend-contract.test.mjs
 
       - name: Install backend dependencies
         # The backend is checked out beneath the frontend workspace. Without

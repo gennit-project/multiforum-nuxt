@@ -64,3 +64,12 @@ merge or deploy a partial slice without reviewing the mixed-version behavior.
 
 Mocked browser tests verify UI and request contracts, not live persistence or
 plugin execution; companion backend/plugin integration tests own those layers.
+
+The stateful admin moderation workflow checks out the exact backend commit in
+`graphql-schema/manifest.json`, verifies its commit and lockfile, and validates
+the schema pin before running the real stack. PR, manual, and scheduled runs use
+the same immutable dependency, rather than the backend's moving `main` branch.
+This allows a coordinated frontend/backend draft to be tested without merging
+either half. It does not prove compatibility with backend `main` or waive the
+release prerequisites above. Update the reviewed schema pin to test a newer
+backend; never replace it with a floating draft branch or skip schema failures.

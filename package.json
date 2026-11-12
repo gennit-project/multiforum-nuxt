@@ -21,7 +21,7 @@
     "graphql:test": "node --test scripts/graphql-operations.test.mjs scripts/graphql-typed-operations.test.mjs scripts/typed-operation-consumers.test.mjs scripts/create-issue-contract.test.mjs",
     "schema:check": "node scripts/check-graphql-schema.mjs",
     "schema:update": "node scripts/update-graphql-schema.mjs",
-    "schema:test": "node --test scripts/graphql-schema-contract.test.mjs",
+    "schema:test": "node --test scripts/graphql-schema-contract.test.mjs scripts/stateful-backend-contract.test.mjs",
     "compile": "node scripts/generate-graphql-types.mjs && pnpm operations:generate",
     "lint": "eslint --cache --cache-location node_modules/.cache/eslint/",
     "lint:a11y": "pnpm exec eslint \"components/**/*.vue\" --quiet --cache --cache-location node_modules/.cache/eslint/",

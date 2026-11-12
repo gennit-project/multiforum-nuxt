@@ -1,4 +1,5 @@
 import { DateTime } from 'luxon';
+import type { IssueWhere } from '@/__generated__/graphql';
 import { createCaseInsensitivePattern } from '@/utils/searchUtils';
 
 /**
@@ -35,8 +36,9 @@ export const isDateInputValue = (value: string | null): value is string => {
 const buildCreatedAtRange = (
   startDate: string,
   endDate: string
-): Record<string, string> => {
-  const createdAtRange: Record<string, string> = {};
+): Pick<IssueWhere, 'createdAt_GTE' | 'createdAt_LTE'> => {
+  const createdAtRange: Pick<IssueWhere, 'createdAt_GTE' | 'createdAt_LTE'> =
+    {};
 
   if (isDateInputValue(startDate)) {
     const createdAtGte = DateTime.fromISO(startDate, {
@@ -64,13 +66,13 @@ const buildCreatedAtRange = (
 };
 
 /**
- * Build the `issueWhere` filter for the open server-issue list: always open,
+ * Build the `issueWhere` filter for a server-issue list (open by default),
  * optionally restricted to flagged server-rule violations, and optionally
  * matched against a case-insensitive title/body search.
  */
 export function buildServerIssueWhere(
   params: ServerIssuesWhereParams
-): Record<string, unknown> {
+): IssueWhere {
   const {
     searchInput,
     selectedChannels,
@@ -78,11 +80,12 @@ export function buildServerIssueWhere(
     endDate,
     showOnlyServerRuleViolations,
     isOpen = true,
-  } =
-    params;
+  } = params;
   const searchPattern = createCaseInsensitivePattern(searchInput);
   const searchFilter = searchPattern
-    ? { OR: [{ title_MATCHES: searchPattern }, { body_MATCHES: searchPattern }] }
+    ? {
+        OR: [{ title_MATCHES: searchPattern }, { body_MATCHES: searchPattern }],
+      }
     : {};
   const channelFilter =
     selectedChannels.length > 0
@@ -90,9 +93,9 @@ export function buildServerIssueWhere(
       : {};
 
   return {
-    isOpen,
+    isOpen: { eq: isOpen },
     ...(showOnlyServerRuleViolations
-      ? { flaggedServerRuleViolation: true }
+      ? { flaggedServerRuleViolation: { eq: true } }
       : {}),
     ...buildCreatedAtRange(startDate, endDate),
     ...channelFilter,
@@ -100,9 +103,9 @@ export function buildServerIssueWhere(
   };
 }
 
-export function buildServerIssuesWhere(
-  params: ServerIssuesWhereParams
-): { issueWhere: Record<string, unknown> } {
+export function buildServerIssuesWhere(params: ServerIssuesWhereParams): {
+  issueWhere: IssueWhere;
+} {
   return {
     issueWhere: buildServerIssueWhere(params),
   };
