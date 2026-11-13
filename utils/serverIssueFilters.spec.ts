@@ -1,16 +1,20 @@
+// @vitest-environment node
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { buildSchema, coerceInputValue, isInputObjectType } from 'graphql';
 import {
   getDefaultServerRuleViolationsFilter,
+  buildServerIssueWhere,
   buildServerIssuesWhere,
   isDateInputValue,
 } from './serverIssueFilters';
 
 describe('getDefaultServerRuleViolationsFilter', () => {
-  it('defaults to true when the query param is absent', () => {
-    expect(getDefaultServerRuleViolationsFilter(undefined)).toBe(true);
+  it('defaults to all issues so governance requests remain discoverable', () => {
+    expect(getDefaultServerRuleViolationsFilter(undefined)).toBe(false);
   });
 
-  it('is false only when explicitly set to "false"', () => {
+  it('is false when explicitly set to "false"', () => {
     expect(getDefaultServerRuleViolationsFilter('false')).toBe(false);
   });
 
@@ -19,7 +23,61 @@ describe('getDefaultServerRuleViolationsFilter', () => {
   });
 });
 
+describe('server issue filter schema contract', () => {
+  const schema = buildSchema(
+    readFileSync(
+      new URL('../graphql-schema/schema.graphql', import.meta.url),
+      'utf8'
+    )
+  );
+  const issueWhereType = schema.getType('IssueWhere');
+  if (!isInputObjectType(issueWhereType))
+    throw new Error('Pinned schema is missing IssueWhere');
+
+  it.each([
+    [true, false],
+    [false, false],
+    [true, true],
+    [false, true],
+  ])(
+    'accepts open=%s and violations=%s with all optional filters',
+    (isOpen, showOnlyServerRuleViolations) => {
+      const filter = buildServerIssueWhere({
+        isOpen,
+        showOnlyServerRuleViolations,
+        searchInput: 'spam',
+        selectedChannels: ['announcements', 'meta'],
+        startDate: '2026-06-01',
+        endDate: '2026-06-30',
+      });
+      expect(coerceInputValue(filter, issueWhereType)).toEqual(filter);
+    }
+  );
+
+  it.each(['isOpen', 'flaggedServerRuleViolation'])(
+    'rejects the former raw boolean shape for %s',
+    (key) => {
+      expect(() => coerceInputValue({ [key]: true }, issueWhereType)).toThrow(
+        /BooleanScalarFilters/
+      );
+    }
+  );
+});
+
 describe('buildServerIssuesWhere', () => {
+  it('preserves an explicit closed-issue filter', () => {
+    expect(
+      buildServerIssueWhere({
+        searchInput: '',
+        selectedChannels: [],
+        startDate: '',
+        endDate: '',
+        showOnlyServerRuleViolations: false,
+        isOpen: false,
+      })
+    ).toEqual({ isOpen: { eq: false } });
+  });
+
   it('always filters to open issues', () => {
     const { issueWhere } = buildServerIssuesWhere({
       searchInput: '',
@@ -28,7 +86,7 @@ describe('buildServerIssuesWhere', () => {
       endDate: '2026-06-30',
       showOnlyServerRuleViolations: false,
     });
-    expect(issueWhere.isOpen).toBe(true);
+    expect(issueWhere.isOpen).toEqual({ eq: true });
   });
 
   it('adds the server-rule-violation flag when enabled', () => {
@@ -39,7 +97,7 @@ describe('buildServerIssuesWhere', () => {
       endDate: '2026-06-30',
       showOnlyServerRuleViolations: true,
     });
-    expect(issueWhere.flaggedServerRuleViolation).toBe(true);
+    expect(issueWhere.flaggedServerRuleViolation).toEqual({ eq: true });
   });
 
   it('omits the violation flag when disabled', () => {

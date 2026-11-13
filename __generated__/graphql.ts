@@ -18,6 +18,8 @@ export type Scalars = {
 
 export type Query = {
   __typename?: 'Query';
+  getPluginManagementCapability: Scalars['Boolean']['output'];
+  getChannelRuleGovernance: ChannelRuleGovernance;
   /** Return public collections that include the specified item (e.g. downloads are Discussions with hasDownload=true). */
   publicCollectionsContaining: Array<Collection>;
   /**
@@ -189,6 +191,12 @@ export type Query = {
   pluginRuns: Array<PluginRun>;
   serverConfigsConnection: ServerConfigsConnection;
   serverConfigs: Array<ServerConfig>;
+};
+
+
+export type QueryGetChannelRuleGovernanceArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  pluginId: Scalars['String']['input'];
 };
 
 
@@ -1377,6 +1385,9 @@ export type Mutation = {
   resumePluginPipelineCampaign: PluginPipelineCampaign;
   clearDownloadableFileScan: DownloadableFile;
   requestDownloadableFileReview: DownloadableFile;
+  setChannelRuleEnforcement: Scalars['Boolean']['output'];
+  requestChannelRuleEnforcement: ChannelRuleEnforcementRequest;
+  approveChannelRuleEnforcement: ChannelRuleEnforcementRequest;
   enableServerPlugin: InstalledPlugin;
   setServerPluginSecret: Scalars['Boolean']['output'];
   updatePluginPipelines: Scalars['JSON']['output'];
@@ -2292,6 +2303,24 @@ export type MutationClearDownloadableFileScanArgs = {
 export type MutationRequestDownloadableFileReviewArgs = {
   downloadableFileId: Scalars['ID']['input'];
   reason?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationSetChannelRuleEnforcementArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  pluginId: Scalars['String']['input'];
+  enabled: Scalars['Boolean']['input'];
+};
+
+
+export type MutationRequestChannelRuleEnforcementArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  pluginId: Scalars['String']['input'];
+};
+
+
+export type MutationApproveChannelRuleEnforcementArgs = {
+  issueId: Scalars['ID']['input'];
 };
 
 
@@ -4336,6 +4365,10 @@ export type ChannelIssueIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -4551,6 +4584,31 @@ export type ChannelRolesConnection = {
   totalCount: Scalars['Int']['output'];
   pageInfo: PageInfo;
   aggregate: ChannelRoleAggregate;
+};
+
+export type ChannelRuleEnforcementRequest = {
+  __typename?: 'ChannelRuleEnforcementRequest';
+  id: Scalars['ID']['output'];
+  issueNumber: Scalars['Int']['output'];
+  channelUniqueName: Scalars['String']['output'];
+  pluginId: Scalars['String']['output'];
+  isOpen: Scalars['Boolean']['output'];
+};
+
+export type ChannelRuleGovernance = {
+  __typename?: 'ChannelRuleGovernance';
+  pluginId: Scalars['String']['output'];
+  version?: Maybe<Scalars['String']['output']>;
+  serverRuleEnforcement: Scalars['String']['output'];
+  serverRulesApply: Scalars['Boolean']['output'];
+  channelRuleEligibility: Scalars['String']['output'];
+  channelRuleAllowlist: Array<Scalars['String']['output']>;
+  eligible: Scalars['Boolean']['output'];
+  ownerEnabled: Scalars['Boolean']['output'];
+  canRequest: Scalars['Boolean']['output'];
+  pendingRequestId?: Maybe<Scalars['ID']['output']>;
+  pendingRequestNumber?: Maybe<Scalars['Int']['output']>;
+  migrationRequired: Scalars['Boolean']['output'];
 };
 
 export type ChannelsConnection = {
@@ -5708,6 +5766,10 @@ export type CommentIssueRelatedIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -6983,6 +7045,10 @@ export type DiscussionChannelIssueRelatedIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -8366,6 +8432,10 @@ export type EventChannelIssueRelatedIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -8551,6 +8621,10 @@ export type EventIssueRelatedIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -9535,6 +9609,10 @@ export type ImageIssueRelatedIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -9693,6 +9771,10 @@ export type Issue = {
   relatedChannelBannerName?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  requestKind?: Maybe<Scalars['String']['output']>;
+  requestedPluginId?: Maybe<Scalars['String']['output']>;
+  channelRuleApprovedAt?: Maybe<Scalars['DateTime']['output']>;
+  channelRuleApprovedBy?: Maybe<Scalars['String']['output']>;
   flaggedServerRuleViolation?: Maybe<Scalars['Boolean']['output']>;
   locked?: Maybe<Scalars['Boolean']['output']>;
   lockedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -9802,6 +9884,10 @@ export type IssueAggregateNode = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };
@@ -10683,6 +10769,10 @@ export type ModerationProfileIssueAuthoredIssuesNodeAggregateSelection = {
   relatedChannelBannerName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
+  requestKind: StringAggregateSelection;
+  requestedPluginId: StringAggregateSelection;
+  channelRuleApprovedAt: DateTimeAggregateSelection;
+  channelRuleApprovedBy: StringAggregateSelection;
   lockedAt: DateTimeAggregateSelection;
   lockReason: StringAggregateSelection;
 };

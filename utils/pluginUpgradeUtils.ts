@@ -1,4 +1,8 @@
-import { getPluginFormSections, getSettingsDefaults } from './pluginManifestUtils';
+import {
+  getPluginFormSections,
+  getSettingsDefaults,
+  parseSettingsJson,
+} from './pluginManifestUtils';
 import type { PluginField } from '@/types/pluginForms';
 
 export interface PluginUpgradeReport {
@@ -74,11 +78,31 @@ export function buildPluginUpgradePreview(params: {
   oldSettings: Record<string, unknown>;
   newManifest?: unknown;
 }): PluginUpgradePreview {
-  const { oldSettings, newManifest } = params;
+  const { newManifest } = params;
+  const oldSettings = { ...params.oldSettings };
   const defaults = getSettingsDefaults(newManifest, 'server');
   const fields = getPluginFormSections(newManifest, 'server')
     .flatMap((section) => section.fields)
     .filter((field) => field.type !== 'secret');
+  // The backend normalizes only governance keys from the legacy nested scope.
+  // Do not mutate the installed settings or lift unrelated nested settings.
+  if (fields.some((field) => field.key === 'serverRuleEnforcement')) {
+    const nested = parseSettingsJson(oldSettings.server);
+    for (const key of [
+      'serverRuleCheckMode',
+      'serverRuleForumAllowlist',
+      'serverRuleEnforcement',
+      'channelRuleEligibility',
+      'channelRuleAllowlist',
+    ]) {
+      if (
+        !Object.prototype.hasOwnProperty.call(oldSettings, key) &&
+        Object.prototype.hasOwnProperty.call(nested, key)
+      ) {
+        oldSettings[key] = nested[key];
+      }
+    }
+  }
   const fieldsByKey = new Map(fields.map((field) => [field.key, field]));
   const settings = { ...defaults };
   const report: PluginUpgradeReport = {
@@ -107,6 +131,25 @@ export function buildPluginUpgradePreview(params: {
     } else {
       settings[key] = value;
       report.carried.push(key);
+    }
+  }
+
+  // Keep upgrade review aligned with backend reconcileSettings: an upgrade
+  // alone must not turn a legacy server-rule trial into global enforcement.
+  if (
+    fields.some((field) => field.key === 'serverRuleEnforcement') &&
+    Object.prototype.hasOwnProperty.call(oldSettings, 'serverRuleCheckMode') &&
+    !Object.prototype.hasOwnProperty.call(oldSettings, 'serverRuleEnforcement')
+  ) {
+    delete settings.serverRuleEnforcement;
+    report.newDefaults = report.newDefaults.filter(
+      (key) => key !== 'serverRuleEnforcement'
+    );
+    for (const key of ['serverRuleCheckMode', 'serverRuleForumAllowlist']) {
+      if (!Object.prototype.hasOwnProperty.call(oldSettings, key)) continue;
+      settings[key] = oldSettings[key];
+      report.dropped = report.dropped.filter((dropped) => dropped !== key);
+      if (!report.carried.includes(key)) report.carried.push(key);
     }
   }
 

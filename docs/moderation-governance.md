@@ -1,0 +1,77 @@
+# Moderation rule governance
+
+Frontend issue: https://github.com/gennit-project/multiforum-nuxt/issues/720
+Backend issue: https://github.com/gennit-project/multiforum-backend/issues/433
+
+The moderation plugin has two independent rule scopes:
+
+- Server admins select `serverRuleEnforcement: on | off | allowlist`. `on` applies server
+  rules in every forum while the server plugin is enabled. Forum owners cannot
+  change this scope. `allowlist` uses the separate `serverRuleForumAllowlist`;
+  an empty list covers no forums.
+- Server admins select `channelRuleEligibility: all | none | allowlist`, with
+  `channelRuleAllowlist` containing forum unique names. An empty allowlist permits
+  no forums.
+- Eligible owners explicitly opt into checks against their own forum's rules.
+  An owner's saved opt-in is inactive while the server policy disallows it.
+- An ineligible owner can request access under `allowlist` policy. The request is
+  a server issue (`channelUniqueName: null`) with a related forum and plugin slug.
+  Admin approval adds eligibility and closes the request. It never opts in for
+  the owner.
+
+## Version and migration boundary
+
+These controls require moderation plugin **0.8.0 or later** and the companion
+backend governance APIs. Older installations show an upgrade message instead
+of sending settings their runtime cannot interpret. Plugin database IDs remain
+in routes; governance APIs receive the canonical `llm-moderation` slug.
+
+Legacy `off`, `all_forums` and `allowlist` map to `off`, `on` and `allowlist`
+without broadening scope. `serverRuleForumAllowlist` is retained independently
+of `channelRuleAllowlist`; legacy JSON/comma-separated lists are normalized.
+Absent forum eligibility remains all, preserving existing owner opt-ins such as
+`bad_advice`. Approval only adds eligibility, never owner opt-in or server scope.
+Flat settings override nested `server` settings. The backend's `serverRulesApply`
+status tells owners whether mandatory server rules apply in their own forum.
+
+The backend is authoritative for permission, current eligibility, deduplicating
+requests and opt-in state. Approval uses the backend-resolved `canManagePlugins`
+capability, including root, tier-role and suspension rules; membership in the
+public Admins list is not sufficient. Capability lookup failures hide approval.
+The frontend does not use generated channel-plugin connect/update mutations for
+the governed plugin. It also resolves the newest server-enabled installation
+rather than depending on query ordering.
+
+## Coordinated release
+
+1. Publish the reviewed backend containing the new schema, governance permission
+   checks and runtime scope enforcement.
+2. Publish the reviewed moderation plugin 0.8.0 artifact and registry entry.
+3. Release this frontend against its reviewed pinned backend schema.
+4. Upgrade the installed moderation plugin, review carried settings, explicitly
+   retain the existing server-rule scope/list, and save the desired policy.
+
+These are release prerequisites, not actions performed by this change. Do not
+merge or deploy a partial slice without reviewing the mixed-version behavior.
+
+## Verification
+
+- `pnpm schema:check`, `pnpm compile`, `pnpm graphql:check`,
+  `pnpm operations:check`, `pnpm operations:contract:check`, `pnpm tsc`.
+- Unit coverage in `pluginGovernance`, `ChannelRuleGovernance`,
+  `ChannelRuleApproval`, upgrade preview and server issue navigation tests.
+- Mocked Playwright: `channels/channelRuleGovernance.spec.ts`,
+  `issues/channelRuleApproval.spec.ts`, and the moderation-governance cases in
+  `admin/pluginDetail.spec.ts`.
+
+Mocked browser tests verify UI and request contracts, not live persistence or
+plugin execution; companion backend/plugin integration tests own those layers.
+
+The stateful admin moderation workflow checks out the exact backend commit in
+`graphql-schema/manifest.json`, verifies its commit and lockfile, and validates
+the schema pin before running the real stack. PR, manual, and scheduled runs use
+the same immutable dependency, rather than the backend's moving `main` branch.
+This allows a coordinated frontend/backend draft to be tested without merging
+either half. It does not prove compatibility with backend `main` or waive the
+release prerequisites above. Update the reviewed schema pin to test a newer
+backend; never replace it with a floating draft branch or skip schema failures.

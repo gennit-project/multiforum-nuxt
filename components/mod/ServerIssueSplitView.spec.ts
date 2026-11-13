@@ -74,6 +74,13 @@ describe('ServerIssueSplitView', () => {
     expect(wrapper.findComponent(IssueDetail).props('channelId')).toBe('cats');
   });
 
+  it('opens server-scoped issues in the detail pane and links to the server route', () => {
+    h.selectedIssueNumber.value = 7;
+    h.selectedIssueChannelId.value = '';
+    const wrapper = mountView(true);
+    expect({ detail: wrapper.findComponent(IssueDetail).exists(), href: wrapper.get('a').attributes('href') }).toEqual({ detail: true, href: '/server/issues/7' });
+  });
+
   it('links to the standalone issue page for the selected issue', () => {
     h.selectedIssueNumber.value = 7;
     h.selectedIssueChannelId.value = 'cats';

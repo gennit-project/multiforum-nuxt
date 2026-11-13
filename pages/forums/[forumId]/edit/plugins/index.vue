@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { GetInstalledPluginsQuery } from '@/__generated__/operations';
+import { hasRuleGovernance } from '@/utils/pluginGovernance';
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
@@ -83,7 +84,7 @@ type ServerPlugin = GetInstalledPluginsQuery['getInstalledPlugins'][number];
 
 const serverEnabledPlugins = computed((): ServerPlugin[] => {
   const installed = installedResult.value?.getInstalledPlugins || [];
-  return installed.filter((plugin: ServerPlugin) => plugin.enabled);
+  return installed.filter((plugin: ServerPlugin) => plugin.enabled || hasRuleGovernance(plugin.plugin.name));
 });
 
 type ConsolidatedPlugin = {
@@ -487,13 +488,13 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
                   }}
                 </NuxtLink>
                 <span
-                  v-if="isAnyVersionEnabled(consolidated)"
+                  v-if="!hasRuleGovernance(consolidated.plugin.name) && isAnyVersionEnabled(consolidated)"
                   class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-200"
                 >
                   Enabled
                 </span>
                 <span
-                  v-else
+                  v-else-if="!hasRuleGovernance(consolidated.plugin.name)"
                   class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-700 dark:text-gray-300"
                 >
                   Disabled
@@ -508,7 +509,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
 
             <div class="flex shrink-0 items-center gap-3">
               <!-- Version selector -->
-              <div class="flex items-center gap-2">
+              <div v-if="!hasRuleGovernance(consolidated.plugin.name)" class="flex items-center gap-2">
                 <label
                   :for="`version-${consolidated.plugin.id}`"
                   class="text-sm text-gray-600 dark:text-gray-400"
@@ -549,7 +550,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
               </div>
 
               <!-- Enable/Disable toggle -->
-              <label class="flex cursor-pointer items-center gap-2">
+              <label v-if="!hasRuleGovernance(consolidated.plugin.name)" class="flex cursor-pointer items-center gap-2">
                 <input
                   type="checkbox"
                   class="text-brand-600 focus:ring-brand-500 h-4 w-4 rounded border-gray-300"
@@ -577,7 +578,7 @@ async function handleToggleEnabled(plugin: ServerPlugin, enabled: boolean) {
                 :to="`/forums/${channelUniqueName}/edit/plugins/${consolidated.plugin.id}`"
                 class="rounded-md bg-gray-100 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
               >
-                Configure
+                {{ hasRuleGovernance(consolidated.plugin.name) ? 'Rule enforcement' : 'Configure' }}
               </NuxtLink>
             </div>
           </div>

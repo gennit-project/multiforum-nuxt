@@ -185,7 +185,7 @@ describe('useServerIssueList', () => {
       filterIReported: false,
       isOpen: false,
       selectedChannels: [],
-      showOnlyServerRuleViolations: true,
+      showOnlyServerRuleViolations: false,
     });
   });
 
@@ -216,7 +216,7 @@ describe('useServerIssueList', () => {
         selectedChannels: ['cats', 'dogs'],
         startDate: null,
         endDate: null,
-        showOnlyServerRuleViolations: true,
+        showOnlyServerRuleViolations: false,
         isOpen: true,
         filterCreatedByMe: false,
         filterIAmOP: false,

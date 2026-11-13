@@ -2,6 +2,8 @@
 import { computed, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
+import ChannelRuleGovernance from '@/components/plugins/ChannelRuleGovernance.vue';
+import { hasRuleGovernance, supportsRuleGovernance, selectGovernanceInstallation } from '@/utils/pluginGovernance';
 import FormRow from '@/components/FormRow.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import PluginSettingsForm from '@/components/plugins/PluginSettingsForm.vue';
@@ -101,15 +103,16 @@ const enabledPluginsById = computed(() => {
   return map;
 });
 
+const isGovernancePlugin = computed(() => hasRuleGovernance(plugin.value?.plugin.name || ''));
+
 const serverEnabledPlugins = computed(() => {
   const installed = installedResult.value?.getInstalledPlugins || [];
-  return installed.filter((plugin) => plugin.enabled);
+  return installed.filter((plugin) => plugin.enabled || hasRuleGovernance(plugin.plugin.name));
 });
 
 const plugin = computed(() => {
-  return serverEnabledPlugins.value.find(
-    (p) => p.plugin.id === pluginId.value
-  );
+  const matches = serverEnabledPlugins.value.filter((p) => p.plugin.id === pluginId.value);
+  return hasRuleGovernance(matches[0]?.plugin.name || '') ? selectGovernanceInstallation(matches) : matches[0];
 });
 
 const pluginState = ref<PluginState>({ enabled: false, settings: {} });
@@ -293,7 +296,7 @@ function updateBotProfiles(profiles: BotProfile[]) {
 // Filter out profilesJson from channel sections when it's a bot plugin
 // since we handle it with the custom editor
 const filteredChannelSections = computed<PluginFormSection[]>(() => {
-  if (!plugin.value?.manifest) return [];
+  if (!plugin.value?.manifest || isGovernancePlugin.value) return [];
   const sections = getPluginFormSections(plugin.value.manifest, 'channel');
   return filterChannelSectionsForBot(sections, isBotPlugin.value);
 });
@@ -383,8 +386,21 @@ const hasFilteredChannelSettings = computed(() => {
         </div>
       </div>
 
+      <ChannelRuleGovernance
+        v-if="isGovernancePlugin && supportsRuleGovernance(plugin.version)"
+        :key="`${channelUniqueName}:${pluginId}`"
+        :channel-unique-name="channelUniqueName"
+        :plugin-id="plugin.plugin.name"
+        @changed="refetchChannel()"
+      />
+
+      <p v-else-if="isGovernancePlugin" role="status" class="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-200">
+        A server admin must upgrade this moderation plugin to version 0.8.0 or later before you can manage channel-rule enforcement. Existing moderation settings are unchanged.
+      </p>
+
       <!-- Enable/Disable Status Card (Prominent like server-scoped page) -->
       <div
+        v-if="!isGovernancePlugin"
         :class="[
           'rounded-xl border-2 p-6 transition-all',
           isEnabled
@@ -456,7 +472,7 @@ const hasFilteredChannelSettings = computed(() => {
 
       <!-- Bot Profiles Section (for bot plugins) -->
       <FormRow
-        v-if="isBotPlugin && serverBotName"
+        v-if="!isGovernancePlugin && isBotPlugin && serverBotName"
         section-title="Bot Profiles"
         description="Configure bot personalities for this forum. Each profile creates a separate bot user with its own identity and behavior."
       >
@@ -491,7 +507,7 @@ const hasFilteredChannelSettings = computed(() => {
 
       <!-- Bot Plugin Missing Bot Name Warning -->
       <FormRow
-        v-if="isBotPlugin && !serverBotName"
+        v-if="!isGovernancePlugin && isBotPlugin && !serverBotName"
         section-title="Bot Profiles"
         description="Configure bot personalities for this forum."
       >

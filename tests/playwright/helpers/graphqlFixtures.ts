@@ -963,7 +963,9 @@ export type IssueFixture = {
   relatedWikiRevisionId: string | null;
   relatedChannelUniqueName: string | null;
   relatedModProfileName: string | null;
-  channelUniqueName: string;
+  channelUniqueName: string | null;
+  requestKind: string | null;
+  requestedPluginId: string | null;
   Author: { __typename: 'User'; username: string };
   flaggedServerRuleViolation: boolean;
   SubscribedToNotifications: Array<{ username: string }>;
@@ -987,7 +989,7 @@ export const buildIssue = ({
   overrides = {},
 }: {
   issueNumber?: number;
-  channelUniqueName?: string;
+  channelUniqueName?: string | null;
   title?: string;
   body?: string;
   isOpen?: boolean;
@@ -1011,6 +1013,8 @@ export const buildIssue = ({
   relatedWikiPageId: null,
   relatedWikiRevisionId: null,
   relatedChannelUniqueName: null,
+  requestKind: null,
+  requestedPluginId: null,
   relatedModProfileName: null,
   channelUniqueName,
   Author: { __typename: 'User', username: authorUsername },

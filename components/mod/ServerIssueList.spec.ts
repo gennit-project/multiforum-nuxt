@@ -149,11 +149,11 @@ describe('ServerIssueList', () => {
     expect(mockedUseQuery.mock.calls[0][1].value.isOpen).toBe(false);
   });
 
-  it('passes the default server-rule-violations state to the filter bar', async () => {
+  it('shows all server issues by default so eligibility requests are visible', async () => {
     const wrapper = await mountWith();
     expect(
       wrapper.getComponent(IssueFilterBar).props('showOnlyServerRuleViolations')
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it('passes the opt-out server-rule-violations state to the filter bar', async () => {

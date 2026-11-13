@@ -77,7 +77,7 @@ export function useIssueActivityFeed({
     const requestedNumber = issueNumber?.value;
     const result = await fetchMoreIssue({
       variables: {
-        channelUniqueName: channelId.value,
+        channelUniqueName: channelId.value || null,
         issueNumber: issueNumber?.value ?? 0,
         activityFeedLimit: pageSize,
         activityFeedOffset: previousCount,
@@ -128,7 +128,7 @@ export function useIssueActivityFeed({
 
       // Attempt to read the existing issues from the cache
       const variables: GetIssueActivityQueryVariables = {
-        channelUniqueName: updatedIssue.channelUniqueName || '',
+        channelUniqueName: updatedIssue.channelUniqueName || null,
         issueNumber: updatedIssue.issueNumber,
       };
 

@@ -1,4 +1,7 @@
 type Query {
+  getPluginManagementCapability: Boolean!
+  getChannelRuleGovernance(channelUniqueName: String!, pluginId: String!): ChannelRuleGovernance!
+
   """
   Return public collections that include the specified item (e.g. downloads are Discussions with hasDownload=true).
   """
@@ -318,6 +321,9 @@ type Mutation {
   resumePluginPipelineCampaign(campaignId: ID!): PluginPipelineCampaign!
   clearDownloadableFileScan(downloadableFileId: ID!, reason: String): DownloadableFile!
   requestDownloadableFileReview(downloadableFileId: ID!, reason: String): DownloadableFile!
+  setChannelRuleEnforcement(channelUniqueName: String!, pluginId: String!, enabled: Boolean!): Boolean!
+  requestChannelRuleEnforcement(channelUniqueName: String!, pluginId: String!): ChannelRuleEnforcementRequest!
+  approveChannelRuleEnforcement(issueId: ID!): ChannelRuleEnforcementRequest!
   enableServerPlugin(pluginId: String!, version: String!, enabled: Boolean!, settingsJson: JSON): InstalledPlugin!
   setServerPluginSecret(pluginId: String!, key: String!, value: String!): Boolean!
   updatePluginPipelines(pipelines: [EventPipelineInput!]!): JSON!
@@ -1296,6 +1302,10 @@ type ChannelIssueIssuesNodeAggregateSelection {
   relatedChannelBannerName: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
+  requestKind: StringAggregateSelection!
+  requestedPluginId: StringAggregateSelection!
+  channelRuleApprovedAt: DateTimeAggregateSelection!
+  channelRuleApprovedBy: StringAggregateSelection!
   lockedAt: DateTimeAggregateSelection!
   lockReason: StringAggregateSelection!
 }
@@ -1483,6 +1493,29 @@ type ChannelRolesConnection {
   totalCount: Int!
   pageInfo: PageInfo!
   aggregate: ChannelRoleAggregate!
+}
+
+type ChannelRuleEnforcementRequest {
+  id: ID!
+  issueNumber: Int!
+  channelUniqueName: String!
+  pluginId: String!
+  isOpen: Boolean!
+}
+
+type ChannelRuleGovernance {
+  pluginId: String!
+  version: String
+  serverRuleEnforcement: String!
+  serverRulesApply: Boolean!
+  channelRuleEligibility: String!
+  channelRuleAllowlist: [String!]!
+  eligible: Boolean!
+  ownerEnabled: Boolean!
+  canRequest: Boolean!
+  pendingRequestId: ID
+  pendingRequestNumber: Int
+  migrationRequired: Boolean!
 }
 
 type ChannelsConnection {
@@ -2284,6 +2317,10 @@ type CommentIssueRelatedIssuesNodeAggregateSelection {
   relatedChannelBannerName: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
+  requestKind: StringAggregateSelection!
+  requestedPluginId: StringAggregateSelection!
+  channelRuleApprovedAt: DateTimeAggregateSelection!
+  channelRuleApprovedBy: StringAggregateSelection!
   lockedAt: DateTimeAggregateSelection!
   lockReason: StringAggregateSelection!
 }
@@ -3149,6 +3186,10 @@ type DiscussionChannelIssueRelatedIssuesNodeAggregateSelection {
   relatedChannelBannerName: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
+  requestKind: StringAggregateSelection!
+  requestedPluginId: StringAggregateSelection!
+  channelRuleApprovedAt: DateTimeAggregateSelection!
+  channelRuleApprovedBy: StringAggregateSelection!
   lockedAt: DateTimeAggregateSelection!
   lockReason: StringAggregateSelection!
 }
@@ -4166,6 +4207,10 @@ type EventChannelIssueRelatedIssuesNodeAggregateSelection {
   relatedChannelBannerName: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
+  requestKind: StringAggregateSelection!
+  requestedPluginId: StringAggregateSelection!
+  channelRuleApprovedAt: DateTimeAggregateSelection!
+  channelRuleApprovedBy: StringAggregateSelection!
   lockedAt: DateTimeAggregateSelection!
   lockReason: StringAggregateSelection!
 }
@@ -4327,6 +4372,10 @@ type EventIssueRelatedIssuesNodeAggregateSelection {
   relatedChannelBannerName: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
+  requestKind: StringAggregateSelection!
+  requestedPluginId: StringAggregateSelection!
+  channelRuleApprovedAt: DateTimeAggregateSelection!
+  channelRuleApprovedBy: StringAggregateSelection!
   lockedAt: DateTimeAggregateSelection!
   lockReason: StringAggregateSelection!
 }
@@ -5077,6 +5126,10 @@ type ImageIssueRelatedIssuesNodeAggregateSelection {
   relatedChannelBannerName: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
+  requestKind: StringAggregateSelection!
+  requestedPluginId: StringAggregateSelection!
+  channelRuleApprovedAt: DateTimeAggregateSelection!
+  channelRuleApprovedBy: StringAggregateSelection!
   lockedAt: DateTimeAggregateSelection!
   lockReason: StringAggregateSelection!
 }
@@ -5219,6 +5272,10 @@ type Issue {
   relatedChannelBannerName: String
   createdAt: DateTime!
   updatedAt: DateTime
+  requestKind: String
+  requestedPluginId: String
+  channelRuleApprovedAt: DateTime
+  channelRuleApprovedBy: String
   flaggedServerRuleViolation: Boolean
   locked: Boolean
   lockedAt: DateTime
@@ -5291,6 +5348,10 @@ type IssueAggregateNode {
   relatedChannelBannerName: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
+  requestKind: StringAggregateSelection!
+  requestedPluginId: StringAggregateSelection!
+  channelRuleApprovedAt: DateTimeAggregateSelection!
+  channelRuleApprovedBy: StringAggregateSelection!
   lockedAt: DateTimeAggregateSelection!
   lockReason: StringAggregateSelection!
 }
@@ -5961,6 +6022,10 @@ type ModerationProfileIssueAuthoredIssuesNodeAggregateSelection {
   relatedChannelBannerName: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
+  requestKind: StringAggregateSelection!
+  requestedPluginId: StringAggregateSelection!
+  channelRuleApprovedAt: DateTimeAggregateSelection!
+  channelRuleApprovedBy: StringAggregateSelection!
   lockedAt: DateTimeAggregateSelection!
   lockReason: StringAggregateSelection!
 }

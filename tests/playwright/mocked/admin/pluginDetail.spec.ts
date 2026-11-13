@@ -313,3 +313,122 @@ test.describe('Server plugin detail', () => {
     }
   });
 });
+
+test.describe('Moderation governance settings', () => {
+  const governanceId = 'uuid-moderation-plugin';
+  const available = buildPlugin({ id: governanceId, name: 'llm-moderation' });
+  const governanceMocks = (
+    settings: Record<string, unknown>,
+    saved: unknown[],
+    version = '0.8.0'
+  ) => ({
+    ...getBaseMocks(TEST_USER),
+    GetPlugins: () => ({ data: { plugins: [available] } }),
+    GetPluginDetail: () => ({ data: { plugins: [available] } }),
+    GetInstalledPlugins: () => ({
+      data: {
+        getInstalledPlugins: [
+          buildInstalledPlugin({
+            plugin: available,
+            version,
+            manifest: {},
+            settingsJson: settings,
+          }),
+        ],
+      },
+    }),
+    getChannelNames: () => ({
+      data: {
+        channels: [
+          {
+            __typename: 'Channel',
+            uniqueName: 'cats',
+            displayName: 'Cats',
+            channelIconURL: '',
+            description: '',
+            eventsEnabled: true,
+          },
+        ],
+      },
+    }),
+    EnableServerPlugin: ({
+      body,
+    }: {
+      body: { variables?: Record<string, unknown> };
+    }) => {
+      saved.push(body.variables);
+      Object.assign(settings, body.variables?.settingsJson);
+      return {
+        data: {
+          enableServerPlugin: buildInstalledPlugin({
+            plugin: available,
+            version,
+            manifest: {},
+            settingsJson: settings,
+          }),
+        },
+      };
+    },
+  });
+
+  test('preserves legacy server scope independently of forum-rule eligibility', async ({
+    context,
+    page,
+  }) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+    const saved: unknown[] = [];
+    await installGraphqlMocks(
+      page,
+      governanceMocks(
+        {
+          serverRuleCheckMode: 'allowlist',
+          serverRuleForumAllowlist: ['cats'],
+        },
+        saved
+      )
+    );
+    await page.goto(`/admin/settings/plugins/${governanceId}`);
+    await expect(
+      page.getByLabel('Server-rule enforcement', { exact: false })
+    ).toHaveValue('allowlist');
+    await page
+      .getByLabel('Channel-rule eligibility', { exact: false })
+      .selectOption('none');
+    await page
+      .getByRole('button', { name: 'Save Settings', exact: true })
+      .click();
+    await expect.poll(() => saved.length).toBe(1);
+    expect(saved[0]).toMatchObject({
+      pluginId: 'llm-moderation',
+      version: '0.8.0',
+      settingsJson: {
+        serverRuleEnforcement: 'allowlist',
+        serverRuleForumAllowlist: ['cats'],
+        channelRuleEligibility: 'none',
+        channelRuleAllowlist: [],
+      },
+    });
+    await expectNoAxeViolations(page);
+  });
+
+  test('blocks governance controls for an older runtime', async ({
+    context,
+    page,
+  }) => {
+    await installMockAuth(context, page, {
+      username: TEST_USER,
+      email: 'alice@example.com',
+    });
+    await installGraphqlMocks(page, governanceMocks({}, [], '0.7.1'));
+    await page.goto(`/admin/settings/plugins/${governanceId}`);
+    await expect(
+      page.getByText('Upgrade this moderation plugin to version 0.8.0 or later')
+    ).toBeVisible();
+    await expect(
+      page.getByLabel('Server-rule enforcement', { exact: false })
+    ).toHaveCount(0);
+  });
+});

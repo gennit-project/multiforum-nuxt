@@ -30,12 +30,16 @@ const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 const mountNav = async (open: number, closed: number) => {
   mockedUseQuery
     .mockReturnValueOnce({
-      result: ref({ issuesConnection: { aggregate: { count: { nodes: open } } } }),
+      result: ref({
+        issuesConnection: { aggregate: { count: { nodes: open } } },
+      }),
       error: ref(null),
       loading: ref(false),
     })
     .mockReturnValueOnce({
-      result: ref({ issuesConnection: { aggregate: { count: { nodes: closed } } } }),
+      result: ref({
+        issuesConnection: { aggregate: { count: { nodes: closed } } },
+      }),
       error: ref(null),
       loading: ref(false),
     });
@@ -72,8 +76,7 @@ describe('ServerIssueTabNav', () => {
     await mountNav(5, 3);
 
     expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).toMatchObject({
-      isOpen: true,
-      flaggedServerRuleViolation: true,
+      isOpen: { eq: true },
       createdAt_GTE: '2026-05-01T00:00:00.000Z',
       createdAt_LTE: '2026-07-01T23:59:59.999Z',
     });
@@ -88,6 +91,16 @@ describe('ServerIssueTabNav', () => {
     expect(mockedUseQuery.mock.calls[0][1].value.issueWhere).not.toHaveProperty(
       'createdAt_GTE'
     );
+  });
+
+  it('uses boolean scalar filters for the closed and violation-only counts', async () => {
+    h.query.showOnlyServerRuleViolations = 'true';
+    await mountNav(5, 3);
+
+    expect(mockedUseQuery.mock.calls[1][1].value.issueWhere).toMatchObject({
+      isOpen: { eq: false },
+      flaggedServerRuleViolation: { eq: true },
+    });
   });
 
   it('shows the open issue count from the aggregate', async () => {

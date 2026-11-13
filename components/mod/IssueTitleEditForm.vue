@@ -36,7 +36,7 @@ const {
 } = useQuery(
   GET_ISSUE,
   () => ({
-    channelUniqueName: channelId.value,
+    channelUniqueName: channelId.value || null,
     issueNumber: issueNumber.value ?? 0,
   }),
   () => ({

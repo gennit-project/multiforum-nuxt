@@ -3267,6 +3267,17 @@
       ],
       "fragments": []
     },
+    "graphQLData/issue/mutations.js#APPROVE_CHANNEL_RULE_ENFORCEMENT": {
+      "operations": [
+        {
+          "name": "approveChannelRuleEnforcement",
+          "document": "ApproveChannelRuleEnforcementDocument",
+          "result": "ApproveChannelRuleEnforcementMutation",
+          "variables": "ApproveChannelRuleEnforcementMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
     "graphQLData/issue/queries.js#ISSUE_BASE_FIELDS": {
       "operations": [],
       "fragments": [
@@ -3894,6 +3905,50 @@
           "document": "GetGeneralNotificationsDocument",
           "result": "GetGeneralNotificationsQuery",
           "variables": "GetGeneralNotificationsQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/pluginGovernance.ts#GET_CHANNEL_RULE_GOVERNANCE": {
+      "operations": [
+        {
+          "name": "GetChannelRuleGovernance",
+          "document": "GetChannelRuleGovernanceDocument",
+          "result": "GetChannelRuleGovernanceQuery",
+          "variables": "GetChannelRuleGovernanceQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/pluginGovernance.ts#SET_CHANNEL_RULE_ENFORCEMENT": {
+      "operations": [
+        {
+          "name": "SetChannelRuleEnforcement",
+          "document": "SetChannelRuleEnforcementDocument",
+          "result": "SetChannelRuleEnforcementMutation",
+          "variables": "SetChannelRuleEnforcementMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/pluginGovernance.ts#REQUEST_CHANNEL_RULE_ENFORCEMENT": {
+      "operations": [
+        {
+          "name": "RequestChannelRuleEnforcement",
+          "document": "RequestChannelRuleEnforcementDocument",
+          "result": "RequestChannelRuleEnforcementMutation",
+          "variables": "RequestChannelRuleEnforcementMutationVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/pluginGovernance.ts#GET_PLUGIN_MANAGEMENT_CAPABILITY": {
+      "operations": [
+        {
+          "name": "GetPluginManagementCapability",
+          "document": "GetPluginManagementCapabilityDocument",
+          "result": "GetPluginManagementCapabilityQuery",
+          "variables": "GetPluginManagementCapabilityQueryVariables"
         }
       ],
       "fragments": []

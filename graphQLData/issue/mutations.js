@@ -465,3 +465,15 @@ export const PERMANENTLY_REMOVE_IMAGE = gql`
     }
   }
 `;
+
+export const APPROVE_CHANNEL_RULE_ENFORCEMENT = gql`
+  mutation approveChannelRuleEnforcement($issueId: ID!) {
+    approveChannelRuleEnforcement(issueId: $issueId) {
+      id
+      issueNumber
+      channelUniqueName
+      pluginId
+      isOpen
+    }
+  }
+`;

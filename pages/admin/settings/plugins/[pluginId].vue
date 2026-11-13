@@ -1,4 +1,11 @@
 <script setup lang="ts">
+import {
+  hasRuleGovernance,
+  supportsRuleGovernance,
+  selectGovernanceAdminInstallation,
+  getGovernanceServerSections,
+  initializeGovernanceSettings,
+} from '@/utils/pluginGovernance';
 import type { GetServerPluginSecretsQuery } from '@/__generated__/operations';
 import { ref, computed, nextTick, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -55,7 +62,15 @@ import type {
   PluginSecretStatus as PluginSecretStatusType,
   PluginSettings,
 } from '@/types/pluginForms';
-import { GetPluginsDocument as GET_AVAILABLE_PLUGINS, GetInstalledPluginsDocument as GET_INSTALLED_PLUGINS, GetServerPluginSecretsDocument as GET_SERVER_PLUGIN_SECRETS, GetPluginDetailDocument as GET_PLUGIN_DETAIL, InstallPluginVersionDocument as INSTALL_PLUGIN_VERSION, EnableServerPluginDocument as ENABLE_SERVER_PLUGIN, SetServerPluginSecretDocument as SET_SERVER_PLUGIN_SECRET  } from '@/__generated__/operations';
+import {
+  GetPluginsDocument as GET_AVAILABLE_PLUGINS,
+  GetInstalledPluginsDocument as GET_INSTALLED_PLUGINS,
+  GetServerPluginSecretsDocument as GET_SERVER_PLUGIN_SECRETS,
+  GetPluginDetailDocument as GET_PLUGIN_DETAIL,
+  InstallPluginVersionDocument as INSTALL_PLUGIN_VERSION,
+  EnableServerPluginDocument as ENABLE_SERVER_PLUGIN,
+  SetServerPluginSecretDocument as SET_SERVER_PLUGIN_SECRET,
+} from '@/__generated__/operations';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -63,7 +78,9 @@ definePageMeta({
 });
 
 const route = useRoute();
-const pluginId = computed(() => typeof route.params.pluginId === 'string' ? route.params.pluginId : '');
+const pluginId = computed(() =>
+  typeof route.params.pluginId === 'string' ? route.params.pluginId : ''
+);
 
 // Toast notifications
 const toast = useToast();
@@ -82,7 +99,10 @@ const pendingUpgrade = ref<{
   secrets: Array<{ key: string; isSet: boolean }>;
 } | null>(null);
 
-type PluginSecretStatus = GetServerPluginSecretsQuery['getServerPluginSecrets'][number] & { required?: boolean };
+type PluginSecretStatus =
+  GetServerPluginSecretsQuery['getServerPluginSecrets'][number] & {
+    required?: boolean;
+  };
 
 // Queries
 const {
@@ -116,8 +136,23 @@ const { mutate: enableMutation, loading: enabling } =
 const { mutate: setSecretMutation } = useMutation(SET_SERVER_PLUGIN_SECRET);
 
 // Core computed properties needed for secrets query
-const plugin = computed(() => pluginsResult.value?.plugins.find((p) => p.id === pluginId.value));
-const installedPlugin = computed(() => installedResult.value?.getInstalledPlugins.find((p) => p.plugin.id === pluginId.value) || null);
+const plugin = computed(() =>
+  pluginsResult.value?.plugins.find((p) => p.id === pluginId.value)
+);
+const installedPlugin = computed(() => {
+  const matches =
+    installedResult.value?.getInstalledPlugins.filter(
+      (p) => p.plugin.id === pluginId.value
+    ) || [];
+  return (
+    (hasRuleGovernance(matches[0]?.plugin.name || '')
+      ? selectGovernanceAdminInstallation({
+          plugins: matches,
+          selectedVersion: selectedVersion.value,
+        })
+      : matches[0]) || null
+  );
+});
 
 // Plugin slug (name) used for secrets - must be defined before secrets query
 const pluginSlug = computed(() => {
@@ -210,7 +245,11 @@ const pluginLicense = computed(() => pluginMeta.value.license);
 const pluginTags = computed(() => pluginMeta.value.tags);
 
 // Get versions with full details from the plugin detail query
-const pluginDetailVersions = computed(() => pluginDetailResult.value?.plugins.find((p) => p.id === pluginId.value)?.Versions || []);
+const pluginDetailVersions = computed(
+  () =>
+    pluginDetailResult.value?.plugins.find((p) => p.id === pluginId.value)
+      ?.Versions || []
+);
 
 const pluginReadme = computed(() =>
   resolvePluginReadme({
@@ -222,7 +261,12 @@ const pluginReadme = computed(() =>
 
 // Extract server settings form sections from the plugin manifest
 const serverSettingsSections = computed((): PluginFormSection[] =>
-  getPluginFormSections(installedPlugin.value?.manifest, 'server')
+  (hasRuleGovernance(installedPlugin.value?.plugin.name || '')
+    ? supportsRuleGovernance(installedVersion.value)
+      ? getGovernanceServerSections(installedPlugin.value?.manifest)
+      : []
+    : getPluginFormSections(installedPlugin.value?.manifest, 'server')
+  )
     .map((section) => ({
       ...section,
       fields: section.fields.filter(
@@ -252,7 +296,12 @@ const pluginRepoUrl = computed(() => {
   const currentVersion = versions.find(
     (v) => v.version === (selectedVersion.value || installedVersion.value)
   );
-  return currentVersion?.sourceRepoUrl || pluginDetailVersions.value.find((version) => version.version === currentVersion?.version)?.repoUrl;
+  return (
+    currentVersion?.sourceRepoUrl ||
+    pluginDetailVersions.value.find(
+      (version) => version.version === currentVersion?.version
+    )?.repoUrl
+  );
 });
 
 const selectedVersionMetadata = computed(() => {
@@ -263,7 +312,9 @@ const selectedVersionMetadata = computed(() => {
 });
 
 const pluginRegistryUrl = computed(
-  () => installedPlugin.value?.registryUrl || selectedVersionMetadata.value?.registryUrl
+  () =>
+    installedPlugin.value?.registryUrl ||
+    selectedVersionMetadata.value?.registryUrl
 );
 const pluginReleaseNotesUrl = computed(
   () =>
@@ -271,7 +322,9 @@ const pluginReleaseNotesUrl = computed(
     selectedVersionMetadata.value?.releaseNotesUrl
 );
 const pluginSourceCommit = computed(
-  () => installedPlugin.value?.sourceCommit || selectedVersionMetadata.value?.sourceCommit
+  () =>
+    installedPlugin.value?.sourceCommit ||
+    selectedVersionMetadata.value?.sourceCommit
 );
 const pluginMinServerVersion = computed(
   () =>
@@ -279,7 +332,9 @@ const pluginMinServerVersion = computed(
     selectedVersionMetadata.value?.minServerVersion
 );
 const pluginApiVersion = computed(
-  () => installedPlugin.value?.apiVersion || selectedVersionMetadata.value?.apiVersion
+  () =>
+    installedPlugin.value?.apiVersion ||
+    selectedVersionMetadata.value?.apiVersion
 );
 
 const canEnable = computed(() => {
@@ -293,7 +348,8 @@ const availableVersions = computed(() =>
 const compatibilityByVersion = computed(() =>
   availableVersions.value.reduce(
     (compatibilityMap, version) => {
-      compatibilityMap[version.version] = getPluginVersionCompatibility(version);
+      compatibilityMap[version.version] =
+        getPluginVersionCompatibility(version);
       return compatibilityMap;
     },
     {} as Record<string, PluginVersionCompatibility>
@@ -369,8 +425,12 @@ watch(
 watch(
   installedPlugin,
   (newInstalledPlugin) => {
-    if (newInstalledPlugin?.settingsJson) {
-      settingsValues.value = parseSettingsJson(newInstalledPlugin.settingsJson);
+    if (newInstalledPlugin) {
+      settingsValues.value =
+        hasRuleGovernance(newInstalledPlugin.plugin.name) &&
+        supportsRuleGovernance(newInstalledPlugin.version)
+          ? initializeGovernanceSettings(newInstalledPlugin.settingsJson)
+          : parseSettingsJson(newInstalledPlugin.settingsJson);
     }
   },
   { immediate: true }
@@ -455,8 +515,7 @@ const handleInstall = async (versionOverride?: string) => {
       .map((secret) => ({
         key: secret.key,
         isSet: storedSecrets.value.some(
-          (stored) =>
-            stored.key === secret.key && stored.status !== 'NOT_SET'
+          (stored) => stored.key === secret.key && stored.status !== 'NOT_SET'
         ),
       }));
     pendingUpgrade.value = {
@@ -500,12 +559,16 @@ const handleToggleEnabled = async (enabled: boolean) => {
     const message = err instanceof Error ? err.message : '';
     if (message.includes('Missing required secrets')) {
       toast.error('Cannot enable: missing required secrets');
-    } else if (message.includes('PLUGIN_MISCONFIGURED_REQUIRED_SECRET_MISSING')) {
+    } else if (
+      message.includes('PLUGIN_MISCONFIGURED_REQUIRED_SECRET_MISSING')
+    ) {
       toast.error('Plugin misconfigured: required secrets missing');
     } else if (message.includes('PLUGIN_CONFIG_INCOMPLETE')) {
       toast.error('Cannot enable: complete all required plugin configuration');
     } else {
-      toast.error(`${enabled ? 'Enable' : 'Disable'} failed: ${message || 'Unknown error'}`);
+      toast.error(
+        `${enabled ? 'Enable' : 'Disable'} failed: ${message || 'Unknown error'}`
+      );
     }
   }
 };
@@ -538,7 +601,10 @@ const handleSetSecret = async (key: string, value: string) => {
 const handleFocusConfigField = async (field: PluginConfigFieldStatus) => {
   await nextTick();
   const control = document.getElementById(
-    getPluginConfigFieldId({ kind: field.kind === 'SECRET' ? 'SECRET' : 'SETTING', key: field.key })
+    getPluginConfigFieldId({
+      kind: field.kind === 'SECRET' ? 'SECRET' : 'SETTING',
+      key: field.key,
+    })
   );
   if (!control) return;
 
@@ -717,6 +783,21 @@ const handleSaveSettings = async () => {
               Loading secrets...
             </div>
           </div>
+
+          <p
+            v-if="
+              isInstalled &&
+              hasRuleGovernance(installedPlugin?.plugin.name || '') &&
+              !supportsRuleGovernance(installedVersion)
+            "
+            role="status"
+            class="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-200"
+          >
+            Upgrade this moderation plugin to version 0.8.0 or later to
+            configure server-rule enforcement scope and channel-rule
+            eligibility. Existing settings remain unchanged until you upgrade
+            and save the new policy.
+          </p>
 
           <!-- Server Settings Section -->
           <PluginSettingsSection

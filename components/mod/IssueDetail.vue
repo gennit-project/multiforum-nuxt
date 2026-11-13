@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, defineAsyncComponent, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GetIssueDocument as GET_ISSUE, GetIssueActivityDocument as GET_ISSUE_ACTIVITY , GetIssueRelatedDiscussionDocument as GET_ISSUE_RELATED_DISCUSSION , GetEventDocument as GET_EVENT , GetCommentDocument as GET_COMMENT , GetChannelDocument as GET_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG  } from '@/__generated__/operations';
+import { GetIssueDocument as GET_ISSUE, GetIssueActivityDocument as GET_ISSUE_ACTIVITY , GetIssueRelatedDiscussionDocument as GET_ISSUE_RELATED_DISCUSSION , GetEventDocument as GET_EVENT , GetCommentDocument as GET_COMMENT , GetChannelDocument as GET_CHANNEL , GetServerConfigDocument as GET_SERVER_CONFIG, GetPluginManagementCapabilityDocument  } from '@/__generated__/operations';
 
 
 
@@ -18,6 +18,7 @@ import IssueLockDialog from '@/components/mod/IssueLockDialog.vue';
 import IssueCommentForm from '@/components/mod/IssueCommentForm.vue';
 import IssueBodyEditor from '@/components/mod/IssueBodyEditor.vue';
 import IssueRelatedContent from '@/components/mod/IssueRelatedContent.vue';
+import ChannelRuleApproval from '@/components/mod/ChannelRuleApproval.vue';
 import IssueRelatedChannel from '@/components/mod/IssueRelatedChannel.vue';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { useRoute } from 'nuxt/app';
@@ -103,7 +104,7 @@ const {
 } = useQuery(
   GET_ISSUE,
   () => ({
-    channelUniqueName: channelId.value,
+    channelUniqueName: channelId.value || null,
     issueNumber: issueNumber.value ?? 0,
   }),
   () => ({
@@ -123,7 +124,7 @@ const {
 } = useQuery(
   GET_ISSUE_ACTIVITY,
   () => ({
-    channelUniqueName: channelId.value,
+    channelUniqueName: channelId.value || null,
     issueNumber: issueNumber.value ?? 0,
     activityFeedLimit: ACTIVITY_FEED_PAGE_SIZE,
     activityFeedOffset: 0,
@@ -164,7 +165,8 @@ const activeIssue = computed<Issue | null>(() => {
   const issueSummary = getIssueResult.value.issues[0];
   if (!issueSummary) return null;
 
-  const issueActivity = getIssueActivityResult.value?.issues?.[0];
+  const activityResult = getIssueActivityResult.value?.issues?.[0];
+  const issueActivity = activityResult?.id === issueSummary.id ? activityResult : null;
   return {
     ...issueSummary,
     ActivityFeed: issueActivity?.ActivityFeed ?? [],
@@ -286,6 +288,25 @@ const { userPermissions: modPermissions } = useResolvedModPermissions({
   username: computed(() => usernameVar.value),
   modProfileName: computed(() => modProfileNameVar.value),
 });
+
+// Resolve plugin-management authority on the backend: root, tier roles and
+// suspension rules cannot be inferred from public Admins membership.
+const {
+  result: pluginCapabilityResult,
+  error: pluginCapabilityError,
+  loading: pluginCapabilityLoading,
+} = useQuery(GetPluginManagementCapabilityDocument, null, () => ({
+  enabled: !!usernameVar.value &&
+    activeIssue.value?.requestKind === 'CHANNEL_RULE_ENFORCEMENT' &&
+    activeIssue.value.requestedPluginId === 'llm-moderation',
+  fetchPolicy: 'no-cache',
+  prefetch: false,
+}));
+const canManagePlugins = computed(() =>
+  !!usernameVar.value && activeIssue.value?.requestKind === 'CHANNEL_RULE_ENFORCEMENT' &&
+  !pluginCapabilityLoading.value && !pluginCapabilityError.value &&
+  pluginCapabilityResult.value?.getPluginManagementCapability === true
+);
 
 const isSuspendedMod = computed(() => {
   return modPermissions.value.isSuspendedMod ?? false;
@@ -512,6 +533,14 @@ const handleLockReasonUpdate = (value: string) => {
       @toggle-close-open="toggleCloseOpenIssue"
       @open-lock-dialog="openLockDialog"
       @unlock-issue="handleUnlockIssue"
+    />
+
+    <ChannelRuleApproval
+      v-if="activeIssue"
+      :key="activeIssue.id"
+      :issue="activeIssue"
+      :can-manage-plugins="canManagePlugins"
+      @approved="resetIssueDetail"
     />
 
     <!-- Lock Status Banner -->
