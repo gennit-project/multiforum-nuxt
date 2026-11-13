@@ -4600,6 +4600,7 @@ export type ChannelRuleGovernance = {
   pluginId: Scalars['String']['output'];
   version?: Maybe<Scalars['String']['output']>;
   serverRuleEnforcement: Scalars['String']['output'];
+  serverRulesApply: Scalars['Boolean']['output'];
   channelRuleEligibility: Scalars['String']['output'];
   channelRuleAllowlist: Array<Scalars['String']['output']>;
   eligible: Scalars['Boolean']['output'];

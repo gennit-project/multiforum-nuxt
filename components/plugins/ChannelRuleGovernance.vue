@@ -123,17 +123,13 @@ const requestEligibility = () => {
     </p>
     <template v-else-if="status">
       <p class="text-sm text-gray-700 dark:text-gray-300">
-        <template v-if="status.migrationRequired"
-          >Server-rule enforcement uses a legacy allowlist. A server admin must
-          choose global On or Off.</template
-        >
-        <template v-else-if="status.serverRuleEnforcement === 'on'"
-          >Server rules are enforced in every forum. Only server admins can
-          change this.</template
+        <template v-if="status.serverRulesApply"
+          >Server rules are mandatory in this forum. Only server admins can
+          change the server-rule scope.</template
         >
         <template v-else
-          >Server-rule enforcement is off. Only server admins can change
-          this.</template
+          >This forum is outside the server-rule enforcement scope. Only server
+          admins can change that scope.</template
         >
       </p>
       <p

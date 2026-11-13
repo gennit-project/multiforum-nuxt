@@ -4,8 +4,8 @@
   "lockfileSha256": "7c5e77f6ab917360eac30eef4fca011fc9494514d154e064b88d3aa46136dc28",
   "pinnedSchema": {
     "repository": "gennit-project/multiforum-backend",
-    "revision": "2b4f6d4ba9b497688663dc62d8bb79f8f6c32b5e",
-    "sha256": "1948fe219029cab6af40703f794b9f5a9e41a735fb9652e17330559454e6dfff"
+    "revision": "89f3f7404a53d52a8242ef2791571a153d1661bf",
+    "sha256": "a52ca28534972c3008de63cfaaa034aee88c595a3c44067bd6154a0c8364a781"
   },
   "sources": [
     {
@@ -122,7 +122,7 @@
     },
     {
       "file": "graphQLData/pluginGovernance.ts",
-      "sha256": "356a91f0a1254f670027e7b2b285429ea45ac6e46cd46d2125d5159d6e1dc08e"
+      "sha256": "b29465fcee7d0a0224909008e3a0a94f3b1a54b92b7ee7d282e968dec5fc62d5"
     },
     {
       "file": "graphQLData/scratchpad/mutations.js",
@@ -2651,13 +2651,13 @@
       "file": "graphQLData/pluginGovernance.ts",
       "line": 3,
       "column": 44,
-      "sha256": "da505b04e1981e1c177b489eda8aaad7fe97b9f39aadf21d8946d2d350928c6f",
-      "source": "query GetChannelRuleGovernance($channelUniqueName: String!, $pluginId: String!) {\n  getChannelRuleGovernance(\n    channelUniqueName: $channelUniqueName\n    pluginId: $pluginId\n  ) {\n    pluginId\n    version\n    serverRuleEnforcement\n    channelRuleEligibility\n    channelRuleAllowlist\n    eligible\n    ownerEnabled\n    canRequest\n    pendingRequestId\n    pendingRequestNumber\n    migrationRequired\n  }\n}"
+      "sha256": "641530bcd339b7739ec1ac9431715c8f923c8a9b32cf5c80cf39206cb85c71ff",
+      "source": "query GetChannelRuleGovernance($channelUniqueName: String!, $pluginId: String!) {\n  getChannelRuleGovernance(\n    channelUniqueName: $channelUniqueName\n    pluginId: $pluginId\n  ) {\n    pluginId\n    version\n    serverRuleEnforcement\n    serverRulesApply\n    channelRuleEligibility\n    channelRuleAllowlist\n    eligible\n    ownerEnabled\n    canRequest\n    pendingRequestId\n    pendingRequestNumber\n    migrationRequired\n  }\n}"
     },
     {
       "id": "graphQLData/pluginGovernance.ts#SET_CHANNEL_RULE_ENFORCEMENT",
       "file": "graphQLData/pluginGovernance.ts",
-      "line": 27,
+      "line": 28,
       "column": 45,
       "sha256": "9758f623e2a694438d549285f09a91ef9ce1a6ebedc16366ecc66c1b7c40d39d",
       "source": "mutation SetChannelRuleEnforcement($channelUniqueName: String!, $pluginId: String!, $enabled: Boolean!) {\n  setChannelRuleEnforcement(\n    channelUniqueName: $channelUniqueName\n    pluginId: $pluginId\n    enabled: $enabled\n  )\n}"
@@ -2665,7 +2665,7 @@
     {
       "id": "graphQLData/pluginGovernance.ts#REQUEST_CHANNEL_RULE_ENFORCEMENT",
       "file": "graphQLData/pluginGovernance.ts",
-      "line": 41,
+      "line": 42,
       "column": 49,
       "sha256": "0e2ea182bd5f926aa3df9da3f384096ecf679458c3d8cc4132b674944d963d03",
       "source": "mutation RequestChannelRuleEnforcement($channelUniqueName: String!, $pluginId: String!) {\n  requestChannelRuleEnforcement(\n    channelUniqueName: $channelUniqueName\n    pluginId: $pluginId\n  ) {\n    id\n    issueNumber\n    channelUniqueName\n    pluginId\n    isOpen\n  }\n}"
@@ -2673,7 +2673,7 @@
     {
       "id": "graphQLData/pluginGovernance.ts#GET_PLUGIN_MANAGEMENT_CAPABILITY",
       "file": "graphQLData/pluginGovernance.ts",
-      "line": 59,
+      "line": 60,
       "column": 49,
       "sha256": "0e098a7ad6b13707626fad72529c70ba803587c03b4010492839e0f488b55459",
       "source": "query GetPluginManagementCapability {\n  getPluginManagementCapability\n}"

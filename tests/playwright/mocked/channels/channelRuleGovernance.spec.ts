@@ -33,6 +33,7 @@ const baseStatus = () => ({
   pluginId: PLUGIN,
   version: '0.8.0',
   serverRuleEnforcement: 'on',
+  serverRulesApply: true,
   channelRuleEligibility: 'allowlist',
   channelRuleAllowlist: [],
   eligible: false,
@@ -139,7 +140,7 @@ test('owner requests eligibility, sees pending server issue, then explicitly opt
   await checkbox.click();
   await expect(checkbox).not.toBeChecked();
   await expect(
-    page.getByText('Server rules are enforced in every forum.')
+    page.getByText('Server rules are mandatory in this forum.')
   ).toBeVisible();
 });
 

@@ -52,6 +52,7 @@ const base = () => ({
   pluginId: 'llm-moderation',
   version: '0.4.0',
   serverRuleEnforcement: 'on',
+  serverRulesApply: true,
   channelRuleEligibility: 'all',
   channelRuleAllowlist: [],
   eligible: true,
@@ -91,7 +92,9 @@ describe('channel rule governance', () => {
   it('shows server enforcement as informational text, not an owner control', () => {
     const wrapper = mountPanel();
     expect({
-      text: wrapper.text().includes('Only server admins can change this'),
+      text: wrapper
+        .text()
+        .includes('Only server admins can change the server-rule scope'),
       controls: wrapper.findAll('input').length,
     }).toEqual({ text: true, controls: 1 });
   });
@@ -193,3 +196,20 @@ describe('channel rule governance', () => {
     );
   });
 });
+
+it.each([true, false])(
+  'shows forum-specific server coverage without changing owner controls: %s',
+  (applies) => {
+    Object.assign(status(), {
+      serverRuleEnforcement: 'allowlist',
+      serverRulesApply: applies,
+    });
+    const wrapper = mountPanel();
+    expect({
+      covered: wrapper
+        .text()
+        .includes('Server rules are mandatory in this forum.'),
+      controls: wrapper.findAll('input').length,
+    }).toEqual({ covered: applies, controls: 1 });
+  }
+);

@@ -12,6 +12,7 @@ export const GET_CHANNEL_RULE_GOVERNANCE = gql`
       pluginId
       version
       serverRuleEnforcement
+      serverRulesApply
       channelRuleEligibility
       channelRuleAllowlist
       eligible

@@ -5,9 +5,10 @@ Backend issue: https://github.com/gennit-project/multiforum-backend/issues/433
 
 The moderation plugin has two independent rule scopes:
 
-- Server admins select `serverRuleEnforcement: on | off`. `on` applies server
+- Server admins select `serverRuleEnforcement: on | off | allowlist`. `on` applies server
   rules in every forum while the server plugin is enabled. Forum owners cannot
-  change this scope.
+  change this scope. `allowlist` uses the separate `serverRuleForumAllowlist`;
+  an empty list covers no forums.
 - Server admins select `channelRuleEligibility: all | none | allowlist`, with
   `channelRuleAllowlist` containing forum unique names. An empty allowlist permits
   no forums.
@@ -25,12 +26,13 @@ backend governance APIs. Older installations show an upgrade message instead
 of sending settings their runtime cannot interpret. Plugin database IDs remain
 in routes; governance APIs receive the canonical `llm-moderation` slug.
 
-A legacy `serverRuleCheckMode: allowlist` means server rules were checked only
-in selected forums. It is **not** equivalent to the new channel eligibility
-allowlist. Preserve the legacy scope through a carried-settings upgrade, then
-ask the admin to explicitly choose global On or Off. The UI does not choose that
-migration automatically and does not copy `serverRuleForumAllowlist` into
-`channelRuleAllowlist`. Flat settings override legacy nested `server` settings.
+Legacy `off`, `all_forums` and `allowlist` map to `off`, `on` and `allowlist`
+without broadening scope. `serverRuleForumAllowlist` is retained independently
+of `channelRuleAllowlist`; legacy JSON/comma-separated lists are normalized.
+Absent forum eligibility remains all, preserving existing owner opt-ins such as
+`bad_advice`. Approval only adds eligibility, never owner opt-in or server scope.
+Flat settings override nested `server` settings. The backend's `serverRulesApply`
+status tells owners whether mandatory server rules apply in their own forum.
 
 The backend is authoritative for permission, current eligibility, deduplicating
 requests and opt-in state. Approval uses the backend-resolved `canManagePlugins`
@@ -47,7 +49,7 @@ rather than depending on query ordering.
 2. Publish the reviewed moderation plugin 0.8.0 artifact and registry entry.
 3. Release this frontend against its reviewed pinned backend schema.
 4. Upgrade the installed moderation plugin, review carried settings, explicitly
-   resolve any legacy server-rule allowlist, and save the desired policy.
+   retain the existing server-rule scope/list, and save the desired policy.
 
 These are release prerequisites, not actions performed by this change. Do not
 merge or deploy a partial slice without reviewing the mixed-version behavior.

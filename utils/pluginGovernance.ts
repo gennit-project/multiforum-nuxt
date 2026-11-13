@@ -31,12 +31,22 @@ const effectiveGovernanceSettings = (settings: unknown) => {
 const hasOwn = (values: Record<string, unknown>, key: string) =>
   Object.prototype.hasOwnProperty.call(values, key);
 
-export function requiresGovernanceMigration(settings: unknown): boolean {
-  const values = effectiveGovernanceSettings(settings);
-  return (
-    !hasOwn(values, 'serverRuleEnforcement') &&
-    values.serverRuleCheckMode === 'allowlist'
-  );
+function normalizeServerAllowlist(value: unknown): string[] {
+  let list = value;
+  if (typeof list === 'string') {
+    const encoded = list;
+    try {
+      list = JSON.parse(encoded);
+    } catch {
+      list = encoded.split(',');
+    }
+  }
+  return Array.isArray(list)
+    ? list
+        .filter((item): item is string => typeof item === 'string')
+        .map((item) => item.trim())
+        .filter(Boolean)
+    : [];
 }
 
 /** Never reinterpret a legacy server-rule allowlist as channel eligibility. */
@@ -49,10 +59,13 @@ export function initializeGovernanceSettings(
     serverRuleEnforcement: hasOwn(values, 'serverRuleEnforcement')
       ? (values.serverRuleEnforcement ?? '')
       : values.serverRuleCheckMode === 'allowlist'
-        ? ''
+        ? 'allowlist'
         : values.serverRuleCheckMode === 'all_forums'
           ? 'on'
           : 'off',
+    serverRuleForumAllowlist: normalizeServerAllowlist(
+      values.serverRuleForumAllowlist
+    ),
     channelRuleEligibility: hasOwn(values, 'channelRuleEligibility')
       ? (values.channelRuleEligibility ?? '')
       : 'all',
@@ -73,20 +86,29 @@ export function getGovernanceServerSections(
     {
       title: 'Rule enforcement',
       description:
-        'Server rules apply globally. Forum owners separately choose whether to enforce their own forum rules.',
+        'Admins choose server-rule scope independently of which forum owners may enable their own rules.',
       fields: [
         {
           key: 'serverRuleEnforcement',
           type: 'select',
           label: 'Server-rule enforcement',
           description:
-            'On checks every forum against server rules. Forum owners cannot opt in or out. The plugin must also be enabled on this server.',
+            'Server rules are mandatory in the selected scope. Forum owners cannot opt in or out. The plugin must also be enabled on this server.',
           required: true,
-          placeholder: 'Choose global enforcement',
+          placeholder: 'Choose server-rule scope',
           options: [
-            { value: 'off', label: 'Off' },
-            { value: 'on', label: 'On, for every forum' },
+            { value: 'off', label: 'No forums' },
+            { value: 'on', label: 'All forums' },
+            { value: 'allowlist', label: 'Allowlisted forums' },
           ],
+        },
+        {
+          key: 'serverRuleForumAllowlist',
+          type: 'forum-multiselect',
+          label: 'Forums subject to server rules',
+          description:
+            'Independent of forum-rule eligibility. An empty list means no forums.',
+          visibleWhen: { key: 'serverRuleEnforcement', equals: 'allowlist' },
         },
         {
           key: 'channelRuleEligibility',

@@ -5,7 +5,6 @@ import {
   selectGovernanceAdminInstallation,
   supportsRuleGovernance,
   initializeGovernanceSettings,
-  requiresGovernanceMigration,
   getGovernanceServerSections,
 } from './pluginGovernance';
 
@@ -81,14 +80,15 @@ describe('plugin governance configuration', () => {
   ])('recognizes supported plugin %s', (id, expected) => {
     expect(hasRuleGovernance(id)).toBe(expected);
   });
-  it('requires an explicit global choice for the legacy server-rule allowlist', () => {
+  it('preserves the legacy server-rule scope independently of eligibility', () => {
     expect(
       initializeGovernanceSettings({
         serverRuleCheckMode: 'allowlist',
         serverRuleForumAllowlist: ['cats'],
       })
     ).toMatchObject({
-      serverRuleEnforcement: '',
+      serverRuleEnforcement: 'allowlist',
+      serverRuleForumAllowlist: ['cats'],
       channelRuleEligibility: 'all',
       channelRuleAllowlist: [],
     });
@@ -116,14 +116,7 @@ describe('plugin governance configuration', () => {
       channelRuleAllowlist: ['cats'],
     });
   });
-  it.each([
-    [{ serverRuleCheckMode: 'allowlist' }, true],
-    [{ serverRuleCheckMode: 'allowlist', serverRuleEnforcement: 'off' }, false],
-    [{}, false],
-  ])('identifies pending migration %j', (settings, expected) => {
-    expect(requiresGovernanceMigration(settings)).toBe(expected);
-  });
-  it('requires migration for a nested legacy allowlist without reusing it for channel eligibility', () => {
+  it('preserves a nested legacy allowlist without reusing it for channel eligibility', () => {
     const settings = {
       server: {
         serverRuleCheckMode: 'allowlist',
@@ -132,13 +125,12 @@ describe('plugin governance configuration', () => {
       model: 'custom',
     };
     expect({
-      required: requiresGovernanceMigration(settings),
       values: initializeGovernanceSettings(settings),
     }).toEqual({
-      required: true,
       values: {
         ...settings,
-        serverRuleEnforcement: '',
+        serverRuleEnforcement: 'allowlist',
+        serverRuleForumAllowlist: ['cats'],
         channelRuleEligibility: 'all',
         channelRuleAllowlist: [],
       },
@@ -156,6 +148,7 @@ describe('plugin governance configuration', () => {
     expect(initializeGovernanceSettings(settings)).toEqual({
       ...settings,
       serverRuleEnforcement: 'off',
+      serverRuleForumAllowlist: [],
       channelRuleEligibility: 'allowlist',
       channelRuleAllowlist: ['cats'],
     });
@@ -171,13 +164,12 @@ describe('plugin governance configuration', () => {
       channelRuleEligibility: null,
     };
     expect({
-      required: requiresGovernanceMigration(settings),
       values: initializeGovernanceSettings(settings),
     }).toEqual({
-      required: false,
       values: {
         ...settings,
         serverRuleEnforcement: '',
+        serverRuleForumAllowlist: [],
         channelRuleEligibility: '',
         channelRuleAllowlist: [],
       },
@@ -214,6 +206,7 @@ describe('plugin governance configuration', () => {
       )
     ).toEqual([
       'serverRuleEnforcement',
+      'serverRuleForumAllowlist',
       'channelRuleEligibility',
       'channelRuleAllowlist',
       'model',
@@ -225,5 +218,19 @@ describe('plugin governance configuration', () => {
         (field) => field.key === 'channelRuleAllowlist'
       )?.required
     ).not.toBe(true);
+  });
+});
+
+it('preserves legacy pilot eligibility separately from a JSON server rollout list', () => {
+  expect(
+    initializeGovernanceSettings({
+      serverRuleCheckMode: 'allowlist',
+      serverRuleForumAllowlist: '["server_trial"]',
+    })
+  ).toMatchObject({
+    serverRuleEnforcement: 'allowlist',
+    serverRuleForumAllowlist: ['server_trial'],
+    channelRuleEligibility: 'all',
+    channelRuleAllowlist: [],
   });
 });

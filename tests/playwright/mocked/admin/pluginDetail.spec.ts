@@ -371,7 +371,7 @@ test.describe('Moderation governance settings', () => {
     },
   });
 
-  test('requires an explicit global choice for legacy allowlists and preserves empty channel eligibility', async ({
+  test('preserves legacy server scope independently of forum-rule eligibility', async ({
     context,
     page,
   }) => {
@@ -392,20 +392,8 @@ test.describe('Moderation governance settings', () => {
     );
     await page.goto(`/admin/settings/plugins/${governanceId}`);
     await expect(
-      page.getByText(
-        'The legacy setting checks server rules only in selected forums.'
-      )
-    ).toBeVisible();
-    await page
-      .getByRole('button', { name: 'Save Settings', exact: true })
-      .click();
-    await expect(
-      page.getByText('Server-rule enforcement is required')
-    ).toBeVisible();
-    expect(saved).toEqual([]);
-    await page
-      .getByLabel('Server-rule enforcement', { exact: false })
-      .selectOption('on');
+      page.getByLabel('Server-rule enforcement', { exact: false })
+    ).toHaveValue('allowlist');
     await page
       .getByLabel('Channel-rule eligibility', { exact: false })
       .selectOption('none');
@@ -417,7 +405,8 @@ test.describe('Moderation governance settings', () => {
       pluginId: 'llm-moderation',
       version: '0.8.0',
       settingsJson: {
-        serverRuleEnforcement: 'on',
+        serverRuleEnforcement: 'allowlist',
+        serverRuleForumAllowlist: ['cats'],
         channelRuleEligibility: 'none',
         channelRuleAllowlist: [],
       },
