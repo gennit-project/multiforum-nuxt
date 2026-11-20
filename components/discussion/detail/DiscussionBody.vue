@@ -243,6 +243,7 @@ function handleBlockedReaction() {
         :key="tag.text"
         class="mt-2"
         :tag="tag.text"
+        interactive
         @click="filterByTag(tag.text)"
       />
     </div>

@@ -39,7 +39,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['filterByTag', 'filterByChannel']);
+const emit = defineEmits(['filterByChannel']);
 
 const route = useRoute();
 const uiStore = useUIStore();
@@ -224,10 +224,6 @@ watch(
 );
 
 // Methods
-const filterByTag = (tag: string) => {
-  emit('filterByTag', tag);
-};
-
 const filterByChannel = (channel: string) => {
   emit('filterByChannel', channel);
 };
@@ -334,7 +330,6 @@ const reachedEndOfResults = computed(() => {
         :selected-channels="selectedChannels"
         :selected-tags="selectedTags"
         @filter-by-channel="filterByChannel"
-        @filter-by-tag="filterByTag"
         @open-mod-profile="showModProfileModal = true"
         @open-album="handleOpenAlbum"
       />

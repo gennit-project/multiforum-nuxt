@@ -108,6 +108,7 @@ const handleTimeFilterShortcutClick = (shortcut: string) => {
       :active="shortcut.value === filterValues.timeShortcut"
       :hide-icon="true"
       :large="false"
+      interactive
       @click="handleTimeFilterShortcutClick(shortcut.value)"
     />
   </div>

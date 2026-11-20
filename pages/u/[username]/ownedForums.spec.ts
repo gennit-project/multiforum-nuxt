@@ -70,6 +70,7 @@ describe('user owned forums page', () => {
       resultCount: 1,
       searchInput: '',
       selectedTags: [],
+      tagsFilterable: false,
       loading: false,
     });
   });

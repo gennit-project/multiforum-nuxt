@@ -42,7 +42,12 @@ withDefaults(defineProps<Props>(), {
             },
           }"
         >
-          <Tag class="mt-2" :tag="channel.uniqueName" :channel-mode="true" />
+          <Tag
+            class="mt-2"
+            :tag="channel.uniqueName"
+            :channel-mode="true"
+            interactive
+          />
         </nuxt-link>
       </li>
     </ul>

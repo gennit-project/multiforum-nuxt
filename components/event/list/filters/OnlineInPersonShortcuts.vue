@@ -80,6 +80,7 @@ watch(
       :active="activeShortcut === LocationFilterTypes.ONLY_VIRTUAL"
       :hide-icon="true"
       :large="false"
+      interactive
       @click="handleShortcutClick(LocationFilterTypes.ONLY_VIRTUAL)"
     />
     <Tag
@@ -90,6 +91,7 @@ watch(
       :active="activeShortcut === LocationFilterTypes.ONLY_WITH_ADDRESS"
       :hide-icon="true"
       :large="false"
+      interactive
       @click="handleShortcutClick(LocationFilterTypes.ONLY_WITH_ADDRESS)"
     />
   </div>

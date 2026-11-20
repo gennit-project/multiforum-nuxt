@@ -231,6 +231,7 @@ const handleBecomeAdminSuccess = () => {
                 :key="tag.text"
                 class="mb-1"
                 :tag="tag.text"
+                interactive
                 @click="filterChannelsByTag(tag.text)"
               />
             </div>

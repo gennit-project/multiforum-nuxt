@@ -57,7 +57,7 @@ const mountList = (props: Record<string, unknown> = {}) =>
         ChannelDownloadListItem: {
           name: 'ChannelDownloadListItem',
           props: ['discussion', 'discussionChannel'],
-          emits: ['filter-by-tag', 'filter-by-channel', 'open-album'],
+          emits: ['filter-by-channel', 'open-album'],
           template: '<li />',
         },
         LoadMore: {
@@ -186,16 +186,6 @@ describe('DownloadList pagination', () => {
 });
 
 describe('DownloadList filter events', () => {
-  it('re-emits filterByTag', async () => {
-    const wrapper = mountList();
-
-    await wrapper
-      .getComponent({ name: 'ChannelDownloadListItem' })
-      .vm.$emit('filter-by-tag', 'stl');
-
-    expect(wrapper.emitted('filterByTag')?.[0]).toEqual(['stl']);
-  });
-
   it('re-emits filterByChannel', async () => {
     const wrapper = mountList();
 

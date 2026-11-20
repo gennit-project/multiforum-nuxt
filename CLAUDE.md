@@ -198,6 +198,7 @@ Hard-won pitfalls (full detail + code in [CONTRIBUTING.md](./CONTRIBUTING.md#fro
 - **Imports**: Group imports by type (Vue, libraries, local components, utils)
 - **Testing**: Each feature should have Playwright coverage, with shared seed data and cleanup helpers
 - **CSS**: Use Tailwind utility classes, dark mode compatible with `dark:` prefix
+- **Tag hover rule**: A tag only changes color on hover (and shows a pointer cursor) if clicking it does something, such as filtering by that tag or following a link. `TagComponent` is non-interactive by default; pass `interactive` only where the click is actually wired up. If a parent only sometimes handles the click, gate `interactive` on a prop (see `tagsFilterable` in `ChannelList`) instead of leaving a dead hover.
 - **Accessibility**: build to WCAG 2.2 AA. The `accessibility` skill carries the full
   contract, AA thresholds, and Vue patterns (invoke it for any UI/component work);
   `pnpm run lint:a11y` and the axe Playwright helper are the detection layers. Baseline:

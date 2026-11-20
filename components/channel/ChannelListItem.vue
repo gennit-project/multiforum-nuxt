@@ -25,6 +25,11 @@ const props = defineProps({
     type: Array as PropType<Array<string>>,
     default: () => [],
   },
+  // Tags only look clickable when the page handles `filterByTag`.
+  tagsFilterable: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const tags = computed(() => props.channel.Tags.map((tag) => tag.text));
@@ -99,7 +104,8 @@ defineEmits(['filterByTag']);
             :key="tag"
             :active="selectedTags.includes(tag)"
             :tag="tag"
-            @click="$emit('filterByTag', tag)"
+            :interactive="tagsFilterable"
+            @click="tagsFilterable && $emit('filterByTag', tag)"
           />
           <span
             v-if="tags.length > 5"
@@ -156,7 +162,10 @@ defineEmits(['filterByTag']);
         class="flex items-center gap-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
       >
         <DiscussionIcon class="h-4 w-4" />
-        {{ channel?.DiscussionChannelsConnection?.aggregate?.count?.nodes || 0 }} Discussions
+        {{
+          channel?.DiscussionChannelsConnection?.aggregate?.count?.nodes || 0
+        }}
+        Discussions
       </nuxt-link>
       <nuxt-link
         v-if="downloadCount > 0"
@@ -172,7 +181,10 @@ defineEmits(['filterByTag']);
         class="flex items-center gap-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
       >
         <CalendarIcon class="h-4 w-4" />
-        {{ channel?.EventChannelsConnection?.aggregate?.count?.nodes || 0 }} Events
+        {{
+          channel?.EventChannelsConnection?.aggregate?.count?.nodes || 0
+        }}
+        Events
       </nuxt-link>
     </div>
   </div>

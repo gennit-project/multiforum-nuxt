@@ -60,7 +60,15 @@ const mountItem = (
           props: ['text', 'searchInput'],
           template: '<span>{{ text }}</span>',
         },
-        TagComponent: stub('TagComponent', ['tag', 'active'], ['click']),
+        TagComponent: {
+          name: 'TagComponent',
+          props: {
+            tag: String,
+            active: Boolean,
+            interactive: { type: Boolean, default: false },
+          },
+          template: '<div />',
+        },
         UsernameWithTooltip: stub('UsernameWithTooltip', [
           'username',
           'variantSource',
@@ -231,12 +239,12 @@ describe('ChannelDownloadListItem tags and actions', () => {
     expect(wrapper.findAllComponents({ name: 'TagComponent' })).toHaveLength(2);
   });
 
-  it('emits filterByTag when a tag is clicked', async () => {
+  it('renders tags as non-interactive because the downloads list does not filter by tag', () => {
     const wrapper = mountItem(makeDiscussion());
 
-    await wrapper.getComponent({ name: 'TagComponent' }).vm.$emit('click');
-
-    expect(wrapper.emitted('filterByTag')?.[0]).toEqual(['3d']);
+    expect(
+      wrapper.getComponent({ name: 'TagComponent' }).props('interactive')
+    ).toBe(false);
   });
 
   it('shows the album-view button when the album has images', async () => {

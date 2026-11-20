@@ -12,7 +12,10 @@ const usernameStub = defineComponent({
 
 const tagStub = defineComponent({
   name: 'TagComponent',
-  props: ['tag'],
+  props: {
+    tag: String,
+    interactive: { type: Boolean, default: false },
+  },
   template: '<div class="tag-stub">{{ tag }}</div>',
 });
 
@@ -67,6 +70,14 @@ const mountCard = (props: Record<string, unknown> = {}) =>
   });
 
 describe('LibraryDownloadCard', () => {
+  it('renders tags as non-interactive because they have no click action', () => {
+    const wrapper = mountCard();
+
+    expect(
+      wrapper.findAllComponents(tagStub).map((tag) => tag.props('interactive'))
+    ).toEqual(Array(wrapper.findAllComponents(tagStub).length).fill(false));
+  });
+
   it('renders the download title', () => {
     const wrapper = mountCard();
 
@@ -74,7 +85,9 @@ describe('LibraryDownloadCard', () => {
   });
 
   it('renders a preview image when one is provided', () => {
-    const wrapper = mountCard({ previewImageUrl: 'https://example.com/preview.jpg' });
+    const wrapper = mountCard({
+      previewImageUrl: 'https://example.com/preview.jpg',
+    });
 
     expect(wrapper.get('img').attributes()).toMatchObject({
       src: 'https://example.com/preview.jpg',
@@ -100,7 +113,9 @@ describe('LibraryDownloadCard', () => {
   it('passes Download as the favorite entity name', () => {
     const wrapper = mountCard();
 
-    expect(wrapper.getComponent(favoriteStub).props('entityName')).toBe('Download');
+    expect(wrapper.getComponent(favoriteStub).props('entityName')).toBe(
+      'Download'
+    );
   });
 
   it('caps visible tags at four entries', () => {

@@ -105,7 +105,6 @@ const channelIconSrc = computed(
         :key="tag.text || `channel-tag-${index}`"
         :tag="tag.text || ''"
         class="text-xs"
-        @click.prevent=""
       />
       <span
         v-if="channel.Tags.length > 4"

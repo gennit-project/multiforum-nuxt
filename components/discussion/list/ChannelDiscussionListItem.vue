@@ -446,6 +446,7 @@ const revealSensitiveContent = () => {
                 class="my-1"
                 :active="selectedTags.includes(tag)"
                 :tag="tag"
+                interactive
                 @click="$emit('filterByTag', tag)"
               />
             </div>

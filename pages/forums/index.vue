@@ -256,6 +256,7 @@ const defaultLabels = {
             :search-input="searchInput"
             :selected-tags="selectedTags"
             :loading="channelLoading"
+            tags-filterable
             @filter-by-tag="setSelectedTags"
             @load-more="loadMore"
           />

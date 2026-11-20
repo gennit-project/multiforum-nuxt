@@ -28,8 +28,6 @@ const props = defineProps({
   },
 });
 
-defineEmits(['filterByTag']);
-
 // Computed property for defaultUniqueName
 const defaultUniqueName = computed(() => {
   if (!props.event.EventChannels || !props.event.EventChannels[0]) {
@@ -82,7 +80,6 @@ const channelName = (channel: (typeof channels.value)[number]) => ('Channel' in 
         class="my-1"
         :active="selectedTags.includes(tag)"
         :tag="tag"
-        @click="$emit('filterByTag', tag)"
       />
     </p>
 

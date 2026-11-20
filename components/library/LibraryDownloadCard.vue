@@ -153,7 +153,6 @@ withDefaults(
           :key="tag.text || `download-tag-${index}`"
           :tag="tag.text || ''"
           class="text-xs"
-          @click.prevent=""
         />
       </div>
     </div>

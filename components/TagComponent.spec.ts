@@ -32,8 +32,8 @@ describe('TagComponent rendering', () => {
     expect(tagEl(wrapper).classes().join(' ')).toContain('bg-brand-400');
   });
 
-  it('keeps a single dark hover background with light text on default tags', () => {
-    const wrapper = mountTag();
+  it('keeps a single dark hover background with light text on interactive tags', () => {
+    const wrapper = mountTag({ interactive: true });
     const classes = tagEl(wrapper).classes();
 
     expect({
@@ -64,13 +64,63 @@ describe('TagComponent rendering', () => {
   });
 });
 
+describe('TagComponent hover rule', () => {
+  const hoverClasses = (w: ReturnType<typeof mount>) =>
+    tagEl(w)
+      .classes()
+      .filter((c) => c.includes('hover:'));
+
+  it.each([
+    ['default', {}],
+    ['active', { active: true }],
+    ['channel mode', { channelMode: true }],
+  ])(
+    'has no hover styles when a %s tag is not interactive',
+    (_label, props) => {
+      const wrapper = mountTag(props);
+
+      expect(hoverClasses(wrapper)).toEqual([]);
+    }
+  );
+
+  it.each([
+    ['default', {}],
+    ['active', { active: true }],
+    ['channel mode', { channelMode: true }],
+  ])('has hover styles when a %s tag is interactive', (_label, props) => {
+    const wrapper = mountTag({ ...props, interactive: true });
+
+    expect(hoverClasses(wrapper).length).toBeGreaterThan(0);
+  });
+
+  it('only shows a pointer cursor when interactive', () => {
+    const wrapper = mountTag();
+
+    expect(tagEl(wrapper).classes()).not.toContain('cursor-pointer');
+  });
+
+  it('renders a non-interactive tag without a button', () => {
+    const wrapper = mountTag();
+
+    expect(wrapper.find('button').exists()).toBe(false);
+  });
+
+  it('does not emit select when a non-interactive tag is clicked', async () => {
+    const wrapper = mountTag();
+
+    await wrapper.find('span.tag > span').trigger('click');
+
+    expect(wrapper.emitted('select')).toBeUndefined();
+  });
+});
+
 describe('TagComponent interaction', () => {
   // The tag content is a real <button> (first button in the tag); the clear
   // control, when present, is a separate button with data-testid tag-delete.
   const selectButton = (w: ReturnType<typeof mountTag>) => w.get('button');
 
   it('emits select when clicked while inactive', async () => {
-    const wrapper = mountTag();
+    const wrapper = mountTag({ interactive: true });
 
     await selectButton(wrapper).trigger('click');
 
@@ -78,7 +128,7 @@ describe('TagComponent interaction', () => {
   });
 
   it('emits deselect when clicked while active', async () => {
-    const wrapper = mountTag({ active: true });
+    const wrapper = mountTag({ interactive: true, active: true });
 
     await selectButton(wrapper).trigger('click');
 
@@ -86,13 +136,13 @@ describe('TagComponent interaction', () => {
   });
 
   it('renders the tag as a keyboard-operable button', () => {
-    const wrapper = mountTag();
+    const wrapper = mountTag({ interactive: true });
 
     expect(selectButton(wrapper).element.tagName).toBe('BUTTON');
   });
 
   it('exposes the selected state via aria-pressed', () => {
-    const wrapper = mountTag({ active: true });
+    const wrapper = mountTag({ interactive: true, active: true });
 
     expect(selectButton(wrapper).attributes('aria-pressed')).toBe('true');
   });
