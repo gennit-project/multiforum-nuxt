@@ -118,7 +118,7 @@ describe('LibraryDownloadCard', () => {
     );
   });
 
-  it('caps visible tags at four entries', () => {
+  it('shows three tags and an "and x others" label past four tags', () => {
     const wrapper = mountCard({
       download: {
         id: 'download-1',
@@ -134,6 +134,9 @@ describe('LibraryDownloadCard', () => {
       },
     });
 
-    expect(wrapper.findAll('.tag-stub')).toHaveLength(4);
+    expect([
+      wrapper.findAll('.tag-stub').length,
+      wrapper.text(),
+    ]).toEqual([3, expect.stringContaining('... and 2 others')]);
   });
 });

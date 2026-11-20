@@ -63,12 +63,15 @@ describe('ChannelListItem tags', () => {
     expect(wrapper.findAll('.tag')).toHaveLength(2);
   });
 
-  it('caps the tags at five with a +more indicator', () => {
+  it('shows the first three tags and an "and x others" label past four tags', () => {
     const wrapper = mountItem({
       channel: channel({ Tags: Array.from({ length: 8 }, (_, i) => ({ text: `t${i}` })) }),
     });
 
-    expect(wrapper.text()).toContain('+3 more');
+    expect([wrapper.findAll('.tag').length, wrapper.text()]).toEqual([
+      3,
+      expect.stringContaining('... and 5 others'),
+    ]);
   });
 
   it('marks a selected tag active', () => {

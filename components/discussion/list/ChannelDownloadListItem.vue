@@ -3,6 +3,8 @@ import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
 import { useRoute } from 'nuxt/app';
 import TagComponent from '@/components/TagComponent.vue';
+import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
+import { splitTagsForList } from '@/utils/tagOverflow';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import DiscussionVotes from '../vote/DiscussionVotes.vue';
@@ -93,6 +95,8 @@ const relativeTimeAgo = computed(() =>
 const tags = computed(
   () => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []
 );
+
+const tagOverflow = computed(() => splitTagsForList(tags.value));
 
 // Get the first image from the album if available, respecting imageOrder
 const firstAlbumImage = computed(() => {
@@ -268,11 +272,12 @@ const filteredQuery = computed(() => {
             class="flex flex-wrap gap-1 text-xs font-medium text-gray-600"
           >
             <TagComponent
-              v-for="tag in tags"
+              v-for="tag in tagOverflow.visible"
               :key="tag"
               :active="selectedTags.includes(tag)"
               :tag="tag"
             />
+            <TagOverflowLabel :count="tagOverflow.hiddenCount" />
           </div>
           <div class="flex items-center gap-1 dark:text-white">
             <DiscussionVotes

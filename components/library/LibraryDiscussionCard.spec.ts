@@ -164,7 +164,7 @@ describe('LibraryDiscussionCard', () => {
     );
   });
 
-  it('caps visible tags at five entries', () => {
+  it('shows three tags and an "and x others" label past four tags', () => {
     const wrapper = mountCard({
       discussion: {
         id: 'discussion-1',
@@ -184,6 +184,9 @@ describe('LibraryDiscussionCard', () => {
       },
     });
 
-    expect(wrapper.findAll('.tag-stub')).toHaveLength(5);
+    expect([
+      wrapper.findAll('.tag-stub').length,
+      wrapper.text(),
+    ]).toEqual([3, expect.stringContaining('... and 3 others')]);
   });
 });

@@ -99,7 +99,7 @@ describe('LibraryChannelCard', () => {
     );
   });
 
-  it('shows a +more indicator when more than four tags exist', () => {
+  it('shows an "and x others" label when more than four tags exist', () => {
     const wrapper = mountCard({
       channel: {
         uniqueName: 'sims4',
@@ -116,6 +116,6 @@ describe('LibraryChannelCard', () => {
       },
     });
 
-    expect(wrapper.text()).toContain('+1 more');
+    expect(wrapper.text()).toContain('... and 2 others');
   });
 });
