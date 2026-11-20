@@ -2,6 +2,8 @@
 import { computed } from 'vue';
 import { relativeTime } from '@/utils';
 import Tag from '@/components/TagComponent.vue';
+import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
+import { splitTagsForList } from '@/utils/tagOverflow';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import type { GetUserDiscussionsQuery } from '@/__generated__/operations';
 import type { NullableSelection } from '@/types/Comment';
@@ -54,6 +56,7 @@ const authorUsername = props.discussion.Author
   ? props.discussion.Author.username
   : 'Deleted';
 const tags = computed(() => ('Tags' in props.discussion ? props.discussion.Tags ?? [] : []).map((tag) => tag.text));
+const tagOverflow = computed(() => splitTagsForList(tags.value));
 const channels = computed(() => (props.discussion.DiscussionChannels || []).filter((item) => item !== null));
 const channelName = (channel: (typeof channels.value)[number]) => channel.channelUniqueName || '';
 </script>
@@ -75,12 +78,13 @@ const channelName = (channel: (typeof channels.value)[number]) => channel.channe
       class="mt-1 flex space-x-1 text-sm font-medium text-gray-600 hover:no-underline"
     >
       <Tag
-        v-for="tag in tags"
+        v-for="tag in tagOverflow.visible"
         :key="tag"
         class="my-1"
         :active="selectedTags.includes(tag)"
         :tag="tag"
       />
+      <TagOverflowLabel :count="tagOverflow.hiddenCount" />
     </p>
     <p
       class="text-xs font-medium text-gray-600 no-underline dark:text-gray-300"

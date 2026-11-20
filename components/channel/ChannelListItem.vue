@@ -4,6 +4,8 @@ import { computed } from 'vue';
 import type { ChannelListEntry as Channel } from '@/types/ChannelPresentation';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import Tag from '@/components/TagComponent.vue';
+import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
+import { splitTagsForList } from '@/utils/tagOverflow';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
@@ -33,6 +35,7 @@ const props = defineProps({
 });
 
 const tags = computed(() => props.channel.Tags.map((tag) => tag.text));
+const tagOverflow = computed(() => splitTagsForList(tags.value));
 
 defineEmits(['filterByTag']);
 </script>
@@ -100,19 +103,14 @@ defineEmits(['filterByTag']);
         <!-- Tags -->
         <div v-if="tags.length > 0" class="mb-3 flex flex-wrap gap-1">
           <Tag
-            v-for="tag in tags.slice(0, 5)"
+            v-for="tag in tagOverflow.visible"
             :key="tag"
             :active="selectedTags.includes(tag)"
             :tag="tag"
             :interactive="tagsFilterable"
             @click="tagsFilterable && $emit('filterByTag', tag)"
           />
-          <span
-            v-if="tags.length > 5"
-            class="text-xs text-gray-500 dark:text-gray-400"
-          >
-            +{{ tags.length - 5 }} more
-          </span>
+          <TagOverflowLabel :count="tagOverflow.hiddenCount" />
         </div>
       </div>
 

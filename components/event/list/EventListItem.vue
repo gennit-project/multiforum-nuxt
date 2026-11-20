@@ -3,6 +3,8 @@ import { computed, nextTick } from 'vue';
 import { DateTime } from 'luxon';
 import { getDatePieces } from '@/utils';
 import Tag from '@/components/TagComponent.vue';
+import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
+import { splitTagsForList } from '@/utils/tagOverflow';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import ArrowPath from '@/components/icons/ArrowPath.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
@@ -59,6 +61,7 @@ const emit = defineEmits(['openPreview', 'select']);
 
 const route = useRoute();
 const router = useRouter();
+const tagOverflow = computed(() => splitTagsForList(props.event.Tags ?? []));
 const startTimeObj = computed(() => DateTime.fromISO(props.event.startTime));
 
 const timeOfDay = computed(() => {
@@ -438,7 +441,7 @@ const seriesOccurrences = computed(() => {
             class="mt-1 flex space-x-1 text-sm font-medium text-gray-600 hover:no-underline"
           >
             <Tag
-              v-for="tag in event.Tags"
+              v-for="tag in tagOverflow.visible"
               :key="`tag-${tag.text}`"
               class="my-1"
               :active="selectedTags.includes(tag.text)"
@@ -450,6 +453,7 @@ const seriesOccurrences = computed(() => {
                 }
               "
             />
+            <TagOverflowLabel :count="tagOverflow.hiddenCount" />
           </p>
         </div>
       </div>

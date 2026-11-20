@@ -3,6 +3,8 @@ import { computed, defineAsyncComponent } from 'vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
+import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
+import { splitTagsForList } from '@/utils/tagOverflow';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import CommentIcon from '@/components/icons/CommentIcon.vue';
 import type { PresentationAlbum } from '@/types/DiscussionPresentation';
@@ -60,8 +62,9 @@ const DiscussionAlbum = defineAsyncComponent(
 );
 
 const visibleTags = computed(() =>
-  (props.discussion.Tags || []).filter((tag) => !!tag?.text).slice(0, 5)
+  (props.discussion.Tags || []).filter((tag) => !!tag?.text)
 );
+const tagOverflow = computed(() => splitTagsForList(visibleTags.value));
 
 const albumForDisplay = computed(() => props.discussion.Album ?? null);
 </script>
@@ -181,11 +184,12 @@ const albumForDisplay = computed(() => props.discussion.Album ?? null);
         class="flex flex-wrap gap-2 border-t border-gray-200/80 pt-4 dark:border-gray-700"
       >
         <TagComponent
-          v-for="(tag, index) in visibleTags"
+          v-for="(tag, index) in tagOverflow.visible"
           :key="tag.text || `discussion-tag-${index}`"
           :tag="tag.text || ''"
           class="text-xs"
         />
+        <TagOverflowLabel :count="tagOverflow.hiddenCount" />
       </div>
     </div>
   </article>

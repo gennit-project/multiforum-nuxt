@@ -2,6 +2,8 @@
 import { computed } from 'vue';
 import { relativeTime } from '@/utils';
 import Tag from '@/components/TagComponent.vue';
+import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
+import { splitTagsForList } from '@/utils/tagOverflow';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import type { GetUserEventsQuery } from '@/__generated__/operations';
 
@@ -48,6 +50,7 @@ const title = computed(() => props.event.title || '');
 const relativeTimeText = relativeTime(props.event.createdAt || '');
 const poster = props.event.Poster ? props.event.Poster.username : 'Deleted';
 const tags = computed(() => ('Tags' in props.event ? props.event.Tags ?? [] : []).map((tag) => tag.text));
+const tagOverflow = computed(() => splitTagsForList(tags.value));
 const channels = computed(() => (props.event.EventChannels || []).filter((item) => item !== null));
 const channelName = (channel: (typeof channels.value)[number]) => ('Channel' in channel ? channel.Channel?.uniqueName : null) || channel.channelUniqueName || '';
 </script>
@@ -75,12 +78,13 @@ const channelName = (channel: (typeof channels.value)[number]) => ('Channel' in 
       class="flex text-xs font-medium text-gray-600 no-underline dark:text-gray-300"
     >
       <Tag
-        v-for="tag in tags"
+        v-for="tag in tagOverflow.visible"
         :key="tag"
         class="my-1"
         :active="selectedTags.includes(tag)"
         :tag="tag"
       />
+      <TagOverflowLabel :count="tagOverflow.hiddenCount" />
     </p>
 
     <p

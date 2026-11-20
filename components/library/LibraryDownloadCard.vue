@@ -1,6 +1,9 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
+import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
+import { splitTagsForList } from '@/utils/tagOverflow';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import AppImage from '@/components/image/AppImage.vue';
 import { relativeTime } from '@/utils';
@@ -22,7 +25,7 @@ type DownloadItem = {
   Tags?: Array<{ text?: string | null }> | null;
 };
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     download: DownloadItem;
     downloadLink: string;
@@ -43,6 +46,10 @@ withDefaults(
     allowAddToList: false,
     isFavorited: false,
   }
+);
+
+const tagOverflow = computed(() =>
+  splitTagsForList(props.download.Tags ?? [])
 );
 </script>
 
@@ -149,11 +156,12 @@ withDefaults(
         class="flex flex-wrap gap-2 border-t border-gray-200/80 pt-3 dark:border-gray-700"
       >
         <TagComponent
-          v-for="(tag, index) in download.Tags.slice(0, 4)"
+          v-for="(tag, index) in tagOverflow.visible"
           :key="tag.text || `download-tag-${index}`"
           :tag="tag.text || ''"
           class="text-xs"
         />
+        <TagOverflowLabel :count="tagOverflow.hiddenCount" />
       </div>
     </div>
   </article>

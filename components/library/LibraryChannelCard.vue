@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import ExpandableImage from '@/components/ExpandableImage.vue';
 import TagComponent from '@/components/TagComponent.vue';
+import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
+import { splitTagsForList } from '@/utils/tagOverflow';
 import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
 import { computed } from 'vue';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
@@ -34,6 +36,9 @@ const channelIconSrc = computed(
       preferred: ['avatar48', 'avatar64', 'avatar32'],
       originalUrl: props.channel.channelIconURL,
     }) || ''
+);
+const tagOverflow = computed(() =>
+  splitTagsForList(props.channel.Tags ?? [])
 );
 </script>
 
@@ -101,17 +106,12 @@ const channelIconSrc = computed(
       class="mt-4 flex flex-wrap gap-2 border-t border-gray-200/80 pt-4 dark:border-gray-700"
     >
       <TagComponent
-        v-for="(tag, index) in channel.Tags.slice(0, 4)"
+        v-for="(tag, index) in tagOverflow.visible"
         :key="tag.text || `channel-tag-${index}`"
         :tag="tag.text || ''"
         class="text-xs"
       />
-      <span
-        v-if="channel.Tags.length > 4"
-        class="text-xs text-gray-500 dark:text-gray-400"
-      >
-        +{{ channel.Tags.length - 4 }} more
-      </span>
+      <TagOverflowLabel :count="tagOverflow.hiddenCount" />
     </div>
   </article>
 </template>

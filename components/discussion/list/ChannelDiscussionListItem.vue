@@ -3,6 +3,8 @@ import { ref, computed, defineAsyncComponent } from 'vue';
 import type { PropType } from 'vue';
 import { useRoute } from 'nuxt/app';
 import TagComponent from '@/components/TagComponent.vue';
+import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
+import { splitTagsForList } from '@/utils/tagOverflow';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import DiscussionVotes from '../vote/DiscussionVotes.vue';
@@ -166,6 +168,7 @@ const relativeTimeAgo = computed(() =>
 const tags = computed(
   () => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []
 );
+const tagOverflow = computed(() => splitTagsForList(tags.value));
 const flairs = computed(() => props.discussionChannel.Flairs || []);
 
 const filteredQuery = computed(() => {
@@ -441,7 +444,7 @@ const revealSensitiveContent = () => {
               class="my-1 flex space-x-1 text-xs font-medium text-gray-600 hover:no-underline"
             >
               <TagComponent
-                v-for="tag in tags"
+                v-for="tag in tagOverflow.visible"
                 :key="tag"
                 class="my-1"
                 :active="selectedTags.includes(tag)"
@@ -449,6 +452,7 @@ const revealSensitiveContent = () => {
                 interactive
                 @click="$emit('filterByTag', tag)"
               />
+              <TagOverflowLabel :count="tagOverflow.hiddenCount" />
             </div>
             <DiscussionFlairBadges
               class="my-1"
