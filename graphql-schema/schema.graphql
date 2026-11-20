@@ -898,6 +898,8 @@ type Channel {
   markAsAnsweredEnabled: Boolean
   discussionFlairRequired: Boolean
   allowedFileTypes: [String!]
+  imageMaxUploadBytes: Int
+  fileMaxUploadBytes: Int
   payoutPercent: Int
   pluginPipelines: JSON
   LockedBy: ModerationProfile
@@ -988,6 +990,8 @@ type ChannelAggregateNode {
   icon64Url: StringAggregateSelection!
   icon96Url: StringAggregateSelection!
   channelBannerURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   payoutPercent: IntAggregateSelection!
 }
 
@@ -1021,6 +1025,8 @@ type ChannelChannelRelatedChannelsNodeAggregateSelection {
   icon64Url: StringAggregateSelection!
   icon96Url: StringAggregateSelection!
   channelBannerURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   payoutPercent: IntAggregateSelection!
 }
 
@@ -1854,6 +1860,8 @@ type CollectionChannelChannelsNodeAggregateSelection {
   icon64Url: StringAggregateSelection!
   icon96Url: StringAggregateSelection!
   channelBannerURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   payoutPercent: IntAggregateSelection!
 }
 
@@ -6117,6 +6125,8 @@ type ModerationProfileServerConfigModOfServersNodeAggregateSelection {
   serverName: StringAggregateSelection!
   serverDescription: StringAggregateSelection!
   serverIconURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   minimumAccountAge: IntAggregateSelection!
   minimumSensitiveContentAge: IntAggregateSelection!
   brandingProductName: StringAggregateSelection!
@@ -7060,6 +7070,8 @@ type ServerConfig {
   serverIconURL: String
   rules: JSON
   allowedFileTypes: [String!]
+  imageMaxUploadBytes: Int
+  fileMaxUploadBytes: Int
   featuredWikiPageIds: [ID!]
   enableDownloads: Boolean
   enableEvents: Boolean
@@ -7135,6 +7147,8 @@ type ServerConfigAggregateNode {
   serverName: StringAggregateSelection!
   serverDescription: StringAggregateSelection!
   serverIconURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   minimumAccountAge: IntAggregateSelection!
   minimumSensitiveContentAge: IntAggregateSelection!
   brandingProductName: StringAggregateSelection!
@@ -7663,6 +7677,7 @@ type SignedURL {
   storageObjectName: String
   storageUrl: String
   uploadedAt: DateTime
+  contentLengthRange: String
 }
 
 type SiteWideDiscussionListFormat {
@@ -7842,6 +7857,8 @@ type TagChannelChannelsNodeAggregateSelection {
   icon64Url: StringAggregateSelection!
   icon96Url: StringAggregateSelection!
   channelBannerURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   payoutPercent: IntAggregateSelection!
 }
 
@@ -8486,6 +8503,8 @@ type UserChannelAdminOfChannelsNodeAggregateSelection {
   icon64Url: StringAggregateSelection!
   icon96Url: StringAggregateSelection!
   channelBannerURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   payoutPercent: IntAggregateSelection!
 }
 
@@ -8507,6 +8526,8 @@ type UserChannelFavoriteChannelsNodeAggregateSelection {
   icon64Url: StringAggregateSelection!
   icon96Url: StringAggregateSelection!
   channelBannerURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   payoutPercent: IntAggregateSelection!
 }
 
@@ -8528,6 +8549,8 @@ type UserChannelModOfChannelsNodeAggregateSelection {
   icon64Url: StringAggregateSelection!
   icon96Url: StringAggregateSelection!
   channelBannerURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   payoutPercent: IntAggregateSelection!
 }
 
@@ -8549,6 +8572,8 @@ type UserChannelPendingModInvitesNodeAggregateSelection {
   icon64Url: StringAggregateSelection!
   icon96Url: StringAggregateSelection!
   channelBannerURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   payoutPercent: IntAggregateSelection!
 }
 
@@ -8570,6 +8595,8 @@ type UserChannelPendingOwnerInvitesNodeAggregateSelection {
   icon64Url: StringAggregateSelection!
   icon96Url: StringAggregateSelection!
   channelBannerURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   payoutPercent: IntAggregateSelection!
 }
 
@@ -8591,6 +8618,8 @@ type UserChannelRecentlyVisitedChannelsNodeAggregateSelection {
   icon64Url: StringAggregateSelection!
   icon96Url: StringAggregateSelection!
   channelBannerURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   payoutPercent: IntAggregateSelection!
 }
 
@@ -9292,6 +9321,8 @@ type UserServerConfigAdminOfServersNodeAggregateSelection {
   serverName: StringAggregateSelection!
   serverDescription: StringAggregateSelection!
   serverIconURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   minimumAccountAge: IntAggregateSelection!
   minimumSensitiveContentAge: IntAggregateSelection!
   brandingProductName: StringAggregateSelection!
@@ -9314,6 +9345,8 @@ type UserServerConfigPendingServerAdminInvitesNodeAggregateSelection {
   serverName: StringAggregateSelection!
   serverDescription: StringAggregateSelection!
   serverIconURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   minimumAccountAge: IntAggregateSelection!
   minimumSensitiveContentAge: IntAggregateSelection!
   brandingProductName: StringAggregateSelection!
@@ -9336,6 +9369,8 @@ type UserServerConfigPendingServerModInvitesNodeAggregateSelection {
   serverName: StringAggregateSelection!
   serverDescription: StringAggregateSelection!
   serverIconURL: StringAggregateSelection!
+  imageMaxUploadBytes: IntAggregateSelection!
+  fileMaxUploadBytes: IntAggregateSelection!
   minimumAccountAge: IntAggregateSelection!
   minimumSensitiveContentAge: IntAggregateSelection!
   brandingProductName: StringAggregateSelection!
@@ -11645,6 +11680,8 @@ input ChannelCreateInput {
   requireVerifiedEmailToPost: Boolean = false
   markAsAnsweredEnabled: Boolean = true
   allowedFileTypes: [String!]
+  imageMaxUploadBytes: Int
+  fileMaxUploadBytes: Int
   payoutPercent: Int = 98
   pluginPipelines: JSON
   LockedBy: ChannelLockedByFieldInput
@@ -14878,6 +14915,48 @@ input ChannelRelatedChannelsNodeAggregationWhereInput {
   channelBannerURL_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { longestLength: { lte: ... } } }' instead.")
   channelBannerURL_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead.")
   channelBannerURL: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   payoutPercent_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead.")
   payoutPercent_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead.")
   payoutPercent_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { sum: { eq: ... } } }' instead.")
@@ -15103,6 +15182,8 @@ input ChannelSort {
   requireVerifiedEmailToPost: SortDirection
   markAsAnsweredEnabled: SortDirection
   discussionFlairRequired: SortDirection
+  imageMaxUploadBytes: SortDirection
+  fileMaxUploadBytes: SortDirection
   payoutPercent: SortDirection
   pluginPipelines: SortDirection
 }
@@ -15694,6 +15775,14 @@ input ChannelUpdateInput {
   allowedFileTypes_SET: [String!] @deprecated(reason: "Please use the generic mutation 'allowedFileTypes: { set: ... } }' instead.")
   allowedFileTypes_POP: Int @deprecated(reason: "Please use the generic mutation 'allowedFileTypes: { pop: ... } }' instead.")
   allowedFileTypes_PUSH: [String!] @deprecated(reason: "Please use the generic mutation 'allowedFileTypes: { push: ... } }' instead.")
+  imageMaxUploadBytes: IntScalarMutations
+  imageMaxUploadBytes_SET: Int @deprecated(reason: "Please use the generic mutation 'imageMaxUploadBytes: { set: ... } }' instead.")
+  imageMaxUploadBytes_INCREMENT: Int @deprecated(reason: "Please use the relevant generic mutation 'imageMaxUploadBytes: { increment: ... } }' instead.")
+  imageMaxUploadBytes_DECREMENT: Int @deprecated(reason: "Please use the relevant generic mutation 'imageMaxUploadBytes: { decrement: ... } }' instead.")
+  fileMaxUploadBytes: IntScalarMutations
+  fileMaxUploadBytes_SET: Int @deprecated(reason: "Please use the generic mutation 'fileMaxUploadBytes: { set: ... } }' instead.")
+  fileMaxUploadBytes_INCREMENT: Int @deprecated(reason: "Please use the relevant generic mutation 'fileMaxUploadBytes: { increment: ... } }' instead.")
+  fileMaxUploadBytes_DECREMENT: Int @deprecated(reason: "Please use the relevant generic mutation 'fileMaxUploadBytes: { decrement: ... } }' instead.")
   payoutPercent: IntScalarMutations
   payoutPercent_SET: Int @deprecated(reason: "Please use the generic mutation 'payoutPercent: { set: ... } }' instead.")
   payoutPercent_INCREMENT: Int @deprecated(reason: "Please use the relevant generic mutation 'payoutPercent: { increment: ... } }' instead.")
@@ -15843,6 +15932,20 @@ input ChannelWhere {
   allowedFileTypes: StringListFilters
   allowedFileTypes_EQ: [String!] @deprecated(reason: "Please use the relevant generic filter allowedFileTypes: { eq: ... }")
   allowedFileTypes_INCLUDES: String @deprecated(reason: "Please use the relevant generic filter allowedFileTypes: { includes: ... }")
+  imageMaxUploadBytes: IntScalarFilters
+  imageMaxUploadBytes_EQ: Int @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { eq: ... }")
+  imageMaxUploadBytes_IN: [Int] @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { in: ... }")
+  imageMaxUploadBytes_LT: Int @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { lt: ... }")
+  imageMaxUploadBytes_LTE: Int @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { lte: ... }")
+  imageMaxUploadBytes_GT: Int @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { gt: ... }")
+  imageMaxUploadBytes_GTE: Int @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { gte: ... }")
+  fileMaxUploadBytes: IntScalarFilters
+  fileMaxUploadBytes_EQ: Int @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { eq: ... }")
+  fileMaxUploadBytes_IN: [Int] @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { in: ... }")
+  fileMaxUploadBytes_LT: Int @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { lt: ... }")
+  fileMaxUploadBytes_LTE: Int @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { lte: ... }")
+  fileMaxUploadBytes_GT: Int @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { gt: ... }")
+  fileMaxUploadBytes_GTE: Int @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { gte: ... }")
   payoutPercent: IntScalarFilters
   payoutPercent_EQ: Int @deprecated(reason: "Please use the relevant generic filter payoutPercent: { eq: ... }")
   payoutPercent_IN: [Int] @deprecated(reason: "Please use the relevant generic filter payoutPercent: { in: ... }")
@@ -17148,6 +17251,48 @@ input CollectionChannelsNodeAggregationWhereInput {
   channelBannerURL_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { longestLength: { lte: ... } } }' instead.")
   channelBannerURL_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead.")
   channelBannerURL: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   payoutPercent_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead.")
   payoutPercent_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead.")
   payoutPercent_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { sum: { eq: ... } } }' instead.")
@@ -39313,6 +39458,48 @@ input ModerationProfileModOfServersNodeAggregationWhereInput {
   rankingSettingsUpdatedBy_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'rankingSettingsUpdatedBy: { longestLength: { lte: ... } } }' instead.")
   rankingSettingsUpdatedBy_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'rankingSettingsUpdatedBy: { shortestLength: { lte: ... } } }' instead.")
   rankingSettingsUpdatedBy: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   minimumAccountAge_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { min: { eq: ... } } }' instead.")
   minimumAccountAge_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { max: { eq: ... } } }' instead.")
   minimumAccountAge_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { sum: { eq: ... } } }' instead.")
@@ -43863,6 +44050,8 @@ input ServerConfigCreateInput {
   serverIconURL: String
   rules: JSON
   allowedFileTypes: [String!]
+  imageMaxUploadBytes: Int = 10485760
+  fileMaxUploadBytes: Int = 104857600
   featuredWikiPageIds: [ID!]
   enableDownloads: Boolean
   enableEvents: Boolean
@@ -45386,6 +45575,8 @@ input ServerConfigSort {
   rankingSettingsJson: SortDirection
   rankingSettingsUpdatedAt: SortDirection
   rankingSettingsUpdatedBy: SortDirection
+  imageMaxUploadBytes: SortDirection
+  fileMaxUploadBytes: SortDirection
   enableDownloads: SortDirection
   enableEvents: SortDirection
   accountAgeGateEnabled: SortDirection
@@ -46218,6 +46409,14 @@ input ServerConfigUpdateInput {
   allowedFileTypes_SET: [String!] @deprecated(reason: "Please use the generic mutation 'allowedFileTypes: { set: ... } }' instead.")
   allowedFileTypes_POP: Int @deprecated(reason: "Please use the generic mutation 'allowedFileTypes: { pop: ... } }' instead.")
   allowedFileTypes_PUSH: [String!] @deprecated(reason: "Please use the generic mutation 'allowedFileTypes: { push: ... } }' instead.")
+  imageMaxUploadBytes: IntScalarMutations
+  imageMaxUploadBytes_SET: Int @deprecated(reason: "Please use the generic mutation 'imageMaxUploadBytes: { set: ... } }' instead.")
+  imageMaxUploadBytes_INCREMENT: Int @deprecated(reason: "Please use the relevant generic mutation 'imageMaxUploadBytes: { increment: ... } }' instead.")
+  imageMaxUploadBytes_DECREMENT: Int @deprecated(reason: "Please use the relevant generic mutation 'imageMaxUploadBytes: { decrement: ... } }' instead.")
+  fileMaxUploadBytes: IntScalarMutations
+  fileMaxUploadBytes_SET: Int @deprecated(reason: "Please use the generic mutation 'fileMaxUploadBytes: { set: ... } }' instead.")
+  fileMaxUploadBytes_INCREMENT: Int @deprecated(reason: "Please use the relevant generic mutation 'fileMaxUploadBytes: { increment: ... } }' instead.")
+  fileMaxUploadBytes_DECREMENT: Int @deprecated(reason: "Please use the relevant generic mutation 'fileMaxUploadBytes: { decrement: ... } }' instead.")
   featuredWikiPageIds: ListIDMutations
   featuredWikiPageIds_SET: [ID!] @deprecated(reason: "Please use the generic mutation 'featuredWikiPageIds: { set: ... } }' instead.")
   featuredWikiPageIds_POP: Int @deprecated(reason: "Please use the generic mutation 'featuredWikiPageIds: { pop: ... } }' instead.")
@@ -46329,6 +46528,20 @@ input ServerConfigWhere {
   allowedFileTypes: StringListFilters
   allowedFileTypes_EQ: [String!] @deprecated(reason: "Please use the relevant generic filter allowedFileTypes: { eq: ... }")
   allowedFileTypes_INCLUDES: String @deprecated(reason: "Please use the relevant generic filter allowedFileTypes: { includes: ... }")
+  imageMaxUploadBytes: IntScalarFilters
+  imageMaxUploadBytes_EQ: Int @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { eq: ... }")
+  imageMaxUploadBytes_IN: [Int] @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { in: ... }")
+  imageMaxUploadBytes_LT: Int @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { lt: ... }")
+  imageMaxUploadBytes_LTE: Int @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { lte: ... }")
+  imageMaxUploadBytes_GT: Int @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { gt: ... }")
+  imageMaxUploadBytes_GTE: Int @deprecated(reason: "Please use the relevant generic filter imageMaxUploadBytes: { gte: ... }")
+  fileMaxUploadBytes: IntScalarFilters
+  fileMaxUploadBytes_EQ: Int @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { eq: ... }")
+  fileMaxUploadBytes_IN: [Int] @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { in: ... }")
+  fileMaxUploadBytes_LT: Int @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { lt: ... }")
+  fileMaxUploadBytes_LTE: Int @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { lte: ... }")
+  fileMaxUploadBytes_GT: Int @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { gt: ... }")
+  fileMaxUploadBytes_GTE: Int @deprecated(reason: "Please use the relevant generic filter fileMaxUploadBytes: { gte: ... }")
   featuredWikiPageIds: IDListFilters
   featuredWikiPageIds_EQ: [ID!] @deprecated(reason: "Please use the relevant generic filter featuredWikiPageIds: { eq: ... }")
   featuredWikiPageIds_INCLUDES: ID @deprecated(reason: "Please use the relevant generic filter featuredWikiPageIds: { includes: ... }")
@@ -47557,6 +47770,48 @@ input TagChannelsNodeAggregationWhereInput {
   channelBannerURL_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { longestLength: { lte: ... } } }' instead.")
   channelBannerURL_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead.")
   channelBannerURL: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   payoutPercent_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead.")
   payoutPercent_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead.")
   payoutPercent_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { sum: { eq: ... } } }' instead.")
@@ -48943,6 +49198,48 @@ input UserAdminOfChannelsNodeAggregationWhereInput {
   channelBannerURL_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { longestLength: { lte: ... } } }' instead.")
   channelBannerURL_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead.")
   channelBannerURL: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   payoutPercent_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead.")
   payoutPercent_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead.")
   payoutPercent_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { sum: { eq: ... } } }' instead.")
@@ -49157,6 +49454,48 @@ input UserAdminOfServersNodeAggregationWhereInput {
   rankingSettingsUpdatedBy_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'rankingSettingsUpdatedBy: { longestLength: { lte: ... } } }' instead.")
   rankingSettingsUpdatedBy_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'rankingSettingsUpdatedBy: { shortestLength: { lte: ... } } }' instead.")
   rankingSettingsUpdatedBy: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   minimumAccountAge_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { min: { eq: ... } } }' instead.")
   minimumAccountAge_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { max: { eq: ... } } }' instead.")
   minimumAccountAge_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { sum: { eq: ... } } }' instead.")
@@ -51381,6 +51720,48 @@ input UserFavoriteChannelsNodeAggregationWhereInput {
   channelBannerURL_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { longestLength: { lte: ... } } }' instead.")
   channelBannerURL_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead.")
   channelBannerURL: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   payoutPercent_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead.")
   payoutPercent_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead.")
   payoutPercent_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { sum: { eq: ... } } }' instead.")
@@ -53949,6 +54330,48 @@ input UserModOfChannelsNodeAggregationWhereInput {
   channelBannerURL_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { longestLength: { lte: ... } } }' instead.")
   channelBannerURL_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead.")
   channelBannerURL: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   payoutPercent_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead.")
   payoutPercent_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead.")
   payoutPercent_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { sum: { eq: ... } } }' instead.")
@@ -54941,6 +55364,48 @@ input UserPendingModInvitesNodeAggregationWhereInput {
   channelBannerURL_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { longestLength: { lte: ... } } }' instead.")
   channelBannerURL_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead.")
   channelBannerURL: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   payoutPercent_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead.")
   payoutPercent_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead.")
   payoutPercent_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { sum: { eq: ... } } }' instead.")
@@ -55246,6 +55711,48 @@ input UserPendingOwnerInvitesNodeAggregationWhereInput {
   channelBannerURL_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { longestLength: { lte: ... } } }' instead.")
   channelBannerURL_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead.")
   channelBannerURL: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   payoutPercent_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead.")
   payoutPercent_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead.")
   payoutPercent_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { sum: { eq: ... } } }' instead.")
@@ -55460,6 +55967,48 @@ input UserPendingServerAdminInvitesNodeAggregationWhereInput {
   rankingSettingsUpdatedBy_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'rankingSettingsUpdatedBy: { longestLength: { lte: ... } } }' instead.")
   rankingSettingsUpdatedBy_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'rankingSettingsUpdatedBy: { shortestLength: { lte: ... } } }' instead.")
   rankingSettingsUpdatedBy: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   minimumAccountAge_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { min: { eq: ... } } }' instead.")
   minimumAccountAge_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { max: { eq: ... } } }' instead.")
   minimumAccountAge_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { sum: { eq: ... } } }' instead.")
@@ -55839,6 +56388,48 @@ input UserPendingServerModInvitesNodeAggregationWhereInput {
   rankingSettingsUpdatedBy_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'rankingSettingsUpdatedBy: { longestLength: { lte: ... } } }' instead.")
   rankingSettingsUpdatedBy_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'rankingSettingsUpdatedBy: { shortestLength: { lte: ... } } }' instead.")
   rankingSettingsUpdatedBy: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   minimumAccountAge_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { min: { eq: ... } } }' instead.")
   minimumAccountAge_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { max: { eq: ... } } }' instead.")
   minimumAccountAge_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'minimumAccountAge: { sum: { eq: ... } } }' instead.")
@@ -56457,6 +57048,48 @@ input UserRecentlyVisitedChannelsNodeAggregationWhereInput {
   channelBannerURL_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { longestLength: { lte: ... } } }' instead.")
   channelBannerURL_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead.")
   channelBannerURL: StringScalarAggregationFilters
+  imageMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  imageMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  imageMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  imageMaxUploadBytes: IntScalarAggregationFilters
+  fileMaxUploadBytes_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead.")
+  fileMaxUploadBytes_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead.")
+  fileMaxUploadBytes_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead.")
+  fileMaxUploadBytes: IntScalarAggregationFilters
   payoutPercent_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead.")
   payoutPercent_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead.")
   payoutPercent_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'payoutPercent: { sum: { eq: ... } } }' instead.")

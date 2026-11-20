@@ -213,6 +213,41 @@ describe('useAlbumImageUpload', () => {
       alertMock.mockRestore();
     });
 
+    it('passes the signed contentLengthRange to the storage upload helper', async () => {
+      mockCreateSignedStorageUrl.mockResolvedValue({
+        data: {
+          createSignedStorageURL: {
+            url: 'https://signed-url.example.com',
+            contentLengthRange: '0,10485760',
+          },
+        },
+      });
+      mockCreateImage.mockResolvedValue({
+        data: {
+          createImageWithUploader: {
+            id: 'img-1',
+            url: 'https://storage.example.com/test-file-123.jpg',
+            alt: 'file1.jpg',
+            caption: '',
+            copyright: '',
+          },
+        },
+      });
+      const { handleMultipleFiles } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+
+      await handleMultipleFiles([
+        new File(['content1'], 'file1.jpg', { type: 'image/jpeg' }),
+      ]);
+
+      expect(mockUploadAndGetEmbeddedLink).toHaveBeenCalledWith(
+        expect.objectContaining({ contentLengthRange: '0,10485760' })
+      );
+    });
+
     it('passes the signed storage object name when creating uploaded images', async () => {
       mockCreateSignedStorageUrl.mockResolvedValue({
         data: {

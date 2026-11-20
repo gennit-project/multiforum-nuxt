@@ -16,6 +16,7 @@ export const CREATE_SIGNED_STORAGE_URL = gql`
       url
       storageObjectName
       storageUrl
+      contentLengthRange
     }
   }
 `;

@@ -143,6 +143,25 @@ describe('useImageUpload.uploadFile', () => {
     );
   });
 
+  it('passes the signed contentLengthRange to the storage upload helper', async () => {
+    mockMutate.mockResolvedValue({
+      data: {
+        createSignedStorageURL: {
+          url: 'https://signed',
+          contentLengthRange: '0,10485760',
+        },
+      },
+    });
+    uploadAndGetEmbeddedLink.mockResolvedValue('https://cdn/x.png');
+    const { uploadFile } = useImageUpload();
+
+    await uploadFile(makeFile());
+
+    expect(uploadAndGetEmbeddedLink).toHaveBeenCalledWith(
+      expect.objectContaining({ contentLengthRange: '0,10485760' })
+    );
+  });
+
   it('returns the error message when the upload throws', async () => {
     mockMutate.mockRejectedValue(new Error('network down'));
     const { uploadFile, isUploading } = useImageUpload();

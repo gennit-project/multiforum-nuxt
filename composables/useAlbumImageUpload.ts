@@ -89,6 +89,7 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
         fileType: contentType,
         signedStorageURL,
         storageUrl: signedUpload?.storageUrl,
+        contentLengthRange: signedUpload?.contentLengthRange,
       });
 
       if (!fileUrl) {

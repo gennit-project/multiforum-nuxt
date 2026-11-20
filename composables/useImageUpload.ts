@@ -94,6 +94,7 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
         fileType,
         signedStorageURL,
         storageUrl: signedUpload?.storageUrl,
+        contentLengthRange: signedUpload?.contentLengthRange,
       });
 
       if (!embeddedLink) {

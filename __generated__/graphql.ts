@@ -3585,6 +3585,8 @@ export type Channel = {
   markAsAnsweredEnabled?: Maybe<Scalars['Boolean']['output']>;
   discussionFlairRequired?: Maybe<Scalars['Boolean']['output']>;
   allowedFileTypes?: Maybe<Array<Scalars['String']['output']>>;
+  imageMaxUploadBytes?: Maybe<Scalars['Int']['output']>;
+  fileMaxUploadBytes?: Maybe<Scalars['Int']['output']>;
   payoutPercent?: Maybe<Scalars['Int']['output']>;
   pluginPipelines?: Maybe<Scalars['JSON']['output']>;
   LockedBy?: Maybe<ModerationProfile>;
@@ -4004,6 +4006,8 @@ export type ChannelAggregateNode = {
   icon64Url: StringAggregateSelection;
   icon96Url: StringAggregateSelection;
   channelBannerURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   payoutPercent: IntAggregateSelection;
 };
 
@@ -4041,6 +4045,8 @@ export type ChannelChannelRelatedChannelsNodeAggregateSelection = {
   icon64Url: StringAggregateSelection;
   icon96Url: StringAggregateSelection;
   channelBannerURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   payoutPercent: IntAggregateSelection;
 };
 
@@ -5082,6 +5088,8 @@ export type CollectionChannelChannelsNodeAggregateSelection = {
   icon64Url: StringAggregateSelection;
   icon96Url: StringAggregateSelection;
   channelBannerURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   payoutPercent: IntAggregateSelection;
 };
 
@@ -10879,6 +10887,8 @@ export type ModerationProfileServerConfigModOfServersNodeAggregateSelection = {
   serverName: StringAggregateSelection;
   serverDescription: StringAggregateSelection;
   serverIconURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   minimumAccountAge: IntAggregateSelection;
   minimumSensitiveContentAge: IntAggregateSelection;
   brandingProductName: StringAggregateSelection;
@@ -11956,6 +11966,8 @@ export type ServerConfig = {
   serverIconURL?: Maybe<Scalars['String']['output']>;
   rules?: Maybe<Scalars['JSON']['output']>;
   allowedFileTypes?: Maybe<Array<Scalars['String']['output']>>;
+  imageMaxUploadBytes?: Maybe<Scalars['Int']['output']>;
+  fileMaxUploadBytes?: Maybe<Scalars['Int']['output']>;
   featuredWikiPageIds?: Maybe<Array<Scalars['ID']['output']>>;
   enableDownloads?: Maybe<Scalars['Boolean']['output']>;
   enableEvents?: Maybe<Scalars['Boolean']['output']>;
@@ -12179,6 +12191,8 @@ export type ServerConfigAggregateNode = {
   serverName: StringAggregateSelection;
   serverDescription: StringAggregateSelection;
   serverIconURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   minimumAccountAge: IntAggregateSelection;
   minimumSensitiveContentAge: IntAggregateSelection;
   brandingProductName: StringAggregateSelection;
@@ -12772,6 +12786,7 @@ export type SignedUrl = {
   storageObjectName?: Maybe<Scalars['String']['output']>;
   storageUrl?: Maybe<Scalars['String']['output']>;
   uploadedAt?: Maybe<Scalars['DateTime']['output']>;
+  contentLengthRange?: Maybe<Scalars['String']['output']>;
 };
 
 export type SiteWideDiscussionListFormat = {
@@ -13042,6 +13057,8 @@ export type TagChannelChannelsNodeAggregateSelection = {
   icon64Url: StringAggregateSelection;
   icon96Url: StringAggregateSelection;
   channelBannerURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   payoutPercent: IntAggregateSelection;
 };
 
@@ -14333,6 +14350,8 @@ export type UserChannelAdminOfChannelsNodeAggregateSelection = {
   icon64Url: StringAggregateSelection;
   icon96Url: StringAggregateSelection;
   channelBannerURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   payoutPercent: IntAggregateSelection;
 };
 
@@ -14356,6 +14375,8 @@ export type UserChannelFavoriteChannelsNodeAggregateSelection = {
   icon64Url: StringAggregateSelection;
   icon96Url: StringAggregateSelection;
   channelBannerURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   payoutPercent: IntAggregateSelection;
 };
 
@@ -14379,6 +14400,8 @@ export type UserChannelModOfChannelsNodeAggregateSelection = {
   icon64Url: StringAggregateSelection;
   icon96Url: StringAggregateSelection;
   channelBannerURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   payoutPercent: IntAggregateSelection;
 };
 
@@ -14402,6 +14425,8 @@ export type UserChannelPendingModInvitesNodeAggregateSelection = {
   icon64Url: StringAggregateSelection;
   icon96Url: StringAggregateSelection;
   channelBannerURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   payoutPercent: IntAggregateSelection;
 };
 
@@ -14425,6 +14450,8 @@ export type UserChannelPendingOwnerInvitesNodeAggregateSelection = {
   icon64Url: StringAggregateSelection;
   icon96Url: StringAggregateSelection;
   channelBannerURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   payoutPercent: IntAggregateSelection;
 };
 
@@ -14448,6 +14475,8 @@ export type UserChannelRecentlyVisitedChannelsNodeAggregateSelection = {
   icon64Url: StringAggregateSelection;
   icon96Url: StringAggregateSelection;
   channelBannerURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   payoutPercent: IntAggregateSelection;
 };
 
@@ -15250,6 +15279,8 @@ export type UserServerConfigAdminOfServersNodeAggregateSelection = {
   serverName: StringAggregateSelection;
   serverDescription: StringAggregateSelection;
   serverIconURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   minimumAccountAge: IntAggregateSelection;
   minimumSensitiveContentAge: IntAggregateSelection;
   brandingProductName: StringAggregateSelection;
@@ -15274,6 +15305,8 @@ export type UserServerConfigPendingServerAdminInvitesNodeAggregateSelection = {
   serverName: StringAggregateSelection;
   serverDescription: StringAggregateSelection;
   serverIconURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   minimumAccountAge: IntAggregateSelection;
   minimumSensitiveContentAge: IntAggregateSelection;
   brandingProductName: StringAggregateSelection;
@@ -15298,6 +15331,8 @@ export type UserServerConfigPendingServerModInvitesNodeAggregateSelection = {
   serverName: StringAggregateSelection;
   serverDescription: StringAggregateSelection;
   serverIconURL: StringAggregateSelection;
+  imageMaxUploadBytes: IntAggregateSelection;
+  fileMaxUploadBytes: IntAggregateSelection;
   minimumAccountAge: IntAggregateSelection;
   minimumSensitiveContentAge: IntAggregateSelection;
   brandingProductName: StringAggregateSelection;
@@ -18827,6 +18862,8 @@ export type ChannelCreateInput = {
   requireVerifiedEmailToPost?: InputMaybe<Scalars['Boolean']['input']>;
   markAsAnsweredEnabled?: InputMaybe<Scalars['Boolean']['input']>;
   allowedFileTypes?: InputMaybe<Array<Scalars['String']['input']>>;
+  imageMaxUploadBytes?: InputMaybe<Scalars['Int']['input']>;
+  fileMaxUploadBytes?: InputMaybe<Scalars['Int']['input']>;
   payoutPercent?: InputMaybe<Scalars['Int']['input']>;
   pluginPipelines?: InputMaybe<Scalars['JSON']['input']>;
   LockedBy?: InputMaybe<ChannelLockedByFieldInput>;
@@ -23578,6 +23615,88 @@ export type ChannelRelatedChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead. */
   channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelBannerURL?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead. */
   payoutPercent_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead. */
@@ -23851,6 +23970,8 @@ export type ChannelSort = {
   requireVerifiedEmailToPost?: InputMaybe<SortDirection>;
   markAsAnsweredEnabled?: InputMaybe<SortDirection>;
   discussionFlairRequired?: InputMaybe<SortDirection>;
+  imageMaxUploadBytes?: InputMaybe<SortDirection>;
+  fileMaxUploadBytes?: InputMaybe<SortDirection>;
   payoutPercent?: InputMaybe<SortDirection>;
   pluginPipelines?: InputMaybe<SortDirection>;
 };
@@ -24619,6 +24740,20 @@ export type ChannelUpdateInput = {
   allowedFileTypes_POP?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the generic mutation 'allowedFileTypes: { push: ... } }' instead. */
   allowedFileTypes_PUSH?: InputMaybe<Array<Scalars['String']['input']>>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarMutations>;
+  /** @deprecated Please use the generic mutation 'imageMaxUploadBytes: { set: ... } }' instead. */
+  imageMaxUploadBytes_SET?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic mutation 'imageMaxUploadBytes: { increment: ... } }' instead. */
+  imageMaxUploadBytes_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic mutation 'imageMaxUploadBytes: { decrement: ... } }' instead. */
+  imageMaxUploadBytes_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarMutations>;
+  /** @deprecated Please use the generic mutation 'fileMaxUploadBytes: { set: ... } }' instead. */
+  fileMaxUploadBytes_SET?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic mutation 'fileMaxUploadBytes: { increment: ... } }' instead. */
+  fileMaxUploadBytes_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic mutation 'fileMaxUploadBytes: { decrement: ... } }' instead. */
+  fileMaxUploadBytes_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   payoutPercent?: InputMaybe<IntScalarMutations>;
   /** @deprecated Please use the generic mutation 'payoutPercent: { set: ... } }' instead. */
   payoutPercent_SET?: InputMaybe<Scalars['Int']['input']>;
@@ -24865,6 +25000,32 @@ export type ChannelWhere = {
   allowedFileTypes_EQ?: InputMaybe<Array<Scalars['String']['input']>>;
   /** @deprecated Please use the relevant generic filter allowedFileTypes: { includes: ... } */
   allowedFileTypes_INCLUDES?: InputMaybe<Scalars['String']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { eq: ... } */
+  imageMaxUploadBytes_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { in: ... } */
+  imageMaxUploadBytes_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { lt: ... } */
+  imageMaxUploadBytes_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { lte: ... } */
+  imageMaxUploadBytes_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { gt: ... } */
+  imageMaxUploadBytes_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { gte: ... } */
+  imageMaxUploadBytes_GTE?: InputMaybe<Scalars['Int']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { eq: ... } */
+  fileMaxUploadBytes_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { in: ... } */
+  fileMaxUploadBytes_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { lt: ... } */
+  fileMaxUploadBytes_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { lte: ... } */
+  fileMaxUploadBytes_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { gt: ... } */
+  fileMaxUploadBytes_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { gte: ... } */
+  fileMaxUploadBytes_GTE?: InputMaybe<Scalars['Int']['input']>;
   payoutPercent?: InputMaybe<IntScalarFilters>;
   /** @deprecated Please use the relevant generic filter payoutPercent: { eq: ... } */
   payoutPercent_EQ?: InputMaybe<Scalars['Int']['input']>;
@@ -26577,6 +26738,88 @@ export type CollectionChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead. */
   channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelBannerURL?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead. */
   payoutPercent_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead. */
@@ -57600,6 +57843,88 @@ export type ModerationProfileModOfServersNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'rankingSettingsUpdatedBy: { shortestLength: { lte: ... } } }' instead. */
   rankingSettingsUpdatedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   rankingSettingsUpdatedBy?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'minimumAccountAge: { min: { eq: ... } } }' instead. */
   minimumAccountAge_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'minimumAccountAge: { max: { eq: ... } } }' instead. */
@@ -64082,6 +64407,8 @@ export type ServerConfigCreateInput = {
   serverIconURL?: InputMaybe<Scalars['String']['input']>;
   rules?: InputMaybe<Scalars['JSON']['input']>;
   allowedFileTypes?: InputMaybe<Array<Scalars['String']['input']>>;
+  imageMaxUploadBytes?: InputMaybe<Scalars['Int']['input']>;
+  fileMaxUploadBytes?: InputMaybe<Scalars['Int']['input']>;
   featuredWikiPageIds?: InputMaybe<Array<Scalars['ID']['input']>>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
@@ -66394,6 +66721,8 @@ export type ServerConfigSort = {
   rankingSettingsJson?: InputMaybe<SortDirection>;
   rankingSettingsUpdatedAt?: InputMaybe<SortDirection>;
   rankingSettingsUpdatedBy?: InputMaybe<SortDirection>;
+  imageMaxUploadBytes?: InputMaybe<SortDirection>;
+  fileMaxUploadBytes?: InputMaybe<SortDirection>;
   enableDownloads?: InputMaybe<SortDirection>;
   enableEvents?: InputMaybe<SortDirection>;
   accountAgeGateEnabled?: InputMaybe<SortDirection>;
@@ -67671,6 +68000,20 @@ export type ServerConfigUpdateInput = {
   allowedFileTypes_POP?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the generic mutation 'allowedFileTypes: { push: ... } }' instead. */
   allowedFileTypes_PUSH?: InputMaybe<Array<Scalars['String']['input']>>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarMutations>;
+  /** @deprecated Please use the generic mutation 'imageMaxUploadBytes: { set: ... } }' instead. */
+  imageMaxUploadBytes_SET?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic mutation 'imageMaxUploadBytes: { increment: ... } }' instead. */
+  imageMaxUploadBytes_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic mutation 'imageMaxUploadBytes: { decrement: ... } }' instead. */
+  imageMaxUploadBytes_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarMutations>;
+  /** @deprecated Please use the generic mutation 'fileMaxUploadBytes: { set: ... } }' instead. */
+  fileMaxUploadBytes_SET?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic mutation 'fileMaxUploadBytes: { increment: ... } }' instead. */
+  fileMaxUploadBytes_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic mutation 'fileMaxUploadBytes: { decrement: ... } }' instead. */
+  fileMaxUploadBytes_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   featuredWikiPageIds?: InputMaybe<ListIdMutations>;
   /** @deprecated Please use the generic mutation 'featuredWikiPageIds: { set: ... } }' instead. */
   featuredWikiPageIds_SET?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -67852,6 +68195,32 @@ export type ServerConfigWhere = {
   allowedFileTypes_EQ?: InputMaybe<Array<Scalars['String']['input']>>;
   /** @deprecated Please use the relevant generic filter allowedFileTypes: { includes: ... } */
   allowedFileTypes_INCLUDES?: InputMaybe<Scalars['String']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { eq: ... } */
+  imageMaxUploadBytes_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { in: ... } */
+  imageMaxUploadBytes_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { lt: ... } */
+  imageMaxUploadBytes_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { lte: ... } */
+  imageMaxUploadBytes_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { gt: ... } */
+  imageMaxUploadBytes_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageMaxUploadBytes: { gte: ... } */
+  imageMaxUploadBytes_GTE?: InputMaybe<Scalars['Int']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { eq: ... } */
+  fileMaxUploadBytes_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { in: ... } */
+  fileMaxUploadBytes_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { lt: ... } */
+  fileMaxUploadBytes_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { lte: ... } */
+  fileMaxUploadBytes_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { gt: ... } */
+  fileMaxUploadBytes_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter fileMaxUploadBytes: { gte: ... } */
+  fileMaxUploadBytes_GTE?: InputMaybe<Scalars['Int']['input']>;
   featuredWikiPageIds?: InputMaybe<IdListFilters>;
   /** @deprecated Please use the relevant generic filter featuredWikiPageIds: { eq: ... } */
   featuredWikiPageIds_EQ?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -69497,6 +69866,88 @@ export type TagChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead. */
   channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelBannerURL?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead. */
   payoutPercent_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead. */
@@ -71523,6 +71974,88 @@ export type UserAdminOfChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead. */
   channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelBannerURL?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead. */
   payoutPercent_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead. */
@@ -71833,6 +72366,88 @@ export type UserAdminOfServersNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'rankingSettingsUpdatedBy: { shortestLength: { lte: ... } } }' instead. */
   rankingSettingsUpdatedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   rankingSettingsUpdatedBy?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'minimumAccountAge: { min: { eq: ... } } }' instead. */
   minimumAccountAge_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'minimumAccountAge: { max: { eq: ... } } }' instead. */
@@ -75022,6 +75637,88 @@ export type UserFavoriteChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead. */
   channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelBannerURL?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead. */
   payoutPercent_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead. */
@@ -79147,6 +79844,88 @@ export type UserModOfChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead. */
   channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelBannerURL?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead. */
   payoutPercent_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead. */
@@ -80569,6 +81348,88 @@ export type UserPendingModInvitesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead. */
   channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelBannerURL?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead. */
   payoutPercent_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead. */
@@ -81055,6 +81916,88 @@ export type UserPendingOwnerInvitesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead. */
   channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelBannerURL?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead. */
   payoutPercent_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead. */
@@ -81365,6 +82308,88 @@ export type UserPendingServerAdminInvitesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'rankingSettingsUpdatedBy: { shortestLength: { lte: ... } } }' instead. */
   rankingSettingsUpdatedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   rankingSettingsUpdatedBy?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'minimumAccountAge: { min: { eq: ... } } }' instead. */
   minimumAccountAge_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'minimumAccountAge: { max: { eq: ... } } }' instead. */
@@ -81995,6 +83020,88 @@ export type UserPendingServerModInvitesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'rankingSettingsUpdatedBy: { shortestLength: { lte: ... } } }' instead. */
   rankingSettingsUpdatedBy_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   rankingSettingsUpdatedBy?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'minimumAccountAge: { min: { eq: ... } } }' instead. */
   minimumAccountAge_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'minimumAccountAge: { max: { eq: ... } } }' instead. */
@@ -82985,6 +84092,88 @@ export type UserRecentlyVisitedChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelBannerURL: { shortestLength: { lte: ... } } }' instead. */
   channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelBannerURL?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  imageMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { eq: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { gte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lt: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { min: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { max: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { sum: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'fileMaxUploadBytes: { average: { lte: ... } } }' instead. */
+  fileMaxUploadBytes_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  fileMaxUploadBytes?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { min: { eq: ... } } }' instead. */
   payoutPercent_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter 'payoutPercent: { max: { eq: ... } } }' instead. */

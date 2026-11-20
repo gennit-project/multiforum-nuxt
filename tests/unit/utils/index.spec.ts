@@ -458,6 +458,46 @@ describe('uploadAndGetEmbeddedLink', () => {
     );
   });
 
+  it('replays the signed x-goog-content-length-range header on the PUT', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true });
+
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+    await uploadAndGetEmbeddedLink({
+      signedStorageURL: 'https://storage.example.com/upload',
+      contentLengthRange: '0,10485760',
+      filename: 'test.jpg',
+      file,
+      fileType: 'image/jpeg',
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://storage.example.com/upload',
+      expect.objectContaining({
+        headers: {
+          'Content-Type': 'image/jpeg',
+          'x-goog-content-length-range': '0,10485760',
+        },
+      })
+    );
+  });
+
+  it('omits the size-limit header when the backend returns no contentLengthRange', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true });
+
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+    await uploadAndGetEmbeddedLink({
+      signedStorageURL: 'https://storage.example.com/upload',
+      contentLengthRange: null,
+      filename: 'test.jpg',
+      file,
+      fileType: 'image/jpeg',
+    });
+
+    expect(mockFetch.mock.calls[0]?.[1].headers).toEqual({
+      'Content-Type': 'image/jpeg',
+    });
+  });
+
   it('returns the signed storageUrl after a successful upload when provided', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true });
 

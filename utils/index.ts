@@ -268,6 +268,13 @@ type UploadFileInput = {
 type GetEmbeddedLinkInput = {
   signedStorageURL: string;
   storageUrl?: string | null;
+  /**
+   * The exact value of the signed `x-goog-content-length-range` header, as
+   * returned by `createSignedStorageURL`. Because GCS signs this header into
+   * the URL, the PUT must replay it verbatim or the upload fails with a 403.
+   * Omitted by older backends that do not sign a size limit.
+   */
+  contentLengthRange?: string | null;
   filename: string;
   file: File;
   fileType: string;
@@ -277,6 +284,7 @@ export type SignedStorageUrlPayload = {
   url?: string | null;
   storageUrl?: string | null;
   storageObjectName?: string | null;
+  contentLengthRange?: string | null;
 };
 
 export function getUploadFileName(input: UploadFileInput) {
@@ -291,7 +299,8 @@ export function encodeSpacesInURL(url: string) {
 }
 
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
-  const { signedStorageURL, storageUrl, filename, file } = input;
+  const { signedStorageURL, storageUrl, contentLengthRange, filename, file } =
+    input;
 
   // Check validation
   const sizeCheck = isFileSizeValid({ file });
@@ -327,12 +336,17 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
     })();
 
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': contentType,
+    };
+    if (contentLengthRange) {
+      headers['x-goog-content-length-range'] = contentLengthRange;
+    }
+
     const response = await fetch(signedStorageURL, {
       method: 'PUT',
       body: file,
-      headers: {
-        'Content-Type': contentType,
-      },
+      headers,
     });
 
     if (!response.ok) {

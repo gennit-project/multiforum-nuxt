@@ -101,6 +101,7 @@ const upload = async (file: File) => {
       fileType: file.type,
       signedStorageURL,
       storageUrl: signedUpload?.storageUrl,
+      contentLengthRange: signedUpload?.contentLengthRange,
     });
 
     return embeddedLink;

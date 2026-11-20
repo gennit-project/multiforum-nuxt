@@ -339,6 +339,7 @@ const uploadFile = async (file: File): Promise<boolean> => {
       fileType,
       signedStorageURL,
       storageUrl: signedUpload?.storageUrl,
+      contentLengthRange: signedUpload?.contentLengthRange,
     });
 
     if (!fileUrl) {

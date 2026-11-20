@@ -4,8 +4,8 @@
   "lockfileSha256": "7c5e77f6ab917360eac30eef4fca011fc9494514d154e064b88d3aa46136dc28",
   "pinnedSchema": {
     "repository": "gennit-project/multiforum-backend",
-    "revision": "89f3f7404a53d52a8242ef2791571a153d1661bf",
-    "sha256": "a52ca28534972c3008de63cfaaa034aee88c595a3c44067bd6154a0c8364a781"
+    "revision": "6cd52f17c8038da1961493e89d315e0294b4e251",
+    "sha256": "1d5fbd8e02b1894d323ea4390844f5b1262dd3202feb6d42cf237c469794cda3"
   },
   "sources": [
     {
@@ -54,7 +54,7 @@
     },
     {
       "file": "graphQLData/discussion/mutations.js",
-      "sha256": "2c8afa4f9bdced865c5e91d3559f252168f7a5bbd8dc4d824b0804f04923d5f6"
+      "sha256": "3ffcfa352e1ee0fce02daf3d1092d14458a084f91666b1af9199faa6b78435c8"
     },
     {
       "file": "graphQLData/discussion/queries.js",
@@ -1339,13 +1339,13 @@
       "file": "graphQLData/discussion/mutations.js",
       "line": 3,
       "column": 42,
-      "sha256": "1887af2899ee409410ff51cfc4b65fc8587e71e86da65b2f35eb2177395a74cb",
-      "source": "mutation createSignedURL($filename: String!, $contentType: String!, $channelConnections: [String!], $uploadTarget: StorageUploadTarget) {\n  createSignedStorageURL(\n    filename: $filename\n    contentType: $contentType\n    channelConnections: $channelConnections\n    uploadTarget: $uploadTarget\n  ) {\n    url\n    storageObjectName\n    storageUrl\n  }\n}"
+      "sha256": "a338b73ab1dd194bf0353560ac44b3ffb6fb717a3e7ba5be1f802d30849d9a0e",
+      "source": "mutation createSignedURL($filename: String!, $contentType: String!, $channelConnections: [String!], $uploadTarget: StorageUploadTarget) {\n  createSignedStorageURL(\n    filename: $filename\n    contentType: $contentType\n    channelConnections: $channelConnections\n    uploadTarget: $uploadTarget\n  ) {\n    url\n    storageObjectName\n    storageUrl\n    contentLengthRange\n  }\n}"
     },
     {
       "id": "graphQLData/discussion/mutations.js#CREATE_IMAGE",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 23,
+      "line": 24,
       "column": 29,
       "sha256": "236080a35fe0657e9840ee2c6cf4c191cd05d2354c3417676fd03d674dab094f",
       "source": "mutation createImage($url: String, $alt: String, $caption: String, $copyright: String, $albumId: ID, $storageObjectName: String) {\n  createImageWithUploader(\n    input: {url: $url, alt: $alt, caption: $caption, copyright: $copyright, albumId: $albumId, storageObjectName: $storageObjectName}\n  ) {\n    id\n    url\n    alt\n    caption\n    copyright\n    Uploader {\n      username\n    }\n  }\n}"
@@ -1353,7 +1353,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#CREATE_DOWNLOADABLE_FILE",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 54,
+      "line": 55,
       "column": 41,
       "sha256": "ce766625d9be70e1558c322945a12ec19d99450b988ef19c88e858804606cc01",
       "source": "mutation createDownloadableFile($fileName: String!, $url: String!, $kind: FileKind!, $size: Int, $priceModel: PriceModel!, $priceCents: Int, $priceCurrency: String, $storageObjectName: String) {\n  createDownloadableFiles(\n    input: [{fileName: $fileName, url: $url, kind: $kind, size: $size, priceModel: $priceModel, priceCents: $priceCents, priceCurrency: $priceCurrency, storageObjectName: $storageObjectName}]\n  ) {\n    downloadableFiles {\n      id\n      fileName\n      url\n      kind\n      size\n      priceModel\n      priceCents\n      priceCurrency\n      license {\n        id\n        name\n      }\n    }\n  }\n}"
@@ -1361,7 +1361,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#PREPARE_DOWNLOAD",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 97,
+      "line": 98,
       "column": 33,
       "sha256": "26a90719db63b673520f05fcd15683830e40db98fe77e65bdbc97eef47b8f868",
       "source": "mutation prepareDownload($downloadableFileId: ID!, $discussionId: ID!) {\n  prepareDownload(\n    downloadableFileId: $downloadableFileId\n    discussionId: $discussionId\n  ) {\n    ready\n    url\n    scanStatus\n    scanReason\n    scanCheckedAt\n    reviewAccess\n    message\n  }\n}"
@@ -1369,7 +1369,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#RETRY_DOWNLOADABLE_FILE_SCAN",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 114,
+      "line": 115,
       "column": 45,
       "sha256": "7e5d07165d69de0611baa71aac6d184adc95c7cfaf4129751fb77adab0fbc3b8",
       "source": "mutation retryDownloadableFileScan($downloadableFileId: ID!) {\n  retryDownloadableFileScan(downloadableFileId: $downloadableFileId) {\n    id\n    status\n  }\n}"
@@ -1377,7 +1377,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#REQUEST_DOWNLOADABLE_FILE_REVIEW",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 123,
+      "line": 124,
       "column": 49,
       "sha256": "6053dab8ce6b4c9840fa2f2cc4d33eb508c5773d464d3486b0d241a3fe1f7d90",
       "source": "mutation requestDownloadableFileReview($downloadableFileId: ID!, $reason: String) {\n  requestDownloadableFileReview(\n    downloadableFileId: $downloadableFileId\n    reason: $reason\n  ) {\n    id\n    scanStatus\n  }\n}"
@@ -1385,7 +1385,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#CLEAR_DOWNLOADABLE_FILE_SCAN",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 138,
+      "line": 139,
       "column": 45,
       "sha256": "1a0c578fdd61dc668472d0ab975d038cc07c76af415d74dfc3c52be8c4c53542",
       "source": "mutation clearDownloadableFileScan($downloadableFileId: ID!, $reason: String) {\n  clearDownloadableFileScan(\n    downloadableFileId: $downloadableFileId\n    reason: $reason\n  ) {\n    id\n    scanStatus\n    scanReason\n    scanCheckedAt\n  }\n}"
@@ -1393,7 +1393,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#PERMANENTLY_DELETE_DOWNLOADABLE_FILE",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 155,
+      "line": 156,
       "column": 53,
       "sha256": "d0ef518cc13ca0037d460d26c23d058608dd14e33ad6d20525e24d53f3b37566",
       "source": "mutation permanentlyDeleteDownloadableFile($downloadableFileId: ID!) {\n  permanentlyDeleteDownloadableFile(downloadableFileId: $downloadableFileId) {\n    id\n    permanentlyRemoved\n    permanentlyRemovedAt\n  }\n}"
@@ -1401,7 +1401,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UPDATE_DOWNLOADABLE_FILE_SUPPORT_SETTINGS",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 167,
+      "line": 168,
       "column": 58,
       "sha256": "060c795794cf4a2e52ee3e4308c6d718a64e506854b331d1da0ed787f9e5ba1c",
       "source": "mutation updateDownloadableFileSupportSettings($downloadableFileId: ID!, $discussionId: ID!, $input: DownloadSupportSettingsInput!) {\n  updateDownloadableFileSupportSettings(\n    downloadableFileId: $downloadableFileId\n    discussionId: $discussionId\n    input: $input\n  )\n}"
@@ -1409,7 +1409,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#ADD_EMOJI_TO_DISCUSSION_CHANNEL",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 181,
+      "line": 182,
       "column": 48,
       "sha256": "5474dd71605f8595a931fe037d7262102519599bdff4d3b5fb282be4d085a524",
       "source": "mutation addEmojiToDiscussionChannel($discussionChannelId: ID!, $emojiLabel: String!, $unicode: String!, $username: String!) {\n  addEmojiToDiscussionChannel(\n    discussionChannelId: $discussionChannelId\n    emojiLabel: $emojiLabel\n    unicode: $unicode\n    username: $username\n  ) {\n    id\n    emoji\n  }\n}"
@@ -1417,7 +1417,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 200,
+      "line": 201,
       "column": 53,
       "sha256": "d75310313ea94876bedd550799fe226dd2b9231382da2a77b6a5ded24dddac79",
       "source": "mutation removeEmojiFromDiscussionChannel($discussionChannelId: ID!, $emojiLabel: String!, $username: String!) {\n  removeEmojiFromDiscussionChannel(\n    discussionChannelId: $discussionChannelId\n    emojiLabel: $emojiLabel\n    username: $username\n  ) {\n    id\n    emoji\n  }\n}"
@@ -1425,7 +1425,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 217,
+      "line": 218,
       "column": 59,
       "sha256": "d3715cf91d040b59a036475276a5e7e0ebe9415adf1d11827dafa785f4b15552",
       "source": "mutation createDiscussion($input: [DiscussionCreateInputWithChannels!]!) {\n  createDiscussionWithChannelConnections(input: $input) {\n    id\n    title\n    body\n    DiscussionChannels {\n      id\n      archived\n      answered\n      locked\n      discussionId\n      channelUniqueName\n      CommentsConnection {\n        aggregate {\n          count {\n            nodes\n          }\n        }\n      }\n      weightedVotesCount\n      createdAt\n      Channel {\n        uniqueName\n      }\n      Discussion {\n        id\n      }\n      UpvotedByUsers {\n        username\n      }\n      UpvotedByUsersConnection {\n        aggregate {\n          count {\n            nodes\n          }\n        }\n      }\n    }\n    Author {\n      username\n    }\n    createdAt\n    updatedAt\n    Tags {\n      text\n    }\n  }\n}"
@@ -1433,7 +1433,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UPDATE_DISCUSSION",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 267,
+      "line": 268,
       "column": 34,
       "sha256": "54e56d38ce69fc7c5f0f154d65a4078a5900361e6d384b7efcc9f49939893a0f",
       "source": "mutation updateDiscussion($where: DiscussionWhere!, $updateDiscussionInput: DiscussionUpdateInput!) {\n  updateDiscussions(where: $where, update: $updateDiscussionInput) {\n    discussions {\n      id\n      title\n      body\n      createdAt\n      updatedAt\n      Album {\n        id\n        imageOrder\n        Images(where: {NOT: {archived: {eq: true}, permanentlyRemoved: {eq: true}}}) {\n          id\n          url\n          caption\n          copyright\n        }\n      }\n      PastTitleVersions(sort: [{createdAt: DESC}]) {\n        id\n        Author {\n          username\n        }\n        body\n        createdAt\n      }\n      PastBodyVersions(sort: [{createdAt: DESC}]) {\n        id\n        Author {\n          username\n        }\n        body\n        createdAt\n      }\n    }\n  }\n}"
@@ -1441,7 +1441,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 311,
+      "line": 312,
       "column": 59,
       "sha256": "73386571ea364891b10774ece20399f199269b78697c3bacb3c02766d3b9a5d3",
       "source": "mutation updateDiscussionWithChannelConnections($updateDiscussionInput: DiscussionUpdateInput!, $where: DiscussionWhere!, $channelConnections: [String!], $channelDisconnections: [String!], $albumImageDisconnections: [ID!], $album: DiscussionAlbumInput, $channelFlairSelections: [DiscussionChannelFlairSelectionInput!]) {\n  updateDiscussionWithChannelConnections(\n    discussionUpdateInput: $updateDiscussionInput\n    where: $where\n    channelConnections: $channelConnections\n    channelDisconnections: $channelDisconnections\n    albumImageDisconnections: $albumImageDisconnections\n    album: $album\n    channelFlairSelections: $channelFlairSelections\n  ) {\n    id\n    title\n    body\n    DiscussionChannels {\n      id\n      channelUniqueName\n      discussionId\n      Flairs {\n        id\n        channelUniqueName\n        displayName\n        color\n        order\n        archived\n      }\n      Channel {\n        uniqueName\n      }\n      archived\n      answered\n      locked\n    }\n    createdAt\n    updatedAt\n    Tags {\n      text\n    }\n  }\n}"
@@ -1449,7 +1449,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#DELETE_DISCUSSION",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 361,
+      "line": 362,
       "column": 34,
       "sha256": "240c584401085dcda8c653024c0a73402840b85dc872559eb5d0e424446b8bed",
       "source": "mutation deleteDiscussion($id: ID!) {\n  deleteDiscussions(where: {id: {eq: $id}}) {\n    nodesDeleted\n    relationshipsDeleted\n  }\n}"
@@ -1457,7 +1457,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UPVOTE_DISCUSSION_CHANNEL",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 370,
+      "line": 371,
       "column": 42,
       "sha256": "d78b42d3148f8b339a46a019f8193c6a72e8c6e15455785e7dc8683c335c4b2a",
       "source": "mutation upvoteDiscussionChannel($id: ID!, $username: String!) {\n  upvoteDiscussionChannel(discussionChannelId: $id, username: $username) {\n    id\n    weightedVotesCount\n    UpvotedByUsers {\n      username\n    }\n    UpvotedByUsersConnection {\n      aggregate {\n        count {\n          nodes\n        }\n      }\n    }\n    SuperUpvotedByUsers {\n      username\n    }\n  }\n}"
@@ -1465,7 +1465,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UNDO_UPVOTE_DISCUSSION_CHANNEL",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 392,
+      "line": 393,
       "column": 47,
       "sha256": "ad898a047f6840c47c2a1ca8a6ca188736c51ca8184c87763cbb7a1a7d83069a",
       "source": "mutation undoUpvoteDiscussionChannel($id: ID!, $username: String!) {\n  undoUpvoteDiscussionChannel(discussionChannelId: $id, username: $username) {\n    id\n    weightedVotesCount\n    UpvotedByUsers {\n      username\n    }\n    UpvotedByUsersConnection {\n      aggregate {\n        count {\n          nodes\n        }\n      }\n    }\n    SuperUpvotedByUsers {\n      username\n    }\n  }\n}"
@@ -1473,7 +1473,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#ADD_FEEDBACK_COMMENT_TO_DISCUSSION",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 414,
+      "line": 415,
       "column": 51,
       "sha256": "1c253ec7447f034f2f13915dc14f07ac32a6a7775cf0121dec7d8adf9653193e",
       "source": "mutation addFeedbackCommentToDiscussion($modProfileName: String!, $text: String!, $discussionId: ID!, $channelId: String!, $discussionChannelId: ID!) {\n  createCommentWithOwnedConnections(\n    input: [{isRootComment: true, isFeedbackComment: true, text: $text, Channel: {connect: {where: {node: {uniqueName: $channelId}}}}, DiscussionChannel: {connect: {where: {node: {id: $discussionChannelId}}}}, CommentAuthor: {ModerationProfile: {connect: {where: {node: {displayName: $modProfileName}}}}}, GivesFeedbackOnDiscussion: {connect: {where: {node: {id: $discussionId}}}}}]\n  ) {\n    comments {\n      id\n      isRootComment\n      isFeedbackComment\n      createdAt\n      Channel {\n        uniqueName\n      }\n      CommentAuthor {\n        ... on ModerationProfile {\n          displayName\n        }\n        ... on User {\n          username\n        }\n      }\n      createdAt\n      text\n      GivesFeedbackOnDiscussion {\n        id\n      }\n    }\n  }\n}"
@@ -1481,7 +1481,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#MARK_AS_ANSWERED",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 469,
+      "line": 470,
       "column": 33,
       "sha256": "033e656ef48083d4b8d0fe7e00fe342776be6b56eed5acc76c0077db69dcf59b",
       "source": "mutation markAsAnswered($channelId: String!, $discussionId: ID!) {\n  updateDiscussionChannels(\n    where: {channelUniqueName: {eq: $channelId}, discussionId: {eq: $discussionId}}\n    update: {answered: {set: true}}\n  ) {\n    discussionChannels {\n      id\n      answered\n      Answers {\n        id\n        text\n        CommentAuthor {\n          ... on User {\n            username\n          }\n          ... on ModerationProfile {\n            displayName\n          }\n        }\n      }\n    }\n  }\n}"
@@ -1489,7 +1489,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#MARK_AS_ANSWERED_BY_COMMENT",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 498,
+      "line": 499,
       "column": 44,
       "sha256": "e817b8e57a88735f7f1f49dae1f13dea34d437aee2947a2e698759f8f4aedadf",
       "source": "mutation markAsAnswered($commentId: ID!, $channelId: String!, $discussionId: ID!) {\n  updateDiscussionChannels(\n    where: {channelUniqueName: {eq: $channelId}, discussionId: {eq: $discussionId}}\n    update: {answered: {set: true}, Answers: {connect: [{where: {node: {id: {eq: $commentId}}}}]}}\n  ) {\n    discussionChannels {\n      id\n      answered\n      Answers {\n        id\n        text\n        CommentAuthor {\n          ... on User {\n            username\n          }\n          ... on ModerationProfile {\n            displayName\n          }\n        }\n      }\n    }\n  }\n}"
@@ -1497,7 +1497,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#MARK_AS_UNANSWERED",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 534,
+      "line": 535,
       "column": 35,
       "sha256": "e3cda257d810d5587d39682c769424e4f0ef088c31ae44ded802da0d71b63b24",
       "source": "mutation markAsUnAnswered($channelId: String!, $discussionId: ID!) {\n  updateDiscussionChannels(\n    where: {channelUniqueName: {eq: $channelId}, discussionId: {eq: $discussionId}}\n    update: {Answers: {disconnect: [{where: {node: {}}}]}}\n  ) {\n    discussionChannels {\n      id\n      answered\n      Answers {\n        id\n        text\n        CommentAuthor {\n          ... on User {\n            username\n          }\n        }\n      }\n    }\n  }\n}"
@@ -1505,7 +1505,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UNMARK_COMMENT_AS_ANSWER",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 560,
+      "line": 561,
       "column": 41,
       "sha256": "6b73aea82866a0f84a9db1d135b30886490ce2820a540d6ebb234a7ffd3d483b",
       "source": "mutation unmarkCommentAsAnswer($commentId: ID!, $channelId: String!, $discussionId: ID!) {\n  updateDiscussionChannels(\n    where: {channelUniqueName: {eq: $channelId}, discussionId: {eq: $discussionId}}\n    update: {Answers: {disconnect: [{where: {node: {id: {eq: $commentId}}}}]}}\n  ) {\n    discussionChannels {\n      id\n      answered\n      Answers {\n        id\n        text\n        CommentAuthor {\n          ... on User {\n            username\n          }\n          ... on ModerationProfile {\n            displayName\n          }\n        }\n      }\n    }\n  }\n}"
@@ -1513,7 +1513,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UPDATE_IMAGE",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 595,
+      "line": 596,
       "column": 29,
       "sha256": "4fc6d0a3630b3359b1be977c36508daff13e5d6177b9229124bb40e00f240ecc",
       "source": "mutation updateImage($imageId: ID!, $caption: String, $alt: String) {\n  updateImages(\n    where: {id: {eq: $imageId}}\n    update: {caption: {set: $caption}, alt: {set: $alt}}\n  ) {\n    images {\n      id\n      caption\n      alt\n      url\n    }\n  }\n}"
@@ -1521,7 +1521,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UPDATE_IMAGE_METADATA",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 613,
+      "line": 614,
       "column": 38,
       "sha256": "75d2d1a0538e7b98426e9014d6ab2c27c0e194d288d1d5f6f026eb69de888b7c",
       "source": "mutation updateImageMetadata($imageId: ID!, $alt: String, $caption: String, $copyright: String) {\n  updateImages(\n    where: {id: {eq: $imageId}}\n    update: {alt: {set: $alt}, caption: {set: $caption}, copyright: {set: $copyright}}\n  ) {\n    images {\n      id\n      alt\n      caption\n      copyright\n    }\n  }\n}"
@@ -1529,7 +1529,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#DELETE_DISCUSSION_BODY_REVISION",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 638,
+      "line": 639,
       "column": 48,
       "sha256": "e6f8607543a896fe074b9dc29027a22fb98025b67b8996a06e550be4cbf01356",
       "source": "mutation deleteDiscussionBodyRevision($textVersionId: ID!) {\n  deleteDiscussionBodyRevision(textVersionId: $textVersionId) {\n    id\n    body\n    editReason\n    createdAt\n    updatedAt\n    Author {\n      username\n    }\n  }\n}"
@@ -1537,7 +1537,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#DELETE_WIKI_REVISION",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 653,
+      "line": 654,
       "column": 37,
       "sha256": "b8c50c78e9e00fb06c30c4b8a2c118487b0b0eb3f302bae87f0a233cf4023a75",
       "source": "mutation deleteWikiRevision($textVersionId: ID!) {\n  deleteWikiRevision(textVersionId: $textVersionId) {\n    id\n    body\n    editReason\n    createdAt\n    updatedAt\n    Author {\n      username\n    }\n  }\n}"
@@ -1545,7 +1545,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#SUBSCRIBE_TO_DISCUSSION_CHANNEL",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 668,
+      "line": 669,
       "column": 48,
       "sha256": "2afb91bb7da3c3284dea5965d211a515578d79d0d696bdd0cff68190ab635fd9",
       "source": "mutation subscribeToDiscussionChannel($discussionChannelId: ID!) {\n  subscribeToDiscussionChannel(discussionChannelId: $discussionChannelId) {\n    id\n    SubscribedToNotifications {\n      username\n    }\n  }\n}"
@@ -1553,7 +1553,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 679,
+      "line": 680,
       "column": 52,
       "sha256": "fdebd0a1e333c0baa6fdd6f9b73b4c58a355f3b4605333f8e4d57837721165c8",
       "source": "mutation unsubscribeFromDiscussionChannel($discussionChannelId: ID!) {\n  unsubscribeFromDiscussionChannel(discussionChannelId: $discussionChannelId) {\n    id\n    SubscribedToNotifications {\n      username\n    }\n  }\n}"
@@ -1561,7 +1561,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UPDATE_DISCUSSION_SENSITIVE_CONTENT",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 692,
+      "line": 693,
       "column": 52,
       "sha256": "9d673919c723e64152047f7921cdd2f551f4523a388e663160c9dae3e8fcf216",
       "source": "mutation updateDiscussionSensitiveContent($discussionId: ID!, $hasSensitiveContent: Boolean!) {\n  updateDiscussions(\n    where: {id: {eq: $discussionId}}\n    update: {hasSensitiveContent: {set: $hasSensitiveContent}}\n  ) {\n    discussions {\n      id\n      hasSensitiveContent\n    }\n  }\n}"
@@ -1569,7 +1569,7 @@
     {
       "id": "graphQLData/discussion/mutations.js#UPDATE_DOWNLOAD_LABELS",
       "file": "graphQLData/discussion/mutations.js",
-      "line": 709,
+      "line": 710,
       "column": 39,
       "sha256": "db008289d0e403dfacf22993219308ace5df48dd6eee21e2b2decb26a5e971f5",
       "source": "mutation updateDownloadLabels($discussionId: ID!, $channelUniqueName: String!, $labelOptionIds: [ID!]!) {\n  updateDownloadLabels(\n    discussionId: $discussionId\n    channelUniqueName: $channelUniqueName\n    labelOptionIds: $labelOptionIds\n  ) {\n    id\n    LabelOptions {\n      id\n      value\n      displayName\n      order\n      group {\n        id\n        key\n        displayName\n      }\n    }\n  }\n}"
