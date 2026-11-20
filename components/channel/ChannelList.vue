@@ -26,6 +26,11 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  // Tags only look clickable when the page handles `filterByTag`.
+  tagsFilterable: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['filterByTag', 'loadMore']);
@@ -54,6 +59,7 @@ function filterByTag(tag: string) {
         :download-count="channel.downloadCount || 0"
         :search-input="searchInput"
         :selected-tags="selectedTags"
+        :tags-filterable="tagsFilterable"
         @filter-by-tag="filterByTag"
       />
     </div>

@@ -443,6 +443,7 @@ const seriesOccurrences = computed(() => {
               class="my-1"
               :active="selectedTags.includes(tag.text)"
               :tag="tag.text"
+              interactive
               @click="
                 () => {
                   handleClickTag(tag.text);

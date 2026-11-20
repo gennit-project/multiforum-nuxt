@@ -185,7 +185,6 @@ const albumForDisplay = computed(() => props.discussion.Album ?? null);
           :key="tag.text || `discussion-tag-${index}`"
           :tag="tag.text || ''"
           class="text-xs"
-          @click.prevent=""
         />
       </div>
     </div>

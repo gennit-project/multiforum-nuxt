@@ -21,7 +21,7 @@ const discussion = (overrides: Record<string, unknown> = {}) =>
   }) as unknown as Discussion;
 
 const highlightStub = { name: 'HighlightedSearchTerms', props: ['text', 'searchInput'], template: '<span>{{ text }}</span>' };
-const tagStub = { name: 'Tag', props: ['tag', 'active'], emits: ['click'], template: '<button class="tag" @click="$emit(\'click\')">{{ tag }}</button>' };
+const tagStub = { name: 'Tag', props: { tag: String, active: Boolean, interactive: { type: Boolean, default: false } }, emits: ['click'], template: '<button class="tag" @click="$emit(\'click\')">{{ tag }}</button>' };
 
 const mountItem = (props: Record<string, unknown> = {}) =>
   mount(DiscussionItemInProfile, {
@@ -72,12 +72,10 @@ describe('DiscussionItemInProfile content', () => {
     expect(wrapper.find('.tag').text()).toBe('pets');
   });
 
-  it('emits filterByTag when a tag is clicked', async () => {
+  it('renders tags as non-interactive because no page filters by tag', () => {
     const wrapper = mountItem();
 
-    await wrapper.find('.tag').trigger('click');
-
-    expect(wrapper.emitted('filterByTag')?.[0]).toEqual(['pets']);
+    expect(wrapper.getComponent(tagStub).props('interactive')).toBe(false);
   });
 });
 

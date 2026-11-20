@@ -16,7 +16,7 @@ const channel = (overrides: Record<string, unknown> = {}) =>
   }) as unknown as Channel;
 
 const highlightStub = { name: 'HighlightedSearchTerms', props: ['text', 'searchInput'], template: '<span>{{ text }}</span>' };
-const tagStub = { name: 'Tag', props: ['tag', 'active'], emits: ['click'], template: '<button class="tag" @click="$emit(\'click\')">{{ tag }}</button>' };
+const tagStub = { name: 'Tag', props: { tag: String, active: Boolean, interactive: { type: Boolean, default: false } }, emits: ['click'], template: '<button class="tag" @click="$emit(\'click\')">{{ tag }}</button>' };
 
 const mountItem = (props: Record<string, unknown> = {}) =>
   mount(ChannelListItem, {
@@ -77,12 +77,32 @@ describe('ChannelListItem tags', () => {
     expect(wrapper.getComponent(tagStub).props('active')).toBe(true);
   });
 
-  it('emits filterByTag when a tag is clicked', async () => {
-    const wrapper = mountItem();
+  it('emits filterByTag when a tag is clicked on a filterable list', async () => {
+    const wrapper = mountItem({ tagsFilterable: true });
 
     await wrapper.find('.tag').trigger('click');
 
     expect(wrapper.emitted('filterByTag')?.[0]).toEqual(['pets']);
+  });
+
+  it('makes tags interactive only on a filterable list', () => {
+    const wrapper = mountItem({ tagsFilterable: true });
+
+    expect(wrapper.getComponent(tagStub).props('interactive')).toBe(true);
+  });
+
+  it('keeps tags non-interactive when the list is not filterable', () => {
+    const wrapper = mountItem();
+
+    expect(wrapper.getComponent(tagStub).props('interactive')).toBe(false);
+  });
+
+  it('does not emit filterByTag when the list is not filterable', async () => {
+    const wrapper = mountItem();
+
+    await wrapper.find('.tag').trigger('click');
+
+    expect(wrapper.emitted('filterByTag')).toBeUndefined();
   });
 });
 

@@ -27,8 +27,6 @@ const props = defineProps({
   },
 });
 
-defineEmits(['filterByTag']);
-
 const defaultUniqueName = computed(() => {
   if (
     !props.discussion.DiscussionChannels ||
@@ -82,7 +80,6 @@ const channelName = (channel: (typeof channels.value)[number]) => channel.channe
         class="my-1"
         :active="selectedTags.includes(tag)"
         :tag="tag"
-        @click="$emit('filterByTag', tag)"
       />
     </p>
     <p

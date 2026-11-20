@@ -49,7 +49,7 @@ const props = defineProps({
   },
 });
 
-defineEmits(['filterByTag', 'openAlbum']);
+defineEmits(['openAlbum']);
 
 const route = useRoute();
 
@@ -272,7 +272,6 @@ const filteredQuery = computed(() => {
               :key="tag"
               :active="selectedTags.includes(tag)"
               :tag="tag"
-              @click="$emit('filterByTag', tag)"
             />
           </div>
           <div class="flex items-center gap-1 dark:text-white">

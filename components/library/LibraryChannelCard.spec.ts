@@ -12,7 +12,10 @@ const imageStub = defineComponent({
 
 const tagStub = defineComponent({
   name: 'TagComponent',
-  props: ['tag'],
+  props: {
+    tag: String,
+    interactive: { type: Boolean, default: false },
+  },
   template: '<div class="tag-stub">{{ tag }}</div>',
 });
 
@@ -54,6 +57,14 @@ const mountCard = (props: Record<string, unknown> = {}) =>
   });
 
 describe('LibraryChannelCard', () => {
+  it('renders tags as non-interactive because they have no click action', () => {
+    const wrapper = mountCard();
+
+    expect(
+      wrapper.findAllComponents(tagStub).map((tag) => tag.props('interactive'))
+    ).toEqual(Array(wrapper.findAllComponents(tagStub).length).fill(false));
+  });
+
   it('renders the channel display name', () => {
     const wrapper = mountCard();
 
@@ -83,7 +94,9 @@ describe('LibraryChannelCard', () => {
   it('passes the channel unique name to the favorite button', () => {
     const wrapper = mountCard({ showFavoriteButton: true });
 
-    expect(wrapper.getComponent(favoriteStub).props('channelUniqueName')).toBe('sims4');
+    expect(wrapper.getComponent(favoriteStub).props('channelUniqueName')).toBe(
+      'sims4'
+    );
   });
 
   it('shows a +more indicator when more than four tags exist', () => {

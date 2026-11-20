@@ -6,7 +6,13 @@ import { mountWithDefaults } from '@/tests/utils/mountWithDefaults';
 
 const discussionAlbumStub = defineComponent({
   name: 'DiscussionAlbum',
-  props: ['album', 'discussionId', 'discussionAuthor', 'carouselFormat', 'showEditAlbum'],
+  props: [
+    'album',
+    'discussionId',
+    'discussionAuthor',
+    'carouselFormat',
+    'showEditAlbum',
+  ],
   template: '<div class="discussion-album-stub" />',
 });
 
@@ -24,7 +30,10 @@ const markdownStub = defineComponent({
 
 const tagStub = defineComponent({
   name: 'TagComponent',
-  props: ['tag'],
+  props: {
+    tag: String,
+    interactive: { type: Boolean, default: false },
+  },
   template: '<div class="tag-stub">{{ tag }}</div>',
 });
 
@@ -87,6 +96,14 @@ const mountCard = (props: Record<string, unknown> = {}) =>
   });
 
 describe('LibraryDiscussionCard', () => {
+  it('renders tags as non-interactive because they have no click action', () => {
+    const wrapper = mountCard();
+
+    expect(
+      wrapper.findAllComponents(tagStub).map((tag) => tag.props('interactive'))
+    ).toEqual(Array(wrapper.findAllComponents(tagStub).length).fill(false));
+  });
+
   it('renders the discussion title', () => {
     const wrapper = mountCard();
 
@@ -112,7 +129,9 @@ describe('LibraryDiscussionCard', () => {
   it('renders the markdown body when present', () => {
     const wrapper = mountCard();
 
-    expect(wrapper.findComponent(markdownStub).props('text')).toBe('A markdown body');
+    expect(wrapper.findComponent(markdownStub).props('text')).toBe(
+      'A markdown body'
+    );
   });
 
   it('renders the async album section when images exist', () => {
@@ -140,7 +159,9 @@ describe('LibraryDiscussionCard', () => {
   it('passes the favorite button the discussion id', () => {
     const wrapper = mountCard();
 
-    expect(wrapper.getComponent(favoriteStub).props('discussionId')).toBe('discussion-1');
+    expect(wrapper.getComponent(favoriteStub).props('discussionId')).toBe(
+      'discussion-1'
+    );
   });
 
   it('caps visible tags at five entries', () => {
