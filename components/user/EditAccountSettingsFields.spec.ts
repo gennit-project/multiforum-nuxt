@@ -181,16 +181,6 @@ describe('EditAccountSettingsFields profile picture upload', () => {
     expect(wrapper.emitted('submit')).toBeTruthy();
   });
 
-  it('alerts and skips upload for an oversized profile picture', async () => {
-    const wrapper = mountFields();
-    const big = new File(['x'], 'big.png');
-    Object.defineProperty(big, 'size', { value: 5 * 1024 * 1024 });
-
-    await changeProfilePic(wrapper, big);
-
-    expect(h.createSignedStorageUrl).not.toHaveBeenCalled();
-  });
-
   it('permanently deletes the current profile picture URL', async () => {
     const wrapper = mountFields({
       formValues: {

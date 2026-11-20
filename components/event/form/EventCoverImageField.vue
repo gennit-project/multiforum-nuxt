@@ -4,7 +4,6 @@ import { useMutation } from '@vue/apollo-composable';
 import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
-  isFileSizeValid,
   type SignedStorageUrlPayload,
 } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
@@ -37,11 +36,6 @@ const coverImageLoading = ref(false);
 const upload = async (file: File) => {
   if (!usernameVar.value) {
     console.error('No username found');
-    return;
-  }
-  const sizeCheck = isFileSizeValid({ file });
-  if (!sizeCheck.valid) {
-    alert(sizeCheck.message);
     return;
   }
   try {

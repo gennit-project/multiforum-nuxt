@@ -20,8 +20,6 @@ import { uploadAndGetEmbeddedLink, getUploadFileName } from '@/utils';
 import DownloadLabelPicker from '@/components/download/DownloadLabelPicker.vue';
 import {
   validateDownloadFileType,
-  validateDownloadFileSize,
-  MAX_DOWNLOAD_FILE_SIZE_MB,
 } from '@/utils/downloadFileValidation';
 import {
   getDownloadFileMimeType,
@@ -244,8 +242,6 @@ const validateFileType = (file: File) =>
     downloadsDisabled: downloadsDisabled.value,
   });
 
-const validateFileSize = (file: File) => validateDownloadFileSize(file.size);
-
 // File upload handling
 const handleFileUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -301,13 +297,6 @@ const addNewFile = (fileData: DownloadFormFile) => {
 const uploadFile = async (file: File): Promise<boolean> => {
   if (!usernameVar.value) {
     console.error('No username found, cannot upload.');
-    return false;
-  }
-
-  // Validate file size
-  const sizeValidation = validateFileSize(file);
-  if (!sizeValidation.valid) {
-    uploadError.value = sizeValidation.message;
     return false;
   }
 
@@ -575,9 +564,6 @@ async function handleSave() {
               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 <span v-if="downloadsDisabled">
                   Downloads are disabled in this channel.
-                </span>
-                <span v-else>
-                  Maximum file size: {{ MAX_DOWNLOAD_FILE_SIZE_MB }}MB
                 </span>
                 <br />
                 <span v-if="channelData?.allowedFileTypes?.length">

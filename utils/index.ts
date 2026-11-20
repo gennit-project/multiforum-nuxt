@@ -20,35 +20,6 @@ import type { Event } from '@/__generated__/graphql';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import CheckCircle from '@/components/icons/CheckCircle.vue';
 
-const MAX_FILE_SIZE_MB = 5;
-const MAX_PROFILE_PIC_SIZE_MB = 1;
-const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024; // Convert MB to bytes
-const MAX_PROFILE_PIC_SIZE_BYTES = MAX_PROFILE_PIC_SIZE_MB * 1024 * 1024; // Convert MB to bytes
-
-type FileSizeValidationInput = {
-  file: File;
-  isProfilePic?: boolean;
-};
-
-export function isFileSizeValid(input: FileSizeValidationInput): {
-  valid: boolean;
-  message: string;
-} {
-  const { file, isProfilePic = false } = input;
-  const maxSize = isProfilePic
-    ? MAX_PROFILE_PIC_SIZE_BYTES
-    : MAX_FILE_SIZE_BYTES;
-  const maxSizeMB = isProfilePic ? MAX_PROFILE_PIC_SIZE_MB : MAX_FILE_SIZE_MB;
-
-  if (file.size > maxSize) {
-    return {
-      valid: false,
-      message: `File size must be less than ${maxSizeMB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`,
-    };
-  }
-  return { valid: true, message: '' };
-}
-
 const getTimePieces = (timeObj: DateTime) => {
   const { year, month, day, weekday, hour } = timeObj;
 
@@ -298,16 +269,30 @@ export function encodeSpacesInURL(url: string) {
   return url.split(' ').join('%20');
 }
 
+type SizeLimitHintInput = {
+  status: number;
+  contentLengthRange?: string | null;
+};
+
+/**
+ * GCS answers 400 when an object violates the signed content-length range.
+ * The limit is owned by the backend, so the client only reads it back out of
+ * the signed range ("min,max" in bytes) to make that failure understandable.
+ */
+function describeSizeLimitHint(input: SizeLimitHintInput) {
+  const { status, contentLengthRange } = input;
+  if (status !== 400 || !contentLengthRange) return '';
+
+  const maxBytes = Number(contentLengthRange.split(',')[1]);
+  if (!Number.isFinite(maxBytes) || maxBytes <= 0) return '';
+
+  const maxMB = (maxBytes / (1024 * 1024)).toFixed(1);
+  return `. The file may exceed the ${maxMB}MB upload limit.`;
+}
+
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
   const { signedStorageURL, storageUrl, contentLengthRange, filename, file } =
     input;
-
-  // Check validation
-  const sizeCheck = isFileSizeValid({ file });
-  if (!sizeCheck.valid) {
-    console.error(sizeCheck.message);
-    throw new Error(sizeCheck.message);
-  }
 
   if (!signedStorageURL) {
     console.error('No signedStorageURL provided');
@@ -355,7 +340,12 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
         response.status,
         response.statusText
       );
-      throw new Error(`Upload failed with status ${response.status}`);
+      throw new Error(
+        `Upload failed with status ${response.status}${describeSizeLimitHint({
+          status: response.status,
+          contentLengthRange,
+        })}`
+      );
     }
 
     return storageUrl || embeddedLink;

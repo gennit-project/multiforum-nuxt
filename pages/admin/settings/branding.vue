@@ -116,7 +116,7 @@ const hasLowContrast = computed(
     (darkContrast.value !== null && darkContrast.value < 4.5)
 );
 
-const { uploadFile, validateFileSize, isUploading } = useImageUpload();
+const { uploadFile, isUploading } = useImageUpload();
 const uploadingField = ref<ImageUrlField | null>(null);
 const uploadError = ref('');
 
@@ -167,14 +167,6 @@ const uploadBrandingImage = async ({
   if (!file) return;
 
   uploadError.value = '';
-  const validation = validateFileSize(file);
-  if (!validation.valid) {
-    uploadError.value =
-      validation.message || 'The selected image is too large.';
-    input.value = '';
-    return;
-  }
-
   uploadingField.value = field;
   const result = await uploadFile(file);
   uploadingField.value = null;

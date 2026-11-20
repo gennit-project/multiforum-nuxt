@@ -3,10 +3,6 @@
  * DownloadEditForm. They take primitive file fields (name/type/size) rather
  * than a File object so they can be unit-tested without the DOM.
  */
-export const MAX_DOWNLOAD_FILE_SIZE_MB = 50;
-export const MAX_DOWNLOAD_FILE_SIZE_BYTES =
-  MAX_DOWNLOAD_FILE_SIZE_MB * 1024 * 1024;
-
 export type FileValidationResult = { valid: boolean; message: string };
 
 export type ValidateFileTypeParams = {
@@ -43,20 +39,5 @@ export function validateDownloadFileType(
     };
   }
 
-  return { valid: true, message: '' };
-}
-
-export function validateDownloadFileSize(
-  fileSize: number
-): FileValidationResult {
-  if (fileSize > MAX_DOWNLOAD_FILE_SIZE_BYTES) {
-    return {
-      valid: false,
-      message: `File size must be less than ${MAX_DOWNLOAD_FILE_SIZE_MB}MB. Current file is ${(
-        fileSize /
-        (1024 * 1024)
-      ).toFixed(1)}MB.`,
-    };
-  }
   return { valid: true, message: '' };
 }

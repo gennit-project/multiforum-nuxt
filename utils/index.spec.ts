@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import {
-  isFileSizeValid,
   getUploadFileName,
   encodeSpacesInURL,
   getDuration,
@@ -13,22 +12,6 @@ const fileOfSize = (bytes: number, name = 'f.zip'): File => {
   Object.defineProperty(file, 'size', { value: bytes });
   return file;
 };
-
-describe('isFileSizeValid', () => {
-  it('accepts a file under the 5MB default limit', () => {
-    expect(isFileSizeValid({ file: fileOfSize(1024) }).valid).toBe(true);
-  });
-
-  it('rejects a file over the 5MB default limit', () => {
-    expect(isFileSizeValid({ file: fileOfSize(6 * 1024 * 1024) }).valid).toBe(false);
-  });
-
-  it('applies the stricter 1MB limit for profile pictures', () => {
-    expect(
-      isFileSizeValid({ file: fileOfSize(2 * 1024 * 1024), isProfilePic: true }).valid
-    ).toBe(false);
-  });
-});
 
 describe('getUploadFileName', () => {
   it('replaces spaces in the file name with underscores', () => {

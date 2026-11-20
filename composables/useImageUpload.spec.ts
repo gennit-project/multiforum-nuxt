@@ -13,25 +13,19 @@ vi.mock('@/composables/useAuthState', () => ({
   useUsername: () => usernameRef,
 }));
 
-const { uploadAndGetEmbeddedLink, getUploadFileName, isFileSizeValid } =
-  vi.hoisted(() => ({
-    uploadAndGetEmbeddedLink: vi.fn(),
-    getUploadFileName: vi.fn(() => 'alice-123.jpg'),
-    // Seed the full {valid, message} shape so later mockReturnValue calls that
-    // include `message` stay within the inferred return type.
-    isFileSizeValid: vi.fn(() => ({ valid: true, message: '' })),
-  }));
+const { uploadAndGetEmbeddedLink, getUploadFileName } = vi.hoisted(() => ({
+  uploadAndGetEmbeddedLink: vi.fn(),
+  getUploadFileName: vi.fn(() => 'alice-123.jpg'),
+}));
 // `@/utils` and `@/utils/index` resolve to the same module, so both mocks must
 // expose every export this composable imports from either specifier.
 vi.mock('@/utils', () => ({
   uploadAndGetEmbeddedLink,
   getUploadFileName,
-  isFileSizeValid,
 }));
 vi.mock('@/utils/index', () => ({
   uploadAndGetEmbeddedLink,
   getUploadFileName,
-  isFileSizeValid,
 }));
 
 const mockMutate = vi.fn();
@@ -46,7 +40,6 @@ beforeEach(() => {
     error: { value: null },
   });
   getUploadFileName.mockReturnValue('alice-123.jpg');
-  isFileSizeValid.mockReturnValue({ valid: true, message: '' });
 });
 
 describe('useImageUpload.uploadFile', () => {
@@ -172,12 +165,6 @@ describe('useImageUpload.uploadFile', () => {
 });
 
 describe('useImageUpload helpers', () => {
-  it('validateFileSize delegates to isFileSizeValid', () => {
-    isFileSizeValid.mockReturnValue({ valid: false, message: 'too big' });
-    const { validateFileSize } = useImageUpload();
-    expect(validateFileSize(makeFile())).toEqual({ valid: false, message: 'too big' });
-  });
-
   it('createUploadPlaceholder sanitizes the filename and embeds the id', () => {
     const { createUploadPlaceholder } = useImageUpload();
     const { markdown, placeholderText } = createUploadPlaceholder(

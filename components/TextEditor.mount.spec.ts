@@ -17,10 +17,6 @@ const { uploadFileMock } = vi.hoisted(() => ({ uploadFileMock: vi.fn() }));
 vi.mock('@/composables/useImageUpload', () => ({
   useImageUpload: () => ({
     uploadFile: uploadFileMock,
-    validateFileSize: (file: File) => ({
-      valid: file.size <= 5 * 1024 * 1024,
-      message: 'File too large',
-    }),
     createUploadPlaceholder: (file: File, id: string) => ({
       markdown: `![uploading ${file.name} (id:${id})]()`,
       placeholderText: `uploading ${file.name}`,
@@ -391,15 +387,6 @@ describe('TextEditor image upload', () => {
     await emitFileChange(wrapper, new File(['x'], 'pic.png'));
 
     expect(wrapper.emitted('update')?.at(-1)?.[0]).toContain('boom');
-  });
-
-  it('alerts and skips upload when the file is too large', async () => {
-    const wrapper = mountEditor();
-    const bigFile = new File(['x'.repeat(6 * 1024 * 1024)], 'big.png');
-
-    await emitFileChange(wrapper, bigFile);
-
-    expect(uploadFileMock).not.toHaveBeenCalled();
   });
 
   it('appends the image when the upload placeholder was removed while uploading', async () => {

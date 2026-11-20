@@ -6,7 +6,6 @@ import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
 } from '@/utils';
-import { isFileSizeValid } from '@/utils/index';
 
 export type AlbumImageInput = {
   id?: string;
@@ -57,12 +56,6 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
   const uploadFile = async (file: File): Promise<boolean> => {
     if (!usernameVar.value) {
       console.error('No username found, cannot upload.');
-      return false;
-    }
-
-    const sizeCheck = isFileSizeValid({ file });
-    if (!sizeCheck.valid) {
-      alert(sizeCheck.message);
       return false;
     }
 

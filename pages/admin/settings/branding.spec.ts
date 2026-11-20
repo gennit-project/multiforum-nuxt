@@ -15,7 +15,6 @@ vi.mock('@/composables/useImageUpload', async () => {
   return {
     useImageUpload: () => ({
       uploadFile: mockUploadFile,
-      validateFileSize: () => ({ valid: true, message: '' }),
       isUploading: ref(false),
     }),
   };

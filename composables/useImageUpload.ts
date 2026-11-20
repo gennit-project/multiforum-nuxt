@@ -6,7 +6,6 @@ import {
   getUploadFileName,
 } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
-import { isFileSizeValid } from '@/utils/index';
 
 type UploadResult = {
   success: boolean;
@@ -121,13 +120,6 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
   };
 
   /**
-   * Validate file size before upload
-   */
-  const validateFileSize = (file: File): { valid: boolean; message?: string } => {
-    return isFileSizeValid({ file });
-  };
-
-  /**
    * Create a placeholder markdown link for an uploading image
    */
   const createUploadPlaceholder = (
@@ -168,7 +160,6 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
 
   return {
     uploadFile,
-    validateFileSize,
     createUploadPlaceholder,
     createImageMarkdown,
     createErrorMarkdown,

@@ -438,16 +438,6 @@ describe('DownloadEditForm upload', () => {
     });
   });
 
-  it('surfaces an error when the file is too large', async () => {
-    const wrapper = mountForm();
-    const bigFile = new File(['x'], 'big.stl');
-    Object.defineProperty(bigFile, 'size', { value: 5_000 * 1024 * 1024 });
-
-    await setFiles(wrapper, '#downloadable-file-input', [bigFile]);
-
-    expect(wrapper.find('.error-banner').exists()).toBe(true);
-  });
-
   it('rejects a file type not allowed by the forum', async () => {
     const wrapper = mountForm({
       channelData: { allowedFileTypes: ['application/zip'] },

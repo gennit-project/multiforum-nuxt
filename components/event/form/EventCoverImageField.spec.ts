@@ -6,11 +6,9 @@ import EventCoverImageField from './EventCoverImageField.vue';
 const {
   createSignedStorageUrlMock,
   uploadAndGetEmbeddedLinkMock,
-  isFileSizeValidMock,
 } = vi.hoisted(() => ({
   createSignedStorageUrlMock: vi.fn(),
   uploadAndGetEmbeddedLinkMock: vi.fn(),
-  isFileSizeValidMock: vi.fn(),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -25,7 +23,6 @@ vi.mock('@/utils', () => ({
   getUploadFileName: ({ username, file }: { username: string; file: File }) =>
     `${username}/${file.name}`,
   uploadAndGetEmbeddedLink: uploadAndGetEmbeddedLinkMock,
-  isFileSizeValid: isFileSizeValidMock,
 }));
 
 const mountField = (imageUrl: string | null) =>
@@ -46,7 +43,6 @@ describe('EventCoverImageField', () => {
     uploadAndGetEmbeddedLinkMock.mockReturnValue(
       'https://cdn.test/cover.png'
     );
-    isFileSizeValidMock.mockReturnValue({ valid: true, message: '' });
   });
 
   it('renders the cover image when a url is provided', () => {
@@ -97,32 +93,6 @@ describe('EventCoverImageField', () => {
         storageUrl: 'https://storage.test/files/alice/cover.png',
       },
       emitted: ['https://cdn.test/cover.png'],
-    });
-  });
-
-  it('alerts and skips upload when the file is too large', async () => {
-    isFileSizeValidMock.mockReturnValue({
-      valid: false,
-      message: 'File too large',
-    });
-    const wrapper = mountField('');
-
-    await wrapper.findComponent({ name: 'AddImage' }).vm.$emit('file-change', {
-      fieldName: 'coverImageURL',
-      event: {
-        target: {
-          files: [new File(['large'], 'large.png', { type: 'image/png' })],
-        },
-      },
-    });
-    await flushPromises();
-
-    expect({
-      alert: vi.mocked(window.alert).mock.calls[0],
-      emitted: wrapper.emitted('update'),
-    }).toEqual({
-      alert: ['File too large'],
-      emitted: undefined,
     });
   });
 
