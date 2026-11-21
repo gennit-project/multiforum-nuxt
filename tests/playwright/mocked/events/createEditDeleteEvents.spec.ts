@@ -468,11 +468,11 @@ test('edits an event with mocked GraphQL', async ({ context, page }, testInfo) =
       }
       return {
         data: {
-          updateEventWithChannelConnections: [buildEvent({
+          updateEventWithChannelConnections: buildEvent({
             id: eventState.id,
             title: eventState.title,
             description: eventState.description,
-          })],
+          }),
         },
       };
     },
