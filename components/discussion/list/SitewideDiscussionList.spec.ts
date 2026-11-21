@@ -38,6 +38,7 @@ const makeDiscussion = (
   DiscussionChannels: [
     {
       channelUniqueName: 'cats',
+      discussionNumber: 10,
       CommentsConnection: { aggregate: { count: { nodes: 2 } } },
       __typename: 'DiscussionChannel',
     },
@@ -72,7 +73,7 @@ const stubs = {
   },
   SitewideDiscussionSidebar: { template: '<div />' },
   DiscussionDetailContent: {
-    props: ['channelId', 'showComments'],
+    props: ['channelId', 'discussionNumber', 'showComments'],
     template: '<div class="detail-stub"><slot name="before-comments" /></div>',
   },
   DiscussionDetailEmptyState: { template: '<div class="empty-state-stub" />' },
@@ -249,7 +250,7 @@ describe('SitewideDiscussionList', () => {
     const commentLink = wrapper
       .findAllComponents({ name: 'NuxtLink' })
       .find((link) => link.attributes('aria-label') === 'cats: 2 comments');
-    expect(commentLink?.props('to')).toBe('/forums/cats/discussions/1');
+    expect(commentLink?.props('to')).toBe('/forums/cats/discussions/10-discussion-1');
   });
 
   it('opens the About overlay as a modal dialog', async () => {
@@ -296,10 +297,12 @@ it('loads the selected forum’s comments, not the first forum’s', () => {
           DiscussionChannels: [
             {
               channelUniqueName: 'cats',
+              discussionNumber: 10,
               CommentsConnection: { aggregate: { count: { nodes: 2 } } },
             },
             {
               channelUniqueName: 'dogs',
+              discussionNumber: 20,
               CommentsConnection: { aggregate: { count: { nodes: 5 } } },
             },
           ],
@@ -312,6 +315,7 @@ it('loads the selected forum’s comments, not the first forum’s', () => {
   });
   expect(wrapper.findComponent(stubs.DiscussionDetailContent).props()).toEqual({
     channelId: 'dogs',
+    discussionNumber: 20,
     showComments: true,
   });
 });
@@ -338,10 +342,12 @@ it.each([
             DiscussionChannels: [
               {
                 channelUniqueName: 'cats',
+                discussionNumber: 10,
                 CommentsConnection: { aggregate: { count: { nodes: 0 } } },
               },
               {
                 channelUniqueName: 'dogs',
+                discussionNumber: 20,
                 CommentsConnection: { aggregate: { count: { nodes: 1 } } },
               },
             ],

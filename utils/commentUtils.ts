@@ -1,26 +1,33 @@
 // Utility functions for handling comment operations
+import { getPermalinkToEventComment, getPermalinkToEvent } from './routerUtils';
 import {
-  getPermalinkToDiscussionComment,
-  getPermalinkToEventComment,
-  getPermalinkToDiscussion,
-  getPermalinkToEvent,
-} from './routerUtils';
+  getDiscussionCommentRoute,
+  getDiscussionRoute,
+  getDownloadCommentRoute,
+  getDownloadRoute,
+} from './contentUrls';
 import { getServerRoleBadge } from './serverRoleBadges';
 
 // Type representing a comment with its context relationships
 // All fields are optional to support partial data in tests and various use cases
 type CommentWithContext = {
   id?: string;
+  /** Public permalink handle; falls back to `id` when not selected. */
+  shortId?: string | null;
   DiscussionChannel?: {
     channelUniqueName?: string;
     discussionId?: string;
+    discussionNumber?: number | null;
     Discussion?: { hasDownload?: boolean | null; title?: string | null } | null;
   } | null;
   Channel?: { uniqueName?: string; displayName?: string | null } | null;
   Event?: {
     id?: string;
     title?: string | null;
-    EventChannels?: Array<{ channelUniqueName: string }>;
+    EventChannels?: Array<{
+      channelUniqueName: string;
+      eventNumber?: number | null;
+    }>;
   } | null;
   CommentAuthor?: {
     __typename?: string;
@@ -41,18 +48,20 @@ type GetCommentAuthorInfoOptions = {
  * Get the permalink URL object for a comment
  */
 export const getCommentPermalink = (comment: CommentWithContext) => {
+  const commentSegment = comment.shortId || comment.id || '';
   if (comment.DiscussionChannel) {
     const channelUniqueName = comment.DiscussionChannel.channelUniqueName || '';
     const discussionId = comment.DiscussionChannel.discussionId || '';
+    const discussionNumber = comment.DiscussionChannel.discussionNumber;
     const hasDownload = comment.DiscussionChannel.Discussion?.hasDownload;
 
-    if (!discussionId) {
+    if (discussionNumber == null && !discussionId) {
       if (comment.Channel?.uniqueName) {
         return {
           name: 'forums-forumId-comments-commentId',
           params: {
             forumId: comment.Channel.uniqueName,
-            commentId: comment.id || '',
+            commentId: commentSegment,
           },
         };
       }
@@ -67,37 +76,34 @@ export const getCommentPermalink = (comment: CommentWithContext) => {
         : { name: 'index' };
     }
 
-    if (hasDownload) {
-      return {
-        name: 'forums-forumId-downloads-discussionId-comments-commentId',
-        params: {
-          forumId: channelUniqueName,
-          discussionId,
-          commentId: comment.id || '',
-        },
-      };
-    } else {
-      return getPermalinkToDiscussionComment({
-        forumId: channelUniqueName,
-        discussionId,
-        commentId: comment.id || '',
-      });
-    }
+    const target = {
+      forumId: channelUniqueName,
+      discussionNumber,
+      title: comment.DiscussionChannel.Discussion?.title,
+      discussionId,
+      shortId: comment.shortId,
+      commentId: comment.id,
+    };
+    return hasDownload
+      ? getDownloadCommentRoute(target)
+      : getDiscussionCommentRoute(target);
   } else if (comment.Channel) {
     return {
       name: 'forums-forumId-comments-commentId',
       params: {
         forumId: comment.Channel.uniqueName || '',
-        commentId: comment.id || '',
+        commentId: commentSegment,
       },
     };
   } else if (comment.Event) {
-    const channelUniqueName =
-      comment.Event.EventChannels?.[0]?.channelUniqueName;
+    const eventChannel = comment.Event.EventChannels?.[0];
     return getPermalinkToEventComment({
-      forumId: channelUniqueName || '',
+      forumId: eventChannel?.channelUniqueName || '',
+      eventNumber: eventChannel?.eventNumber,
+      eventTitle: comment.Event.title,
       eventId: comment.Event.id || '',
-      commentId: comment.id || '',
+      shortId: comment.shortId,
+      commentId: comment.id,
     });
   }
   return { name: 'index' }; // fallback to home
@@ -110,9 +116,10 @@ export const getCommentContextPermalink = (comment: CommentWithContext) => {
   if (comment.DiscussionChannel) {
     const channelUniqueName = comment.DiscussionChannel.channelUniqueName || '';
     const discussionId = comment.DiscussionChannel.discussionId || '';
+    const discussionNumber = comment.DiscussionChannel.discussionNumber;
     const hasDownload = comment.DiscussionChannel.Discussion?.hasDownload;
 
-    if (!discussionId) {
+    if (discussionNumber == null && !discussionId) {
       return channelUniqueName
         ? {
             name: 'forums-forumId',
@@ -123,20 +130,13 @@ export const getCommentContextPermalink = (comment: CommentWithContext) => {
         : { name: 'index' };
     }
 
-    if (hasDownload) {
-      return {
-        name: 'forums-forumId-downloads-discussionId',
-        params: {
-          forumId: channelUniqueName,
-          discussionId,
-        },
-      };
-    } else {
-      return getPermalinkToDiscussion({
-        forumId: channelUniqueName,
-        discussionId,
-      });
-    }
+    const target = {
+      forumId: channelUniqueName,
+      discussionNumber,
+      title: comment.DiscussionChannel.Discussion?.title,
+      discussionId,
+    };
+    return hasDownload ? getDownloadRoute(target) : getDiscussionRoute(target);
   } else if (comment.Channel) {
     return {
       name: 'forums-forumId',
@@ -145,10 +145,11 @@ export const getCommentContextPermalink = (comment: CommentWithContext) => {
       },
     };
   } else if (comment.Event) {
-    const channelUniqueName =
-      comment.Event.EventChannels?.[0]?.channelUniqueName;
+    const eventChannel = comment.Event.EventChannels?.[0];
     return getPermalinkToEvent({
-      forumId: channelUniqueName || '',
+      forumId: eventChannel?.channelUniqueName || '',
+      eventNumber: eventChannel?.eventNumber,
+      eventTitle: comment.Event.title,
       eventId: comment.Event.id || '',
     });
   }

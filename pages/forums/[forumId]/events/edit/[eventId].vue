@@ -20,6 +20,8 @@ import type {
 import { EventEditScope as EventEditScopeInput } from '@/__generated__/graphql';
 import type { EventDetailSelection } from '@/types/EventPresentation';
 import { useModProfileName } from '@/composables/useAuthState';
+import { useResolvedEventId } from '@/composables/useRouteContentIds';
+import { getEventLinkRoute, type EventLinkSource } from '@/utils/eventLinks';
 const scopeInput = { THIS_ONLY: EventEditScopeInput.ThisOnly, THIS_AND_FUTURE: EventEditScopeInput.ThisAndFuture, ALL_IN_SERIES: EventEditScopeInput.AllInSeries };
 
 const modProfileNameVar = useModProfileName();
@@ -34,7 +36,13 @@ const channelId = computed(() => {
   return '';
 });
 
-const eventId = computed(() => typeof route.params.eventId === 'string' ? route.params.eventId : '');
+// The route carries `{eventNumber}-{slug}`; the edit queries and mutations are
+// keyed by the global event id, so resolve it first.
+const {
+  id: eventId,
+  loading: resolvingEventId,
+  notFound: eventNotFound,
+} = useResolvedEventId();
 
 const dataLoaded = ref(false);
 const loggedInUserModName = computed(() => modProfileNameVar.value);
@@ -246,25 +254,26 @@ const combinedUpdateLoading = computed(() => {
   return updateEventLoading.value || updateEventInSeriesLoading.value;
 });
 
-const redirectToEventDetail = () => {
-  router.push({
-    name: 'forums-forumId-events-eventId',
-    params: {
+// Prefer the mutation response (it selects the per-forum event numbers) over
+// the pre-edit event, which lacks a number for a newly added forum.
+const redirectToEventDetail = (updatedEvent?: EventLinkSource | null) => {
+  router.push(
+    getEventLinkRoute({
+      event: updatedEvent ?? event.value ?? { id: eventId.value },
       forumId: formValues.value.selectedChannels[0],
-      eventId: eventId.value,
-    },
-  });
+    })
+  );
 };
 
-onDone(() => {
+onDone((result) => {
   if (!updateEventError.value) {
-    redirectToEventDetail();
+    redirectToEventDetail(result?.data?.updateEventWithChannelConnections);
   }
 });
 
-onUpdateEventInSeriesDone(() => {
+onUpdateEventInSeriesDone((result) => {
   if (!updateEventInSeriesError.value) {
-    redirectToEventDetail();
+    redirectToEventDetail(result?.data?.updateEventInSeries);
   }
 });
 
@@ -317,16 +326,18 @@ function updateFormValues(data: CreateEditEventFormValues) {
 }
 </script>
 <template>
+  <ErrorBanner v-if="eventNotFound" text="Event not found." />
   <RequireAuth
+    v-else
     :require-ownership="true"
     :owners="ownerList"
-    :loading="getEventLoading"
+    :loading="getEventLoading || resolvingEventId"
   >
     <template #has-auth>
       <CreateEditEventFields
         :key="dataLoaded.toString()"
         :edit-mode="true"
-        :event-loading="getEventLoading"
+        :event-loading="getEventLoading || resolvingEventId"
         :update-event-loading="combinedUpdateLoading"
         :get-event-error="getEventError"
         :update-event-error="combinedUpdateError"

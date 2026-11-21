@@ -9,6 +9,7 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import { getDownloadRoute } from '@/utils/contentUrls';
 
 const router = useRouter();
 const route = useRoute();
@@ -143,7 +144,8 @@ const submitForm = async () => {
   try {
     const response = await createDownload(createDownloadVariables());
     if (!current()) return;
-    const discussionId = response?.data?.createDiscussionWithChannelConnections?.[0]?.id;
+    const createdDownload = response?.data?.createDiscussionWithChannelConnections?.[0];
+    const discussionId = createdDownload?.id;
     if (!discussionId) throw new Error('No discussionId found in response');
     if (labelOptionIds.length) {
       try {
@@ -154,7 +156,18 @@ const submitForm = async () => {
     }
     if (!current()) return;
     await Promise.all(files.map((file) => updateDownloadableFileSupportSettings({ ...file, discussionId })));
-    if (current()) router.push({ name: 'forums-forumId-downloads-discussionId', params: { forumId: channel, discussionId } });
+    if (current()) {
+      router.push(
+        getDownloadRoute({
+          forumId: channel,
+          discussionNumber: createdDownload?.DiscussionChannels?.find(
+            (discussionChannel) => discussionChannel.channelUniqueName === channel
+          )?.discussionNumber,
+          title: createdDownload?.title,
+          discussionId,
+        })
+      );
+    }
   } catch (error) {
     console.error('Error creating download:', error);
     if (current()) submitError.value = error instanceof Error ? error.message : 'Error creating download';

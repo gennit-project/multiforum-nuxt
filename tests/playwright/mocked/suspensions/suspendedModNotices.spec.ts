@@ -6,6 +6,7 @@ import {
   buildServerConfig,
   buildDiscussion,
   buildEvent,
+  buildEventIdLookupHandlers,
   buildUser,
 } from '../../helpers/graphqlFixtures';
 import { installMockAuth } from '../../helpers/mockAuth';
@@ -284,7 +285,7 @@ test.describe('Mod suspension notices', () => {
     });
 
     try {
-      await page.goto(`/forums/${TEST_CHANNEL}/discussions/disc-1`);
+      await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
 
       // Wait for page to load
       await expect(page.getByRole('heading', { name: 'Test Discussion' })).toBeVisible({
@@ -385,7 +386,7 @@ test.describe('Mod suspension notices', () => {
     });
 
     try {
-      await page.goto(`/forums/${TEST_CHANNEL}/discussions/disc-1`);
+      await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
 
       // Wait for page to load
       await expect(page.getByRole('heading', { name: 'Test Discussion' })).toBeVisible({
@@ -450,6 +451,7 @@ test.describe('Mod suspension notices', () => {
           ],
         },
       }),
+      ...buildEventIdLookupHandlers('event-1'),
       getEvent: () => ({ data: { events: [mockEvent] } }),
       getEventComments: () => ({
         data: { getEventComments: { Event: mockEvent, Comments: [] } },
@@ -468,7 +470,7 @@ test.describe('Mod suspension notices', () => {
     });
 
     try {
-      await page.goto(`/forums/${TEST_CHANNEL}/events/event-1`);
+      await page.goto(`/forums/${TEST_CHANNEL}/events/1-test-event`);
 
       await expect(page.getByText('Test Event').first()).toBeVisible({
         timeout: 30000,

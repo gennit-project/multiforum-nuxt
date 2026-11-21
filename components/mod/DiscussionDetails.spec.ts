@@ -80,11 +80,13 @@ const mountDetails = (channelId = 'cats') =>
         },
         NuxtLink: {
           props: ['to'],
-          template: '<a :data-forum-id="to?.params?.forumId"><slot /></a>',
+          template:
+            '<a :data-forum-id="to?.params?.forumId" :data-discussion-id="to?.params?.discussionId"><slot /></a>',
         },
         'nuxt-link': {
           props: ['to'],
-          template: '<a :data-forum-id="to?.params?.forumId"><slot /></a>',
+          template:
+            '<a :data-forum-id="to?.params?.forumId" :data-discussion-id="to?.params?.discussionId"><slot /></a>',
         },
       },
     },
@@ -221,5 +223,30 @@ describe('DiscussionDetails author emit', () => {
     expect(wrapper.emitted('fetchedOriginalAuthorUsername')?.[0]).toEqual([
       'alice',
     ]);
+  });
+});
+
+describe('DiscussionDetails title link', () => {
+  const titleLinkDiscussionId = () =>
+    mountDetails()
+      .findAll('a')
+      .find((link) => link.text() === 'A reported discussion')!
+      .attributes('data-discussion-id');
+
+  it('links to the discussion by its per-forum number and title slug', () => {
+    h.result = ref({
+      discussions: [
+        discussion({
+          DiscussionChannels: [
+            { channelUniqueName: 'cats', discussionNumber: 42 },
+          ],
+        }),
+      ],
+    });
+    expect(titleLinkDiscussionId()).toBe('42-a-reported-discussion');
+  });
+
+  it('falls back to the raw discussion id when no number is selected', () => {
+    expect(titleLinkDiscussionId()).toBe('d1');
   });
 });

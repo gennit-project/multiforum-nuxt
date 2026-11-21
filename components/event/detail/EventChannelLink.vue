@@ -1,6 +1,10 @@
 <script setup lang="ts">
+import { getEventRoute } from '@/utils/contentUrls';
+
 defineProps<{
   eventId: string;
+  eventNumber?: number | null;
+  eventTitle?: string | null;
   channelId: string;
   channelIcon: string;
   channelDisplayName: string;
@@ -12,13 +16,14 @@ defineProps<{
   >
     <nuxt-link
       class="flex w-full items-center gap-3"
-      :to="{
-        name: 'forums-forumId-events-eventId',
-        params: {
-          eventId,
+      :to="
+        getEventRoute({
           forumId: channelId,
-        },
-      }"
+          eventNumber,
+          title: eventTitle,
+          eventId,
+        })
+      "
     >
       <AvatarComponent
         class="shadow-sm"

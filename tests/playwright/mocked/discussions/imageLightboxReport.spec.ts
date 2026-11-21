@@ -142,7 +142,7 @@ test('reports an album image from the lightbox with the selected rules', async (
   });
 
   try {
-    await page.goto(`/forums/${CHANNEL}/discussions/${DISCUSSION_ID}`, {
+    await page.goto(`/forums/${CHANNEL}/discussions/1`, {
       waitUntil: 'domcontentloaded',
     });
     await expect(page.getByTestId('discussion-album-carousel')).toBeVisible();

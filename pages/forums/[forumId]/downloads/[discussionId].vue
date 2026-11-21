@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { GetDownloadDetailDocument as GET_DOWNLOAD_DETAIL } from '@/__generated__/operations';
 import { config } from '@/config';
-import { ref, computed, watchEffect } from 'vue';
+import { computed } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
@@ -10,19 +10,16 @@ import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 
 import type { HeadObject } from '@/utils/seoHead';
+import { getDownloadUrl } from '@/utils/contentUrls';
+import { useRouteDiscussionNumber } from '@/composables/useRouteContentIds';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
 
 const route = useRoute();
 
-const updateDiscussionId = () => {
-  if (typeof route.params.discussionId === 'string') {
-    return route.params.discussionId;
-  }
-  return '';
-};
-const discussionId = ref(updateDiscussionId());
+// Route segment is `{discussionNumber}-{slug}`; only the number matters.
+const discussionNumber = useRouteDiscussionNumber();
 
 const channelId = computed(() => {
   if (typeof route.params.forumId === 'string') {
@@ -31,12 +28,8 @@ const channelId = computed(() => {
   return '';
 });
 
-watchEffect(() => {
-  discussionId.value = updateDiscussionId();
-});
-
 const { result: discussionResult } = useQuery(GET_DOWNLOAD_DETAIL, () => ({
-  id: discussionId.value,
+  discussionNumber: discussionNumber.value,
   loggedInModName: modProfileNameVar.value,
   loggedInUsername: usernameVar.value || null,
   channelUniqueName: channelId.value,
@@ -78,7 +71,11 @@ const metaData = computed<HeadObject>(() => {
     const baseUrl = import.meta.env.VITE_BASE_URL;
     const serverName = config.serverDisplayName;
     const imageUrl = download.Album?.Images?.[0]?.url || '';
-    const url = `${baseUrl}/forums/${channelId.value}/downloads/${discussionId.value}`;
+    const url = `${baseUrl}${getDownloadUrl({
+      forumId: channelId.value,
+      discussionNumber: discussionNumber.value,
+      title: download.title,
+    })}`;
 
     return {
       title: `${title} | ${channelId.value} | ${serverName}`,
@@ -151,11 +148,14 @@ useHead(metaData);
     class="relative mx-auto w-full flex-1 overflow-hidden p-0 focus:outline-none xl:order-last xl:max-w-6xl"
   >
     <div class="flex w-full justify-center space-y-4 overflow-x-hidden">
-      <ErrorBanner v-if="!discussionId" text="Download not found" />
+      <ErrorBanner
+        v-if="discussionNumber == null"
+        text="Download not found"
+      />
       <DiscussionDetailContent
         v-else
-        :key="discussionId"
-        :discussion-id="discussionId"
+        :key="discussionNumber"
+        :discussion-number="discussionNumber"
         :logged-in-user-mod-name="modProfileNameVar || ''"
         :download-mode="true"
       />

@@ -10,7 +10,7 @@ import {
 
 const BASE = {
   channelId: 'cats',
-  discussionId: 'd1',
+  discussionNumber: 42,
   serverDisplayName: 'Topical',
   baseUrl: 'https://example.test',
 };
@@ -62,6 +62,12 @@ describe('buildDiscussionHead - loaded', () => {
     createdAt: '2024-01-01T00:00:00Z',
     Author: { username: 'alice', displayName: 'Alice' },
   };
+
+  it('builds the canonical og:url from the number and title slug', () => {
+    const head = buildDiscussionHead({ ...BASE, discussions: [discussion] });
+    const ogUrl = head.meta?.find((m) => m.property === 'og:url');
+    expect(ogUrl?.content).toBe('https://example.test/forums/cats/discussions/42-my-post');
+  });
 
   it('formats the title with channel and server name', () => {
     const head = buildDiscussionHead({ ...BASE, discussions: [discussion] });

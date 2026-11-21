@@ -55,8 +55,8 @@ const mountList = (events: unknown[], eventChannelsAggregate = events.length) =>
     props: { eventChannelsAggregate },
     global: {
       stubs: {
-        NuxtLink: { template: '<a><slot /></a>' },
-        'nuxt-link': { template: '<a><slot /></a>' },
+        NuxtLink: { name: 'NuxtLink', props: ['to'], template: '<a><slot /></a>' },
+        'nuxt-link': { name: 'NuxtLink', props: ['to'], template: '<a><slot /></a>' },
       },
     },
   });
@@ -109,6 +109,27 @@ describe('SidebarEventList time buckets', () => {
     });
 
     expect(wrapper.text()).toContain(heading);
+  });
+});
+
+describe('SidebarEventList event links', () => {
+  it('links to the event by its number in this forum and its title', () => {
+    (h.result as { value: unknown }).value = {
+      events: [
+        nowEvent({
+          title: 'Standup',
+          EventChannels: [{ channelUniqueName: 'cats', eventNumber: 12 }],
+        }),
+      ],
+    };
+    const wrapper = mountList([nowEvent()]);
+
+    expect(
+      wrapper.findAllComponents({ name: 'NuxtLink' })[0]!.props('to')
+    ).toEqual({
+      name: 'forums-forumId-events-eventId',
+      params: { forumId: 'cats', eventId: '12-standup' },
+    });
   });
 });
 

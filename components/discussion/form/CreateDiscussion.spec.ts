@@ -243,7 +243,16 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     onDoneCallbacks[0]({
       data: {
         createDiscussionWithChannelConnections: [
-          { DiscussionChannels: [{ Discussion: { id: 'new-disc-1' } }] },
+          {
+            title: 'My New Post',
+            DiscussionChannels: [
+              {
+                discussionNumber: 12,
+                channelUniqueName: 'cats',
+                Discussion: { id: 'new-disc-1' },
+              },
+            ],
+          },
         ],
       },
     });
@@ -252,7 +261,7 @@ describe('CreateDiscussion — builder, cache, handlers', () => {
     expect(mockPush).toHaveBeenCalledWith(
       expect.objectContaining({
         name: 'forums-forumId-discussions-discussionId',
-        params: expect.objectContaining({ discussionId: 'new-disc-1' }),
+        params: expect.objectContaining({ discussionId: '12-my-new-post' }),
       })
     );
   });

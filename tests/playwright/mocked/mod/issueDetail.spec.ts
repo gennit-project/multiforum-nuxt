@@ -451,6 +451,7 @@ test.describe('Moderation issue detail', () => {
             {
               __typename: 'Image',
               id: imageId,
+              imageNumber: 1,
               archived: false,
               url: '/favicon.ico',
               alt: 'Reported image',

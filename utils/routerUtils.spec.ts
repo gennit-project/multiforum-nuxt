@@ -282,6 +282,146 @@ describe('routerUtils', () => {
     });
   });
 
+  describe('short URL permalinks', () => {
+    it('builds a discussion comment permalink from the number, title and shortId', () => {
+      expect(
+        getPermalinkToDiscussionComment({
+          forumId: 'cats',
+          discussionNumber: 42,
+          discussionTitle: 'Trail Conditions',
+          shortId: 'a1b2c3d4e5f6',
+        })
+      ).toEqual({
+        name: 'forums-forumId-discussions-discussionId-comments-commentId',
+        params: {
+          forumId: 'cats',
+          discussionId: '42-trail-conditions',
+          commentId: 'a1b2c3d4e5f6',
+        },
+      });
+    });
+
+    it('builds a discussion permalink from the number and title', () => {
+      expect(
+        getPermalinkToDiscussion({
+          forumId: 'cats',
+          discussionNumber: 42,
+          discussionTitle: 'Trail Conditions',
+        })
+      ).toEqual({
+        name: 'forums-forumId-discussions-discussionId',
+        params: { forumId: 'cats', discussionId: '42-trail-conditions' },
+      });
+    });
+
+    it('builds an event comment permalink from the number, title and shortId', () => {
+      expect(
+        getPermalinkToEventComment({
+          forumId: 'cats',
+          eventNumber: 7,
+          eventTitle: 'Spring Meetup',
+          shortId: 'f6e5d4c3b2a1',
+        })
+      ).toEqual({
+        name: 'forums-forumId-events-eventId-comments-commentId',
+        params: {
+          forumId: 'cats',
+          eventId: '7-spring-meetup',
+          commentId: 'f6e5d4c3b2a1',
+        },
+      });
+    });
+
+    it('builds an event permalink from the number and title', () => {
+      expect(
+        getPermalinkToEvent({
+          forumId: 'cats',
+          eventNumber: 7,
+          eventTitle: 'Spring Meetup',
+        })
+      ).toEqual({
+        name: 'forums-forumId-events-eventId',
+        params: { forumId: 'cats', eventId: '7-spring-meetup' },
+      });
+    });
+
+    it('prefers the shortId over the raw comment id', () => {
+      expect(
+        getPermalinkToDiscussionComment({
+          forumId: 'cats',
+          discussionNumber: 1,
+          shortId: 'short',
+          commentId: 'raw-id',
+        }).params.commentId
+      ).toBe('short');
+    });
+
+    it('builds feedback-on-discussion permalinks from the discussion number', () => {
+      expect(
+        getFeedbackPermalinkObject({
+          routeName: 'forums-forumId-discussions-feedback-discussionId',
+          forumId: 'cats',
+          commentId: 'feedback-1',
+          discussionNumber: 42,
+          discussionTitle: 'Trail Conditions',
+          GivesFeedbackOnDiscussion: { id: 'discussion-raw' } as any,
+        })
+      ).toEqual({
+        name: 'forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId',
+        params: {
+          forumId: 'cats',
+          discussionId: '42-trail-conditions',
+          feedbackId: 'feedback-1',
+        },
+      });
+    });
+
+    it('reuses the route discussion segment for feedback permalinks without a number', () => {
+      expect(
+        getFeedbackPermalinkObject({
+          routeName: 'forums-forumId-discussions-feedback-discussionId',
+          forumId: 'cats',
+          commentId: 'feedback-1',
+          discussionId: '42-trail-conditions',
+          GivesFeedbackOnDiscussion: { id: 'discussion-raw' } as any,
+        })?.params?.discussionId
+      ).toBe('42-trail-conditions');
+    });
+
+    it('builds feedback-on-event permalinks from the event number', () => {
+      expect(
+        getFeedbackPermalinkObject({
+          routeName: 'forums-forumId-events-feedback-eventId',
+          forumId: 'cats',
+          commentId: 'feedback-1',
+          eventNumber: 7,
+          eventTitle: 'Spring Meetup',
+          GivesFeedbackOnEvent: { id: 'event-raw' } as any,
+        })?.params?.eventId
+      ).toBe('7-spring-meetup');
+    });
+
+    it('builds feedback-on-comment permalinks with the discussion segment and raw comment id', () => {
+      expect(
+        getFeedbackPermalinkObject({
+          routeName: 'forums-forumId-discussions-discussionId',
+          forumId: 'cats',
+          commentId: 'feedback-1',
+          discussionNumber: 42,
+          GivesFeedbackOnComment: { id: 'commented-on-1' } as any,
+        })
+      ).toEqual({
+        name: 'forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId',
+        params: {
+          forumId: 'cats',
+          discussionId: '42',
+          commentId: 'commented-on-1',
+          feedbackId: 'feedback-1',
+        },
+      });
+    });
+  });
+
   describe('updateFilters', () => {
     it('updates query parameters correctly and calls router.replace', () => {
       const mockRouter = {

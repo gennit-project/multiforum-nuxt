@@ -15,6 +15,11 @@ import {
   RetryDownloadableFileScanDocument as RETRY_DOWNLOADABLE_FILE_SCAN,
 } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
+import {
+  getDiscussionLinkTarget,
+  getDownloadEditUrl,
+  getDownloadTabUrl,
+} from '@/utils/discussionLinks';
 
 type DownloadScanStatus =
   'PENDING' | 'CLEAN' | 'INFECTED' | 'SUSPICIOUS' | 'FAILED';
@@ -137,14 +142,17 @@ const attachmentUnavailable = computed(() => {
 
 const downloadLabel = 'Download Now';
 
-const replaceFilePath = computed(
-  () =>
-    `/forums/${props.channelUniqueName}/downloads/edit/${props.discussionId}`
+const linkTarget = computed(() =>
+  getDiscussionLinkTarget({
+    discussion: props.discussion ?? { id: props.discussionId },
+    channelId: props.channelUniqueName,
+  })
 );
 
-const pipelinePath = computed(
-  () =>
-    `/forums/${props.channelUniqueName}/downloads/${props.discussionId}/pipelines`
+const replaceFilePath = computed(() => getDownloadEditUrl(linkTarget.value));
+
+const pipelinePath = computed(() =>
+  getDownloadTabUrl({ target: linkTarget.value, tab: 'pipelines' })
 );
 
 const scanCheckedDisplay = computed(() => {
@@ -414,6 +422,8 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
         v-if="primaryFile?.id"
         :file-id="primaryFile.id"
         :discussion-id="discussionId"
+        :discussion-number="linkTarget.discussionNumber"
+        :discussion-title="linkTarget.title"
         :channel-name="channelUniqueName"
       />
     </div>

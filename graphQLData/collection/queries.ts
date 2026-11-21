@@ -9,6 +9,8 @@ export const GET_USER_COLLECTIONS_DISCUSSIONS = gql`
         sort: [{ createdAt: DESC }]
       ) {
         id
+        collectionNumber
+        ownerUsername
         name
         description
         collectionType
@@ -34,6 +36,8 @@ export const GET_USER_COLLECTIONS_COMMENTS = gql`
         sort: [{ createdAt: DESC }]
       ) {
         id
+        collectionNumber
+        ownerUsername
         name
         description
         collectionType
@@ -44,6 +48,7 @@ export const GET_USER_COLLECTIONS_COMMENTS = gql`
       }
       FavoriteComments {
         id
+        shortId
         text
       }
     }
@@ -59,6 +64,8 @@ export const GET_USER_COLLECTIONS_IMAGES = gql`
         sort: [{ createdAt: DESC }]
       ) {
         id
+        collectionNumber
+        ownerUsername
         name
         description
         collectionType
@@ -69,9 +76,13 @@ export const GET_USER_COLLECTIONS_IMAGES = gql`
       }
       FavoriteImages {
         id
+        imageNumber
         url
         alt
         caption
+        Uploader {
+          username
+        }
       }
     }
   }
@@ -86,6 +97,8 @@ export const GET_USER_COLLECTIONS_CHANNELS = gql`
         sort: [{ createdAt: DESC }]
       ) {
         id
+        collectionNumber
+        ownerUsername
         name
         description
         collectionType
@@ -111,6 +124,8 @@ export const GET_USER_COLLECTIONS_DOWNLOADS = gql`
         sort: [{ createdAt: DESC }]
       ) {
         id
+        collectionNumber
+        ownerUsername
         name
         description
         collectionType
@@ -131,6 +146,8 @@ export const GET_COLLECTION_ITEMS = gql`
   query GetCollectionItems($collectionId: ID!, $loggedInUsername: String) {
     collections(where: { id: { eq: $collectionId } }) {
       id
+      collectionNumber
+      ownerUsername
       name
       description
       collectionType
@@ -156,6 +173,7 @@ export const GET_COLLECTION_ITEMS = gql`
         DiscussionChannels {
           id
           channelUniqueName
+          discussionNumber
           archived
           answered
           CommentsConnection {
@@ -176,6 +194,7 @@ export const GET_COLLECTION_ITEMS = gql`
       }
       Comments {
         id
+        shortId
         text
         createdAt
         CommentAuthor {
@@ -191,6 +210,7 @@ export const GET_COLLECTION_ITEMS = gql`
         DiscussionChannel {
           id
           channelUniqueName
+          discussionNumber
           Discussion {
             id
             title
@@ -220,6 +240,7 @@ export const GET_COLLECTION_ITEMS = gql`
         DiscussionChannels {
           id
           channelUniqueName
+          discussionNumber
           archived
           answered
           CommentsConnection {
@@ -240,6 +261,7 @@ export const GET_COLLECTION_ITEMS = gql`
       }
       Images {
         id
+        imageNumber
         url
         alt
         caption
@@ -266,6 +288,8 @@ export const GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD = gql`
   query GetPublicCollectionsForDownload($downloadId: ID!) {
     publicCollectionsContaining(itemId: $downloadId, itemType: DOWNLOAD) {
       id
+      collectionNumber
+      ownerUsername
       name
       description
       visibility
@@ -294,6 +318,7 @@ export const GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD = gql`
         DiscussionChannels {
           id
           channelUniqueName
+          discussionNumber
           CommentsConnection {
             aggregate { count { nodes } }
           }
@@ -326,6 +351,8 @@ export const GET_PUBLIC_COLLECTION_BY_ID = gql`
   ) {
     collections(where: { id: { eq: $collectionId }, visibility: { eq: PUBLIC } }) {
       id
+      collectionNumber
+      ownerUsername
       name
       description
       visibility
@@ -361,6 +388,7 @@ export const GET_PUBLIC_COLLECTION_BY_ID = gql`
         DiscussionChannels {
           id
           channelUniqueName
+          discussionNumber
         }
         Tags {
           text
@@ -489,6 +517,8 @@ export const GET_ALL_USER_COLLECTIONS = gql`
       username
       Collections(sort: [{ createdAt: DESC }]) {
         id
+        collectionNumber
+        ownerUsername
         name
         description
         collectionType
@@ -511,6 +541,8 @@ export const GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS = gql`
         sort: [{ createdAt: DESC }]
       ) {
         id
+        collectionNumber
+        ownerUsername
         name
         itemCount
         Channels {
@@ -521,5 +553,15 @@ export const GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS = gql`
         }
       }
     }
+  }
+`;
+
+// Resolves a route's per-user collection number to the global collection id.
+export const GET_COLLECTION_ID_BY_NUMBER = gql`
+  query getCollectionIdByNumber($username: String!, $collectionNumber: Int!) {
+    getCollectionIdByNumber(
+      username: $username
+      collectionNumber: $collectionNumber
+    )
   }
 `;

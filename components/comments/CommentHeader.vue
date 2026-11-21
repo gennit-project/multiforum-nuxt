@@ -150,30 +150,47 @@ const contextLinkObject = computed(() => {
       // discussion comment it's giving feedback on.
       return getPermalinkToDiscussionComment({
         forumId: Channel?.uniqueName || '',
+        discussionNumber:
+          GivesFeedbackOnComment.DiscussionChannel?.discussionNumber,
         discussionId:
           GivesFeedbackOnComment.DiscussionChannel?.discussionId || '',
+        shortId: GivesFeedbackOnComment.shortId,
         commentId: GivesFeedbackOnComment.id,
       });
     }
     // If it's giving feedback on an event comment, the context is the
     // event comment it's giving feedback on.
+    const feedbackEvent = GivesFeedbackOnComment.Event;
     return getPermalinkToEventComment({
       forumId: Channel?.uniqueName || '',
-      eventId: GivesFeedbackOnComment.Event?.id || '',
+      eventNumber: feedbackEvent?.EventChannels?.[0]?.eventNumber,
+      eventTitle: feedbackEvent?.title,
+      eventId: feedbackEvent?.id || '',
+      shortId: GivesFeedbackOnComment.shortId,
       commentId: GivesFeedbackOnComment.id,
     });
   }
   if (GivesFeedbackOnDiscussion) {
     // If it's giving feedback on a discussion, the context is the discussion.
+    const forumId = Channel?.uniqueName || '';
+    const feedbackDiscussionChannel =
+      GivesFeedbackOnDiscussion.DiscussionChannels?.find(
+        (channel) => channel.channelUniqueName === forumId
+      );
     return getPermalinkToDiscussion({
-      forumId: Channel?.uniqueName || '',
+      forumId,
+      discussionNumber: feedbackDiscussionChannel?.discussionNumber,
+      discussionTitle: GivesFeedbackOnDiscussion.title,
       discussionId: GivesFeedbackOnDiscussion.id,
     });
   }
   if (GivesFeedbackOnEvent) {
     // If it's giving feedback on an event, the context is the event.
+    const feedbackEventChannel = GivesFeedbackOnEvent.EventChannels?.[0];
     return getPermalinkToEvent({
-      forumId: GivesFeedbackOnEvent.EventChannels?.[0]?.channelUniqueName || '',
+      forumId: feedbackEventChannel?.channelUniqueName || '',
+      eventNumber: feedbackEventChannel?.eventNumber,
+      eventTitle: GivesFeedbackOnEvent.title,
       eventId: GivesFeedbackOnEvent.id,
     });
   }
@@ -181,15 +198,21 @@ const contextLinkObject = computed(() => {
   if (ParentComment && DiscussionChannel) {
     return getPermalinkToDiscussionComment({
       forumId: DiscussionChannel?.channelUniqueName || '',
+      discussionNumber: DiscussionChannel?.discussionNumber,
       discussionId: DiscussionChannel?.discussionId || '',
+      shortId: ParentComment.shortId,
       commentId: ParentComment.id,
     });
   }
   if (ParentComment && Event) {
     // If the event comment has a parent comment, the context is the parent comment.
+    const eventChannel = Event.EventChannels?.[0];
     return getPermalinkToEventComment({
-      forumId: Event.EventChannels?.[0]?.channelUniqueName || '',
+      forumId: eventChannel?.channelUniqueName || '',
+      eventNumber: eventChannel?.eventNumber,
+      eventTitle: Event.title,
       eventId: Event.id,
+      shortId: ParentComment.shortId,
       commentId: ParentComment.id,
     });
   }
@@ -198,13 +221,19 @@ const contextLinkObject = computed(() => {
   if (DiscussionChannel) {
     return getPermalinkToDiscussionComment({
       forumId: DiscussionChannel?.channelUniqueName || '',
+      discussionNumber: DiscussionChannel?.discussionNumber,
       discussionId: DiscussionChannel?.discussionId || '',
+      shortId: props.commentData.shortId,
       commentId: props.commentData.id,
     });
   }
+  const ownEventChannel = Event?.EventChannels?.[0];
   return getPermalinkToEventComment({
-    forumId: Event?.EventChannels?.[0]?.channelUniqueName || '',
+    forumId: ownEventChannel?.channelUniqueName || '',
+    eventNumber: ownEventChannel?.eventNumber,
+    eventTitle: Event?.title,
     eventId: Event?.id || '',
+    shortId: props.commentData.shortId,
     commentId: props.commentData.id,
   });
 });

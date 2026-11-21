@@ -7,9 +7,11 @@ const props = withDefaults(
   defineProps<{
     channelId?: string;
     eventChannels: EventChannel[];
+    eventTitle?: string;
   }>(),
   {
     channelId: '',
+    eventTitle: '',
   }
 );
 
@@ -33,6 +35,8 @@ const channelsExceptActive = computed(() => {
           :channel-icon="eventChannel.Channel?.channelIconURL || ''"
           :channel-display-name="eventChannel.Channel?.displayName || ''"
           :event-id="eventChannel.eventId"
+          :event-number="eventChannel.eventNumber"
+          :event-title="eventTitle"
         />
       </ul>
     </div>
@@ -48,6 +52,8 @@ const channelsExceptActive = computed(() => {
             :channel-icon="dc.Channel?.channelIconURL || ''"
             :channel-display-name="dc.Channel?.displayName || ''"
             :event-id="dc.eventId"
+            :event-number="dc.eventNumber"
+            :event-title="eventTitle"
           />
         </ul>
         <p v-if="channelsExceptActive.length === 0" class="text-sm">

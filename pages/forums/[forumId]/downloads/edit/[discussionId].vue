@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { UpdateDiscussionWithChannelConnectionsDocument as UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
+import { type UpdateDiscussionWithChannelConnectionsMutation,
+  UpdateDiscussionWithChannelConnectionsDocument as UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
   GetDiscussionDocument as GET_DISCUSSION,
   GetChannelDocument as GET_CHANNEL,
   UpdateDownloadLabelsDocument as UPDATE_DOWNLOAD_LABELS } from '@/__generated__/operations';
@@ -18,6 +19,8 @@ import type {
   DiscussionUpdateInput,
 } from '@/__generated__/graphql';
 import { useModProfileName } from '@/composables/useAuthState';
+import { useResolvedDiscussionId } from '@/composables/useRouteContentIds';
+import { getDownloadRoute } from '@/utils/contentUrls';
 import { resolveSelectedLabelOptionIds } from '@/utils/downloadLabelUtils';
 import { buildAlbumUpdateInput } from '@/utils/albumUpdateInput';
 import { buildDiscussionEditFormValues } from '@/utils/discussionEditForm';
@@ -39,12 +42,13 @@ const channelId = computed(() => {
   return route.params.forumId;
 });
 
-const discussionId = computed(() => {
-  if (typeof route.params.discussionId !== 'string') {
-    return '';
-  }
-  return route.params.discussionId;
-});
+// The route carries `{number}-{slug}`; the global id comes from a lookup.
+const {
+  id: discussionId,
+  discussionNumber: routeDiscussionNumber,
+  loading: discussionIdLoading,
+  notFound: discussionNotFound,
+} = useResolvedDiscussionId();
 
 const {
   result: getDiscussionResult,
@@ -69,8 +73,16 @@ const {
   uniqueName: channelId.value,
 });
 
+const pageLoading = computed(
+  () => discussionIdLoading.value || getDiscussionLoading.value
+);
+
 const discussion = computed(() => {
-  if (getDiscussionError.value || getDiscussionLoading.value) {
+  if (
+    discussionNotFound.value ||
+    getDiscussionError.value ||
+    getDiscussionLoading.value
+  ) {
     return null;
   }
   return getDiscussionResult.value?.discussions.find((item) => item.id === discussionId.value) || null;
@@ -356,8 +368,36 @@ const {
   },
 }));
 
+type UpdatedDownload = NonNullable<
+  UpdateDiscussionWithChannelConnectionsMutation['updateDiscussionWithChannelConnections']
+>;
+type DownloadRouteInForumParams = {
+  forumId: string | undefined;
+  updated?: UpdatedDownload | null;
+};
+
+// Route back to the download in a forum, using that forum's number (the
+// mutation result knows about newly added forums).
+const getDownloadRouteInForum = ({
+  forumId = '',
+  updated,
+}: DownloadRouteInForumParams) =>
+  getDownloadRoute({
+    forumId,
+    discussionNumber:
+      updated?.DiscussionChannels?.find(
+        (discussionChannel) => discussionChannel.channelUniqueName === forumId
+      )?.discussionNumber ??
+      discussion.value?.DiscussionChannels?.find(
+        (discussionChannel) => discussionChannel.channelUniqueName === forumId
+      )?.discussionNumber ??
+      (forumId === channelId.value ? routeDiscussionNumber.value : null),
+    title: updated?.title ?? discussion.value?.title,
+    discussionId: discussionId.value,
+  });
+
 let pendingSave: { discussionId: string; channelId: string; destination: string | undefined; labelOptionIds: string[] } | undefined;
-onDone(async () => {
+onDone(async (result) => {
   const saved = pendingSave;
   if (!saved || saved.discussionId !== discussionId.value || saved.channelId !== channelId.value) return;
   try {
@@ -366,7 +406,12 @@ onDone(async () => {
     console.error('Error updating labels:', error);
   }
   if (saved.discussionId !== discussionId.value || saved.channelId !== channelId.value) return;
-  router.push({ name: 'forums-forumId-downloads-discussionId', params: { forumId: saved.destination, discussionId: saved.discussionId } });
+  router.push(
+    getDownloadRouteInForum({
+      forumId: saved.destination,
+      updated: result?.data?.updateDiscussionWithChannelConnections,
+    })
+  );
 });
 
 async function submit() {
@@ -384,13 +429,9 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
 }
 
 function handleCancel() {
-  router.push({
-    name: 'forums-forumId-downloads-discussionId',
-    params: {
-      forumId: formValues.value.selectedChannels[0],
-      discussionId: discussionId.value,
-    },
-  });
+  router.push(
+    getDownloadRouteInForum({ forumId: formValues.value.selectedChannels[0] })
+  );
 }
 
 // Suppress unused variable warnings for refs that are only used in template
@@ -400,7 +441,7 @@ void updateLabelsLoading;
 <template>
   <ClientOnly>
     <div
-      v-if="getDiscussionLoading"
+      v-if="pageLoading"
       class="flex min-h-[400px] items-center justify-center"
     >
       <LoadingSpinner label="Checking permissions…" />
@@ -410,7 +451,7 @@ void updateLabelsLoading;
         <CreateEditDiscussionFields
           :key="dataLoaded.toString()"
           :edit-mode="true"
-          :discussion-loading="getDiscussionLoading"
+          :discussion-loading="pageLoading"
           :get-discussion-error="getDiscussionError"
           :update-discussion-error="updateDiscussionError"
           :form-values="formValues"
@@ -420,7 +461,7 @@ void updateLabelsLoading;
           :channel-data="channelData"
           :crossposted-discussion="discussion?.CrosspostedDiscussion || null"
           :crosspost-error="getDiscussionError"
-          :crosspost-loading="getDiscussionLoading"
+          :crosspost-loading="pageLoading"
           @submit="submit"
           @update-form-values="updateFormValues"
           @cancel="handleCancel"

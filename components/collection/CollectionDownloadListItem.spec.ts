@@ -57,6 +57,33 @@ describe('CollectionDownloadListItem content', () => {
   });
 });
 
+describe('CollectionDownloadListItem link', () => {
+  it('links to the download by number and title', () => {
+    const wrapper = mount(CollectionDownloadListItem, {
+      props: {
+        discussion: discussion({
+          DiscussionChannels: [
+            { channelUniqueName: 'cats', discussionNumber: 8 },
+          ],
+        }),
+      },
+      global: {
+        stubs: {
+          'nuxt-link': {
+            props: ['to'],
+            template: '<a :data-to="JSON.stringify(to)"><slot /></a>',
+          },
+        },
+      },
+    });
+
+    expect(JSON.parse(wrapper.get('a').attributes('data-to'))).toEqual({
+      name: 'forums-forumId-downloads-discussionId',
+      params: { forumId: 'cats', discussionId: '8-a-model' },
+    });
+  });
+});
+
 describe('CollectionDownloadListItem preview image', () => {
   it('shows the first album image', () => {
     const wrapper = mountItem();

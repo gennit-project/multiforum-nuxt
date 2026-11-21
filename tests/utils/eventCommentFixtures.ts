@@ -44,6 +44,7 @@ export const makeEventDetail = (
     {
       id: 'ec1',
       eventId: 'e1',
+      eventNumber: 1,
       channelUniqueName: 'cats',
       Channel: {
         uniqueName: 'cats',
@@ -91,7 +92,11 @@ export const makeEventSection = (
 export const makeEventRoot = (id = 'c1'): EventRootComment => ({
   ...makeReply({
     id,
-    Event: { id: 'e1' },
+    Event: {
+      id: 'e1',
+      title: 'Fallback event',
+      EventChannels: [{ channelUniqueName: 'cats', eventNumber: 1 }],
+    },
     DiscussionChannel: null,
     ParentComment: null,
   }),

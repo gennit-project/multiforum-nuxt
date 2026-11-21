@@ -2,7 +2,7 @@ import { computed, type Ref, type ComputedRef } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import {
   UpdatedAnswersFragmentDoc as UPDATED_ANSWERS_FRAGMENT,
-  MarkAsAnsweredSource68ece8b51cDocument as MARK_AS_ANSWERED_BY_COMMENT,
+  MarkAsAnsweredSource21cae36e28Document as MARK_AS_ANSWERED_BY_COMMENT,
   UnmarkCommentAsAnswerDocument as UNMARK_COMMENT_AS_ANSWER,
 } from '@/__generated__/operations';
 import type { Reference } from '@apollo/client/core';

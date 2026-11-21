@@ -18,13 +18,24 @@ const futureDate = (daysFromNow: number): string => {
   return date.toISOString();
 };
 
-type Occurrence = { id: string; startTime: string; endTime: string; canceled: boolean };
+type Occurrence = {
+  id: string;
+  title: string;
+  startTime: string;
+  endTime: string;
+  canceled: boolean;
+  EventChannels: Array<{ channelUniqueName: string; eventNumber: number }>;
+};
+
+const occurrenceChannels = (eventNumber: number) => [
+  { channelUniqueName: TEST_CHANNEL, eventNumber },
+];
 
 const defaultOccurrences = (): Occurrence[] => [
-  { id: 'event-1', startTime: futureDate(7), endTime: futureDate(7), canceled: false },
-  { id: 'event-2', startTime: futureDate(14), endTime: futureDate(14), canceled: false },
-  { id: 'event-3', startTime: futureDate(21), endTime: futureDate(21), canceled: false },
-  { id: 'event-4', startTime: futureDate(28), endTime: futureDate(28), canceled: false },
+  { id: 'event-1', title: 'Weekly Meetup', startTime: futureDate(7), endTime: futureDate(7), canceled: false, EventChannels: occurrenceChannels(1) },
+  { id: 'event-2', title: 'Weekly Meetup', startTime: futureDate(14), endTime: futureDate(14), canceled: false, EventChannels: occurrenceChannels(2) },
+  { id: 'event-3', title: 'Weekly Meetup', startTime: futureDate(21), endTime: futureDate(21), canceled: false, EventChannels: occurrenceChannels(3) },
+  { id: 'event-4', title: 'Weekly Meetup', startTime: futureDate(28), endTime: futureDate(28), canceled: false, EventChannels: occurrenceChannels(4) },
 ];
 
 const seriesData = (occurrences: Occurrence[]) => ({
@@ -60,7 +71,13 @@ const withTypenames = (event: Record<string, any>) => ({
         ...event.EventSeries,
         __typename: 'EventSeries',
         Occurrences: (event.EventSeries.Occurrences ?? []).map(
-          (occ: Record<string, any>) => ({ ...occ, __typename: 'Event' })
+          (occ: Record<string, any>) => ({
+            ...occ,
+            __typename: 'Event',
+            EventChannels: (occ.EventChannels ?? []).map(
+              (ec: Record<string, any>) => ({ ...ec, __typename: 'EventChannel' })
+            ),
+          })
         ),
       }
     : event.EventSeries,
@@ -304,16 +321,22 @@ test.describe('Series List Display', () => {
       .filter({ hasText: /^[A-Z][a-z]{2} \d{1,2}$/ })
       .first();
     await expect(firstOccurrence).toBeVisible();
-    expect(await firstOccurrence.getAttribute('href')).toContain('/events/');
+    // Short URL scheme: `{eventNumber}-{slug}` (the first upcoming occurrence
+    // is number 2 because the current event, number 1, is excluded).
+    expect(await firstOccurrence.getAttribute('href')).toMatch(
+      new RegExp(`/forums/${TEST_CHANNEL}/events/2-weekly-meetup$`)
+    );
   });
 
   test('shows +N more indicator when many occurrences exist', async ({ context, page }) => {
     // Create event with many occurrences
     const manyOccurrences = Array.from({ length: 10 }, (_, i) => ({
       id: `event-${i + 1}`,
+      title: 'Weekly Meetup',
       startTime: futureDate(7 * (i + 1)),
       endTime: futureDate(7 * (i + 1)),
       canceled: false,
+      EventChannels: occurrenceChannels(i + 1),
     }));
 
     const eventWithManyOccurrences = {

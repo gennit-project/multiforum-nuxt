@@ -392,14 +392,25 @@ describe('Comment — forum id resolution', () => {
     expect(wrapper.find('.comment-buttons-stub').exists()).toBe(true);
   });
 
-  it.each([
-    ['discussion-1', 'discussion-1'],
-    [['discussion-2'], 'discussion-2'],
-  ])('normalizes the route discussion id %j', (discussionId) => {
-    routeParams = { discussionId };
-    mountComment();
-    expect(bestAnswerOptions.discussionId.value).toBe(
-      Array.isArray(discussionId) ? discussionId[0] : discussionId
+  it('uses the discussionId prop (the route param is a short-URL segment, not an id)', async () => {
+    routeParams = { discussionId: '42-trail-conditions' };
+    const wrapper = mountComment();
+    await wrapper.setProps({ discussionId: 'global-discussion-id' });
+    expect(bestAnswerOptions.discussionId.value).toBe('global-discussion-id');
+  });
+
+  it('falls back to the comment DiscussionChannel discussionId, ignoring the route segment', () => {
+    routeParams = { discussionId: '42-trail-conditions' };
+    mountComment(
+      baseComment({
+        DiscussionChannel: {
+          id: 'dc1',
+          discussionId: 'global-from-comment',
+          discussionNumber: 42,
+          channelUniqueName: 'cats',
+        },
+      })
     );
+    expect(bestAnswerOptions.discussionId.value).toBe('global-from-comment');
   });
 });

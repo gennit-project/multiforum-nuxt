@@ -17,9 +17,10 @@ export const useUIStore = defineStore('ui', () => {
   // Discussion list states - separate for channel view and sitewide view
   const expandChannelDiscussions = ref(true); // Default expanded for channel view
   const expandSitewideDiscussions = ref(false); // Default collapsed for sitewide view
-  const selectedChannelDiscussionId = ref('');
+  const selectedChannelDiscussionNumber = ref<number | null>(null);
   const selectedChannelDiscussionTitle = ref('');
   const selectedChannelEventId = ref('');
+  const selectedChannelEventNumber = ref<number | null>(null);
   const selectedChannelEventTitle = ref('');
   const selectedIssueNumber = ref<number | null>(null);
   const selectedIssueTitle = ref('');
@@ -163,28 +164,32 @@ export const useUIStore = defineStore('ui', () => {
   }
 
   function setSelectedChannelDiscussionSelection(params: {
-    discussionId: string;
+    discussionNumber: number;
     title: string;
   }) {
-    selectedChannelDiscussionId.value = params.discussionId;
+    selectedChannelDiscussionNumber.value = params.discussionNumber;
     selectedChannelDiscussionTitle.value = params.title;
   }
 
   function clearSelectedChannelDiscussion() {
-    selectedChannelDiscussionId.value = '';
+    selectedChannelDiscussionNumber.value = null;
     selectedChannelDiscussionTitle.value = '';
   }
 
   function setSelectedChannelEventSelection(params: {
     eventId: string;
+    /** The event's per-forum number, used to build its short URL. */
+    eventNumber?: number | null;
     title: string;
   }) {
     selectedChannelEventId.value = params.eventId;
+    selectedChannelEventNumber.value = params.eventNumber ?? null;
     selectedChannelEventTitle.value = params.title;
   }
 
   function clearSelectedChannelEventSelection() {
     selectedChannelEventId.value = '';
+    selectedChannelEventNumber.value = null;
     selectedChannelEventTitle.value = '';
   }
 
@@ -213,9 +218,10 @@ export const useUIStore = defineStore('ui', () => {
     themeMode,
     expandChannelDiscussions,
     expandSitewideDiscussions,
-    selectedChannelDiscussionId,
+    selectedChannelDiscussionNumber,
     selectedChannelDiscussionTitle,
     selectedChannelEventId,
+    selectedChannelEventNumber,
     selectedChannelEventTitle,
     selectedIssueNumber,
     selectedIssueTitle,

@@ -1,5 +1,6 @@
 import removeMarkdown from 'remove-markdown';
 import type { HeadObject } from '@/utils/seoHead';
+import { getDiscussionUrl } from '@/utils/contentUrls';
 
 /**
  * Pure builders for the discussion detail page's SEO/social metadata and
@@ -44,7 +45,10 @@ export type BuildDiscussionHeadParams = {
   /** The `discussions` array from the GraphQL result (null while loading). */
   discussions: DiscussionSeoSource[] | null | undefined;
   channelId: string;
-  discussionId: string;
+  /** The per-forum discussion number from the route; builds the canonical URL. */
+  discussionNumber: number | null;
+  /** Raw route segment, used when the number cannot be parsed. */
+  discussionSegment?: string;
   serverDisplayName: string;
   baseUrl: string;
 };
@@ -58,7 +62,8 @@ export function buildDiscussionStructuredData(params: {
   title: string;
   description: string;
   channelId: string;
-  discussionId: string;
+  discussionNumber: number | null;
+  discussionSegment?: string;
   serverDisplayName: string;
   baseUrl: string;
 }): Record<string, unknown> {
@@ -67,11 +72,17 @@ export function buildDiscussionStructuredData(params: {
     title,
     description,
     channelId,
-    discussionId,
+    discussionNumber,
+    discussionSegment,
     serverDisplayName,
     baseUrl,
   } = params;
-  const url = `${baseUrl}/forums/${channelId}/discussions/${discussionId}`;
+  const url = `${baseUrl}${getDiscussionUrl({
+    forumId: channelId,
+    discussionNumber,
+    title: discussion.title,
+    discussionId: discussionSegment,
+  })}`;
   return {
     '@context': 'https://schema.org',
     '@type': 'DiscussionForumPosting',
@@ -105,8 +116,14 @@ export function buildDiscussionStructuredData(params: {
 export function buildDiscussionHead(
   params: BuildDiscussionHeadParams
 ): HeadObject {
-  const { discussions, channelId, discussionId, serverDisplayName, baseUrl } =
-    params;
+  const {
+    discussions,
+    channelId,
+    discussionNumber,
+    discussionSegment,
+    serverDisplayName,
+    baseUrl,
+  } = params;
 
   if (!discussions) {
     return {
@@ -128,7 +145,12 @@ export function buildDiscussionHead(
     ? toMetaDescription(discussion.body)
     : fallbackDescription(serverDisplayName);
   const imageUrl = discussion.coverImageURL || '';
-  const url = `${baseUrl}/forums/${channelId}/discussions/${discussionId}`;
+  const url = `${baseUrl}${getDiscussionUrl({
+    forumId: channelId,
+    discussionNumber,
+    title: discussion.title,
+    discussionId: discussionSegment,
+  })}`;
 
   return {
     title: `${title} | ${channelId} | ${serverDisplayName}`,
@@ -161,7 +183,8 @@ export function buildDiscussionHead(
             title,
             description,
             channelId,
-            discussionId,
+            discussionNumber,
+            discussionSegment,
             serverDisplayName,
             baseUrl,
           })

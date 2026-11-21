@@ -20,7 +20,11 @@ what they need: to sign in, to add their birthday, or that they're too young.
 When no age check applies, it renders the default slot (the not-found page).
 */
 const props = defineProps<{
-  discussionId: string;
+  /** The global id, when known (edit pages); otherwise pass the number. */
+  discussionId?: string;
+  /** Per-forum discussion number from the route, resolved to an id here. */
+  discussionNumber?: number | null;
+  channelUniqueName?: string;
 }>();
 
 const route = useRoute();
@@ -30,7 +34,9 @@ const loginUrl = computed(() =>
 );
 
 const { check, loading } = useDiscussionAgeGateCheck({
-  discussionId: computed(() => props.discussionId),
+  discussionId: computed(() => props.discussionId ?? ''),
+  discussionNumber: computed(() => props.discussionNumber ?? null),
+  channelUniqueName: computed(() => props.channelUniqueName ?? ''),
   enabled: true,
 });
 const status = computed(() =>

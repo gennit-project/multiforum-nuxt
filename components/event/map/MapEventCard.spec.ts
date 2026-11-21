@@ -173,11 +173,15 @@ describe('online discovery cards', () => {
       vi.fn(() => ({ matches: false }))
     );
     const wrapper = mountCard(
-      { EventChannels: [{ channelUniqueName: 'books' }] } as Partial<Event>,
+      {
+        EventChannels: [{ channelUniqueName: 'books', eventNumber: 14 }],
+      } as Partial<Event>,
       { onlineList: true }
     );
     await wrapper.get('button[aria-label]').trigger('click');
-    expect(push).toHaveBeenCalledWith('/forums/books/events/trivia');
+    expect(push).toHaveBeenCalledWith(
+      '/forums/books/events/14-crescent-ballroom-trivia'
+    );
     vi.unstubAllGlobals();
   });
 });

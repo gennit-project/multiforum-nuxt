@@ -117,7 +117,7 @@ test('shows the archived banner on initial load with a link to the related issue
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
 
   // Banner is present from the first render — no refresh required.
   const banner = page.getByTestId('archived-discussion-banner');

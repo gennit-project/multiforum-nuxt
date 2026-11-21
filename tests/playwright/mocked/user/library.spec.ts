@@ -109,6 +109,8 @@ const getBaseMocks = (username: string) => ({
             {
               __typename: 'Collection',
               id: 'custom-collection-1',
+              collectionNumber: 2,
+              ownerUsername: DEFAULT_USERNAME,
               name: 'My Reading List',
               description: 'Articles to read later',
               itemCount: 15,
@@ -324,9 +326,12 @@ test.describe('Library page', () => {
     await page.goto('/library');
     await waitForLibraryData(diagnostics.completedOperations);
 
-    await expect(
-      page.getByRole('link', { name: /My Reading List/i })
-    ).toBeVisible({ timeout: 10000 });
+    const collectionLink = page.getByRole('link', { name: /My Reading List/i });
+    await expect(collectionLink).toBeVisible({ timeout: 10000 });
+    await expect(collectionLink).toHaveAttribute(
+      'href',
+      `/u/${DEFAULT_USERNAME}/collections/2-my-reading-list`
+    );
   });
 
   test('links both the source forum and original uploader', async ({

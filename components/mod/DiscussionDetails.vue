@@ -15,6 +15,7 @@ import MarkdownPreview from '../MarkdownPreview.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import { getOriginalPoster } from '@/utils/originalPoster';
+import { getDiscussionRoute } from '@/utils/contentUrls';
 
 const props = defineProps<{
   activeIssue: Issue;
@@ -66,6 +67,22 @@ const discussionChannelId = computed(
     discussion.value?.DiscussionChannels?.[0]?.channelUniqueName ||
     ''
 );
+
+// The related discussion's DiscussionChannel for the link's forum carries the
+// per-forum discussionNumber the short URL is built from.
+const discussionLink = computed(() => {
+  const current = discussion.value;
+  if (!current) return '';
+  const discussionChannel = current.DiscussionChannels?.find(
+    (channel) => channel.channelUniqueName === discussionChannelId.value
+  );
+  return getDiscussionRoute({
+    forumId: discussionChannelId.value,
+    discussionNumber: discussionChannel?.discussionNumber,
+    title: current.title,
+    discussionId: current.id,
+  });
+});
 
 const downloadableFiles = computed(
   () => discussion.value?.DownloadableFiles || []
@@ -171,13 +188,7 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
         <div class="border-l border-l-2 pl-6">
           <h3 v-if="discussion?.title">
             <nuxt-link
-              :to="{
-                name: 'forums-forumId-discussions-discussionId',
-                params: {
-                  forumId: discussionChannelId,
-                  discussionId: discussion.id,
-                },
-              }"
+              :to="discussionLink"
               class="text-brand-500 dark:text-brand-400"
               rel="noopener noreferrer"
             >

@@ -72,7 +72,7 @@ test('continues vertical page scrolling when a touch starts on a discussion albu
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
 
   const carousel = page.getByTestId('discussion-album-carousel');
   await expect(carousel).toBeVisible({ timeout: 30_000 });

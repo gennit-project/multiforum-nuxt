@@ -310,6 +310,7 @@ export const GET_DOWNLOAD_SCAN_REVIEW_QUEUE = gql`
       reviewRequestReason
       uploaderUsername
       discussionId
+      discussionNumber
       discussionTitle
       channelUniqueName
     }
@@ -1087,6 +1088,7 @@ export const GET_PLUGIN_PIPELINE_CAMPAIGN_FAILURES = gql`
       pipelineId
       targetId
       discussionId
+      discussionNumber
       channelId
       status
       attemptNumber

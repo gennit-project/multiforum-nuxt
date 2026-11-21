@@ -1,5 +1,8 @@
 import { test, expect } from '../../helpers/testFixture';
-import { buildEvent } from '../../helpers/graphqlFixtures';
+import {
+  buildEvent,
+  buildEventIdLookupHandlers,
+} from '../../helpers/graphqlFixtures';
 import { createBaseHandlers } from '../../helpers/baseHandlers';
 
 // Workflow: "Verify Unsubscribe Works for Events and Issues".
@@ -35,6 +38,7 @@ test.describe('Auto-unsubscribe via ?action=unsubscribe', () => {
       email: 'alice@example.com',
       handlers: {
         ...createBaseHandlers({ username: TEST_USER, channelId: TEST_CHANNEL }),
+        ...buildEventIdLookupHandlers(EVENT_ID),
         getEvent: () => ({ data: { events: [subscribedEvent] } }),
         getEventComments: () => ({
           data: {
@@ -72,7 +76,7 @@ test.describe('Auto-unsubscribe via ?action=unsubscribe', () => {
     );
 
     await page.goto(
-      `/forums/${TEST_CHANNEL}/events/${EVENT_ID}?action=unsubscribe`
+      `/forums/${TEST_CHANNEL}/events/1-subscribed-event?action=unsubscribe`
     );
 
     // The composable fires the unsubscribe mutation automatically.

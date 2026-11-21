@@ -152,7 +152,7 @@ test('reports a discussion with mocked GraphQL', async ({
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
   await page.getByTestId('discussion-menu-button').click();
   await page.getByTestId('discussion-menu-button-item-Report').click();
   await expect(page.getByText('Report Discussion')).toBeVisible();

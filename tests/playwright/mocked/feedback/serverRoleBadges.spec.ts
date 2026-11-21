@@ -1,5 +1,6 @@
 import { test, expect } from '../../helpers/testFixture';
 import { createBaseHandlers } from '../../helpers/baseHandlers';
+import { buildEventIdLookupHandlers } from '../../helpers/graphqlFixtures';
 
 const TEST_CHANNEL = 'test-forum';
 const MOD_PROFILE = 'server-mod-mary';
@@ -72,7 +73,7 @@ test('shows Server Mod on a discussion feedback comment', async ({
   });
 
   await page.goto(
-    `/forums/${TEST_CHANNEL}/discussions/feedback/${discussionId}`
+    `/forums/${TEST_CHANNEL}/discussions/feedback/1`
   );
 
   const feedback = page.locator('main').filter({ hasText: FEEDBACK_TEXT });
@@ -94,6 +95,7 @@ test('shows Server Mod on an event feedback comment', async ({
     modProfileName: MOD_PROFILE,
     handlers: {
       ...baseHandlers(),
+      ...buildEventIdLookupHandlers(eventId),
       getEventFeedback: () => ({
         data: {
           events: [
@@ -113,7 +115,7 @@ test('shows Server Mod on an event feedback comment', async ({
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/events/feedback/${eventId}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/events/feedback/1-event-feedback-badges`);
 
   const feedback = page.locator('main').filter({ hasText: FEEDBACK_TEXT });
   await expect(feedback.getByText('Server Mod', { exact: true })).toBeVisible({

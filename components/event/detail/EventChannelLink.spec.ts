@@ -14,7 +14,7 @@ const mountLink = (props: Record<string, unknown> = {}) =>
     },
     global: {
       stubs: {
-        'nuxt-link': { template: '<a><slot /></a>' },
+        'nuxt-link': { name: 'NuxtLink', props: ['to'], template: '<a><slot /></a>' },
         AvatarComponent: true,
       },
     },
@@ -29,6 +29,17 @@ describe('EventChannelLink', () => {
     expect(mountLink({ channelDisplayName: 'Cats Forum' }).text()).toContain(
       'Cats Forum'
     );
+  });
+
+  it('links to the forum event using its number and title', () => {
+    const wrapper = mountLink({ eventNumber: 4, eventTitle: 'Game Night' });
+
+    expect(
+      (wrapper.getComponent({ name: 'NuxtLink' }).props('to') as unknown)
+    ).toEqual({
+      name: 'forums-forumId-events-eventId',
+      params: { forumId: 'cats', eventId: '4-game-night' },
+    });
   });
 
   it('renders the channel avatar', () => {

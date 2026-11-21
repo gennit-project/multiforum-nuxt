@@ -26,7 +26,7 @@ test('user can give and undo a super upvote on another user\'s comment', async (
     handlers: createCommentSuperUpvoteHandlers(state),
   });
 
-  await page.goto(`/forums/${CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${CHANNEL}/discussions/1`);
   await page.waitForLoadState('networkidle');
 
   const upvoteButton = page.getByTestId('upvote-comment-button').first();

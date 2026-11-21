@@ -19,6 +19,7 @@ import { useChannelPermissions } from '@/composables/useCommentPermissions';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { RerunPluginPipelineDocument as RERUN_PLUGIN_PIPELINE, StartPluginPipelineDocument as START_PLUGIN_PIPELINE, GetInternalPluginPipelineRunDocument as GET_INTERNAL_PLUGIN_PIPELINE_RUN, GetPipelineRunPageDocument as GET_PLUGIN_PIPELINE_RUN_PAGE  } from '@/__generated__/operations';
 import PipelineJobPage from './PipelineJobPage.vue';
+import { getDownloadTabUrl } from '@/utils/discussionLinks';
 
 type InternalPipelineRunDetail = NonNullable<GetInternalPluginPipelineRunQuery['getInternalPluginPipelineRun']>;
 
@@ -31,6 +32,9 @@ interface PublicDetailEntry {
 const props = defineProps<{
   fileId: string;
   discussionId: string;
+  /** Per-forum number and title of the download, for permalinks. */
+  discussionNumber?: number | null;
+  discussionTitle?: string | null;
   channelName: string;
   ownerUsername?: string;
   uploaderUsername?: string;
@@ -420,9 +424,15 @@ const filteredAttempts = computed(() =>
 );
 
 const attemptPermalink = (attempt: PublicPipelineAttempt) =>
-  `/forums/${encodeURIComponent(props.channelName)}/downloads/${encodeURIComponent(
-    props.discussionId
-  )}/pipelines?attempt=${encodeURIComponent(
+  `${getDownloadTabUrl({
+    target: {
+      forumId: props.channelName,
+      discussionNumber: props.discussionNumber,
+      title: props.discussionTitle,
+      discussionId: props.discussionId,
+    },
+    tab: 'pipelines',
+  })}?attempt=${encodeURIComponent(
     attempt.id
   )}#attempt-${encodeURIComponent(attempt.pipelineId)}`;
 

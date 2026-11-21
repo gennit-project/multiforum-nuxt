@@ -173,6 +173,9 @@ const event = (id: string, title = `Event ${id}`) => ({
   title,
   locationName: 'Phoenix',
   location: { latitude: 33.4, longitude: -111.9 },
+  EventChannels: [
+    { channelUniqueName: 'cats', eventNumber: Number.parseInt(id, 10) || null },
+  ],
 });
 
 const markerData = (numberOfEvents = 1) => {
@@ -296,9 +299,9 @@ describe('MapView', () => {
     await Promise.resolve();
     expect(h.push).toHaveBeenCalledWith({
       name: 'map-search-eventId',
-      params: { eventId: '1' },
+      params: { eventId: '1-event-1' },
       hash: '#',
-      query: {},
+      query: { forum: 'cats' },
     });
   });
 
@@ -391,9 +394,9 @@ describe('MapView', () => {
       openCalls: 2,
       route: {
         name: 'map-search-eventId',
-        params: { eventId: '1' },
+        params: { eventId: '1-event-1' },
         hash: '#loc1',
-        query: {},
+        query: { forum: 'cats' },
       },
     });
   });

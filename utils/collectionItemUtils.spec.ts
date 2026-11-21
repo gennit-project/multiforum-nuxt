@@ -81,19 +81,20 @@ describe('collection item ordering helpers', () => {
 describe('buildCollectionDiscussionLink', () => {
   const discussion = {
     id: 'd1',
-    DiscussionChannels: [{ channelUniqueName: 'cats' }],
+    title: 'Trail Conditions',
+    DiscussionChannels: [{ channelUniqueName: 'cats', discussionNumber: 42 }],
   } as unknown as Discussion;
 
   it('links to the discussions path for a normal discussion', () => {
     expect(
       buildCollectionDiscussionLink({ discussion, isDownloadsCollection: false })
-    ).toBe('/forums/cats/discussions/d1');
+    ).toBe('/forums/cats/discussions/42-trail-conditions');
   });
 
   it('links to the downloads path for a downloads collection', () => {
     expect(
       buildCollectionDiscussionLink({ discussion, isDownloadsCollection: true })
-    ).toBe('/forums/cats/downloads/d1');
+    ).toBe('/forums/cats/downloads/42-trail-conditions');
   });
 
   it('links to the downloads path when the discussion hasDownload', () => {
@@ -101,12 +102,27 @@ describe('buildCollectionDiscussionLink', () => {
       buildCollectionDiscussionLink({
         discussion: {
           id: 'd1',
+          title: 'Trail Conditions',
           hasDownload: true,
+          DiscussionChannels: [
+            { channelUniqueName: 'cats', discussionNumber: 42 },
+          ],
+        } as unknown as Discussion,
+        isDownloadsCollection: false,
+      })
+    ).toBe('/forums/cats/downloads/42-trail-conditions');
+  });
+
+  it('falls back to the raw id when the discussion number is missing', () => {
+    expect(
+      buildCollectionDiscussionLink({
+        discussion: {
+          id: 'd1',
           DiscussionChannels: [{ channelUniqueName: 'cats' }],
         } as unknown as Discussion,
         isDownloadsCollection: false,
       })
-    ).toBe('/forums/cats/downloads/d1');
+    ).toBe('/forums/cats/discussions/d1');
   });
 
   it('falls back to root when there is no channel', () => {

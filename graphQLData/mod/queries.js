@@ -82,6 +82,7 @@ export const GET_MOD = gql`
         limit: 25, offset: 0, sort: { createdAt: DESC }
       ) {
         id
+        shortId
         text
         createdAt
         updatedAt
@@ -101,6 +102,7 @@ export const GET_MOD = gql`
             uniqueName
           }
           discussionId
+          discussionNumber
           channelUniqueName
         }
         Channel {
@@ -108,12 +110,18 @@ export const GET_MOD = gql`
         }
         GivesFeedbackOnDiscussion {
           id
+          title
+          DiscussionChannels {
+            channelUniqueName
+            discussionNumber
+          }
         }
         GivesFeedbackOnEvent {
           id
         }
         GivesFeedbackOnComment {
           id
+          shortId
         }
         Issue {
           id
@@ -152,6 +160,7 @@ export const GET_MOD_COMMENTS = gql`
         limit: $limit, offset: $offset, sort: { createdAt: DESC }
       ) {
         id
+        shortId
         text
         createdAt
         updatedAt
@@ -171,6 +180,7 @@ export const GET_MOD_COMMENTS = gql`
             uniqueName
           }
           discussionId
+          discussionNumber
           channelUniqueName
         }
         Channel {
@@ -178,12 +188,18 @@ export const GET_MOD_COMMENTS = gql`
         }
         GivesFeedbackOnDiscussion {
           id
+          title
+          DiscussionChannels {
+            channelUniqueName
+            discussionNumber
+          }
         }
         GivesFeedbackOnEvent {
           id
         }
         GivesFeedbackOnComment {
           id
+          shortId
         }
         Issue {
           id
@@ -244,6 +260,7 @@ export const GET_MOD_CONTRIBUTIONS = gql`
         }
         Comment {
           id
+          shortId
           text
           createdAt
         }
@@ -254,6 +271,7 @@ export const GET_MOD_CONTRIBUTIONS = gql`
           DiscussionChannels {
             id
             discussionId
+            discussionNumber
             channelUniqueName
           }
         }
@@ -264,16 +282,19 @@ export const GET_MOD_CONTRIBUTIONS = gql`
           EventChannels {
             id
             eventId
+            eventNumber
             channelUniqueName
           }
         }
         RelatedComment {
           id
+          shortId
           text
           createdAt
           DiscussionChannel {
             id
             discussionId
+            discussionNumber
             channelUniqueName
           }
           Event {
@@ -283,6 +304,7 @@ export const GET_MOD_CONTRIBUTIONS = gql`
             EventChannels {
               id
               eventId
+              eventNumber
               channelUniqueName
             }
           }

@@ -32,8 +32,14 @@ const authorDisplayName = computed(() => {
 });
 
 const sourceLink = computed(() => {
-  const { sourceType, sourceId, sourceChannelUniqueName, discussionId } =
-    props.entry;
+  const {
+    sourceType,
+    sourceId,
+    sourceChannelUniqueName,
+    discussionId,
+    discussionNumber,
+    sourceCommentShortId,
+  } = props.entry;
 
   // Without the channel we cannot build any forum link.
   if (!sourceChannelUniqueName) return '#';
@@ -44,11 +50,15 @@ const sourceLink = computed(() => {
     return `/forums/${sourceChannelUniqueName}/discussions`;
   }
 
+  // The comment permalink segment is the comment's shortId; the raw comment id
+  // (sourceId) is only a fallback for entries without one.
   if (sourceType === 'comment') {
     // sourceId is the Comment id; link straight to the comment permalink.
     return getPermalinkToDiscussionComment({
       forumId: sourceChannelUniqueName,
       discussionId,
+      discussionNumber,
+      shortId: sourceCommentShortId,
       commentId: sourceId,
     });
   }
@@ -57,6 +67,7 @@ const sourceLink = computed(() => {
   return getPermalinkToDiscussion({
     forumId: sourceChannelUniqueName,
     discussionId,
+    discussionNumber,
   });
 });
 

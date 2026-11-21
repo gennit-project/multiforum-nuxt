@@ -2,10 +2,12 @@ import { test, expect } from '../../helpers/testFixture';
 import { createBaseHandlers } from '../../helpers/baseHandlers';
 import { buildEvent } from '../../helpers/graphqlFixtures';
 import { expectNoAxeViolations } from '../../helpers/axe';
+import type { GraphQLHandlers } from '../../helpers/mockGraphql';
 
 const events = Array.from({ length: 24 }, (_, index) => {
   const event = buildEvent({
     id: `map-event-${index}`,
+    eventNumber: index + 1,
     eventChannelId: `map-channel-${index}`,
     title:
       [
@@ -47,10 +49,24 @@ const events = Array.from({ length: 24 }, (_, index) => {
     })),
   };
 });
-const handlers = {
+const handlers: GraphQLHandlers = {
   ...createBaseHandlers({ serverConfigOverrides: { enableEvents: true } }),
   getEvents: () => ({
     data: { events, eventsConnection: { aggregate: { count: { nodes: events.length } } } },
+  }),
+  // The map preview route carries `{eventNumber}-{slug}` plus a `forum` query
+  // param; resolve it to the event's global id.
+  getEventIdByNumber: ({ body }) => ({
+    data: {
+      getEventIdByNumber:
+        events.find((event) =>
+          event.EventChannels.some(
+            (channel) =>
+              channel.eventNumber === body.variables?.eventNumber &&
+              channel.channelUniqueName === body.variables?.channelUniqueName
+          )
+        )?.id ?? null,
+    },
   }),
   getEvent: () => ({
     data: {

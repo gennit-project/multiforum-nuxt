@@ -25,6 +25,7 @@ import { useUsername } from '@/composables/useAuthState';
 import ForumSubmissions from '@/components/discovery/ForumSubmissions.vue';
 import { useFocusTrap } from '@/composables/useFocusTrap';
 import { selectDiscussionForum } from '@/utils/selectDiscussionForum';
+import { getDiscussionUrl } from '@/utils/contentUrls';
 
 const usernameVar = useUsername();
 const SitewideDiscussionSidebar = defineAsyncComponent(
@@ -244,14 +245,29 @@ const selectedDiscussionTitle = computed(() => {
   return selectedDiscussion.value?.title || '';
 });
 
-const selectedDiscussionLink = computed(() => {
-  if (!selectedDiscussionId.value || !selectedChannelId.value) return '';
-  return `/forums/${selectedChannelId.value}/discussions/${selectedDiscussionId.value}`;
-});
-
 const selectedDiscussionChannels = computed(() => {
   if (!selectedDiscussion.value?.DiscussionChannels) return [];
   return selectedDiscussion.value.DiscussionChannels;
+});
+
+// The selection is keyed by the global id in the query (it survives switching
+// forums); the detail view needs the per-forum number of the selected forum.
+const selectedDiscussionNumber = computed(
+  () =>
+    selectedDiscussionChannels.value.find(
+      (discussionChannel) =>
+        discussionChannel.channelUniqueName === selectedChannelId.value
+    )?.discussionNumber ?? null
+);
+
+const selectedDiscussionLink = computed(() => {
+  if (!selectedDiscussionId.value || !selectedChannelId.value) return '';
+  return getDiscussionUrl({
+    forumId: selectedChannelId.value,
+    discussionNumber: selectedDiscussionNumber.value,
+    title: selectedDiscussionTitle.value,
+    discussionId: selectedDiscussionId.value,
+  });
 });
 
 const aggregateDiscussionCount = computed(() => {
@@ -461,15 +477,16 @@ const filterByChannel = (channel: string) => {
                   :key="selectedDiscussionId"
                   :submissions="selectedDiscussionChannels"
                   :content-id="selectedDiscussionId"
+                  :content-title="selectedDiscussionTitle"
                   kind="discussion"
                   :preview="true"
                   :selected-forum="selectedChannelId"
                 />
               </div>
               <DiscussionDetailContent
-                v-if="selectedChannelId"
+                v-if="selectedChannelId && selectedDiscussionNumber != null"
                 :key="`${selectedDiscussionId}:${selectedChannelId}`"
-                :discussion-id="selectedDiscussionId"
+                :discussion-number="selectedDiscussionNumber"
                 :channel-id="selectedChannelId"
                 :horizontal-album-thumbnails="true"
                 :show-comments="true"

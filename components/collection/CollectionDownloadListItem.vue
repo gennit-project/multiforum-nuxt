@@ -5,6 +5,7 @@ import type { GetPublicCollectionByIdQuery } from '@/__generated__/operations';
 import AppImage from '@/components/image/AppImage.vue';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
 import { relativeTime } from '@/utils';
+import { getDownloadRoute } from '@/utils/contentUrls';
 type Discussion =
   GetPublicCollectionByIdQuery['collections'][number]['Downloads'][number];
 
@@ -23,13 +24,12 @@ const linkTarget = computed(() => {
   if (!primaryChannel.value?.channelUniqueName || !props.discussion?.id) {
     return '#';
   }
-  return {
-    name: 'forums-forumId-downloads-discussionId',
-    params: {
-      forumId: primaryChannel.value.channelUniqueName,
-      discussionId: props.discussion.id,
-    },
-  };
+  return getDownloadRoute({
+    forumId: primaryChannel.value.channelUniqueName,
+    discussionNumber: primaryChannel.value.discussionNumber,
+    title: props.discussion.title,
+    discussionId: props.discussion.id,
+  });
 });
 
 const firstImage = computed(() => {

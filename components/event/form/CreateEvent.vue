@@ -23,6 +23,7 @@ import { RepeatPatternType, RepeatEndType } from '@/__generated__/graphql';
 import { useUsername } from '@/composables/useAuthState';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { FORUM_LOCKED_MESSAGE } from '@/composables/useForumLock';
+import { getEventLinkRoute } from '@/utils/eventLinks';
 
 const usernameVar = useUsername();
 
@@ -214,17 +215,16 @@ const {
   refetchQueries: ['getEvents'],
 });
 onDone((response) => {
-  const newEventId = response.data?.createEventWithChannelConnections?.[0]?.id;
+  const newEvent = response.data?.createEventWithChannelConnections?.[0];
   const redirectChannelId = formValues.value.selectedChannels[0];
-  if (!newEventId) {
+  if (!newEvent?.id) {
     submitError.value =
       'Unable to create event. Please check your permissions or try again.';
     return;
   }
-  router.push({
-    name: 'forums-forumId-events-eventId',
-    params: { forumId: redirectChannelId, eventId: newEventId },
-  });
+  router.push(
+    getEventLinkRoute({ event: newEvent, forumId: redirectChannelId })
+  );
 });
 
 const {
@@ -237,17 +237,16 @@ const {
 onSeriesDone((response) => {
   const series = response.data?.createEventSeriesWithChannelConnections;
   // Land the user on the first occurrence of the new series.
-  const firstOccurrenceId = series?.Occurrences?.[0]?.id;
+  const firstOccurrence = series?.Occurrences?.[0];
   const redirectChannelId = formValues.value.selectedChannels[0];
-  if (!firstOccurrenceId) {
+  if (!firstOccurrence?.id) {
     submitError.value =
       'Unable to create event series. Please check your permissions or try again.';
     return;
   }
-  router.push({
-    name: 'forums-forumId-events-eventId',
-    params: { forumId: redirectChannelId, eventId: firstOccurrenceId },
-  });
+  router.push(
+    getEventLinkRoute({ event: firstOccurrence, forumId: redirectChannelId })
+  );
 });
 
 function submit() {

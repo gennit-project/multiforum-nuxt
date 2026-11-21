@@ -14,6 +14,8 @@ const h = vi.hoisted(() => ({
   onDone: undefined as undefined | (() => void),
   username: null as unknown,
   route: null as unknown,
+  resolvedId: null as unknown,
+  resolving: null as unknown,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -35,6 +37,13 @@ vi.mock('@vue/apollo-composable', () => ({
   }),
 }));
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
+vi.mock('@/composables/useRouteContentIds', () => ({
+  useResolvedEventId: () => ({
+    id: h.resolvedId,
+    loading: h.resolving,
+    notFound: ref(false),
+  }),
+}));
 vi.mock('@/composables/useTheme', () => ({ useAppTheme: () => ({ theme: ref('light') }) }));
 vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => ref(''),
@@ -96,13 +105,23 @@ beforeEach(() => {
   h.updateError = { value: null };
   h.onDone = undefined;
   h.username = ref('alice');
-  h.route = { params: { forumId: 'cats', eventId: 'ev1' } };
+  h.route = { params: { forumId: 'cats', eventId: '4-my-event' } };
+  h.resolvedId = ref('ev1');
+  h.resolving = ref(false);
 });
 
 describe('EventTitleEditForm display', () => {
   it('shows a skeleton while loading', () => {
     h.loading = ref(true);
     h.result = ref(null);
+    const wrapper = mountForm();
+
+    expect(wrapper.find('.skeleton').exists()).toBe(true);
+  });
+
+  it('shows a skeleton while the route number is being resolved', () => {
+    h.resolving = ref(true);
+    h.resolvedId = ref('');
     const wrapper = mountForm();
 
     expect(wrapper.find('.skeleton').exists()).toBe(true);

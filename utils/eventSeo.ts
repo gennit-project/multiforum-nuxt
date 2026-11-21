@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon';
 import { toMetaDescription } from '@/utils/discussionSeo';
 import { jsonLdScript, type HeadMeta, type HeadObject } from '@/utils/seoHead';
+import { getEventLinkUrl, type EventLinkSource } from '@/utils/eventLinks';
 
 /**
  * Pure builders for EventDetail's SEO metadata and schema.org structured data,
@@ -19,6 +20,7 @@ export type EventSeoData = {
   coverImageURL?: string | null;
   canceled?: boolean | null;
   Poster?: { username?: string | null; displayName?: string | null } | null;
+  EventChannels?: EventLinkSource['EventChannels'];
 };
 
 export function formatEventDate(iso: string): string {
@@ -71,13 +73,18 @@ export function buildEventSeoMeta(params: BuildEventSeoMetaParams): EventSeoMeta
 export type BuildEventStructuredDataParams = {
   event: EventSeoData;
   baseUrl: string;
+  /** Forum the page is viewed in; picks which forum's event number is used. */
+  channelId?: string;
 };
 
 /** schema.org Event JSON-LD object. */
 export function buildEventStructuredData(
   params: BuildEventStructuredDataParams
 ): Record<string, unknown> {
-  const { event, baseUrl } = params;
+  const { event, baseUrl, channelId } = params;
+  const eventPath = event.EventChannels?.length
+    ? getEventLinkUrl({ event, forumId: channelId })
+    : '/events/list/search';
   return {
     '@context': 'https://schema.org',
     '@type': 'Event',
@@ -98,8 +105,7 @@ export function buildEventStructuredData(
       : {
           '@type': 'VirtualLocation',
           url:
-            event.virtualEventUrl ??
-            `${baseUrl}/events/list/search/${event.id}`,
+            event.virtualEventUrl ?? `${baseUrl}${eventPath}`,
         },
     organizer: {
       '@type': 'Person',
@@ -128,7 +134,7 @@ export type BuildEventHeadParams = BuildEventSeoMetaParams & {
  * title and nothing else (#583).
  */
 export function buildEventHead(params: BuildEventHeadParams): HeadObject {
-  const { event, baseUrl } = params;
+  const { event, baseUrl, channelId } = params;
   const seo = buildEventSeoMeta(params);
   const meta: HeadMeta[] = [
     { name: 'description', content: seo.description },
@@ -148,7 +154,9 @@ export function buildEventHead(params: BuildEventHeadParams): HeadObject {
     title: seo.title,
     meta,
     ...(event
-      ? { script: [jsonLdScript(buildEventStructuredData({ event, baseUrl }))] }
+      ? { script: [jsonLdScript(
+            buildEventStructuredData({ event, baseUrl, channelId })
+          )] }
       : {}),
   };
 }

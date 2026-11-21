@@ -48,9 +48,14 @@ export const EVENT_FIELDS = gql`
       }
       Occurrences(sort: [{ startTime: ASC }], limit: 20) {
         id
+        title
         startTime
         endTime
         canceled
+        EventChannels {
+          channelUniqueName
+          eventNumber
+        }
       }
     }
     location {
@@ -71,6 +76,7 @@ export const EVENT_FIELDS = gql`
     EventChannels {
       id
       eventId
+      eventNumber
       channelUniqueName
       Channel {
         uniqueName
@@ -175,6 +181,7 @@ export const GET_EVENTS = gql`
       EventChannels {
         id
         eventId
+        eventNumber
         channelUniqueName
         archived
       }
@@ -202,6 +209,7 @@ export const GET_EVENT_FEEDBACK = gql`
       }
       FeedbackComments(limit: $limit, offset: $offset) {
         id
+        shortId
         text
         createdAt
         archived
@@ -221,5 +229,15 @@ export const GET_EVENT_FEEDBACK = gql`
         }
       }
     }
+  }
+`;
+
+// Resolves a route's per-forum event number to the global event id.
+export const GET_EVENT_ID_BY_NUMBER = gql`
+  query getEventIdByNumber($channelUniqueName: String!, $eventNumber: Int!) {
+    getEventIdByNumber(
+      channelUniqueName: $channelUniqueName
+      eventNumber: $eventNumber
+    )
   }
 `;

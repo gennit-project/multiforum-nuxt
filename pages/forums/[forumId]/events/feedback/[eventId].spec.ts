@@ -8,8 +8,17 @@ import EventBody from '@/components/event/detail/EventBody.vue';
 import FeedbackSection from '@/components/comments/FeedbackSection.vue';
 
 const hState = vi.hoisted(() => ({
-  route: { params: { forumId: 'cats', eventId: 'e1' } },
+  route: { params: { forumId: 'cats', eventId: '4-cat-meetup' } },
   fetchMore: vi.fn(),
+  resolver: {
+    id: null as unknown as { value: string },
+    loading: null as unknown as { value: boolean },
+    notFound: null as unknown as { value: boolean },
+  },
+}));
+
+vi.mock('@/composables/useRouteContentIds', () => ({
+  useResolvedEventId: () => hState.resolver,
 }));
 
 vi.mock('nuxt/app', () => ({
@@ -64,12 +73,29 @@ const mountPage = async (event: unknown, opts: { loading?: boolean; error?: unkn
 
 beforeEach(() => {
   vi.clearAllMocks();
-  hState.route = { params: { forumId: 'cats', eventId: 'e1' } };
+  hState.route = { params: { forumId: 'cats', eventId: '4-cat-meetup' } };
+  hState.resolver.id = ref('e1');
+  hState.resolver.loading = ref(false);
+  hState.resolver.notFound = ref(false);
 });
 
 describe('event feedback page', () => {
   it('shows the not-found page when the event is missing', async () => {
     const wrapper = await mountPage(null);
+    expect(wrapper.findComponent(PageNotFound).exists()).toBe(true);
+  });
+
+  it('does not show the not-found page while the route number resolves', async () => {
+    hState.resolver.id = ref('');
+    hState.resolver.loading = ref(true);
+    const wrapper = await mountPage(null);
+    expect(wrapper.findComponent(PageNotFound).exists()).toBe(false);
+  });
+
+  it('shows the not-found page when the route number matches no event', async () => {
+    hState.resolver.id = ref('');
+    hState.resolver.notFound = ref(true);
+    const wrapper = await mountPage({ id: 'e1', title: 'Other' });
     expect(wrapper.findComponent(PageNotFound).exists()).toBe(true);
   });
 

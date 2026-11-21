@@ -15,7 +15,13 @@ const discussion = (overrides: Record<string, unknown> = {}) =>
     createdAt: '2024-01-01T00:00:00Z',
     Author: { username: 'alice' },
     Tags: [{ text: 'pets' }],
-    DiscussionChannels: [{ Channel: { uniqueName: 'cats' }, channelUniqueName: 'cats' }],
+    DiscussionChannels: [
+      {
+        Channel: { uniqueName: 'cats' },
+        channelUniqueName: 'cats',
+        discussionNumber: 12,
+      },
+    ],
     hasDownload: false,
     ...overrides,
   }) as unknown as Discussion;
@@ -87,7 +93,7 @@ describe('DiscussionItemInProfile navigation', () => {
     const wrapper = mountItem();
 
     expect(titleLink(wrapper)?.attributes('href')).toBe(
-      '/forums/cats/discussions/d1'
+      '/forums/cats/discussions/12-a-discussion'
     );
   });
 
@@ -95,7 +101,7 @@ describe('DiscussionItemInProfile navigation', () => {
     const wrapper = mountItem({ discussion: discussion({ hasDownload: true }) });
 
     expect(titleLink(wrapper)?.attributes('href')).toBe(
-      '/forums/cats/downloads/d1'
+      '/forums/cats/downloads/12-a-discussion'
     );
   });
 

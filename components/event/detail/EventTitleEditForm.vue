@@ -11,6 +11,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import { EVENT_TITLE_CHAR_LIMIT } from '@/utils/constants';
 import { useRoute } from 'nuxt/app';
+import { useResolvedEventId } from '@/composables/useRouteContentIds';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -21,9 +22,8 @@ const titleEditMode = ref(false);
 const channelId = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
-const eventId = computed(() =>
-  typeof route.params.eventId === 'string' ? route.params.eventId : ''
-);
+// The route carries `{eventNumber}-{slug}`; resolve it to the global event id.
+const { id: eventId, loading: resolvingEventId } = useResolvedEventId();
 
 const {
   result: getEventResult,
@@ -100,7 +100,11 @@ const formattedDate = computed(() => {
     <div
       class="flex space-x-0 md:flex-row md:items-center md:justify-between md:space-x-2"
     >
-      <SkeletonLoader v-if="getEventLoading" class="flex-1" type="text" />
+      <SkeletonLoader
+        v-if="getEventLoading || resolvingEventId"
+        class="flex-1"
+        type="text"
+      />
       <div v-else ref="eventDetail" class="flex-1">
         <h1
           v-if="!titleEditMode"

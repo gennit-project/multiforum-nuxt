@@ -33,7 +33,7 @@ test('locked forum blocks commenting on a discussion', async ({
   });
 
   try {
-    const discussionUrl = `/forums/${DEFAULT_COMMENT_CONFIG.channelId}/discussions/${DEFAULT_COMMENT_CONFIG.discussionId}`;
+    const discussionUrl = `/forums/${DEFAULT_COMMENT_CONFIG.channelId}/discussions/1`;
 
     await page.goto(discussionUrl);
     await expect(

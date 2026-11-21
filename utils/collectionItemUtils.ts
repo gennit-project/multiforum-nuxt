@@ -1,5 +1,6 @@
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { getDiscussionUrl, getDownloadUrl } from '@/utils/contentUrls';
 import type { GetCollectionItemsQuery } from '@/__generated__/operations';
 type SelectedCollection = GetCollectionItemsQuery['collections'][number];
 type Discussion = SelectedCollection['Discussions'][number];
@@ -7,7 +8,7 @@ type Comment = SelectedCollection['Comments'][number];
 
 /**
  * Pure helpers for the collection detail page
- * (pages/library/[collectionId].vue). Extracted so the type-label, item
+ * (components/collection/OwnedCollectionDetail.vue). Extracted so the type-label, item
  * selection, link building, and author resolution logic is unit-testable.
  */
 
@@ -135,9 +136,10 @@ export function orderCollectionItems<T>(
  */
 export function buildCollectionDiscussionLink(params: {
   discussion: Pick<Discussion, 'id'> &
-    Partial<Pick<Discussion, 'hasDownload'>> & {
+    Partial<Pick<Discussion, 'hasDownload' | 'title'>> & {
       DiscussionChannels?: Array<
-        Pick<Discussion['DiscussionChannels'][number], 'channelUniqueName'>
+        Pick<Discussion['DiscussionChannels'][number], 'channelUniqueName'> &
+          Partial<Pick<Discussion['DiscussionChannels'][number], 'discussionNumber'>>
       >;
     };
   isDownloadsCollection: boolean;
@@ -147,8 +149,13 @@ export function buildCollectionDiscussionLink(params: {
   if (!firstChannel?.channelUniqueName) return '/';
 
   const isDownload = discussion?.hasDownload === true || isDownloadsCollection;
-  const basePath = isDownload ? 'downloads' : 'discussions';
-  return `/forums/${firstChannel.channelUniqueName}/${basePath}/${discussion.id}`;
+  const target = {
+    forumId: firstChannel.channelUniqueName,
+    discussionNumber: firstChannel.discussionNumber,
+    title: discussion.title,
+    discussionId: discussion.id,
+  };
+  return isDownload ? getDownloadUrl(target) : getDiscussionUrl(target);
 }
 
 export interface CollectionAuthorInfo {

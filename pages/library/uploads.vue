@@ -9,6 +9,7 @@ import FolderOpenIcon from '@/components/icons/FolderOpenIcon.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 import { useUsername } from '@/composables/useAuthState';
+import { getDownloadUrl } from '@/utils/contentUrls';
 import {
   GetUploadedDownloadableFilesDocument as GET_UPLOADED_DOWNLOADABLE_FILES,
   PermanentlyDeleteDownloadableFileDocument as PERMANENTLY_DELETE_DOWNLOADABLE_FILE,
@@ -60,13 +61,20 @@ const formatFileSize = (size?: number | null) => {
 };
 
 const getDiscussionPath = (group: UploadedDownloadGroup) => {
-  const channelUniqueName = group.discussion.channelUniqueNames?.[0];
+  // A download can live in several forums, each with its own number; link to
+  // the first forum, using that forum's number.
+  const channel = group.discussion.channels?.[0];
 
-  if (!channelUniqueName) {
+  if (!channel?.channelUniqueName) {
     return `/discussions/${group.discussion.id}`;
   }
 
-  return `/forums/${channelUniqueName}/downloads/${group.discussion.id}`;
+  return getDownloadUrl({
+    forumId: channel.channelUniqueName,
+    discussionNumber: channel.discussionNumber,
+    title: group.discussion.title,
+    discussionId: group.discussion.id,
+  });
 };
 
 const confirmDelete = (file: UploadedFile) => {

@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import type { PropType } from 'vue';
 import type { GetPublicCollectionsForDownloadQuery } from '@/__generated__/operations';
 import CollectionDownloadListItem from '@/components/collection/CollectionDownloadListItem.vue';
+import { getCollectionUrl } from '@/utils/contentUrls';
 type Collection =
   GetPublicCollectionsForDownloadQuery['publicCollectionsContaining'][number];
 
@@ -16,6 +17,16 @@ const props = defineProps({
 const firstDownloads = computed(() => {
   return (props.collection?.Downloads || []).slice(0, 5);
 });
+
+const collectionLink = computed(() =>
+  getCollectionUrl({
+    username:
+      props.collection.ownerUsername || props.collection.CreatedBy?.username || '',
+    collectionNumber: props.collection.collectionNumber,
+    name: props.collection.name,
+    collectionId: props.collection.id,
+  })
+);
 
 const creatorLabel = computed(() => {
   const creator = props.collection?.CreatedBy;
@@ -34,7 +45,7 @@ const creatorLabel = computed(() => {
     <div class="flex items-start justify-between gap-3">
       <div class="min-w-0">
         <NuxtLink
-          :to="`/collections/${collection.id}`"
+          :to="collectionLink"
           class="hover:text-brand-600 truncate text-sm font-semibold text-gray-900 dark:text-white"
         >
           {{ collection.name }}
@@ -47,7 +58,7 @@ const creatorLabel = computed(() => {
         </p>
       </div>
       <NuxtLink
-        :to="`/collections/${collection.id}`"
+        :to="collectionLink"
         class="text-brand-700 dark:text-brand-300 text-xs font-medium hover:underline"
       >
         View all

@@ -85,7 +85,7 @@ test('clicking the React button opens the emoji picker', async ({
     },
   });
 
-  await page.goto(`/forums/${CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${CHANNEL}/discussions/1`);
 
   const reactButton = page.getByTestId('emoji-button').first();
   await expect(reactButton).toBeVisible();

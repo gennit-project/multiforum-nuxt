@@ -89,6 +89,7 @@ const buildWrapper = (opts: BuildOpts = {}) =>
       discussionChannel: {
         id: 'discussion-channel-1',
         discussionId: 'discussion-1',
+        discussionNumber: 7,
         channelUniqueName: 'cats',
       },
       ...(opts.props ?? {}),
@@ -231,6 +232,7 @@ describe('InlineCommentForm — cache update', () => {
     capturedMutationOptions!().update({}, successResult());
     expect(mockInsert.mock.calls[0]?.[2]).toMatchObject({
       discussionId: 'discussion-1',
+      discussionNumber: 7,
       channelUniqueName: 'cats',
     });
   });

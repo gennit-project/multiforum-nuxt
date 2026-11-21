@@ -178,7 +178,15 @@ test.describe('Create Series Event', () => {
           data: {
             createEventSeriesWithChannelConnections: {
               id: 'series-1',
-              Occurrences: [{ id: 'event-1' }],
+              Occurrences: [
+                {
+                  id: 'event-1',
+                  title: 'Annual Expo',
+                  EventChannels: [
+                    { channelUniqueName: TEST_CHANNEL, eventNumber: 1 },
+                  ],
+                },
+              ],
             },
           },
         };

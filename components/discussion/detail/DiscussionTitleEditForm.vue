@@ -17,6 +17,7 @@ import InfoBanner from '@/components/InfoBanner.vue';
 import { DISCUSSION_TITLE_CHAR_LIMIT } from '@/utils/constants';
 import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { useRoute } from 'nuxt/app';
+import { useRouteDiscussionNumber } from '@/composables/useRouteContentIds';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import AgeGateCheckScope from '@/components/auth/AgeGateCheckScope.vue';
@@ -30,9 +31,9 @@ const titleEditMode = ref(false);
 const channelId = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
-const discussionId = computed(() =>
-  typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
-);
+// The route carries `{number}-{slug}`; the global id comes from the loaded
+// discussion once the detail query returns.
+const discussionNumber = useRouteDiscussionNumber();
 const isDownloadDetailPage = computed(
   () =>
     typeof route.name === 'string' &&
@@ -48,7 +49,7 @@ const {
   isDownloadDetailPage.value ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION_DETAIL,
   () =>
     buildDetailQueryVariables({
-      discussionId: discussionId.value,
+      discussionNumber: discussionNumber.value,
       downloadMode: isDownloadDetailPage.value,
       modProfileName: modProfileNameVar.value,
       username: usernameVar.value,
@@ -102,7 +103,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: {
-    where: { id: { eq: discussionId.value } },
+    where: { id: { eq: discussion.value?.id ?? '' } },
     updateDiscussionInput: { title: { set: formValues.value.title } },
   },
 }));
@@ -148,7 +149,8 @@ const formattedDate = computed(() => {
         <AgeGateCheckScope
           v-if="discussionMissing"
           v-slot="{ requiresAgeCheck }"
-          :discussion-id="discussionId"
+          :discussion-number="discussionNumber"
+          :channel-unique-name="channelId"
         >
           <h1
             class="px-1 text-lg text-wrap text-black sm:tracking-tight md:text-2xl dark:text-white"
@@ -296,7 +298,8 @@ const formattedDate = computed(() => {
     <AgeGateCheckScope
       v-else-if="discussionMissing"
       v-slot="{ requiresAgeCheck }"
-      :discussion-id="discussionId"
+      :discussion-number="discussionNumber"
+      :channel-unique-name="channelId"
     >
       <InfoBanner
         v-if="!requiresAgeCheck"

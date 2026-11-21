@@ -14,7 +14,7 @@ const mountGrid = (props: Record<string, unknown>) =>
     props,
     global: {
       stubs: {
-        NuxtLink: { template: '<a><slot /></a>' },
+        NuxtLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
         ImageCaption: {
           name: 'ImageCaption',
           props: ['text'],
@@ -29,6 +29,13 @@ describe('AlbumThumbnailGrid', () => {
     expect(mountGrid({ images: [] }).text()).toContain(
       'No images in this album.'
     );
+  });
+
+  it('links each tile to the image by number under its uploader', () => {
+    const wrapper = mountGrid({
+      images: [img('a', { imageNumber: 5, Uploader: { username: 'bob' } })],
+    });
+    expect(wrapper.get('a').attributes('href')).toBe('/u/bob/images/5');
   });
 
   it('renders a tile per image', () => {
