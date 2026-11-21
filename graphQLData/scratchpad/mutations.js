@@ -21,6 +21,7 @@ export const CREATE_SCRATCHPAD_ENTRY = gql`
       isPublic
       sourceType
       sourceId
+      sourceCommentShortId
       sourceChannelUniqueName
       discussionId
       discussionNumber
@@ -53,6 +54,7 @@ export const UPDATE_SCRATCHPAD_ENTRY_VISIBILITY = gql`
       text
       sourceType
       sourceId
+      sourceCommentShortId
       sourceChannelUniqueName
       discussionId
       discussionNumber

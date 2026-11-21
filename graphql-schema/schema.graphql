@@ -7134,6 +7134,7 @@ type ScratchpadEntry {
   sourceChannelUniqueName: String
   discussionId: String
   discussionNumber: Int
+  sourceCommentShortId: String
   superUpvotedByUsers: [User!]
   Author: User
   AuthorConnection: ScratchpadEntryAuthorConnection!
@@ -8388,12 +8389,18 @@ type UpdateWikiPagesMutationResponse {
   wikiPages: [WikiPage!]!
 }
 
+type UploadedDownloadableFileChannel {
+  channelUniqueName: String!
+  discussionNumber: Int
+}
+
 type UploadedDownloadableFileDiscussion {
   id: ID!
   title: String!
   createdAt: DateTime
   updatedAt: DateTime
   channelUniqueNames: [String!]!
+  channels: [UploadedDownloadableFileChannel!]!
 }
 
 type UploadedDownloadableFileGroup {
@@ -44085,6 +44092,7 @@ input ScratchpadEntrySort {
   sourceChannelUniqueName: SortDirection
   discussionId: SortDirection
   discussionNumber: SortDirection
+  sourceCommentShortId: SortDirection
 }
 
 input ScratchpadEntryUpdateInput {
@@ -44162,6 +44170,13 @@ input ScratchpadEntryWhere {
   discussionNumber_LTE: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { lte: ... }")
   discussionNumber_GT: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { gt: ... }")
   discussionNumber_GTE: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { gte: ... }")
+  sourceCommentShortId: StringScalarFilters
+  sourceCommentShortId_EQ: String @deprecated(reason: "Please use the relevant generic filter sourceCommentShortId: { eq: ... }")
+  sourceCommentShortId_IN: [String] @deprecated(reason: "Please use the relevant generic filter sourceCommentShortId: { in: ... }")
+  sourceCommentShortId_CONTAINS: String @deprecated(reason: "Please use the relevant generic filter sourceCommentShortId: { contains: ... }")
+  sourceCommentShortId_STARTS_WITH: String @deprecated(reason: "Please use the relevant generic filter sourceCommentShortId: { startsWith: ... }")
+  sourceCommentShortId_ENDS_WITH: String @deprecated(reason: "Please use the relevant generic filter sourceCommentShortId: { endsWith: ... }")
+  sourceCommentShortId_MATCHES: String @deprecated(reason: "Please use the relevant generic filter sourceCommentShortId: { matches: ... }")
   OR: [ScratchpadEntryWhere!]
   AND: [ScratchpadEntryWhere!]
   NOT: ScratchpadEntryWhere

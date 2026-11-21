@@ -12022,6 +12022,7 @@ export type ScratchpadEntry = {
   sourceChannelUniqueName?: Maybe<Scalars['String']['output']>;
   discussionId?: Maybe<Scalars['String']['output']>;
   discussionNumber?: Maybe<Scalars['Int']['output']>;
+  sourceCommentShortId?: Maybe<Scalars['String']['output']>;
   superUpvotedByUsers?: Maybe<Array<User>>;
   Author?: Maybe<User>;
   AuthorConnection: ScratchpadEntryAuthorConnection;
@@ -13657,6 +13658,12 @@ export type UpdateWikiPagesMutationResponse = {
   wikiPages: Array<WikiPage>;
 };
 
+export type UploadedDownloadableFileChannel = {
+  __typename?: 'UploadedDownloadableFileChannel';
+  channelUniqueName: Scalars['String']['output'];
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
+};
+
 export type UploadedDownloadableFileDiscussion = {
   __typename?: 'UploadedDownloadableFileDiscussion';
   id: Scalars['ID']['output'];
@@ -13664,6 +13671,7 @@ export type UploadedDownloadableFileDiscussion = {
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   channelUniqueNames: Array<Scalars['String']['output']>;
+  channels: Array<UploadedDownloadableFileChannel>;
 };
 
 export type UploadedDownloadableFileGroup = {
@@ -64583,6 +64591,7 @@ export type ScratchpadEntrySort = {
   sourceChannelUniqueName?: InputMaybe<SortDirection>;
   discussionId?: InputMaybe<SortDirection>;
   discussionNumber?: InputMaybe<SortDirection>;
+  sourceCommentShortId?: InputMaybe<SortDirection>;
 };
 
 export type ScratchpadEntryUpdateInput = {
@@ -64715,6 +64724,19 @@ export type ScratchpadEntryWhere = {
   discussionNumber_GT?: InputMaybe<Scalars['Int']['input']>;
   /** @deprecated Please use the relevant generic filter discussionNumber: { gte: ... } */
   discussionNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceCommentShortId?: InputMaybe<StringScalarFilters>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { eq: ... } */
+  sourceCommentShortId_EQ?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { in: ... } */
+  sourceCommentShortId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { contains: ... } */
+  sourceCommentShortId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { startsWith: ... } */
+  sourceCommentShortId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { endsWith: ... } */
+  sourceCommentShortId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { matches: ... } */
+  sourceCommentShortId_MATCHES?: InputMaybe<Scalars['String']['input']>;
   OR?: InputMaybe<Array<ScratchpadEntryWhere>>;
   AND?: InputMaybe<Array<ScratchpadEntryWhere>>;
   NOT?: InputMaybe<ScratchpadEntryWhere>;

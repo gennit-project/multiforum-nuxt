@@ -38,6 +38,7 @@ const sourceLink = computed(() => {
     sourceChannelUniqueName,
     discussionId,
     discussionNumber,
+    sourceCommentShortId,
   } = props.entry;
 
   // Without the channel we cannot build any forum link.
@@ -49,15 +50,15 @@ const sourceLink = computed(() => {
     return `/forums/${sourceChannelUniqueName}/discussions`;
   }
 
-  // ScratchpadEntry carries the discussion number but not the comment shortId,
-  // so a comment link uses the raw comment id (sourceId) as its permalink
-  // segment, which the permalink page resolves as a fallback.
+  // The comment permalink segment is the comment's shortId; the raw comment id
+  // (sourceId) is only a fallback for entries without one.
   if (sourceType === 'comment') {
     // sourceId is the Comment id; link straight to the comment permalink.
     return getPermalinkToDiscussionComment({
       forumId: sourceChannelUniqueName,
       discussionId,
       discussionNumber,
+      shortId: sourceCommentShortId,
       commentId: sourceId,
     });
   }

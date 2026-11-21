@@ -61,17 +61,17 @@ const formatFileSize = (size?: number | null) => {
 };
 
 const getDiscussionPath = (group: UploadedDownloadGroup) => {
-  const channelUniqueName = group.discussion.channelUniqueNames?.[0];
+  // A download can live in several forums, each with its own number; link to
+  // the first forum, using that forum's number.
+  const channel = group.discussion.channels?.[0];
 
-  if (!channelUniqueName) {
+  if (!channel?.channelUniqueName) {
     return `/discussions/${group.discussion.id}`;
   }
 
-  // TODO(short-urls): backend does not expose discussionNumber on
-  // UploadedDownloadableFileDiscussion, so this link falls back to the raw id.
   return getDownloadUrl({
-    forumId: channelUniqueName,
-    discussionNumber: null,
+    forumId: channel.channelUniqueName,
+    discussionNumber: channel.discussionNumber,
     title: group.discussion.title,
     discussionId: group.discussion.id,
   });

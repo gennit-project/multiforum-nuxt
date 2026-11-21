@@ -449,6 +449,10 @@ export const GET_UPLOADED_DOWNLOADABLE_FILES = gql`
         createdAt
         updatedAt
         channelUniqueNames
+        channels {
+          channelUniqueName
+          discussionNumber
+        }
       }
       files {
         id

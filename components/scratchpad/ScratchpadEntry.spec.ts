@@ -176,6 +176,24 @@ describe('ScratchpadEntry source link', () => {
     });
   });
 
+  it('links a comment entry by the comment shortId and discussion number', () => {
+    const wrapper = mountEntry({
+      entry: entry({
+        sourceType: 'comment',
+        sourceId: 'comment-1',
+        sourceCommentShortId: '4f3a9b2e1c7d',
+        discussionId: 'discussion-1',
+        discussionNumber: 42,
+        sourceChannelUniqueName: 'cats',
+      }),
+    });
+
+    expect(sourceLinkTo(wrapper)).toEqual({
+      name: 'forums-forumId-discussions-discussionId-comments-commentId',
+      params: { forumId: 'cats', discussionId: '42', commentId: '4f3a9b2e1c7d' },
+    });
+  });
+
   it('falls back to the forum discussion list when discussionId is missing', () => {
     const wrapper = mountEntry({
       entry: entry({

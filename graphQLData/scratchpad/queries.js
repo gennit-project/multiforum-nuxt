@@ -28,6 +28,7 @@ export const GET_PUBLIC_SCRATCHPAD_ENTRIES = gql`
       isPublic
       sourceType
       sourceId
+      sourceCommentShortId
       sourceChannelUniqueName
       discussionId
       discussionNumber
@@ -56,6 +57,7 @@ export const GET_PENDING_SCRATCHPAD_ENTRIES = gql`
       isPublic
       sourceType
       sourceId
+      sourceCommentShortId
       sourceChannelUniqueName
       discussionId
       discussionNumber

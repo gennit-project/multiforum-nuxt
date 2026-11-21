@@ -4,8 +4,8 @@
   "lockfileSha256": "7c5e77f6ab917360eac30eef4fca011fc9494514d154e064b88d3aa46136dc28",
   "pinnedSchema": {
     "repository": "gennit-project/multiforum-backend",
-    "revision": "2a2d2102a9b9f3addf20cb59720e867f91f6f369",
-    "sha256": "f31b6fdce3a0bfbbc06243cbd2dc0fef0e43853208c394009e650425ade74809"
+    "revision": "9c549bd3e7f4b5167ff94ced639d671316829882",
+    "sha256": "9b0e713b1f984c9e938f649c6d544c5c95e5c8356e9ad2b5ad3051c0ec056f39"
   },
   "sources": [
     {
@@ -126,11 +126,11 @@
     },
     {
       "file": "graphQLData/scratchpad/mutations.js",
-      "sha256": "f2df7d7e327b59943a30749f424a90e1f1bd61d0dde1fa875d9cf0158883ecb6"
+      "sha256": "8f3b454b0fde7aa6b788daf57b303c734390efcae9a333a841b52c6631b6727f"
     },
     {
       "file": "graphQLData/scratchpad/queries.js",
-      "sha256": "295751d7381617c7c9d39a090e3a1a40104a5ca968a28fb30f47841a740ade64"
+      "sha256": "7753c5c9e1b7d6ecb2ca77dde1d6d6e316dfabbbf83e96b987dbbd05fbdc44a3"
     },
     {
       "file": "graphQLData/server/queries.ts",
@@ -154,7 +154,7 @@
     },
     {
       "file": "graphQLData/user/queries.js",
-      "sha256": "53ac50f2b263b855dc06509ad40da2993a0a0b2862e9234cc7289063e0a79d6c"
+      "sha256": "7cf8e2a2ea649a977e0effc2f67abade1a345a0fb76f2b1602403a1606e8519f"
     },
     {
       "file": "graphQLData/wiki/mutations.ts",
@@ -2731,21 +2731,21 @@
       "file": "graphQLData/scratchpad/mutations.js",
       "line": 3,
       "column": 40,
-      "sha256": "4953b1d4d6223a2612e97d9c500923977114e6471a5bda306edfe570f38b481e",
-      "source": "mutation createScratchpadEntry($recipientUsername: String!, $text: String!, $sourceType: String!, $sourceId: String!, $sourceChannelUniqueName: String) {\n  createScratchpadEntry(\n    recipientUsername: $recipientUsername\n    text: $text\n    sourceType: $sourceType\n    sourceId: $sourceId\n    sourceChannelUniqueName: $sourceChannelUniqueName\n  ) {\n    id\n    createdAt\n    text\n    isPublic\n    sourceType\n    sourceId\n    sourceChannelUniqueName\n    discussionId\n    discussionNumber\n    Author {\n      username\n      displayName\n      profilePicURL\n    }\n    Recipient {\n      username\n    }\n    superUpvotedByUsers {\n      username\n    }\n  }\n}"
+      "sha256": "1176b3d328b827bc8c874f3ae5b49551ce2ac5cd104de24510985553ed2677ad",
+      "source": "mutation createScratchpadEntry($recipientUsername: String!, $text: String!, $sourceType: String!, $sourceId: String!, $sourceChannelUniqueName: String) {\n  createScratchpadEntry(\n    recipientUsername: $recipientUsername\n    text: $text\n    sourceType: $sourceType\n    sourceId: $sourceId\n    sourceChannelUniqueName: $sourceChannelUniqueName\n  ) {\n    id\n    createdAt\n    text\n    isPublic\n    sourceType\n    sourceId\n    sourceCommentShortId\n    sourceChannelUniqueName\n    discussionId\n    discussionNumber\n    Author {\n      username\n      displayName\n      profilePicURL\n    }\n    Recipient {\n      username\n    }\n    superUpvotedByUsers {\n      username\n    }\n  }\n}"
     },
     {
       "id": "graphQLData/scratchpad/mutations.js#UPDATE_SCRATCHPAD_ENTRY_VISIBILITY",
       "file": "graphQLData/scratchpad/mutations.js",
-      "line": 42,
+      "line": 43,
       "column": 51,
-      "sha256": "6a87025bd5d6c2e9b985481af4464eb7feebd440f9ed0d8616c62fbc6ff76542",
-      "source": "mutation updateScratchpadEntryVisibility($scratchpadEntryId: ID!, $isPublic: Boolean!) {\n  updateScratchpadEntryVisibility(\n    scratchpadEntryId: $scratchpadEntryId\n    isPublic: $isPublic\n  ) {\n    id\n    isPublic\n    text\n    sourceType\n    sourceId\n    sourceChannelUniqueName\n    discussionId\n    discussionNumber\n    createdAt\n    Author {\n      username\n      displayName\n      profilePicURL\n    }\n    Recipient {\n      username\n    }\n  }\n}"
+      "sha256": "2be2f1eddaa7e65b202fb806a5541aba14af5936188c74d950f4f9cede2ae1cb",
+      "source": "mutation updateScratchpadEntryVisibility($scratchpadEntryId: ID!, $isPublic: Boolean!) {\n  updateScratchpadEntryVisibility(\n    scratchpadEntryId: $scratchpadEntryId\n    isPublic: $isPublic\n  ) {\n    id\n    isPublic\n    text\n    sourceType\n    sourceId\n    sourceCommentShortId\n    sourceChannelUniqueName\n    discussionId\n    discussionNumber\n    createdAt\n    Author {\n      username\n      displayName\n      profilePicURL\n    }\n    Recipient {\n      username\n    }\n  }\n}"
     },
     {
       "id": "graphQLData/scratchpad/mutations.js#DELETE_SCRATCHPAD_ENTRY",
       "file": "graphQLData/scratchpad/mutations.js",
-      "line": 72,
+      "line": 74,
       "column": 40,
       "sha256": "8aa350a46199b8b7cde1f74882ecbaa853b1d63b9a8f8c171f778aa48ad584b2",
       "source": "mutation deleteScratchpadEntry($scratchpadEntryId: ID!) {\n  deleteScratchpadEntry(scratchpadEntryId: $scratchpadEntryId)\n}"
@@ -2753,7 +2753,7 @@
     {
       "id": "graphQLData/scratchpad/mutations.js#UNDO_SUPER_UPVOTE",
       "file": "graphQLData/scratchpad/mutations.js",
-      "line": 78,
+      "line": 80,
       "column": 34,
       "sha256": "bd514d2bcfe8e8f27de452d19944ba9014c3194b0e4e4b0332f95f4e90a5ba26",
       "source": "mutation undoSuperUpvote($sourceType: String!, $sourceId: String!) {\n  undoSuperUpvote(sourceType: $sourceType, sourceId: $sourceId) {\n    success\n    message\n    sourceId\n    sourceType\n    superUpvotedByUsers {\n      username\n    }\n  }\n}"
@@ -2763,16 +2763,16 @@
       "file": "graphQLData/scratchpad/queries.js",
       "line": 4,
       "column": 46,
-      "sha256": "6bab6c315a44828fc1cff809f6e58169bedb9328c837db59b6c29de8ca33cfcd",
-      "source": "query getPublicScratchpadEntries($username: String!, $limit: Int, $offset: Int) {\n  scratchpadEntriesConnection(\n    where: {Recipient: {username: {eq: $username}}, isPublic: {eq: true}}\n  ) {\n    aggregate {\n      count {\n        nodes\n      }\n    }\n  }\n  scratchpadEntries(\n    where: {Recipient: {username: {eq: $username}}, isPublic: {eq: true}}\n    sort: [{createdAt: DESC}]\n    limit: $limit\n    offset: $offset\n  ) {\n    id\n    createdAt\n    text\n    isPublic\n    sourceType\n    sourceId\n    sourceChannelUniqueName\n    discussionId\n    discussionNumber\n    Author {\n      username\n      displayName\n      profilePicURL\n    }\n    Recipient {\n      username\n    }\n  }\n}"
+      "sha256": "cbc4d5807040e612f063f816c1ddfe8ffaf2d2284904fba8beb327b2623780eb",
+      "source": "query getPublicScratchpadEntries($username: String!, $limit: Int, $offset: Int) {\n  scratchpadEntriesConnection(\n    where: {Recipient: {username: {eq: $username}}, isPublic: {eq: true}}\n  ) {\n    aggregate {\n      count {\n        nodes\n      }\n    }\n  }\n  scratchpadEntries(\n    where: {Recipient: {username: {eq: $username}}, isPublic: {eq: true}}\n    sort: [{createdAt: DESC}]\n    limit: $limit\n    offset: $offset\n  ) {\n    id\n    createdAt\n    text\n    isPublic\n    sourceType\n    sourceId\n    sourceCommentShortId\n    sourceChannelUniqueName\n    discussionId\n    discussionNumber\n    Author {\n      username\n      displayName\n      profilePicURL\n    }\n    Recipient {\n      username\n    }\n  }\n}"
     },
     {
       "id": "graphQLData/scratchpad/queries.js#GET_PENDING_SCRATCHPAD_ENTRIES",
       "file": "graphQLData/scratchpad/queries.js",
-      "line": 47,
+      "line": 48,
       "column": 47,
-      "sha256": "41670abba2c2173042480be0f695977b2d6d1fb0865318825aeca5289d1685ff",
-      "source": "query getPendingScratchpadEntries($username: String!) {\n  scratchpadEntries(\n    where: {Recipient: {username: {eq: $username}}, isPublic: {eq: false}}\n    sort: [{createdAt: DESC}]\n  ) {\n    id\n    createdAt\n    text\n    isPublic\n    sourceType\n    sourceId\n    sourceChannelUniqueName\n    discussionId\n    discussionNumber\n    Author {\n      username\n      displayName\n      profilePicURL\n    }\n    Recipient {\n      username\n    }\n  }\n}"
+      "sha256": "b2d92540e28eaa36419c55b5b21203cb963173bde51be2bac53940958922e1af",
+      "source": "query getPendingScratchpadEntries($username: String!) {\n  scratchpadEntries(\n    where: {Recipient: {username: {eq: $username}}, isPublic: {eq: false}}\n    sort: [{createdAt: DESC}]\n  ) {\n    id\n    createdAt\n    text\n    isPublic\n    sourceType\n    sourceId\n    sourceCommentShortId\n    sourceChannelUniqueName\n    discussionId\n    discussionNumber\n    Author {\n      username\n      displayName\n      profilePicURL\n    }\n    Recipient {\n      username\n    }\n  }\n}"
     },
     {
       "id": "graphQLData/server/queries.ts#GET_SESSION_PROFILE",
@@ -2979,13 +2979,13 @@
       "file": "graphQLData/user/queries.js",
       "line": 443,
       "column": 48,
-      "sha256": "f165ec363204c19b735386fa5f62c442c5299f8040b3eb3893d2e748ee4387e8",
-      "source": "query getUploadedDownloadableFiles($username: String!) {\n  getUploadedDownloadableFiles(username: $username) {\n    discussion {\n      id\n      title\n      createdAt\n      updatedAt\n      channelUniqueNames\n    }\n    files {\n      id\n      fileName\n      kind\n      size\n      url\n      uploadedAt\n      createdAt\n    }\n  }\n}"
+      "sha256": "b304ee519cbeceebfd802a22c7ae35306e2bf9ce3b6219c6b20494126acc4541",
+      "source": "query getUploadedDownloadableFiles($username: String!) {\n  getUploadedDownloadableFiles(username: $username) {\n    discussion {\n      id\n      title\n      createdAt\n      updatedAt\n      channelUniqueNames\n      channels {\n        channelUniqueName\n        discussionNumber\n      }\n    }\n    files {\n      id\n      fileName\n      kind\n      size\n      url\n      uploadedAt\n      createdAt\n    }\n  }\n}"
     },
     {
       "id": "graphQLData/user/queries.js#GET_USER_EVENTS",
       "file": "graphQLData/user/queries.js",
-      "line": 466,
+      "line": 470,
       "column": 32,
       "sha256": "8729b86cce6ba358182da714138aa39e818bc3a963a88f43b0246772d560c82b",
       "source": "query getUserEvents($username: String!, $where: EventWhere) {\n  users(where: {username: {eq: $username}}) {\n    username\n    profilePicURL\n    Events(where: $where, sort: {createdAt: DESC}) {\n      id\n      title\n      startTime\n      endTime\n      locationName\n      address\n      virtualEventUrl\n      location {\n        latitude\n        longitude\n      }\n      Poster {\n        username\n      }\n      Tags {\n        text\n      }\n      createdAt\n      updatedAt\n      deleted\n      EventChannels {\n        eventNumber\n        channelUniqueName\n        Channel {\n          uniqueName\n        }\n      }\n    }\n  }\n}"
@@ -2993,7 +2993,7 @@
     {
       "id": "graphQLData/user/queries.js#GET_USER_WIKI_EDITS",
       "file": "graphQLData/user/queries.js",
-      "line": 504,
+      "line": 508,
       "column": 36,
       "sha256": "b74470ca9ca34b524b81ccb858a1173eb433e942b6f83e26e83713ab68855ebf",
       "source": "query getUserWikiEdits($where: WikiPageWhere, $versionWhere: TextVersionWhere) {\n  wikiPages(where: $where, sort: [{updatedAt: DESC}]) {\n    id\n    title\n    body\n    editReason\n    slug\n    createdAt\n    updatedAt\n    channelUniqueName\n    VersionAuthor {\n      username\n      displayName\n      profilePicURL\n    }\n    PastVersions(where: $versionWhere, sort: [{createdAt: DESC}]) {\n      id\n      body\n      editReason\n      createdAt\n      Author {\n        username\n        displayName\n        profilePicURL\n      }\n    }\n  }\n}"
@@ -3001,7 +3001,7 @@
     {
       "id": "graphQLData/user/queries.js#DOES_USER_EXIST",
       "file": "graphQLData/user/queries.js",
-      "line": 541,
+      "line": 545,
       "column": 32,
       "sha256": "b52cfba5bfd0ea5fa66c7fdf374f1a38a98fe2ac0a7bbe666a3abe884a6927b7",
       "source": "query doesUserExist($username: String!) {\n  users(where: {username: {eq: $username}}) {\n    username\n    profilePicURL\n    Email {\n      address\n    }\n  }\n}"
@@ -3009,7 +3009,7 @@
     {
       "id": "graphQLData/user/queries.js#GET_MODDED_CHANNELS",
       "file": "graphQLData/user/queries.js",
-      "line": 553,
+      "line": 557,
       "column": 36,
       "sha256": "b968277b3f15ff93f5c8542a20a875a1f470826efdf36e4fc0ab62da744a3063",
       "source": "query getModdedChannels($username: String!) {\n  users(where: {username: {eq: $username}}) {\n    username\n    profilePicURL\n    ModOfChannels {\n      uniqueName\n      description\n      ...ChannelIconFields\n      Tags {\n        text\n      }\n      EventChannelsConnection(where: {node: {NOT: {Event: null}}}) {\n        aggregate {\n          count {\n            nodes\n          }\n        }\n      }\n      DiscussionChannelsConnection(where: {node: {NOT: {Discussion: null}}}) {\n        aggregate {\n          count {\n            nodes\n          }\n        }\n      }\n    }\n    AdminOfChannelsConnection {\n      aggregate {\n        count {\n          nodes\n        }\n      }\n    }\n  }\n}\n\nfragment ChannelIconFields on Channel {\n  channelIconURL\n}"
@@ -3017,7 +3017,7 @@
     {
       "id": "graphQLData/user/queries.js#GET_OWNED_CHANNELS",
       "file": "graphQLData/user/queries.js",
-      "line": 594,
+      "line": 598,
       "column": 35,
       "sha256": "7bb70bbf69c5ef781c2fcb14f5c1da01ee91f2062ef211a4b9edace893dbcfdf",
       "source": "query getOwnedChannels($username: String!) {\n  users(where: {username: {eq: $username}}) {\n    username\n    profilePicURL\n    AdminOfChannels {\n      uniqueName\n      description\n      ...ChannelIconFields\n      Tags {\n        text\n      }\n      EventChannelsConnection(where: {node: {NOT: {Event: null}}}) {\n        aggregate {\n          count {\n            nodes\n          }\n        }\n      }\n      DiscussionChannelsConnection(where: {node: {NOT: {Discussion: null}}}) {\n        aggregate {\n          count {\n            nodes\n          }\n        }\n      }\n    }\n    AdminOfChannelsConnection {\n      aggregate {\n        count {\n          nodes\n        }\n      }\n    }\n  }\n}\n\nfragment ChannelIconFields on Channel {\n  channelIconURL\n}"
@@ -3025,7 +3025,7 @@
     {
       "id": "graphQLData/user/queries.js#GET_USER_CONTRIBUTIONS",
       "file": "graphQLData/user/queries.js",
-      "line": 635,
+      "line": 639,
       "column": 39,
       "sha256": "1635b8f443a1a256247892701907a87d054410b29b79cf73008c319670fceefc",
       "source": "query getUserContributions($username: String!, $year: Int) {\n  getUserContributions(username: $username, year: $year) {\n    count\n    date\n    activities {\n      id\n      description\n      type\n      Comments {\n        id\n        shortId\n        text\n        createdAt\n        CommentAuthor {\n          username\n          ... on User {\n            profilePicURL\n          }\n        }\n        Channel {\n          uniqueName\n        }\n        DiscussionChannel {\n          id\n          discussionId\n          discussionNumber\n          channelUniqueName\n        }\n        Event {\n          id\n        }\n      }\n      Discussions {\n        id\n        title\n        createdAt\n        Author {\n          username\n          profilePicURL\n        }\n        DiscussionChannels {\n          id\n          channelUniqueName\n          discussionId\n          discussionNumber\n        }\n      }\n      Events {\n        id\n        title\n        createdAt\n        Poster {\n          username\n        }\n        EventChannels {\n          id\n          channelUniqueName\n          eventId\n          eventNumber\n        }\n      }\n      WikiEdits {\n        id\n        body\n        editReason\n        createdAt\n        Author {\n          username\n          profilePicURL\n        }\n        WikiPage {\n          id\n          title\n          slug\n          channelUniqueName\n        }\n      }\n    }\n  }\n}"
@@ -3033,7 +3033,7 @@
     {
       "id": "graphQLData/user/queries.js#USER_IS_MOD_OR_OWNER_IN_CHANNEL",
       "file": "graphQLData/user/queries.js",
-      "line": 718,
+      "line": 722,
       "column": 48,
       "sha256": "ccbb7fdf76331da8be21eb21e50476be926362de4e534d8cb5b76b54c0852c3d",
       "source": "query userIsModInChannel($modDisplayName: String!, $username: String!, $channelUniqueName: String!) {\n  channels(where: {uniqueName: {eq: $channelUniqueName}}) {\n    uniqueName\n    Admins(where: {username: {eq: $username}}) {\n      username\n    }\n    SuspendedUsers(where: {username: {eq: $username}}) {\n      username\n    }\n    Moderators(where: {displayName: {eq: $modDisplayName}}) {\n      displayName\n    }\n    SuspendedMods(where: {modProfileName: {eq: $modDisplayName}}) {\n      modProfileName\n    }\n  }\n}"
@@ -3041,7 +3041,7 @@
     {
       "id": "graphQLData/user/queries.js#GET_USER_SUSPENSION_IN_CHANNEL",
       "file": "graphQLData/user/queries.js",
-      "line": 742,
+      "line": 746,
       "column": 47,
       "sha256": "7482de43a8911806153e26e196243fbee20b22ca108cd4425e880223047ed7eb",
       "source": "query getUserSuspensionInChannel($channelUniqueName: String!, $username: String!) {\n  channels(where: {uniqueName: {eq: $channelUniqueName}}) {\n    uniqueName\n    SuspendedUsers(where: {username: {eq: $username}}) {\n      id\n      suspendedUntil\n      suspendedIndefinitely\n      RelatedIssue {\n        issueNumber\n      }\n    }\n  }\n}"
@@ -3049,7 +3049,7 @@
     {
       "id": "graphQLData/user/queries.js#GET_USER_ACTIVE_SUSPENSIONS",
       "file": "graphQLData/user/queries.js",
-      "line": 761,
+      "line": 765,
       "column": 44,
       "sha256": "a991f84b124f93b3ba775171484f024c30c2228f2681576d122bfbb0d70ce124",
       "source": "query getUserActiveSuspensions($username: String!, $now: DateTime!) {\n  users(where: {username: {eq: $username}}) {\n    username\n    Suspensions(\n      where: {OR: [{suspendedIndefinitely: {eq: true}}, {suspendedUntil_GT: $now}]}\n      limit: 1\n      sort: {suspendedUntil: DESC}\n    ) {\n      id\n      channelUniqueName\n      suspendedUntil\n      suspendedIndefinitely\n      RelatedIssue {\n        issueNumber\n      }\n    }\n  }\n}"
@@ -3057,7 +3057,7 @@
     {
       "id": "graphQLData/user/queries.js#GET_USER_FAVORITE_COUNTS",
       "file": "graphQLData/user/queries.js",
-      "line": 787,
+      "line": 791,
       "column": 41,
       "sha256": "e4a4067741ed2c51e3bf2223b53db0bffa2dbc0490f04adb494247bca8627f3c",
       "source": "query getUserFavoriteCounts($username: String!) {\n  users(where: {username: {eq: $username}}) {\n    username\n    FavoriteChannelsConnection {\n      totalCount\n    }\n    FavoriteImagesConnection {\n      totalCount\n    }\n    FavoriteCommentsConnection {\n      totalCount\n    }\n    FavoriteDiscussionsConnection(\n      where: {node: {OR: [{hasDownload: {eq: false}}, {hasDownload: {eq: null}}]}}\n    ) {\n      totalCount\n    }\n    FavoriteDownloadsConnection: FavoriteDiscussionsConnection(\n      where: {node: {hasDownload: {eq: true}}}\n    ) {\n      totalCount\n    }\n  }\n}"

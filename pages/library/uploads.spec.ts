@@ -40,7 +40,7 @@ const mountPage = async () => {
         RequireAuth: RequireAuthStub,
         WarningModal: WarningModalStub,
         ErrorBanner: { props: ['text'], template: '<div>{{ text }}</div>' },
-        NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
+        NuxtLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
       },
     },
   });
@@ -65,6 +65,7 @@ beforeEach(() => {
             id: 'discussion-1',
             title: 'Printable model',
             channelUniqueNames: ['models'],
+            channels: [{ channelUniqueName: 'models', discussionNumber: 5 }],
           },
           files: [
             {
@@ -93,6 +94,14 @@ describe('uploaded files library page', () => {
     const wrapper = await mountPage();
 
     expect(wrapper.text()).toContain('Printable model');
+  });
+
+  it('links the discussion by the first forum and its number', async () => {
+    const wrapper = await mountPage();
+
+    expect(
+      wrapper.find('a[href="/forums/models/downloads/5-printable-model"]').exists()
+    ).toBe(true);
   });
 
   it('opens a confirmation before deleting a file', async () => {
