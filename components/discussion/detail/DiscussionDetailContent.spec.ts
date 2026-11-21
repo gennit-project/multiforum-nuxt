@@ -106,7 +106,7 @@ const stubs = {
   // behavior is covered in AgeGatedDiscussionNotice.spec.ts.
   AgeGatedDiscussionNotice: {
     name: 'AgeGatedDiscussionNotice',
-    props: ['discussionId'],
+    props: ['discussionNumber', 'channelUniqueName'],
     template: '<div class="age-gate-stub"><slot /></div>',
   },
   InfoBanner: {
@@ -152,6 +152,8 @@ const stubs = {
   },
 };
 
+// The component is given the discussion's per-forum number; the fixtures below
+// use 7 for 'd1' and 8 for 'd2'.
 const makeDiscussion = (overrides: Record<string, unknown> = {}): Discussion =>
   ({
     id: 'd1',
@@ -160,6 +162,7 @@ const makeDiscussion = (overrides: Record<string, unknown> = {}): Discussion =>
     DiscussionChannels: [
       {
         id: 'dc1',
+        discussionNumber: 7,
         channelUniqueName: 'cats',
         archived: false,
         locked: false,
@@ -184,6 +187,7 @@ const commentSection = (comments: Comment[]) => ({
     DiscussionChannel: {
       id: 'dc1',
       discussionId: 'd1',
+      discussionNumber: 7,
       channelUniqueName: 'cats',
       Answers: [],
       archived: false,
@@ -262,7 +266,7 @@ const setup = (
     fallbackQuery: createQueryMock({ discussionChannels: [] }),
   });
   const wrapper = mountWithDefaults(DiscussionDetailContent, {
-    props: { discussionId: 'd1', channelId: 'cats', ...componentProps },
+    props: { discussionNumber: 7, channelId: 'cats', ...componentProps },
     global: { stubs },
   });
   return {
@@ -472,8 +476,8 @@ describe('DiscussionDetailContent', () => {
     expect(
       wrapper
         .findComponent({ name: 'AgeGatedDiscussionNotice' })
-        .props('discussionId')
-    ).toBe(wrapper.props('discussionId'));
+        .props('discussionNumber')
+    ).toBe(wrapper.props('discussionNumber'));
   });
 
   it('passes the comment-section comments through in order', () => {
@@ -551,10 +555,10 @@ describe('DiscussionDetailContent', () => {
       .findComponent(DiscussionCommentsWrapperStub)
       .vm.$emit('load-more-answers');
     discussionQuery.result.value = {
-      discussions: [makeDiscussion({ id: 'd2' })],
+      discussions: [makeDiscussion({ id: 'd2', DiscussionChannels: [{ ...makeDiscussion().DiscussionChannels[0], id: 'dc2', discussionNumber: 8 }] })],
     };
     commentSectionQuery.result.value = { getCommentSection: null };
-    await wrapper.setProps({ discussionId: 'd2' });
+    await wrapper.setProps({ discussionNumber: 8 });
     resolvePage({
       data: {
         getDiscussionDetailAnswers: {
@@ -627,13 +631,13 @@ describe('DiscussionDetailContent', () => {
     });
   });
 
-  // Clicking another item in the list swaps discussionId while the new
+  // Clicking another item in the list swaps discussionNumber while the new
   // discussion loads: show the skeleton, not the previous discussion.
   it('shows the loading skeleton instead of the previous discussion while another loads', async () => {
     const { wrapper, discussionQuery } = setup();
     discussionQuery.result.value = { discussions: [] };
     discussionQuery.loading.value = true;
-    await wrapper.setProps({ discussionId: 'd2' });
+    await wrapper.setProps({ discussionNumber: 8 });
 
     expect(wrapper.find('[aria-busy="true"]').exists()).toBe(true);
   });
@@ -647,26 +651,42 @@ describe('DiscussionDetailContent', () => {
     expect(wrapper.find('[aria-busy="true"]').exists()).toBe(false);
   });
 
-  // Guarded by the existing discussionId watch that clears the saved section.
+  // Guarded by the existing discussionNumber watch that clears the saved section.
   it("does not show the previous discussion's comments while the next ones load", async () => {
     const { wrapper, discussionQuery, commentSectionQuery } = setup({
       comments: [makeComment('a'), makeComment('b')],
-      discussionChannelOverrides: { discussionId: 'd1' },
+      discussionChannelOverrides: { discussionNumber: 7 },
     });
     discussionQuery.result.value = {
-      discussions: [makeDiscussion({ id: 'd2' })],
+      discussions: [makeDiscussion({ id: 'd2', DiscussionChannels: [{ ...makeDiscussion().DiscussionChannels[0], id: 'dc2', discussionNumber: 8 }] })],
     };
     commentSectionQuery.result.value = { getCommentSection: null };
     commentSectionQuery.loading.value = true;
-    await wrapper.setProps({ discussionId: 'd2' });
+    await wrapper.setProps({ discussionNumber: 8 });
 
     expect(
       wrapper.findComponent(DiscussionCommentsWrapperStub).props('comments')
     ).toEqual([]);
   });
 
+  // Numbers are per forum, so the detail result for another forum is another
+  // discussion: the retained cats result must not be used for dogs.
+  const dogsDiscussion = () =>
+    makeDiscussion({
+      DiscussionChannels: [
+        {
+          ...makeDiscussion().DiscussionChannels[0],
+          id: 'dc-dogs',
+          channelUniqueName: 'dogs',
+        },
+      ],
+    });
+
   it('discards a retained query result when switching to an empty forum', async () => {
-    const { wrapper } = setup({ comments: [makeComment('cats-only')] });
+    const { wrapper, discussionQuery } = setup({
+      comments: [makeComment('cats-only')],
+    });
+    discussionQuery.result.value = { discussions: [dogsDiscussion()] };
     await wrapper.setProps({ channelId: 'dogs' });
     expect(
       wrapper.findComponent(DiscussionCommentsWrapperStub).props('comments')
@@ -674,13 +694,16 @@ describe('DiscussionDetailContent', () => {
   });
 
   it('does not use another forum’s channel metadata', async () => {
-    const { wrapper } = setup({ comments: [makeComment('cats-only')] });
+    const { wrapper, discussionQuery } = setup({
+      comments: [makeComment('cats-only')],
+    });
+    discussionQuery.result.value = { discussions: [dogsDiscussion()] };
     await wrapper.setProps({ channelId: 'dogs' });
     expect(
       wrapper
         .findComponent(DiscussionCommentsWrapperStub)
         .props('discussionChannel')
-    ).toBeUndefined();
+    ).toMatchObject({ id: 'dc-dogs' });
   });
 
   it('replaces populated comments with an empty response for the same forum', async () => {
@@ -697,7 +720,7 @@ describe('DiscussionDetailContent', () => {
   it('keeps the comments while the same discussion refetches them', async () => {
     const { wrapper, commentSectionQuery } = setup({
       comments: [makeComment('a'), makeComment('b')],
-      discussionChannelOverrides: { discussionId: 'd1' },
+      discussionChannelOverrides: { discussionNumber: 7 },
     });
     commentSectionQuery.result.value = { getCommentSection: null };
     commentSectionQuery.loading.value = true;
@@ -707,6 +730,42 @@ describe('DiscussionDetailContent', () => {
       .findComponent(DiscussionCommentsWrapperStub)
       .props('comments') as Comment[];
     expect(passed.map((c) => c.id)).toEqual(['a', 'b']);
+  });
+
+  it('loads the detail by number without a global id', () => {
+    setup();
+    const call = asMock(useQuery).mock.calls.find(
+      ([document]) => document === GET_DISCUSSION_DETAIL
+    );
+    const variables = typeof call?.[1] === 'function' ? call[1]() : call?.[1];
+
+    expect(variables).toEqual({
+      discussionNumber: 7,
+      loggedInModName: null,
+      channelUniqueName: 'cats',
+    });
+  });
+
+  it('loads the comment section by number, in parallel with the detail', () => {
+    setup();
+    const call = asMock(useQuery).mock.calls.find(
+      ([document]) => document === GET_DISCUSSION_COMMENTS
+    );
+    const variables = typeof call?.[1] === 'function' ? call[1]() : call?.[1];
+
+    expect(variables).toEqual(
+      expect.objectContaining({ discussionNumber: 7, channelUniqueName: 'cats' })
+    );
+  });
+
+  it('keys the revision history query by the loaded discussion id', () => {
+    setup();
+    const call = asMock(useQuery).mock.calls.find(
+      ([document]) => document === GET_DISCUSSION_ACTIVITY
+    );
+    const variables = typeof call?.[1] === 'function' ? call[1]() : call?.[1];
+
+    expect(variables).toEqual({ id: 'd1' });
   });
 
   it('limits the initial comment page to twenty comments', () => {
@@ -770,6 +829,7 @@ describe('DiscussionDetailContent', () => {
           DiscussionChannels: [
             {
               id: 'dc1',
+              discussionNumber: 7,
               channelUniqueName: 'cats',
               archived: true,
               locked: true,
@@ -1024,9 +1084,9 @@ describe('DiscussionDetailContent', () => {
     ]).toEqual([0, 0]);
   });
 
-  it('clears cached comment-section state when the discussion ID changes', async () => {
+  it('clears cached comment-section state when the discussion number changes', async () => {
     const { wrapper } = setup({ comments: [makeComment('a')] });
-    await wrapper.setProps({ discussionId: 'd2' });
-    expect(wrapper.props('discussionId')).toBe('d2');
+    await wrapper.setProps({ discussionNumber: 8 });
+    expect(wrapper.props('discussionNumber')).toBe(8);
   });
 });

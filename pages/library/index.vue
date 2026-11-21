@@ -7,6 +7,7 @@ import type { GetUnifiedLibraryFavoritesQuery } from '@/__generated__/operations
 import { useUsername } from '@/composables/useAuthState';
 import { GetUnifiedLibraryFavoritesDocument as GET_UNIFIED_LIBRARY_FAVORITES } from '@/__generated__/operations';
 import { getCommentPermalink } from '@/utils/commentUtils';
+import { getImageUrl } from '@/utils/contentUrls';
 import {
   getDiscussionLink,
   getDownloadLink,
@@ -128,7 +129,11 @@ const imageItems = computed<LibraryFavoriteItem[]>(() =>
       title: image.caption || image.alt || 'Untitled image',
       summary: image.alt || image.caption || 'Saved image',
       href: image.Uploader?.username
-        ? `/u/${image.Uploader.username}/images/${image.id}`
+        ? getImageUrl({
+            username: image.Uploader.username,
+            imageNumber: image.imageNumber,
+            imageId: image.id,
+          })
         : '/library/favorite-images',
       thumbnailUrl: image.url,
       createdAt: image.createdAt,
@@ -161,11 +166,13 @@ const commentItems = computed<LibraryFavoriteItem[]>(() =>
       summary: cleanText(comment.text) || 'Saved comment',
       href: getCommentPermalink({
         id: comment.id,
+        shortId: comment.shortId,
         DiscussionChannel: comment.DiscussionChannel
           ? {
               channelUniqueName:
                 comment.DiscussionChannel.channelUniqueName || undefined,
               discussionId: comment.DiscussionChannel.discussionId || undefined,
+              discussionNumber: comment.DiscussionChannel.discussionNumber,
               Discussion: comment.DiscussionChannel.Discussion || undefined,
             }
           : undefined,

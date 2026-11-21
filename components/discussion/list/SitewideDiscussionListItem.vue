@@ -22,6 +22,9 @@ import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
+import { getDiscussionRoute } from '@/utils/contentUrls';
+import { getDiscussionLinkTarget } from '@/utils/discussionLinks';
+import { parseSlugSegmentNumber } from '@/utils/slugify';
 
 type DiscussionChannel = Discussion['DiscussionChannels'][number];
 
@@ -116,13 +119,12 @@ const getDetailLink = () => {
       },
     };
   }
-  return {
-    name: 'forums-forumId-discussions-discussionId',
-    params: {
-      forumId: forumId.value,
-      discussionId: props.discussion.id,
-    },
-  };
+  return getDiscussionRoute(
+    getDiscussionLinkTarget({
+      discussion: props.discussion,
+      channelId: forumId.value,
+    })
+  );
 };
 
 const getDesktopSelectionLink = () => {
@@ -143,15 +145,27 @@ const getDesktopSelectionLink = () => {
   };
 };
 
-const discussionIdInParams = computed(() =>
-  typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
+const discussionNumberInParams = computed(() =>
+  parseSlugSegmentNumber(
+    typeof route.params.discussionId === 'string'
+      ? route.params.discussionId
+      : ''
+  )
 );
 const discussionId = computed(() => props.discussion?.id || '');
 const isSelected = computed(() => {
   if (props.selectedDiscussionId) {
     return props.selectedDiscussionId === discussionId.value;
   }
-  return discussionIdInParams.value === discussionId.value;
+  // Numbers are per forum, so match the route's number within its forum.
+  return (
+    discussionNumberInParams.value != null &&
+    (props.discussion?.DiscussionChannels || []).some(
+      (discussionChannel) =>
+        discussionChannel.discussionNumber === discussionNumberInParams.value &&
+        discussionChannel.channelUniqueName === route.params.forumId
+    )
+  );
 });
 const title = computed(() => props.discussion?.title || '[Deleted]');
 const flairGroups = computed(() =>
@@ -369,6 +383,7 @@ const revealSensitiveContent = () => {
             :mobile-layout="true"
             :submissions="discussion.DiscussionChannels"
             :content-id="discussion.id"
+            :content-title="discussion.title"
             kind="discussion"
             :preview="true"
             :selected-forum="isSelected ? forumId : ''"

@@ -5,12 +5,10 @@ import { ref } from 'vue';
 import DiscussionVotes from '@/components/discussion/vote/DiscussionVotes.vue';
 import { useUsername } from '@/composables/useAuthState';
 
+const { mockPush } = vi.hoisted(() => ({ mockPush: vi.fn() }));
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({
-    params: { discussionId: 'discussion-1' },
-  }),
   useRouter: () => ({
-    push: vi.fn(),
+    push: mockPush,
   }),
 }));
 
@@ -101,12 +99,14 @@ const SuperUpvoteModalStub = {
 const defaultChannel = () => ({
   id: 'dc-1',
   channelUniqueName: 'cats',
+  discussionNumber: 12,
   Channel: { uniqueName: 'cats', displayName: 'Cats Forum' },
   UpvotedByUsers: [] as Array<{ username: string }>,
   SuperUpvotedByUsers: [] as Array<{ username: string }>,
   UpvotedByUsersAggregate: { count: 0 },
 });
 const defaultDiscussion = () => ({
+  title: 'My post',
   Author: { __typename: 'User', username: 'bob' },
   FeedbackComments: [] as Array<{ id: string }>,
   FeedbackCommentsAggregate: { count: 0 },
@@ -327,8 +327,10 @@ describe('DiscussionVotes', () => {
     it('navigates to the feedback view on view-feedback', async () => {
       const wrapper = mountVotes();
       await voteBtns(wrapper)[1]!.vm.$emit('view-feedback');
-      // No throw and the router.push handler ran; view is exercised.
-      expect(voteBtns(wrapper)).toHaveLength(2);
+      expect(mockPush).toHaveBeenCalledWith({
+        name: 'forums-forumId-discussions-feedback-discussionId',
+        params: { forumId: 'cats', discussionId: '12-my-post' },
+      });
     });
   });
 

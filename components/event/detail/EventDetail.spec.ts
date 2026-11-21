@@ -23,6 +23,7 @@ import {
   GetEventCommentsDocument,
   GetEventRootCommentAggregateDocument,
   GetEventChannelIdDocument,
+  GetEventIdByNumberDocument,
 } from '@/__generated__/operations';
 
 import { useQuery } from '@vue/apollo-composable';
@@ -136,6 +137,10 @@ const setup = (
     linkTitle?: boolean;
     usernameOnTop?: boolean;
     issueEventId?: string;
+    /** Global id passed via props; '' makes the route number resolve it. */
+    suppliedEventId?: string;
+    resolvedEventId?: string;
+    resolvingEventId?: boolean;
   } = {}
 ) => {
   const {
@@ -158,10 +163,13 @@ const setup = (
     linkTitle = false,
     usernameOnTop = false,
     issueEventId = '',
+    suppliedEventId = 'e1',
+    resolvedEventId = '',
+    resolvingEventId = false,
   } = params;
 
   h.route = reactive({
-    params: { eventId: 'e1', forumId: 'cats' },
+    params: { eventId: '4-meetup', forumId: 'cats' },
     query: routeQuery,
     name: routeName,
   });
@@ -214,12 +222,16 @@ const setup = (
       getEventChannel: channelQuery,
       getEventChannelID: channelQuery,
       getEventRootCommentAggregate: aggregateQuery,
+      getEventIdByNumber: createQueryMock(
+        { getEventIdByNumber: resolvedEventId || null },
+        { loading: ref(resolvingEventId) }
+      ),
     },
   });
 
   const wrapper = mountWithDefaults(EventDetail, {
     props: {
-      eventId: 'e1',
+      eventId: suppliedEventId,
       channelUniqueName: 'cats',
       showComments,
       showTitle,
@@ -275,6 +287,48 @@ describe('EventDetail', () => {
     const { wrapper } = setup({ event: null, eventLoading: true });
 
     expect(wrapper.text()).toContain('Loading...');
+  });
+
+  describe('route number resolution', () => {
+    const eventQueryVariables = () =>
+      asMock(useQuery)
+        .mock.calls.filter((call) => call[0] === GetEventDocument)
+        .map((call) => call[1]());
+
+    it('loads the event by the id resolved from the route number', () => {
+      setup({ suppliedEventId: '', resolvedEventId: 'resolved-1' });
+
+      expect(eventQueryVariables()).toEqual([
+        { id: 'resolved-1', channelUniqueName: 'cats', loggedInModName: '' },
+      ]);
+    });
+
+    it('shows loading, not the not-found message, while the lookup is in flight', () => {
+      const { wrapper } = setup({
+        event: null,
+        suppliedEventId: '',
+        resolvingEventId: true,
+      });
+
+      expect(wrapper.text()).toContain('Loading...');
+    });
+
+    it('shows the not-found message when the number matches no event', () => {
+      const { wrapper } = setup({ event: null, suppliedEventId: '' });
+
+      expect(wrapper.text()).toContain(
+        "Can't find the content that was reported"
+      );
+    });
+
+    it('skips the lookup when a global id is supplied by props', () => {
+      setup({ suppliedEventId: 'e1' });
+      const lookup = asMock(useQuery).mock.calls.find(
+        (call) => call[0] === GetEventIdByNumberDocument
+      );
+
+      expect(lookup?.[2]()).toEqual({ enabled: false });
+    });
   });
 
   it('renders the error banner when the event query errors', () => {

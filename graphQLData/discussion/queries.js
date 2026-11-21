@@ -27,6 +27,7 @@ const CROSSPOST_PREVIEW_FIELDS = gql`
       imageOrder
       Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
         id
+        imageNumber
         url
         alt
         caption
@@ -44,6 +45,7 @@ const CROSSPOST_PREVIEW_FIELDS = gql`
     }
     DiscussionChannels {
       channelUniqueName
+      discussionNumber
       Channel {
         uniqueName
         displayName
@@ -55,6 +57,8 @@ const CROSSPOST_PREVIEW_FIELDS = gql`
 const SHARED_COLLECTION_PREVIEW_FIELDS = gql`
   fragment SharedCollectionPreviewFields on Collection {
     id
+    collectionNumber
+    ownerUsername
     name
     description
     collectionType
@@ -127,6 +131,14 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           updatedAt
           hasSensitiveContent
           authorIsChannelModerator(channelUniqueName: $channelUniqueName)
+          # DiscussionChannelListItem has no discussionNumber, so select it
+          # through the Discussion for the forum being listed.
+          DiscussionChannels(where: { channelUniqueName: { eq: $channelUniqueName } }) {
+            id
+            discussionId
+            discussionNumber
+            channelUniqueName
+          }
           Author {
             ... on User {
               displayName
@@ -144,6 +156,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
               where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }
             ) {
               id
+              imageNumber
               url
               alt
               caption
@@ -208,6 +221,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           createdAt
           channelUniqueName
           discussionId
+          discussionNumber
           weightedVotesCount
           archived
           answered
@@ -248,6 +262,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           imageOrder
           Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
             id
+            imageNumber
             url
             alt
             caption
@@ -275,13 +290,15 @@ export const GET_DOWNLOAD_DETAIL = gql`
   ${AUTHOR_FIELDS}
   ${CROSSPOST_PREVIEW_FIELDS}
   query getDownloadDetail(
-    $id: ID!
+    $id: ID
+    $discussionNumber: Int
     $loggedInModName: String
     $loggedInUsername: String
     $channelUniqueName: String!
   ) {
     discussions: getDiscussionDetail(
       discussionId: $id
+      discussionNumber: $discussionNumber
       channelUniqueName: $channelUniqueName
     ) {
       id
@@ -304,6 +321,7 @@ export const GET_DOWNLOAD_DETAIL = gql`
         }
         Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
           id
+          imageNumber
           url
           alt
           caption
@@ -317,6 +335,7 @@ export const GET_DOWNLOAD_DETAIL = gql`
       DiscussionChannels(where: { channelUniqueName: { eq: $channelUniqueName } }) {
         id
         discussionId
+        discussionNumber
         channelUniqueName
         archived
         answered
@@ -447,6 +466,7 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
       }
       Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
         id
+        imageNumber
         url
         alt
         caption
@@ -460,6 +480,7 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
     DiscussionChannels {
       id
       discussionId
+      discussionNumber
       channelUniqueName
       weightedVotesCount
       archived
@@ -502,6 +523,7 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
       }
       Answers {
         id
+        shortId
         text
         createdAt
         CommentAuthor {
@@ -580,12 +602,14 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
 export const GET_DISCUSSION_DETAIL = gql`
   ${DISCUSSION_DETAIL_FIELDS}
   query getDiscussionDetail(
-    $id: ID!
+    $id: ID
+    $discussionNumber: Int
     $loggedInModName: String
     $channelUniqueName: String!
   ) {
     discussions: getDiscussionDetail(
       discussionId: $id
+      discussionNumber: $discussionNumber
       channelUniqueName: $channelUniqueName
     ) {
       ...DiscussionDetailFields
@@ -606,6 +630,7 @@ export const GET_DISCUSSION_DETAIL_ANSWERS_PAGE = gql`
     ) {
       answers {
         id
+        shortId
         text
         createdAt
         CommentAuthor {
@@ -639,6 +664,7 @@ export const GET_DISCUSSION_DETAIL_IMAGES_PAGE = gql`
     ) {
       images {
         id
+        imageNumber
         url
         alt
         caption
@@ -749,6 +775,7 @@ export const GET_ISSUE_RELATED_DISCUSSION = gql`
       }
       DiscussionChannels {
         channelUniqueName
+        discussionNumber
       }
       DownloadableFiles(where: { NOT: { permanentlyRemoved: { eq: true } } }) {
         id
@@ -898,6 +925,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
         imageOrder
         Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
           id
+          imageNumber
           url
           alt
           caption
@@ -936,6 +964,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
       }
       FeedbackComments(limit: $limit, offset: $offset) {
         id
+        shortId
         text
         archived
         Channel {
@@ -999,6 +1028,7 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
       }
     ) {
       id
+      shortId
       text
       createdAt
       archived
@@ -1037,3 +1067,26 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
 //     }
 //   }
 // }
+
+// Resolves a route's per-forum discussion number to the global discussion id,
+// for pages whose data is keyed by the id (edit forms, download tabs, feedback).
+// getDiscussionDetail/getCommentSection take the number directly instead.
+export const GET_DISCUSSION_ID_BY_NUMBER = gql`
+  query getDiscussionIdByNumber(
+    $channelUniqueName: String!
+    $discussionNumber: Int!
+  ) {
+    discussionChannels(
+      where: {
+        channelUniqueName: { eq: $channelUniqueName }
+        discussionNumber: { eq: $discussionNumber }
+      }
+      limit: 1
+    ) {
+      id
+      discussionId
+      discussionNumber
+      channelUniqueName
+    }
+  }
+`;

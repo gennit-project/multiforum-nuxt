@@ -4,8 +4,8 @@ import { createBaseHandlers } from '../../helpers/baseHandlers';
 
 const channel = 'cats';
 const id = 'album-download';
-const images = ['first', 'second'].map((imageId) => ({
-  id: imageId, url: '/favicon.ico', alt: imageId, caption: null, copyright: 'Other uploader',
+const images = ['first', 'second'].map((imageId, index) => ({
+  id: imageId, imageNumber: index + 1, url: '/favicon.ico', alt: imageId, caption: null, copyright: 'Other uploader',
   Uploader: { username: 'bob', displayName: 'Bob' },
 }));
 const author = { __typename: 'User', username: 'alice', displayName: 'Alice', profilePicURL: null, createdAt: '2024-01-01T00:00:00Z', discussionKarma: 0, commentKarma: 0 };
@@ -20,7 +20,7 @@ const discussion: GetDiscussionQuery['discussions'][number] & { __typename: 'Dis
   FeedbackComments: [], FeedbackCommentsConnection: { aggregate: { count: { nodes: 0 } } },
   CrosspostedDiscussion: null, SharedCollection: null,
   DiscussionChannels: [{
-    id: 'album-channel', discussionId: id, channelUniqueName: channel,
+    id: 'album-channel', discussionId: id, discussionNumber: 1, channelUniqueName: channel,
     weightedVotesCount: 0, archived: false, answered: false, locked: false,
     LabelOptions: [], LabelChangeHistory: [], Flairs: [], UpvotedByUsers: [],
     UpvotedByUsersConnection: { aggregate: { count: { nodes: 0 } } },
@@ -36,7 +36,7 @@ const updateResult: UpdateDiscussionWithChannelConnectionsMutation = {
     createdAt: discussion.createdAt, updatedAt: discussion.updatedAt,
     Tags: discussion.Tags,
     DiscussionChannels: discussion.DiscussionChannels.map((entry) => ({
-      id: entry.id, channelUniqueName: entry.channelUniqueName, discussionId: entry.discussionId,
+      id: entry.id, channelUniqueName: entry.channelUniqueName, discussionId: entry.discussionId, discussionNumber: entry.discussionNumber,
       archived: entry.archived, answered: entry.answered, locked: entry.locked,
       Flairs: entry.Flairs, Channel: entry.Channel ? { uniqueName: entry.Channel.uniqueName } : null,
     })),
@@ -50,7 +50,8 @@ test('reorders reused album images without rewriting their metadata', async ({ p
     updateDiscussionWithChannelConnections: () => ({ data: updateResult }),
     updateDownloadLabels: () => ({ data: { updateDownloadLabels: { id: 'album-channel', LabelOptions: [] } } }),
   } });
-  await page.goto(`/forums/${channel}/downloads/edit/${id}`);
+  // The route carries the per-forum number; the page resolves it to the id.
+  await page.goto(`/forums/${channel}/downloads/edit/1-album-download`);
   await page.getByRole('button', { name: 'Move image 2 up', exact: true }).click();
   // Download form defers saving to its final submit rather than auto-saving.
   const save = page.getByRole('button', { name: /save changes|update download|save download|save/i }).last();

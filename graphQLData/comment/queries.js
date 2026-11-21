@@ -5,6 +5,7 @@ import { AUTHOR_FIELDS } from '../fragments';
 export const SEARCH_COMMENT_FIELDS = gql`
   fragment SearchCommentFields on Comment {
     id
+    shortId
     text
     createdAt
     updatedAt
@@ -28,6 +29,7 @@ export const SEARCH_COMMENT_FIELDS = gql`
       id
       channelUniqueName
       discussionId
+      discussionNumber
       Discussion {
         id
         title
@@ -38,6 +40,7 @@ export const SEARCH_COMMENT_FIELDS = gql`
       title
       EventChannels {
         channelUniqueName
+        eventNumber
       }
     }
   }
@@ -87,6 +90,7 @@ export const COMMENT_FIELDS = gql`
   ${COMMENT_VOTE_FIELDS}
   fragment CommentFields on Comment {
     id
+    shortId
     text
     emoji
     weightedVotesCount
@@ -120,6 +124,7 @@ export const COMMENT_FIELDS = gql`
     }
     ParentComment {
       id
+      shortId
     }
     PastVersions {
       id
@@ -135,11 +140,17 @@ export const COMMENT_FIELDS = gql`
     }
     Event {
       id
+      title
+      EventChannels {
+        channelUniqueName
+        eventNumber
+      }
     }
     DiscussionChannel {
       id
       channelUniqueName
       discussionId
+      discussionNumber
     }
     ...CommentVoteFields
   }
@@ -148,7 +159,8 @@ export const COMMENT_FIELDS = gql`
 export const GET_DISCUSSION_COMMENTS = gql`
   query getCommentSection(
     $channelUniqueName: String!
-    $discussionId: ID!
+    $discussionId: ID
+    $discussionNumber: Int
     $modName: String
     $offset: Int
     $limit: Int
@@ -157,6 +169,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
     getCommentSection(
       channelUniqueName: $channelUniqueName
       discussionId: $discussionId
+      discussionNumber: $discussionNumber
       modName: $modName
       offset: $offset
       limit: $limit
@@ -166,6 +179,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
         id
         weightedVotesCount
         discussionId
+        discussionNumber
         channelUniqueName
         emoji
         archived
@@ -245,6 +259,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
         }
         Answers {
           id
+          shortId
           text
           createdAt
           CommentAuthor {
@@ -264,6 +279,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
       }
       Comments {
         id
+        shortId
         text
         emoji
         weightedVotesCount
@@ -287,6 +303,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
         }
         ParentComment {
           id
+          shortId
         }
         FeedbackComments {
           id
@@ -352,6 +369,7 @@ export const GET_EVENT_COMMENTS = gql`
         EventChannels {
           id
           eventId
+          eventNumber
           channelUniqueName
           Channel {
             uniqueName
@@ -376,6 +394,7 @@ export const GET_EVENT_COMMENTS = gql`
         ...CommentFields
         ChildComments {
           id
+          shortId
           text
         }
       }
@@ -398,6 +417,7 @@ export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
     ) {
       id
       discussionId
+      discussionNumber
       channelUniqueName
       archived
       answered
@@ -435,6 +455,7 @@ export const GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE = gql`
     ) {
       id
       discussionId
+      discussionNumber
       channelUniqueName
       archived
       answered
@@ -494,6 +515,7 @@ export const GET_FEEDBACK_COMMENT = gql`
   query getFeedbackComment($id: ID!) {
     comments(where: { id: { eq: $id } }) {
       id
+      shortId
       text
       createdAt
       archived
@@ -512,6 +534,7 @@ export const GET_FEEDBACK_COMMENT = gql`
       }
       GivesFeedbackOnComment {
         id
+        shortId
       }
       GivesFeedbackOnDiscussion {
         id
@@ -539,6 +562,7 @@ export const GET_ACTIVITY_FEED_COMMENT = gql`
         }
         Comment {
           id
+          shortId
           text
           createdAt
           CommentAuthor {
@@ -576,12 +600,19 @@ export const GET_COMMENT = gql`
       ...CommentFields
       GivesFeedbackOnComment {
         id
+        shortId
         DiscussionChannel {
           channelUniqueName
           discussionId
+          discussionNumber
         }
         Event {
           id
+          title
+          EventChannels {
+            channelUniqueName
+            eventNumber
+          }
         }
       }
       GivesFeedbackOnDiscussion {
@@ -593,9 +624,15 @@ export const GET_COMMENT = gql`
       DiscussionChannel {
         channelUniqueName
         discussionId
+        discussionNumber
       }
       Event {
         id
+        title
+        EventChannels {
+          channelUniqueName
+          eventNumber
+        }
       }
       Channel {
         uniqueName
@@ -651,6 +688,7 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
   ) {
     comments(where: { id: { eq: $commentId } }) {
       id
+      shortId
       CommentAuthor {
         ... on User {
           username
@@ -686,6 +724,7 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
       }
       FeedbackComments(limit: $limit, offset: $offset) {
         id
+        shortId
         text
         archived
         Channel {
@@ -753,6 +792,7 @@ export const GET_SPECIFIC_COMMENT_FEEDBACK = gql`
       }
     ) {
       id
+      shortId
       text
       createdAt
       archived
@@ -775,5 +815,12 @@ export const GET_SPECIFIC_COMMENT_FEEDBACK = gql`
         }
       }
     }
+  }
+`;
+
+// Resolves a permalink's comment shortId to the global comment id.
+export const GET_COMMENT_ID_BY_SHORT_ID = gql`
+  query getCommentIdByShortId($shortId: String!) {
+    getCommentIdByShortId(shortId: $shortId)
   }
 `;

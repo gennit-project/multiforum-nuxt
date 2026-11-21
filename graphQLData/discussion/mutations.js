@@ -41,6 +41,7 @@ export const CREATE_IMAGE = gql`
       }
     ) {
       id
+      imageNumber
       url
       alt
       caption
@@ -227,6 +228,7 @@ export const CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
         answered
         locked
         discussionId
+        discussionNumber
         channelUniqueName
         CommentsConnection {
           aggregate {
@@ -335,6 +337,7 @@ export const UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
         id
         channelUniqueName
         discussionId
+        discussionNumber
         Flairs {
           id
           channelUniqueName
@@ -443,6 +446,7 @@ export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
     ) {
       comments {
         id
+        shortId
         isRootComment
         isFeedbackComment
         createdAt
@@ -481,6 +485,7 @@ export const MARK_AS_ANSWERED = gql`
         answered
         Answers {
           id
+          shortId
           text
           CommentAuthor {
             ... on User {
@@ -517,6 +522,7 @@ export const MARK_AS_ANSWERED_BY_COMMENT = gql`
         answered
         Answers {
           id
+          shortId
           text
           CommentAuthor {
             ... on User {
@@ -546,6 +552,7 @@ export const MARK_AS_UNANSWERED = gql`
         answered
         Answers {
           id
+          shortId
           text
           CommentAuthor {
             ... on User {
@@ -578,6 +585,7 @@ export const UNMARK_COMMENT_AS_ANSWER = gql`
         answered
         Answers {
           id
+          shortId
           text
           CommentAuthor {
             ... on User {

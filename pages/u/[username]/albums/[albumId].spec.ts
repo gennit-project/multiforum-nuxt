@@ -6,12 +6,25 @@ import AlbumDetailPage from './[albumId].vue';
 vi.stubGlobal('definePageMeta', vi.fn());
 
 const h = vi.hoisted(() => ({
-  route: { params: { username: 'alice', albumId: 'al1' } as Record<string, unknown> },
+  route: { params: { username: 'alice', albumId: '3' } as Record<string, unknown> },
   resultRef: null as unknown as { value: unknown },
   loadingRef: null as unknown as { value: boolean },
   errorRef: null as unknown as { value: unknown },
   copyUrl: null as unknown as ReturnType<typeof vi.fn>,
+  resolvedId: null as unknown as { value: string },
+  resolvedLoading: null as unknown as { value: boolean },
+  resolvedNotFound: null as unknown as { value: boolean },
 }));
+
+vi.mock('@/composables/useRouteContentIds', async () => {
+  return {
+    useResolvedAlbumId: () => ({
+      id: h.resolvedId,
+      loading: h.resolvedLoading,
+      notFound: h.resolvedNotFound,
+    }),
+  };
+});
 
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route, useHead: vi.fn() }));
 
@@ -20,6 +33,9 @@ vi.mock('@vue/apollo-composable', async () => {
   h.resultRef = ref(null);
   h.loadingRef = ref(false);
   h.errorRef = ref(null);
+  h.resolvedId = ref('al1');
+  h.resolvedLoading = ref(false);
+  h.resolvedNotFound = ref(false);
   return {
     useQuery: () => ({
       result: h.resultRef,
@@ -60,6 +76,7 @@ const setAlbum = (album: Record<string, unknown> | null) => {
 
 const baseAlbum = (over: Record<string, unknown> = {}) => ({
   id: 'al1',
+  albumNumber: 3,
   Owner: { username: 'alice', displayName: 'Alice' },
   Images: [
     { id: 'a', url: 'u/a' },
@@ -73,10 +90,13 @@ const baseAlbum = (over: Record<string, unknown> = {}) => ({
 
 beforeEach(() => {
   vi.clearAllMocks();
-  h.route = { params: { username: 'alice', albumId: 'al1' } };
+  h.route = { params: { username: 'alice', albumId: '3' } };
   h.resultRef.value = null;
   h.loadingRef.value = false;
   h.errorRef.value = null;
+  h.resolvedId.value = 'al1';
+  h.resolvedLoading.value = false;
+  h.resolvedNotFound.value = false;
 });
 
 describe('Album detail page', () => {
@@ -90,6 +110,16 @@ describe('Album detail page', () => {
     expect(mountAlbum().text()).toContain('Album Not Found');
   });
 
+  it('shows the loading state while the album number is being resolved', () => {
+    h.resolvedLoading.value = true;
+    expect(mountAlbum().text()).toContain('Loading album');
+  });
+
+  it('shows the not-found state when the album number matches nothing', () => {
+    h.resolvedNotFound.value = true;
+    expect(mountAlbum().text()).toContain('Album Not Found');
+  });
+
   it('shows the not-found state on query error', () => {
     h.errorRef.value = { message: 'boom' };
     expect(mountAlbum().text()).toContain('Album Not Found');
@@ -100,6 +130,16 @@ describe('Album detail page', () => {
     const wrapper = mountAlbum();
     expect(wrapper.text()).toContain('Invalid URL');
     expect(wrapper.text()).toContain('bob');
+  });
+
+  it('links to the owner copy of the album by number', () => {
+    setAlbum(baseAlbum({ Owner: { username: 'bob' } }));
+    expect(
+      mountAlbum()
+        .findAll('a')
+        .find((node) => node.text().includes('View on Correct Profile'))
+        ?.attributes('href')
+    ).toBe('/u/bob/albums/3');
   });
 
   it('renders the album with its owner and image count', () => {
@@ -132,7 +172,9 @@ describe('Album detail page', () => {
           {
             id: 'd1',
             title: 'Trip photos',
-            DiscussionChannels: [{ channelUniqueName: 'cats' }],
+            DiscussionChannels: [
+              { channelUniqueName: 'cats', discussionNumber: 42 },
+            ],
             Author: { username: 'alice' },
           },
         ],
@@ -141,5 +183,28 @@ describe('Album detail page', () => {
     const wrapper = mountAlbum();
     expect(wrapper.text()).toContain('Related Discussion');
     expect(wrapper.text()).toContain('Trip photos');
+  });
+
+  it('links the related discussion by number and title', () => {
+    setAlbum(
+      baseAlbum({
+        Discussions: [
+          {
+            id: 'd1',
+            title: 'Trip photos',
+            DiscussionChannels: [
+              { channelUniqueName: 'cats', discussionNumber: 42 },
+            ],
+            Author: { username: 'alice' },
+          },
+        ],
+      })
+    );
+    expect(
+      mountAlbum()
+        .findAll('a')
+        .find((node) => node.text().includes('Trip photos'))
+        ?.attributes('href')
+    ).toBe('/forums/cats/discussions/42-trip-photos');
   });
 });

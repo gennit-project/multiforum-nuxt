@@ -11,6 +11,8 @@ const TEST_USER = 'alice';
 const DISCUSSION_ID = 'download-1';
 const DISCUSSION_CHANNEL_ID = 'download-channel-1';
 const DOWNLOAD_TITLE = 'Test Download';
+// The route carries the per-forum number (the fixtures default to 1) and a slug.
+const DISCUSSION_SEGMENT = '1-test-download';
 
 const buildDownload = ({ withActivity }: { withActivity: boolean }) => {
   const discussionChannel = {
@@ -180,7 +182,7 @@ test.describe('Download detail Activity tab', () => {
       handlers: createDownloadHandlers({ withActivity: true }),
     });
 
-    await page.goto(`/forums/${TEST_CHANNEL}/downloads/${DISCUSSION_ID}`);
+    await page.goto(`/forums/${TEST_CHANNEL}/downloads/${DISCUSSION_SEGMENT}`);
 
     const activityTab = page.getByRole('link', {
       name: 'Activity',
@@ -196,7 +198,7 @@ test.describe('Download detail Activity tab', () => {
 
     await activityTab.click();
     await expect(page).toHaveURL(
-      `/forums/${TEST_CHANNEL}/downloads/${DISCUSSION_ID}/activity`
+      `/forums/${TEST_CHANNEL}/downloads/${DISCUSSION_SEGMENT}/activity`
     );
 
     await expect(
@@ -223,7 +225,7 @@ test.describe('Download detail Activity tab', () => {
     });
 
     await page.goto(
-      `/forums/${TEST_CHANNEL}/downloads/${DISCUSSION_ID}/activity`
+      `/forums/${TEST_CHANNEL}/downloads/${DISCUSSION_SEGMENT}/activity`
     );
 
     await expect(

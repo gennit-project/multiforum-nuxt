@@ -16,7 +16,8 @@ const event = (overrides: Record<string, unknown> = {}) =>
   ({
     id: 'e1',
     location: { latitude: 1, longitude: 2 },
-    EventChannels: [{ channelUniqueName: 'cats' }],
+    title: 'Trivia Night',
+    EventChannels: [{ channelUniqueName: 'cats', eventNumber: 6 }],
     ...overrides,
   }) as unknown as Event;
 
@@ -116,7 +117,7 @@ describe('EventList navigation', () => {
 
     expect(h.push).toHaveBeenCalledWith(
       expect.objectContaining({
-        params: { eventId: 'e1', forumId: 'cats' },
+        params: { eventId: '6-trivia-night', forumId: 'cats' },
       })
     );
   });
@@ -129,7 +130,7 @@ describe('EventList navigation', () => {
 
     expect(h.push).toHaveBeenCalledWith(
       expect.objectContaining({
-        params: { eventId: 'e1', forumId: 'cats' },
+        params: { eventId: '6-trivia-night', forumId: 'cats' },
       })
     );
   });

@@ -5,6 +5,7 @@ import RefreshIcon from '@/components/icons/RefreshIcon.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import { getImageUrl } from '@/utils/contentUrls';
 
 defineProps({
   lightboxIndex: {
@@ -38,6 +39,10 @@ defineProps({
   currentImageId: {
     type: String,
     default: '',
+  },
+  currentImageNumber: {
+    type: Number,
+    default: undefined,
   },
   currentImageCaption: {
     type: String,
@@ -208,7 +213,13 @@ const downloadImage = (imageUrl: string) => {
       <!-- More Details button - hidden on narrow screens to save space -->
       <NuxtLink
         v-if="currentImageUploader && !panelOnSide"
-        :to="`/u/${currentImageUploader}/images/${currentImageId}`"
+        :to="
+          getImageUrl({
+            username: currentImageUploader,
+            imageNumber: currentImageNumber,
+            imageId: currentImageId,
+          })
+        "
         class="inline-flex items-center rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700"
       >
         More Details

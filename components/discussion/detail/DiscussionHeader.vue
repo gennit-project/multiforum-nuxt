@@ -27,6 +27,13 @@ import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { getAuthorBadges } from '@/utils/roleBadges';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
+import { getDiscussionRoute } from '@/utils/contentUrls';
+import {
+  getDiscussionEditUrl,
+  getDiscussionFeedbackRoute,
+  getDiscussionLinkTarget,
+  getDownloadEditUrl,
+} from '@/utils/discussionLinks';
 
 const WarningModal = defineAsyncComponent(
   () => import('@/components/WarningModal.vue')
@@ -251,14 +258,32 @@ const { userPermissions } = useResolvedModPermissions({
 
 const permalinkObject = computed(() => {
   if (!props.discussion) return {};
-  return {
-    name: 'forums-forumId-discussions-discussionId',
-    params: {
-      discussionId: props.discussion.id,
-      forumId: defaultChannel.value,
-    },
-  };
+  return getDiscussionRoute(
+    getDiscussionLinkTarget({
+      discussion: props.discussion,
+      channelId: defaultChannel.value,
+    })
+  );
 });
+
+const editDiscussionUrl = computed(() => {
+  const target = getDiscussionLinkTarget({
+    discussion: props.discussion,
+    channelId: props.channelId || defaultChannel.value,
+  });
+  return props.discussion?.hasDownload
+    ? getDownloadEditUrl(target)
+    : getDiscussionEditUrl(target);
+});
+
+const viewFeedbackRoute = computed(() =>
+  getDiscussionFeedbackRoute(
+    getDiscussionLinkTarget({
+      discussion: props.discussion,
+      channelId: defaultChannel.value,
+    })
+  )
+);
 
 const showCopiedLinkNotification = ref(false);
 
@@ -540,13 +565,7 @@ const warningModalBody = computed(() => {
           :items="menuItems"
           :data-testid="'discussion-menu-button'"
           :aria-label="'Discussion actions'"
-          @handle-edit="
-            router.push(
-              discussion?.hasDownload
-                ? `/forums/${channelId}/downloads/edit/${discussion?.id}`
-                : `/forums/${channelId}/discussions/edit/${discussion?.id}`
-            )
-          "
+          @handle-edit="router.push(editDiscussionUrl)"
           @handle-delete="deleteModalIsOpen = true"
           @handle-click-report="openReportModal"
           @handle-click-archive="openArchiveModal"
@@ -555,15 +574,7 @@ const warningModalBody = computed(() => {
           @handle-feedback="emit('handleClickGiveFeedback')"
           @handle-add-album="emit('handleClickAddAlbum')"
           @handle-toggle-sensitive-content="handleToggleSensitiveContent"
-          @handle-view-feedback="
-            router.push({
-              name: 'forums-forumId-discussions-feedback-discussionId',
-              params: {
-                forumId: defaultChannel,
-                discussionId: discussion?.id,
-              },
-            })
-          "
+          @handle-view-feedback="router.push(viewFeedbackRoute)"
         >
           <EllipsisHorizontal
             class="h-6 w-6 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"

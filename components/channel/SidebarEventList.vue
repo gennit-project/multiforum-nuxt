@@ -8,6 +8,7 @@ import { useRoute } from 'nuxt/app';
 import ArrowUpRightIcon from '@/components/icons/ArrowUpRightIcon.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import TicketIcon from '@/components/icons/TicketIcon.vue';
+import { getEventLinkRoute } from '@/utils/eventLinks';
 type Event = GetEventsQuery['events'][number];
 
 defineProps({
@@ -49,6 +50,9 @@ const soonestEventsInChannel = computed(() => {
 });
 
 // Helper functions
+const getEventLink = (event: Event) =>
+  getEventLinkRoute({ event, forumId: channelId.value });
+
 const getDateSectionFormat = (date: string) => {
   const dateObj = DateTime.fromISO(date);
   // The date should be in the format "Thu Nov 9"
@@ -173,13 +177,7 @@ const dateSectionObj = computed(() => {
     >
       <nuxt-link
         class="flex items-center"
-        :to="{
-          name: 'forums-forumId-events-eventId',
-          params: {
-            forumId: channelId,
-            eventId: event?.id,
-          },
-        }"
+        :to="getEventLink(event)"
       >
         <span class="text-xs leading-6 text-gray-500 dark:text-gray-300">
           {{ getSidebarLinkText(event) }}
@@ -213,13 +211,7 @@ const dateSectionObj = computed(() => {
     >
       <nuxt-link
         class="flex items-center"
-        :to="{
-          name: 'forums-forumId-events-eventId',
-          params: {
-            forumId: channelId,
-            eventId: event?.id,
-          },
-        }"
+        :to="getEventLink(event)"
       >
         <span class="text-xs leading-6 text-gray-500 dark:text-gray-300">
           {{ getSidebarLinkText(event) }}
@@ -244,13 +236,7 @@ const dateSectionObj = computed(() => {
     >
       <nuxt-link
         class="flex items-center"
-        :to="{
-          name: 'forums-forumId-events-eventId',
-          params: {
-            forumId: channelId,
-            eventId: event?.id,
-          },
-        }"
+        :to="getEventLink(event)"
       >
         <span class="text-xs leading-6 text-gray-500 dark:text-gray-300">
           {{ getSidebarLinkText(event) }}
@@ -277,13 +263,7 @@ const dateSectionObj = computed(() => {
       >
         <nuxt-link
           class="flex items-center"
-          :to="{
-            name: 'forums-forumId-events-eventId',
-            params: {
-              forumId: channelId,
-              eventId: event?.id,
-            },
-          }"
+          :to="getEventLink(event)"
         >
           <span class="text-xs leading-6 text-gray-500 dark:text-gray-300">
             {{ getSidebarLinkText(event) }}

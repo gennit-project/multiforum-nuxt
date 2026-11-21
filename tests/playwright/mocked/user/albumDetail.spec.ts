@@ -8,9 +8,12 @@ import {
 
 const TEST_USER = 'alice';
 const ALBUM_ID = 'album-1';
+const ALBUM_NUMBER = 1;
 
 const buildAlbum = (overrides = {}) => ({
   id: ALBUM_ID,
+  albumNumber: ALBUM_NUMBER,
+  ownerUsername: TEST_USER,
   imageOrder: ['img-1'],
   Owner: { username: TEST_USER, displayName: 'Alice' },
   Images: [
@@ -54,6 +57,8 @@ const getBaseMocks = (username: string) => ({
   getServerConfig: () => ({
     data: { serverConfigs: [buildServerConfig({ serverName: 'Listical' })] },
   }),
+  // The route carries the album number; the page resolves it to the global id.
+  getAlbumIdByNumber: () => ({ data: { getAlbumIdByNumber: ALBUM_ID } }),
   GetAlbumDetails: () => ({ data: { albums: [buildAlbum()] } }),
 });
 
@@ -70,7 +75,7 @@ test.describe('User album detail', () => {
     const diagnostics = await installGraphqlMocks(page, getBaseMocks(TEST_USER));
 
     try {
-      await page.goto(`/u/${TEST_USER}/albums/${ALBUM_ID}`);
+      await page.goto(`/u/${TEST_USER}/albums/${ALBUM_NUMBER}`);
 
       await expect(
         page.getByRole('heading', { name: /Album by Alice/ })
@@ -104,7 +109,7 @@ test.describe('User album detail', () => {
     });
 
     try {
-      await page.goto(`/u/${TEST_USER}/albums/${ALBUM_ID}`);
+      await page.goto(`/u/${TEST_USER}/albums/${ALBUM_NUMBER}`);
 
       await expect(
         page.getByRole('heading', { name: 'Album Not Found' })

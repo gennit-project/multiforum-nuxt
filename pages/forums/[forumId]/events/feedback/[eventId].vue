@@ -9,6 +9,8 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 import EventBody from '@/components/event/detail/EventBody.vue';
 import FeedbackSection from '@/components/comments/FeedbackSection.vue';
+import { useResolvedEventId } from '@/composables/useRouteContentIds';
+import { getEventLinkRoute } from '@/utils/eventLinks';
 
 const PAGE_LIMIT = 10;
 
@@ -21,12 +23,12 @@ const channelId = computed(() => {
   return '';
 });
 
-const eventId = computed(() => {
-  if (typeof route.params.eventId === 'string') {
-    return route.params.eventId;
-  }
-  return '';
-});
+// The route carries `{eventNumber}-{slug}`; resolve it to the global event id.
+const {
+  id: eventId,
+  loading: resolvingEventId,
+  notFound: eventNotFound,
+} = useResolvedEventId();
 
 const {
   result: getEventResult,
@@ -113,7 +115,12 @@ const reachedEndOfResults = computed(() => {
       class="mt-2 px-4"
       :text="getEventError.message"
     />
-    <PageNotFound v-if="!getEventLoading && !getEventError && !event" />
+    <PageNotFound
+      v-if="
+        eventNotFound ||
+        (!resolvingEventId && !getEventLoading && !getEventError && !event)
+      "
+    />
     <p class="mb-4 px-2">This page collects feedback on this event:</p>
     <div class="ml-2 flex flex-col gap-2 border-l pl-4">
       <h3 class="px-2 text-xl font-bold text-wrap sm:tracking-tight">
@@ -134,8 +141,8 @@ const reachedEndOfResults = computed(() => {
         </div>
       </div>
       <router-link
-        v-if="event"
-        :to="`/forums/${channelId}/events/${event.id}`"
+        v-if="detail"
+        :to="getEventLinkRoute({ event: detail, forumId: channelId })"
         class="text-brand-500 dark:text-brand-400 text-sm hover:underline"
         >View Event</router-link
       >

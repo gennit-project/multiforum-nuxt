@@ -164,7 +164,7 @@ describe('User profile container', () => {
 
   it('uses the full-width image layout on an image detail page', async () => {
     harness.route = {
-      path: '/u/alice/images/img-1',
+      path: '/u/alice/images/12',
       params: { username: 'alice' },
     };
     const wrapper = await mountContainer();
@@ -173,6 +173,17 @@ describe('User profile container', () => {
       false
     );
     expect(wrapper.findComponent({ name: 'NuxtPage' }).exists()).toBe(true);
+  });
+
+  it('uses the full-width layout on a collection detail page', async () => {
+    harness.route = {
+      path: '/u/alice/collections/3-reading-list',
+      params: { username: 'alice' },
+    };
+    const wrapper = await mountContainer();
+    expect(wrapper.findComponent({ name: 'UserProfileSidebar' }).exists()).toBe(
+      false
+    );
   });
 
   it('passes a server-role badge to the sidebar for an admin user', async () => {

@@ -7,6 +7,8 @@ export const CREATE_EVENT_WITH_CHANNEL_CONNECTIONS = gql`
       ...EventFields
       EventChannels {
         id
+        channelUniqueName
+        eventNumber
         Channel {
           uniqueName
         }
@@ -62,6 +64,7 @@ export const CREATE_EVENT_SERIES_WITH_CHANNEL_CONNECTIONS = gql`
         EventChannels {
           id
           channelUniqueName
+          eventNumber
           Channel {
             uniqueName
           }
@@ -70,6 +73,7 @@ export const CREATE_EVENT_SERIES_WITH_CHANNEL_CONNECTIONS = gql`
       EventChannels {
         id
         channelUniqueName
+        eventNumber
         Channel {
           uniqueName
         }
@@ -96,6 +100,7 @@ export const UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS = gql`
         id
         channelUniqueName
         eventId
+        eventNumber
         Channel {
           uniqueName
         }
@@ -131,6 +136,7 @@ export const UPDATE_EVENT_IN_SERIES = gql`
         id
         channelUniqueName
         eventId
+        eventNumber
         Channel {
           uniqueName
         }
@@ -211,6 +217,7 @@ export const ADD_FEEDBACK_COMMENT_TO_EVENT = gql`
     ) {
       comments {
         id
+        shortId
         isRootComment
         isFeedbackComment
         createdAt

@@ -15,7 +15,9 @@ const event = (overrides: Record<string, unknown> = {}) =>
     createdAt: '2024-01-01T00:00:00Z',
     Poster: { username: 'alice' },
     Tags: [{ text: 'music' }],
-    EventChannels: [{ channelUniqueName: 'cats', Channel: { uniqueName: 'cats' } }],
+    EventChannels: [
+      { channelUniqueName: 'cats', eventNumber: 3, Channel: { uniqueName: 'cats' } },
+    ],
     ...overrides,
   }) as unknown as Event;
 
@@ -91,7 +93,7 @@ describe('EventItemInProfile navigation', () => {
   it('links the keyboard-focusable title to the event', () => {
     const wrapper = mountItem();
 
-    expect(titleLink(wrapper)?.attributes('href')).toBe('/forums/cats/events/e1');
+    expect(titleLink(wrapper)?.attributes('href')).toBe('/forums/cats/events/3-an-event');
   });
 
   it('renders the title without a link when there is no channel', () => {

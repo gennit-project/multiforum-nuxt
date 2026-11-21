@@ -115,6 +115,7 @@ export const CREATE_COMMENT = gql`
         }
         ChildComments {
           id
+          shortId
           text
         }
       }
@@ -131,6 +132,7 @@ export const UPDATE_COMMENT = gql`
     updateComments(update: $updateCommentInput, where: $commentWhere) {
       comments {
         id
+        shortId
         text
         CommentAuthor {
           ... on User {
@@ -182,6 +184,7 @@ export const SOFT_DELETE_COMMENT = gql`
     softDeleteComment(where: { id: { eq: $id } }) {
       comments {
         id
+        shortId
         text
         CommentAuthor {
           ... on User {
@@ -276,6 +279,7 @@ export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
     ) {
       comments {
         id
+        shortId
         isRootComment
         isFeedbackComment
         CommentAuthor {

@@ -1,13 +1,14 @@
 <script lang="ts" setup>
 import { GetDiscussionDetailDocument as GET_DISCUSSION_DETAIL } from '@/__generated__/operations';
 import { config } from '@/config';
-import { ref, watchEffect, computed } from 'vue';
+import { computed } from 'vue';
 import DiscussionDetailContent from '@/components/discussion/detail/DiscussionDetailContent.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
 import { useModProfileName } from '@/composables/useAuthState';
 import { useRoute, useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
+import { useRouteDiscussionNumber } from '@/composables/useRouteContentIds';
 
 import { buildDetailQueryVariables } from '@/utils/discussionDetailQuery';
 import { buildDiscussionHead } from '@/utils/discussionSeo';
@@ -16,17 +17,8 @@ const modProfileNameVar = useModProfileName();
 
 const route = useRoute();
 
-const updateDiscussionId = () => {
-  if (typeof route.params.discussionId === 'string') {
-    return route.params.discussionId;
-  }
-  return '';
-};
-const discussionId = ref(updateDiscussionId());
-
-watchEffect(() => {
-  discussionId.value = updateDiscussionId();
-});
+// Route segment is `{discussionNumber}-{slug}`; only the number matters.
+const discussionNumber = useRouteDiscussionNumber();
 
 const channelId = computed(() => {
   if (typeof route.params.forumId === 'string') {
@@ -38,7 +30,7 @@ const channelId = computed(() => {
 // Same variables as DiscussionDetailContent so Apollo sends one request.
 const { result: discussionResult } = useQuery(GET_DISCUSSION_DETAIL, () =>
   buildDetailQueryVariables({
-    discussionId: discussionId.value,
+    discussionNumber: discussionNumber.value,
     downloadMode: false,
     modProfileName: modProfileNameVar.value,
     channelUniqueName: channelId.value,
@@ -52,7 +44,11 @@ const metaData = computed(() => {
     return buildDiscussionHead({
       discussions: discussionResult.value?.discussions,
       channelId: channelId.value,
-      discussionId: discussionId.value,
+      discussionNumber: discussionNumber.value,
+      discussionSegment:
+        typeof route.params.discussionId === 'string'
+          ? route.params.discussionId
+          : '',
       serverDisplayName: config.serverDisplayName,
       baseUrl: import.meta.env.VITE_BASE_URL,
     });
@@ -79,11 +75,14 @@ useHead(metaData);
     class="relative mx-auto w-full flex-1 overflow-hidden p-0 focus:outline-none xl:order-last xl:max-w-6xl"
   >
     <div class="flex w-full justify-center space-y-4 overflow-x-hidden">
-      <ErrorBanner v-if="!discussionId" text="Discussion not found" />
+      <ErrorBanner
+        v-if="discussionNumber == null"
+        text="Discussion not found"
+      />
       <DiscussionDetailContent
         v-else
-        :key="discussionId"
-        :discussion-id="discussionId"
+        :key="discussionNumber"
+        :discussion-number="discussionNumber"
         :logged-in-user-mod-name="modProfileNameVar || ''"
       />
     </div>

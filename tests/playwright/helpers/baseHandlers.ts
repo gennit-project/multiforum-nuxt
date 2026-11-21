@@ -149,6 +149,20 @@ export const createBaseHandlers = (
         },
       },
     }),
+    // Edit/feedback/download-tab pages resolve the route's `{number}-{slug}` to
+    // the global discussion id with this lookup.
+    getDiscussionIdByNumber: () => ({
+      data: {
+        discussionChannels: [
+          {
+            id: discussionChannelId,
+            discussionId,
+            discussionNumber: 1,
+            channelUniqueName: channelId,
+          },
+        ],
+      },
+    }),
     getChannelDownloadCount: () => ({
       data: {
         channels: [

@@ -15,6 +15,7 @@ import {
 } from '@/__generated__/operations';
 import { useUsername, useIsAuthenticated } from '@/composables/useAuthState';
 import { isAutoSavedDownloadsCollection } from '@/utils/downloadLibraryCollection';
+import { getCollectionUrl } from '@/utils/contentUrls';
 type Collection =
   GetAllUserCollectionsQuery['users'][number]['Collections'][number];
 
@@ -169,7 +170,12 @@ const sidebarItems = computed<SidebarItem[]>(() => {
     .map<SidebarItem>((collection) => ({
       id: collection.id,
       name: collection.name,
-      route: `/library/${collection.id}`,
+      route: getCollectionUrl({
+        username: collection.ownerUsername || username.value || '',
+        collectionNumber: collection.collectionNumber,
+        name: collection.name,
+        collectionId: collection.id,
+      }),
       meta: `${collection.collectionType.toLowerCase()} · ${collection.itemCount || 0} · ${collection.visibility.toLowerCase()}`,
       collectionType: collection.collectionType,
       filterGroup:
@@ -209,9 +215,7 @@ const activeItemId = computed(() => {
   }
   if (route.path === '/library/my-downloads') return 'my-downloads';
   if (route.path === '/library/uploads') return 'uploaded-files';
-  return typeof route.params.collectionId === 'string'
-    ? route.params.collectionId
-    : '';
+  return '';
 });
 
 const activeItem = computed(

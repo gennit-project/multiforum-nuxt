@@ -3,7 +3,7 @@ import {
   GetUserCommentsDocument,
   GetGeneralNotificationsDocument,
   UpdateEventsDocument,
-  GetEventsSourcef3f666cbeeDocument,
+  GetEventsSource0ffac39832Document,
 } from '@/__generated__/operations';
 import type { CommentView } from '@/types/Comment';
 
@@ -16,7 +16,7 @@ export function checkProfileEventContracts() {
   const notifications = useQuery(GetGeneralNotificationsDocument, {
     username: 'alice',
   });
-  const events = useQuery(GetEventsSourcef3f666cbeeDocument, { limit: 25 });
+  const events = useQuery(GetEventsSource0ffac39832Document, { limit: 25 });
   const mutation = useMutation(UpdateEventsDocument);
   // @ts-expect-error raw route arrays must be narrowed to one username
   summaries.refetch({ username: ['alice'], limit: 25, offset: 0 });

@@ -113,6 +113,8 @@ const permalinkObject = computed(() => {
       commentId: comment.id,
       discussionId:
         comment.GivesFeedbackOnComment?.DiscussionChannel?.discussionId,
+      discussionNumber:
+        comment.GivesFeedbackOnComment?.DiscussionChannel?.discussionNumber,
       GivesFeedbackOnComment: comment.GivesFeedbackOnComment || undefined,
       GivesFeedbackOnDiscussion: comment.GivesFeedbackOnDiscussion || undefined,
       GivesFeedbackOnEvent: comment.GivesFeedbackOnEvent || undefined,
@@ -122,6 +124,7 @@ const permalinkObject = computed(() => {
   // For regular comments, check if it's on a discussion or event
   const discussionChannel = comment.DiscussionChannel;
   const eventId = comment.Event?.id;
+  const eventChannel = comment.Event?.EventChannels?.[0];
   const forumId =
     discussionChannel?.channelUniqueName ||
     comment.Channel?.uniqueName ||
@@ -131,7 +134,9 @@ const permalinkObject = computed(() => {
     // Comment is on a discussion
     return getPermalinkToDiscussionComment({
       forumId,
+      discussionNumber: discussionChannel.discussionNumber,
       discussionId: discussionChannel.discussionId,
+      shortId: comment.shortId,
       commentId: comment.id,
     });
   }
@@ -140,7 +145,10 @@ const permalinkObject = computed(() => {
     // Comment is on an event
     return getPermalinkToEventComment({
       forumId,
+      eventNumber: eventChannel?.eventNumber,
+      eventTitle: comment.Event?.title,
       eventId,
+      shortId: comment.shortId,
       commentId: comment.id,
     });
   }

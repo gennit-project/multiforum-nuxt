@@ -70,6 +70,7 @@ const favorites = {
       FavoriteImages: [
         {
           id: 'image-1',
+          imageNumber: 6,
           url: '/image.jpg',
           alt: 'A bright orange poster',
           caption: 'Poster',
@@ -170,6 +171,14 @@ describe('library index page', () => {
       .findAllComponents(LibraryFavoriteRow)
       .find((row) => row.props('item').id === 'image-1');
     expect(imageRow?.props('item').source.forumUniqueName).toBe('art');
+  });
+
+  it('links a saved image by number under its uploader', async () => {
+    const wrapper = await mountPage();
+    const imageRow = wrapper
+      .findAllComponents(LibraryFavoriteRow)
+      .find((row) => row.props('item').id === 'image-1');
+    expect(imageRow?.props('item').href).toBe('/u/zoe/images/6');
   });
 
   it('shows stable loading skeleton rows before favorites arrive', async () => {

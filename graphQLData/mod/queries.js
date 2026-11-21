@@ -82,6 +82,7 @@ export const GET_MOD = gql`
         limit: 25, offset: 0, sort: { createdAt: DESC }
       ) {
         id
+        shortId
         text
         createdAt
         updatedAt
@@ -101,6 +102,7 @@ export const GET_MOD = gql`
             uniqueName
           }
           discussionId
+          discussionNumber
           channelUniqueName
         }
         Channel {
@@ -114,6 +116,7 @@ export const GET_MOD = gql`
         }
         GivesFeedbackOnComment {
           id
+          shortId
         }
         Issue {
           id
@@ -152,6 +155,7 @@ export const GET_MOD_COMMENTS = gql`
         limit: $limit, offset: $offset, sort: { createdAt: DESC }
       ) {
         id
+        shortId
         text
         createdAt
         updatedAt
@@ -171,6 +175,7 @@ export const GET_MOD_COMMENTS = gql`
             uniqueName
           }
           discussionId
+          discussionNumber
           channelUniqueName
         }
         Channel {
@@ -184,6 +189,7 @@ export const GET_MOD_COMMENTS = gql`
         }
         GivesFeedbackOnComment {
           id
+          shortId
         }
         Issue {
           id

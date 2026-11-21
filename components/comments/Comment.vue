@@ -23,6 +23,7 @@ import ArchivedCommentText from './ArchivedCommentText.vue';
 import { useCommentPermissions } from '@/composables/useCommentPermissions';
 import { useBestAnswerMutations } from '@/composables/useBestAnswerMutations';
 import { useCommentPermalink } from '@/composables/useCommentPermalink';
+import { isPermalinkedComment } from '@/utils/commentPermalink';
 import { useCommentSubscription } from '@/composables/useCommentSubscription';
 import { useCommentStickyMutations } from '@/composables/useCommentStickyMutations';
 import { getCommentMenuItems } from '@/utils/headerPermissionUtils';
@@ -193,6 +194,14 @@ const props = defineProps({
     type: Array as PropType<Pick<Comment, 'id'>[]>,
     default: () => [],
   },
+  // Global id of the discussion this comment belongs to. The route's
+  // discussionId param is a `{number}-{slug}` segment, not an id, so the
+  // comment section passes the loaded discussion's id down; permalinked
+  // comments fall back to their own DiscussionChannel.discussionId.
+  discussionId: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits([
@@ -224,7 +233,6 @@ const emit = defineEmits([
 ]);
 
 const route = useRoute();
-const { discussionId } = route.params;
 
 // Compute forumId from comment data or route
 const forumId = computed(() => {
@@ -253,17 +261,12 @@ const { serverAdminUsernames, serverModProfileNames } =
 const commentIdRef = computed(() => props.commentData.id);
 const originalPosterRef = computed(() => props.originalPoster);
 const answersRef = computed(() => props.answers);
-const discussionIdRef = computed(() => {
-  const discussionIdFromRoute =
-    typeof discussionId === 'string'
-      ? discussionId
-      : Array.isArray(discussionId)
-        ? discussionId[0]
-        : undefined;
-  return (
-    discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId
-  );
-});
+const discussionIdRef = computed(
+  () =>
+    props.discussionId ||
+    props.commentData.DiscussionChannel?.discussionId ||
+    undefined
+);
 
 // Use the best answer mutations composable
 const {
@@ -309,9 +312,17 @@ const copyLink = async () => {
   });
 };
 
+// The route's commentId is the comment shortId.
 const permalinkedCommentId = route.params.commentId;
 const isHighlighted = computed(() => {
-  return props.isPermalinked || permalinkedCommentId === props.commentData.id;
+  return (
+    props.isPermalinked ||
+    isPermalinkedComment({
+      routeCommentId:
+        typeof permalinkedCommentId === 'string' ? permalinkedCommentId : '',
+      comment: props.commentData,
+    })
+  );
 });
 
 const replyCount = computed(() => getCommentReplyCount(props.commentData));
@@ -356,7 +367,7 @@ const commentMenuItems = computed(() => {
     isDiscussionAuthor: isDiscussionAuthor.value,
     isMarkedAsAnswer: isMarkedAsAnswer.value,
     depth: props.depth,
-    discussionId: typeof discussionId === 'string' ? discussionId : undefined,
+    discussionId: discussionIdRef.value,
     userPermissions: userPermissions.value,
     isLoggedIn: !!usernameVar.value,
     enableFeedback: props.enableFeedback,
@@ -403,6 +414,7 @@ const childPassThroughProps = computed(() => ({
   lengthOfCommentInProgress: props.lengthOfCommentInProgress,
   answers: props.answers,
   botUsernames: props.botUsernames,
+  discussionId: props.discussionId,
 }));
 
 function createComment(parentCommentId: string) {
@@ -770,7 +782,15 @@ const label = computed(() =>
               :key="childComment.id"
             >
               <Comment
-                v-if="childComment.id !== permalinkedCommentId"
+                v-if="
+                  !isPermalinkedComment({
+                    routeCommentId:
+                      typeof permalinkedCommentId === 'string'
+                        ? permalinkedCommentId
+                        : '',
+                    comment: childComment,
+                  })
+                "
                 :compact="true"
                 :comment-data="childComment"
                 :depth="props.depth + 1"

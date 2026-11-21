@@ -6,6 +6,7 @@ export const GET_USER_FAVORITE_COMMENTS = gql`
       username
       FavoriteComments(sort: [{ createdAt: DESC }]) {
         id
+        shortId
         text
         createdAt
         updatedAt
@@ -27,6 +28,7 @@ export const GET_USER_FAVORITE_COMMENTS = gql`
         DiscussionChannel {
           id
           discussionId
+          discussionNumber
           channelUniqueName
           Channel {
             uniqueName
@@ -45,6 +47,11 @@ export const GET_USER_FAVORITE_COMMENTS = gql`
         Event {
           id
           title
+          EventChannels {
+            id
+            channelUniqueName
+            eventNumber
+          }
         }
       }
     }
@@ -78,6 +85,7 @@ export const GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS = gql`
         DiscussionChannels {
           id
           channelUniqueName
+          discussionNumber
           archived
           answered
           locked
@@ -136,6 +144,7 @@ export const GET_USER_FAVORITE_DOWNLOADS = gql`
         DiscussionChannels {
           id
           channelUniqueName
+          discussionNumber
           archived
           answered
           locked
@@ -176,6 +185,7 @@ export const GET_USER_FAVORITE_IMAGES = gql`
       username
       FavoriteImages(sort: [{ createdAt: DESC }]) {
         id
+        imageNumber
         url
         alt
         caption

@@ -177,7 +177,7 @@ test('reports a comment with mocked GraphQL', async ({ page, setupMockedPage }) 
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/discussions/1-example-topic`);
 
   // Wait for the comment to be visible
   await expect(page.getByText(COMMENT_TEXT)).toBeVisible();

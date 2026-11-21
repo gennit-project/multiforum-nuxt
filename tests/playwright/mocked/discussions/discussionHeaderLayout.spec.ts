@@ -118,7 +118,7 @@ test('keeps the discussion author avatar aligned with the identity on narrow scr
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
 
   const authorRow = page.getByTestId('discussion-author-row');
   await expect(authorRow).toBeVisible({ timeout: 30000 });

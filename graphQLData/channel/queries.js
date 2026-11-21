@@ -332,6 +332,11 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
       endTime
       isAllDay
       virtualEventUrl
+      EventChannels(where: { channelUniqueName: { eq: $uniqueName } }) {
+        id
+        channelUniqueName
+        eventNumber
+      }
     }
   }
 `;

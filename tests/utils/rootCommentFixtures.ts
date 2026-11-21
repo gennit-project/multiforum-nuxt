@@ -18,6 +18,7 @@ export const makeRootSection = (
   DiscussionChannel: {
     id: `${discussionId}-${channelUniqueName}`,
     discussionId,
+    discussionNumber: 1,
     channelUniqueName,
     weightedVotesCount: 0,
     emoji: null,

@@ -14,11 +14,19 @@ import {
 } from './rootCommentCache';
 const scope = {
   discussionId: 'd1',
+  discussionNumber: 1,
   channelUniqueName: 'cats',
   modName: '',
   sort: 'new',
 };
-const variables = { ...scope, offset: 0, limit: 20 };
+const variables = {
+  discussionNumber: scope.discussionNumber,
+  channelUniqueName: scope.channelUniqueName,
+  modName: scope.modName,
+  sort: scope.sort,
+  offset: 0,
+  limit: 20,
+};
 const makeCache = () => {
   const cache = new InMemoryCache();
   cache.writeQuery({
@@ -36,6 +44,7 @@ const created = () => ({
   DiscussionChannel: {
     id: 'd1-cats',
     discussionId: 'd1',
+    discussionNumber: 1,
     channelUniqueName: 'cats',
   },
 });
@@ -60,7 +69,7 @@ describe('root comment cache isolation', () => {
   );
   it.each([
     { channelUniqueName: 'dogs' },
-    { discussionId: 'd2' },
+    { discussionNumber: 2 },
     { sort: 'top' },
     { modName: 'moderator' },
     { offset: 20 },
@@ -72,7 +81,7 @@ describe('root comment cache isolation', () => {
       variables: vars,
       data: {
         getCommentSection: makeRootSection(
-          vars.discussionId,
+          'd1',
           vars.channelUniqueName
         ),
       },

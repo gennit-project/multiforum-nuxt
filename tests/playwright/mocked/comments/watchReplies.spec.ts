@@ -6,7 +6,10 @@ import {
   createCommentHandlers,
   DEFAULT_COMMENT_CONFIG,
 } from '../../helpers/mockedCommentHandlers';
-import { buildComment } from '../../helpers/graphqlFixtures';
+import {
+  buildComment,
+  buildCommentIdLookupHandlers,
+} from '../../helpers/graphqlFixtures';
 import { expectNoAxeViolations } from '../../helpers/axe';
 
 test('repeated watch and unwatch updates a permalink comment without a reload', async ({
@@ -25,6 +28,7 @@ test('repeated watch and unwatch updates a permalink comment without a reload', 
   await installMockAuth(context, page);
   const diagnostics = await installGraphqlMocks(page, {
     ...createCommentHandlers(state, config),
+    ...buildCommentIdLookupHandlers(state.comments),
     getPermalinkedComment: () => ({
       data: {
         comments: [
@@ -69,7 +73,7 @@ test('repeated watch and unwatch updates a permalink comment without a reload', 
     },
   });
   await page.goto(
-    `/forums/${config.channelId}/discussions/${config.discussionId}/comments/watched-comment`
+    `/forums/${config.channelId}/discussions/1-example-topic-1/comments/short-watched-comment`
   );
   const panel = page.getByTestId('permalinked-comment');
   await expect(

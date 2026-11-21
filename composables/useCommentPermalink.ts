@@ -34,7 +34,8 @@ export function useCommentPermalink(
   const route = useRoute();
   const router = useRouter();
 
-  // Extract route params
+  // Extract route params. `discussionId` / `eventId` carry the short-URL
+  // segment (`{number}-{slug}`), not a global id.
   const discussionId = computed(() => route.params.discussionId as string | undefined);
   const eventId = computed(() => route.params.eventId as string | undefined);
   const issueNumber = computed(() => route.params.issueNumber as string | undefined);
@@ -95,16 +96,21 @@ export function useCommentPermalink(
       if (!channelUniqueName && !forumId.value) {
         return {};
       }
+      const discussionChannel = comment.DiscussionChannel;
+      const eventChannel = comment.GivesFeedbackOnEvent?.EventChannels?.[0];
       return (
         getFeedbackPermalinkObject({
           routeName: route.name as string,
           forumId: channelUniqueName || (forumId.value as string),
           discussionId:
-            comment.GivesFeedbackOnDiscussion?.id ||
             (discussionId.value as string) ||
-            comment.DiscussionChannel?.discussionId,
+            comment.GivesFeedbackOnDiscussion?.id ||
+            discussionChannel?.discussionId,
+          discussionNumber: discussionChannel?.discussionNumber,
           eventId:
-            comment.GivesFeedbackOnEvent?.id || (eventId.value as string),
+            (eventId.value as string) || comment.GivesFeedbackOnEvent?.id,
+          eventNumber: eventChannel?.eventNumber,
+          eventTitle: comment.GivesFeedbackOnEvent?.title,
           commentId: comment.id,
           GivesFeedbackOnComment:
             comment.GivesFeedbackOnComment || undefined,
@@ -119,8 +125,8 @@ export function useCommentPermalink(
     return (
       getCommentPermalinkRoute(comment, {
         fallbackForumId: forumId.value,
-        fallbackDiscussionId: discussionId.value,
-        fallbackEventId: eventId.value,
+        fallbackDiscussionSegment: discussionId.value,
+        fallbackEventSegment: eventId.value,
         fallbackIssueNumber: issueNumber.value,
       }) || {}
     );

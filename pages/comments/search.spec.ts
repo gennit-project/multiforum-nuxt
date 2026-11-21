@@ -180,6 +180,7 @@ describe('comment search page', () => {
 describe('comment search result navigation', () => {
   const discussionComment = {
     id: 'comment-1',
+    shortId: 'a1b2c3d4e5f6',
     text: 'a matching comment',
     createdAt: '2026-01-01T00:00:00.000Z',
     CommentAuthor: {
@@ -191,6 +192,7 @@ describe('comment search result navigation', () => {
     DiscussionChannel: {
       channelUniqueName: 'cats',
       discussionId: 'discussion-1',
+      discussionNumber: 42,
       Discussion: { title: 'Great topic' },
     },
   };
@@ -239,11 +241,23 @@ describe('comment search result navigation', () => {
         name: 'forums-forumId-discussions-discussionId-comments-commentId',
         params: expect.objectContaining({
           forumId: 'cats',
-          discussionId: 'discussion-1',
-          commentId: 'comment-1',
+          discussionId: '42-great-topic',
+          commentId: 'a1b2c3d4e5f6',
         }),
       })
     );
+  });
+
+  it('links the context to the discussion by number and slug', async () => {
+    const wrapper = await mountResults();
+    const contextLink = wrapper
+      .findAllComponents(RouterLinkStub)
+      .find((link) => link.text().includes('Great topic'))!;
+
+    expect(contextLink.props('to')).toEqual({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { forumId: 'cats', discussionId: '42-great-topic' },
+    });
   });
 
   it('does not trigger card navigation when the author link is clicked', async () => {

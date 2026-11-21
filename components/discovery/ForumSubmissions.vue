@@ -3,9 +3,13 @@ import { computed, ref, useId } from 'vue';
 import { useRoute } from 'nuxt/app';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import { MessageSquare } from 'lucide-vue-next';
+import { getDiscussionUrl, getEventUrl } from '@/utils/contentUrls';
 
 type Submission = {
   channelUniqueName: string;
+  /** Per-forum number of the submission, for the `{number}-{slug}` link. */
+  discussionNumber?: number | null;
+  eventNumber?: number | null;
   Channel?: { channelIconURL?: string | null } | null;
   CommentsConnection?: {
     aggregate?: { count?: { nodes?: number | null } | null } | null;
@@ -15,6 +19,8 @@ const props = withDefaults(
   defineProps<{
     submissions: Submission[];
     contentId: string;
+    /** Title of the content, used for the decorative slug in links. */
+    contentTitle?: string;
     kind: 'discussion' | 'event';
     selectedForum?: string;
     preview?: boolean;
@@ -23,6 +29,7 @@ const props = withDefaults(
     mobileLayout?: boolean;
   }>(),
   {
+    contentTitle: '',
     selectedForum: '',
     preview: false,
     compact: false,
@@ -44,8 +51,20 @@ const visible = computed(() => {
   if (selected && !first.includes(selected)) first.splice(3, 1, selected);
   return first;
 });
-const detailLink = (forum: string) =>
-  `/forums/${encodeURIComponent(forum)}/${props.kind === 'discussion' ? 'discussions' : 'events'}/${encodeURIComponent(props.contentId)}`;
+const detailLink = (submission: Submission) =>
+  props.kind === 'discussion'
+    ? getDiscussionUrl({
+        forumId: submission.channelUniqueName,
+        discussionNumber: submission.discussionNumber,
+        title: props.contentTitle,
+        discussionId: props.contentId,
+      })
+    : getEventUrl({
+        forumId: submission.channelUniqueName,
+        eventNumber: submission.eventNumber,
+        title: props.contentTitle,
+        eventId: props.contentId,
+      });
 const previewLink = (forum: string) => ({
   path: route.path,
   query: {
@@ -117,7 +136,7 @@ const label = (submission: Submission) =>
           :to="
             mode === 'desktop'
               ? previewLink(submission.channelUniqueName)
-              : detailLink(submission.channelUniqueName)
+              : detailLink(submission)
           "
           :aria-label="label(submission)"
           :aria-current="

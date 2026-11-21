@@ -5,6 +5,12 @@ import Tag from '@/components/TagComponent.vue';
 import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
 import { splitTagsForList } from '@/utils/tagOverflow';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
+import {
+  getDiscussionRoute,
+  getDiscussionUrl,
+  getDownloadRoute,
+  getDownloadUrl,
+} from '@/utils/contentUrls';
 import type { GetUserDiscussionsQuery } from '@/__generated__/operations';
 import type { NullableSelection } from '@/types/Comment';
 import type { UserContributionActivity } from '@/types/contribution';
@@ -44,11 +50,33 @@ const isDownload = computed(() => 'hasDownload' in props.discussion && !!props.d
 
 // Primary link target for the card title, so it is reachable by keyboard
 // instead of relying on a click handler on the whole <li>.
+type ProfileDiscussionChannel = NonNullable<
+  Discussion['DiscussionChannels']
+>[number];
+
+// The user-contributions variant of this list (UserContributionActivity) does
+// not select discussionNumber (TODO(short-urls): backend does not expose it on
+// DiscussionChannelInfo), so those links fall back to the raw id segment.
+const linkTargetFor = (channel: ProfileDiscussionChannel) => ({
+  forumId: channel?.channelUniqueName || '',
+  discussionNumber:
+    channel && 'discussionNumber' in channel ? channel.discussionNumber : null,
+  title: props.discussion.title,
+  discussionId: props.discussion.id,
+});
+
 const titleLink = computed(() => {
   if (!defaultUniqueName.value || !props.discussion.id) return '';
-  const basePath = isDownload.value ? 'downloads' : 'discussions';
-  return `/forums/${defaultUniqueName.value}/${basePath}/${props.discussion.id}`;
+  const firstChannel = props.discussion.DiscussionChannels?.[0];
+  if (!firstChannel) return '';
+  const target = linkTargetFor(firstChannel);
+  return isDownload.value ? getDownloadUrl(target) : getDiscussionUrl(target);
 });
+
+const channelLink = (channel: ProfileDiscussionChannel) => {
+  const target = linkTargetFor(channel);
+  return isDownload.value ? getDownloadRoute(target) : getDiscussionRoute(target);
+};
 
 const title = computed(() => props.discussion.title || '');
 const relativeTimeText = relativeTime(props.discussion.createdAt || '');
@@ -96,16 +124,7 @@ const channelName = (channel: (typeof channels.value)[number]) => channel.channe
         v-for="(discussionChannel, i) in channels"
         :key="i"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
-        :to="{
-          name: isDownload
-            ? 'forums-forumId-downloads-discussionId'
-            : 'forums-forumId-discussions-discussionId',
-          params: {
-            forumId:
-              channelName(discussionChannel),
-            discussionId: discussion.id,
-          },
-        }"
+        :to="channelLink(discussionChannel)"
       >
         View this {{ isDownload ? 'download' : 'post' }} in
         {{

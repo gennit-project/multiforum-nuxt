@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, defineAsyncComponent } from 'vue';
-import { useRoute, useRouter } from 'nuxt/app';
+import { useRouter } from 'nuxt/app';
 import { useMutation } from '@vue/apollo-composable';
 import type { Reference, StoreObject } from '@apollo/client/core';
 import type { User } from '@/__generated__/graphql';
@@ -15,6 +15,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
+import { getDiscussionFeedbackRoute } from '@/utils/discussionLinks';
 
 const SuperUpvoteModal = defineAsyncComponent(
   () => import('@/components/superUpvote/SuperUpvoteModal.vue')
@@ -52,13 +53,7 @@ const emit = defineEmits([
   'handleClickUndoFeedback',
 ]);
 
-const route = useRoute();
 const router = useRouter();
-const discussionIdInParams = computed(() => {
-  return typeof route.params.discussionId === 'string'
-    ? route.params.discussionId
-    : '';
-});
 
 const discussionChannelId = computed(() => props.discussionChannel.id || '');
 const channelUniqueName = computed(
@@ -246,10 +241,15 @@ function handleClickUndoFeedback() {
 }
 
 function handleClickViewFeedback() {
-  router.push({
-    name: 'forums-forumId-discussions-feedback-discussionId',
-    params: { discussionId: discussionIdInParams.value },
-  });
+  router.push(
+    getDiscussionFeedbackRoute({
+      forumId: channelUniqueName.value,
+      discussionNumber: props.discussionChannel?.discussionNumber,
+      title: props.discussion?.title ?? props.discussionChannel?.Discussion?.title,
+      discussionId:
+        props.discussionChannel?.discussionId ?? props.discussion?.id,
+    })
+  );
 }
 
 function handleBlockedReaction() {

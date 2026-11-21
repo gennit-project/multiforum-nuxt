@@ -15,7 +15,7 @@ type QueryResultShape = {
 };
 
 const h = vi.hoisted(() => ({
-  route: { params: { forumId: 'cats', discussionId: 'd1' } } as RouteShape,
+  route: { params: { forumId: 'cats', discussionId: '42-my-download' } } as RouteShape,
   modName: null as unknown as Ref<string>,
   username: null as unknown as Ref<string>,
   queryResult: null as unknown as Ref<QueryResultShape | undefined>,
@@ -54,7 +54,7 @@ vi.mock('@/graphQLData/discussion/queries', () => ({
 
 const DiscussionDetailContentStub = defineComponent({
   name: 'DiscussionDetailContent',
-  props: ['discussionId', 'loggedInUserModName', 'downloadMode'],
+  props: ['discussionNumber', 'loggedInUserModName', 'downloadMode'],
   template: '<div class="detail" />',
 });
 
@@ -71,7 +71,7 @@ const headValue = () => h.useHead.mock.calls[0]?.[0]?.value;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  h.route = { params: { forumId: 'cats', discussionId: 'd1' } };
+  h.route = { params: { forumId: 'cats', discussionId: '42-my-download' } };
   h.queryResult.value = undefined;
   vi.stubEnv('VITE_BASE_URL', 'https://example.test');
 });
@@ -91,8 +91,8 @@ describe('download detail page wrapper', () => {
     expect(h.queryDocument).toBe(GetDownloadDetailDocument);
   });
 
-  it('shows an error banner when the route discussion id is missing', async () => {
-    h.route = { params: { forumId: 'cats', discussionId: null } };
+  it('shows an error banner when the route has no discussion number', async () => {
+    h.route = { params: { forumId: 'cats', discussionId: 'not-a-number' } };
 
     const wrapper = await mountPage();
 
@@ -132,7 +132,7 @@ describe('download detail page wrapper', () => {
   });
 
   it('omits the channel suffix from not-found metadata without a forum id', async () => {
-    h.route = { params: { discussionId: 'd1' } };
+    h.route = { params: { discussionId: '42-my-download' } };
     await mountPage();
 
     h.queryResult.value = { discussions: [] };
@@ -163,6 +163,10 @@ describe('download detail page wrapper', () => {
         meta: expect.arrayContaining([
           { name: 'description', content: `${'A'.repeat(160)}...` },
           { property: 'og:image', content: 'https://example.test/image.png' },
+          {
+            property: 'og:url',
+            content: 'https://example.test/forums/cats/downloads/42-my-download',
+          },
           { name: 'twitter:card', content: 'summary_large_image' },
         ]),
         script: [

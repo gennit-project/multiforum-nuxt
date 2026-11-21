@@ -9,6 +9,7 @@ import { getDatePieces } from '@/utils';
 import SeriesOccurrenceButtons from '../list/SeriesOccurrenceButtons.vue';
 import AppImage from '@/components/image/AppImage.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
+import { getEventLinkUrl } from '@/utils/eventLinks';
 
 const props = withDefaults(
   defineProps<{
@@ -40,9 +41,7 @@ const openEvent = () => {
   if (window.matchMedia('(min-width: 1024px)').matches) {
     emit('select', { eventId: props.event.id, title: props.event.title });
   } else {
-    router.push(
-      `/forums/${encodeURIComponent(props.event.EventChannels[0]?.channelUniqueName || '')}/events/${encodeURIComponent(props.event.id)}`
-    );
+    router.push(getEventLinkUrl({ event: props.event }));
   }
 };
 const start = computed(() =>
@@ -170,6 +169,7 @@ const multipleDays = computed(
       <ForumSubmissions
         :submissions="event.EventChannels"
         :content-id="event.id"
+        :content-title="event.title"
         kind="event"
         :compact="true"
         :subtle="true"

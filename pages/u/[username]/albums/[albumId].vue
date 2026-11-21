@@ -8,6 +8,8 @@ import AlbumThumbnailGrid from '@/components/album/AlbumThumbnailGrid.vue';
 import LinkIcon from '@/components/icons/LinkIcon.vue';
 import Notification from '@/components/NotificationComponent.vue';
 import { useCopyCurrentUrl } from '@/composables/useCopyCurrentUrl';
+import { useResolvedAlbumId } from '@/composables/useRouteContentIds';
+import { getAlbumUrl, getDiscussionUrl } from '@/utils/contentUrls';
 type Album = GetAlbumDetailsQuery['albums'][number];
 type Image = Album['Images'][number];
 
@@ -28,13 +30,16 @@ const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
 });
 
-const albumId = computed(() => {
-  return typeof route.params.albumId === 'string' ? route.params.albumId : '';
-});
+// The route carries the album's number; resolve it to the global id.
+const {
+  id: albumId,
+  loading: albumIdLoading,
+  notFound: albumIdNotFound,
+} = useResolvedAlbumId();
 
 const {
   result: albumResult,
-  loading: albumLoading,
+  loading: albumDetailsLoading,
   error: albumError,
 } = useQuery(
   GET_ALBUM_DETAILS,
@@ -45,6 +50,10 @@ const {
     enabled: !!albumId.value,
     fetchPolicy: 'network-only',
   })
+);
+
+const albumLoading = computed(
+  () => albumIdLoading.value || albumDetailsLoading.value
 );
 
 const album = computed((): Album | null => {
@@ -95,6 +104,26 @@ const discussion = computed(() => {
   return album.value?.Discussions?.[0] || null;
 });
 
+const discussionLink = computed(() => {
+  const target = discussion.value;
+  const channel = target?.DiscussionChannels?.[0];
+  if (!target || !channel?.channelUniqueName) return '';
+  return getDiscussionUrl({
+    forumId: channel.channelUniqueName,
+    discussionNumber: channel.discussionNumber,
+    title: target.title,
+    discussionId: target.id,
+  });
+});
+
+const ownerAlbumLink = computed(() =>
+  getAlbumUrl({
+    username: owner.value?.username ?? '',
+    albumNumber: album.value?.albumNumber,
+    albumId: album.value?.id,
+  })
+);
+
 // SEO metadata
 useHead({
   title: computed(() => {
@@ -117,7 +146,7 @@ useHead({
 
       <!-- Error state -->
       <div
-        v-else-if="albumError || !album"
+        v-else-if="albumIdNotFound || albumError || !album"
         class="flex h-96 flex-col items-center justify-center text-center"
       >
         <h1 class="mb-4 text-2xl font-bold">Album Not Found</h1>
@@ -142,7 +171,7 @@ useHead({
           This album belongs to {{ owner?.username }}, not {{ username }}.
         </p>
         <NuxtLink
-          :to="`/u/${owner?.username}/albums/${albumId}`"
+          :to="ownerAlbumLink"
           class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
         >
           View on Correct Profile
@@ -192,7 +221,7 @@ useHead({
             Related Discussion
           </h2>
           <NuxtLink
-            :to="`/forums/${discussion.DiscussionChannels?.[0]?.channelUniqueName}/discussions/${discussion.id}`"
+            :to="discussionLink"
             class="font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
           >
             {{ discussion.title }}

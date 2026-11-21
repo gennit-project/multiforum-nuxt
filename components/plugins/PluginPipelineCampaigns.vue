@@ -4,6 +4,7 @@ import { useApolloClient, useMutation, useQuery } from '@vue/apollo-composable';
 import type { EventPipeline } from '@/utils/pipelineSchema';
 import { GetPluginPipelineCampaignsDocument as GET_PLUGIN_PIPELINE_CAMPAIGNS, GetPluginPipelineCampaignFailuresDocument as GET_PLUGIN_PIPELINE_CAMPAIGN_FAILURES, PreviewPluginPipelineCampaignDocument as PREVIEW_PLUGIN_PIPELINE_CAMPAIGN, CreatePluginPipelineCampaignDocument as CREATE_PLUGIN_PIPELINE_CAMPAIGN, PausePluginPipelineCampaignDocument as PAUSE_PLUGIN_PIPELINE_CAMPAIGN, ResumePluginPipelineCampaignDocument as RESUME_PLUGIN_PIPELINE_CAMPAIGN  } from '@/__generated__/operations';
 
+import { getDownloadTabUrl } from '@/utils/discussionLinks';
 import type { PreviewPluginPipelineCampaignQuery, GetPluginPipelineCampaignsQuery, GetPluginPipelineCampaignFailuresQuery } from '@/__generated__/operations';
 type CampaignPreview = PreviewPluginPipelineCampaignQuery['previewPluginPipelineCampaign'];
 type Campaign = GetPluginPipelineCampaignsQuery['getPluginPipelineCampaigns'][number];
@@ -111,10 +112,17 @@ const loadFailures = async (campaignId: string) => {
   failures.value[campaignId] = response.data.getPluginPipelineCampaignFailures;
 };
 
+// TODO(short-urls): backend does not expose discussionNumber on
+// PluginPipelineCampaignFailure, so this link falls back to the raw id segment.
 const failureUrl = (failure: CampaignFailure) =>
-  `/forums/${encodeURIComponent(failure.channelId)}/downloads/${encodeURIComponent(
-    failure.discussionId
-  )}/pipelines?attempt=${encodeURIComponent(
+  `${getDownloadTabUrl({
+    target: {
+      forumId: failure.channelId,
+      discussionNumber: null,
+      discussionId: failure.discussionId,
+    },
+    tab: 'pipelines',
+  })}?attempt=${encodeURIComponent(
     failure.pipelineId
   )}#attempt-${encodeURIComponent(failure.pipelineId)}`;
 </script>

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildDetailQueryVariables } from './discussionDetailQuery';
 
 const base = {
-  discussionId: 'd1',
+  discussionNumber: 42,
   channelUniqueName: 'cats',
 };
 
@@ -18,7 +18,7 @@ describe('buildDetailQueryVariables', () => {
     expect(
       buildDetailQueryVariables({ ...base, downloadMode: false, ...extra })
     ).toEqual({
-      id: 'd1',
+      discussionNumber: 42,
       loggedInModName: null,
       channelUniqueName: 'cats',
     });
@@ -32,7 +32,7 @@ describe('buildDetailQueryVariables', () => {
         modProfileName: 'ModAlice',
       })
     ).toEqual({
-      id: 'd1',
+      discussionNumber: 42,
       loggedInModName: 'ModAlice',
       channelUniqueName: 'cats',
     });
@@ -47,7 +47,7 @@ describe('buildDetailQueryVariables', () => {
         username: 'alice',
       })
     ).toEqual({
-      id: 'd1',
+      discussionNumber: 42,
       loggedInModName: null,
       loggedInUsername: 'alice',
       channelUniqueName: 'cats',

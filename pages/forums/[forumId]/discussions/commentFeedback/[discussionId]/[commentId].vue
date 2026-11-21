@@ -81,7 +81,8 @@ const updateContextLink = () => {
         name: commentPermalinkRoute,
         params: {
           discussionId: route.params.discussionId,
-          commentId: originalComment.value.id || '',
+          // The permalink route's commentId is the comment shortId.
+          commentId: originalComment.value.shortId || originalComment.value.id || '',
         },
       };
     }
@@ -104,7 +105,8 @@ const updateContextLink = () => {
         params: {
           forumId: route.params.forumId,
           discussionId: route.params.discussionId,
-          commentId: originalComment.value.id || '',
+          // The permalink route's commentId is the comment shortId.
+          commentId: originalComment.value.shortId || originalComment.value.id || '',
         },
       };
     }

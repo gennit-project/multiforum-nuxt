@@ -15,10 +15,22 @@ const mockRoute = reactive<{
 const mockResult = ref<GetPermalinkedCommentQuery>();
 const mockError = ref<{ message: string } | null>(null);
 const mockLoading = ref(false);
+// The route's commentId is a shortId, resolved to the global id by a lookup.
+const mockResolvedId = ref('c1');
+const mockResolving = ref(false);
+const mockNotFound = ref(false);
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: (...args: unknown[]) => mockQuery(...args),
 }));
+vi.mock('@/composables/useRouteContentIds', () => ({
+  useResolvedCommentId: () => ({
+    id: mockResolvedId,
+    loading: mockResolving,
+    notFound: mockNotFound,
+  }),
+}));
 vi.mock('nuxt/app', () => ({ useRoute: () => mockRoute }));
+const SHORT_ID = 'replyshort01';
 const mountComment = () =>
   mount(PermalinkedComment, {
     slots: {
@@ -43,7 +55,14 @@ beforeEach(() => {
   mockResult.value = { comments: [makePermalinkedComment()] };
   mockError.value = null;
   mockLoading.value = false;
-  mockRoute.params = { commentId: 'c1', forumId: 'cats', discussionId: 'd1' };
+  mockResolvedId.value = 'c1';
+  mockResolving.value = false;
+  mockNotFound.value = false;
+  mockRoute.params = {
+    commentId: SHORT_ID,
+    forumId: 'cats',
+    discussionId: '1-trail-conditions',
+  };
   mockQuery.mockReturnValue({
     result: mockResult,
     error: mockError,
@@ -53,7 +72,7 @@ beforeEach(() => {
 describe('permalink query contract', () => {
   it('uses one generated document with reactive scalar variables', async () => {
     mountComment();
-    mockRoute.params.commentId = 'c2';
+    mockResolvedId.value = 'c2';
     await nextTick();
     const [document, variables, options] = mockQuery.mock.calls[0]!;
     expect({
@@ -72,6 +91,7 @@ describe('permalink query contract', () => {
     'disables invalid ID %j without displaying cached data',
     (id) => {
       mockRoute.params.commentId = id;
+      mockResolvedId.value = '';
       const wrapper = mountComment();
       expect({
         enabled: mockQuery.mock.calls[0]![2]().enabled,
@@ -86,6 +106,38 @@ describe('permalink query contract', () => {
       });
     }
   );
+});
+describe('shortId resolution', () => {
+  it('queries the resolved global id, not the route shortId', () => {
+    mockResolvedId.value = 'global-1';
+    mountComment();
+    expect(mockQuery.mock.calls[0]![1]()).toEqual({ id: 'global-1' });
+  });
+  it('shows loading while the shortId lookup is in flight', () => {
+    mockResolvedId.value = '';
+    mockResolving.value = true;
+    expect(mountComment().find('[role="status"]').text()).toBe('Loading...');
+  });
+  it('does not query anything until the lookup resolves', () => {
+    mockResolvedId.value = '';
+    mockResolving.value = true;
+    mountComment();
+    expect(mockQuery.mock.calls[0]![2]().enabled).toBe(false);
+  });
+  it('tries the route param as a raw id when the lookup finds nothing', () => {
+    mockResolvedId.value = '';
+    mockNotFound.value = true;
+    mockRoute.params.commentId = 'c1';
+    mountComment();
+    expect(mockQuery.mock.calls[0]![1]()).toEqual({ id: 'c1' });
+  });
+  it('renders the comment whose shortId matches the route', () => {
+    expect(mountComment().find('.slot').text()).toBe('A comment');
+  });
+  it('does not render a comment whose shortId differs from the route', () => {
+    mockRoute.params.commentId = 'someothershort';
+    expect(mountComment().find('.slot').exists()).toBe(false);
+  });
 });
 describe('permalink states and navigation', () => {
   it('shows loading instead of stale content', () => {
@@ -126,10 +178,14 @@ describe('permalink states and navigation', () => {
   });
   it('hides previous comment and context immediately on ID navigation', async () => {
     mockResult.value = {
-      comments: [makePermalinkedComment({ ParentComment: { id: 'p1' } })],
+      comments: [
+        makePermalinkedComment({
+          ParentComment: { id: 'p1', shortId: 'p1short' },
+        }),
+      ],
     };
     const wrapper = mountComment();
-    mockRoute.params.commentId = 'c2';
+    mockRoute.params.commentId = 'c2short';
     await nextTick();
     expect({
       content: wrapper.find('.slot').exists(),
@@ -138,9 +194,16 @@ describe('permalink states and navigation', () => {
   });
   it('renders the new ID after its result arrives', async () => {
     const wrapper = mountComment();
-    mockRoute.params.commentId = 'c2';
+    mockRoute.params.commentId = 'c2short';
+    mockResolvedId.value = 'c2';
     mockResult.value = {
-      comments: [makePermalinkedComment({ id: 'c2', text: 'New comment' })],
+      comments: [
+        makePermalinkedComment({
+          id: 'c2',
+          shortId: 'c2short',
+          text: 'New comment',
+        }),
+      ],
     };
     await nextTick();
     expect(wrapper.find('.slot').text()).toBe('New comment');
@@ -149,18 +212,26 @@ describe('permalink states and navigation', () => {
     'builds the exact %s context link',
     (kind) => {
       mockRoute.params = {
-        commentId: 'c1',
+        commentId: SHORT_ID,
         forumId: 'cats',
-        [`${kind}Id`]: 'context1',
+        [`${kind}Id`]: '7-context-title',
       };
       mockResult.value = {
-        comments: [makePermalinkedComment({ ParentComment: { id: 'p1' } })],
+        comments: [
+          makePermalinkedComment({
+            ParentComment: { id: 'p1', shortId: 'p1short' },
+          }),
+        ],
       };
       expect(
         mountComment().findComponent({ name: 'NuxtLink' }).props('to')
       ).toEqual({
         name: `forums-forumId-${kind}s-${kind}Id-comments-commentId`,
-        params: { forumId: 'cats', [`${kind}Id`]: 'context1', commentId: 'p1' },
+        params: {
+          forumId: 'cats',
+          [`${kind}Id`]: '7-context-title',
+          commentId: 'p1short',
+        },
       });
     }
   );
@@ -169,9 +240,25 @@ describe('permalink states and navigation', () => {
     (field) => {
       mockRoute.params[field] = ['invalid'];
       mockResult.value = {
-        comments: [makePermalinkedComment({ ParentComment: { id: 'p1' } })],
+        comments: [
+          makePermalinkedComment({
+            ParentComment: { id: 'p1', shortId: 'p1short' },
+          }),
+        ],
       };
       expect(mountComment().find('a').exists()).toBe(false);
     }
   );
+  it('falls back to the raw parent id when the parent has no shortId', () => {
+    mockResult.value = {
+      comments: [
+        makePermalinkedComment({
+          ParentComment: { id: 'p1', shortId: null },
+        }),
+      ],
+    };
+    expect(
+      mountComment().findComponent({ name: 'NuxtLink' }).props('to')
+    ).toMatchObject({ params: { commentId: 'p1' } });
+  });
 });

@@ -7,15 +7,23 @@ import ModelPreviewTile from '@/components/image/ModelPreviewTile.vue';
 import AddToImageFavorites from '@/components/favorites/AddToImageFavorites.vue';
 import { is3DModelFile } from '@/utils/fileTypeUtils';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
+import { getImageUrl } from '@/utils/contentUrls';
 type SelectedImage =
   GetUserFavoriteImagesQuery['users'][number]['FavoriteImages'][number];
 type Image = Pick<SelectedImage, 'id'> &
   Partial<
     Pick<
       SelectedImage,
-      'url' | 'alt' | 'caption' | 'hasSensitiveContent' | 'hasSpoiler'
+      | 'imageNumber'
+      | 'url'
+      | 'alt'
+      | 'caption'
+      | 'hasSensitiveContent'
+      | 'hasSpoiler'
     >
-  >;
+  > & {
+    Uploader?: Pick<NonNullable<SelectedImage['Uploader']>, 'username'> | null;
+  };
 
 const props = defineProps({
   allowAddToList: {
@@ -45,6 +53,16 @@ const getImageAlt = (image: Image) => {
   return image.alt || image.caption || 'Image';
 };
 
+// Image numbers are scoped to the uploader, so prefer the uploader's username
+// over the profile being viewed.
+const imageLink = computed(() =>
+  getImageUrl({
+    username: props.image.Uploader?.username || props.username,
+    imageNumber: props.image.imageNumber,
+    imageId: props.image.id,
+  })
+);
+
 const imageUrl = computed(
   () =>
     getPreferredImageUrl({
@@ -58,7 +76,7 @@ const imageUrl = computed(
 <template>
   <div class="group relative aspect-square overflow-hidden rounded">
     <NuxtLink
-      :to="`/u/${props.username}/images/${props.image.id}`"
+      :to="imageLink"
       class="block h-full w-full"
     >
       <!-- 3D models get a static tile; the viewer loads on the image page -->

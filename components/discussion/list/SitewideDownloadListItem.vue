@@ -12,6 +12,7 @@ import DownloadQuarantineBadge from '@/components/download/DownloadQuarantineBad
 import AppImage from '@/components/image/AppImage.vue';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
 import { relativeTime } from '@/utils';
+import { getDownloadRoute, getDownloadUrl } from '@/utils/contentUrls';
 import type { DownloadListPresentation as Discussion } from '@/types/DiscussionList';
 type DiscussionChannel = Discussion['DiscussionChannels'][number];
 
@@ -65,11 +66,12 @@ const defaultLink = computed(() => {
     return {};
   }
   return {
-    name: 'forums-forumId-downloads-discussionId',
-    params: {
+    ...getDownloadRoute({
       forumId: primaryChannel.value.channelUniqueName,
+      discussionNumber: primaryChannel.value.discussionNumber,
+      title: props.discussion.title,
       discussionId: props.discussion.id,
-    },
+    }),
     query: filteredQuery.value,
   };
 });
@@ -106,7 +108,12 @@ const discussionDetailOptions = computed(() => {
     const comments = dc.CommentsConnection?.aggregate?.count?.nodes || 0;
     return {
       label: `${comments} ${comments === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
-      value: `/forums/${dc.channelUniqueName}/downloads/${props.discussion.id}`,
+      value: getDownloadUrl({
+        forumId: dc.channelUniqueName,
+        discussionNumber: dc.discussionNumber,
+        title: props.discussion.title,
+        discussionId: props.discussion.id,
+      }),
       event: '',
     };
   });

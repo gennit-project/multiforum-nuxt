@@ -133,7 +133,7 @@ beforeEach(() => {
   h.username = ref('alice');
   h.ageGated = ref(false);
   h.route = {
-    params: { forumId: 'cats', discussionId: 'd1' },
+    params: { forumId: 'cats', discussionId: '42-my-discussion' },
     name: 'forums-forumId-discussions-discussionId',
   };
 });
@@ -255,7 +255,7 @@ describe('DiscussionTitleEditForm author actions', () => {
 
   it('shows the New Upload link on a download page', () => {
     h.route = {
-      params: { forumId: 'cats', discussionId: 'd1' },
+      params: { forumId: 'cats', discussionId: '42-my-discussion' },
       name: 'forums-forumId-downloads-discussionId',
     };
     const wrapper = mountForm();

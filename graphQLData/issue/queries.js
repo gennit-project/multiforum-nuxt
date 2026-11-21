@@ -78,6 +78,7 @@ export const ISSUE_FIELDS = gql`
         }
         Comment {
           id
+          shortId
           text
           emoji
           weightedVotesCount
@@ -106,6 +107,7 @@ export const ISSUE_FIELDS = gql`
           }
           ParentComment {
             id
+            shortId
           }
           editReason
           PastVersions(sort: [{ createdAt: DESC }]) {
@@ -193,6 +195,7 @@ export const GET_ISSUE_ACTIVITY = gql`
           }
           Comment {
             id
+            shortId
             text
             emoji
             weightedVotesCount
@@ -221,6 +224,7 @@ export const GET_ISSUE_ACTIVITY = gql`
             }
             ParentComment {
               id
+              shortId
             }
             editReason
             PastVersions(sort: [{ createdAt: DESC }]) {

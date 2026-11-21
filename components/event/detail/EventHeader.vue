@@ -31,6 +31,11 @@ import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { getAuthorBadges } from '@/utils/roleBadges';
 import { useModerationOutcomeUI } from '@/composables/useModerationOutcomeUI';
 import { useResolvedModPermissions } from '@/composables/useResolvedModPermissions';
+import {
+  getEventEditUrl,
+  getEventFeedbackRoute,
+  getEventLinkRoute,
+} from '@/utils/eventLinks';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -99,12 +104,9 @@ const {
   dismissArchivedAndSuspendedNotification,
 } = useModerationOutcomeUI();
 
-const eventId = computed(() => {
-  return (
-    props.eventData?.id ||
-    (typeof route.params.eventId === 'string' ? route.params.eventId : '')
-  );
-});
+// The global event id comes from the loaded event; the route param only
+// carries the short `{eventNumber}-{slug}` segment.
+const eventId = computed(() => props.eventData?.id || '');
 
 const channelId = computed(() => {
   if (typeof route.params.forumId === 'string') {
@@ -209,13 +211,7 @@ const feedbackEnabled = computed(() => {
 
 const permalinkObject = computed(() => {
   if (!eventId.value) return {};
-  return {
-    name: 'forums-forumId-events-eventId',
-    params: {
-      eventId: eventId.value,
-      forumId: channelId.value,
-    },
-  };
+  return getEventLinkRoute({ event: props.eventData, forumId: channelId.value });
 });
 
 // Cancel/delete lifecycle (standalone event vs event-series scoping) lives in a
@@ -342,13 +338,9 @@ function handleSubmitFeedback() {
 }
 
 function handleViewFeedback() {
-  router.push({
-    name: 'forums-forumId-events-feedback-eventId',
-    params: {
-      eventId: eventId.value,
-      forumId: channelId.value,
-    },
-  });
+  router.push(
+    getEventFeedbackRoute({ event: props.eventData, forumId: channelId.value })
+  );
 }
 
 function handleFeedbackInput(event: string) {
@@ -509,7 +501,9 @@ function openFeedbackFormModal() {
           :aria-label="'Event actions'"
           @copy-link="copyLink"
           @handle-edit="
-            router.push(`/forums/${channelId}/events/edit/${eventId}`)
+            router.push(
+              getEventEditUrl({ event: eventData, forumId: channelId })
+            )
           "
           @handle-delete="handleDeleteClick"
           @handle-cancel="handleCancelClick"

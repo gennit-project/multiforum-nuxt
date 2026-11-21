@@ -68,4 +68,50 @@ describe('buildFeedbackContextLink', () => {
       })
     ).toBe('');
   });
+
+  it('passes the short-URL route segment through to the discussion link', () => {
+    expect(
+      buildFeedbackContextLink({
+        routeName: DISCUSSION_ROUTE,
+        discussionId: '42-trail-conditions',
+        forumId: 'cats',
+        hasDiscussion: true,
+      })
+    ).toEqual({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { discussionId: '42-trail-conditions', forumId: 'cats' },
+    });
+  });
+
+  it('rebuilds the discussion segment from the number and title when known', () => {
+    expect(
+      buildFeedbackContextLink({
+        routeName: DISCUSSION_ROUTE,
+        discussionId: 'ignored',
+        discussionNumber: 42,
+        discussionTitle: 'Trail Conditions',
+        forumId: 'cats',
+        hasDiscussion: true,
+      })
+    ).toEqual({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { discussionId: '42-trail-conditions', forumId: 'cats' },
+    });
+  });
+
+  it('uses the discussion number for the feedback permalink route too', () => {
+    expect(
+      buildFeedbackContextLink({
+        routeName: PERMALINK_ROUTE,
+        discussionId: 'ignored',
+        discussionNumber: 42,
+        forumId: 'cats',
+        hasDiscussion: true,
+        contextFeedbackId: 'fb9',
+      })
+    ).toEqual({
+      name: PERMALINK_ROUTE,
+      params: { discussionId: '42', forumId: 'cats', feedbackId: 'fb9' },
+    });
+  });
 });
