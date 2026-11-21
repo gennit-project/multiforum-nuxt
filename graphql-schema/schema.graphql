@@ -22,7 +22,18 @@ type Query {
   Return the bounded data needed for the first discussion/download detail
   render, scoped to the channel in the route.
   """
-  getDiscussionDetail(discussionId: ID!, channelUniqueName: String!): [Discussion!]!
+  getDiscussionDetail(
+    """
+    Global discussion id. Supply this or discussionNumber (the per-forum short URL id).
+    """
+    discussionId: ID
+
+    """
+    Per-forum short URL number, resolved to a discussion within channelUniqueName.
+    """
+    discussionNumber: Int
+    channelUniqueName: String!
+  ): [Discussion!]!
   getDiscussionDetailAnswers(discussionId: ID!, channelUniqueName: String!, after: String, limit: Int): DiscussionAnswerPage!
   getDiscussionDetailFiles(discussionId: ID!, channelUniqueName: String!, after: String, limit: Int): DiscussionFilePage!
   getDiscussionDetailImages(discussionId: ID!, channelUniqueName: String!, after: String, limit: Int): DiscussionImagePage!
@@ -31,8 +42,58 @@ type Query {
   getChannelDiscussionFlairConfig(channelUniqueName: String!, includeArchived: Boolean = false): ChannelDiscussionFlairConfig!
   getSiteWideIssueList(searchInput: String, selectedChannels: [String], startDate: String, endDate: String, showOnlyServerRuleViolations: Boolean, isOpen: Boolean!, filterCreatedByMe: Boolean, filterIAmOP: Boolean, filterIReported: Boolean, options: IssueListOptions): SiteWideIssueListFormat
   getSiteWideWikiList(searchInput: String, selectedChannels: [String], options: WikiListOptions): SiteWideWikiListFormat
-  getCommentSection(channelUniqueName: String!, discussionId: ID!, modName: String, offset: Int, limit: Int, sort: String): CommentSectionFormat
+  getCommentSection(
+    channelUniqueName: String!
+
+    """
+    Global discussion id. Supply this or discussionNumber (the per-forum short URL id).
+    """
+    discussionId: ID
+
+    """
+    Per-forum short URL number, resolved to a discussion within channelUniqueName.
+    """
+    discussionNumber: Int
+    modName: String
+    offset: Int
+    limit: Int
+    sort: String
+  ): CommentSectionFormat
   getEventComments(eventId: ID!, offset: Int, limit: Int, sort: SortType): EventCommentsFormat
+
+  """
+  Translate a per-forum event number (the short URL id) into the global Event
+  id, for routes like /forums/cats/events/7-saturday-cleanup. Returns null when
+  no event carries that number in the channel.
+  """
+  getEventIdByNumber(channelUniqueName: String!, eventNumber: Int!): ID
+
+  """
+  Translate a comment shortId (the public URL handle) into the global Comment
+  id, for permalinks like /forums/cats/discussions/42-.../comments/4f3a9b2e1c7d.
+  Returns null when no comment carries that shortId.
+  """
+  getCommentIdByShortId(shortId: String!): ID
+
+  """
+  Translate a per-user image number (the short URL id) into the global Image
+  id, for routes like /u/alice/images/12. Returns null when no image carries
+  that number for the user.
+  """
+  getImageIdByNumber(username: String!, imageNumber: Int!): ID
+
+  """
+  Translate a per-user album number (the short URL id) into the global Album
+  id, for routes like /u/alice/albums/3. Null when none matches for the user.
+  """
+  getAlbumIdByNumber(username: String!, albumNumber: Int!): ID
+
+  """
+  Translate a per-user collection number (the short URL id) into the global
+  Collection id, for routes like /u/alice/collections/5-nature. Null when none
+  matches for the user.
+  """
+  getCollectionIdByNumber(username: String!, collectionNumber: Int!): ID
   getCommentReplies(commentId: ID!, modName: String, offset: Int, limit: Int, sort: SortType): CommentRepliesFormat
 
   """
@@ -745,6 +806,8 @@ type AgePolicy {
 
 type Album {
   id: ID!
+  ownerUsername: String
+  albumNumber: Int
   imageOrder: [ID!]
   detailImagesPageInfo: DetailCollectionPageInfo!
   Owner: User
@@ -757,6 +820,12 @@ type Album {
 
 type AlbumAggregate {
   count: Count!
+  node: AlbumAggregateNode!
+}
+
+type AlbumAggregateNode {
+  ownerUsername: StringAggregateSelection!
+  albumNumber: IntAggregateSelection!
 }
 
 type AlbumDiscussionDiscussionsAggregateSelection {
@@ -809,6 +878,7 @@ type AlbumImageImagesNodeAggregateSelection {
   storageUrl: StringAggregateSelection!
   uploadedAt: DateTimeAggregateSelection!
   uploadedByUsername: StringAggregateSelection!
+  imageNumber: IntAggregateSelection!
   uploadedByIp: StringAggregateSelection!
   alt: StringAggregateSelection!
   caption: StringAggregateSelection!
@@ -1037,6 +1107,8 @@ type ChannelCollectionInCollectionsAggregateSelection {
 
 type ChannelCollectionInCollectionsNodeAggregateSelection {
   name: StringAggregateSelection!
+  ownerUsername: StringAggregateSelection!
+  collectionNumber: IntAggregateSelection!
   description: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
@@ -1048,6 +1120,7 @@ type ChannelCommentCommentsAggregateSelection {
 }
 
 type ChannelCommentCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -1100,6 +1173,7 @@ type ChannelDiscussionChannelDiscussionChannelsAggregateSelection {
 
 type ChannelDiscussionChannelDiscussionChannelsNodeAggregateSelection {
   channelUniqueName: StringAggregateSelection!
+  discussionNumber: IntAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   weightedVotesCount: FloatAggregateSelection!
   botMentions: StringAggregateSelection!
@@ -1112,6 +1186,7 @@ type ChannelDiscussionChannelPinnedDiscussionChannelsAggregateSelection {
 
 type ChannelDiscussionChannelPinnedDiscussionChannelsNodeAggregateSelection {
   channelUniqueName: StringAggregateSelection!
+  discussionNumber: IntAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   weightedVotesCount: FloatAggregateSelection!
   botMentions: StringAggregateSelection!
@@ -1205,6 +1280,7 @@ type ChannelEventChannelEventChannelsAggregateSelection {
 
 type ChannelEventChannelEventChannelsNodeAggregateSelection {
   channelUniqueName: StringAggregateSelection!
+  eventNumber: IntAggregateSelection!
   createdAt: DateTimeAggregateSelection!
 }
 
@@ -1806,6 +1882,8 @@ type ChannelWikiPageWikiPagesNodeAggregateSelection {
 type Collection {
   id: ID!
   name: String!
+  ownerUsername: String
+  collectionNumber: Int
   description: String
   visibility: CollectionVisibility!
   collectionType: CollectionType!
@@ -1837,6 +1915,8 @@ type CollectionAggregate {
 
 type CollectionAggregateNode {
   name: StringAggregateSelection!
+  ownerUsername: StringAggregateSelection!
+  collectionNumber: IntAggregateSelection!
   description: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
@@ -1883,6 +1963,7 @@ type CollectionCommentCommentsAggregateSelection {
 }
 
 type CollectionCommentCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -2005,6 +2086,7 @@ type CollectionImageImagesNodeAggregateSelection {
   storageUrl: StringAggregateSelection!
   uploadedAt: DateTimeAggregateSelection!
   uploadedByUsername: StringAggregateSelection!
+  imageNumber: IntAggregateSelection!
   uploadedByIp: StringAggregateSelection!
   alt: StringAggregateSelection!
   caption: StringAggregateSelection!
@@ -2050,6 +2132,7 @@ type CollectionSharedInDiscussionsRelationship {
 
 type Comment {
   id: ID!
+  shortId: String
   text: String
   editReason: String
   isRootComment: Boolean!
@@ -2112,6 +2195,7 @@ type CommentAggregate {
 }
 
 type CommentAggregateNode {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -2157,6 +2241,8 @@ type CommentCollectionInCollectionsAggregateSelection {
 
 type CommentCollectionInCollectionsNodeAggregateSelection {
   name: StringAggregateSelection!
+  ownerUsername: StringAggregateSelection!
+  collectionNumber: IntAggregateSelection!
   description: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
@@ -2179,6 +2265,7 @@ type CommentCommentChildCommentsAggregateSelection {
 }
 
 type CommentCommentChildCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -2196,6 +2283,7 @@ type CommentCommentFeedbackCommentsAggregateSelection {
 }
 
 type CommentCommentFeedbackCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -3007,6 +3095,7 @@ type DiscussionChannel {
   locked: Boolean
   discussionId: ID!
   channelUniqueName: String!
+  discussionNumber: Int
   createdAt: DateTime!
   weightedVotesCount: Float
   emoji: JSON
@@ -3045,6 +3134,7 @@ type DiscussionChannelAggregate {
 
 type DiscussionChannelAggregateNode {
   channelUniqueName: StringAggregateSelection!
+  discussionNumber: IntAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   weightedVotesCount: FloatAggregateSelection!
   botMentions: StringAggregateSelection!
@@ -3079,6 +3169,7 @@ type DiscussionChannelCommentAnswersAggregateSelection {
 }
 
 type DiscussionChannelCommentAnswersNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -3096,6 +3187,7 @@ type DiscussionChannelCommentCommentsAggregateSelection {
 }
 
 type DiscussionChannelCommentCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -3408,6 +3500,8 @@ type DiscussionCollectionInCollectionsAggregateSelection {
 
 type DiscussionCollectionInCollectionsNodeAggregateSelection {
   name: StringAggregateSelection!
+  ownerUsername: StringAggregateSelection!
+  collectionNumber: IntAggregateSelection!
   description: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
@@ -3419,6 +3513,7 @@ type DiscussionCommentFeedbackCommentsAggregateSelection {
 }
 
 type DiscussionCommentFeedbackCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -3448,6 +3543,7 @@ type DiscussionDiscussionChannelDiscussionChannelsAggregateSelection {
 
 type DiscussionDiscussionChannelDiscussionChannelsNodeAggregateSelection {
   channelUniqueName: StringAggregateSelection!
+  discussionNumber: IntAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   weightedVotesCount: FloatAggregateSelection!
   botMentions: StringAggregateSelection!
@@ -3573,6 +3669,7 @@ type DiscussionFlairDiscussionChannelDiscussionChannelsAggregateSelection {
 
 type DiscussionFlairDiscussionChannelDiscussionChannelsNodeAggregateSelection {
   channelUniqueName: StringAggregateSelection!
+  discussionNumber: IntAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   weightedVotesCount: FloatAggregateSelection!
   botMentions: StringAggregateSelection!
@@ -4112,6 +4209,7 @@ type EventChannel {
   locked: Boolean
   eventId: ID!
   channelUniqueName: String!
+  eventNumber: Int
   createdAt: DateTime!
   archived: Boolean
   Event: Event
@@ -4131,6 +4229,7 @@ type EventChannelAggregate {
 
 type EventChannelAggregateNode {
   channelUniqueName: StringAggregateSelection!
+  eventNumber: IntAggregateSelection!
   createdAt: DateTimeAggregateSelection!
 }
 
@@ -4151,6 +4250,7 @@ type EventChannelCommentCommentsAggregateSelection {
 }
 
 type EventChannelCommentCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -4248,6 +4348,7 @@ type EventCommentCommentsAggregateSelection {
 }
 
 type EventCommentCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -4265,6 +4366,7 @@ type EventCommentFeedbackCommentsAggregateSelection {
 }
 
 type EventCommentFeedbackCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -4316,6 +4418,7 @@ type EventEventChannelEventChannelsAggregateSelection {
 
 type EventEventChannelEventChannelsNodeAggregateSelection {
   channelUniqueName: StringAggregateSelection!
+  eventNumber: IntAggregateSelection!
   createdAt: DateTimeAggregateSelection!
 }
 
@@ -4521,6 +4624,7 @@ type EventSeriesEventChannelEventChannelsAggregateSelection {
 
 type EventSeriesEventChannelEventChannelsNodeAggregateSelection {
   channelUniqueName: StringAggregateSelection!
+  eventNumber: IntAggregateSelection!
   createdAt: DateTimeAggregateSelection!
 }
 
@@ -5002,6 +5106,7 @@ type Image {
   storageUrl: String
   uploadedAt: DateTime
   uploadedByUsername: String
+  imageNumber: Int
   uploadedByIp: String
   alt: String
   caption: String
@@ -5052,6 +5157,7 @@ type ImageAggregateNode {
   storageUrl: StringAggregateSelection!
   uploadedAt: DateTimeAggregateSelection!
   uploadedByUsername: StringAggregateSelection!
+  imageNumber: IntAggregateSelection!
   uploadedByIp: StringAggregateSelection!
   alt: StringAggregateSelection!
   caption: StringAggregateSelection!
@@ -5066,6 +5172,12 @@ type ImageAggregateNode {
 
 type ImageAlbumAlbumsAggregateSelection {
   count: CountConnection!
+  node: ImageAlbumAlbumsNodeAggregateSelection
+}
+
+type ImageAlbumAlbumsNodeAggregateSelection {
+  ownerUsername: StringAggregateSelection!
+  albumNumber: IntAggregateSelection!
 }
 
 type ImageAlbumsConnection {
@@ -5094,6 +5206,8 @@ type ImageCollectionInCollectionsAggregateSelection {
 
 type ImageCollectionInCollectionsNodeAggregateSelection {
   name: StringAggregateSelection!
+  ownerUsername: StringAggregateSelection!
+  collectionNumber: IntAggregateSelection!
   description: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
@@ -5996,6 +6110,7 @@ type ModerationProfileCommentAuthoredCommentsAggregateSelection {
 }
 
 type ModerationProfileCommentAuthoredCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -7880,6 +7995,7 @@ type TagCommentCommentsAggregateSelection {
 }
 
 type TagCommentCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -8447,6 +8563,12 @@ type UserAggregateResult {
 
 type UserAlbumAlbumsAggregateSelection {
   count: CountConnection!
+  node: UserAlbumAlbumsNodeAggregateSelection
+}
+
+type UserAlbumAlbumsNodeAggregateSelection {
+  ownerUsername: StringAggregateSelection!
+  albumNumber: IntAggregateSelection!
 }
 
 type UserAlbumsConnection {
@@ -8653,6 +8775,8 @@ type UserCollectionCollectionsAggregateSelection {
 
 type UserCollectionCollectionsNodeAggregateSelection {
   name: StringAggregateSelection!
+  ownerUsername: StringAggregateSelection!
+  collectionNumber: IntAggregateSelection!
   description: StringAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   updatedAt: DateTimeAggregateSelection!
@@ -8676,6 +8800,7 @@ type UserCommentCommentsAggregateSelection {
 }
 
 type UserCommentCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -8693,6 +8818,7 @@ type UserCommentFavoriteCommentsAggregateSelection {
 }
 
 type UserCommentFavoriteCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -8722,6 +8848,7 @@ type UserCommentUpvotedCommentsAggregateSelection {
 }
 
 type UserCommentUpvotedCommentsNodeAggregateSelection {
+  shortId: StringAggregateSelection!
   text: StringAggregateSelection!
   editReason: StringAggregateSelection!
   stickyAt: DateTimeAggregateSelection!
@@ -8759,6 +8886,7 @@ type UserDiscussionChannelUpvotedDiscussionChannelsAggregateSelection {
 
 type UserDiscussionChannelUpvotedDiscussionChannelsNodeAggregateSelection {
   channelUniqueName: StringAggregateSelection!
+  discussionNumber: IntAggregateSelection!
   createdAt: DateTimeAggregateSelection!
   weightedVotesCount: FloatAggregateSelection!
   botMentions: StringAggregateSelection!
@@ -8998,6 +9126,7 @@ type UserImageFavoriteImagesNodeAggregateSelection {
   storageUrl: StringAggregateSelection!
   uploadedAt: DateTimeAggregateSelection!
   uploadedByUsername: StringAggregateSelection!
+  imageNumber: IntAggregateSelection!
   uploadedByIp: StringAggregateSelection!
   alt: StringAggregateSelection!
   caption: StringAggregateSelection!
@@ -9030,6 +9159,7 @@ type UserImageImagesNodeAggregateSelection {
   storageUrl: StringAggregateSelection!
   uploadedAt: DateTimeAggregateSelection!
   uploadedByUsername: StringAggregateSelection!
+  imageNumber: IntAggregateSelection!
   uploadedByIp: StringAggregateSelection!
   alt: StringAggregateSelection!
   caption: StringAggregateSelection!
@@ -10232,6 +10362,27 @@ input AlbumImagesNodeAggregationWhereInput {
   uploadedByUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByUsername: { longestLength: { lte: ... } } }' instead.")
   uploadedByUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByUsername: { shortestLength: { lte: ... } } }' instead.")
   uploadedByUsername: StringScalarAggregationFilters
+  imageNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { eq: ... } } }' instead.")
+  imageNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { eq: ... } } }' instead.")
+  imageNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { eq: ... } } }' instead.")
+  imageNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { eq: ... } } }' instead.")
+  imageNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { gt: ... } } }' instead.")
+  imageNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { gt: ... } } }' instead.")
+  imageNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { gt: ... } } }' instead.")
+  imageNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { gt: ... } } }' instead.")
+  imageNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { gte: ... } } }' instead.")
+  imageNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { gte: ... } } }' instead.")
+  imageNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { gte: ... } } }' instead.")
+  imageNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { gte: ... } } }' instead.")
+  imageNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { lt: ... } } }' instead.")
+  imageNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { lt: ... } } }' instead.")
+  imageNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { lt: ... } } }' instead.")
+  imageNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { lt: ... } } }' instead.")
+  imageNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { lte: ... } } }' instead.")
+  imageNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { lte: ... } } }' instead.")
+  imageNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { lte: ... } } }' instead.")
+  imageNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { lte: ... } } }' instead.")
+  imageNumber: IntScalarAggregationFilters
   uploadedByIp_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { averageLength: { eq: ... } } }' instead.")
   uploadedByIp_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { longestLength: { eq: ... } } }' instead.")
   uploadedByIp_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { shortestLength: { eq: ... } } }' instead.")
@@ -10431,6 +10582,8 @@ Fields to sort Albums by. The order in which sorts are applied is not guaranteed
 """
 input AlbumSort {
   id: SortDirection
+  ownerUsername: SortDirection
+  albumNumber: SortDirection
 }
 
 input AlbumUpdateInput {
@@ -10449,6 +10602,20 @@ input AlbumWhere {
   id_CONTAINS: ID @deprecated(reason: "Please use the relevant generic filter id: { contains: ... }")
   id_STARTS_WITH: ID @deprecated(reason: "Please use the relevant generic filter id: { startsWith: ... }")
   id_ENDS_WITH: ID @deprecated(reason: "Please use the relevant generic filter id: { endsWith: ... }")
+  ownerUsername: StringScalarFilters
+  ownerUsername_EQ: String @deprecated(reason: "Please use the relevant generic filter ownerUsername: { eq: ... }")
+  ownerUsername_IN: [String] @deprecated(reason: "Please use the relevant generic filter ownerUsername: { in: ... }")
+  ownerUsername_CONTAINS: String @deprecated(reason: "Please use the relevant generic filter ownerUsername: { contains: ... }")
+  ownerUsername_STARTS_WITH: String @deprecated(reason: "Please use the relevant generic filter ownerUsername: { startsWith: ... }")
+  ownerUsername_ENDS_WITH: String @deprecated(reason: "Please use the relevant generic filter ownerUsername: { endsWith: ... }")
+  ownerUsername_MATCHES: String @deprecated(reason: "Please use the relevant generic filter ownerUsername: { matches: ... }")
+  albumNumber: IntScalarFilters
+  albumNumber_EQ: Int @deprecated(reason: "Please use the relevant generic filter albumNumber: { eq: ... }")
+  albumNumber_IN: [Int] @deprecated(reason: "Please use the relevant generic filter albumNumber: { in: ... }")
+  albumNumber_LT: Int @deprecated(reason: "Please use the relevant generic filter albumNumber: { lt: ... }")
+  albumNumber_LTE: Int @deprecated(reason: "Please use the relevant generic filter albumNumber: { lte: ... }")
+  albumNumber_GT: Int @deprecated(reason: "Please use the relevant generic filter albumNumber: { gt: ... }")
+  albumNumber_GTE: Int @deprecated(reason: "Please use the relevant generic filter albumNumber: { gte: ... }")
   imageOrder: IDListFilters
   imageOrder_EQ: [ID!] @deprecated(reason: "Please use the relevant generic filter imageOrder: { eq: ... }")
   imageOrder_INCLUDES: ID @deprecated(reason: "Please use the relevant generic filter imageOrder: { includes: ... }")
@@ -11480,6 +11647,22 @@ input ChannelCommentsNodeAggregationWhereInput {
   AND: [ChannelCommentsNodeAggregationWhereInput!]
   OR: [ChannelCommentsNodeAggregationWhereInput!]
   NOT: ChannelCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -11907,6 +12090,27 @@ input ChannelDiscussionChannelsNodeAggregationWhereInput {
   channelUniqueName_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { longestLength: { lte: ... } } }' instead.")
   channelUniqueName_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead.")
   channelUniqueName: StringScalarAggregationFilters
+  discussionNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { eq: ... } } }' instead.")
+  discussionNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { eq: ... } } }' instead.")
+  discussionNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { eq: ... } } }' instead.")
+  discussionNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { eq: ... } } }' instead.")
+  discussionNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { gt: ... } } }' instead.")
+  discussionNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { gt: ... } } }' instead.")
+  discussionNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { gt: ... } } }' instead.")
+  discussionNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { gt: ... } } }' instead.")
+  discussionNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { gte: ... } } }' instead.")
+  discussionNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { gte: ... } } }' instead.")
+  discussionNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { gte: ... } } }' instead.")
+  discussionNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { gte: ... } } }' instead.")
+  discussionNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { lt: ... } } }' instead.")
+  discussionNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { lt: ... } } }' instead.")
+  discussionNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { lt: ... } } }' instead.")
+  discussionNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { lt: ... } } }' instead.")
+  discussionNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { lte: ... } } }' instead.")
+  discussionNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { lte: ... } } }' instead.")
+  discussionNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { lte: ... } } }' instead.")
+  discussionNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { lte: ... } } }' instead.")
+  discussionNumber: IntScalarAggregationFilters
   createdAt_MIN_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead.")
   createdAt_MAX_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead.")
   createdAt_MIN_GT: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { gt: ... } } }' instead.")
@@ -12559,6 +12763,27 @@ input ChannelEventChannelsNodeAggregationWhereInput {
   channelUniqueName_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { longestLength: { lte: ... } } }' instead.")
   channelUniqueName_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead.")
   channelUniqueName: StringScalarAggregationFilters
+  eventNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { eq: ... } } }' instead.")
+  eventNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { eq: ... } } }' instead.")
+  eventNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { eq: ... } } }' instead.")
+  eventNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { eq: ... } } }' instead.")
+  eventNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { gt: ... } } }' instead.")
+  eventNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { gt: ... } } }' instead.")
+  eventNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { gt: ... } } }' instead.")
+  eventNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { gt: ... } } }' instead.")
+  eventNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { gte: ... } } }' instead.")
+  eventNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { gte: ... } } }' instead.")
+  eventNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { gte: ... } } }' instead.")
+  eventNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { gte: ... } } }' instead.")
+  eventNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { lt: ... } } }' instead.")
+  eventNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { lt: ... } } }' instead.")
+  eventNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { lt: ... } } }' instead.")
+  eventNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { lt: ... } } }' instead.")
+  eventNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { lte: ... } } }' instead.")
+  eventNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { lte: ... } } }' instead.")
+  eventNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { lte: ... } } }' instead.")
+  eventNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { lte: ... } } }' instead.")
+  eventNumber: IntScalarAggregationFilters
   createdAt_MIN_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead.")
   createdAt_MAX_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead.")
   createdAt_MIN_GT: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { gt: ... } } }' instead.")
@@ -12843,6 +13068,43 @@ input ChannelInCollectionsNodeAggregationWhereInput {
   name_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'name: { longestLength: { lte: ... } } }' instead.")
   name_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'name: { shortestLength: { lte: ... } } }' instead.")
   name: StringScalarAggregationFilters
+  ownerUsername_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead.")
+  ownerUsername: StringScalarAggregationFilters
+  collectionNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { eq: ... } } }' instead.")
+  collectionNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { eq: ... } } }' instead.")
+  collectionNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { eq: ... } } }' instead.")
+  collectionNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { eq: ... } } }' instead.")
+  collectionNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { gt: ... } } }' instead.")
+  collectionNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { gt: ... } } }' instead.")
+  collectionNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { gt: ... } } }' instead.")
+  collectionNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { gt: ... } } }' instead.")
+  collectionNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { gte: ... } } }' instead.")
+  collectionNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { gte: ... } } }' instead.")
+  collectionNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { gte: ... } } }' instead.")
+  collectionNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { gte: ... } } }' instead.")
+  collectionNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { lt: ... } } }' instead.")
+  collectionNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { lt: ... } } }' instead.")
+  collectionNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { lt: ... } } }' instead.")
+  collectionNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { lt: ... } } }' instead.")
+  collectionNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { lte: ... } } }' instead.")
+  collectionNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { lte: ... } } }' instead.")
+  collectionNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { lte: ... } } }' instead.")
+  collectionNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { lte: ... } } }' instead.")
+  collectionNumber: IntScalarAggregationFilters
   description_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'description: { averageLength: { eq: ... } } }' instead.")
   description_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'description: { longestLength: { eq: ... } } }' instead.")
   description_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'description: { shortestLength: { eq: ... } } }' instead.")
@@ -14330,6 +14592,27 @@ input ChannelPinnedDiscussionChannelsNodeAggregationWhereInput {
   channelUniqueName_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { longestLength: { lte: ... } } }' instead.")
   channelUniqueName_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead.")
   channelUniqueName: StringScalarAggregationFilters
+  discussionNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { eq: ... } } }' instead.")
+  discussionNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { eq: ... } } }' instead.")
+  discussionNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { eq: ... } } }' instead.")
+  discussionNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { eq: ... } } }' instead.")
+  discussionNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { gt: ... } } }' instead.")
+  discussionNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { gt: ... } } }' instead.")
+  discussionNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { gt: ... } } }' instead.")
+  discussionNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { gt: ... } } }' instead.")
+  discussionNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { gte: ... } } }' instead.")
+  discussionNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { gte: ... } } }' instead.")
+  discussionNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { gte: ... } } }' instead.")
+  discussionNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { gte: ... } } }' instead.")
+  discussionNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { lt: ... } } }' instead.")
+  discussionNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { lt: ... } } }' instead.")
+  discussionNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { lt: ... } } }' instead.")
+  discussionNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { lt: ... } } }' instead.")
+  discussionNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { lte: ... } } }' instead.")
+  discussionNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { lte: ... } } }' instead.")
+  discussionNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { lte: ... } } }' instead.")
+  discussionNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { lte: ... } } }' instead.")
+  discussionNumber: IntScalarAggregationFilters
   createdAt_MIN_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead.")
   createdAt_MAX_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead.")
   createdAt_MIN_GT: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { gt: ... } } }' instead.")
@@ -17416,6 +17699,22 @@ input CollectionCommentsNodeAggregationWhereInput {
   AND: [CollectionCommentsNodeAggregationWhereInput!]
   OR: [CollectionCommentsNodeAggregationWhereInput!]
   NOT: CollectionCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -18288,6 +18587,27 @@ input CollectionImagesNodeAggregationWhereInput {
   uploadedByUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByUsername: { longestLength: { lte: ... } } }' instead.")
   uploadedByUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByUsername: { shortestLength: { lte: ... } } }' instead.")
   uploadedByUsername: StringScalarAggregationFilters
+  imageNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { eq: ... } } }' instead.")
+  imageNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { eq: ... } } }' instead.")
+  imageNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { eq: ... } } }' instead.")
+  imageNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { eq: ... } } }' instead.")
+  imageNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { gt: ... } } }' instead.")
+  imageNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { gt: ... } } }' instead.")
+  imageNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { gt: ... } } }' instead.")
+  imageNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { gt: ... } } }' instead.")
+  imageNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { gte: ... } } }' instead.")
+  imageNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { gte: ... } } }' instead.")
+  imageNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { gte: ... } } }' instead.")
+  imageNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { gte: ... } } }' instead.")
+  imageNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { lt: ... } } }' instead.")
+  imageNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { lt: ... } } }' instead.")
+  imageNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { lt: ... } } }' instead.")
+  imageNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { lt: ... } } }' instead.")
+  imageNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { lte: ... } } }' instead.")
+  imageNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { lte: ... } } }' instead.")
+  imageNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { lte: ... } } }' instead.")
+  imageNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { lte: ... } } }' instead.")
+  imageNumber: IntScalarAggregationFilters
   uploadedByIp_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { averageLength: { eq: ... } } }' instead.")
   uploadedByIp_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { longestLength: { eq: ... } } }' instead.")
   uploadedByIp_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { shortestLength: { eq: ... } } }' instead.")
@@ -18640,6 +18960,8 @@ Fields to sort Collections by. The order in which sorts are applied is not guara
 input CollectionSort {
   id: SortDirection
   name: SortDirection
+  ownerUsername: SortDirection
+  collectionNumber: SortDirection
   description: SortDirection
   visibility: SortDirection
   collectionType: SortDirection
@@ -18708,6 +19030,20 @@ input CollectionWhere {
   name_STARTS_WITH: String @deprecated(reason: "Please use the relevant generic filter name: { startsWith: ... }")
   name_ENDS_WITH: String @deprecated(reason: "Please use the relevant generic filter name: { endsWith: ... }")
   name_MATCHES: String @deprecated(reason: "Please use the relevant generic filter name: { matches: ... }")
+  ownerUsername: StringScalarFilters
+  ownerUsername_EQ: String @deprecated(reason: "Please use the relevant generic filter ownerUsername: { eq: ... }")
+  ownerUsername_IN: [String] @deprecated(reason: "Please use the relevant generic filter ownerUsername: { in: ... }")
+  ownerUsername_CONTAINS: String @deprecated(reason: "Please use the relevant generic filter ownerUsername: { contains: ... }")
+  ownerUsername_STARTS_WITH: String @deprecated(reason: "Please use the relevant generic filter ownerUsername: { startsWith: ... }")
+  ownerUsername_ENDS_WITH: String @deprecated(reason: "Please use the relevant generic filter ownerUsername: { endsWith: ... }")
+  ownerUsername_MATCHES: String @deprecated(reason: "Please use the relevant generic filter ownerUsername: { matches: ... }")
+  collectionNumber: IntScalarFilters
+  collectionNumber_EQ: Int @deprecated(reason: "Please use the relevant generic filter collectionNumber: { eq: ... }")
+  collectionNumber_IN: [Int] @deprecated(reason: "Please use the relevant generic filter collectionNumber: { in: ... }")
+  collectionNumber_LT: Int @deprecated(reason: "Please use the relevant generic filter collectionNumber: { lt: ... }")
+  collectionNumber_LTE: Int @deprecated(reason: "Please use the relevant generic filter collectionNumber: { lte: ... }")
+  collectionNumber_GT: Int @deprecated(reason: "Please use the relevant generic filter collectionNumber: { gt: ... }")
+  collectionNumber_GTE: Int @deprecated(reason: "Please use the relevant generic filter collectionNumber: { gte: ... }")
   description: StringScalarFilters
   description_EQ: String @deprecated(reason: "Please use the relevant generic filter description: { eq: ... }")
   description_IN: [String] @deprecated(reason: "Please use the relevant generic filter description: { in: ... }")
@@ -19113,6 +19449,22 @@ input CommentChildCommentsNodeAggregationWhereInput {
   AND: [CommentChildCommentsNodeAggregationWhereInput!]
   OR: [CommentChildCommentsNodeAggregationWhereInput!]
   NOT: CommentChildCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -19528,6 +19880,22 @@ input CommentFeedbackCommentsNodeAggregationWhereInput {
   AND: [CommentFeedbackCommentsNodeAggregationWhereInput!]
   OR: [CommentFeedbackCommentsNodeAggregationWhereInput!]
   NOT: CommentFeedbackCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -19835,6 +20203,43 @@ input CommentInCollectionsNodeAggregationWhereInput {
   name_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'name: { longestLength: { lte: ... } } }' instead.")
   name_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'name: { shortestLength: { lte: ... } } }' instead.")
   name: StringScalarAggregationFilters
+  ownerUsername_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead.")
+  ownerUsername: StringScalarAggregationFilters
+  collectionNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { eq: ... } } }' instead.")
+  collectionNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { eq: ... } } }' instead.")
+  collectionNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { eq: ... } } }' instead.")
+  collectionNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { eq: ... } } }' instead.")
+  collectionNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { gt: ... } } }' instead.")
+  collectionNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { gt: ... } } }' instead.")
+  collectionNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { gt: ... } } }' instead.")
+  collectionNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { gt: ... } } }' instead.")
+  collectionNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { gte: ... } } }' instead.")
+  collectionNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { gte: ... } } }' instead.")
+  collectionNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { gte: ... } } }' instead.")
+  collectionNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { gte: ... } } }' instead.")
+  collectionNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { lt: ... } } }' instead.")
+  collectionNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { lt: ... } } }' instead.")
+  collectionNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { lt: ... } } }' instead.")
+  collectionNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { lt: ... } } }' instead.")
+  collectionNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { lte: ... } } }' instead.")
+  collectionNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { lte: ... } } }' instead.")
+  collectionNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { lte: ... } } }' instead.")
+  collectionNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { lte: ... } } }' instead.")
+  collectionNumber: IntScalarAggregationFilters
   description_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'description: { averageLength: { eq: ... } } }' instead.")
   description_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'description: { longestLength: { eq: ... } } }' instead.")
   description_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'description: { shortestLength: { eq: ... } } }' instead.")
@@ -20613,6 +21018,7 @@ Fields to sort Comments by. The order in which sorts are applied is not guarante
 """
 input CommentSort {
   id: SortDirection
+  shortId: SortDirection
   ageGateTouchedAt: SortDirection
   ageGateSensitive: SortDirection
   ageGateRestricted: SortDirection
@@ -22087,6 +22493,13 @@ input CommentWhere {
   id_CONTAINS: ID @deprecated(reason: "Please use the relevant generic filter id: { contains: ... }")
   id_STARTS_WITH: ID @deprecated(reason: "Please use the relevant generic filter id: { startsWith: ... }")
   id_ENDS_WITH: ID @deprecated(reason: "Please use the relevant generic filter id: { endsWith: ... }")
+  shortId: StringScalarFilters
+  shortId_EQ: String @deprecated(reason: "Please use the relevant generic filter shortId: { eq: ... }")
+  shortId_IN: [String] @deprecated(reason: "Please use the relevant generic filter shortId: { in: ... }")
+  shortId_CONTAINS: String @deprecated(reason: "Please use the relevant generic filter shortId: { contains: ... }")
+  shortId_STARTS_WITH: String @deprecated(reason: "Please use the relevant generic filter shortId: { startsWith: ... }")
+  shortId_ENDS_WITH: String @deprecated(reason: "Please use the relevant generic filter shortId: { endsWith: ... }")
+  shortId_MATCHES: String @deprecated(reason: "Please use the relevant generic filter shortId: { matches: ... }")
   ageGateSensitive: BooleanScalarFilters
   ageGateSensitive_EQ: Boolean @deprecated(reason: "Please use the relevant generic filter ageGateSensitive: { eq: ... }")
   ageGateRestricted: BooleanScalarFilters
@@ -23090,6 +23503,22 @@ input DiscussionChannelAnswersNodeAggregationWhereInput {
   AND: [DiscussionChannelAnswersNodeAggregationWhereInput!]
   OR: [DiscussionChannelAnswersNodeAggregationWhereInput!]
   NOT: DiscussionChannelAnswersNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -23341,6 +23770,22 @@ input DiscussionChannelCommentsNodeAggregationWhereInput {
   AND: [DiscussionChannelCommentsNodeAggregationWhereInput!]
   OR: [DiscussionChannelCommentsNodeAggregationWhereInput!]
   NOT: DiscussionChannelCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -24371,6 +24816,7 @@ input DiscussionChannelSort {
   locked: SortDirection
   discussionId: SortDirection
   channelUniqueName: SortDirection
+  discussionNumber: SortDirection
   createdAt: SortDirection
   weightedVotesCount: SortDirection
   emoji: SortDirection
@@ -25713,6 +26159,13 @@ input DiscussionChannelWhere {
   channelUniqueName_STARTS_WITH: String @deprecated(reason: "Please use the relevant generic filter channelUniqueName: { startsWith: ... }")
   channelUniqueName_ENDS_WITH: String @deprecated(reason: "Please use the relevant generic filter channelUniqueName: { endsWith: ... }")
   channelUniqueName_MATCHES: String @deprecated(reason: "Please use the relevant generic filter channelUniqueName: { matches: ... }")
+  discussionNumber: IntScalarFilters
+  discussionNumber_EQ: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { eq: ... }")
+  discussionNumber_IN: [Int] @deprecated(reason: "Please use the relevant generic filter discussionNumber: { in: ... }")
+  discussionNumber_LT: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { lt: ... }")
+  discussionNumber_LTE: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { lte: ... }")
+  discussionNumber_GT: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { gt: ... }")
+  discussionNumber_GTE: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { gte: ... }")
   createdAt: DateTimeScalarFilters
   createdAt_EQ: DateTime @deprecated(reason: "Please use the relevant generic filter createdAt: { eq: ... }")
   createdAt_IN: [DateTime!] @deprecated(reason: "Please use the relevant generic filter createdAt: { in: ... }")
@@ -26329,6 +26782,27 @@ input DiscussionDiscussionChannelsNodeAggregationWhereInput {
   channelUniqueName_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { longestLength: { lte: ... } } }' instead.")
   channelUniqueName_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead.")
   channelUniqueName: StringScalarAggregationFilters
+  discussionNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { eq: ... } } }' instead.")
+  discussionNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { eq: ... } } }' instead.")
+  discussionNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { eq: ... } } }' instead.")
+  discussionNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { eq: ... } } }' instead.")
+  discussionNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { gt: ... } } }' instead.")
+  discussionNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { gt: ... } } }' instead.")
+  discussionNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { gt: ... } } }' instead.")
+  discussionNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { gt: ... } } }' instead.")
+  discussionNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { gte: ... } } }' instead.")
+  discussionNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { gte: ... } } }' instead.")
+  discussionNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { gte: ... } } }' instead.")
+  discussionNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { gte: ... } } }' instead.")
+  discussionNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { lt: ... } } }' instead.")
+  discussionNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { lt: ... } } }' instead.")
+  discussionNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { lt: ... } } }' instead.")
+  discussionNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { lt: ... } } }' instead.")
+  discussionNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { lte: ... } } }' instead.")
+  discussionNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { lte: ... } } }' instead.")
+  discussionNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { lte: ... } } }' instead.")
+  discussionNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { lte: ... } } }' instead.")
+  discussionNumber: IntScalarAggregationFilters
   createdAt_MIN_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead.")
   createdAt_MAX_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead.")
   createdAt_MIN_GT: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { gt: ... } } }' instead.")
@@ -27051,6 +27525,22 @@ input DiscussionFeedbackCommentsNodeAggregationWhereInput {
   AND: [DiscussionFeedbackCommentsNodeAggregationWhereInput!]
   OR: [DiscussionFeedbackCommentsNodeAggregationWhereInput!]
   NOT: DiscussionFeedbackCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -27330,6 +27820,27 @@ input DiscussionFlairDiscussionChannelsNodeAggregationWhereInput {
   channelUniqueName_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { longestLength: { lte: ... } } }' instead.")
   channelUniqueName_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead.")
   channelUniqueName: StringScalarAggregationFilters
+  discussionNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { eq: ... } } }' instead.")
+  discussionNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { eq: ... } } }' instead.")
+  discussionNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { eq: ... } } }' instead.")
+  discussionNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { eq: ... } } }' instead.")
+  discussionNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { gt: ... } } }' instead.")
+  discussionNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { gt: ... } } }' instead.")
+  discussionNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { gt: ... } } }' instead.")
+  discussionNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { gt: ... } } }' instead.")
+  discussionNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { gte: ... } } }' instead.")
+  discussionNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { gte: ... } } }' instead.")
+  discussionNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { gte: ... } } }' instead.")
+  discussionNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { gte: ... } } }' instead.")
+  discussionNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { lt: ... } } }' instead.")
+  discussionNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { lt: ... } } }' instead.")
+  discussionNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { lt: ... } } }' instead.")
+  discussionNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { lt: ... } } }' instead.")
+  discussionNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { lte: ... } } }' instead.")
+  discussionNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { lte: ... } } }' instead.")
+  discussionNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { lte: ... } } }' instead.")
+  discussionNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { lte: ... } } }' instead.")
+  discussionNumber: IntScalarAggregationFilters
   createdAt_MIN_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead.")
   createdAt_MAX_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead.")
   createdAt_MIN_GT: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { gt: ... } } }' instead.")
@@ -27596,6 +28107,43 @@ input DiscussionInCollectionsNodeAggregationWhereInput {
   name_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'name: { longestLength: { lte: ... } } }' instead.")
   name_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'name: { shortestLength: { lte: ... } } }' instead.")
   name: StringScalarAggregationFilters
+  ownerUsername_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead.")
+  ownerUsername: StringScalarAggregationFilters
+  collectionNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { eq: ... } } }' instead.")
+  collectionNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { eq: ... } } }' instead.")
+  collectionNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { eq: ... } } }' instead.")
+  collectionNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { eq: ... } } }' instead.")
+  collectionNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { gt: ... } } }' instead.")
+  collectionNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { gt: ... } } }' instead.")
+  collectionNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { gt: ... } } }' instead.")
+  collectionNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { gt: ... } } }' instead.")
+  collectionNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { gte: ... } } }' instead.")
+  collectionNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { gte: ... } } }' instead.")
+  collectionNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { gte: ... } } }' instead.")
+  collectionNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { gte: ... } } }' instead.")
+  collectionNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { lt: ... } } }' instead.")
+  collectionNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { lt: ... } } }' instead.")
+  collectionNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { lt: ... } } }' instead.")
+  collectionNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { lt: ... } } }' instead.")
+  collectionNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { lte: ... } } }' instead.")
+  collectionNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { lte: ... } } }' instead.")
+  collectionNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { lte: ... } } }' instead.")
+  collectionNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { lte: ... } } }' instead.")
+  collectionNumber: IntScalarAggregationFilters
   description_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'description: { averageLength: { eq: ... } } }' instead.")
   description_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'description: { longestLength: { eq: ... } } }' instead.")
   description_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'description: { shortestLength: { eq: ... } } }' instead.")
@@ -29733,6 +30281,22 @@ input EventChannelCommentsNodeAggregationWhereInput {
   AND: [EventChannelCommentsNodeAggregationWhereInput!]
   OR: [EventChannelCommentsNodeAggregationWhereInput!]
   NOT: EventChannelCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -30267,6 +30831,7 @@ input EventChannelSort {
   locked: SortDirection
   eventId: SortDirection
   channelUniqueName: SortDirection
+  eventNumber: SortDirection
   createdAt: SortDirection
   archived: SortDirection
 }
@@ -30302,6 +30867,13 @@ input EventChannelWhere {
   channelUniqueName_STARTS_WITH: String @deprecated(reason: "Please use the relevant generic filter channelUniqueName: { startsWith: ... }")
   channelUniqueName_ENDS_WITH: String @deprecated(reason: "Please use the relevant generic filter channelUniqueName: { endsWith: ... }")
   channelUniqueName_MATCHES: String @deprecated(reason: "Please use the relevant generic filter channelUniqueName: { matches: ... }")
+  eventNumber: IntScalarFilters
+  eventNumber_EQ: Int @deprecated(reason: "Please use the relevant generic filter eventNumber: { eq: ... }")
+  eventNumber_IN: [Int] @deprecated(reason: "Please use the relevant generic filter eventNumber: { in: ... }")
+  eventNumber_LT: Int @deprecated(reason: "Please use the relevant generic filter eventNumber: { lt: ... }")
+  eventNumber_LTE: Int @deprecated(reason: "Please use the relevant generic filter eventNumber: { lte: ... }")
+  eventNumber_GT: Int @deprecated(reason: "Please use the relevant generic filter eventNumber: { gt: ... }")
+  eventNumber_GTE: Int @deprecated(reason: "Please use the relevant generic filter eventNumber: { gte: ... }")
   createdAt: DateTimeScalarFilters
   createdAt_EQ: DateTime @deprecated(reason: "Please use the relevant generic filter createdAt: { eq: ... }")
   createdAt_IN: [DateTime!] @deprecated(reason: "Please use the relevant generic filter createdAt: { in: ... }")
@@ -30489,6 +31061,22 @@ input EventCommentsNodeAggregationWhereInput {
   AND: [EventCommentsNodeAggregationWhereInput!]
   OR: [EventCommentsNodeAggregationWhereInput!]
   NOT: EventCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -30849,6 +31437,27 @@ input EventEventChannelsNodeAggregationWhereInput {
   channelUniqueName_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { longestLength: { lte: ... } } }' instead.")
   channelUniqueName_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead.")
   channelUniqueName: StringScalarAggregationFilters
+  eventNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { eq: ... } } }' instead.")
+  eventNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { eq: ... } } }' instead.")
+  eventNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { eq: ... } } }' instead.")
+  eventNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { eq: ... } } }' instead.")
+  eventNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { gt: ... } } }' instead.")
+  eventNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { gt: ... } } }' instead.")
+  eventNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { gt: ... } } }' instead.")
+  eventNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { gt: ... } } }' instead.")
+  eventNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { gte: ... } } }' instead.")
+  eventNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { gte: ... } } }' instead.")
+  eventNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { gte: ... } } }' instead.")
+  eventNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { gte: ... } } }' instead.")
+  eventNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { lt: ... } } }' instead.")
+  eventNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { lt: ... } } }' instead.")
+  eventNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { lt: ... } } }' instead.")
+  eventNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { lt: ... } } }' instead.")
+  eventNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { lte: ... } } }' instead.")
+  eventNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { lte: ... } } }' instead.")
+  eventNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { lte: ... } } }' instead.")
+  eventNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { lte: ... } } }' instead.")
+  eventNumber: IntScalarAggregationFilters
   createdAt_MIN_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead.")
   createdAt_MAX_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead.")
   createdAt_MIN_GT: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { gt: ... } } }' instead.")
@@ -30982,6 +31591,22 @@ input EventFeedbackCommentsNodeAggregationWhereInput {
   AND: [EventFeedbackCommentsNodeAggregationWhereInput!]
   OR: [EventFeedbackCommentsNodeAggregationWhereInput!]
   NOT: EventFeedbackCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -31948,6 +32573,27 @@ input EventSeriesEventChannelsNodeAggregationWhereInput {
   channelUniqueName_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { longestLength: { lte: ... } } }' instead.")
   channelUniqueName_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead.")
   channelUniqueName: StringScalarAggregationFilters
+  eventNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { eq: ... } } }' instead.")
+  eventNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { eq: ... } } }' instead.")
+  eventNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { eq: ... } } }' instead.")
+  eventNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { eq: ... } } }' instead.")
+  eventNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { gt: ... } } }' instead.")
+  eventNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { gt: ... } } }' instead.")
+  eventNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { gt: ... } } }' instead.")
+  eventNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { gt: ... } } }' instead.")
+  eventNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { gte: ... } } }' instead.")
+  eventNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { gte: ... } } }' instead.")
+  eventNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { gte: ... } } }' instead.")
+  eventNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { gte: ... } } }' instead.")
+  eventNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { lt: ... } } }' instead.")
+  eventNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { lt: ... } } }' instead.")
+  eventNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { lt: ... } } }' instead.")
+  eventNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { lt: ... } } }' instead.")
+  eventNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { min: { lte: ... } } }' instead.")
+  eventNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { max: { lte: ... } } }' instead.")
+  eventNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { sum: { lte: ... } } }' instead.")
+  eventNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'eventNumber: { average: { lte: ... } } }' instead.")
+  eventNumber: IntScalarAggregationFilters
   createdAt_MIN_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead.")
   createdAt_MAX_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead.")
   createdAt_MIN_GT: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { gt: ... } } }' instead.")
@@ -35236,6 +35882,7 @@ input ImageAlbumsAggregateInput {
   AND: [ImageAlbumsAggregateInput!]
   OR: [ImageAlbumsAggregateInput!]
   NOT: ImageAlbumsAggregateInput
+  node: ImageAlbumsNodeAggregationWhereInput
 }
 
 input ImageAlbumsConnectFieldInput {
@@ -35248,6 +35895,7 @@ input ImageAlbumsConnectionAggregateInput {
   AND: [ImageAlbumsConnectionAggregateInput!]
   OR: [ImageAlbumsConnectionAggregateInput!]
   NOT: ImageAlbumsConnectionAggregateInput
+  node: ImageAlbumsNodeAggregationWhereInput
 }
 
 input ImageAlbumsConnectionFilters {
@@ -35303,6 +35951,49 @@ input ImageAlbumsDisconnectFieldInput {
 input ImageAlbumsFieldInput {
   connect: [ImageAlbumsConnectFieldInput!]
   create: [ImageAlbumsCreateFieldInput!]
+}
+
+input ImageAlbumsNodeAggregationWhereInput {
+  AND: [ImageAlbumsNodeAggregationWhereInput!]
+  OR: [ImageAlbumsNodeAggregationWhereInput!]
+  NOT: ImageAlbumsNodeAggregationWhereInput
+  ownerUsername_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead.")
+  ownerUsername: StringScalarAggregationFilters
+  albumNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { min: { eq: ... } } }' instead.")
+  albumNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { max: { eq: ... } } }' instead.")
+  albumNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { sum: { eq: ... } } }' instead.")
+  albumNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { average: { eq: ... } } }' instead.")
+  albumNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { min: { gt: ... } } }' instead.")
+  albumNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { max: { gt: ... } } }' instead.")
+  albumNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { sum: { gt: ... } } }' instead.")
+  albumNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { average: { gt: ... } } }' instead.")
+  albumNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { min: { gte: ... } } }' instead.")
+  albumNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { max: { gte: ... } } }' instead.")
+  albumNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { sum: { gte: ... } } }' instead.")
+  albumNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { average: { gte: ... } } }' instead.")
+  albumNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { min: { lt: ... } } }' instead.")
+  albumNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { max: { lt: ... } } }' instead.")
+  albumNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { sum: { lt: ... } } }' instead.")
+  albumNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { average: { lt: ... } } }' instead.")
+  albumNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { min: { lte: ... } } }' instead.")
+  albumNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { max: { lte: ... } } }' instead.")
+  albumNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { sum: { lte: ... } } }' instead.")
+  albumNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { average: { lte: ... } } }' instead.")
+  albumNumber: IntScalarAggregationFilters
 }
 
 input ImageAlbumsUpdateConnectionInput {
@@ -35484,6 +36175,43 @@ input ImageInCollectionsNodeAggregationWhereInput {
   name_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'name: { longestLength: { lte: ... } } }' instead.")
   name_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'name: { shortestLength: { lte: ... } } }' instead.")
   name: StringScalarAggregationFilters
+  ownerUsername_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead.")
+  ownerUsername: StringScalarAggregationFilters
+  collectionNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { eq: ... } } }' instead.")
+  collectionNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { eq: ... } } }' instead.")
+  collectionNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { eq: ... } } }' instead.")
+  collectionNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { eq: ... } } }' instead.")
+  collectionNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { gt: ... } } }' instead.")
+  collectionNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { gt: ... } } }' instead.")
+  collectionNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { gt: ... } } }' instead.")
+  collectionNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { gt: ... } } }' instead.")
+  collectionNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { gte: ... } } }' instead.")
+  collectionNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { gte: ... } } }' instead.")
+  collectionNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { gte: ... } } }' instead.")
+  collectionNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { gte: ... } } }' instead.")
+  collectionNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { lt: ... } } }' instead.")
+  collectionNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { lt: ... } } }' instead.")
+  collectionNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { lt: ... } } }' instead.")
+  collectionNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { lt: ... } } }' instead.")
+  collectionNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { lte: ... } } }' instead.")
+  collectionNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { lte: ... } } }' instead.")
+  collectionNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { lte: ... } } }' instead.")
+  collectionNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { lte: ... } } }' instead.")
+  collectionNumber: IntScalarAggregationFilters
   description_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'description: { averageLength: { eq: ... } } }' instead.")
   description_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'description: { longestLength: { eq: ... } } }' instead.")
   description_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'description: { shortestLength: { eq: ... } } }' instead.")
@@ -35928,6 +36656,7 @@ input ImageSort {
   storageUrl: SortDirection
   uploadedAt: SortDirection
   uploadedByUsername: SortDirection
+  imageNumber: SortDirection
   uploadedByIp: SortDirection
   alt: SortDirection
   caption: SortDirection
@@ -36145,6 +36874,13 @@ input ImageWhere {
   uploadedByUsername_STARTS_WITH: String @deprecated(reason: "Please use the relevant generic filter uploadedByUsername: { startsWith: ... }")
   uploadedByUsername_ENDS_WITH: String @deprecated(reason: "Please use the relevant generic filter uploadedByUsername: { endsWith: ... }")
   uploadedByUsername_MATCHES: String @deprecated(reason: "Please use the relevant generic filter uploadedByUsername: { matches: ... }")
+  imageNumber: IntScalarFilters
+  imageNumber_EQ: Int @deprecated(reason: "Please use the relevant generic filter imageNumber: { eq: ... }")
+  imageNumber_IN: [Int] @deprecated(reason: "Please use the relevant generic filter imageNumber: { in: ... }")
+  imageNumber_LT: Int @deprecated(reason: "Please use the relevant generic filter imageNumber: { lt: ... }")
+  imageNumber_LTE: Int @deprecated(reason: "Please use the relevant generic filter imageNumber: { lte: ... }")
+  imageNumber_GT: Int @deprecated(reason: "Please use the relevant generic filter imageNumber: { gt: ... }")
+  imageNumber_GTE: Int @deprecated(reason: "Please use the relevant generic filter imageNumber: { gte: ... }")
   uploadedByIp: StringScalarFilters
   uploadedByIp_EQ: String @deprecated(reason: "Please use the relevant generic filter uploadedByIp: { eq: ... }")
   uploadedByIp_IN: [String] @deprecated(reason: "Please use the relevant generic filter uploadedByIp: { in: ... }")
@@ -38625,6 +39361,22 @@ input ModerationProfileAuthoredCommentsNodeAggregationWhereInput {
   AND: [ModerationProfileAuthoredCommentsNodeAggregationWhereInput!]
   OR: [ModerationProfileAuthoredCommentsNodeAggregationWhereInput!]
   NOT: ModerationProfileAuthoredCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -47933,6 +48685,22 @@ input TagCommentsNodeAggregationWhereInput {
   AND: [TagCommentsNodeAggregationWhereInput!]
   OR: [TagCommentsNodeAggregationWhereInput!]
   NOT: TagCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -49707,6 +50475,7 @@ input UserAlbumsAggregateInput {
   AND: [UserAlbumsAggregateInput!]
   OR: [UserAlbumsAggregateInput!]
   NOT: UserAlbumsAggregateInput
+  node: UserAlbumsNodeAggregationWhereInput
 }
 
 input UserAlbumsConnectFieldInput {
@@ -49719,6 +50488,7 @@ input UserAlbumsConnectionAggregateInput {
   AND: [UserAlbumsConnectionAggregateInput!]
   OR: [UserAlbumsConnectionAggregateInput!]
   NOT: UserAlbumsConnectionAggregateInput
+  node: UserAlbumsNodeAggregationWhereInput
 }
 
 input UserAlbumsConnectionFilters {
@@ -49774,6 +50544,49 @@ input UserAlbumsDisconnectFieldInput {
 input UserAlbumsFieldInput {
   connect: [UserAlbumsConnectFieldInput!]
   create: [UserAlbumsCreateFieldInput!]
+}
+
+input UserAlbumsNodeAggregationWhereInput {
+  AND: [UserAlbumsNodeAggregationWhereInput!]
+  OR: [UserAlbumsNodeAggregationWhereInput!]
+  NOT: UserAlbumsNodeAggregationWhereInput
+  ownerUsername_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead.")
+  ownerUsername: StringScalarAggregationFilters
+  albumNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { min: { eq: ... } } }' instead.")
+  albumNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { max: { eq: ... } } }' instead.")
+  albumNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { sum: { eq: ... } } }' instead.")
+  albumNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { average: { eq: ... } } }' instead.")
+  albumNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { min: { gt: ... } } }' instead.")
+  albumNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { max: { gt: ... } } }' instead.")
+  albumNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { sum: { gt: ... } } }' instead.")
+  albumNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { average: { gt: ... } } }' instead.")
+  albumNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { min: { gte: ... } } }' instead.")
+  albumNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { max: { gte: ... } } }' instead.")
+  albumNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { sum: { gte: ... } } }' instead.")
+  albumNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { average: { gte: ... } } }' instead.")
+  albumNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { min: { lt: ... } } }' instead.")
+  albumNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { max: { lt: ... } } }' instead.")
+  albumNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { sum: { lt: ... } } }' instead.")
+  albumNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { average: { lt: ... } } }' instead.")
+  albumNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { min: { lte: ... } } }' instead.")
+  albumNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { max: { lte: ... } } }' instead.")
+  albumNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { sum: { lte: ... } } }' instead.")
+  albumNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'albumNumber: { average: { lte: ... } } }' instead.")
+  albumNumber: IntScalarAggregationFilters
 }
 
 input UserAlbumsUpdateConnectionInput {
@@ -50419,6 +51232,43 @@ input UserCollectionsNodeAggregationWhereInput {
   name_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'name: { longestLength: { lte: ... } } }' instead.")
   name_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'name: { shortestLength: { lte: ... } } }' instead.")
   name: StringScalarAggregationFilters
+  ownerUsername_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead.")
+  ownerUsername_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead.")
+  ownerUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead.")
+  ownerUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead.")
+  ownerUsername: StringScalarAggregationFilters
+  collectionNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { eq: ... } } }' instead.")
+  collectionNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { eq: ... } } }' instead.")
+  collectionNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { eq: ... } } }' instead.")
+  collectionNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { eq: ... } } }' instead.")
+  collectionNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { gt: ... } } }' instead.")
+  collectionNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { gt: ... } } }' instead.")
+  collectionNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { gt: ... } } }' instead.")
+  collectionNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { gt: ... } } }' instead.")
+  collectionNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { gte: ... } } }' instead.")
+  collectionNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { gte: ... } } }' instead.")
+  collectionNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { gte: ... } } }' instead.")
+  collectionNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { gte: ... } } }' instead.")
+  collectionNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { lt: ... } } }' instead.")
+  collectionNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { lt: ... } } }' instead.")
+  collectionNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { lt: ... } } }' instead.")
+  collectionNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { lt: ... } } }' instead.")
+  collectionNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { min: { lte: ... } } }' instead.")
+  collectionNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { max: { lte: ... } } }' instead.")
+  collectionNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { sum: { lte: ... } } }' instead.")
+  collectionNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'collectionNumber: { average: { lte: ... } } }' instead.")
+  collectionNumber: IntScalarAggregationFilters
   description_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'description: { averageLength: { eq: ... } } }' instead.")
   description_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'description: { longestLength: { eq: ... } } }' instead.")
   description_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'description: { shortestLength: { eq: ... } } }' instead.")
@@ -50557,6 +51407,22 @@ input UserCommentsNodeAggregationWhereInput {
   AND: [UserCommentsNodeAggregationWhereInput!]
   OR: [UserCommentsNodeAggregationWhereInput!]
   NOT: UserCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -51885,6 +52751,22 @@ input UserFavoriteCommentsNodeAggregationWhereInput {
   AND: [UserFavoriteCommentsNodeAggregationWhereInput!]
   OR: [UserFavoriteCommentsNodeAggregationWhereInput!]
   NOT: UserFavoriteCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -52689,6 +53571,27 @@ input UserFavoriteImagesNodeAggregationWhereInput {
   uploadedByUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByUsername: { longestLength: { lte: ... } } }' instead.")
   uploadedByUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByUsername: { shortestLength: { lte: ... } } }' instead.")
   uploadedByUsername: StringScalarAggregationFilters
+  imageNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { eq: ... } } }' instead.")
+  imageNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { eq: ... } } }' instead.")
+  imageNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { eq: ... } } }' instead.")
+  imageNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { eq: ... } } }' instead.")
+  imageNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { gt: ... } } }' instead.")
+  imageNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { gt: ... } } }' instead.")
+  imageNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { gt: ... } } }' instead.")
+  imageNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { gt: ... } } }' instead.")
+  imageNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { gte: ... } } }' instead.")
+  imageNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { gte: ... } } }' instead.")
+  imageNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { gte: ... } } }' instead.")
+  imageNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { gte: ... } } }' instead.")
+  imageNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { lt: ... } } }' instead.")
+  imageNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { lt: ... } } }' instead.")
+  imageNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { lt: ... } } }' instead.")
+  imageNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { lt: ... } } }' instead.")
+  imageNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { lte: ... } } }' instead.")
+  imageNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { lte: ... } } }' instead.")
+  imageNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { lte: ... } } }' instead.")
+  imageNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { lte: ... } } }' instead.")
+  imageNumber: IntScalarAggregationFilters
   uploadedByIp_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { averageLength: { eq: ... } } }' instead.")
   uploadedByIp_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { longestLength: { eq: ... } } }' instead.")
   uploadedByIp_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { shortestLength: { eq: ... } } }' instead.")
@@ -53163,6 +54066,27 @@ input UserImagesNodeAggregationWhereInput {
   uploadedByUsername_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByUsername: { longestLength: { lte: ... } } }' instead.")
   uploadedByUsername_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByUsername: { shortestLength: { lte: ... } } }' instead.")
   uploadedByUsername: StringScalarAggregationFilters
+  imageNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { eq: ... } } }' instead.")
+  imageNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { eq: ... } } }' instead.")
+  imageNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { eq: ... } } }' instead.")
+  imageNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { eq: ... } } }' instead.")
+  imageNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { gt: ... } } }' instead.")
+  imageNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { gt: ... } } }' instead.")
+  imageNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { gt: ... } } }' instead.")
+  imageNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { gt: ... } } }' instead.")
+  imageNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { gte: ... } } }' instead.")
+  imageNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { gte: ... } } }' instead.")
+  imageNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { gte: ... } } }' instead.")
+  imageNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { gte: ... } } }' instead.")
+  imageNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { lt: ... } } }' instead.")
+  imageNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { lt: ... } } }' instead.")
+  imageNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { lt: ... } } }' instead.")
+  imageNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { lt: ... } } }' instead.")
+  imageNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { min: { lte: ... } } }' instead.")
+  imageNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { max: { lte: ... } } }' instead.")
+  imageNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { sum: { lte: ... } } }' instead.")
+  imageNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'imageNumber: { average: { lte: ... } } }' instead.")
+  imageNumber: IntScalarAggregationFilters
   uploadedByIp_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { averageLength: { eq: ... } } }' instead.")
   uploadedByIp_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { longestLength: { eq: ... } } }' instead.")
   uploadedByIp_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'uploadedByIp: { shortestLength: { eq: ... } } }' instead.")
@@ -57880,6 +58804,22 @@ input UserUpvotedCommentsNodeAggregationWhereInput {
   AND: [UserUpvotedCommentsNodeAggregationWhereInput!]
   OR: [UserUpvotedCommentsNodeAggregationWhereInput!]
   NOT: UserUpvotedCommentsNodeAggregationWhereInput
+  shortId_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LT: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LT: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead.")
+  shortId_AVERAGE_LENGTH_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead.")
+  shortId_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead.")
+  shortId_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead.")
+  shortId: StringScalarAggregationFilters
   text_AVERAGE_LENGTH_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead.")
   text_LONGEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead.")
   text_SHORTEST_LENGTH_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'text: { shortestLength: { eq: ... } } }' instead.")
@@ -58127,6 +59067,27 @@ input UserUpvotedDiscussionChannelsNodeAggregationWhereInput {
   channelUniqueName_LONGEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { longestLength: { lte: ... } } }' instead.")
   channelUniqueName_SHORTEST_LENGTH_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead.")
   channelUniqueName: StringScalarAggregationFilters
+  discussionNumber_MIN_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { eq: ... } } }' instead.")
+  discussionNumber_MAX_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { eq: ... } } }' instead.")
+  discussionNumber_SUM_EQUAL: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { eq: ... } } }' instead.")
+  discussionNumber_AVERAGE_EQUAL: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { eq: ... } } }' instead.")
+  discussionNumber_MIN_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { gt: ... } } }' instead.")
+  discussionNumber_MAX_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { gt: ... } } }' instead.")
+  discussionNumber_SUM_GT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { gt: ... } } }' instead.")
+  discussionNumber_AVERAGE_GT: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { gt: ... } } }' instead.")
+  discussionNumber_MIN_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { gte: ... } } }' instead.")
+  discussionNumber_MAX_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { gte: ... } } }' instead.")
+  discussionNumber_SUM_GTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { gte: ... } } }' instead.")
+  discussionNumber_AVERAGE_GTE: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { gte: ... } } }' instead.")
+  discussionNumber_MIN_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { lt: ... } } }' instead.")
+  discussionNumber_MAX_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { lt: ... } } }' instead.")
+  discussionNumber_SUM_LT: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { lt: ... } } }' instead.")
+  discussionNumber_AVERAGE_LT: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { lt: ... } } }' instead.")
+  discussionNumber_MIN_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { min: { lte: ... } } }' instead.")
+  discussionNumber_MAX_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { max: { lte: ... } } }' instead.")
+  discussionNumber_SUM_LTE: Int @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { sum: { lte: ... } } }' instead.")
+  discussionNumber_AVERAGE_LTE: Float @deprecated(reason: "Please use the relevant generic filter 'discussionNumber: { average: { lte: ... } } }' instead.")
+  discussionNumber: IntScalarAggregationFilters
   createdAt_MIN_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead.")
   createdAt_MAX_EQUAL: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead.")
   createdAt_MIN_GT: DateTime @deprecated(reason: "Please use the relevant generic filter 'createdAt: { min: { gt: ... } } }' instead.")
