@@ -13,7 +13,7 @@ import StarIcon from '@/components/icons/StarIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import GenericButton from '@/components/GenericButton.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PageSkeleton from '@/components/PageSkeleton.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import SearchBar from '@/components/SearchBar.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
@@ -156,12 +156,7 @@ useHead(
   <div
     class="mx-auto w-full max-w-6xl px-4 py-6 text-gray-900 sm:px-6 sm:py-8 lg:px-8 dark:text-gray-100"
   >
-    <div
-      v-if="channelLoading || wikiLoading"
-      class="flex items-center justify-center py-16"
-    >
-      <LoadingSpinner size="lg" />
-    </div>
+    <PageSkeleton v-if="channelLoading || wikiLoading" class="p-8" label="Loading wiki…" />
 
     <div
       v-else-if="channelError || wikiError"

@@ -5,7 +5,7 @@ import { useQuery } from '@vue/apollo-composable';
 import type { GetPublicCollectionByIdQuery } from '@/__generated__/operations';
 import { GetPublicCollectionByIdDocument as GET_PUBLIC_COLLECTION_BY_ID } from '@/__generated__/operations';
 import { mergeUniqueById } from '@/utils/mergeUniqueById';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PageSkeleton from '@/components/PageSkeleton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import CollectionDownloadListItem from '@/components/collection/CollectionDownloadListItem.vue';
 type Discussion =
@@ -95,10 +95,9 @@ const loadMore = () => {
 <template>
   <NuxtLayout>
     <div class="mx-auto w-full max-w-6xl px-3 py-6">
-      <LoadingSpinner
+      <PageSkeleton
         v-if="loading && !collection"
-        class="py-6"
-        :loading-text="'Loading collection...'"
+        label="Loading collection…"
       />
       <ErrorBanner v-else-if="error" :text="error.message" class="mb-4" />
       <div v-else-if="collection" class="space-y-4">

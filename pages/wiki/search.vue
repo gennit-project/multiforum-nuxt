@@ -13,7 +13,7 @@ import StarIcon from '@/components/icons/StarIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PageSkeleton from '@/components/PageSkeleton.vue';
 import WikiPagePinButton from '@/components/wiki/WikiPagePinButton.vue';
 import { updateFilters } from '@/utils/routerUtils';
 import { getChannelLabel, relativeTime } from '@/utils';
@@ -236,9 +236,7 @@ watch(
         </div>
       </header>
 
-      <div v-if="wikiLoading" class="flex items-center justify-center py-16">
-        <LoadingSpinner size="lg" />
-      </div>
+      <PageSkeleton v-if="wikiLoading" class="p-8" label="Loading wiki…" />
       <div
         v-else-if="wikiError"
         class="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 dark:border-red-700 dark:bg-red-900/30 dark:text-red-200"

@@ -267,7 +267,7 @@ describe('channel wiki landing page', () => {
   it('shows the loading state while either query is loading', async () => {
     const wrapper = await mountWith({ queryState: { wikiLoading: true } });
 
-    expect(wrapper.findComponent({ name: 'LoadingSpinner' }).exists()).toBe(
+    expect(wrapper.findComponent({ name: 'PageSkeleton' }).exists()).toBe(
       true
     );
   });

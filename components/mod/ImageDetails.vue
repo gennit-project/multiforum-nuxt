@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { GetImageDetailsDocument as GET_IMAGE_DETAILS } from '@/__generated__/operations';
 import { useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '../ErrorBanner.vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PageSkeleton from '@/components/PageSkeleton.vue';
 import AppImage from '@/components/image/AppImage.vue';
 import ImageCaption from '@/components/image/ImageCaption.vue';
 import { stableRelativeTime } from '@/utils';
@@ -78,7 +78,7 @@ onImageResult(({ data }) => {
 
 <template>
   <div class="flex w-full flex-col space-y-4">
-    <LoadingSpinner v-if="imageLoading" />
+    <PageSkeleton v-if="imageLoading" :lines="3" label="Loading image…" />
     <ErrorBanner v-else-if="imageError" :text="imageError.message" />
     <div
       v-else-if="!image"
