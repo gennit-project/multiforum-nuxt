@@ -4,7 +4,6 @@ import { useMutation } from '@vue/apollo-composable';
 import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
-  isFileSizeValid,
   type SignedStorageUrlPayload,
 } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
@@ -39,11 +38,6 @@ const upload = async (file: File) => {
     console.error('No username found');
     return;
   }
-  const sizeCheck = isFileSizeValid({ file });
-  if (!sizeCheck.valid) {
-    alert(sizeCheck.message);
-    return;
-  }
   try {
     const filename = getUploadFileName({ username: usernameVar.value, file });
     const signedUrlResult = await createSignedStorageUrl({
@@ -60,6 +54,7 @@ const upload = async (file: File) => {
       fileType: file.type,
       signedStorageURL,
       storageUrl: signedUpload?.storageUrl,
+      contentLengthRange: signedUpload?.contentLengthRange,
     });
 
     return embeddedLink;

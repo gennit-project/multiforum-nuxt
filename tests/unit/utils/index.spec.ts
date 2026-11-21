@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import {
-  isFileSizeValid,
   getUploadFileName,
   encodeSpacesInURL,
   getDuration,
@@ -28,43 +27,6 @@ import { DateTime } from 'luxon';
 import type { Duration } from 'luxon';
 import type { ApolloCache } from '@apollo/client/core';
 import type { Event, Tag as TagData } from '@/__generated__/graphql';
-
-describe('isFileSizeValid', () => {
-  it('returns valid for file under 5MB', () => {
-    const file = new File(['x'.repeat(1024 * 1024)], 'test.jpg'); // ~1MB
-
-    const result = isFileSizeValid({ file });
-
-    expect(result.valid).toBe(true);
-    expect(result.message).toBe('');
-  });
-
-  it('returns invalid for file over 5MB', () => {
-    const file = new File(['x'.repeat(6 * 1024 * 1024)], 'large.jpg'); // ~6MB
-
-    const result = isFileSizeValid({ file });
-
-    expect(result.valid).toBe(false);
-    expect(result.message).toContain('less than 5MB');
-  });
-
-  it('uses 1MB limit for profile pics', () => {
-    const file = new File(['x'.repeat(2 * 1024 * 1024)], 'profile.jpg'); // ~2MB
-
-    const result = isFileSizeValid({ file, isProfilePic: true });
-
-    expect(result.valid).toBe(false);
-    expect(result.message).toContain('less than 1MB');
-  });
-
-  it('returns valid for profile pic under 1MB', () => {
-    const file = new File(['x'.repeat(512 * 1024)], 'profile.jpg'); // ~0.5MB
-
-    const result = isFileSizeValid({ file, isProfilePic: true });
-
-    expect(result.valid).toBe(true);
-  });
-});
 
 describe('getUploadFileName', () => {
   it('includes timestamp, username, and filename', () => {
@@ -458,6 +420,55 @@ describe('uploadAndGetEmbeddedLink', () => {
     );
   });
 
+  it('replays the signed x-goog-content-length-range header on the PUT', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true });
+
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+    await uploadAndGetEmbeddedLink({
+      signedStorageURL: 'https://storage.example.com/upload',
+      contentLengthRange: '0,10485760',
+      filename: 'test.jpg',
+      file,
+      fileType: 'image/jpeg',
+    });
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://storage.example.com/upload',
+      expect.objectContaining({
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': 'image/jpeg',
+          'x-goog-content-length-range': '0,10485760',
+        },
+      })
+    );
+  });
+
+  it.each([
+    ['null', null],
+    ['undefined', undefined],
+    ['an empty string', ''],
+  ])(
+    'omits the size-limit header when contentLengthRange is %s (older backend)',
+    async (_label, contentLengthRange) => {
+      mockFetch.mockResolvedValueOnce({ ok: true });
+
+      const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+      await uploadAndGetEmbeddedLink({
+        signedStorageURL: 'https://storage.example.com/upload',
+        contentLengthRange,
+        filename: 'test.jpg',
+        file,
+        fileType: 'image/jpeg',
+      });
+
+      expect(mockFetch.mock.calls[0]?.[1].headers).toEqual({
+        'Content-Type': 'image/jpeg',
+      });
+    }
+  );
+
   it('returns the signed storageUrl after a successful upload when provided', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true });
 
@@ -473,20 +484,54 @@ describe('uploadAndGetEmbeddedLink', () => {
     expect(result).toBe('https://storage.googleapis.com/bucket/users/alice/test.jpg');
   });
 
-  it('throws error when file is too large', async () => {
-    const largeFile = new File(['x'.repeat(6 * 1024 * 1024)], 'large.jpg');
+  it('explains an over-limit rejection using the signed size range', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 400, statusText: 'Bad Request' });
+
+    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
 
     await expect(
       uploadAndGetEmbeddedLink({
         signedStorageURL: 'https://storage.example.com/upload',
-        filename: 'large.jpg',
-        file: largeFile,
+        contentLengthRange: '0,10485760',
+        filename: 'test.jpg',
+        file,
         fileType: 'image/jpeg',
       })
-    ).rejects.toThrow('less than 5MB');
-
-    expect(mockFetch).not.toHaveBeenCalled();
+    ).rejects.toThrow('Upload failed with status 400. The file may exceed the 10.0MB upload limit.');
   });
+
+  it.each([
+    ['a non-400 status', 403, '0,10485760'],
+    ['a missing range', 400, undefined],
+    ['a null range', 400, null],
+    ['a zero max', 400, '0,0'],
+    ['a negative max', 400, '0,-5'],
+    ['a non-numeric max', 400, '0,abc'],
+    ['a range with no max', 400, '0'],
+  ])(
+    'adds no size hint for %s',
+    async (_label, status, contentLengthRange) => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status,
+        statusText: 'Error',
+      });
+
+      const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+
+      await expect(
+        uploadAndGetEmbeddedLink({
+          signedStorageURL: 'https://storage.example.com/upload',
+          contentLengthRange,
+          filename: 'test.jpg',
+          file,
+          fileType: 'image/jpeg',
+        })
+      ).rejects.toMatchObject({
+        message: `Upload failed with status ${status}`,
+      });
+    }
+  );
 
   it('returns undefined when signedStorageURL is missing', async () => {
     const file = new File(['content'], 'test.jpg');

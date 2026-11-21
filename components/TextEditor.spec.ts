@@ -15,7 +15,6 @@ import {
   insertEmoji,
   calculateRemainingChars,
 } from '@/utils/textFormatting';
-import { isFileSizeValid } from '@/utils/index';
 
 // --- Mounted-component setup (the existing tests above only exercise the
 // extracted utils; these mount the real TextEditor textarea editor) ---
@@ -35,9 +34,8 @@ vi.mock('@/composables/useAuthState', () => ({
 
 // Mock the image-upload composable so the upload flow (placeholder insertion,
 // success/failure replacement, size validation) is drivable without Apollo.
-const { uploadFileMock, validateFileSizeMock, createSignedStorageUrlErrorRef } = vi.hoisted(() => ({
+const { uploadFileMock, createSignedStorageUrlErrorRef } = vi.hoisted(() => ({
   uploadFileMock: vi.fn(),
-  validateFileSizeMock: vi.fn(() => ({ valid: true, message: '' })),
   createSignedStorageUrlErrorRef: {
     value: null as null | { message: string },
     __v_isRef: true,
@@ -46,7 +44,6 @@ const { uploadFileMock, validateFileSizeMock, createSignedStorageUrlErrorRef } =
 vi.mock('@/composables/useImageUpload', () => ({
   useImageUpload: () => ({
     uploadFile: uploadFileMock,
-    validateFileSize: validateFileSizeMock,
     createUploadPlaceholder: (file: File, id: string) => ({
       markdown: `![uploading ${file.name}](placeholder-${id})`,
       placeholderText: `uploading ${file.name}`,
@@ -190,29 +187,6 @@ describe('CharCounter', () => {
     expect(calculateRemainingChars({ current: 100, max: 500 })).toBe(400);
     expect(calculateRemainingChars({ current: 500, max: 500 })).toBe(0);
     expect(calculateRemainingChars({ current: 600, max: 500 })).toBe(-100);
-  });
-});
-
-// Test the file size validation utility
-describe('Image Upload Validation', () => {
-  it('validates file size correctly', () => {
-    // Mock small file (1MB)
-    const smallFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-    Object.defineProperty(smallFile, 'size', { value: 1 * 1024 * 1024 });
-    expect(isFileSizeValid({ file: smallFile }).valid).toBe(true);
-
-    // Mock large file (10MB)
-    const largeFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-    Object.defineProperty(largeFile, 'size', { value: 10 * 1024 * 1024 });
-    expect(isFileSizeValid({ file: largeFile }).valid).toBe(false);
-  });
-
-  it('returns informative error messages', () => {
-    const largeFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
-    Object.defineProperty(largeFile, 'size', { value: 10 * 1024 * 1024 });
-    const result = isFileSizeValid({ file: largeFile });
-    expect(result.valid).toBe(false);
-    expect(result.message).toContain('must be less than');
   });
 });
 
@@ -361,7 +335,6 @@ describe('TextEditor (mounted)', () => {
 describe('TextEditor (image upload)', () => {
   beforeEach(() => {
     uploadFileMock.mockReset();
-    validateFileSizeMock.mockReset().mockReturnValue({ valid: true, message: '' });
     createSignedStorageUrlErrorRef.value = null;
   });
 
@@ -392,21 +365,6 @@ describe('TextEditor (image upload)', () => {
 
     const last = String(wrapper.emitted('update')?.at(-1)?.[0]);
     expect(last).toContain('upload failed');
-  });
-
-  it('rejects an oversized file before uploading', async () => {
-    validateFileSizeMock.mockReturnValue({ valid: false, message: 'too big' });
-    const alertSpy = vi.fn();
-    vi.stubGlobal('alert', alertSpy);
-    const wrapper = mountEditor({ initialValue: '' });
-    await wrapper
-      .findComponent({ name: 'AddImage' })
-      .vm.$emit('file-change', fileChange(pngFile()));
-    await flushPromises();
-
-    expect(alertSpy).toHaveBeenCalledWith('too big');
-    expect(uploadFileMock).not.toHaveBeenCalled();
-    vi.unstubAllGlobals();
   });
 
   it('renders the signed storage url error banner', () => {

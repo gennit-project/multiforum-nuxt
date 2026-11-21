@@ -17,7 +17,6 @@ import type { EditAccountSettingsFormValues } from '@/types/User';
 import FormComponent from '../FormComponent.vue';
 import { MAX_CHARS_IN_USER_BIO } from '@/utils/constants';
 import { CreateSignedUrlDocument as CREATE_SIGNED_STORAGE_URL, PermanentlyDeleteProfileImageDocument as PERMANENTLY_DELETE_PROFILE_IMAGE  } from '@/__generated__/operations';
-import { isFileSizeValid } from '@/utils/index';
 
 type FileChangeInput = {
   // event of HTMLInputElement;
@@ -78,11 +77,6 @@ const upload = async (file: File) => {
     console.error('No username found');
     return;
   }
-  const sizeCheck = isFileSizeValid({ file, isProfilePic: true });
-  if (!sizeCheck.valid) {
-    alert(sizeCheck.message);
-    return;
-  }
 
   try {
     const filename = getUploadFileName({ username: usernameVar.value, file });
@@ -101,6 +95,7 @@ const upload = async (file: File) => {
       fileType: file.type,
       signedStorageURL,
       storageUrl: signedUpload?.storageUrl,
+      contentLengthRange: signedUpload?.contentLengthRange,
     });
 
     return embeddedLink;

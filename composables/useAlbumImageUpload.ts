@@ -6,7 +6,6 @@ import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
 } from '@/utils';
-import { isFileSizeValid } from '@/utils/index';
 
 export type AlbumImageInput = {
   id?: string;
@@ -60,12 +59,6 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
       return false;
     }
 
-    const sizeCheck = isFileSizeValid({ file });
-    if (!sizeCheck.valid) {
-      alert(sizeCheck.message);
-      return false;
-    }
-
     try {
       // Generate a unique filename
       const filename = getUploadFileName({ username: usernameVar.value, file });
@@ -89,6 +82,7 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
         fileType: contentType,
         signedStorageURL,
         storageUrl: signedUpload?.storageUrl,
+        contentLengthRange: signedUpload?.contentLengthRange,
       });
 
       if (!fileUrl) {

@@ -12,7 +12,6 @@ const h = vi.hoisted(() => ({
   removeForumOwner: vi.fn(),
   permanentlyDeleteChannelBanner: vi.fn(),
   uploadAndGetEmbeddedLink: vi.fn(),
-  isFileSizeValid: vi.fn(),
   username: null as unknown as { value: string | null },
   deleteLoading: null as unknown as { value: boolean },
   removeDone: undefined as undefined | (() => void),
@@ -41,7 +40,6 @@ vi.mock('@/utils', async (importOriginal) => {
     ...actual,
     getUploadFileName: vi.fn(() => 'alice-banner.png'),
     uploadAndGetEmbeddedLink: h.uploadAndGetEmbeddedLink,
-    isFileSizeValid: h.isFileSizeValid,
   };
 });
 
@@ -51,7 +49,6 @@ vi.mock('@/utils/index', async (importOriginal) => {
     ...actual,
     getUploadFileName: vi.fn(() => 'alice-banner.png'),
     uploadAndGetEmbeddedLink: h.uploadAndGetEmbeddedLink,
-    isFileSizeValid: h.isFileSizeValid,
   };
 });
 
@@ -164,7 +161,6 @@ beforeEach(() => {
   h.deleteLoading ??= ref(false);
   h.username.value = 'alice';
   h.deleteLoading.value = false;
-  h.isFileSizeValid.mockReturnValue({ valid: true, message: '' });
   h.uploadAndGetEmbeddedLink.mockReturnValue('https://cdn.example.com/new.png');
   h.createSignedStorageUrl.mockResolvedValue({
     data: {
@@ -240,15 +236,6 @@ describe('forum basic settings page', () => {
     emitImage(wrapper, new File(['banner'], 'banner.png'));
     await flushPromises();
     expect(h.createSignedStorageUrl).not.toHaveBeenCalled();
-  });
-
-  it('rejects an oversized upload before requesting a signed URL', async () => {
-    h.isFileSizeValid.mockReturnValue({ valid: false, message: 'Too large' });
-    vi.stubGlobal('alert', vi.fn());
-    const wrapper = await buildWrapper({});
-    emitImage(wrapper, new File(['x'], 'large.png'));
-    await flushPromises();
-    expect(globalThis.alert).toHaveBeenCalledWith('Too large');
   });
 
   it('does not submit when signed URL creation fails', async () => {

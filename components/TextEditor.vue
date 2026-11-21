@@ -134,7 +134,6 @@ const isSmallScreen = computed(() => width.value < 640);
 // Initialize composables
 const {
   uploadFile,
-  validateFileSize,
   createUploadPlaceholder,
   createImageMarkdown,
   createErrorMarkdown,
@@ -330,12 +329,6 @@ function formatTextArea(format: string) {
 async function handleFormStateDuringUpload(file: File) {
   const textarea = editorRef.value;
   if (!textarea) return;
-
-  const sizeCheck = validateFileSize(file);
-  if (!sizeCheck.valid) {
-    alert(sizeCheck.message);
-    return;
-  }
 
   const cursorPositionStart = textarea.selectionStart;
   const cursorPositionEnd = textarea.selectionEnd;

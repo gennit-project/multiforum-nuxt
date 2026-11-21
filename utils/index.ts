@@ -20,35 +20,6 @@ import type { Event } from '@/__generated__/graphql';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import CheckCircle from '@/components/icons/CheckCircle.vue';
 
-const MAX_FILE_SIZE_MB = 5;
-const MAX_PROFILE_PIC_SIZE_MB = 1;
-const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024; // Convert MB to bytes
-const MAX_PROFILE_PIC_SIZE_BYTES = MAX_PROFILE_PIC_SIZE_MB * 1024 * 1024; // Convert MB to bytes
-
-type FileSizeValidationInput = {
-  file: File;
-  isProfilePic?: boolean;
-};
-
-export function isFileSizeValid(input: FileSizeValidationInput): {
-  valid: boolean;
-  message: string;
-} {
-  const { file, isProfilePic = false } = input;
-  const maxSize = isProfilePic
-    ? MAX_PROFILE_PIC_SIZE_BYTES
-    : MAX_FILE_SIZE_BYTES;
-  const maxSizeMB = isProfilePic ? MAX_PROFILE_PIC_SIZE_MB : MAX_FILE_SIZE_MB;
-
-  if (file.size > maxSize) {
-    return {
-      valid: false,
-      message: `File size must be less than ${maxSizeMB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`,
-    };
-  }
-  return { valid: true, message: '' };
-}
-
 const getTimePieces = (timeObj: DateTime) => {
   const { year, month, day, weekday, hour } = timeObj;
 
@@ -268,6 +239,13 @@ type UploadFileInput = {
 type GetEmbeddedLinkInput = {
   signedStorageURL: string;
   storageUrl?: string | null;
+  /**
+   * The exact value of the signed `x-goog-content-length-range` header, as
+   * returned by `createSignedStorageURL`. Because GCS signs this header into
+   * the URL, the PUT must replay it verbatim or the upload fails with a 403.
+   * Omitted by older backends that do not sign a size limit.
+   */
+  contentLengthRange?: string | null;
   filename: string;
   file: File;
   fileType: string;
@@ -277,6 +255,7 @@ export type SignedStorageUrlPayload = {
   url?: string | null;
   storageUrl?: string | null;
   storageObjectName?: string | null;
+  contentLengthRange?: string | null;
 };
 
 export function getUploadFileName(input: UploadFileInput) {
@@ -290,15 +269,30 @@ export function encodeSpacesInURL(url: string) {
   return url.split(' ').join('%20');
 }
 
-export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
-  const { signedStorageURL, storageUrl, filename, file } = input;
+type SizeLimitHintInput = {
+  status: number;
+  contentLengthRange?: string | null;
+};
 
-  // Check validation
-  const sizeCheck = isFileSizeValid({ file });
-  if (!sizeCheck.valid) {
-    console.error(sizeCheck.message);
-    throw new Error(sizeCheck.message);
-  }
+/**
+ * GCS answers 400 when an object violates the signed content-length range.
+ * The limit is owned by the backend, so the client only reads it back out of
+ * the signed range ("min,max" in bytes) to make that failure understandable.
+ */
+function describeSizeLimitHint(input: SizeLimitHintInput) {
+  const { status, contentLengthRange } = input;
+  if (status !== 400 || !contentLengthRange) return '';
+
+  const maxBytes = Number(contentLengthRange.split(',')[1]);
+  if (!Number.isFinite(maxBytes) || maxBytes <= 0) return '';
+
+  const maxMB = (maxBytes / (1024 * 1024)).toFixed(1);
+  return `. The file may exceed the ${maxMB}MB upload limit.`;
+}
+
+export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
+  const { signedStorageURL, storageUrl, contentLengthRange, filename, file } =
+    input;
 
   if (!signedStorageURL) {
     console.error('No signedStorageURL provided');
@@ -327,12 +321,17 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
     })();
 
   try {
+    const headers: Record<string, string> = {
+      'Content-Type': contentType,
+    };
+    if (contentLengthRange) {
+      headers['x-goog-content-length-range'] = contentLengthRange;
+    }
+
     const response = await fetch(signedStorageURL, {
       method: 'PUT',
       body: file,
-      headers: {
-        'Content-Type': contentType,
-      },
+      headers,
     });
 
     if (!response.ok) {
@@ -341,7 +340,12 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
         response.status,
         response.statusText
       );
-      throw new Error(`Upload failed with status ${response.status}`);
+      throw new Error(
+        `Upload failed with status ${response.status}${describeSizeLimitHint({
+          status: response.status,
+          contentLengthRange,
+        })}`
+      );
     }
 
     return storageUrl || embeddedLink;

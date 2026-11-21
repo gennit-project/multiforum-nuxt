@@ -18,7 +18,6 @@ import { useUsername } from '@/composables/useAuthState';
 import { ref, nextTick, computed } from 'vue';
 import { CreateSignedUrlDocument as CREATE_SIGNED_STORAGE_URL, PermanentlyDeleteChannelBannerDocument as PERMANENTLY_DELETE_CHANNEL_BANNER, SetChannelIconDocument as SET_CHANNEL_ICON , RemoveForumOwnerDocument as REMOVE_FORUM_OWNER  } from '@/__generated__/operations';
 import { useMutation } from '@vue/apollo-composable';
-import { isFileSizeValid } from '@/utils/index';
 import { useRoute, useRouter } from 'nuxt/app';
 
 const props = defineProps({
@@ -124,12 +123,6 @@ const upload = async (file: File) => {
     console.error('No username found');
     return;
   }
-  const sizeCheck = isFileSizeValid({ file });
-  if (!sizeCheck.valid) {
-    alert(sizeCheck.message);
-    return;
-  }
-
   try {
     const filename = getUploadFileName({
       username: usernameVar.value,
@@ -154,6 +147,7 @@ const upload = async (file: File) => {
       signedStorageURL,
       fileType: file.type,
       storageUrl: signedUpload?.storageUrl,
+      contentLengthRange: signedUpload?.contentLengthRange,
     });
 
     return embeddedLink;

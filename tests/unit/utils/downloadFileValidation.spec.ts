@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
   validateDownloadFileType,
-  validateDownloadFileSize,
-  MAX_DOWNLOAD_FILE_SIZE_BYTES,
 } from '@/utils/downloadFileValidation';
 
 describe('validateDownloadFileType', () => {
@@ -57,23 +55,5 @@ describe('validateDownloadFileType', () => {
       downloadsDisabled: false,
     });
     expect(result.message).toContain('stl, obj');
-  });
-});
-
-describe('validateDownloadFileSize', () => {
-  it('accepts a file within the size limit', () => {
-    expect(validateDownloadFileSize(1024).valid).toBe(true);
-  });
-
-  it('rejects a file over the size limit', () => {
-    expect(
-      validateDownloadFileSize(MAX_DOWNLOAD_FILE_SIZE_BYTES + 1).valid
-    ).toBe(false);
-  });
-
-  it('reports the file size in the rejection message', () => {
-    expect(
-      validateDownloadFileSize(MAX_DOWNLOAD_FILE_SIZE_BYTES + 1).message
-    ).toContain('less than 50MB');
   });
 });

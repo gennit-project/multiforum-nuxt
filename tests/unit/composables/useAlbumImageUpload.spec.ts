@@ -5,12 +5,10 @@ import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
 
 const mockCreateSignedStorageUrl = vi.fn();
 const mockCreateImage = vi.fn();
-const { mockUploadAndGetEmbeddedLink, mockIsFileSizeValid, mockUsername } =
-  vi.hoisted(() => ({
-    mockUploadAndGetEmbeddedLink: vi.fn(),
-    mockIsFileSizeValid: vi.fn(),
-    mockUsername: { value: 'testuser' },
-  }));
+const { mockUploadAndGetEmbeddedLink, mockUsername } = vi.hoisted(() => ({
+  mockUploadAndGetEmbeddedLink: vi.fn(),
+  mockUsername: { value: 'testuser' },
+}));
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (doc: unknown) => {
@@ -35,13 +33,11 @@ vi.mock('@/composables/useAuthState', () => ({
 vi.mock('@/utils', () => ({
   getUploadFileName: vi.fn(() => 'test-file-123.jpg'),
   uploadAndGetEmbeddedLink: mockUploadAndGetEmbeddedLink,
-  isFileSizeValid: mockIsFileSizeValid,
 }));
 
 vi.mock('@/utils/index', () => ({
   getUploadFileName: vi.fn(() => 'test-file-123.jpg'),
   uploadAndGetEmbeddedLink: mockUploadAndGetEmbeddedLink,
-  isFileSizeValid: mockIsFileSizeValid,
 }));
 
 describe('useAlbumImageUpload', () => {
@@ -55,8 +51,6 @@ describe('useAlbumImageUpload', () => {
     mockUploadAndGetEmbeddedLink.mockResolvedValue(
       'https://storage.example.com/test-file-123.jpg'
     );
-    mockIsFileSizeValid.mockReset();
-    mockIsFileSizeValid.mockReturnValue({ valid: true, message: '' });
     mockUsername.value = 'testuser';
     onImageUploaded = vi.fn(() => {});
     currentImageCount = () => 0;
@@ -213,6 +207,41 @@ describe('useAlbumImageUpload', () => {
       alertMock.mockRestore();
     });
 
+    it('passes the signed contentLengthRange to the storage upload helper', async () => {
+      mockCreateSignedStorageUrl.mockResolvedValue({
+        data: {
+          createSignedStorageURL: {
+            url: 'https://signed-url.example.com',
+            contentLengthRange: '0,10485760',
+          },
+        },
+      });
+      mockCreateImage.mockResolvedValue({
+        data: {
+          createImageWithUploader: {
+            id: 'img-1',
+            url: 'https://storage.example.com/test-file-123.jpg',
+            alt: 'file1.jpg',
+            caption: '',
+            copyright: '',
+          },
+        },
+      });
+      const { handleMultipleFiles } = useAlbumImageUpload({
+        maxImages: 25,
+        currentImageCount,
+        onImageUploaded,
+      });
+
+      await handleMultipleFiles([
+        new File(['content1'], 'file1.jpg', { type: 'image/jpeg' }),
+      ]);
+
+      expect(mockUploadAndGetEmbeddedLink).toHaveBeenCalledWith(
+        expect.objectContaining({ contentLengthRange: '0,10485760' })
+      );
+    });
+
     it('passes the signed storage object name when creating uploaded images', async () => {
       mockCreateSignedStorageUrl.mockResolvedValue({
         data: {
@@ -318,22 +347,6 @@ describe('useAlbumImageUpload', () => {
       });
 
       expect(await uploadFile(file)).toBe(false);
-    });
-
-    it('stops when the file is too large', async () => {
-      mockIsFileSizeValid.mockReturnValue({
-        valid: false,
-        message: 'File is too large',
-      });
-      const alertMock = vi.spyOn(window, 'alert').mockImplementation(() => {});
-      const { uploadFile } = useAlbumImageUpload({
-        maxImages: 25,
-        currentImageCount,
-        onImageUploaded,
-      });
-      await uploadFile(file);
-
-      expect(alertMock).toHaveBeenCalledWith('File is too large');
     });
 
     it('fails when no signed upload URL is returned', async () => {

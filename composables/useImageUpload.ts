@@ -6,7 +6,6 @@ import {
   getUploadFileName,
 } from '@/utils';
 import { useUsername } from '@/composables/useAuthState';
-import { isFileSizeValid } from '@/utils/index';
 
 type UploadResult = {
   success: boolean;
@@ -94,6 +93,7 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
         fileType,
         signedStorageURL,
         storageUrl: signedUpload?.storageUrl,
+        contentLengthRange: signedUpload?.contentLengthRange,
       });
 
       if (!embeddedLink) {
@@ -117,13 +117,6 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
     } finally {
       isUploading.value = false;
     }
-  };
-
-  /**
-   * Validate file size before upload
-   */
-  const validateFileSize = (file: File): { valid: boolean; message?: string } => {
-    return isFileSizeValid({ file });
   };
 
   /**
@@ -167,7 +160,6 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
 
   return {
     uploadFile,
-    validateFileSize,
     createUploadPlaceholder,
     createImageMarkdown,
     createErrorMarkdown,
