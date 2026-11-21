@@ -315,11 +315,11 @@ for (const mobile of [false, true]) {
       await row
         .getByRole('link', { name: 'chatGPT: 1 comment', exact: true })
         .click();
-      await expect(page).toHaveURL(/\/forums\/chatGPT\/discussions\/topic/);
+      await expect(page).toHaveURL(/\/forums\/chatGPT\/discussions\/1-/);
       await expect(
         page.getByText('A reply only in chatGPT', { exact: true })
       ).toBeVisible();
-      await page.goto('/forums/fungi/discussions/topic');
+      await page.goto('/forums/fungi/discussions/1-topic');
       await expect(
         page.getByText('There are no comments yet.', { exact: true })
       ).toBeVisible();

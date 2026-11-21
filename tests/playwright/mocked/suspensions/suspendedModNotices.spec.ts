@@ -285,7 +285,7 @@ test.describe('Mod suspension notices', () => {
     });
 
     try {
-      await page.goto(`/forums/${TEST_CHANNEL}/discussions/disc-1`);
+      await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
 
       // Wait for page to load
       await expect(page.getByRole('heading', { name: 'Test Discussion' })).toBeVisible({
@@ -386,7 +386,7 @@ test.describe('Mod suspension notices', () => {
     });
 
     try {
-      await page.goto(`/forums/${TEST_CHANNEL}/discussions/disc-1`);
+      await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
 
       // Wait for page to load
       await expect(page.getByRole('heading', { name: 'Test Discussion' })).toBeVisible({

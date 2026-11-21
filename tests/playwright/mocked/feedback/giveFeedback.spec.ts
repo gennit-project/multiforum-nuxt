@@ -298,7 +298,7 @@ test.describe('Give feedback flows', () => {
     });
 
     // Navigate to discussion detail page
-    await page.goto(`/forums/${TEST_CHANNEL}/discussions/${discussionId}`);
+    await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
     await seedModProfile(page);
 
     // Click the feedback menu button (thumbs down / flag icon)
@@ -611,7 +611,7 @@ test.describe('Give feedback flows', () => {
     });
 
     // Navigate to discussion detail page with comment
-    await page.goto(`/forums/${TEST_CHANNEL}/discussions/${discussionId}`);
+    await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
     await seedModProfile(page);
 
     // Wait for comment to load

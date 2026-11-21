@@ -23,7 +23,7 @@ test('opens the root comment editor from the keyboard', async ({
     page,
     createCommentHandlers(state, DEFAULT_COMMENT_CONFIG)
   );
-  const discussionUrl = `/forums/${DEFAULT_COMMENT_CONFIG.channelId}/discussions/${DEFAULT_COMMENT_CONFIG.discussionId}`;
+  const discussionUrl = `/forums/${DEFAULT_COMMENT_CONFIG.channelId}/discussions/1`;
 
   await page.goto(discussionUrl);
   const openEditor = page.getByRole('button', { name: 'Write a comment' });
@@ -45,7 +45,7 @@ test('creates a root comment', async ({ context, page }, testInfo) => {
   );
 
   try {
-    const discussionUrl = `/forums/${DEFAULT_COMMENT_CONFIG.channelId}/discussions/${DEFAULT_COMMENT_CONFIG.discussionId}`;
+    const discussionUrl = `/forums/${DEFAULT_COMMENT_CONFIG.channelId}/discussions/1`;
 
     await page.goto(discussionUrl);
     await expect(

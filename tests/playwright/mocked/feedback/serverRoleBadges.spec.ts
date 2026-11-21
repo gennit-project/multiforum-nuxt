@@ -73,7 +73,7 @@ test('shows Server Mod on a discussion feedback comment', async ({
   });
 
   await page.goto(
-    `/forums/${TEST_CHANNEL}/discussions/feedback/${discussionId}`
+    `/forums/${TEST_CHANNEL}/discussions/feedback/1`
   );
 
   const feedback = page.locator('main').filter({ hasText: FEEDBACK_TEXT });

@@ -4,6 +4,7 @@ import {
   buildBasicUser,
   buildChannel,
   buildComment,
+  buildCommentIdLookupHandlers,
   buildServerConfig,
   buildDiscussion,
   buildDiscussionChannel,
@@ -349,7 +350,7 @@ test.describe('Link verification - pages resolve correctly', () => {
 
     try {
       // Navigate to discussion permalink
-      await page.goto(`/forums/${TEST_CHANNEL}/discussions/${discussionId}`);
+      await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
 
       // Verify the page loads with correct content. The detail page shows two
       // "Add to favorites" buttons (header + title-edit form), so scope to the
@@ -364,7 +365,7 @@ test.describe('Link verification - pages resolve correctly', () => {
       await expect(page.getByText('Test discussion body content')).toBeVisible();
 
       // Verify URL is correct
-      expect(page.url()).toContain(`/forums/${TEST_CHANNEL}/discussions/${discussionId}`);
+      expect(page.url()).toContain(`/forums/${TEST_CHANNEL}/discussions/1`);
 
       expect(diagnostics.pageErrors).toEqual([]);
     } finally {
@@ -484,13 +485,18 @@ test.describe('Link verification - pages resolve correctly', () => {
           },
         },
       }),
+      ...buildCommentIdLookupHandlers([
+        { id: commentId },
+        { id: 'parent-1' },
+      ]),
       getPermalinkedComment: ({ body }) => ({
         data: {
           comments: [{
             ...testComment,
             id: body.variables?.id,
+            shortId: body.variables?.id === commentId ? 'short-comment-1' : 'short-parent-1',
             text: body.variables?.id === commentId ? testComment.text : 'Parent discussion comment',
-            ParentComment: body.variables?.id === commentId ? { __typename: 'Comment', id: 'parent-1' } : null,
+            ParentComment: body.variables?.id === commentId ? { __typename: 'Comment', id: 'parent-1', shortId: 'short-parent-1' } : null,
           }],
         },
       }),
@@ -504,15 +510,15 @@ test.describe('Link verification - pages resolve correctly', () => {
 
     try {
       // Navigate to comment permalink
-      await page.goto(`/forums/${TEST_CHANNEL}/discussions/${discussionId}/comments/${commentId}`);
+      await page.goto(`/forums/${TEST_CHANNEL}/discussions/1/comments/short-comment-1`);
 
       // Verify the comment is visible
       await expect(page.getByText('This is a permalinked comment')).toBeVisible();
 
       // Verify URL contains the comment ID
-      expect(page.url()).toContain(`/comments/${commentId}`);
+      expect(page.url()).toContain('/comments/short-comment-1');
 
-      await expect(page.getByRole('link', { name: 'View Context', exact: true })).toHaveAttribute('href', `/forums/${TEST_CHANNEL}/discussions/${discussionId}/comments/parent-1`);
+      await expect(page.getByRole('link', { name: 'View Context', exact: true })).toHaveAttribute('href', `/forums/${TEST_CHANNEL}/discussions/1/comments/short-parent-1`);
       await expectNoAxeViolations(page);
       await page.getByRole('link', { name: 'View Context', exact: true }).click();
       await expect(page.getByText('Parent discussion comment', { exact: true })).toBeVisible();
@@ -538,6 +544,10 @@ test.describe('Link verification - pages resolve correctly', () => {
 
       const diagnostics = await installGraphqlMocks(page, {
         ...getCommonMocks(TEST_USERNAME),
+        ...buildCommentIdLookupHandlers([
+          { id: 'event-comment' },
+          { id: 'event-parent' },
+        ]),
         getPermalinkedComment: ({ body }) => ({ data: { comments: [{
           ...buildComment({
             comment: {
@@ -550,7 +560,7 @@ test.describe('Link verification - pages resolve correctly', () => {
           DiscussionChannel: null,
           Event: { __typename: 'Event', id: eventId },
           ParentComment: body.variables?.id === 'event-comment'
-            ? { __typename: 'Comment', id: 'event-parent' }
+            ? { __typename: 'Comment', id: 'event-parent', shortId: 'short-event-parent' }
             : null,
         }] } }),
         getEventIdByNumber: () => ({ data: { getEventIdByNumber: eventId } }),
@@ -596,7 +606,7 @@ test.describe('Link verification - pages resolve correctly', () => {
 
       try {
         // Navigate to event permalink
-        await page.goto(`/forums/${TEST_CHANNEL}/events/1-test-event-title${commentPermalink ? '/comments/event-comment' : ''}`);
+        await page.goto(`/forums/${TEST_CHANNEL}/events/1-test-event-title${commentPermalink ? '/comments/short-event-comment' : ''}`);
 
         // Verify the event detail shell loaded
         await expect(page.getByTestId('event-menu-button')).toBeVisible();
@@ -606,7 +616,7 @@ test.describe('Link verification - pages resolve correctly', () => {
 
         if (commentPermalink) {
           await expect(page.getByText('Event permalink body', { exact: true })).toBeVisible();
-          await expect(page.getByRole('link', { name: 'View Context', exact: true })).toHaveAttribute('href', `/forums/${TEST_CHANNEL}/events/1-test-event-title/comments/event-parent`);
+          await expect(page.getByRole('link', { name: 'View Context', exact: true })).toHaveAttribute('href', `/forums/${TEST_CHANNEL}/events/1-test-event-title/comments/short-event-parent`);
           await expectNoAxeViolations(page);
           await page.getByRole('link', { name: 'View Context', exact: true }).click();
           await expect(page.getByText('Parent event comment', { exact: true })).toBeVisible();
@@ -687,6 +697,18 @@ test.describe('Link verification - pages resolve correctly', () => {
           ],
         },
       }),
+      getDiscussionIdByNumber: () => ({
+        data: {
+          discussionChannels: [
+            {
+              id: discussionChannelId,
+              discussionId,
+              discussionNumber: 1,
+              channelUniqueName: TEST_CHANNEL,
+            },
+          ],
+        },
+      }),
       getDiscussionFeedback: () => ({
         data: {
           discussions: [
@@ -702,13 +724,13 @@ test.describe('Link verification - pages resolve correctly', () => {
 
     try {
       // Navigate to feedback page
-      await page.goto(`/forums/${TEST_CHANNEL}/discussions/feedback/${discussionId}`);
+      await page.goto(`/forums/${TEST_CHANNEL}/discussions/feedback/1`);
 
       // Verify the feedback content is visible
       await expect(page.getByText('This is feedback on the discussion')).toBeVisible();
 
       // Verify URL is correct
-      expect(page.url()).toContain(`/forums/${TEST_CHANNEL}/discussions/feedback/${discussionId}`);
+      expect(page.url()).toContain(`/forums/${TEST_CHANNEL}/discussions/feedback/1`);
 
       expect(diagnostics.pageErrors).toEqual([]);
     } finally {
