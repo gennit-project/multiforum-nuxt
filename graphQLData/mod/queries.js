@@ -250,6 +250,7 @@ export const GET_MOD_CONTRIBUTIONS = gql`
         }
         Comment {
           id
+          shortId
           text
           createdAt
         }
@@ -260,6 +261,7 @@ export const GET_MOD_CONTRIBUTIONS = gql`
           DiscussionChannels {
             id
             discussionId
+            discussionNumber
             channelUniqueName
           }
         }
@@ -270,16 +272,19 @@ export const GET_MOD_CONTRIBUTIONS = gql`
           EventChannels {
             id
             eventId
+            eventNumber
             channelUniqueName
           }
         }
         RelatedComment {
           id
+          shortId
           text
           createdAt
           DiscussionChannel {
             id
             discussionId
+            discussionNumber
             channelUniqueName
           }
           Event {
@@ -289,6 +294,7 @@ export const GET_MOD_CONTRIBUTIONS = gql`
             EventChannels {
               id
               eventId
+              eventNumber
               channelUniqueName
             }
           }

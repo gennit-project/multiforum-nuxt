@@ -11,8 +11,10 @@ export const ISSUE_BASE_FIELDS = gql`
     createdAt
     updatedAt
     relatedCommentId
+    relatedCommentShortId
     relatedDiscussionId
     relatedEventId
+    relatedEventNumber
     relatedImageId
     relatedWikiPageId
     relatedWikiRevisionId

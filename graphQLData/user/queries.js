@@ -643,6 +643,7 @@ export const GET_USER_CONTRIBUTIONS = gql`
         type
         Comments {
           id
+          shortId
           text
           createdAt
           CommentAuthor {
@@ -657,6 +658,7 @@ export const GET_USER_CONTRIBUTIONS = gql`
           DiscussionChannel {
             id
             discussionId
+            discussionNumber
             channelUniqueName
           }
           Event {
@@ -675,6 +677,7 @@ export const GET_USER_CONTRIBUTIONS = gql`
             id
             channelUniqueName
             discussionId
+            discussionNumber
           }
         }
         Events {
@@ -688,6 +691,7 @@ export const GET_USER_CONTRIBUTIONS = gql`
             id
             channelUniqueName
             eventId
+            eventNumber
           }
         }
         WikiEdits {
