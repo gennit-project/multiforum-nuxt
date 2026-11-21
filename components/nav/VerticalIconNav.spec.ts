@@ -19,7 +19,9 @@ const h = vi.hoisted(() => ({
 }));
 
 vi.mock('nuxt/app', () => ({ useRoute: () => h.route }));
-vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ height: ref(900) }) }));
+vi.mock('@/composables/useDisplay', () => ({
+  useDisplay: () => ({ height: ref(900) }),
+}));
 vi.mock('@/utils/localStorageUtils', () => ({
   getLocalStorageItem: () => h.recentForums,
   setLocalStorageItem: vi.fn(),
@@ -40,13 +42,29 @@ const mountNav = () =>
   mount(VerticalIconNav, {
     global: {
       stubs: {
-        IconTooltip: { name: 'IconTooltip', props: ['text'], template: '<div><slot /></div>' },
-        NuxtLink: { props: ['to', 'ariaLabel'], template: '<a :class="$attrs.class" :aria-label="ariaLabel"><slot /></a>' },
-        'nuxt-link': { props: ['to', 'ariaLabel'], template: '<a :class="$attrs.class" :aria-label="ariaLabel"><slot /></a>' },
+        IconTooltip: {
+          name: 'IconTooltip',
+          props: ['text'],
+          template: '<div><slot /></div>',
+        },
+        NuxtLink: {
+          props: ['to', 'ariaLabel'],
+          template:
+            '<a :class="$attrs.class" :aria-label="ariaLabel"><slot /></a>',
+        },
+        'nuxt-link': {
+          props: ['to', 'ariaLabel'],
+          template:
+            '<a :class="$attrs.class" :aria-label="ariaLabel"><slot /></a>',
+        },
         ClientOnly: { template: '<div><slot /></div>' },
         AvatarComponent: true,
         CreateAnythingButton: true,
-        RecentForumsDrawer: { name: 'RecentForumsDrawer', props: ['forums', 'isOpen'], template: '<div class="drawer" />' },
+        RecentForumsDrawer: {
+          name: 'RecentForumsDrawer',
+          props: ['forums', 'isOpen'],
+          template: '<div class="drawer" />',
+        },
         DiscussionIcon: true,
         DownloadIcon: true,
         CalendarIcon: true,
@@ -127,23 +145,25 @@ describe('VerticalIconNav active state', () => {
     const wrapper = mountNav();
 
     expect(navLink(wrapper, 'Discuss').classes()).toEqual(
-      expect.arrayContaining(['w-full', 'rounded-xl', 'hover:bg-gray-200'])
+      expect.arrayContaining(['w-full', 'border-r-4', 'hover:bg-gray-200'])
     );
-    expect(navLink(wrapper, 'Discuss').classes()).not.toContain('rounded-full');
+    expect(navLink(wrapper, 'Discuss').classes()).not.toContain('rounded-xl');
   });
 
   it('highlights the active nav item', () => {
     h.route = { params: {}, name: 'forums' };
     const wrapper = mountNav();
 
-    expect(navLink(wrapper, 'Forums').classes().join(' ')).toContain('ring-1');
+    expect(navLink(wrapper, 'Forums').classes()).toContain('border-brand-500');
   });
 
   it('does not highlight an inactive nav item', () => {
     h.route = { params: {}, name: 'forums' };
     const wrapper = mountNav();
 
-    expect(navLink(wrapper, 'Discuss').classes().join(' ')).not.toContain('ring-1');
+    expect(navLink(wrapper, 'Discuss').classes()).not.toContain(
+      'border-brand-500'
+    );
   });
 
   it('highlights the admin item on admin routes', () => {
@@ -153,7 +173,9 @@ describe('VerticalIconNav active state', () => {
     h.serverAdminUsernames = ['alice'];
     const wrapper = mountNav();
 
-    expect(navLink(wrapper, 'Admin dashboard').classes().join(' ')).toContain('ring-1');
+    expect(navLink(wrapper, 'Admin dashboard').classes()).toContain(
+      'border-brand-500'
+    );
   });
 });
 
@@ -161,9 +183,9 @@ describe('VerticalIconNav drawer', () => {
   it('renders the recent forums drawer closed', () => {
     const wrapper = mountNav();
 
-    expect(wrapper.getComponent({ name: 'RecentForumsDrawer' }).props('isOpen')).toBe(
-      false
-    );
+    expect(
+      wrapper.getComponent({ name: 'RecentForumsDrawer' }).props('isOpen')
+    ).toBe(false);
   });
 });
 

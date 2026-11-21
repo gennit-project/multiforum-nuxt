@@ -211,11 +211,11 @@ watch(
 );
 
 const ACTIVE_NAV_ITEM =
-  'bg-brand-100 text-brand-700 ring-1 ring-inset ring-brand-300 dark:bg-brand-950/70 dark:text-brand-200 dark:ring-brand-700/70';
+  'border-brand-500 bg-brand-100 text-brand-700 dark:border-brand-400 dark:bg-brand-950/70 dark:text-brand-200';
 
 const getNavItemClasses = (isActive: boolean) => {
   const baseClasses =
-    'flex w-full flex-col items-center gap-0.5 rounded-xl px-2 py-2 text-gray-600 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100';
+    'flex w-full min-w-0 flex-col items-center gap-0.5 border-r-4 border-transparent px-1 py-2 text-gray-600 transition-colors duration-200 hover:bg-gray-200 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-gray-100';
   return isActive ? `${baseClasses} ${ACTIVE_NAV_ITEM}` : baseClasses;
 };
 
@@ -242,7 +242,7 @@ const getNavLabelClasses = (isActive: boolean) =>
 
     <!-- Main Navigation Icons -->
     <div
-      class="flex w-full flex-col px-2"
+      class="flex w-full flex-col"
       :class="{
         'space-y-1': isVerticallyShort,
         'space-y-2': !isVerticallyShort,
@@ -252,6 +252,7 @@ const getNavLabelClasses = (isActive: boolean) =>
         v-for="item in navigation"
         :key="item.name"
         :text="item.name"
+        class="block! w-full"
       >
         <div class="w-full">
           <NuxtLink
@@ -295,8 +296,9 @@ const getNavLabelClasses = (isActive: boolean) =>
           v-for="forum in limitedRecentForums"
           :key="forum.uniqueName"
           :text="forum.uniqueName"
+          class="block! w-full min-w-0"
         >
-          <div class="w-full px-2">
+          <div class="w-full min-w-0">
             <NuxtLink
               :to="{
                 name: 'forums-forumId-discussions',
@@ -327,7 +329,7 @@ const getNavLabelClasses = (isActive: boolean) =>
         </IconTooltip>
 
         <!-- More Button -->
-        <div v-if="hasMoreForums" class="w-full px-2">
+        <div v-if="hasMoreForums" class="w-full">
           <IconTooltip text="More Forums" class="block! w-full">
             <button
               type="button"
@@ -356,7 +358,7 @@ const getNavLabelClasses = (isActive: boolean) =>
 
     <!-- User Actions -->
     <div
-      class="mt-auto flex w-full flex-col px-2"
+      class="mt-auto flex w-full flex-col"
       :class="{
         'space-y-1': isVerticallyShort,
         'space-y-2': !isVerticallyShort,
@@ -364,7 +366,11 @@ const getNavLabelClasses = (isActive: boolean) =>
     >
       <!-- Admin Dashboard (server admins/mods only) -->
       <ClientOnly>
-        <IconTooltip v-if="canSeeAdminDashboard" text="Admin Dashboard">
+        <IconTooltip
+          v-if="canSeeAdminDashboard"
+          text="Admin Dashboard"
+          class="block! w-full"
+        >
           <div class="w-full">
             <NuxtLink
               to="/admin/issues"
@@ -387,7 +393,7 @@ const getNavLabelClasses = (isActive: boolean) =>
       <ClientOnly>
         <template #fallback>
           <!-- Fallback: Show login icon as default -->
-          <IconTooltip text="Log In">
+          <IconTooltip text="Log In" class="block! w-full">
             <div class="w-full">
               <div :class="getNavItemClasses(false)">
                 <LoginIcon />
