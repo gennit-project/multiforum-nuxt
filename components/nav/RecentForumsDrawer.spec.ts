@@ -15,6 +15,7 @@ const mountDrawer = (props: Record<string, unknown> = {}) =>
     global: {
       stubs: {
         ClientOnly: { template: '<div><slot /></div>' },
+        Teleport: { template: '<div><slot /></div>' },
         Transition: { template: '<div><slot /></div>' },
         RecentForumsList: {
           name: 'RecentForumsList',
