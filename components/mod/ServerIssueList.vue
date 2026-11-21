@@ -6,6 +6,7 @@
 // search placeholder/test id.
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
+import IssueListSkeleton from '@/components/mod/IssueListSkeleton.vue';
 import { useServerIssueList } from '@/composables/useServerIssueList';
 
 const props = withDefaults(
@@ -35,6 +36,7 @@ const {
   channelLabel,
   selectedSortLabel,
   issues,
+  loading,
   selectedIssueNumber,
   updateShowOnlyServerRuleViolations,
   updateSearchInput,
@@ -72,7 +74,12 @@ const {
       "
       @update:involvement-filter="updateInvolvementFilter"
     />
+    <IssueListSkeleton
+      v-if="loading && issues.length === 0"
+      class="border-t border-gray-200 dark:border-gray-800"
+    />
     <ul
+      v-else
       class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"
       data-testid="issue-list"
     >

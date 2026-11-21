@@ -7,7 +7,7 @@ import CommentHeader from '@/components/comments/CommentHeader.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ErrorBanner from '../ErrorBanner.vue';
 import { useRoute } from 'nuxt/app';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PageSkeleton from '@/components/PageSkeleton.vue';
 import {
   getFeedbackPermalinkObject,
   getPermalinkToDiscussionComment,
@@ -153,7 +153,7 @@ const permalinkObject = computed(() => {
 
 <template>
   <div class="flex w-full flex-col space-y-4">
-    <LoadingSpinner v-if="commentLoading" />
+    <PageSkeleton v-if="commentLoading" :lines="3" label="Loading comment…" />
     <ErrorBanner v-else-if="commentError" :text="commentError.message" />
     <div
       v-else-if="!originalComment"

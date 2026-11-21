@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
+import IssueListSkeleton from '@/components/mod/IssueListSkeleton.vue';
 import IssueFilterBar from '@/components/admin/IssueFilterBar.vue';
 import { useServerIssueList } from '@/composables/useServerIssueList';
 
@@ -73,7 +74,8 @@ const {
         Create one?
       </nuxt-link>
     </div>
-    <ul class="divide-y" data-testid="issue-list">
+    <IssueListSkeleton v-if="loading && issues.length === 0" />
+    <ul v-else class="divide-y" data-testid="issue-list">
       <ModIssueListItem
         v-for="issue in issues"
         :key="issue.id"

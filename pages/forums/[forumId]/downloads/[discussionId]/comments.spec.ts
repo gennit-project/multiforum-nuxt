@@ -4,7 +4,7 @@ import { defineComponent, ref, nextTick } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PageSkeleton from '@/components/PageSkeleton.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
 
 const hState = vi.hoisted(() => ({
@@ -44,10 +44,10 @@ const stubs = {
     props: ['discussionChannel'],
     template: '<div data-testid="root-form" />',
   },
-  LoadingSpinner: {
-    name: 'LoadingSpinner',
+  PageSkeleton: {
+    name: 'PageSkeleton',
     props: ['loadingText'],
-    template: '<div data-testid="loading-spinner" />',
+    template: '<div data-testid="loading-skeleton" />',
   },
   ErrorBanner: {
     name: 'ErrorBanner',
@@ -146,9 +146,9 @@ beforeEach(() => {
 });
 
 describe('download comments page', () => {
-  it('shows the loading spinner while comments load', async () => {
+  it('shows the skeleton while comments load', async () => {
     const wrapper = await mountPage({ loading: true, comments: [] });
-    expect(wrapper.findComponent(LoadingSpinner).exists()).toBe(true);
+    expect(wrapper.findComponent(PageSkeleton).exists()).toBe(true);
   });
 
   it('shows the locked banner when the discussion channel is locked', async () => {

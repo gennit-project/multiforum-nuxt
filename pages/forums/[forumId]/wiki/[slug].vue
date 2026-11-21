@@ -9,7 +9,7 @@ import {
 import { useQuery } from '@vue/apollo-composable';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PageSkeleton from '@/components/PageSkeleton.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import OnThisPage from '@/components/wiki/OnThisPage.vue';
 import WikiPagePinButton from '@/components/wiki/WikiPagePinButton.vue';
@@ -103,12 +103,7 @@ useHead(
 
 <template>
   <div>
-    <div
-      v-if="loading || channelLoading"
-      class="flex items-center justify-center p-8"
-    >
-      <LoadingSpinner size="lg" />
-    </div>
+    <PageSkeleton v-if="loading || channelLoading" class="p-8" label="Loading wiki…" />
 
     <div
       v-else-if="error || channelError"
