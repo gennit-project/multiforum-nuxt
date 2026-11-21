@@ -435,6 +435,8 @@ describe('uploadAndGetEmbeddedLink', () => {
     expect(mockFetch).toHaveBeenCalledWith(
       'https://storage.example.com/upload',
       expect.objectContaining({
+        method: 'PUT',
+        body: file,
         headers: {
           'Content-Type': 'image/jpeg',
           'x-goog-content-length-range': '0,10485760',
@@ -443,22 +445,29 @@ describe('uploadAndGetEmbeddedLink', () => {
     );
   });
 
-  it('omits the size-limit header when the backend returns no contentLengthRange', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true });
+  it.each([
+    ['null', null],
+    ['undefined', undefined],
+    ['an empty string', ''],
+  ])(
+    'omits the size-limit header when contentLengthRange is %s (older backend)',
+    async (_label, contentLengthRange) => {
+      mockFetch.mockResolvedValueOnce({ ok: true });
 
-    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
-    await uploadAndGetEmbeddedLink({
-      signedStorageURL: 'https://storage.example.com/upload',
-      contentLengthRange: null,
-      filename: 'test.jpg',
-      file,
-      fileType: 'image/jpeg',
-    });
+      const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+      await uploadAndGetEmbeddedLink({
+        signedStorageURL: 'https://storage.example.com/upload',
+        contentLengthRange,
+        filename: 'test.jpg',
+        file,
+        fileType: 'image/jpeg',
+      });
 
-    expect(mockFetch.mock.calls[0]?.[1].headers).toEqual({
-      'Content-Type': 'image/jpeg',
-    });
-  });
+      expect(mockFetch.mock.calls[0]?.[1].headers).toEqual({
+        'Content-Type': 'image/jpeg',
+      });
+    }
+  );
 
   it('returns the signed storageUrl after a successful upload when provided', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true });
@@ -491,20 +500,38 @@ describe('uploadAndGetEmbeddedLink', () => {
     ).rejects.toThrow('Upload failed with status 400. The file may exceed the 10.0MB upload limit.');
   });
 
-  it('adds no size hint to a 400 when no size range was signed', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: false, status: 400, statusText: 'Bad Request' });
+  it.each([
+    ['a non-400 status', 403, '0,10485760'],
+    ['a missing range', 400, undefined],
+    ['a null range', 400, null],
+    ['a zero max', 400, '0,0'],
+    ['a negative max', 400, '0,-5'],
+    ['a non-numeric max', 400, '0,abc'],
+    ['a range with no max', 400, '0'],
+  ])(
+    'adds no size hint for %s',
+    async (_label, status, contentLengthRange) => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status,
+        statusText: 'Error',
+      });
 
-    const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
+      const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
 
-    await expect(
-      uploadAndGetEmbeddedLink({
-        signedStorageURL: 'https://storage.example.com/upload',
-        filename: 'test.jpg',
-        file,
-        fileType: 'image/jpeg',
-      })
-    ).rejects.toThrow(/^Upload failed with status 400$/);
-  });
+      await expect(
+        uploadAndGetEmbeddedLink({
+          signedStorageURL: 'https://storage.example.com/upload',
+          contentLengthRange,
+          filename: 'test.jpg',
+          file,
+          fileType: 'image/jpeg',
+        })
+      ).rejects.toMatchObject({
+        message: `Upload failed with status ${status}`,
+      });
+    }
+  );
 
   it('returns undefined when signedStorageURL is missing', async () => {
     const file = new File(['content'], 'test.jpg');
