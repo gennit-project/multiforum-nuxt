@@ -2381,6 +2381,7 @@ type CommentInCollectionsRelationship {
 
 type CommentInfo {
   id: ID!
+  shortId: String
   text: String
   createdAt: DateTime
   Channel: ChannelInfo
@@ -3264,6 +3265,7 @@ type DiscussionChannelFlairsRelationship {
 type DiscussionChannelInfo {
   id: ID
   discussionId: String
+  discussionNumber: Int
   channelUniqueName: String
   Channel: ChannelInfo
 }
@@ -4027,6 +4029,7 @@ type DownloadScanReviewItem {
   reviewRequestReason: String
   uploaderUsername: String
   discussionId: ID!
+  discussionNumber: Int
   discussionTitle: String
   channelUniqueName: String
 }
@@ -4293,6 +4296,7 @@ type EventChannelEventRelationship {
 type EventChannelInfo {
   id: ID
   eventId: String
+  eventNumber: Int
   channelUniqueName: String
   Channel: ChannelInfo
 }
@@ -5382,6 +5386,8 @@ type Issue {
   relatedDiscussionId: ID
   relatedCommentId: ID
   relatedEventId: ID
+  relatedEventNumber: Int
+  relatedCommentShortId: String
   relatedWikiPageId: ID
   relatedWikiRevisionId: ID
   relatedUsername: String
@@ -6545,6 +6551,7 @@ type PluginPipelineCampaignFailure {
   pipelineId: ID!
   targetId: ID!
   discussionId: ID!
+  discussionNumber: Int
   channelId: String!
   status: PluginPipelineRunStatus!
   attemptNumber: Int!
@@ -7126,6 +7133,7 @@ type ScratchpadEntry {
   sourceId: String!
   sourceChannelUniqueName: String
   discussionId: String
+  discussionNumber: Int
   superUpvotedByUsers: [User!]
   Author: User
   AuthorConnection: ScratchpadEntryAuthorConnection!
@@ -37490,6 +37498,8 @@ input IssueSort {
   relatedDiscussionId: SortDirection
   relatedCommentId: SortDirection
   relatedEventId: SortDirection
+  relatedEventNumber: SortDirection
+  relatedCommentShortId: SortDirection
   relatedWikiPageId: SortDirection
   relatedWikiRevisionId: SortDirection
   relatedUsername: SortDirection
@@ -38099,6 +38109,20 @@ input IssueWhere {
   relatedEventId_CONTAINS: ID @deprecated(reason: "Please use the relevant generic filter relatedEventId: { contains: ... }")
   relatedEventId_STARTS_WITH: ID @deprecated(reason: "Please use the relevant generic filter relatedEventId: { startsWith: ... }")
   relatedEventId_ENDS_WITH: ID @deprecated(reason: "Please use the relevant generic filter relatedEventId: { endsWith: ... }")
+  relatedEventNumber: IntScalarFilters
+  relatedEventNumber_EQ: Int @deprecated(reason: "Please use the relevant generic filter relatedEventNumber: { eq: ... }")
+  relatedEventNumber_IN: [Int] @deprecated(reason: "Please use the relevant generic filter relatedEventNumber: { in: ... }")
+  relatedEventNumber_LT: Int @deprecated(reason: "Please use the relevant generic filter relatedEventNumber: { lt: ... }")
+  relatedEventNumber_LTE: Int @deprecated(reason: "Please use the relevant generic filter relatedEventNumber: { lte: ... }")
+  relatedEventNumber_GT: Int @deprecated(reason: "Please use the relevant generic filter relatedEventNumber: { gt: ... }")
+  relatedEventNumber_GTE: Int @deprecated(reason: "Please use the relevant generic filter relatedEventNumber: { gte: ... }")
+  relatedCommentShortId: StringScalarFilters
+  relatedCommentShortId_EQ: String @deprecated(reason: "Please use the relevant generic filter relatedCommentShortId: { eq: ... }")
+  relatedCommentShortId_IN: [String] @deprecated(reason: "Please use the relevant generic filter relatedCommentShortId: { in: ... }")
+  relatedCommentShortId_CONTAINS: String @deprecated(reason: "Please use the relevant generic filter relatedCommentShortId: { contains: ... }")
+  relatedCommentShortId_STARTS_WITH: String @deprecated(reason: "Please use the relevant generic filter relatedCommentShortId: { startsWith: ... }")
+  relatedCommentShortId_ENDS_WITH: String @deprecated(reason: "Please use the relevant generic filter relatedCommentShortId: { endsWith: ... }")
+  relatedCommentShortId_MATCHES: String @deprecated(reason: "Please use the relevant generic filter relatedCommentShortId: { matches: ... }")
   relatedWikiPageId: IDScalarFilters
   relatedWikiPageId_EQ: ID @deprecated(reason: "Please use the relevant generic filter relatedWikiPageId: { eq: ... }")
   relatedWikiPageId_IN: [ID] @deprecated(reason: "Please use the relevant generic filter relatedWikiPageId: { in: ... }")
@@ -44060,6 +44084,7 @@ input ScratchpadEntrySort {
   sourceId: SortDirection
   sourceChannelUniqueName: SortDirection
   discussionId: SortDirection
+  discussionNumber: SortDirection
 }
 
 input ScratchpadEntryUpdateInput {
@@ -44130,6 +44155,13 @@ input ScratchpadEntryWhere {
   discussionId_STARTS_WITH: String @deprecated(reason: "Please use the relevant generic filter discussionId: { startsWith: ... }")
   discussionId_ENDS_WITH: String @deprecated(reason: "Please use the relevant generic filter discussionId: { endsWith: ... }")
   discussionId_MATCHES: String @deprecated(reason: "Please use the relevant generic filter discussionId: { matches: ... }")
+  discussionNumber: IntScalarFilters
+  discussionNumber_EQ: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { eq: ... }")
+  discussionNumber_IN: [Int] @deprecated(reason: "Please use the relevant generic filter discussionNumber: { in: ... }")
+  discussionNumber_LT: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { lt: ... }")
+  discussionNumber_LTE: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { lte: ... }")
+  discussionNumber_GT: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { gt: ... }")
+  discussionNumber_GTE: Int @deprecated(reason: "Please use the relevant generic filter discussionNumber: { gte: ... }")
   OR: [ScratchpadEntryWhere!]
   AND: [ScratchpadEntryWhere!]
   NOT: ScratchpadEntryWhere

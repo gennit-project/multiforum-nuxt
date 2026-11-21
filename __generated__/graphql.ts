@@ -5827,6 +5827,7 @@ export type CommentInCollectionsRelationship = {
 export type CommentInfo = {
   __typename?: 'CommentInfo';
   id: Scalars['ID']['output'];
+  shortId?: Maybe<Scalars['String']['output']>;
   text?: Maybe<Scalars['String']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   Channel?: Maybe<ChannelInfo>;
@@ -7121,6 +7122,7 @@ export type DiscussionChannelInfo = {
   __typename?: 'DiscussionChannelInfo';
   id?: Maybe<Scalars['ID']['output']>;
   discussionId?: Maybe<Scalars['String']['output']>;
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   Channel?: Maybe<ChannelInfo>;
 };
@@ -8037,6 +8039,7 @@ export type DownloadScanReviewItem = {
   reviewRequestReason?: Maybe<Scalars['String']['output']>;
   uploaderUsername?: Maybe<Scalars['String']['output']>;
   discussionId: Scalars['ID']['output'];
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
   discussionTitle?: Maybe<Scalars['String']['output']>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
 };
@@ -8516,6 +8519,7 @@ export type EventChannelInfo = {
   __typename?: 'EventChannelInfo';
   id?: Maybe<Scalars['ID']['output']>;
   eventId?: Maybe<Scalars['String']['output']>;
+  eventNumber?: Maybe<Scalars['Int']['output']>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   Channel?: Maybe<ChannelInfo>;
 };
@@ -9882,6 +9886,8 @@ export type Issue = {
   relatedDiscussionId?: Maybe<Scalars['ID']['output']>;
   relatedCommentId?: Maybe<Scalars['ID']['output']>;
   relatedEventId?: Maybe<Scalars['ID']['output']>;
+  relatedEventNumber?: Maybe<Scalars['Int']['output']>;
+  relatedCommentShortId?: Maybe<Scalars['String']['output']>;
   relatedWikiPageId?: Maybe<Scalars['ID']['output']>;
   relatedWikiRevisionId?: Maybe<Scalars['ID']['output']>;
   relatedUsername?: Maybe<Scalars['String']['output']>;
@@ -11357,6 +11363,7 @@ export type PluginPipelineCampaignFailure = {
   pipelineId: Scalars['ID']['output'];
   targetId: Scalars['ID']['output'];
   discussionId: Scalars['ID']['output'];
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
   channelId: Scalars['String']['output'];
   status: PluginPipelineRunStatus;
   attemptNumber: Scalars['Int']['output'];
@@ -12014,6 +12021,7 @@ export type ScratchpadEntry = {
   sourceId: Scalars['String']['output'];
   sourceChannelUniqueName?: Maybe<Scalars['String']['output']>;
   discussionId?: Maybe<Scalars['String']['output']>;
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
   superUpvotedByUsers?: Maybe<Array<User>>;
   Author?: Maybe<User>;
   AuthorConnection: ScratchpadEntryAuthorConnection;
@@ -55341,6 +55349,8 @@ export type IssueSort = {
   relatedDiscussionId?: InputMaybe<SortDirection>;
   relatedCommentId?: InputMaybe<SortDirection>;
   relatedEventId?: InputMaybe<SortDirection>;
+  relatedEventNumber?: InputMaybe<SortDirection>;
+  relatedCommentShortId?: InputMaybe<SortDirection>;
   relatedWikiPageId?: InputMaybe<SortDirection>;
   relatedWikiRevisionId?: InputMaybe<SortDirection>;
   relatedUsername?: InputMaybe<SortDirection>;
@@ -56307,6 +56317,32 @@ export type IssueWhere = {
   relatedEventId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
   /** @deprecated Please use the relevant generic filter relatedEventId: { endsWith: ... } */
   relatedEventId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventNumber?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { eq: ... } */
+  relatedEventNumber_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { in: ... } */
+  relatedEventNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { lt: ... } */
+  relatedEventNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { lte: ... } */
+  relatedEventNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { gt: ... } */
+  relatedEventNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { gte: ... } */
+  relatedEventNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedCommentShortId?: InputMaybe<StringScalarFilters>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { eq: ... } */
+  relatedCommentShortId_EQ?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { in: ... } */
+  relatedCommentShortId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { contains: ... } */
+  relatedCommentShortId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { startsWith: ... } */
+  relatedCommentShortId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { endsWith: ... } */
+  relatedCommentShortId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { matches: ... } */
+  relatedCommentShortId_MATCHES?: InputMaybe<Scalars['String']['input']>;
   relatedWikiPageId?: InputMaybe<IdScalarFilters>;
   /** @deprecated Please use the relevant generic filter relatedWikiPageId: { eq: ... } */
   relatedWikiPageId_EQ?: InputMaybe<Scalars['ID']['input']>;
@@ -64546,6 +64582,7 @@ export type ScratchpadEntrySort = {
   sourceId?: InputMaybe<SortDirection>;
   sourceChannelUniqueName?: InputMaybe<SortDirection>;
   discussionId?: InputMaybe<SortDirection>;
+  discussionNumber?: InputMaybe<SortDirection>;
 };
 
 export type ScratchpadEntryUpdateInput = {
@@ -64665,6 +64702,19 @@ export type ScratchpadEntryWhere = {
   discussionId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   /** @deprecated Please use the relevant generic filter discussionId: { matches: ... } */
   discussionId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  discussionNumber?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { eq: ... } */
+  discussionNumber_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { in: ... } */
+  discussionNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { lt: ... } */
+  discussionNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { lte: ... } */
+  discussionNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { gt: ... } */
+  discussionNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { gte: ... } */
+  discussionNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
   OR?: InputMaybe<Array<ScratchpadEntryWhere>>;
   AND?: InputMaybe<Array<ScratchpadEntryWhere>>;
   NOT?: InputMaybe<ScratchpadEntryWhere>;
