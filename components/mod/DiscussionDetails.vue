@@ -10,7 +10,7 @@ import type { IssueView as Issue } from '@/types/Issue';
 /* component imports that were previously declared in `components:`.
    Adjust the paths if yours are different. */
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PageSkeleton from '@/components/PageSkeleton.vue';
 import MarkdownPreview from '../MarkdownPreview.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
@@ -133,8 +133,9 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
 <template>
   <div>
     <ErrorBanner v-if="getDiscussionError" :text="getDiscussionError.message" />
-    <LoadingSpinner
+    <PageSkeleton
       v-else-if="getDiscussionLoading"
+      :lines="3"
       label="Loading original discussion…"
     />
     <div

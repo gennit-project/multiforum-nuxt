@@ -62,10 +62,10 @@ const mountDetails = (channelId = 'cats') =>
           props: ['text'],
           template: '<div class="err">{{ text }}</div>',
         },
-        LoadingSpinner: {
-          name: 'LoadingSpinner',
+        PageSkeleton: {
+          name: 'PageSkeleton',
           props: ['label'],
-          template: '<div class="spinner">{{ label }}</div>',
+          template: '<div class="skeleton">{{ label }}</div>',
         },
         MarkdownPreview: {
           name: 'MarkdownPreview',
@@ -111,18 +111,18 @@ describe('DiscussionDetails states', () => {
     expect(wrapper.find('.err').text()).toContain('boom');
   });
 
-  it('shows a spinner while loading', () => {
+  it('shows a skeleton while loading', () => {
     h.loading = ref(true);
     const wrapper = mountDetails();
 
-    expect(wrapper.find('.spinner').exists()).toBe(true);
+    expect(wrapper.find('.skeleton').exists()).toBe(true);
   });
 
   it('labels the deferred loading status with its content', () => {
     h.loading = ref(true);
     const wrapper = mountDetails();
 
-    expect(wrapper.find('.spinner').text()).toBe(
+    expect(wrapper.find('.skeleton').text()).toBe(
       'Loading original discussion…'
     );
   });

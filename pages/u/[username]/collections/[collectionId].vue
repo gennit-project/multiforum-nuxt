@@ -2,7 +2,7 @@
 import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PageSkeleton from '@/components/PageSkeleton.vue';
 import OwnedCollectionDetail from '@/components/collection/OwnedCollectionDetail.vue';
 import PublicCollectionDetail from '@/components/collection/PublicCollectionDetail.vue';
 import { useUsername } from '@/composables/useAuthState';
@@ -46,10 +46,9 @@ const isOwner = computed(
 
 <template>
   <ClientOnly>
-    <LoadingSpinner
+    <PageSkeleton
       v-if="!isNotFound && (collectionIdLoading || !collectionId)"
-      class="py-6"
-      label="Loading collection..."
+      label="Loading collection…"
     />
     <div v-else-if="isNotFound" class="mx-auto w-full max-w-6xl px-3 py-6">
       <ErrorBanner
@@ -59,7 +58,7 @@ const isOwner = computed(
     <OwnedCollectionDetail v-else-if="isOwner" :collection-id="collectionId" />
     <PublicCollectionDetail v-else :collection-id="collectionId" />
     <template #fallback>
-      <LoadingSpinner class="py-6" label="Loading collection..." />
+      <PageSkeleton label="Loading collection…" />
     </template>
   </ClientOnly>
 </template>

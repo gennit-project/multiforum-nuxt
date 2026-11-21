@@ -45,7 +45,7 @@ const mountDetails = () =>
       stubs: {
         CommentHeader: { name: 'CommentHeader', props: ['commentData', 'forumRoleBadge'], template: '<div class="header" />' },
         MarkdownPreview: { name: 'MarkdownPreview', props: ['text'], template: '<div class="md">{{ text }}</div>' },
-        LoadingSpinner: { name: 'LoadingSpinner', template: '<div class="spinner" />' },
+        PageSkeleton: { name: 'PageSkeleton', template: '<div class="skeleton" />' },
         ErrorBanner: { name: 'ErrorBanner', props: ['text'], template: '<div class="err">{{ text }}</div>' },
         NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
@@ -62,11 +62,11 @@ beforeEach(() => {
 });
 
 describe('CommentDetails states', () => {
-  it('shows a spinner while loading', () => {
+  it('shows a skeleton while loading', () => {
     h.loading = ref(true);
     const wrapper = mountDetails();
 
-    expect(wrapper.find('.spinner').exists()).toBe(true);
+    expect(wrapper.find('.skeleton').exists()).toBe(true);
   });
 
   it('shows an error banner on query error', () => {

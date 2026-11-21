@@ -36,9 +36,9 @@ const mountDetails = () =>
     props: { imageId: 'img1' },
     global: {
       stubs: {
-        LoadingSpinner: {
-          name: 'LoadingSpinner',
-          template: '<div class="spinner" />',
+        PageSkeleton: {
+          name: 'PageSkeleton',
+          template: '<div class="skeleton" />',
         },
         ErrorBanner: {
           name: 'ErrorBanner',
@@ -78,11 +78,11 @@ beforeEach(() => {
 });
 
 describe('ImageDetails states', () => {
-  it('shows a spinner while loading', () => {
+  it('shows a skeleton while loading', () => {
     h.loading = ref(true);
     const wrapper = mountDetails();
 
-    expect(wrapper.find('.spinner').exists()).toBe(true);
+    expect(wrapper.find('.skeleton').exists()).toBe(true);
   });
 
   it('shows an error banner on query error', () => {

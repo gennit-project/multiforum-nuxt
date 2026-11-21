@@ -11,7 +11,7 @@ import { useQuery } from '@vue/apollo-composable';
 import { useModProfileName, useUsername } from '@/composables/useAuthState';
 import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import PageSkeleton from '@/components/PageSkeleton.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
 import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
@@ -228,10 +228,11 @@ const previousOffset = ref(0);
 
 <template>
   <div class="px-2 pt-2">
-    <LoadingSpinner
+    <PageSkeleton
       v-if="getDiscussionChannelLoading && !comments.length"
-      class="flex justify-center py-4"
-      :loading-text="'Loading comments...'"
+      class="py-4"
+      :lines="3"
+      label="Loading comments…"
     />
     <ErrorBanner
       v-else-if="getDiscussionChannelError"
