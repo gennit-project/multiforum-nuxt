@@ -523,3 +523,13 @@ export const GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS = gql`
     }
   }
 `;
+
+// Resolves a route's per-user collection number to the global collection id.
+export const GET_COLLECTION_ID_BY_NUMBER = gql`
+  query getCollectionIdByNumber($username: String!, $collectionNumber: Int!) {
+    getCollectionIdByNumber(
+      username: $username
+      collectionNumber: $collectionNumber
+    )
+  }
+`;

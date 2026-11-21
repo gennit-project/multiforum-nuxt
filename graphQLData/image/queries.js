@@ -315,3 +315,17 @@ export const GET_REUSABLE_COLLECTION_IMAGES = gql`
     }
   }
 `;
+
+// Resolves a route's per-user image number to the global image id.
+export const GET_IMAGE_ID_BY_NUMBER = gql`
+  query getImageIdByNumber($username: String!, $imageNumber: Int!) {
+    getImageIdByNumber(username: $username, imageNumber: $imageNumber)
+  }
+`;
+
+// Resolves a route's per-user album number to the global album id.
+export const GET_ALBUM_ID_BY_NUMBER = gql`
+  query getAlbumIdByNumber($username: String!, $albumNumber: Int!) {
+    getAlbumIdByNumber(username: $username, albumNumber: $albumNumber)
+  }
+`;

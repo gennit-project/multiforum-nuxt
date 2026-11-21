@@ -223,3 +223,13 @@ export const GET_EVENT_FEEDBACK = gql`
     }
   }
 `;
+
+// Resolves a route's per-forum event number to the global event id.
+export const GET_EVENT_ID_BY_NUMBER = gql`
+  query getEventIdByNumber($channelUniqueName: String!, $eventNumber: Int!) {
+    getEventIdByNumber(
+      channelUniqueName: $channelUniqueName
+      eventNumber: $eventNumber
+    )
+  }
+`;

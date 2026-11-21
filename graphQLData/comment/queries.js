@@ -777,3 +777,10 @@ export const GET_SPECIFIC_COMMENT_FEEDBACK = gql`
     }
   }
 `;
+
+// Resolves a permalink's comment shortId to the global comment id.
+export const GET_COMMENT_ID_BY_SHORT_ID = gql`
+  query getCommentIdByShortId($shortId: String!) {
+    getCommentIdByShortId(shortId: $shortId)
+  }
+`;

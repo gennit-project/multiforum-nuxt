@@ -1037,3 +1037,26 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
 //     }
 //   }
 // }
+
+// Resolves a route's per-forum discussion number to the global discussion id,
+// for pages whose data is keyed by the id (edit forms, download tabs, feedback).
+// getDiscussionDetail/getCommentSection take the number directly instead.
+export const GET_DISCUSSION_ID_BY_NUMBER = gql`
+  query getDiscussionIdByNumber(
+    $channelUniqueName: String!
+    $discussionNumber: Int!
+  ) {
+    discussionChannels(
+      where: {
+        channelUniqueName: { eq: $channelUniqueName }
+        discussionNumber: { eq: $discussionNumber }
+      }
+      limit: 1
+    ) {
+      id
+      discussionId
+      discussionNumber
+      channelUniqueName
+    }
+  }
+`;
