@@ -30,6 +30,9 @@ import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { useForumRoleMembership } from '@/composables/useForumRoleMembership';
 import { getAuthorBadges } from '@/utils/roleBadges';
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
+import { getDiscussionRoute } from '@/utils/contentUrls';
+import { getChannelListDiscussionNumber } from '@/utils/discussionListUtils';
+import { parseSlugSegmentNumber } from '@/utils/slugify';
 type Tag = Discussion['Tags'][number];
 
 const usernameVar = useUsername();
@@ -50,9 +53,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  selectedDiscussionId: {
-    type: String,
-    default: '',
+  // Per-forum number of the discussion selected in the list's split view.
+  selectedDiscussionNumber: {
+    type: Number as PropType<number | null>,
+    default: null,
   },
   discussionChannel: {
     type: Object as PropType<DiscussionChannel>,
@@ -127,17 +131,33 @@ const errorMessage = ref('');
 // Initial value is based on the defaultExpanded prop
 const isExpanded = ref(props.defaultExpanded);
 
-const discussionIdInParams = computed(() =>
-  typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
+const discussionNumberInParams = computed(() =>
+  parseSlugSegmentNumber(
+    typeof route.params.discussionId === 'string'
+      ? route.params.discussionId
+      : ''
+  )
 );
 const discussionId = computed(
   () => props.discussionChannel?.discussionId || props.discussion?.id || ''
 );
+const discussionNumber = computed(() =>
+  getChannelListDiscussionNumber({ Discussion: props.discussion })
+);
+const discussionLink = computed(() =>
+  getDiscussionRoute({
+    forumId: defaultUniqueName.value,
+    discussionNumber: discussionNumber.value,
+    title: props.discussion?.title,
+    discussionId: discussionId.value,
+  })
+);
 const isSelected = computed(() => {
-  if (props.selectedDiscussionId) {
-    return props.selectedDiscussionId === discussionId.value;
+  if (discussionNumber.value == null) return false;
+  if (props.selectedDiscussionNumber != null) {
+    return props.selectedDiscussionNumber === discussionNumber.value;
   }
-  return discussionIdInParams.value === discussionId.value;
+  return discussionNumberInParams.value === discussionNumber.value;
 });
 
 // Later in the lifecycle, clicking Expand/Collapse on this item only affects this item
@@ -184,7 +204,7 @@ const desktopSelectionLink = computed(() => {
     path: route.path,
     query: {
       ...filteredQuery.value,
-      selectedDiscussionId: discussionId.value,
+      selectedDiscussionId: discussionNumber.value?.toString() ?? '',
     },
   };
 });
@@ -224,14 +244,7 @@ const revealSensitiveContent = () => {
           <div class="w-full min-w-0 flex-col">
             <div>
               <nuxt-link
-                :to="{
-                  name: 'forums-forumId-discussions-discussionId',
-                  params: {
-                    forumId: defaultUniqueName,
-                    discussionId: discussionChannel.discussionId,
-                  },
-                  query: filteredQuery,
-                }"
+                :to="{ ...discussionLink, query: filteredQuery }"
                 class="mb-1 flex w-full items-start gap-2 lg:hidden"
               >
                 <span
@@ -468,14 +481,7 @@ const revealSensitiveContent = () => {
               />
               <div class="flex items-center justify-start gap-6">
                 <nuxt-link
-                  :to="{
-                    name: 'forums-forumId-discussions-discussionId',
-                    params: {
-                      forumId: defaultUniqueName,
-                      discussionId: discussionChannel.discussionId,
-                    },
-                    query: filteredQuery,
-                  }"
+                  :to="{ ...discussionLink, query: filteredQuery }"
                   class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                 >
                   <CommentIcon class="h-3 w-3" aria-hidden="true" />

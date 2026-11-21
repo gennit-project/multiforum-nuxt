@@ -13,10 +13,15 @@ import {
   formatDiscussionDate,
   getDiscussionTags,
   buildFilteredQuery,
+  getChannelListDiscussionNumber,
 } from './discussionListUtils';
 
 const discussion = (channels: unknown[]): Discussion =>
-  ({ id: 'd1', DiscussionChannels: channels } as unknown as Discussion);
+  ({
+    id: 'd1',
+    title: 'Trail conditions',
+    DiscussionChannels: channels,
+  } as unknown as Discussion);
 
 describe('getTotalCommentCount', () => {
   it('sums comment counts across channels', () => {
@@ -56,13 +61,14 @@ describe('getDiscussionDetailOptions', () => {
         discussion([
           {
             channelUniqueName: 'cats',
+            discussionNumber: 42,
             CommentsConnection: { aggregate: { count: { nodes: 1 } } },
           },
         ])
       )[0]
     ).toEqual({
       label: '1 comment in cats',
-      value: '/forums/cats/discussions/d1',
+      value: '/forums/cats/discussions/42-trail-conditions',
     });
   });
 
@@ -78,11 +84,12 @@ describe('getDownloadDetailOptions', () => {
         discussion([
           {
             channelUniqueName: 'cats',
+            discussionNumber: 42,
             CommentsConnection: { aggregate: { count: { nodes: 2 } } },
           },
         ])
       )[0].value
-    ).toBe('/forums/cats/downloads/d1');
+    ).toBe('/forums/cats/downloads/42-trail-conditions');
   });
 });
 
@@ -159,5 +166,19 @@ describe('buildFilteredQuery', () => {
     expect(
       buildFilteredQuery({ a: 'x', b: '', c: undefined, d: 0, e: 'y' })
     ).toEqual({ a: 'x', e: 'y' });
+  });
+});
+
+describe('getChannelListDiscussionNumber', () => {
+  it('reads the number selected through the list item discussion', () => {
+    expect(
+      getChannelListDiscussionNumber({
+        Discussion: { DiscussionChannels: [{ discussionNumber: 7 }] },
+      })
+    ).toBe(7);
+  });
+
+  it('returns null when the item has no number', () => {
+    expect(getChannelListDiscussionNumber({ Discussion: null })).toBeNull();
   });
 });

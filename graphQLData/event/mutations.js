@@ -7,6 +7,7 @@ export const CREATE_EVENT_WITH_CHANNEL_CONNECTIONS = gql`
       ...EventFields
       EventChannels {
         id
+        channelUniqueName
         eventNumber
         Channel {
           uniqueName

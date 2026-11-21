@@ -1,5 +1,6 @@
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { getDiscussionUrl, getDownloadUrl } from '@/utils/contentUrls';
 
 /**
  * Pure display helpers for the favorite-discussions library page: count
@@ -10,6 +11,7 @@ import { getServerRoleBadge } from '@/utils/serverRoleBadges';
 
 type FavoriteChannel = {
   channelUniqueName?: string | null;
+  discussionNumber?: number | null;
   CommentsConnection?: {
     aggregate?: { count?: { nodes?: number | null } | null } | null;
   } | null;
@@ -37,25 +39,37 @@ export function formatCount(
 /** Link to a discussion under its first forum, or '/' when none is available. */
 export function getDiscussionLink(discussion: {
   id: string;
+  title?: string | null;
   DiscussionChannels?: FavoriteChannel[];
 }): string {
   const firstChannel = safeArrayFirst(discussion.DiscussionChannels) as
     | FavoriteChannel
     | undefined;
   if (!firstChannel?.channelUniqueName) return '/';
-  return `/forums/${firstChannel.channelUniqueName}/discussions/${discussion.id}`;
+  return getDiscussionUrl({
+    forumId: firstChannel.channelUniqueName,
+    discussionNumber: firstChannel.discussionNumber,
+    title: discussion.title,
+    discussionId: discussion.id,
+  });
 }
 
 /** Link to a download under its first forum, or '/' when none is available. */
 export function getDownloadLink(download: {
   id: string;
+  title?: string | null;
   DiscussionChannels?: FavoriteChannel[];
 }): string {
   const firstChannel = safeArrayFirst(download.DiscussionChannels) as
     | FavoriteChannel
     | undefined;
   if (!firstChannel?.channelUniqueName) return '/';
-  return `/forums/${firstChannel.channelUniqueName}/downloads/${download.id}`;
+  return getDownloadUrl({
+    forumId: firstChannel.channelUniqueName,
+    discussionNumber: firstChannel.discussionNumber,
+    title: download.title,
+    discussionId: download.id,
+  });
 }
 
 /** Link to a forum, or '/' when no channel name is given. */

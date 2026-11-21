@@ -1,14 +1,34 @@
 import type { LocationFilterTypes } from '@/components/event/list/filters/locationFilterTypes';
 import type { LocationQuery } from 'vue-router';
 import type { Comment, Discussion, Event } from '@/__generated__/graphql';
+import {
+  getDiscussionCommentRoute,
+  getDiscussionRoute,
+  getDiscussionSegment,
+  getEventCommentRoute,
+  getEventRoute,
+  getEventSegment,
+} from '@/utils/contentUrls';
+
+type MaybeText = string | null | undefined;
+type MaybeNumber = number | null | undefined;
 
 type FeedbackPermalinkInput = {
   routeName: string;
   forumId: string;
   isFeedbackOnDiscussion?: boolean;
   isFeedbackOnEvent?: boolean;
+  /**
+   * The discussion's route segment (`{number}-{slug}`) or, failing that, its
+   * raw global id. Only used when `discussionNumber` is unknown.
+   */
   discussionId?: string;
+  discussionNumber?: MaybeNumber;
+  discussionTitle?: MaybeText;
+  /** The event's route segment or raw global id; see `discussionId`. */
   eventId?: string;
+  eventNumber?: MaybeNumber;
+  eventTitle?: MaybeText;
   commentId?: string;
   GivesFeedbackOnComment?: Pick<Comment, 'id'>;
   GivesFeedbackOnDiscussion?: Pick<Discussion, 'id'>;
@@ -17,74 +37,82 @@ type FeedbackPermalinkInput = {
 
 type DiscussionCommentPermalinkInput = {
   forumId: string;
-  discussionId: string;
-  commentId: string;
+  discussionNumber?: MaybeNumber;
+  discussionTitle?: MaybeText;
+  /** Raw id (or existing route segment), used only without a number. */
+  discussionId?: MaybeText;
+  /** The comment's shortId, the canonical permalink handle. */
+  shortId?: MaybeText;
+  /** Raw comment id, used only without a shortId. */
+  commentId?: MaybeText;
 };
 export const getPermalinkToDiscussionComment = (
   input: DiscussionCommentPermalinkInput
-) => {
-  const { forumId, discussionId, commentId } = input;
-  return {
-    name: 'forums-forumId-discussions-discussionId-comments-commentId',
-    params: {
-      forumId,
-      discussionId,
-      commentId,
-    },
-  };
-};
+) =>
+  getDiscussionCommentRoute({
+    forumId: input.forumId,
+    discussionNumber: input.discussionNumber,
+    title: input.discussionTitle,
+    discussionId: input.discussionId,
+    shortId: input.shortId,
+    commentId: input.commentId,
+  });
 
 type DiscussionPermalinkInput = {
   forumId: string;
-  discussionId: string;
+  discussionNumber?: MaybeNumber;
+  discussionTitle?: MaybeText;
+  /** Raw id (or existing route segment), used only without a number. */
+  discussionId?: MaybeText;
 };
 
-export const getPermalinkToDiscussion = (input: DiscussionPermalinkInput) => {
-  const { forumId, discussionId } = input;
-  return {
-    name: 'forums-forumId-discussions-discussionId',
-    params: {
-      forumId,
-      discussionId,
-    },
-  };
-};
+export const getPermalinkToDiscussion = (input: DiscussionPermalinkInput) =>
+  getDiscussionRoute({
+    forumId: input.forumId,
+    discussionNumber: input.discussionNumber,
+    title: input.discussionTitle,
+    discussionId: input.discussionId,
+  });
 
 type EventCommentPermalinkInput = {
   forumId: string;
-  eventId: string;
-  commentId: string;
+  eventNumber?: MaybeNumber;
+  eventTitle?: MaybeText;
+  /** Raw id (or existing route segment), used only without a number. */
+  eventId?: MaybeText;
+  /** The comment's shortId, the canonical permalink handle. */
+  shortId?: MaybeText;
+  /** Raw comment id, used only without a shortId. */
+  commentId?: MaybeText;
 };
 
 export const getPermalinkToEventComment = (
   input: EventCommentPermalinkInput
-) => {
-  const { forumId, eventId, commentId } = input;
-  return {
-    name: 'forums-forumId-events-eventId-comments-commentId',
-    params: {
-      forumId,
-      eventId,
-      commentId,
-    },
-  };
-};
+) =>
+  getEventCommentRoute({
+    forumId: input.forumId,
+    eventNumber: input.eventNumber,
+    title: input.eventTitle,
+    eventId: input.eventId,
+    shortId: input.shortId,
+    commentId: input.commentId,
+  });
 
 type EventPermalinkInput = {
   forumId: string;
-  eventId: string;
+  eventNumber?: MaybeNumber;
+  eventTitle?: MaybeText;
+  /** Raw id (or existing route segment), used only without a number. */
+  eventId?: MaybeText;
 };
 
-export const getPermalinkToEvent = (input: EventPermalinkInput) => {
-  const { forumId, eventId } = input;
-  return {
-    name: 'forums-forumId-events-eventId',
-    params: {
-      forumId,
-      eventId,
-    },
-  };
-};
+export const getPermalinkToEvent = (input: EventPermalinkInput) =>
+  getEventRoute({
+    forumId: input.forumId,
+    eventNumber: input.eventNumber,
+    title: input.eventTitle,
+    eventId: input.eventId,
+  });
 
 export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   const {
@@ -108,7 +136,11 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
       name: 'forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId',
       params: {
         forumId,
-        discussionId: GivesFeedbackOnDiscussion.id,
+        discussionId: getDiscussionSegment({
+          discussionNumber: input.discussionNumber,
+          title: input.discussionTitle,
+          discussionId: discussionId || GivesFeedbackOnDiscussion.id,
+        }),
         feedbackId: commentId,
       },
     };
@@ -126,7 +158,11 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
       name: 'forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId',
       params: {
         forumId,
-        eventId: GivesFeedbackOnEvent.id,
+        eventId: getEventSegment({
+          eventNumber: input.eventNumber,
+          title: input.eventTitle,
+          eventId: input.eventId || GivesFeedbackOnEvent.id,
+        }),
         feedbackId: commentId,
       },
     };
@@ -136,13 +172,17 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   if (!commentId || !forumId || !GivesFeedbackOnComment) {
     return null;
   }
-  if (discussionId) {
+  if (discussionId || input.discussionNumber != null) {
     // For feedback on comments on a discussion
     return {
       name: 'forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId',
       params: {
         forumId,
-        discussionId,
+        discussionId: getDiscussionSegment({
+          discussionNumber: input.discussionNumber,
+          title: input.discussionTitle,
+          discussionId,
+        }),
         commentId: GivesFeedbackOnComment.id,
         feedbackId: commentId,
       },

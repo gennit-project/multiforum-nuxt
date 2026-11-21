@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { config } from '@/config';
 import {
+  type UpdateDiscussionWithChannelConnectionsMutation,
   GetDiscussionDocument as GET_DISCUSSION,
   UpdateDiscussionWithChannelConnectionsDocument as UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
 } from '@/__generated__/operations';
@@ -17,6 +18,8 @@ import type {
   DiscussionUpdateInput,
 } from '@/__generated__/graphql';
 import { useModProfileName } from '@/composables/useAuthState';
+import { useResolvedDiscussionId } from '@/composables/useRouteContentIds';
+import { getDiscussionRoute } from '@/utils/contentUrls';
 import {
   buildDiscussionEditFormValues,
   getActiveDiscussionFlairIdsByChannel,
@@ -35,12 +38,13 @@ const channelId = computed(() => {
   return route.params.forumId;
 });
 
-const discussionId = computed(() => {
-  if (typeof route.params.discussionId !== 'string') {
-    return '';
-  }
-  return route.params.discussionId;
-});
+// The route carries `{number}-{slug}`; the global id comes from a lookup.
+const {
+  id: discussionId,
+  discussionNumber: routeDiscussionNumber,
+  loading: discussionIdLoading,
+  notFound: discussionNotFound,
+} = useResolvedDiscussionId();
 
 const {
   result: getDiscussionResult,
@@ -57,7 +61,12 @@ const {
   { enabled: computed(() => !!discussionId.value), keepPreviousResult: false }
 );
 
+const pageLoading = computed(
+  () => discussionIdLoading.value || getDiscussionLoading.value
+);
+
 const discussion = computed(() => {
+  if (discussionNotFound.value) return null;
   if (
     getDiscussionError.value ||
     getDiscussionLoading.value ||
@@ -310,14 +319,36 @@ const {
   },
 }));
 
-onDone(() => {
-  router.push({
-    name: 'forums-forumId-discussions-discussionId',
-    params: {
-      forumId: formValues.value.selectedChannels[0],
-      discussionId: discussionId.value,
-    },
+type UpdatedDiscussion = NonNullable<
+  UpdateDiscussionWithChannelConnectionsMutation['updateDiscussionWithChannelConnections']
+>;
+
+// Route back to the discussion in the first selected forum, using that
+// forum's discussion number (the mutation result knows about newly added forums).
+const getDiscussionRouteInForum = (updated?: UpdatedDiscussion | null) => {
+  const forumId = formValues.value.selectedChannels[0] ?? '';
+  const numberInForum =
+    updated?.DiscussionChannels?.find(
+      (discussionChannel) => discussionChannel.channelUniqueName === forumId
+    )?.discussionNumber ??
+    discussion.value?.DiscussionChannels?.find(
+      (discussionChannel) => discussionChannel.channelUniqueName === forumId
+    )?.discussionNumber ??
+    (forumId === channelId.value ? routeDiscussionNumber.value : null);
+  return getDiscussionRoute({
+    forumId,
+    discussionNumber: numberInForum,
+    title: updated?.title ?? discussion.value?.title,
+    discussionId: discussionId.value,
   });
+};
+
+onDone((result) => {
+  router.push(
+    getDiscussionRouteInForum(
+      result?.data?.updateDiscussionWithChannelConnections
+    )
+  );
 });
 
 // Methods converted to regular functions
@@ -361,27 +392,21 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
 }
 
 function handleCancel() {
-  router.push({
-    name: 'forums-forumId-discussions-discussionId',
-    params: {
-      forumId: formValues.value.selectedChannels[0],
-      discussionId: discussionId.value,
-    },
-  });
+  router.push(getDiscussionRouteInForum());
 }
 </script>
 <template>
   <RequireAuth
     :require-ownership="true"
     :owners="ownerList"
-    :loading="getDiscussionLoading"
+    :loading="pageLoading"
   >
     <template #has-auth>
       <ClientOnly>
         <CreateEditDiscussionFields
           :key="dataLoaded.toString()"
           :edit-mode="true"
-          :discussion-loading="getDiscussionLoading"
+          :discussion-loading="pageLoading"
           :discussion="discussion"
           :get-discussion-error="getDiscussionError"
           :update-discussion-error="updateDiscussionError"
@@ -391,7 +416,7 @@ function handleCancel() {
           :download-mode="false"
           :crossposted-discussion="discussion?.CrosspostedDiscussion || null"
           :crosspost-error="getDiscussionError"
-          :crosspost-loading="getDiscussionLoading"
+          :crosspost-loading="pageLoading"
           :discussion-flair-configs="discussionFlairConfigs"
           :discussion-flairs-loading-channels="discussionFlairsLoadingChannels"
           :discussion-flairs-errors-by-channel="discussionFlairsErrorsByChannel"

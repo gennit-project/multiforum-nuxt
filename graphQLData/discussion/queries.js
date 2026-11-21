@@ -27,6 +27,7 @@ const CROSSPOST_PREVIEW_FIELDS = gql`
       imageOrder
       Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
         id
+        imageNumber
         url
         alt
         caption
@@ -56,6 +57,8 @@ const CROSSPOST_PREVIEW_FIELDS = gql`
 const SHARED_COLLECTION_PREVIEW_FIELDS = gql`
   fragment SharedCollectionPreviewFields on Collection {
     id
+    collectionNumber
+    ownerUsername
     name
     description
     collectionType
@@ -153,6 +156,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
               where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }
             ) {
               id
+              imageNumber
               url
               alt
               caption
@@ -258,6 +262,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           imageOrder
           Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
             id
+            imageNumber
             url
             alt
             caption
@@ -316,6 +321,7 @@ export const GET_DOWNLOAD_DETAIL = gql`
         }
         Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
           id
+          imageNumber
           url
           alt
           caption
@@ -460,6 +466,7 @@ export const DISCUSSION_DETAIL_FIELDS = gql`
       }
       Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
         id
+        imageNumber
         url
         alt
         caption
@@ -657,6 +664,7 @@ export const GET_DISCUSSION_DETAIL_IMAGES_PAGE = gql`
     ) {
       images {
         id
+        imageNumber
         url
         alt
         caption
@@ -917,6 +925,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
         imageOrder
         Images(where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }) {
           id
+          imageNumber
           url
           alt
           caption

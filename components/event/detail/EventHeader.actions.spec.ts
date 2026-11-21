@@ -20,7 +20,7 @@ let useMutationCall = 0;
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
     name: 'forums-forumId-events-eventId',
-    params: { forumId: 'cats', eventId: 'event-1' },
+    params: { forumId: 'cats', eventId: '7-cat-meetup' },
   }),
   useRouter: () => ({ push: routerPush, resolve: routerResolve }),
 }));
@@ -132,7 +132,7 @@ const baseEvent = () => ({
     commentKarma: 0,
     discussionKarma: 0,
   },
-  EventChannels: [{ channelUniqueName: 'cats' }],
+  EventChannels: [{ channelUniqueName: 'cats', eventNumber: 7 }],
 });
 
 const buildWrapper = (eventData: Record<string, unknown> = baseEvent()) =>
@@ -205,6 +205,16 @@ describe('EventHeader — copy actions', () => {
     expect(clipboardWriteText).toHaveBeenCalledTimes(1);
   });
 
+  it('builds the permalink from the forum event number and title', async () => {
+    const wrapper = buildWrapper();
+    await menu(wrapper).vm.$emit('copy-link');
+
+    expect(routerResolve).toHaveBeenCalledWith({
+      name: 'forums-forumId-events-eventId',
+      params: { forumId: 'cats', eventId: '7-cat-meetup' },
+    });
+  });
+
   it('copies the event address to the clipboard', async () => {
     const wrapper = buildWrapper();
     await wrapper
@@ -249,7 +259,9 @@ describe('EventHeader — direct menu actions', () => {
   it('navigates to the event editor', async () => {
     const wrapper = buildWrapper();
     await menu(wrapper).vm.$emit('handle-edit');
-    expect(routerPush).toHaveBeenCalledWith('/forums/cats/events/edit/event-1');
+    expect(routerPush).toHaveBeenCalledWith(
+      '/forums/cats/events/edit/7-cat-meetup'
+    );
   });
 
   it('closes cancel and scope modals from their close events', async () => {
@@ -366,7 +378,7 @@ describe('EventHeader — feedback flow', () => {
 
     expect(routerPush).toHaveBeenCalledWith({
       name: 'forums-forumId-events-feedback-eventId',
-      params: { eventId: 'event-1', forumId: 'cats' },
+      params: { eventId: '7-cat-meetup', forumId: 'cats' },
     });
   });
 

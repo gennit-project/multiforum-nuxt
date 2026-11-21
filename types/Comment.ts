@@ -62,21 +62,35 @@ type Author = NonNullable<SelectedComment['CommentAuthor']> &
   Partial<Pick<User, 'displayName'>>;
 
 type ChannelContext = Pick<NonNullable<SchemaComment['Channel']>, 'uniqueName'>;
-type EventContext = Pick<NonNullable<SchemaComment['Event']>, 'id'> & {
-  EventChannels?: Array<
-    Pick<
-      NonNullable<SchemaComment['Event']>['EventChannels'][number],
-      'channelUniqueName'
-    >
-  >;
-};
-type FeedbackCommentContext = Pick<SchemaComment, 'id'> & {
-  DiscussionChannel?: Pick<
-    NonNullable<SchemaComment['DiscussionChannel']>,
-    'discussionId'
-  > | null;
-  Event?: Pick<NonNullable<SchemaComment['Event']>, 'id'> | null;
-};
+type EventContext = Pick<NonNullable<SchemaComment['Event']>, 'id'> &
+  Partial<Pick<NonNullable<SchemaComment['Event']>, 'title'>> & {
+    EventChannels?: Array<
+      Pick<
+        NonNullable<SchemaComment['Event']>['EventChannels'][number],
+        'channelUniqueName'
+      > &
+        Partial<
+          Pick<
+            NonNullable<SchemaComment['Event']>['EventChannels'][number],
+            'eventNumber'
+          >
+        >
+    >;
+  };
+type FeedbackCommentContext = Pick<SchemaComment, 'id'> &
+  Partial<Pick<SchemaComment, 'shortId'>> & {
+    DiscussionChannel?: (Pick<
+      NonNullable<SchemaComment['DiscussionChannel']>,
+      'discussionId'
+    > &
+      Partial<
+        Pick<
+          NonNullable<SchemaComment['DiscussionChannel']>,
+          'discussionNumber'
+        >
+      >) | null;
+    Event?: EventContext | null;
+  };
 
 export type CommentView = Omit<SelectedComment, 'CommentAuthor' | 'Event'> & {
   CommentAuthor?: Author | null;

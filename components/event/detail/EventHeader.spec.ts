@@ -11,7 +11,7 @@ vi.mock('nuxt/app', () => ({
     name: 'forums-forumId-events-eventId',
     params: {
       forumId: 'cats',
-      eventId: 'event-1',
+      eventId: '1-cat-meetup',
     },
   }),
   useRouter: () => ({
@@ -126,6 +126,7 @@ describe('EventHeader', () => {
           EventChannels: [
             {
               channelUniqueName: 'cats',
+              eventNumber: 1,
             },
           ],
         },

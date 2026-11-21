@@ -6,7 +6,8 @@
 // sent the same query to the backend twice on every detail page view.
 
 type DetailQueryVariablesParams = {
-  discussionId: string;
+  /** The per-forum discussion number parsed from the route segment. */
+  discussionNumber: number | null;
   downloadMode: boolean;
   modProfileName?: string | null;
   username?: string | null;
@@ -14,7 +15,7 @@ type DetailQueryVariablesParams = {
 };
 
 export type DiscussionDetailQueryVariables = {
-  id: string;
+  discussionNumber: number | null;
   loggedInModName: string | null;
   channelUniqueName: string;
 };
@@ -31,7 +32,7 @@ export const buildDetailQueryVariables = (
   params: DetailQueryVariablesParams
 ): DiscussionDetailQueryVariables | DownloadDetailQueryVariables => {
   const base: DiscussionDetailQueryVariables = {
-    id: params.discussionId,
+    discussionNumber: params.discussionNumber,
     loggedInModName: params.modProfileName || null,
     channelUniqueName: params.channelUniqueName,
   };

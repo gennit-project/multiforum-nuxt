@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
-import { useRoute } from 'nuxt/app';
 import { useMutation } from '@vue/apollo-composable';
 import { UpdateDiscussionDocument as UPDATE_DISCUSSION } from '@/__generated__/operations';
 import { useUsername } from '@/composables/useAuthState';
@@ -20,13 +19,9 @@ const props = defineProps<{
   discussion: Discussion;
 }>();
 
-const route = useRoute();
-
-const discussionId = computed(() => {
-  return typeof route.params.discussionId === 'string'
-    ? route.params.discussionId
-    : '';
-});
+// The route param is `{number}-{slug}`; the global id comes from the discussion
+// the parent download page already loaded and passes in.
+const discussionId = computed(() => props.discussion.id);
 
 const bodyText = computed(() => props.discussion.body || '');
 

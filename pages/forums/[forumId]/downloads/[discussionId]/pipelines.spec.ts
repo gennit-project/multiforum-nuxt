@@ -3,7 +3,7 @@ import { shallowMount } from '@vue/test-utils';
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
-    params: { discussionId: 'discussion-1', forumId: 'cats' },
+    params: { discussionId: '7-desert-bloom', forumId: 'cats' },
   }),
 }));
 
@@ -29,7 +29,7 @@ const NuxtLinkStub = {
 const mountPage = async (discussion: Record<string, unknown>) => {
   const Page = (await import('./pipelines.vue')).default;
   return shallowMount(Page, {
-    props: { discussion },
+    props: { discussion: { id: 'discussion-1', ...discussion } },
     global: {
       stubs: {
         NuxtLink: NuxtLinkStub,
@@ -66,7 +66,7 @@ describe('download checks page', () => {
 
     expect(wrapper.getComponent(NuxtLinkStub).props('to')).toEqual({
       name: 'forums-forumId-downloads-discussionId',
-      params: { forumId: 'cats', discussionId: 'discussion-1' },
+      params: { forumId: 'cats', discussionId: '7-desert-bloom' },
     });
   });
 

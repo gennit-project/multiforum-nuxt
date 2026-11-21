@@ -12,8 +12,13 @@ import ErrorBanner from '../../ErrorBanner.vue';
 import LoadingSpinner from '../../LoadingSpinner.vue';
 import EventFilterBar from '../list/filters/EventFilterBar.vue';
 import TimeShortcuts from '../list/filters/TimeShortcuts.vue';
-import { GetEventsSourcef3f666cbeeDocument as GET_EVENTS } from '@/__generated__/operations';
+import { GetEventsSource0ffac39832Document as GET_EVENTS } from '@/__generated__/operations';
 import getEventWhere from '@/utils/getEventWhere';
+import { getEventSegment } from '@/utils/contentUrls';
+import {
+  EVENT_SEARCH_FORUM_QUERY_KEY,
+  getEventLinkTarget,
+} from '@/utils/eventLinks';
 import { getEventFilterValuesFromParams } from '@/utils/getEventFilterValuesFromParams';
 import {
   chronologicalOrder,
@@ -149,19 +154,35 @@ onGetEventResult((value) => {
     return;
   }
   const defaultSelectedEventId = value.data.events[0]?.id || '';
-  sendToPreview(defaultSelectedEventId, '');
+  sendToPreview({
+    eventId: defaultSelectedEventId,
+    eventLocationId: '',
+    events: value.data.events,
+  });
 });
 
-const sendToPreview = async (eventId: string, eventLocationId: string) => {
-  if (eventId) {
+type SendToPreviewParams = {
+  eventId: string;
+  eventLocationId: string;
+  /** Events to look the target up in; defaults to the loaded result. */
+  events?: NonNullable<typeof eventResult.value>['events'];
+};
+
+const sendToPreview = async (params: SendToPreviewParams) => {
+  const { eventId, eventLocationId, events = eventResult.value?.events } = params;
+  const event = events?.find((item) => item.id === eventId);
+  if (event) {
     const escapedEventLocationId = eventLocationId
       ? CSS.escape(eventLocationId)
       : '';
+    // The route carries `{eventNumber}-{slug}`; the number is only unique per
+    // forum, so the forum travels as a query param.
+    const target = getEventLinkTarget({ event });
     await router.push({
       name: 'map-search-eventId',
-      params: { eventId },
+      params: { eventId: getEventSegment(target) },
       hash: `#${escapedEventLocationId}`,
-      query: route.query,
+      query: { ...route.query, [EVENT_SEARCH_FORUM_QUERY_KEY]: target.forumId },
     });
   }
 };
@@ -380,7 +401,7 @@ const highlightEvent = (
   });
 
   if (shouldNavigate) {
-    sendToPreview(eventId, eventLocationId);
+    sendToPreview({ eventId, eventLocationId });
   }
 };
 

@@ -8,6 +8,8 @@ const h = vi.hoisted(() => ({
   loading: undefined as unknown as Ref<boolean>,
   params: undefined as unknown as {
     discussionId: Ref<string>;
+    discussionNumber: Ref<number | null>;
+    channelUniqueName: Ref<string>;
     enabled: boolean;
   },
 }));
@@ -19,9 +21,9 @@ vi.mock('@/composables/useDiscussionAgeGateCheck', () => ({
   },
 }));
 
-const mountScope = () =>
+const mountScope = (props: Record<string, unknown> = { discussionId: 'd1' }) =>
   mount(AgeGateCheckScope, {
-    props: { discussionId: 'd1' },
+    props,
     slots: {
       default: `<template #default="{ requiresAgeCheck }">
         <p class="slot">{{ requiresAgeCheck ? 'gated' : 'not gated' }}</p>
@@ -41,6 +43,19 @@ describe('AgeGateCheckScope', () => {
       discussionId: h.params.discussionId.value,
       enabled: h.params.enabled,
     }).toEqual({ discussionId: 'd1', enabled: true });
+  });
+
+  it('identifies a discussion by forum and number when it has no id', () => {
+    mountScope({ discussionNumber: 7, channelUniqueName: 'cats' });
+    expect({
+      discussionId: h.params.discussionId.value,
+      discussionNumber: h.params.discussionNumber.value,
+      channelUniqueName: h.params.channelUniqueName.value,
+    }).toEqual({
+      discussionId: '',
+      discussionNumber: 7,
+      channelUniqueName: 'cats',
+    });
   });
 
   it('renders nothing until the check resolves', () => {

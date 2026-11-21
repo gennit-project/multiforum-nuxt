@@ -5,6 +5,7 @@ import { useRoute } from 'nuxt/app';
 import type { GetUserAlbumsQuery } from '@/__generated__/operations';
 import { GetUserAlbumsDocument as GET_USER_ALBUMS } from '@/__generated__/operations';
 import { useSelectedChannelsFromQuery } from '@/composables/useSelectedChannelsFromQuery';
+import { getAlbumUrl } from '@/utils/contentUrls';
 type Album = GetUserAlbumsQuery['albums'][number];
 
 const route = useRoute();
@@ -91,6 +92,15 @@ const otherAlbums = computed(() => {
   return sortByNewest(other);
 });
 
+// Album numbers are scoped to the owner, so link to the owner's profile
+// (which for "other" albums is not the profile being viewed).
+const getAlbumLink = (album: Album) =>
+  getAlbumUrl({
+    username: album.ownerUsername || album.Owner?.username || username.value,
+    albumNumber: album.albumNumber,
+    albumId: album.id,
+  });
+
 // Get first image from album for thumbnail
 const getAlbumThumbnail = (album: Album) => {
   if (album.imageOrder && album.imageOrder.length > 0 && album.Images) {
@@ -141,7 +151,7 @@ const getAlbumThumbnail = (album: Album) => {
           <NuxtLink
             v-for="album in ownedAlbums"
             :key="album.id"
-            :to="`/u/${username}/albums/${album.id}`"
+            :to="getAlbumLink(album)"
             class="group overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-900"
           >
             <!-- Thumbnail -->
@@ -189,7 +199,7 @@ const getAlbumThumbnail = (album: Album) => {
           <NuxtLink
             v-for="album in otherAlbums"
             :key="album.id"
-            :to="`/u/${username}/albums/${album.id}`"
+            :to="getAlbumLink(album)"
             class="group overflow-hidden rounded-lg border bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-900"
           >
             <!-- Thumbnail -->

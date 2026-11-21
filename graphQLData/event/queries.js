@@ -48,9 +48,14 @@ export const EVENT_FIELDS = gql`
       }
       Occurrences(sort: [{ startTime: ASC }], limit: 20) {
         id
+        title
         startTime
         endTime
         canceled
+        EventChannels {
+          channelUniqueName
+          eventNumber
+        }
       }
     }
     location {

@@ -1,4 +1,10 @@
 import type { RouteLocationRaw } from 'vue-router';
+import {
+  getDiscussionCommentRoute,
+  getEventCommentRoute,
+  getCommentSegment,
+} from '@/utils/contentUrls';
+import { parseSlugSegmentNumber } from '@/utils/slugify';
 
 type ChannelLike = {
   uniqueName?: string | null;
@@ -7,14 +13,18 @@ type ChannelLike = {
 type DiscussionChannelLike = {
   channelUniqueName?: string | null;
   discussionId?: string | null;
+  discussionNumber?: number | null;
+  Discussion?: { title?: string | null } | null;
 };
 
 type EventChannelLike = {
   channelUniqueName?: string | null;
+  eventNumber?: number | null;
 };
 
 type EventLike = {
   id?: string | null;
+  title?: string | null;
   EventChannels?: EventChannelLike[] | null;
 };
 
@@ -26,6 +36,8 @@ type IssueLike = {
 
 export type CommentPermalinkInput = {
   id?: string | null;
+  /** Public permalink handle; the route's `commentId` param carries it. */
+  shortId?: string | null;
   Channel?: ChannelLike | null;
   DiscussionChannel?: DiscussionChannelLike | null;
   Event?: EventLike | null;
@@ -34,8 +46,13 @@ export type CommentPermalinkInput = {
 
 type CommentPermalinkOptions = {
   fallbackForumId?: string | null;
-  fallbackDiscussionId?: string | null;
-  fallbackEventId?: string | null;
+  /**
+   * The current route's `discussionId` param, i.e. a `{number}-{slug}` segment.
+   * Used when the comment doesn't carry the discussion number itself.
+   */
+  fallbackDiscussionSegment?: string | null;
+  /** The current route's `eventId` param; see `fallbackDiscussionSegment`. */
+  fallbackEventSegment?: string | null;
   fallbackIssueNumber?: string | number | null;
 };
 
@@ -58,35 +75,47 @@ export function getCommentPermalinkRoute(
   comment: CommentPermalinkInput,
   options: CommentPermalinkOptions = {}
 ): RouteLocationRaw | null {
-  if (!comment.id) {
+  if (!comment.id && !comment.shortId) {
     return null;
   }
 
   const forumId = getCommentForumId(comment, options.fallbackForumId);
+  const commentSegment = getCommentSegment({
+    shortId: comment.shortId,
+    commentId: comment.id,
+  });
 
+  const discussionNumber =
+    comment.DiscussionChannel?.discussionNumber ??
+    parseSlugSegmentNumber(options.fallbackDiscussionSegment ?? '');
   const discussionId =
-    comment.DiscussionChannel?.discussionId || options.fallbackDiscussionId;
-  if (discussionId && forumId) {
-    return {
-      name: 'forums-forumId-discussions-discussionId-comments-commentId',
-      params: {
-        forumId,
-        discussionId,
-        commentId: comment.id,
-      },
-    };
+    comment.DiscussionChannel?.discussionId ||
+    options.fallbackDiscussionSegment;
+  if ((discussionNumber != null || discussionId) && forumId) {
+    return getDiscussionCommentRoute({
+      forumId,
+      discussionNumber,
+      title: comment.DiscussionChannel?.Discussion?.title,
+      discussionId,
+      shortId: comment.shortId,
+      commentId: comment.id,
+    });
   }
 
-  const eventId = comment.Event?.id || options.fallbackEventId;
-  if (eventId && forumId) {
-    return {
-      name: 'forums-forumId-events-eventId-comments-commentId',
-      params: {
-        forumId,
-        eventId,
-        commentId: comment.id,
-      },
-    };
+  const eventChannel = comment.Event?.EventChannels?.[0];
+  const eventNumber =
+    eventChannel?.eventNumber ??
+    parseSlugSegmentNumber(options.fallbackEventSegment ?? '');
+  const eventId = comment.Event?.id || options.fallbackEventSegment;
+  if ((eventNumber != null || eventId) && forumId) {
+    return getEventCommentRoute({
+      forumId,
+      eventNumber,
+      title: comment.Event?.title,
+      eventId,
+      shortId: comment.shortId,
+      commentId: comment.id,
+    });
   }
 
   const issueNumber =
@@ -97,10 +126,29 @@ export function getCommentPermalinkRoute(
       params: {
         forumId,
         issueNumber,
-        commentId: comment.id,
+        commentId: commentSegment,
       },
     };
   }
 
   return null;
+}
+
+type PermalinkMatchInput = {
+  /** The route's `commentId` param (a comment shortId; raw id for legacy links). */
+  routeCommentId: string | null | undefined;
+  comment: { id?: string | null; shortId?: string | null } | null | undefined;
+};
+
+/**
+ * Whether `comment` is the one a comment-permalink route points at. The route
+ * carries the shortId; a raw id also matches so links built from data that
+ * lacked a shortId keep highlighting.
+ */
+export function isPermalinkedComment({
+  routeCommentId,
+  comment,
+}: PermalinkMatchInput): boolean {
+  if (!routeCommentId || !comment) return false;
+  return comment.shortId === routeCommentId || comment.id === routeCommentId;
 }

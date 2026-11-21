@@ -56,6 +56,136 @@ describe('getCommentPermalink', () => {
   });
 });
 
+describe('getCommentPermalink short URLs', () => {
+  it('links to a discussion comment by number, slug and shortId', () => {
+    expect(
+      getCommentPermalink({
+        id: 'c1',
+        shortId: 'a1b2c3d4e5f6',
+        DiscussionChannel: {
+          channelUniqueName: 'cats',
+          discussionId: 'd1',
+          discussionNumber: 42,
+          Discussion: { title: 'Trail Conditions' },
+        },
+      })
+    ).toEqual({
+      name: 'forums-forumId-discussions-discussionId-comments-commentId',
+      params: {
+        forumId: 'cats',
+        discussionId: '42-trail-conditions',
+        commentId: 'a1b2c3d4e5f6',
+      },
+    });
+  });
+
+  it('links to a download comment by number and shortId', () => {
+    expect(
+      getCommentPermalink({
+        id: 'c1',
+        shortId: 'a1b2c3d4e5f6',
+        DiscussionChannel: {
+          channelUniqueName: 'cats',
+          discussionId: 'd1',
+          discussionNumber: 3,
+          Discussion: { hasDownload: true, title: 'Cool Mod' },
+        },
+      })
+    ).toEqual({
+      name: 'forums-forumId-downloads-discussionId-comments-commentId',
+      params: {
+        forumId: 'cats',
+        discussionId: '3-cool-mod',
+        commentId: 'a1b2c3d4e5f6',
+      },
+    });
+  });
+
+  it('links to an event comment by event number, slug and shortId', () => {
+    expect(
+      getCommentPermalink({
+        id: 'c1',
+        shortId: 'f6e5d4c3b2a1',
+        Event: {
+          id: 'e1',
+          title: 'Spring Meetup',
+          EventChannels: [{ channelUniqueName: 'cats', eventNumber: 7 }],
+        },
+      })
+    ).toEqual({
+      name: 'forums-forumId-events-eventId-comments-commentId',
+      params: {
+        forumId: 'cats',
+        eventId: '7-spring-meetup',
+        commentId: 'f6e5d4c3b2a1',
+      },
+    });
+  });
+
+  it('uses a number-only discussion segment when no title is available', () => {
+    expect(
+      getCommentPermalink({
+        id: 'c1',
+        shortId: 'a1b2c3d4e5f6',
+        DiscussionChannel: {
+          channelUniqueName: 'cats',
+          discussionId: 'd1',
+          discussionNumber: 42,
+        },
+      }).params?.discussionId
+    ).toBe('42');
+  });
+});
+
+describe('getCommentContextPermalink short URLs', () => {
+  it('links to the parent discussion by number and slug', () => {
+    expect(
+      getCommentContextPermalink({
+        DiscussionChannel: {
+          channelUniqueName: 'cats',
+          discussionId: 'd1',
+          discussionNumber: 42,
+          Discussion: { title: 'Trail Conditions' },
+        },
+      })
+    ).toEqual({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { forumId: 'cats', discussionId: '42-trail-conditions' },
+    });
+  });
+
+  it('links to the parent download by number', () => {
+    expect(
+      getCommentContextPermalink({
+        DiscussionChannel: {
+          channelUniqueName: 'cats',
+          discussionId: 'd1',
+          discussionNumber: 3,
+          Discussion: { hasDownload: true },
+        },
+      })
+    ).toEqual({
+      name: 'forums-forumId-downloads-discussionId',
+      params: { forumId: 'cats', discussionId: '3' },
+    });
+  });
+
+  it('links to the parent event by number and slug', () => {
+    expect(
+      getCommentContextPermalink({
+        Event: {
+          id: 'e1',
+          title: 'Spring Meetup',
+          EventChannels: [{ channelUniqueName: 'cats', eventNumber: 7 }],
+        },
+      })
+    ).toEqual({
+      name: 'forums-forumId-events-eventId',
+      params: { forumId: 'cats', eventId: '7-spring-meetup' },
+    });
+  });
+});
+
 describe('getCommentContextPermalink', () => {
   it('links to the parent discussion', () => {
     expect(

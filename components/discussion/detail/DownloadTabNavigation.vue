@@ -12,6 +12,12 @@ import { useQuery } from '@vue/apollo-composable';
 import { GetPublicCollectionsForDownloadDocument as GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD } from '@/__generated__/operations';
 import PublicCollectionListItem from '@/components/collection/PublicCollectionListItem.vue';
 import { useUsername } from '@/composables/useAuthState';
+import {
+  getDiscussionLinkTarget,
+  getDownloadTabRoute,
+  getDownloadTabUrl,
+} from '@/utils/discussionLinks';
+import { getDownloadRoute } from '@/utils/contentUrls';
 
 const usernameVar = useUsername();
 const hasMounted = ref(false);
@@ -45,6 +51,23 @@ const props = defineProps({
 
 const router = useRouter();
 const route = useRoute();
+
+const linkTarget = computed(() =>
+  getDiscussionLinkTarget({
+    discussion: props.discussion ?? { id: props.discussionId },
+    channelId: props.channelId,
+  })
+);
+const descriptionTabRoute = computed(() => getDownloadRoute(linkTarget.value));
+const commentsTabRoute = computed(() =>
+  getDownloadTabRoute({ target: linkTarget.value, tab: 'comments' })
+);
+const activityTabRoute = computed(() =>
+  getDownloadTabRoute({ target: linkTarget.value, tab: 'activity' })
+);
+const editDescriptionUrl = computed(() =>
+  getDownloadTabUrl({ target: linkTarget.value, tab: 'description' })
+);
 
 const loggedInUserIsAuthor = computed(() => {
   return props.discussion?.Author?.username === usernameVar.value;
@@ -83,13 +106,7 @@ const isDescriptionTab = computed(
     <div class="border-b border-gray-200 dark:border-gray-700">
       <nav class="flex space-x-8 px-2">
         <nuxt-link
-          :to="{
-            name: 'forums-forumId-downloads-discussionId',
-            params: {
-              forumId: channelId,
-              discussionId: discussionId,
-            },
-          }"
+          :to="descriptionTabRoute"
           class="border-b-2 px-1 py-2 text-sm font-medium"
           :class="
             typeof $route.name === 'string' &&
@@ -102,13 +119,7 @@ const isDescriptionTab = computed(
           Description
         </nuxt-link>
         <nuxt-link
-          :to="{
-            name: 'forums-forumId-downloads-discussionId-comments',
-            params: {
-              forumId: channelId,
-              discussionId: discussionId,
-            },
-          }"
+          :to="commentsTabRoute"
           class="border-b-2 px-1 py-2 text-sm font-medium"
           :class="
             typeof $route.name === 'string' && $route.name.includes('comments')
@@ -119,13 +130,7 @@ const isDescriptionTab = computed(
           Comments ({{ aggregateCommentCount }})
         </nuxt-link>
         <nuxt-link
-          :to="{
-            name: 'forums-forumId-downloads-discussionId-activity',
-            params: {
-              forumId: channelId,
-              discussionId: discussionId,
-            },
-          }"
+          :to="activityTabRoute"
           class="border-b-2 px-1 py-2 text-sm font-medium"
           :class="
             typeof $route.name === 'string' && $route.name.includes('activity')
@@ -167,11 +172,7 @@ const isDescriptionTab = computed(
               type="button"
               class="focus:ring-brand-500 inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-offset-2 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
               data-testid="edit-download-button-fallback"
-              @click="
-                router.push(
-                  `/forums/${channelId}/downloads/${discussionId}/description`
-                )
-              "
+              @click="router.push(editDescriptionUrl)"
             >
               <PencilIcon class="h-4 w-4" />
               Edit Description

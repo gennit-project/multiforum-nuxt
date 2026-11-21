@@ -1,5 +1,13 @@
 import type { GetModContributionsQuery } from '@/__generated__/operations';
 import type { NullableSelection } from '@/types/Comment';
+import {
+  getDiscussionCommentRoute,
+  getDiscussionRoute,
+  getDiscussionSegment,
+  getEventCommentRoute,
+  getEventRoute,
+  getEventSegment,
+} from '@/utils/contentUrls';
 type SelectedActivity = GetModContributionsQuery['getModContributions'][number]['activities'][number];
 
 export type ModActivityLink = {
@@ -12,6 +20,10 @@ export type ModActivityLink = {
 
 export type ModActivityLinkInput = Partial<NullableSelection<Pick<SelectedActivity, 'actionType' | 'Comment' | 'Issue' | 'RelatedDiscussion' | 'RelatedEvent' | 'RelatedComment'>>>;
 
+// TODO(short-urls): backend does not expose discussionNumber / eventNumber /
+// Comment.shortId on the contribution-activity types (getModContributions), so
+// every discussion, event and comment link below falls back to the raw global
+// id segment. Switch to the numbers/shortId once the backend selects them.
 const getFirst = <T>(items?: T[] | null) => {
   return Array.isArray(items) && items.length > 0 ? items[0] : null;
 };
@@ -35,7 +47,10 @@ export const getModActivityLinks = (
           name: 'forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId',
           params: {
             forumId: discussionChannel.channelUniqueName,
-            discussionId: discussionChannel.discussionId,
+            discussionId: getDiscussionSegment({
+              discussionNumber: null,
+              discussionId: discussionChannel.discussionId,
+            }),
             feedbackId: activity.Comment.id,
           },
         },
@@ -51,7 +66,10 @@ export const getModActivityLinks = (
           name: 'forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId',
           params: {
             forumId: eventChannel?.channelUniqueName || '',
-            eventId: activity.RelatedEvent.id,
+            eventId: getEventSegment({
+              eventNumber: null,
+              eventId: activity.RelatedEvent.id,
+            }),
             feedbackId: activity.Comment.id,
           },
         },
@@ -68,8 +86,11 @@ export const getModActivityLinks = (
           params: {
             forumId:
               activity.RelatedComment.DiscussionChannel.channelUniqueName,
-            discussionId:
-              activity.RelatedComment.DiscussionChannel.discussionId,
+            discussionId: getDiscussionSegment({
+              discussionNumber: null,
+              discussionId:
+                activity.RelatedComment.DiscussionChannel.discussionId,
+            }),
             commentId: activity.RelatedComment.id,
             feedbackId: activity.Comment.id,
           },
@@ -97,13 +118,12 @@ export const getModActivityLinks = (
   if (discussionChannel?.channelUniqueName && discussionChannel?.discussionId) {
     links.push({
       label: 'Discussion',
-      to: {
-        name: 'forums-forumId-discussions-discussionId',
-        params: {
-          forumId: discussionChannel.channelUniqueName,
-          discussionId: discussionChannel.discussionId,
-        },
-      },
+      to: getDiscussionRoute({
+        forumId: discussionChannel.channelUniqueName,
+        discussionNumber: null,
+        title: activity.RelatedDiscussion?.title,
+        discussionId: discussionChannel.discussionId,
+      }),
     });
   }
 
@@ -111,13 +131,12 @@ export const getModActivityLinks = (
   if (eventChannel?.channelUniqueName && eventChannel?.eventId) {
     links.push({
       label: 'Event',
-      to: {
-        name: 'forums-forumId-events-eventId',
-        params: {
-          forumId: eventChannel.channelUniqueName,
-          eventId: eventChannel.eventId,
-        },
-      },
+      to: getEventRoute({
+        forumId: eventChannel.channelUniqueName,
+        eventNumber: null,
+        title: activity.RelatedEvent?.title,
+        eventId: eventChannel.eventId,
+      }),
     });
   }
 
@@ -128,14 +147,13 @@ export const getModActivityLinks = (
   ) {
     links.push({
       label: 'Comment',
-      to: {
-        name: 'forums-forumId-discussions-discussionId-comments-commentId',
-        params: {
-          forumId: activity.RelatedComment.DiscussionChannel.channelUniqueName,
-          discussionId: activity.RelatedComment.DiscussionChannel.discussionId,
-          commentId: activity.RelatedComment.id,
-        },
-      },
+      to: getDiscussionCommentRoute({
+        forumId: activity.RelatedComment.DiscussionChannel.channelUniqueName,
+        discussionNumber: null,
+        discussionId: activity.RelatedComment.DiscussionChannel.discussionId,
+        shortId: null,
+        commentId: activity.RelatedComment.id,
+      }),
     });
   } else if (
     getFirst(activity.RelatedComment?.Event?.EventChannels)
@@ -148,14 +166,14 @@ export const getModActivityLinks = (
     );
     links.push({
       label: 'Comment',
-      to: {
-        name: 'forums-forumId-events-eventId-comments-commentId',
-        params: {
-          forumId: relatedEventChannel?.channelUniqueName || '',
-          eventId: activity.RelatedComment.Event.id,
-          commentId: activity.RelatedComment.id,
-        },
-      },
+      to: getEventCommentRoute({
+        forumId: relatedEventChannel?.channelUniqueName || '',
+        eventNumber: null,
+        title: activity.RelatedComment.Event.title,
+        eventId: activity.RelatedComment.Event.id,
+        shortId: null,
+        commentId: activity.RelatedComment.id,
+      }),
     });
   } else if (
     activity.RelatedComment?.Event?.id &&
@@ -164,14 +182,14 @@ export const getModActivityLinks = (
   ) {
     links.push({
       label: 'Comment',
-      to: {
-        name: 'forums-forumId-events-eventId-comments-commentId',
-        params: {
-          forumId: activity.Issue.channelUniqueName,
-          eventId: activity.RelatedComment.Event.id,
-          commentId: activity.RelatedComment.id,
-        },
-      },
+      to: getEventCommentRoute({
+        forumId: activity.Issue.channelUniqueName,
+        eventNumber: null,
+        title: activity.RelatedComment.Event.title,
+        eventId: activity.RelatedComment.Event.id,
+        shortId: null,
+        commentId: activity.RelatedComment.id,
+      }),
     });
   }
 

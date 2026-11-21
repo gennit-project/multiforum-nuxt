@@ -86,7 +86,13 @@ const serverRoleBadge = computed(() => {
 // Check if we're on an image detail page
 const isImageDetailPage = computed(() => {
   const path = route.path;
-  return path.includes('/images/') && path.split('/').length > 4; // /u/username/images/imageId
+  return path.includes('/images/') && path.split('/').length > 4; // /u/username/images/imageNumber
+});
+
+// Collection detail pages (/u/username/collections/number-slug) are also full width
+const isCollectionDetailPage = computed(() => {
+  const path = route.path;
+  return path.includes('/collections/') && path.split('/').length > 4;
 });
 
 const filterableTabs = [
@@ -120,8 +126,8 @@ useHead(
 <template>
   <NuxtLayout>
     <div class="w-full max-w-[theme(screens.2xl)] bg-white px-2 dark:bg-black">
-      <!-- Image detail page layout (full width) -->
-      <div v-if="isImageDetailPage" class="w-full">
+      <!-- Image and collection detail page layout (full width) -->
+      <div v-if="isImageDetailPage || isCollectionDetailPage" class="w-full">
         <NuxtPage />
       </div>
 

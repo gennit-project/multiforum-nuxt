@@ -145,10 +145,11 @@ test('creates, edits and deletes a discussion', async ({
 
   await page.getByRole('button', { name: 'Save' }).first().click();
 
-  // Get the created discussion ID from state - we know it exists after creation
+  // The new discussion's URL carries its per-forum number and a title slug.
   const createdDiscussion = state.discussions[0]!;
+  const createdSegment = `${createdDiscussion.discussionNumber}-test-discussion-title`;
   await expect(page).toHaveURL(
-    `/forums/${TEST_CHANNEL}/discussions/${createdDiscussion.id}`
+    `/forums/${TEST_CHANNEL}/discussions/${createdSegment}`
   );
   await expect(
     page.getByRole('heading', { name: TEST_DISCUSSION })
@@ -156,10 +157,10 @@ test('creates, edits and deletes a discussion', async ({
   await expect(page.getByText(TEST_BODY)).toBeVisible();
 
   await page.goto(
-    `/forums/${TEST_CHANNEL}/discussions/edit/${createdDiscussion.id}`
+    `/forums/${TEST_CHANNEL}/discussions/edit/${createdSegment}`
   );
   await expect(page).toHaveURL(
-    `/forums/${TEST_CHANNEL}/discussions/edit/${createdDiscussion.id}`
+    `/forums/${TEST_CHANNEL}/discussions/edit/${createdSegment}`
   );
 
   const bodyInput = page.getByTestId('body-input');
@@ -174,7 +175,7 @@ test('creates, edits and deletes a discussion', async ({
   await expect(tagPicker).not.toHaveAttribute('aria-label', new RegExp(TAG_ONE));
 
   await page.getByRole('button', { name: 'Save' }).first().click();
-  await page.goto(`/forums/${TEST_CHANNEL}/discussions/${createdDiscussion.id}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/discussions/${createdSegment}`);
   await expect(page.getByText(UPDATED_BODY)).toBeVisible();
 
   await page.getByTestId('discussion-menu-button').click();
@@ -227,7 +228,7 @@ test('requires and submits a flair in the channel-scoped form', async ({
   await saveButton.click();
 
   await expect(page).toHaveURL(
-    `/forums/${TEST_CHANNEL}/discussions/discussion-1`
+    `/forums/${TEST_CHANNEL}/discussions/1-test-discussion-title`
   );
   expect(state.lastChannelFlairSelections).toEqual([
     { channelUniqueName: TEST_CHANNEL, flairIds: ['question'] },
@@ -242,6 +243,7 @@ test('shows, hydrates, and clears an existing optional flair', async ({
   state.discussions = [
     {
       id: 'discussion-with-flair',
+      discussionNumber: 5,
       discussionChannelId: 'discussion-channel-with-flair',
       title: TEST_DISCUSSION,
       body: TEST_BODY,
@@ -288,12 +290,12 @@ test('shows, hydrates, and clears an existing optional flair', async ({
   });
 
   const discussionPath =
-    `/forums/${TEST_CHANNEL}/discussions/discussion-with-flair`;
+    `/forums/${TEST_CHANNEL}/discussions/5-test-discussion-title`;
   await page.goto(discussionPath);
   await expect(page.getByTestId('discussion-flair')).toHaveText('Question');
 
   await page.goto(
-    `/forums/${TEST_CHANNEL}/discussions/edit/discussion-with-flair`
+    `/forums/${TEST_CHANNEL}/discussions/edit/5-test-discussion-title`
   );
   const selectedFlair = page.getByRole('button', {
     name: 'Remove Question flair',
@@ -378,7 +380,9 @@ test('requires flair selections independently in the sitewide form', async ({
   await expect(saveButton).toBeEnabled();
   await saveButton.click();
 
-  await expect(page).toHaveURL('/forums/cats/discussions/discussion-1');
+  await expect(page).toHaveURL(
+    '/forums/cats/discussions/1-test-discussion-title'
+  );
   expect(state.lastChannelFlairSelections).toEqual([
     { channelUniqueName: 'cats', flairIds: ['cat-question'] },
     { channelUniqueName: 'dogs', flairIds: ['dog-topic'] },
@@ -401,7 +405,7 @@ test('creates a crosspost using the existing discussion ID contract', async ({ p
   await page.getByTestId('title-input').fill('Crosspost contract');
   await page.getByTestId('body-input').fill('A reference to an existing discussion');
   await page.getByRole('button', { name: 'Save', exact: true }).first().click();
-  await expect(page).toHaveURL(/\/forums\/cats\/discussions\/discussion-1$/);
+  await expect(page).toHaveURL(/\/forums\/cats\/discussions\/1-crosspost-contract$/);
   expect(submitted).toMatchObject({ input: [{
     crosspostedDiscussionId: 'existing-source',
     channelConnections: ['cats'],

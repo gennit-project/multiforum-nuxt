@@ -69,13 +69,32 @@ describe('buildEventStructuredData', () => {
     expect((data.location as { '@type': string })['@type']).toBe('Place');
   });
 
-  it('uses a VirtualLocation with a fallback url when there is no address', () => {
+  it('uses the forum event URL as the VirtualLocation fallback when there is no address', () => {
+    const data = buildEventStructuredData({
+      event: {
+        ...baseEvent,
+        address: '',
+        virtualEventUrl: null,
+        EventChannels: [
+          { channelUniqueName: 'dogs', eventNumber: 3 },
+          { channelUniqueName: 'cats', eventNumber: 7 },
+        ],
+      },
+      baseUrl: 'https://x',
+      channelId: 'cats',
+    });
+    expect((data.location as { url: string }).url).toBe(
+      'https://x/forums/cats/events/7-trivia-night'
+    );
+  });
+
+  it('falls back to the event list when the event has no forums', () => {
     const data = buildEventStructuredData({
       event: { ...baseEvent, address: '', virtualEventUrl: null },
       baseUrl: 'https://x',
     });
     expect((data.location as { url: string }).url).toBe(
-      'https://x/events/list/search/e1'
+      'https://x/events/list/search'
     );
   });
 

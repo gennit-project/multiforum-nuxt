@@ -55,7 +55,8 @@ const mountItem = (
   const discussion = makeDiscussion({
     title,
     Author: { username: 'alice' },
-  } as Partial<Discussion>);
+    DiscussionChannels: [{ discussionNumber: 42, channelUniqueName: 'cats' }],
+  } as unknown as Partial<Discussion>);
   const discussionChannel = {
     __typename: 'DiscussionChannel',
     channelUniqueName: 'cats',
@@ -84,6 +85,17 @@ const mountItem = (
 describe('ChannelDiscussionListItem', () => {
   it('renders the discussion title', () => {
     expect(mountItem('My Discussion').text()).toContain('My Discussion');
+  });
+
+  it('links the title to the number-and-slug discussion url', () => {
+    expect(
+      mountItem('My Discussion')
+        .findAllComponents({ name: 'NuxtLinkStub' })
+        .map((link) => link.props('to'))[0]
+    ).toMatchObject({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { forumId: 'cats', discussionId: '42-my-discussion' },
+    });
   });
 
   it('reflects an overridden title', () => {

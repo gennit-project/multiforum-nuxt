@@ -10,6 +10,7 @@ import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 import { useServerRoleMembership } from '@/composables/useServerRoleMembership';
 import { getServerRoleBadge } from '@/utils/serverRoleBadges';
+import { getDownloadUrl } from '@/utils/contentUrls';
 
 const usernameVar = useUsername();
 
@@ -39,7 +40,12 @@ const getDownloadLink = (download: FavoriteDownload) => {
   const firstChannel = safeArrayFirst(download.DiscussionChannels);
   if (!firstChannel?.channelUniqueName) return '/';
 
-  return `/forums/${firstChannel.channelUniqueName}/downloads/${download.id}`;
+  return getDownloadUrl({
+    forumId: firstChannel.channelUniqueName,
+    discussionNumber: firstChannel.discussionNumber,
+    title: download.title,
+    discussionId: download.id,
+  });
 };
 
 const getChannelLink = (channelUniqueName: string | undefined) => {

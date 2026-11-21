@@ -48,6 +48,7 @@ const buildEvent = (overrides: Partial<{
     {
       id: 'event-channel-1',
       eventId: overrides.id || 'event-1',
+      eventNumber: 1,
       channelUniqueName: TEST_CHANNEL,
       archived: false,
       Channel: {
@@ -552,6 +553,7 @@ test.describe('Link verification - pages resolve correctly', () => {
             ? { __typename: 'Comment', id: 'event-parent' }
             : null,
         }] } }),
+        getEventIdByNumber: () => ({ data: { getEventIdByNumber: eventId } }),
         getEvent: () => ({
           data: {
             events: [
@@ -594,17 +596,17 @@ test.describe('Link verification - pages resolve correctly', () => {
 
       try {
         // Navigate to event permalink
-        await page.goto(`/forums/${TEST_CHANNEL}/events/${eventId}${commentPermalink ? '/comments/event-comment' : ''}`);
+        await page.goto(`/forums/${TEST_CHANNEL}/events/1-test-event-title${commentPermalink ? '/comments/event-comment' : ''}`);
 
         // Verify the event detail shell loaded
         await expect(page.getByTestId('event-menu-button')).toBeVisible();
 
         // Verify URL is correct
-        expect(page.url()).toContain(`/forums/${TEST_CHANNEL}/events/${eventId}`);
+        expect(page.url()).toContain(`/forums/${TEST_CHANNEL}/events/1-test-event-title`);
 
         if (commentPermalink) {
           await expect(page.getByText('Event permalink body', { exact: true })).toBeVisible();
-          await expect(page.getByRole('link', { name: 'View Context', exact: true })).toHaveAttribute('href', `/forums/${TEST_CHANNEL}/events/${eventId}/comments/event-parent`);
+          await expect(page.getByRole('link', { name: 'View Context', exact: true })).toHaveAttribute('href', `/forums/${TEST_CHANNEL}/events/1-test-event-title/comments/event-parent`);
           await expectNoAxeViolations(page);
           await page.getByRole('link', { name: 'View Context', exact: true }).click();
           await expect(page.getByText('Parent event comment', { exact: true })).toBeVisible();

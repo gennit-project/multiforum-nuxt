@@ -5,6 +5,7 @@ export const makeReply = (
   overrides: Partial<ReplyComment> = {}
 ): ReplyComment => ({
   id: 'reply',
+  shortId: 'replyshort01',
   text: 'Reply body',
   emoji: null,
   weightedVotesCount: 0,
@@ -18,13 +19,14 @@ export const makeReply = (
   isFavoritedByUser: null,
   CommentAuthor: null,
   ChildCommentsConnection: { aggregate: { count: { nodes: 0 } } },
-  ParentComment: { id: 'root' },
+  ParentComment: { id: 'root', shortId: 'rootshort001' },
   PastVersions: [],
   SubscribedToNotifications: [],
   Event: null,
   DiscussionChannel: {
     id: 'dc1',
     discussionId: 'd1',
+    discussionNumber: 1,
     channelUniqueName: 'cats',
   },
   UpvotedByUsers: [],

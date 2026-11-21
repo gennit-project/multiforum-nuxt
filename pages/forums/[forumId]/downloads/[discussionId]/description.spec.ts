@@ -29,6 +29,7 @@ vi.mock('@/composables/useAuthState', async () => {
 });
 
 const discussion = {
+  id: 'd1',
   title: 'A download',
   body: 'Download body text',
   Author: { username: 'alice' },

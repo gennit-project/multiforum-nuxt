@@ -2,6 +2,7 @@
 import { computed, defineAsyncComponent } from 'vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import type { DiscussionPresentation } from '@/types/DiscussionPresentation';
+import { getDiscussionRoute } from '@/utils/contentUrls';
 
 const DiscussionAlbum = defineAsyncComponent(
   () => import('@/components/discussion/detail/DiscussionAlbum.vue')
@@ -29,13 +30,12 @@ const discussionLink = computed(() => {
   if (!props.discussion?.id || !primaryChannel.value?.channelUniqueName) {
     return null;
   }
-  return {
-    name: 'forums-forumId-discussions-discussionId',
-    params: {
-      forumId: primaryChannel.value.channelUniqueName,
-      discussionId: props.discussion.id,
-    },
-  };
+  return getDiscussionRoute({
+    forumId: primaryChannel.value.channelUniqueName,
+    discussionNumber: primaryChannel.value.discussionNumber,
+    title: props.discussion.title,
+    discussionId: props.discussion.id,
+  });
 });
 
 const hasAlbum = computed(() => {

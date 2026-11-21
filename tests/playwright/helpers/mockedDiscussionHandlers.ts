@@ -49,6 +49,8 @@ export const DEFAULT_DISCUSSION_CONFIG: DiscussionTestConfig = {
 
 export type MockDiscussionState = {
   id: string;
+  /** Per-forum number the discussion's URL carries (`{number}-{slug}`). */
+  discussionNumber: number;
   discussionChannelId: string;
   title: string;
   body: string;
@@ -104,6 +106,7 @@ const buildDiscussionResponse = (
           {
             ...buildDiscussion({
               id: discussion.id,
+              discussionNumber: discussion.discussionNumber,
               discussionChannelId: discussion.discussionChannelId,
               channelUniqueName: channelId,
               title: discussion.title,
@@ -112,6 +115,7 @@ const buildDiscussionResponse = (
             }),
             DiscussionChannels: buildDiscussion({
               id: discussion.id,
+              discussionNumber: discussion.discussionNumber,
               discussionChannelId: discussion.discussionChannelId,
               channelUniqueName: channelId,
               title: discussion.title,
@@ -159,6 +163,16 @@ const buildDiscussionListResponse = (
                 Author: buildUser(),
                 Album: null,
                 Tags: discussion.tags.map((text) => ({ text })),
+                // The list item has no discussionNumber, so the list query
+                // selects it through the Discussion.
+                DiscussionChannels: [
+                  {
+                    id: discussion.discussionChannelId,
+                    discussionId: discussion.id,
+                    discussionNumber: discussion.discussionNumber,
+                    channelUniqueName: channelId,
+                  },
+                ],
               },
             },
           ],
@@ -190,6 +204,32 @@ export const createDiscussionHandlers = (
       return buildDiscussionResponse(discussion, config.channelId);
     },
 
+    getDiscussionIdByNumber: ({
+      body,
+    }: {
+      body: { variables?: { discussionNumber?: number } };
+    }) => {
+      const discussion = state.discussions.find(
+        (item) =>
+          !item.deleted &&
+          item.discussionNumber === body.variables?.discussionNumber
+      );
+      return {
+        data: {
+          discussionChannels: discussion
+            ? [
+                {
+                  id: discussion.discussionChannelId,
+                  discussionId: discussion.id,
+                  discussionNumber: discussion.discussionNumber,
+                  channelUniqueName: config.channelId,
+                },
+              ]
+            : [],
+        },
+      };
+    },
+
     getCommentSection: () => {
       const discussion = getActiveDiscussion();
       return {
@@ -201,6 +241,7 @@ export const createDiscussionHandlers = (
                 : buildDiscussionChannel({
                     id: discussion.discussionChannelId,
                     discussionId: discussion.id,
+                    discussionNumber: discussion.discussionNumber,
                     channelUniqueName: config.channelId,
                     title: discussion.title,
                   }),
@@ -304,11 +345,13 @@ export const createDiscussionHandlers = (
       state.lastChannelFlairSelections =
         requestInput?.channelFlairSelections ?? [];
 
-      const id = `discussion-${state.nextDiscussionId++}`;
+      const discussionNumber = state.nextDiscussionId++;
+      const id = `discussion-${discussionNumber}`;
       const discussionChannelId = `discussion-channel-${id}`;
 
       const newDiscussion: MockDiscussionState = {
         id,
+        discussionNumber,
         discussionChannelId,
         title: input.title,
         body: input.body ?? '',
@@ -332,6 +375,7 @@ export const createDiscussionHandlers = (
                   answered: false,
                   locked: false,
                   discussionId: newDiscussion.id,
+                  discussionNumber: newDiscussion.discussionNumber,
                   channelUniqueName: config.channelId,
                   Flairs: [],
                   CommentsConnection: { aggregate: { count: { nodes: 0 } } },
@@ -392,6 +436,7 @@ export const createDiscussionHandlers = (
                 id: discussion.discussionChannelId,
                 channelUniqueName: config.channelId,
                 discussionId: discussion.id,
+                discussionNumber: discussion.discussionNumber,
                 Flairs: discussion.flairs ?? [],
                 Channel: { uniqueName: config.channelId },
                 archived: false,

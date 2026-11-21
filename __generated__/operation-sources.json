@@ -2737,9 +2737,9 @@
       "operations": [
         {
           "name": "getEvents",
-          "document": "GetEventsSource98b9ac2a6cDocument",
-          "result": "GetEventsSource98b9ac2a6cQuery",
-          "variables": "GetEventsSource98b9ac2a6cQueryVariables"
+          "document": "GetEventsSource0ffac39832Document",
+          "result": "GetEventsSource0ffac39832Query",
+          "variables": "GetEventsSource0ffac39832QueryVariables"
         }
       ],
       "fragments": [

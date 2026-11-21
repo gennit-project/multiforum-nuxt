@@ -132,6 +132,10 @@ const props = defineProps({
 const route = useRoute();
 const commentSectionQueryVariables = computed(() => ({
   discussionId: props.discussionChannel?.discussionId,
+  // getCommentSection is keyed by the per-forum number; links (e.g. comment
+  // feedback) need it too. `discussionTitle` supplies the decorative slug.
+  discussionNumber: props.discussionChannel?.discussionNumber,
+  discussionTitle: props.discussionChannel?.Discussion?.title,
   channelUniqueName: props.discussionChannel?.channelUniqueName,
   modName: props.modName,
   limit: COMMENT_LIMIT,

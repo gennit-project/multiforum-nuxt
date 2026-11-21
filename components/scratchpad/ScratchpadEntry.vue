@@ -44,6 +44,9 @@ const sourceLink = computed(() => {
     return `/forums/${sourceChannelUniqueName}/discussions`;
   }
 
+  // TODO(short-urls): backend does not expose discussionNumber on
+  // ScratchpadEntry nor shortId for sourceId, so both links below fall back to
+  // the raw-id segments (discussionId / commentId = sourceId).
   if (sourceType === 'comment') {
     // sourceId is the Comment id; link straight to the comment permalink.
     return getPermalinkToDiscussionComment({

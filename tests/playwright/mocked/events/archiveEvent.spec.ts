@@ -1,5 +1,5 @@
 import { test, expect } from '../../helpers/testFixture';
-import { buildChannel, buildEvent } from '../../helpers/graphqlFixtures';
+import { buildChannel, buildEvent, buildEventIdLookupHandlers} from '../../helpers/graphqlFixtures';
 import { createBaseHandlers } from '../../helpers/baseHandlers';
 import {
   DEFAULT_MOD_ROLE,
@@ -75,6 +75,7 @@ test('archives an event with mocked GraphQL', async ({
           ],
         },
       }),
+      ...buildEventIdLookupHandlers(EVENT_ID),
       getEvent: () => ({
         data: {
           events: [mockEvent],
@@ -129,7 +130,7 @@ test('archives an event with mocked GraphQL', async ({
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/events/${EVENT_ID}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/events/1-event-to-archive`);
   await page.getByTestId('event-menu-button').click();
   await page.getByTestId('event-menu-button-item-Archive').click();
   await expect(page.getByText('Archive Event')).toBeVisible();

@@ -175,7 +175,7 @@ test('archives a discussion and suspends user with mocked GraphQL', async ({
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/discussions/1`);
 
   // Click the discussion menu button
   await page.getByTestId('discussion-menu-button').click();

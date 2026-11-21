@@ -6,19 +6,28 @@ import CreateEditEventFields from '@/components/event/form/CreateEditEventFields
 import EditScopeModal from '@/components/event/form/EditScopeModal.vue';
 
 const mockState = vi.hoisted(() => ({
-  routeParams: { forumId: 'cats' as unknown, eventId: 'e1' as unknown },
+  routeParams: {
+    forumId: 'cats' as unknown,
+    eventId: '4-meetup' as unknown,
+  },
+  resolvedId: null as unknown as { value: string },
+  resolving: null as unknown as { value: boolean },
+  notFound: null as unknown as { value: boolean },
   routerPush: vi.fn(),
   queryResultCallback: null as null | ((value: unknown) => void),
   updateEvent: vi.fn(),
   updateSeries: vi.fn(),
-  updateDone: null as null | (() => void),
-  seriesDone: null as null | (() => void),
+  updateDone: null as null | ((result?: unknown) => void),
+  seriesDone: null as null | ((result?: unknown) => void),
   updateError: null as unknown as { value: unknown },
   seriesError: null as unknown as { value: unknown },
   updateLoading: null as unknown as { value: boolean },
   seriesLoading: null as unknown as { value: boolean },
 }));
 
+mockState.resolvedId = ref('e1');
+mockState.resolving = ref(false);
+mockState.notFound = ref(false);
 mockState.updateError = ref(null);
 mockState.seriesError = ref(null);
 mockState.updateLoading = ref(false);
@@ -27,6 +36,14 @@ mockState.seriesLoading = ref(false);
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: mockState.routeParams }),
   useRouter: () => ({ push: mockState.routerPush }),
+}));
+
+vi.mock('@/composables/useRouteContentIds', () => ({
+  useResolvedEventId: () => ({
+    id: mockState.resolvedId,
+    loading: mockState.resolving,
+    notFound: mockState.notFound,
+  }),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -53,7 +70,10 @@ const baseEvent = {
   title: 'Meetup',
   description: '',
   Tags: [{ text: 'old-tag' }],
-  EventChannels: [{ channelUniqueName: 'cats' }, { channelUniqueName: 'dogs' }],
+  EventChannels: [
+    { channelUniqueName: 'cats', eventNumber: 4 },
+    { channelUniqueName: 'dogs', eventNumber: 9 },
+  ],
   Poster: { username: 'owner' },
   startTime: '2024-01-01T18:00:00Z',
   endTime: '2024-01-01T20:00:00Z',
@@ -77,7 +97,7 @@ const mountWith = async (
       mutate: mockState.updateEvent,
       loading: mockState.updateLoading,
       error: mockState.updateError,
-      onDone: (callback: () => void) => {
+      onDone: (callback: (result?: unknown) => void) => {
         mockState.updateDone = callback;
       },
     })
@@ -85,7 +105,7 @@ const mountWith = async (
       mutate: mockState.updateSeries,
       loading: mockState.seriesLoading,
       error: mockState.seriesError,
-      onDone: (callback: () => void) => {
+      onDone: (callback: (result?: unknown) => void) => {
         mockState.seriesDone = callback;
       },
     });
@@ -97,7 +117,10 @@ const mountWith = async (
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockState.routeParams = { forumId: 'cats', eventId: 'e1' };
+  mockState.routeParams = { forumId: 'cats', eventId: '4-meetup' };
+  mockState.resolvedId.value = 'e1';
+  mockState.resolving.value = false;
+  mockState.notFound.value = false;
   mockState.queryResultCallback = null;
   mockState.updateDone = null;
   mockState.seriesDone = null;
@@ -236,8 +259,45 @@ describe('event edit page', () => {
 
     expect(mockState.routerPush).toHaveBeenCalledWith({
       name: 'forums-forumId-events-eventId',
-      params: { forumId: 'cats', eventId: 'e1' },
+      params: { forumId: 'cats', eventId: '4-meetup' },
     });
+  });
+
+  it('redirects using the event number from the update response', async () => {
+    await mountWith();
+
+    mockState.updateDone?.({
+      data: {
+        updateEventWithChannelConnections: {
+          id: 'e1',
+          title: 'Renamed meetup',
+          EventChannels: [{ channelUniqueName: 'cats', eventNumber: 4 }],
+        },
+      },
+    });
+
+    expect(mockState.routerPush).toHaveBeenCalledWith({
+      name: 'forums-forumId-events-eventId',
+      params: { forumId: 'cats', eventId: '4-renamed-meetup' },
+    });
+  });
+
+  it('keeps the form in its loading state while the route number resolves', async () => {
+    mockState.resolving.value = true;
+    mockState.resolvedId.value = '';
+    const wrapper = await mountWith();
+
+    expect(
+      wrapper.findComponent(CreateEditEventFields).props('eventLoading')
+    ).toBe(true);
+  });
+
+  it('shows a not-found banner when the route number matches no event', async () => {
+    mockState.notFound.value = true;
+    mockState.resolvedId.value = '';
+    const wrapper = await mountWith();
+
+    expect(wrapper.findComponent(CreateEditEventFields).exists()).toBe(false);
   });
 
   it('does not redirect after a failed series update', async () => {

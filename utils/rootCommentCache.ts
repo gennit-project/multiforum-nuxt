@@ -15,10 +15,15 @@ import type { RootCommentSection } from '@/types/DiscussionPresentation';
 type CreatedComment = NonNullable<
   CreateCommentMutation['createCommentWithOwnedConnections']
 >['comments'][number];
+// getCommentSection is keyed by the per-forum `discussionNumber`; `discussionId`
+// (the global id) identifies the created comment's DiscussionChannel.
 export type RootCommentScope = Pick<
   GetCommentSectionQueryVariables,
-  'discussionId' | 'channelUniqueName' | 'sort' | 'modName'
->;
+  'channelUniqueName' | 'sort' | 'modName'
+> & {
+  discussionId: string;
+  discussionNumber: number | null;
+};
 const counted = new WeakMap<ApolloCache<NormalizedCacheObject>, Set<string>>();
 
 // Count aliases share the underlying field name in Apollo. Only the two
@@ -64,7 +69,7 @@ export function insertRootComment(
     if (
       !args ||
       typeof args !== 'object' ||
-      !('discussionId' in args) ||
+      !('discussionNumber' in args) ||
       !('channelUniqueName' in args) ||
       !('sort' in args) ||
       !('modName' in args) ||
@@ -73,7 +78,7 @@ export function insertRootComment(
     )
       continue;
     if (
-      args.discussionId !== scope.discussionId ||
+      args.discussionNumber !== scope.discussionNumber ||
       args.channelUniqueName !== scope.channelUniqueName ||
       (args.sort ?? null) !== (scope.sort ?? null) ||
       (args.modName ?? null) !== (scope.modName ?? null) ||
@@ -81,7 +86,14 @@ export function insertRootComment(
       typeof args.limit !== 'number'
     )
       continue;
-    const variables = { ...scope, offset: 0, limit: args.limit };
+    const variables = {
+      discussionNumber: scope.discussionNumber,
+      channelUniqueName: scope.channelUniqueName,
+      sort: scope.sort,
+      modName: scope.modName,
+      offset: 0,
+      limit: args.limit,
+    };
     const previous = cache.readQuery({
       query: GetCommentSectionDocument,
       variables,

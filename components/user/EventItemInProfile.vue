@@ -5,6 +5,7 @@ import Tag from '@/components/TagComponent.vue';
 import TagOverflowLabel from '@/components/TagOverflowLabel.vue';
 import { splitTagsForList } from '@/utils/tagOverflow';
 import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
+import { getEventLinkRoute, getEventLinkUrl } from '@/utils/eventLinks';
 import type { GetUserEventsQuery } from '@/__generated__/operations';
 
 import type { NullableSelection } from '@/types/Comment';
@@ -38,11 +39,14 @@ const defaultUniqueName = computed(() => {
   return props.event.EventChannels[0].channelUniqueName;
 });
 
+// TODO(short-urls): backend does not expose eventNumber on the
+// getUserContributions activity feed's EventChannelInfo (reused through
+// GithubContributionChart), so those events link with the raw-id fallback.
 // Primary link target for the card title, so it is keyboard-reachable instead
 // of relying on a click handler on the whole <li>.
 const titleLink = computed(() =>
   defaultUniqueName.value && props.event.id
-    ? `/forums/${defaultUniqueName.value}/events/${props.event.id}`
+    ? getEventLinkUrl({ event: props.event, forumId: defaultUniqueName.value })
     : ''
 );
 
@@ -101,13 +105,7 @@ const channelName = (channel: (typeof channels.value)[number]) => ('Channel' in 
       <nuxt-link
         v-if="channelName(ec)"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
-        :to="{
-          name: 'forums-forumId-events-eventId',
-          params: {
-            forumId: channelName(ec),
-            eventId: event.id,
-          },
-        }"
+        :to="getEventLinkRoute({ event, forumId: channelName(ec) })"
       >
         {{ `c/${channelName(ec)}` }}
       </nuxt-link>

@@ -9,7 +9,7 @@ import InfoBanner from '@/components/InfoBanner.vue';
 
 const hState = vi.hoisted(() => ({
   route: {
-    params: { forumId: 'cats', discussionId: 'd1' },
+    params: { forumId: 'cats', discussionId: '7-download' },
     query: {},
   },
   fetchMore: vi.fn(),
@@ -92,15 +92,11 @@ const mountPage = async (opts: {
     rootCount = 2,
   } = opts;
 
+  // The page makes no discussion query of its own (the parent passes the
+  // discussion in); queries run in order: comments, comment count, root count.
   let callIndex = 0;
   mockedUseQuery.mockImplementation(() => {
     if (callIndex === 0) {
-      callIndex += 1;
-      return {
-        result: ref({ discussions: [discussion] }),
-      };
-    }
-    if (callIndex === 1) {
       callIndex += 1;
       return {
         result: ref({
@@ -112,7 +108,7 @@ const mountPage = async (opts: {
         refetch: hState.refetch,
       };
     }
-    if (callIndex === 2) {
+    if (callIndex === 1) {
       callIndex += 1;
       return {
         result: ref({
@@ -140,7 +136,7 @@ const mountPage = async (opts: {
 beforeEach(() => {
   vi.clearAllMocks();
   hState.route = {
-    params: { forumId: 'cats', discussionId: 'd1' },
+    params: { forumId: 'cats', discussionId: '7-download' },
     query: {},
   };
 });

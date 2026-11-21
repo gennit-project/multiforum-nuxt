@@ -1,7 +1,11 @@
 import { expect, test } from '../../helpers/testFixture';
 import { installMockAuth } from '../../helpers/mockAuth';
 import { installGraphqlMocks } from '../../helpers/mockGraphql';
-import { buildComment, buildEvent } from '../../helpers/graphqlFixtures';
+import {
+  buildComment,
+  buildEvent,
+  buildEventIdLookupHandlers,
+} from '../../helpers/graphqlFixtures';
 import {
   createCommentHandlers,
   createCommentState,
@@ -18,10 +22,11 @@ const event = () =>
     posterUsername: 'cluse',
     overrides: {
       CommentsConnection: { aggregate: { count: { nodes: 4 } } },
-      EventChannels: ['cats', 'dogs'].map((name) => ({
+      EventChannels: ['cats', 'dogs'].map((name, index) => ({
         __typename: 'EventChannel',
         id: `ec-${name}`,
         eventId,
+        eventNumber: index + 1,
         channelUniqueName: name,
         archived: name === 'dogs',
         Channel: {
@@ -45,6 +50,7 @@ const root = (id: string) => ({
 });
 const baseHandlers = () => ({
   ...createCommentHandlers(createCommentState()),
+  ...buildEventIdLookupHandlers(eventId),
   getEvent: () => ({ data: { events: [event()] } }),
   getEventChannelID: ({
     body,
@@ -98,7 +104,7 @@ test('merges repeated overlapping event pages without duplicate roots', async ({
       };
     },
   });
-  await page.goto(`/forums/cats/events/${eventId}`);
+  await page.goto(`/forums/cats/events/1-selected-event-roots`);
   await expect(page.getByText('Event root one', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Load more', exact: true }).click();
   await expect(
@@ -140,19 +146,19 @@ test('reads the URL sort and switches forum archive context without stale pages'
       },
     }),
   });
-  await page.goto(`/forums/cats/events/${eventId}`);
+  await page.goto(`/forums/cats/events/1-selected-event-roots`);
   await expect(
     page.getByText('Event root hot-sort', { exact: true })
   ).toBeVisible();
-  await page.goto(`/forums/cats/events/${eventId}?sort=new`);
+  await page.goto(`/forums/cats/events/1-selected-event-roots?sort=new`);
   await expect(
     page.getByText('Event root new-sort', { exact: true })
   ).toBeVisible();
   await expect(
     page.getByText('Event root hot-sort', { exact: true })
   ).toHaveCount(0);
-  await page.locator(`a[href="/forums/dogs/events/${eventId}"]`).last().click();
-  await expect(page).toHaveURL(new RegExp(`/forums/dogs/events/${eventId}`));
+  await page.locator(`a[href="/forums/dogs/events/2-selected-event-roots"]`).last().click();
+  await expect(page).toHaveURL(new RegExp('/forums/dogs/events/2-selected-event-roots'));
   await expect(
     page.getByRole('button', { name: 'Write a comment', exact: true })
   ).toHaveCount(0);
@@ -188,7 +194,7 @@ for (const state of ['empty', 'null', 'error'] as const) {
               },
             },
     });
-    await page.goto(`/forums/cats/events/${eventId}`);
+    await page.goto(`/forums/cats/events/1-selected-event-roots`);
     await expect(
       page
         .getByTestId('event-detail-content')

@@ -6,6 +6,7 @@ import LoadMore from '../../LoadMore.vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import type { EventListPresentation as Event } from '@/types/EventPresentation';
 import { sideNavIsOpenVar } from '@/cache';
+import { getEventLinkRoute } from '@/utils/eventLinks';
 import type { PropType } from 'vue';
 
 const props = defineProps({
@@ -105,22 +106,9 @@ const handleClickEventListItem = (event: Event) => {
   if (props.showMap) {
     emit('openPreview', event.id);
   } else {
-    if (channelId.value) {
-      return router.push({
-        name: 'forums-forumId-events-eventId',
-        params: {
-          eventId: event.id,
-          forumId: channelId.value,
-        },
-      });
-    }
-    return router.push({
-      name: 'forums-forumId-events-eventId',
-      params: {
-        eventId: event.id,
-        forumId: event.EventChannels?.[0]?.channelUniqueName || '',
-      },
-    });
+    return router.push(
+      getEventLinkRoute({ event, forumId: channelId.value || undefined })
+    );
   }
 };
 

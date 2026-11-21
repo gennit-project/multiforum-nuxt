@@ -158,6 +158,7 @@ const {
 } = useMutation(CREATE_COMMENT, () => {
   const scope = {
     discussionId: props.discussionChannel?.discussionId || '',
+    discussionNumber: props.discussionChannel?.discussionNumber ?? null,
     channelUniqueName: props.discussionChannel?.channelUniqueName || '',
     modName: props.modName,
     sort: getSortFromQuery(route.query),

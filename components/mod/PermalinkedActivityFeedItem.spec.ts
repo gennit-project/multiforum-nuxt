@@ -13,16 +13,29 @@ h.result = ref(null);
 h.error = ref(null);
 h.loading = ref(false);
 
+const mockUseQuery = vi.hoisted(() => vi.fn());
+
+// The route's commentId is a comment shortId, resolved to the global id.
+const mockResolved = vi.hoisted(() => ({
+  id: null as unknown as { value: string },
+  loading: null as unknown as { value: boolean },
+  notFound: null as unknown as { value: boolean },
+}));
+
+mockResolved.id = ref('c1');
+mockResolved.loading = ref(false);
+mockResolved.notFound = ref(false);
+
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { commentId: 'c1' } }),
+  useRoute: () => ({ params: { commentId: 'shortc1' } }),
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
-  useQuery: () => ({
-    result: h.result,
-    error: h.error,
-    loading: h.loading,
-  }),
+  useQuery: (...args: unknown[]) => mockUseQuery(...args),
+}));
+
+vi.mock('@/composables/useRouteContentIds', () => ({
+  useResolvedCommentId: () => mockResolved,
 }));
 
 vi.mock('@/graphQLData/comment/queries', () => ({
@@ -47,6 +60,14 @@ const mountItem = () =>
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockUseQuery.mockReturnValue({
+    result: h.result,
+    error: h.error,
+    loading: h.loading,
+  });
+  mockResolved.id.value = 'c1';
+  mockResolved.loading.value = false;
+  mockResolved.notFound.value = false;
   h.result.value = null;
   h.error.value = null;
   h.loading.value = false;
@@ -78,5 +99,23 @@ describe('PermalinkedActivityFeedItem', () => {
     };
 
     expect(mountItem().text()).toContain('Mod action not found');
+  });
+
+  it('queries the activity feed with the resolved global id', () => {
+    mountItem();
+    expect(mockUseQuery.mock.calls[0]![1]()).toEqual({ id: 'c1' });
+  });
+
+  it('shows loading while the shortId lookup is in flight', () => {
+    mockResolved.id.value = '';
+    mockResolved.loading.value = true;
+    expect(mountItem().text()).toContain('Loading...');
+  });
+
+  it('falls back to the route param as a raw id when the lookup finds nothing', () => {
+    mockResolved.id.value = '';
+    mockResolved.notFound.value = true;
+    mountItem();
+    expect(mockUseQuery.mock.calls[0]![1]()).toEqual({ id: 'shortc1' });
   });
 });

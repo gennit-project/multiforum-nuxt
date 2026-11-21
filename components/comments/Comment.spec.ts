@@ -277,6 +277,28 @@ describe('Comment', () => {
     expect(wrapper.text()).toContain('Continue thread');
   });
 
+  it('highlights the header when the route permalink matches the comment shortId', () => {
+    h.route.params.commentId = 'a1b2c3d4e5f6';
+    const wrapper = mountComment({
+      commentData: makeComment({ shortId: 'a1b2c3d4e5f6' }),
+    });
+
+    expect(wrapper.findComponent(CommentHeaderStub).props('isHighlighted')).toBe(
+      true
+    );
+  });
+
+  it('does not highlight the header when the route points at another comment', () => {
+    h.route.params.commentId = 'someothershort';
+    const wrapper = mountComment({
+      commentData: makeComment({ shortId: 'a1b2c3d4e5f6' }),
+    });
+
+    expect(wrapper.findComponent(CommentHeaderStub).props('isHighlighted')).toBe(
+      false
+    );
+  });
+
   it('highlights the header when the route permalink matches the comment id', () => {
     h.route.params.commentId = 'c1';
     const wrapper = mountComment();

@@ -167,6 +167,25 @@ describe('Library page', () => {
     ).toContain('discussions · 4 · private');
   });
 
+  it('links custom collection rows to the owner collection page by number', () => {
+    setData({
+      collections: [
+        {
+          id: 'c1',
+          collectionNumber: 4,
+          ownerUsername: 'alice',
+          name: 'My Reading List',
+          collectionType: 'DISCUSSIONS',
+          visibility: 'PRIVATE',
+          itemCount: 4,
+        },
+      ],
+    });
+    expect(
+      mountLibrary().get('[data-testid="library-item-c1"]').attributes('href')
+    ).toBe('/u/alice/collections/4-my-reading-list');
+  });
+
   it('uses content-type icons for fixed and custom library rows', () => {
     setData({
       collections: [

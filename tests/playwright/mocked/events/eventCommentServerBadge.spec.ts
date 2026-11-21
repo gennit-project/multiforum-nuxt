@@ -4,6 +4,7 @@ import {
   buildEvent,
   buildUser,
   type MockCommentState,
+  buildEventIdLookupHandlers,
 } from '../../helpers/graphqlFixtures';
 import { createBaseHandlers } from '../../helpers/baseHandlers';
 
@@ -60,6 +61,7 @@ test('shows a Server Admin badge on an event comment from a server admin', async
           Moderators: [],
         },
       }),
+      ...buildEventIdLookupHandlers(EVENT_ID),
       getEvent: () => ({ data: { events: [mockEvent] } }),
       getEventComments: () => ({
         data: {
@@ -83,7 +85,7 @@ test('shows a Server Admin badge on an event comment from a server admin', async
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/events/${EVENT_ID}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/events/1-event`);
 
   await expect(page.getByText(COMMENT_TEXT)).toBeVisible({ timeout: 60_000 });
 

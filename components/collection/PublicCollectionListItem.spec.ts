@@ -8,7 +8,7 @@ const mountItem = (collection: Partial<Collection>) =>
     props: { collection },
     global: {
       stubs: {
-        NuxtLink: { template: '<a><slot /></a>' },
+        NuxtLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
         CollectionDownloadListItem: { template: '<li class="dl" />' },
       },
     },
@@ -48,5 +48,17 @@ describe('PublicCollectionListItem', () => {
       Downloads: downloads,
     } as unknown as Partial<Collection>);
     expect(wrapper.findAll('.dl')).toHaveLength(5);
+  });
+
+  it('links the title and view-all to the owner collection page', () => {
+    const wrapper = mountItem({
+      id: 'c1',
+      collectionNumber: 3,
+      ownerUsername: 'alice',
+      name: 'My Models',
+    });
+    expect(wrapper.findAll('a').map((link) => link.attributes('href'))).toEqual(
+      ['/u/alice/collections/3-my-models', '/u/alice/collections/3-my-models']
+    );
   });
 });

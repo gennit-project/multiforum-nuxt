@@ -178,12 +178,18 @@ describe('EventListItem', () => {
   describe('detail link resolution', () => {
     it('falls back to the first event channel when not scoped to a forum', () => {
       const wrapper = mountItem(
-        makeEvent({ id: 'e9', EventChannels: [eventChannel({ channelUniqueName: 'dogs' })] }),
+        makeEvent({
+          id: 'e9',
+          title: 'Dog Walk',
+          EventChannels: [
+            eventChannel({ channelUniqueName: 'dogs', eventNumber: 12 }),
+          ],
+        }),
         { currentChannelId: '' }
       );
       expect(
         (wrapper.vm as unknown as { detailLink: string }).detailLink
-      ).toBe('/forums/dogs/events/e9');
+      ).toBe('/forums/dogs/events/12-dog-walk');
     });
 
     it('yields an empty detail link with no channel context', () => {
@@ -198,13 +204,16 @@ describe('EventListItem', () => {
     const multiChannelEvent = () =>
       makeEvent({
         id: 'e5',
+        title: 'Pet Fair',
         EventChannels: [
           eventChannel({
             channelUniqueName: 'cats',
+            eventNumber: 5,
             CommentsConnection: { aggregate: { count: { nodes: 1 } } },
           }),
           eventChannel({
             channelUniqueName: 'dogs',
+            eventNumber: 8,
             CommentsConnection: { aggregate: { count: { nodes: 3 } } },
           }),
         ],
@@ -219,7 +228,7 @@ describe('EventListItem', () => {
       ).eventDetailOptions;
       expect(options).toContainEqual({
         label: 'View in cats',
-        value: '/forums/cats/events/e5',
+        value: '/forums/cats/events/5-pet-fair',
         event: '',
       });
     });

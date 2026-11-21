@@ -2,21 +2,16 @@ import { beforeEach, describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref, defineComponent, h } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
+import OwnedCollectionDetail from './OwnedCollectionDetail.vue';
 vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
 
 const harness = vi.hoisted(() => ({
-  route: { params: { collectionId: 'col-1' } },
   routerPush: undefined as unknown as ReturnType<typeof vi.fn>,
 }));
 
-vi.mock('vue-router', async () => {
-  const { reactive } = await import('vue');
-  harness.route = reactive(harness.route);
-  return {
-    useRoute: () => harness.route,
-    useRouter: () => ({ push: harness.routerPush }),
-  };
-});
+vi.mock('vue-router', () => ({
+  useRouter: () => ({ push: harness.routerPush }),
+}));
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
@@ -93,19 +88,18 @@ let queryError: Error | null = null;
 beforeEach(() => {
   vi.clearAllMocks();
   harness.routerPush = vi.fn();
-  harness.route.params.collectionId = 'col-1';
   queryLoading = false;
   queryError = null;
 });
 
 const mountWith = async (collection: unknown) => {
-  if (
+  const collectionId =
     collection &&
     typeof collection === 'object' &&
     'id' in collection &&
     typeof collection.id === 'string'
-  )
-    harness.route.params.collectionId = collection.id;
+      ? collection.id
+      : 'col-1';
   refetchCollection = vi.fn();
   mutationMocks.update.mockResolvedValue({});
   mutationMocks.delete.mockResolvedValue({});
@@ -114,7 +108,10 @@ const mountWith = async (collection: unknown) => {
     data: {
       shareCollectionAsDiscussion: {
         id: 'discussion-1',
-        DiscussionChannels: [{ channelUniqueName: 'sims4_builds' }],
+        title: 'Shared collection: Public list',
+        DiscussionChannels: [
+          { channelUniqueName: 'sims4_builds', discussionNumber: 7 },
+        ],
       },
     },
   });
@@ -145,8 +142,8 @@ const mountWith = async (collection: unknown) => {
     error: ref(queryError),
     refetch: refetchCollection,
   });
-  const Page = (await import('./[collectionId].vue')).default;
-  return shallowMount(Page, {
+  return shallowMount(OwnedCollectionDetail, {
+    props: { collectionId },
     global: {
       stubs: {
         RequireAuth: RequireAuthStub,
@@ -401,7 +398,7 @@ describe('library collection detail page', () => {
       shareMessage: null,
     });
     expect(harness.routerPush).toHaveBeenCalledWith(
-      '/forums/sims4_builds/discussions/discussion-1'
+      '/forums/sims4_builds/discussions/7-shared-collection-public-list'
     );
   });
 
@@ -729,8 +726,7 @@ it('does not redirect to a shared discussion after leaving its collection', asyn
     .trigger('click');
   await wrapper.find('[data-testid="forum-picker"]').trigger('click');
   await wrapper.find('[data-testid="modal-primary"]').trigger('click');
-  harness.route.params.collectionId = 'col-2';
-  await wrapper.vm.$nextTick();
+  await wrapper.setProps({ collectionId: 'col-2' });
   finish({
     data: {
       shareCollectionAsDiscussion: {

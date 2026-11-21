@@ -9,6 +9,7 @@ import FolderOpenIcon from '@/components/icons/FolderOpenIcon.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
 import { useUsername } from '@/composables/useAuthState';
+import { getDownloadUrl } from '@/utils/contentUrls';
 import {
   GetUploadedDownloadableFilesDocument as GET_UPLOADED_DOWNLOADABLE_FILES,
   PermanentlyDeleteDownloadableFileDocument as PERMANENTLY_DELETE_DOWNLOADABLE_FILE,
@@ -66,7 +67,14 @@ const getDiscussionPath = (group: UploadedDownloadGroup) => {
     return `/discussions/${group.discussion.id}`;
   }
 
-  return `/forums/${channelUniqueName}/downloads/${group.discussion.id}`;
+  // TODO(short-urls): backend does not expose discussionNumber on
+  // UploadedDownloadableFileDiscussion, so this link falls back to the raw id.
+  return getDownloadUrl({
+    forumId: channelUniqueName,
+    discussionNumber: null,
+    title: group.discussion.title,
+    discussionId: group.discussion.id,
+  });
 };
 
 const confirmDelete = (file: UploadedFile) => {

@@ -114,7 +114,9 @@ test('creates an event root comment through the typed mutation and scoped refetc
   context,
   page,
 }) => {
-  const { buildEvent } = await import('../../helpers/graphqlFixtures');
+  const { buildEvent, buildEventIdLookupHandlers } = await import(
+    '../../helpers/graphqlFixtures'
+  );
   const state = createCommentState();
   const handlers = createCommentHandlers(state);
   const event = buildEvent({
@@ -137,6 +139,7 @@ test('creates an event root comment through the typed mutation and scoped refetc
   await installMockAuth(context, page);
   const diagnostics = await installGraphqlMocks(page, {
     ...handlers,
+    ...buildEventIdLookupHandlers(event.id),
     getEvent: () => ({ data: { events: [event] } }),
     getEventComments: () => ({
       data: {
@@ -172,7 +175,7 @@ test('creates an event root comment through the typed mutation and scoped refetc
       };
     },
   });
-  await page.goto(`/forums/${config.channelId}/events/${event.id}`);
+  await page.goto(`/forums/${config.channelId}/events/1-typed-event-comments`);
   await page.getByRole('button', { name: 'Write a comment' }).click();
   await page
     .getByTestId('texteditor-textarea')

@@ -7,6 +7,8 @@ import DiscussionTitleVersions from '@/components/discussion/detail/activityFeed
 import LabelChangeHistory from '@/components/discussion/detail/activityFeed/LabelChangeHistory.vue';
 import type { GetDownloadActivityQuery } from '@/__generated__/operations';
 import { useSharedDownloadPipelineOverview } from '@/composables/useDownloadPipelineOverview';
+import { useRouteDiscussionNumber } from '@/composables/useRouteContentIds';
+import { getDownloadTabUrl } from '@/utils/discussionLinks';
 type Discussion = GetDownloadActivityQuery['discussions'][number];
 
 const props = defineProps<{
@@ -15,11 +17,10 @@ const props = defineProps<{
 
 const route = useRoute();
 
-const discussionId = computed(() => {
-  return typeof route.params.discussionId === 'string'
-    ? route.params.discussionId
-    : '';
-});
+// The route param is `{number}-{slug}`; the global id comes from the discussion
+// the parent download page already loaded and passes in.
+const discussionId = computed(() => props.discussion?.id ?? '');
+const discussionNumber = useRouteDiscussionNumber();
 
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
@@ -76,9 +77,14 @@ const formatPipelineTime = (value: string) =>
     timeStyle: 'short',
   }).format(new Date(value));
 const pipelineAttemptUrl = (attempt: { id: string; pipelineId: string }) =>
-  `/forums/${encodeURIComponent(channelId.value)}/downloads/${encodeURIComponent(
-    discussionId.value
-  )}/pipelines?attempt=${encodeURIComponent(
+  `${getDownloadTabUrl({
+    target: {
+      forumId: channelId.value,
+      discussionNumber: discussionNumber.value,
+      discussionId: discussionId.value,
+    },
+    tab: 'pipelines',
+  })}?attempt=${encodeURIComponent(
     attempt.id
   )}#attempt-${encodeURIComponent(attempt.pipelineId)}`;
 

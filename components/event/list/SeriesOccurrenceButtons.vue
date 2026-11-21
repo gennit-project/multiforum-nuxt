@@ -2,10 +2,13 @@
 import { computed } from 'vue';
 import { DateTime } from 'luxon';
 import type { PropType } from 'vue';
+import { getEventLinkUrl, type EventLinkSource } from '@/utils/eventLinks';
 
 interface Occurrence {
   id: string;
+  title?: string | null;
   startTime: string;
+  EventChannels?: EventLinkSource['EventChannels'];
 }
 
 const props = defineProps({
@@ -60,8 +63,11 @@ const formatDate = (isoString: string): string => {
 };
 
 // Generate link to occurrence
-const getOccurrenceLink = (occurrenceId: string): string => {
-  return `/forums/${props.channelUniqueName}/events/${occurrenceId}`;
+const getOccurrenceLink = (occurrence: Occurrence): string => {
+  return getEventLinkUrl({
+    event: occurrence,
+    forumId: props.channelUniqueName,
+  });
 };
 </script>
 
@@ -74,7 +80,7 @@ const getOccurrenceLink = (occurrenceId: string): string => {
     <nuxt-link
       v-for="occurrence in visibleOccurrences"
       :key="occurrence.id"
-      :to="getOccurrenceLink(occurrence.id)"
+      :to="getOccurrenceLink(occurrence)"
       class="bg-brand-100 text-brand-700 hover:bg-brand-200 dark:bg-brand-900/30 dark:text-brand-300 dark:hover:bg-brand-900/50 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
       @click.stop
     >

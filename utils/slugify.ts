@@ -67,6 +67,6 @@ export const parseSlugSegmentNumber = (
   if (!value) return null;
   const match = /^(\d+)/.exec(value.trim());
   if (!match) return null;
-  const parsed = Number.parseInt(match[1], 10);
+  const parsed = Number.parseInt(match[1] ?? '', 10);
   return Number.isSafeInteger(parsed) ? parsed : null;
 };

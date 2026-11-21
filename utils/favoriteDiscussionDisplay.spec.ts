@@ -27,9 +27,10 @@ describe('getDiscussionLink', () => {
     expect(
       getDiscussionLink({
         id: 'd1',
-        DiscussionChannels: [{ channelUniqueName: 'cats' }],
+        title: 'Trail conditions',
+        DiscussionChannels: [{ channelUniqueName: 'cats', discussionNumber: 42 }],
       })
-    ).toBe('/forums/cats/discussions/d1');
+    ).toBe('/forums/cats/discussions/42-trail-conditions');
   });
 
   it('falls back to root when there is no forum channel', () => {
@@ -42,9 +43,10 @@ describe('getDownloadLink', () => {
     expect(
       getDownloadLink({
         id: 'd1',
-        DiscussionChannels: [{ channelUniqueName: 'cats' }],
+        title: 'Trail conditions',
+        DiscussionChannels: [{ channelUniqueName: 'cats', discussionNumber: 42 }],
       })
-    ).toBe('/forums/cats/downloads/d1');
+    ).toBe('/forums/cats/downloads/42-trail-conditions');
   });
 
   it('falls back to root when there is no forum channel', () => {

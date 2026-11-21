@@ -30,7 +30,7 @@ test('user can give and undo a super upvote on another user\'s discussion', asyn
     handlers: createSuperUpvoteHandlers(state),
   });
 
-  await page.goto(`/forums/${CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${CHANNEL}/discussions/1`);
 
   const upvoteButton = page.getByTestId('upvote-discussion-button').first();
   const superUpvoteButton = page

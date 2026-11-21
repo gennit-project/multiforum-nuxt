@@ -12,9 +12,14 @@ import {
 
 const TEST_USER = 'alice';
 const COLLECTION_ID = 'collection-1';
+const COLLECTION_NUMBER = 1;
+// Collections live under the owner's profile: /u/{owner}/collections/{number}-{slug}
+const COLLECTION_PATH = `/u/${TEST_USER}/collections/${COLLECTION_NUMBER}-my-test-collection`;
 
 const buildCollectionItems = (overrides = {}) => ({
   id: COLLECTION_ID,
+  collectionNumber: COLLECTION_NUMBER,
+  ownerUsername: TEST_USER,
   name: 'My Test Collection',
   description: 'A collection owned by the current user.',
   collectionType: 'DISCUSSIONS',
@@ -58,6 +63,10 @@ const getBaseMocks = (
   }),
   getServerConfig: () => ({
     data: { serverConfigs: [buildServerConfig({ serverName: 'Listical' })] },
+  }),
+  // The route carries the collection number; the page resolves it to the global id.
+  getCollectionIdByNumber: () => ({
+    data: { getCollectionIdByNumber: COLLECTION_ID },
   }),
   // library.vue parent shell counts
   GetAllUserCollections: () => ({
@@ -112,7 +121,7 @@ test.describe('Library collection detail', () => {
     );
 
     try {
-      await page.goto(`/library/${COLLECTION_ID}`);
+      await page.goto(COLLECTION_PATH);
 
       await expect(page.getByText('My Test Collection').first()).toBeVisible();
 
@@ -143,7 +152,7 @@ test.describe('Library collection detail', () => {
       }),
     });
 
-    await page.goto(`/library/${COLLECTION_ID}`);
+    await page.goto(COLLECTION_PATH);
     await page.getByRole('button', { name: 'Collection actions' }).click();
     await page.getByRole('menuitem', { name: 'Edit collection' }).click();
     await page.getByLabel('Collection Name').fill('New name');
@@ -185,7 +194,7 @@ test.describe('Library collection detail', () => {
       }),
     });
 
-    await page.goto(`/library/${COLLECTION_ID}`);
+    await page.goto(COLLECTION_PATH);
     await page.getByRole('button', { name: 'Make Public' }).click();
     await waitForGraphqlOperation(
       diagnostics.completedOperations,
@@ -249,7 +258,7 @@ test.describe('Library collection detail', () => {
       )
     );
 
-    await page.goto(`/library/${COLLECTION_ID}`);
+    await page.goto(COLLECTION_PATH);
 
     const moveFirstDown = page.getByRole('button', {
       name: 'Move First saved down',
@@ -270,7 +279,7 @@ test.describe('Library collection detail', () => {
     });
     await installGraphqlMocks(page, getBaseMocks(TEST_USER));
 
-    await page.goto(`/library/${COLLECTION_ID}`);
+    await page.goto(COLLECTION_PATH);
 
     const shareButton = page.getByTestId('share-collection-button');
     await expect(shareButton).toHaveAttribute('aria-disabled', 'true');

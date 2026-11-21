@@ -4,12 +4,13 @@ import { shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import FeedbackSection from '@/components/comments/FeedbackSection.vue';
 
-const h = vi.hoisted(() => ({
+const h = await vi.hoisted(async () => ({
+  resolvedId: (await import('vue')).ref('d1'),
   route: {
     name: 'forums-forumId-discussions-feedback-discussionId',
     params: {
       forumId: 'cats',
-      discussionId: 'd1',
+      discussionId: '5-hello',
       commentId: '',
       feedbackId: '',
     } as Record<string, unknown>,
@@ -32,6 +33,22 @@ vi.mock('nuxt/app', async () => {
   const { reactive: makeReactive } = await import('vue');
   h.route = makeReactive(h.route);
   return { useRoute: () => h.route };
+});
+
+// The page resolves the route's `{number}-{slug}` to the global id.
+vi.mock('@/composables/useRouteContentIds', async () => {
+  const { computed: vcomputed, ref: vref } = await import('vue');
+  const { parseSlugSegmentNumber } = await import('@/utils/slugify');
+  return {
+    useResolvedDiscussionId: () => ({
+      id: vcomputed(() => h.resolvedId.value),
+      discussionNumber: vcomputed(() =>
+        parseSlugSegmentNumber(String(h.route.params.discussionId))
+      ),
+      loading: vref(false),
+      notFound: vref(false),
+    }),
+  };
 });
 
 vi.mock('@vue/apollo-composable', async () => {
@@ -111,9 +128,10 @@ beforeEach(() => {
   h.commentError.value = null;
   h.discussionLoading.value = false;
   h.commentLoading.value = false;
+  h.resolvedId.value = 'd1';
   Object.assign(h.route.params, {
     forumId: 'cats',
-    discussionId: 'd1',
+    discussionId: '5-hello',
     commentId: '',
     feedbackId: '',
   });
@@ -174,7 +192,8 @@ describe('discussion feedback page', () => {
   it('ignores a feedback page that arrives after navigation', async () => {
     const wrapper = await mountPage();
     (wrapper.findComponent(FeedbackSection).props('loadMore') as () => void)();
-    h.route.params = { ...h.route.params, discussionId: 'd2' };
+    h.route.params = { ...h.route.params, discussionId: '6-other' };
+    h.resolvedId.value = 'd2';
     await wrapper.vm.$nextTick();
     const previous = {
       discussions: [{ id: 'd1', FeedbackComments: [{ id: 'one' }] }],
@@ -260,13 +279,13 @@ describe('discussion feedback page', () => {
     const wrapper = await mountPage();
     h.route.params = {
       forumId: 'dogs',
-      discussionId: 'd2',
+      discussionId: '6-other',
       commentId: 'c1',
       feedbackId: 'f1',
     };
     await wrapper.vm.$nextTick();
     expect(wrapper.findComponent({ name: 'BackLink' }).props('link')).toBe(
-      '/forums/dogs/discussions/d2'
+      '/forums/dogs/discussions/6-hello'
     );
   });
 });

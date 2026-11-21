@@ -60,6 +60,7 @@ const events = [
 ].map((title, i) => {
   const event = buildEvent({
     id: `online-${i}`,
+    eventNumber: i + 1,
     title,
     overrides: {
       startTime: '2025-02-20T18:00:00Z',
@@ -405,7 +406,9 @@ for (const mobile of [false, true]) {
       await row
         .getByRole('button', { name: `Preview ${events[0]!.title}` })
         .click();
-      await expect(page).toHaveURL(/\/forums\/prototaxites\/events\/online-0/);
+      await expect(page).toHaveURL(
+        /\/forums\/prototaxites\/events\/1-coffee-tea-and-books-virtual/
+      );
     }
   });
 }

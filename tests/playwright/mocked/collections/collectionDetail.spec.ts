@@ -8,9 +8,13 @@ import {
 
 const TEST_USER = 'alice';
 const COLLECTION_ID = 'collection-1';
+const COLLECTION_OWNER = 'bob';
+const COLLECTION_NUMBER = 1;
 
 const buildPublicCollection = (overrides = {}) => ({
   id: COLLECTION_ID,
+  collectionNumber: COLLECTION_NUMBER,
+  ownerUsername: COLLECTION_OWNER,
   name: 'My Favorite Models',
   description: 'A public collection of 3D models.',
   visibility: 'PUBLIC',
@@ -31,7 +35,7 @@ const buildPublicCollection = (overrides = {}) => ({
       hasSensitiveContent: false,
       Album: { id: 'album-1', imageOrder: [], Images: [] },
       DiscussionChannels: [
-        { id: 'dc-1', channelUniqueName: 'cats' },
+        { id: 'dc-1', channelUniqueName: 'cats', discussionNumber: 1 },
       ],
     },
   ],
@@ -65,6 +69,10 @@ const getBaseMocks = (username: string) => ({
   getServerConfig: () => ({
     data: { serverConfigs: [buildServerConfig({ serverName: 'Listical' })] },
   }),
+  // The route carries the collection number; the page resolves it to the global id.
+  getCollectionIdByNumber: () => ({
+    data: { getCollectionIdByNumber: COLLECTION_ID },
+  }),
   GetPublicCollectionById: () => ({
     data: { collections: [buildPublicCollection()] },
   }),
@@ -83,7 +91,10 @@ test.describe('Public collection detail', () => {
     const diagnostics = await installGraphqlMocks(page, getBaseMocks(TEST_USER));
 
     try {
-      await page.goto(`/collections/${COLLECTION_ID}`);
+      // Signed-in alice views bob's collection, so she gets the public view.
+      await page.goto(
+        `/u/${COLLECTION_OWNER}/collections/${COLLECTION_NUMBER}-my-favorite-models`
+      );
 
       await expect(
         page.getByRole('heading', { name: 'My Favorite Models' })

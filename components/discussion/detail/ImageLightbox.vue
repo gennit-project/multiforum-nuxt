@@ -24,6 +24,7 @@ const BrokenRulesModal = defineAsyncComponent(
 // Simplified image type for lightbox display
 interface LightboxImage {
   id: string;
+  imageNumber?: number | null;
   url?: string | null;
   alt?: string | null;
   caption?: string | null;
@@ -355,6 +356,7 @@ onUnmounted(() => {
         :panel-on-side="panelOnSide"
         :current-image-url="currentImage.url || ''"
         :current-image-id="currentImage.id || ''"
+        :current-image-number="currentImage.imageNumber ?? undefined"
         :current-image-caption="currentImage.caption || ''"
         :current-image-alt="currentImage.alt || ''"
         :current-image-uploader="currentImage.Uploader?.username || ''"

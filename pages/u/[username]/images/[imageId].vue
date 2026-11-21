@@ -29,6 +29,8 @@ import { useImageZoomPan } from '@/composables/useImageZoomPan';
 import AddToListPopover from '@/components/collection/AddToListPopover.vue';
 import { useToastStore } from '@/stores/toastStore';
 import { useFocusTrap } from '@/composables/useFocusTrap';
+import { useResolvedImageId } from '@/composables/useRouteContentIds';
+import { getImageUrl } from '@/utils/contentUrls';
 
 type Image = GetImageDetailsQuery['images'][number];
 
@@ -62,13 +64,16 @@ const username = computed(() => {
   return typeof route.params.username === 'string' ? route.params.username : '';
 });
 
-const imageId = computed(() => {
-  return typeof route.params.imageId === 'string' ? route.params.imageId : '';
-});
+// The route carries the image's number; resolve it to the global id.
+const {
+  id: imageId,
+  loading: imageIdLoading,
+  notFound: imageIdNotFound,
+} = useResolvedImageId();
 
 const {
   result: imageResult,
-  loading: imageLoading,
+  loading: imageDetailsLoading,
   error: imageError,
 } = useQuery(
   GET_IMAGE_DETAILS,
@@ -79,6 +84,10 @@ const {
     enabled: !!imageId.value,
     fetchPolicy: 'network-only',
   })
+);
+
+const imageLoading = computed(
+  () => imageIdLoading.value || imageDetailsLoading.value
 );
 
 const showAlbumSaveModal = ref(false);
@@ -345,7 +354,7 @@ onUnmounted(() => {
 
       <!-- Error state -->
       <div
-        v-else-if="imageError || !image"
+        v-else-if="imageIdNotFound || imageError || !image"
         class="flex h-96 flex-col items-center justify-center text-center"
       >
         <h1 class="mb-4 text-2xl font-bold">Image Not Found</h1>
@@ -371,7 +380,13 @@ onUnmounted(() => {
           {{ username }}.
         </p>
         <NuxtLink
-          :to="`/u/${uploader?.username}/images/${imageId}`"
+          :to="
+            getImageUrl({
+              username: uploader?.username ?? '',
+              imageNumber: image.imageNumber,
+              imageId: image.id,
+            })
+          "
           class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
         >
           View on Correct Profile

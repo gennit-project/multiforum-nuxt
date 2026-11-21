@@ -3,6 +3,7 @@ import type { GetDownloadScanReviewQueueQuery } from '@/__generated__/operations
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { Flag, ShieldX } from 'lucide-vue-next';
+import { getDownloadUrl } from '@/utils/contentUrls';
 import { GetDownloadScanReviewQueueDocument as GET_DOWNLOAD_SCAN_REVIEW_QUEUE } from '@/__generated__/operations';
 
 type ReviewItem = GetDownloadScanReviewQueueQuery['getDownloadScanReviewQueue'][number];
@@ -46,7 +47,14 @@ const hasNothingToReview = computed(
 
 const discussionPath = (item: ReviewItem) => {
   if (!item.channelUniqueName) return null;
-  return `/forums/${item.channelUniqueName}/downloads/${item.discussionId}`;
+  // TODO(short-urls): backend does not expose discussionNumber on
+  // DownloadScanReviewItem, so this link falls back to the raw id segment.
+  return getDownloadUrl({
+    forumId: item.channelUniqueName,
+    discussionNumber: null,
+    title: item.discussionTitle,
+    discussionId: item.discussionId,
+  });
 };
 
 const pluralize = (count: number, singular: string) =>

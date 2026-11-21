@@ -175,6 +175,108 @@ describe('useCommentPermalink', () => {
       });
     });
 
+    it('should build the short-URL discussion segment and shortId', () => {
+      const commentData = ref(
+        createCommentData({
+          shortId: 'a1b2c3d4e5f6',
+          DiscussionChannel: {
+            id: 'dc1',
+            discussionId: 'discussion1',
+            discussionNumber: 42,
+            channelUniqueName: 'test-forum',
+          },
+        })
+      );
+
+      const { permalinkObject } = useCommentPermalink({
+        commentData,
+        forumId: ref('test-forum'),
+      });
+
+      expect(permalinkObject.value).toEqual({
+        name: 'forums-forumId-discussions-discussionId-comments-commentId',
+        params: {
+          discussionId: '42',
+          commentId: 'a1b2c3d4e5f6',
+          forumId: 'test-forum',
+        },
+      });
+    });
+
+    it('should derive the discussion number from the route segment when the comment has none', () => {
+      mockRouteParams.discussionId = '9-route-discussion';
+
+      const commentData = ref(
+        createCommentData({
+          shortId: 'a1b2c3d4e5f6',
+          DiscussionChannel: {
+            id: 'dc1',
+            discussionId: undefined,
+            channelUniqueName: 'test-forum',
+          },
+        })
+      );
+
+      const { permalinkObject } = useCommentPermalink({
+        commentData,
+        forumId: ref('test-forum'),
+      });
+
+      expect(permalinkObject.value).toMatchObject({
+        params: { discussionId: '9', commentId: 'a1b2c3d4e5f6' },
+      });
+    });
+
+    it('should build the short-URL event segment and shortId', () => {
+      const commentData = ref(
+        createCommentData({
+          shortId: 'f6e5d4c3b2a1',
+          DiscussionChannel: undefined,
+          Event: {
+            id: 'event1',
+            title: 'Spring Meetup',
+            EventChannels: [
+              { channelUniqueName: 'test-forum', eventNumber: 7 },
+            ],
+          },
+        })
+      );
+
+      const { permalinkObject } = useCommentPermalink({
+        commentData,
+        forumId: ref('test-forum'),
+      });
+
+      expect(permalinkObject.value).toEqual({
+        name: 'forums-forumId-events-eventId-comments-commentId',
+        params: {
+          eventId: '7-spring-meetup',
+          forumId: 'test-forum',
+          commentId: 'f6e5d4c3b2a1',
+        },
+      });
+    });
+
+    it('should use the shortId for issue comment permalinks', () => {
+      mockRouteParams.issueNumber = '42';
+      const commentData = ref(
+        createCommentData({
+          shortId: 'issueshort01',
+          DiscussionChannel: undefined,
+        })
+      );
+
+      const { permalinkObject } = useCommentPermalink({
+        commentData,
+        forumId: ref('test-forum'),
+      });
+
+      expect(permalinkObject.value).toMatchObject({
+        name: 'forums-forumId-issues-issueNumber-comments-commentId',
+        params: { commentId: 'issueshort01' },
+      });
+    });
+
     it('should compute event comment permalink', () => {
       const commentData = ref(
         createCommentData({

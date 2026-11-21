@@ -81,19 +81,35 @@ export function useResolvedDiscussionId(): ResolvedId & {
   };
 }
 
-export function useResolvedEventId(): ResolvedId & {
+type ResolvedEventIdOptions = {
+  /** Set false to skip the lookup, e.g. when the global id is already known. */
+  enabled?: ComputedRef<boolean>;
+};
+
+export function useResolvedEventId(
+  options: ResolvedEventIdOptions = {}
+): ResolvedId & {
   eventNumber: ComputedRef<number | null>;
 } {
   const route = useRoute();
   const eventNumber = useRouteEventNumber();
-  const forumId = computed(() => paramString(route.params.forumId));
+  // The forum-less search routes (/events/list/search/[eventId],
+  // /map/search/[eventId]) carry the forum as a `forum` query param.
+  const forumId = computed(
+    () => paramString(route.params.forumId) || paramString(route.query.forum)
+  );
   const { result, loading } = useQuery(
     GetEventIdByNumberDocument,
     () => ({
       channelUniqueName: forumId.value,
       eventNumber: eventNumber.value ?? 0,
     }),
-    () => ({ enabled: eventNumber.value != null && !!forumId.value })
+    () => ({
+      enabled:
+        (options.enabled?.value ?? true) &&
+        eventNumber.value != null &&
+        !!forumId.value,
+    })
   );
   const id = computed(() => result.value?.getEventIdByNumber ?? '');
   return {

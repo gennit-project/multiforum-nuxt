@@ -8,12 +8,15 @@ import type {
   ServerConfig,
   User,
 } from '@/__generated__/graphql';
+import type { GraphQLHandler } from './mockGraphql';
 
 export const MOCK_DATE = '2024-01-01T00:00:00.000Z';
 export const DEFAULT_USERNAME = 'cluse';
 
 export type MockCommentState = {
   id: string;
+  /** Public permalink handle; defaults to `short-<id>` in `buildComment`. */
+  shortId?: string;
   text: string;
   parentCommentId: string | null;
   archived?: boolean;
@@ -155,6 +158,7 @@ export type DiscussionChannelFixture = Pick<
   | '__typename'
   | 'id'
   | 'discussionId'
+  | 'discussionNumber'
   | 'channelUniqueName'
   | 'weightedVotesCount'
   | 'createdAt'
@@ -214,6 +218,7 @@ export type CommentFixture = Pick<
   Comment,
   | '__typename'
   | 'id'
+  | 'shortId'
   | 'text'
   | 'emoji'
   | 'weightedVotesCount'
@@ -230,13 +235,13 @@ export type CommentFixture = Pick<
   stickyByUsername: string | null;
   CommentAuthor: UserFixture;
   ChildCommentsConnection: CountAggregate;
-  ParentComment: Pick<Comment, 'id'> | null;
+  ParentComment: Pick<Comment, 'id' | 'shortId'> | null;
   ChildComments: CommentFixture[];
   FeedbackCommentsConnection: CountAggregate;
   SubscribedToNotifications: Array<Pick<User, 'username'>>;
   DiscussionChannel: Pick<
     DiscussionChannel,
-    '__typename' | 'id' | 'channelUniqueName' | 'discussionId'
+    '__typename' | 'id' | 'channelUniqueName' | 'discussionId' | 'discussionNumber'
   >;
   Channel: Pick<Channel, '__typename' | 'uniqueName'>;
   UpvotedByUsers: Array<Pick<User, 'username'>>;
@@ -510,6 +515,7 @@ export const buildChannel = ({
 export const buildDiscussionChannel = ({
   id = 'discussion-channel-1',
   discussionId = 'discussion-1',
+  discussionNumber = 1,
   channelUniqueName = 'cats',
   title = 'Example topic 1',
   commentsCount = 0,
@@ -517,6 +523,8 @@ export const buildDiscussionChannel = ({
 }: {
   id?: string;
   discussionId?: string;
+  /** The per-forum number the discussion's URL carries; defaults to 1. */
+  discussionNumber?: number;
   channelUniqueName?: string;
   title?: string;
   commentsCount?: number;
@@ -525,6 +533,7 @@ export const buildDiscussionChannel = ({
   __typename: 'DiscussionChannel',
   id,
   discussionId,
+  discussionNumber,
   channelUniqueName,
   weightedVotesCount: 1,
   createdAt: MOCK_DATE,
@@ -561,6 +570,7 @@ export const buildDiscussionChannel = ({
 export const buildDiscussion = ({
   id = 'discussion-1',
   discussionChannelId = 'discussion-channel-1',
+  discussionNumber = 1,
   channelUniqueName = 'cats',
   title = 'Example topic 1',
   body = 'Example body',
@@ -570,6 +580,8 @@ export const buildDiscussion = ({
 }: {
   id?: string;
   discussionChannelId?: string;
+  /** The per-forum number the discussion's URL carries; defaults to 1. */
+  discussionNumber?: number;
   channelUniqueName?: string;
   title?: string;
   body?: string;
@@ -595,6 +607,7 @@ export const buildDiscussion = ({
     buildDiscussionChannel({
       id: discussionChannelId,
       discussionId: id,
+      discussionNumber,
       channelUniqueName,
       title,
       commentsCount,
@@ -609,21 +622,48 @@ export const buildDiscussion = ({
   ...overrides,
 });
 
+/** The shortId a mocked comment carries (and that its permalink URL uses). */
+export const getMockCommentShortId = (
+  comment: Pick<MockCommentState, 'id' | 'shortId'>
+) => comment.shortId ?? `short-${comment.id}`;
+
+/**
+ * Comment permalink routes carry the comment shortId; the page resolves it to
+ * the global id with a `getCommentIdByShortId` lookup. Spread this into a
+ * test's handlers so `/comments/<shortId>` resolves to the mocked comment.
+ */
+export const buildCommentIdLookupHandlers = (
+  comments: Array<Pick<MockCommentState, 'id' | 'shortId'>>
+): { getCommentIdByShortId: GraphQLHandler } => ({
+  getCommentIdByShortId: ({ body }) => ({
+    data: {
+      getCommentIdByShortId:
+        comments.find(
+          (comment) =>
+            getMockCommentShortId(comment) === body.variables?.shortId
+        )?.id ?? null,
+    },
+  }),
+});
+
 export const buildComment = ({
   comment,
   comments,
   channelUniqueName = 'cats',
   discussionId = 'discussion-1',
   discussionChannelId = 'discussion-channel-1',
+  discussionNumber = 1,
 }: {
   comment: MockCommentState;
   comments: MockCommentState[];
   channelUniqueName?: string;
   discussionId?: string;
   discussionChannelId?: string;
+  discussionNumber?: number;
 }): CommentFixture => ({
   __typename: 'Comment',
   id: comment.id,
+  shortId: getMockCommentShortId(comment),
   text: comment.text,
   emoji: '',
   weightedVotesCount: 1,
@@ -638,7 +678,14 @@ export const buildComment = ({
   ChildCommentsConnection: { aggregate: { count: { nodes: comments.filter((child) => child.parentCommentId === comment.id)
       .length, } } },
   ParentComment: comment.parentCommentId
-    ? { id: comment.parentCommentId }
+    ? {
+        id: comment.parentCommentId,
+        shortId: getMockCommentShortId(
+          comments.find((parent) => parent.id === comment.parentCommentId) ?? {
+            id: comment.parentCommentId,
+          }
+        ),
+      }
     : null,
   ChildComments: comments
     .filter((child) => child.parentCommentId === comment.id)
@@ -649,6 +696,7 @@ export const buildComment = ({
         channelUniqueName,
         discussionId,
         discussionChannelId,
+        discussionNumber,
       })
     ),
   FeedbackComments: [],
@@ -661,6 +709,7 @@ export const buildComment = ({
     id: discussionChannelId,
     channelUniqueName,
     discussionId,
+    discussionNumber,
   },
   Channel: {
     __typename: 'Channel',
@@ -707,6 +756,7 @@ export type EventFixture = Pick<
   EventChannels: Array<{
     id: string;
     eventId: string;
+    eventNumber: number;
     channelUniqueName: string;
     archived: boolean;
     Channel: {
@@ -725,6 +775,7 @@ export type EventFixture = Pick<
 export const buildEvent = ({
   id = 'event-1',
   eventChannelId = 'event-channel-1',
+  eventNumber = 1,
   channelUniqueName = 'cats',
   title = 'Test Event',
   description = 'Test event description',
@@ -733,6 +784,7 @@ export const buildEvent = ({
 }: {
   id?: string;
   eventChannelId?: string;
+  eventNumber?: number;
   channelUniqueName?: string;
   title?: string;
   description?: string;
@@ -773,6 +825,7 @@ export const buildEvent = ({
     {
       id: eventChannelId,
       eventId: id,
+      eventNumber,
       channelUniqueName,
       archived: false,
       Channel: {
@@ -791,6 +844,15 @@ export const buildEvent = ({
     displayName: posterUsername,
   }),
   ...overrides,
+});
+
+/**
+ * Event detail routes carry `{eventNumber}-{slug}`; the page resolves that to
+ * the global event id with a `getEventIdByNumber` lookup. Spread this into a
+ * test's handlers so `/forums/<forum>/events/1-<slug>` resolves to `eventId`.
+ */
+export const buildEventIdLookupHandlers = (eventId: string) => ({
+  getEventIdByNumber: () => ({ data: { getEventIdByNumber: eventId } }),
 });
 
 // ---------------------------------------------------------------------------

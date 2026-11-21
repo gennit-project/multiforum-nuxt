@@ -16,6 +16,7 @@ import type { SearchEventValues } from '@/types/Event';
 import { useRoute, useRouter } from 'nuxt/app';
 import { isEventSearchRoute } from '@/utils/isEventSearchRoute';
 import AppImage from '@/components/image/AppImage.vue';
+import { getEventLinkUrl } from '@/utils/eventLinks';
 
 const props = defineProps({
   event: {
@@ -83,7 +84,10 @@ const detailLink = computed(() => {
   if (!defaultUniqueName.value) {
     return '';
   }
-  return `/forums/${defaultUniqueName.value}/events/${props.event.id}`;
+  return getEventLinkUrl({
+    event: props.event,
+    forumId: defaultUniqueName.value,
+  });
 });
 
 const submittedToMultipleChannels = computed(
@@ -97,7 +101,10 @@ const eventDetailOptions = computed(() => {
   return props.event.EventChannels.map((dc) => {
     return {
       label: `View in ${dc.channelUniqueName}`,
-      value: `/forums/${dc.channelUniqueName}/events/${props.event.id}`,
+      value: getEventLinkUrl({
+        event: props.event,
+        forumId: dc.channelUniqueName,
+      }),
       event: '',
     };
   }).sort((a, b) => b.label.localeCompare(a.label));
@@ -208,7 +215,9 @@ const seriesOccurrences = computed(() => {
   }
   return eventWithSeries.value.EventSeries.Occurrences.map((occ) => ({
     id: occ.id,
+    title: occ.title,
     startTime: occ.startTime,
+    EventChannels: occ.EventChannels,
   }));
 });
 </script>

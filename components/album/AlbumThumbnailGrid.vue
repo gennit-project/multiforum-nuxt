@@ -3,9 +3,11 @@ import type { PropType } from 'vue';
 import AppImage from '@/components/image/AppImage.vue';
 import ImageCaption from '@/components/image/ImageCaption.vue';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
+import { getImageUrl as getImagePageUrl } from '@/utils/contentUrls';
 
 type AlbumImage = {
   id: string;
+  imageNumber?: number | null;
   url?: string | null;
   alt?: string | null;
   caption?: string | null;
@@ -49,7 +51,13 @@ const getImageUrl = (image: AlbumImage) =>
       class="group relative aspect-square overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800"
     >
       <NuxtLink
-        :to="`/u/${image.Uploader?.username}/images/${image.id}`"
+        :to="
+          getImagePageUrl({
+            username: image.Uploader?.username ?? '',
+            imageNumber: image.imageNumber,
+            imageId: image.id,
+          })
+        "
         class="block h-full w-full"
       >
         <AppImage

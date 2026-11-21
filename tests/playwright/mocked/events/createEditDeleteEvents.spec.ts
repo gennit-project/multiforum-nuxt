@@ -95,6 +95,7 @@ const buildEvent = (overrides: Partial<{
     {
       id: 'event-channel-1',
       eventId: overrides.id || 'event-1',
+      eventNumber: 1,
       channelUniqueName: TEST_CHANNEL,
       archived: false,
       Channel: {
@@ -115,6 +116,8 @@ const buildEvent = (overrides: Partial<{
 });
 
 const getCommonMocks = (username: string) => ({
+  // Event routes carry `{eventNumber}-{slug}`; every event here is number 1.
+  getEventIdByNumber: () => ({ data: { getEventIdByNumber: 'event-1' } }),
   getOwnEmail: () => ({
     data: {
       getOwnEmail: {
@@ -477,7 +480,7 @@ test('edits an event with mocked GraphQL', async ({ context, page }, testInfo) =
 
   try {
     // Navigate to edit page
-    await page.goto(`/forums/${TEST_CHANNEL}/events/edit/${eventState.id}`);
+    await page.goto(`/forums/${TEST_CHANNEL}/events/edit/1-test-event-title`);
     await expect(page.getByTestId('event-form')).toBeVisible();
 
     // Verify original title is shown
@@ -620,7 +623,7 @@ test('deletes an event with mocked GraphQL', async ({ context, page }, testInfo)
 
   try {
     // Navigate to event detail page
-    await page.goto(`/forums/${TEST_CHANNEL}/events/${eventState.id}`);
+    await page.goto(`/forums/${TEST_CHANNEL}/events/1-test-event-title`);
     await seedAuthState(page);
 
     // Click the event menu button

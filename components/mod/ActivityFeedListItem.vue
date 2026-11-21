@@ -95,8 +95,11 @@ const props = defineProps({
   },
 });
 const commentIdInParams = useRoute().params.commentId as string;
+// The route's commentId is the comment shortId (raw id for legacy links).
 const isPermalinked =
-  commentIdInParams && commentIdInParams === props.activityItem.Comment?.id;
+  commentIdInParams &&
+  (commentIdInParams === props.activityItem.Comment?.shortId ||
+    commentIdInParams === props.activityItem.Comment?.id);
 const { forumAdminUsernames, forumModProfileNames } = useForumRoleMembership();
 const { serverAdminUsernames, serverModProfileNames } =
   useServerRoleMembership();

@@ -7,6 +7,7 @@ import {
   buildDiscussion,
   buildDiscussionChannel,
   buildEvent,
+  buildEventIdLookupHandlers,
 } from '../../helpers/graphqlFixtures';
 import { createBaseHandlers } from '../../helpers/baseHandlers';
 import { FEEDBACK_MOD_ROLE } from '../../helpers/moderationFixtures';
@@ -358,6 +359,7 @@ test.describe('Give feedback flows', () => {
       modProfileName: TEST_MOD_PROFILE,
       handlers: {
         ...getFeedbackHandlers(TEST_USERNAME, TEST_MOD_PROFILE),
+        ...buildEventIdLookupHandlers(eventId),
         getEvent: () => ({
           data: {
             events: [mockEvent],
@@ -417,7 +419,7 @@ test.describe('Give feedback flows', () => {
     });
 
     // Navigate to event detail page
-    await page.goto(`/forums/${TEST_CHANNEL}/events/${eventId}`);
+    await page.goto(`/forums/${TEST_CHANNEL}/events/1-test-event`);
     await seedModProfile(page);
 
     // Click the event menu button
