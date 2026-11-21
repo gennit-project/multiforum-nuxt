@@ -47,11 +47,9 @@ const hasNothingToReview = computed(
 
 const discussionPath = (item: ReviewItem) => {
   if (!item.channelUniqueName) return null;
-  // TODO(short-urls): backend does not expose discussionNumber on
-  // DownloadScanReviewItem, so this link falls back to the raw id segment.
   return getDownloadUrl({
     forumId: item.channelUniqueName,
-    discussionNumber: null,
+    discussionNumber: item.discussionNumber,
     title: item.discussionTitle,
     discussionId: item.discussionId,
   });

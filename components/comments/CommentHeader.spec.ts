@@ -319,6 +319,28 @@ describe('CommentHeader context link target', () => {
     });
   });
 
+  it('links feedback on a discussion by the discussion number and title', () => {
+    expect(
+      contextLinkTarget(
+        makeComment({
+          DiscussionChannel: discussionContext,
+          Channel: { uniqueName: 'cats' },
+          GivesFeedbackOnDiscussion: {
+            id: 'd9',
+            title: 'Trail conditions',
+            DiscussionChannels: [
+              { channelUniqueName: 'dogs', discussionNumber: 3 },
+              { channelUniqueName: 'cats', discussionNumber: 42 },
+            ],
+          },
+        })
+      )
+    ).toEqual({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { forumId: 'cats', discussionId: '42-trail-conditions' },
+    });
+  });
+
   it('falls back to the raw discussion id for feedback on a discussion', () => {
     expect(
       contextLinkTarget(

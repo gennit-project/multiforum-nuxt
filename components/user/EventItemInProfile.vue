@@ -39,9 +39,6 @@ const defaultUniqueName = computed(() => {
   return props.event.EventChannels[0].channelUniqueName;
 });
 
-// TODO(short-urls): backend does not expose eventNumber on the
-// getUserContributions activity feed's EventChannelInfo (reused through
-// GithubContributionChart), so those events link with the raw-id fallback.
 // Primary link target for the card title, so it is keyboard-reachable instead
 // of relying on a click handler on the whole <li>.
 const titleLink = computed(() =>

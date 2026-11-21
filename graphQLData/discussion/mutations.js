@@ -465,6 +465,11 @@ export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
         text
         GivesFeedbackOnDiscussion {
           id
+          title
+          DiscussionChannels {
+            channelUniqueName
+            discussionNumber
+          }
         }
       }
     }

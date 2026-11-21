@@ -1011,6 +1011,11 @@ export const GET_DISCUSSION_FEEDBACK = gql`
         }
         GivesFeedbackOnDiscussion {
           id
+          title
+          DiscussionChannels {
+            channelUniqueName
+            discussionNumber
+          }
         }
       }
     }

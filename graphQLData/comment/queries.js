@@ -538,6 +538,11 @@ export const GET_FEEDBACK_COMMENT = gql`
       }
       GivesFeedbackOnDiscussion {
         id
+        title
+        DiscussionChannels {
+          channelUniqueName
+          discussionNumber
+        }
       }
       GivesFeedbackOnEvent {
         id
@@ -617,6 +622,11 @@ export const GET_COMMENT = gql`
       }
       GivesFeedbackOnDiscussion {
         id
+        title
+        DiscussionChannels {
+          channelUniqueName
+          discussionNumber
+        }
       }
       GivesFeedbackOnEvent {
         id
@@ -718,6 +728,11 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
       }
       GivesFeedbackOnDiscussion {
         id
+        title
+        DiscussionChannels {
+          channelUniqueName
+          discussionNumber
+        }
       }
       GivesFeedbackOnEvent {
         id

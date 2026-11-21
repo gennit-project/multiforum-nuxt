@@ -20,10 +20,6 @@ export type ModActivityLink = {
 
 export type ModActivityLinkInput = Partial<NullableSelection<Pick<SelectedActivity, 'actionType' | 'Comment' | 'Issue' | 'RelatedDiscussion' | 'RelatedEvent' | 'RelatedComment'>>>;
 
-// TODO(short-urls): backend does not expose discussionNumber / eventNumber /
-// Comment.shortId on the contribution-activity types (getModContributions), so
-// every discussion, event and comment link below falls back to the raw global
-// id segment. Switch to the numbers/shortId once the backend selects them.
 const getFirst = <T>(items?: T[] | null) => {
   return Array.isArray(items) && items.length > 0 ? items[0] : null;
 };
@@ -48,7 +44,8 @@ export const getModActivityLinks = (
           params: {
             forumId: discussionChannel.channelUniqueName,
             discussionId: getDiscussionSegment({
-              discussionNumber: null,
+              discussionNumber: discussionChannel.discussionNumber,
+              title: activity.RelatedDiscussion?.title,
               discussionId: discussionChannel.discussionId,
             }),
             feedbackId: activity.Comment.id,
@@ -67,7 +64,8 @@ export const getModActivityLinks = (
           params: {
             forumId: eventChannel?.channelUniqueName || '',
             eventId: getEventSegment({
-              eventNumber: null,
+              eventNumber: eventChannel?.eventNumber,
+              title: activity.RelatedEvent.title,
               eventId: activity.RelatedEvent.id,
             }),
             feedbackId: activity.Comment.id,
@@ -87,7 +85,8 @@ export const getModActivityLinks = (
             forumId:
               activity.RelatedComment.DiscussionChannel.channelUniqueName,
             discussionId: getDiscussionSegment({
-              discussionNumber: null,
+              discussionNumber:
+                activity.RelatedComment.DiscussionChannel.discussionNumber,
               discussionId:
                 activity.RelatedComment.DiscussionChannel.discussionId,
             }),
@@ -120,7 +119,7 @@ export const getModActivityLinks = (
       label: 'Discussion',
       to: getDiscussionRoute({
         forumId: discussionChannel.channelUniqueName,
-        discussionNumber: null,
+        discussionNumber: discussionChannel.discussionNumber,
         title: activity.RelatedDiscussion?.title,
         discussionId: discussionChannel.discussionId,
       }),
@@ -133,7 +132,7 @@ export const getModActivityLinks = (
       label: 'Event',
       to: getEventRoute({
         forumId: eventChannel.channelUniqueName,
-        eventNumber: null,
+        eventNumber: eventChannel.eventNumber,
         title: activity.RelatedEvent?.title,
         eventId: eventChannel.eventId,
       }),
@@ -149,9 +148,10 @@ export const getModActivityLinks = (
       label: 'Comment',
       to: getDiscussionCommentRoute({
         forumId: activity.RelatedComment.DiscussionChannel.channelUniqueName,
-        discussionNumber: null,
+        discussionNumber:
+          activity.RelatedComment.DiscussionChannel.discussionNumber,
         discussionId: activity.RelatedComment.DiscussionChannel.discussionId,
-        shortId: null,
+        shortId: activity.RelatedComment.shortId,
         commentId: activity.RelatedComment.id,
       }),
     });
@@ -168,10 +168,10 @@ export const getModActivityLinks = (
       label: 'Comment',
       to: getEventCommentRoute({
         forumId: relatedEventChannel?.channelUniqueName || '',
-        eventNumber: null,
+        eventNumber: relatedEventChannel?.eventNumber,
         title: activity.RelatedComment.Event.title,
         eventId: activity.RelatedComment.Event.id,
-        shortId: null,
+        shortId: activity.RelatedComment.shortId,
         commentId: activity.RelatedComment.id,
       }),
     });
@@ -187,7 +187,7 @@ export const getModActivityLinks = (
         eventNumber: null,
         title: activity.RelatedComment.Event.title,
         eventId: activity.RelatedComment.Event.id,
-        shortId: null,
+        shortId: activity.RelatedComment.shortId,
         commentId: activity.RelatedComment.id,
       }),
     });

@@ -110,6 +110,11 @@ export const GET_MOD = gql`
         }
         GivesFeedbackOnDiscussion {
           id
+          title
+          DiscussionChannels {
+            channelUniqueName
+            discussionNumber
+          }
         }
         GivesFeedbackOnEvent {
           id
@@ -183,6 +188,11 @@ export const GET_MOD_COMMENTS = gql`
         }
         GivesFeedbackOnDiscussion {
           id
+          title
+          DiscussionChannels {
+            channelUniqueName
+            discussionNumber
+          }
         }
         GivesFeedbackOnEvent {
           id

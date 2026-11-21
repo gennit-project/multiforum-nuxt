@@ -54,9 +54,6 @@ type ProfileDiscussionChannel = NonNullable<
   Discussion['DiscussionChannels']
 >[number];
 
-// The user-contributions variant of this list (UserContributionActivity) does
-// not select discussionNumber (TODO(short-urls): backend does not expose it on
-// DiscussionChannelInfo), so those links fall back to the raw id segment.
 const linkTargetFor = (channel: ProfileDiscussionChannel) => ({
   forumId: channel?.channelUniqueName || '',
   discussionNumber:

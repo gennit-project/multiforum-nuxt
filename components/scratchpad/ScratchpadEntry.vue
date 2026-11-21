@@ -32,8 +32,13 @@ const authorDisplayName = computed(() => {
 });
 
 const sourceLink = computed(() => {
-  const { sourceType, sourceId, sourceChannelUniqueName, discussionId } =
-    props.entry;
+  const {
+    sourceType,
+    sourceId,
+    sourceChannelUniqueName,
+    discussionId,
+    discussionNumber,
+  } = props.entry;
 
   // Without the channel we cannot build any forum link.
   if (!sourceChannelUniqueName) return '#';
@@ -44,14 +49,15 @@ const sourceLink = computed(() => {
     return `/forums/${sourceChannelUniqueName}/discussions`;
   }
 
-  // TODO(short-urls): backend does not expose discussionNumber on
-  // ScratchpadEntry nor shortId for sourceId, so both links below fall back to
-  // the raw-id segments (discussionId / commentId = sourceId).
+  // ScratchpadEntry carries the discussion number but not the comment shortId,
+  // so a comment link uses the raw comment id (sourceId) as its permalink
+  // segment, which the permalink page resolves as a fallback.
   if (sourceType === 'comment') {
     // sourceId is the Comment id; link straight to the comment permalink.
     return getPermalinkToDiscussionComment({
       forumId: sourceChannelUniqueName,
       discussionId,
+      discussionNumber,
       commentId: sourceId,
     });
   }
@@ -60,6 +66,7 @@ const sourceLink = computed(() => {
   return getPermalinkToDiscussion({
     forumId: sourceChannelUniqueName,
     discussionId,
+    discussionNumber,
   });
 });
 

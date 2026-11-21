@@ -172,10 +172,15 @@ const contextLinkObject = computed(() => {
   }
   if (GivesFeedbackOnDiscussion) {
     // If it's giving feedback on a discussion, the context is the discussion.
-    // TODO(short-urls): GivesFeedbackOnDiscussion selects only the global id
-    // (no discussionNumber), so this link falls back to the raw id segment.
+    const forumId = Channel?.uniqueName || '';
+    const feedbackDiscussionChannel =
+      GivesFeedbackOnDiscussion.DiscussionChannels?.find(
+        (channel) => channel.channelUniqueName === forumId
+      );
     return getPermalinkToDiscussion({
-      forumId: Channel?.uniqueName || '',
+      forumId,
+      discussionNumber: feedbackDiscussionChannel?.discussionNumber,
+      discussionTitle: GivesFeedbackOnDiscussion.title,
       discussionId: GivesFeedbackOnDiscussion.id,
     });
   }

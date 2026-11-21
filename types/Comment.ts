@@ -105,10 +105,17 @@ export type CommentView = Omit<SelectedComment, 'CommentAuthor' | 'Event'> & {
       })
     | null;
   GivesFeedbackOnComment?: FeedbackCommentContext | null;
-  GivesFeedbackOnDiscussion?: Pick<
-    NonNullable<SchemaComment['GivesFeedbackOnDiscussion']>,
-    'id'
-  > | null;
+  GivesFeedbackOnDiscussion?:
+    | (Pick<NonNullable<SchemaComment['GivesFeedbackOnDiscussion']>, 'id'> &
+        Partial<
+          Pick<NonNullable<SchemaComment['GivesFeedbackOnDiscussion']>, 'title'>
+        > & {
+          DiscussionChannels?: Array<{
+            channelUniqueName: string;
+            discussionNumber?: number | null;
+          }> | null;
+        })
+    | null;
   GivesFeedbackOnEvent?: EventContext | null;
 } & Partial<Pick<ReplyComment, 'FeedbackComments'>> & {
     FeedbackCommentsConnection?: {

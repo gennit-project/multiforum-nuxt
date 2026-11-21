@@ -112,13 +112,11 @@ const loadFailures = async (campaignId: string) => {
   failures.value[campaignId] = response.data.getPluginPipelineCampaignFailures;
 };
 
-// TODO(short-urls): backend does not expose discussionNumber on
-// PluginPipelineCampaignFailure, so this link falls back to the raw id segment.
 const failureUrl = (failure: CampaignFailure) =>
   `${getDownloadTabUrl({
     target: {
       forumId: failure.channelId,
-      discussionNumber: null,
+      discussionNumber: failure.discussionNumber,
       discussionId: failure.discussionId,
     },
     tab: 'pipelines',

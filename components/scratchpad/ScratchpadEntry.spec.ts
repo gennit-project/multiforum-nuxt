@@ -159,6 +159,23 @@ describe('ScratchpadEntry source link', () => {
     });
   });
 
+  it('links a discussion entry by its discussion number', () => {
+    const wrapper = mountEntry({
+      entry: entry({
+        sourceType: 'discussion',
+        sourceId: 'discussion-channel-1',
+        discussionId: 'discussion-1',
+        discussionNumber: 42,
+        sourceChannelUniqueName: 'cats',
+      }),
+    });
+
+    expect(sourceLinkTo(wrapper)).toEqual({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { forumId: 'cats', discussionId: '42' },
+    });
+  });
+
   it('falls back to the forum discussion list when discussionId is missing', () => {
     const wrapper = mountEntry({
       entry: entry({

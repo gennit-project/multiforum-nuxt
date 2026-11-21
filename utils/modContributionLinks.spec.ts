@@ -204,4 +204,41 @@ describe('getModActivityLinks', () => {
 
     expect(links).toEqual([]);
   });
+
+  it('builds discussion, event and comment links from numbers and shortId', () => {
+    const links = getModActivityLinks({
+      RelatedDiscussion: {
+        title: 'Trail conditions',
+        DiscussionChannels: [
+          {
+            channelUniqueName: 'phoenix',
+            discussionId: 'disc-1',
+            discussionNumber: 42,
+          },
+        ],
+      },
+      RelatedEvent: {
+        id: 'event-1',
+        title: 'Saturday Cleanup',
+        EventChannels: [
+          { channelUniqueName: 'tempe', eventId: 'event-1', eventNumber: 7 },
+        ],
+      },
+      RelatedComment: {
+        id: 'comment-1',
+        shortId: '4f3a9b2e1c7d',
+        DiscussionChannel: {
+          channelUniqueName: 'phoenix',
+          discussionId: 'disc-1',
+          discussionNumber: 42,
+        },
+      },
+    });
+
+    expect(links.map((link) => link.to.params)).toEqual([
+      { forumId: 'phoenix', discussionId: '42-trail-conditions' },
+      { forumId: 'tempe', eventId: '7-saturday-cleanup' },
+      { forumId: 'phoenix', discussionId: '42', commentId: '4f3a9b2e1c7d' },
+    ]);
+  });
 });
