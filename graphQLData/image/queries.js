@@ -4,6 +4,7 @@ export const GET_IMAGE_DETAILS = gql`
   query GetImageDetails($imageId: ID!) {
     images(where: { id: { eq: $imageId } }) {
       id
+      imageNumber
       archived
       url
       alt
@@ -27,6 +28,8 @@ export const GET_ALBUM_DETAILS = gql`
   query GetAlbumDetails($albumId: ID!) {
     albums(where: { id: { eq: $albumId } }) {
       id
+      albumNumber
+      ownerUsername
       imageOrder
       Owner {
         username
@@ -36,6 +39,7 @@ export const GET_ALBUM_DETAILS = gql`
         where: { NOT: { archived: { eq: true }, permanentlyRemoved: { eq: true } } }
       ) {
         id
+        imageNumber
         url
         alt
         caption
@@ -56,6 +60,7 @@ export const GET_ALBUM_DETAILS = gql`
         DiscussionChannels {
           id
           channelUniqueName
+          discussionNumber
         }
       }
     }
@@ -66,6 +71,8 @@ export const GET_USER_ALBUMS = gql`
   query GetUserAlbums($where: AlbumWhere) {
     albums(where: $where) {
       id
+      albumNumber
+      ownerUsername
       imageOrder
       Owner {
         username
@@ -77,6 +84,7 @@ export const GET_USER_ALBUMS = gql`
         sort: { createdAt: DESC }
       ) {
         id
+        imageNumber
         url
         alt
         caption
@@ -103,6 +111,7 @@ export const GET_USER_ALBUMS = gql`
         DiscussionChannels {
           id
           channelUniqueName
+          discussionNumber
         }
       }
     }
@@ -113,6 +122,8 @@ export const GET_USER_ALBUMS_FOR_IMAGE_SAVE = gql`
   query GetUserAlbumsForImageSave($username: String!, $imageId: ID!) {
     albums(where: { Owner: { username: { eq: $username } } }) {
       id
+      albumNumber
+      ownerUsername
       Owner {
         username
         displayName
@@ -157,6 +168,7 @@ export const GET_USER_IMAGES = gql`
         sort: { createdAt: DESC }
       ) {
         id
+        imageNumber
         url
         alt
         caption
@@ -204,6 +216,7 @@ export const GET_REUSABLE_USER_IMAGES = gql`
         sort: { createdAt: DESC }
       ) {
         id
+        imageNumber
         url
         alt
         caption
@@ -241,6 +254,7 @@ export const GET_REUSABLE_FAVORITE_IMAGES = gql`
         sort: { createdAt: DESC }
       ) {
         id
+        imageNumber
         url
         alt
         caption
@@ -271,6 +285,8 @@ export const GET_REUSABLE_IMAGE_COLLECTIONS = gql`
         sort: [{ updatedAt: DESC }]
       ) {
         id
+        collectionNumber
+        ownerUsername
         name
         itemCount
       }
@@ -287,6 +303,8 @@ export const GET_REUSABLE_COLLECTION_IMAGES = gql`
   ) {
     collections(where: { id: { eq: $collectionId } }) {
       id
+      collectionNumber
+      ownerUsername
       name
       Images(
         where: $where
@@ -295,6 +313,7 @@ export const GET_REUSABLE_COLLECTION_IMAGES = gql`
         sort: { createdAt: DESC }
       ) {
         id
+        imageNumber
         url
         alt
         caption

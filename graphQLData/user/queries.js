@@ -210,6 +210,7 @@ export const GET_USER_COMMENTS = gql`
         sort: { createdAt: DESC }
       ) {
         id
+        shortId
         text
         createdAt
         updatedAt
@@ -218,6 +219,7 @@ export const GET_USER_COMMENTS = gql`
         weightedVotesCount
         ParentComment {
           id
+          shortId
         }
         CommentAuthor {
           ... on User {
@@ -234,6 +236,7 @@ export const GET_USER_COMMENTS = gql`
             uniqueName
           }
           discussionId
+          discussionNumber
           channelUniqueName
         }
         Event {
@@ -241,6 +244,7 @@ export const GET_USER_COMMENTS = gql`
           title
           EventChannels {
             channelUniqueName
+            eventNumber
           }
         }
         Channel {
@@ -290,6 +294,7 @@ export const GET_USER_DISCUSSIONS = gql`
           weightedVotesCount
           id
           discussionId
+          discussionNumber
           channelUniqueName
         }
         Tags {
@@ -339,6 +344,7 @@ export const GET_USER_DOWNLOADS = gql`
           weightedVotesCount
           id
           discussionId
+          discussionNumber
           channelUniqueName
         }
         Tags {
@@ -383,6 +389,7 @@ export const GET_USER_OWNED_DOWNLOADS = gql`
         }
         DiscussionChannels {
           id
+          discussionNumber
           channelUniqueName
           archived
           answered
@@ -483,6 +490,7 @@ export const GET_USER_EVENTS = gql`
         updatedAt
         deleted
         EventChannels {
+          eventNumber
           channelUniqueName
           Channel {
             uniqueName

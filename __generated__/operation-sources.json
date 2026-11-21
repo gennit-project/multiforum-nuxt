@@ -1721,6 +1721,17 @@
       ],
       "fragments": []
     },
+    "graphQLData/collection/queries.ts#GET_COLLECTION_ID_BY_NUMBER": {
+      "operations": [
+        {
+          "name": "getCollectionIdByNumber",
+          "document": "GetCollectionIdByNumberDocument",
+          "result": "GetCollectionIdByNumberQuery",
+          "variables": "GetCollectionIdByNumberQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
     "graphQLData/comment/mutations.js#ADD_EMOJI_TO_COMMENT": {
       "operations": [
         {
@@ -1928,6 +1939,17 @@
           "document": "GetSpecificCommentFeedbackDocument",
           "result": "GetSpecificCommentFeedbackQuery",
           "variables": "GetSpecificCommentFeedbackQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/comment/queries.js#GET_COMMENT_ID_BY_SHORT_ID": {
+      "operations": [
+        {
+          "name": "getCommentIdByShortId",
+          "document": "GetCommentIdByShortIdDocument",
+          "result": "GetCommentIdByShortIdQuery",
+          "variables": "GetCommentIdByShortIdQueryVariables"
         }
       ],
       "fragments": []
@@ -2156,9 +2178,9 @@
       "operations": [
         {
           "name": "markAsAnswered",
-          "document": "MarkAsAnsweredSource68ece8b51cDocument",
-          "result": "MarkAsAnsweredSource68ece8b51cMutation",
-          "variables": "MarkAsAnsweredSource68ece8b51cMutationVariables"
+          "document": "MarkAsAnsweredSource21cae36e28Document",
+          "result": "MarkAsAnsweredSource21cae36e28Mutation",
+          "variables": "MarkAsAnsweredSource21cae36e28MutationVariables"
         }
       ],
       "fragments": []
@@ -2492,6 +2514,17 @@
       ],
       "fragments": []
     },
+    "graphQLData/discussion/queries.js#GET_DISCUSSION_ID_BY_NUMBER": {
+      "operations": [
+        {
+          "name": "getDiscussionIdByNumber",
+          "document": "GetDiscussionIdByNumberDocument",
+          "result": "GetDiscussionIdByNumberQuery",
+          "variables": "GetDiscussionIdByNumberQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
     "graphQLData/email/mutations.js#CREATE_EMAIL_AND_USER": {
       "operations": [
         {
@@ -2704,9 +2737,9 @@
       "operations": [
         {
           "name": "getEvents",
-          "document": "GetEventsSourcef3f666cbeeDocument",
-          "result": "GetEventsSourcef3f666cbeeQuery",
-          "variables": "GetEventsSourcef3f666cbeeQueryVariables"
+          "document": "GetEventsSource98b9ac2a6cDocument",
+          "result": "GetEventsSource98b9ac2a6cQuery",
+          "variables": "GetEventsSource98b9ac2a6cQueryVariables"
         }
       ],
       "fragments": [
@@ -2731,6 +2764,17 @@
           "document": "GetEventFeedbackDocument",
           "result": "GetEventFeedbackQuery",
           "variables": "GetEventFeedbackQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/event/queries.js#GET_EVENT_ID_BY_NUMBER": {
+      "operations": [
+        {
+          "name": "getEventIdByNumber",
+          "document": "GetEventIdByNumberDocument",
+          "result": "GetEventIdByNumberQuery",
+          "variables": "GetEventIdByNumberQueryVariables"
         }
       ],
       "fragments": []
@@ -2863,6 +2907,28 @@
           "document": "GetReusableCollectionImagesDocument",
           "result": "GetReusableCollectionImagesQuery",
           "variables": "GetReusableCollectionImagesQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_IMAGE_ID_BY_NUMBER": {
+      "operations": [
+        {
+          "name": "getImageIdByNumber",
+          "document": "GetImageIdByNumberDocument",
+          "result": "GetImageIdByNumberQuery",
+          "variables": "GetImageIdByNumberQueryVariables"
+        }
+      ],
+      "fragments": []
+    },
+    "graphQLData/image/queries.js#GET_ALBUM_ID_BY_NUMBER": {
+      "operations": [
+        {
+          "name": "getAlbumIdByNumber",
+          "document": "GetAlbumIdByNumberDocument",
+          "result": "GetAlbumIdByNumberQuery",
+          "variables": "GetAlbumIdByNumberQueryVariables"
         }
       ],
       "fragments": []

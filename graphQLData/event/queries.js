@@ -71,6 +71,7 @@ export const EVENT_FIELDS = gql`
     EventChannels {
       id
       eventId
+      eventNumber
       channelUniqueName
       Channel {
         uniqueName
@@ -175,6 +176,7 @@ export const GET_EVENTS = gql`
       EventChannels {
         id
         eventId
+        eventNumber
         channelUniqueName
         archived
       }
@@ -202,6 +204,7 @@ export const GET_EVENT_FEEDBACK = gql`
       }
       FeedbackComments(limit: $limit, offset: $offset) {
         id
+        shortId
         text
         createdAt
         archived

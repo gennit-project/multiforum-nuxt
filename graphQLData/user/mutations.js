@@ -183,6 +183,7 @@ export const ADD_FAVORITE_COMMENT = gql`
         username
         FavoriteComments {
           id
+          shortId
         }
       }
     }
@@ -203,6 +204,7 @@ export const REMOVE_FAVORITE_COMMENT = gql`
         username
         FavoriteComments {
           id
+          shortId
         }
       }
     }
@@ -223,6 +225,7 @@ export const ADD_FAVORITE_IMAGE = gql`
         username
         FavoriteImages {
           id
+          imageNumber
           url
         }
       }
@@ -244,6 +247,7 @@ export const REMOVE_FAVORITE_IMAGE = gql`
         username
         FavoriteImages {
           id
+          imageNumber
           url
         }
       }

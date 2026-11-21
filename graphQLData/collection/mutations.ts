@@ -22,6 +22,8 @@ export const CREATE_COLLECTION = gql`
     ) {
       collections {
         id
+        collectionNumber
+        ownerUsername
         name
         description
         collectionType
@@ -129,6 +131,8 @@ export const UPDATE_COLLECTION = gql`
     updateCollections(where: { id: { eq: $collectionId } }, update: $update) {
       collections {
         id
+        collectionNumber
+        ownerUsername
         name
         description
         visibility
@@ -177,6 +181,7 @@ export const SHARE_COLLECTION_AS_DISCUSSION = gql`
       title
       DiscussionChannels {
         channelUniqueName
+        discussionNumber
       }
     }
   }

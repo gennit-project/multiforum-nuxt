@@ -17,6 +17,7 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
         }
         DiscussionChannels {
           channelUniqueName
+          discussionNumber
           Channel {
             uniqueName
             displayName
@@ -34,6 +35,7 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
       }
       FavoriteImages(sort: [{ createdAt: DESC }], limit: 50) {
         id
+        imageNumber
         url
         alt
         caption
@@ -45,10 +47,13 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
         }
         Albums(limit: 1) {
           id
+          albumNumber
+          ownerUsername
           Discussions(limit: 1) {
             id
             DiscussionChannels {
               channelUniqueName
+              discussionNumber
               Channel {
                 uniqueName
                 displayName
@@ -60,6 +65,7 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
       }
       FavoriteComments(sort: [{ createdAt: DESC }], limit: 50) {
         id
+        shortId
         text
         createdAt
         CommentAuthor {
@@ -74,6 +80,7 @@ export const GET_UNIFIED_LIBRARY_FAVORITES = gql`
         }
         DiscussionChannel {
           discussionId
+          discussionNumber
           channelUniqueName
           Channel {
             uniqueName
