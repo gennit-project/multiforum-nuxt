@@ -457,7 +457,7 @@ onBeforeUnmount(() => {
             <template #default>
               <button
                 type="button"
-                class="group inline-flex items-center pt-2 text-xs font-medium"
+                class="inline-flex items-center pt-2 text-xs font-medium"
                 :class="
                   isMoreActive
                     ? 'border-brand-500 border-b-2 text-gray-900 dark:text-gray-100'
@@ -467,7 +467,7 @@ onBeforeUnmount(() => {
                 data-testid="channel-tabs-more"
               >
                 <span
-                  class="flex h-6 items-center space-x-2 rounded-lg px-2 py-4 group-hover:bg-gray-100 sm:my-1 dark:group-hover:bg-gray-700"
+                  class="flex h-6 items-center space-x-2 rounded-lg px-2 py-4 hover:bg-gray-100 sm:my-1 dark:hover:bg-gray-700"
                 >
                   <span class="text-gray-700 dark:text-white">More</span>
                   <i
