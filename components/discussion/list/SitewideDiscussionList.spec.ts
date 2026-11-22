@@ -73,7 +73,7 @@ const stubs = {
   },
   SitewideDiscussionSidebar: { template: '<div />' },
   DiscussionDetailContent: {
-    props: ['channelId', 'discussionNumber', 'showComments'],
+    props: ['channelId', 'discussionNumber', 'knownDiscussionId', 'showComments'],
     template: '<div class="detail-stub"><slot name="before-comments" /></div>',
   },
   DiscussionDetailEmptyState: { template: '<div class="empty-state-stub" />' },
@@ -316,8 +316,19 @@ it('loads the selected forum’s comments, not the first forum’s', () => {
   expect(wrapper.findComponent(stubs.DiscussionDetailContent).props()).toEqual({
     channelId: 'dogs',
     discussionNumber: 20,
+    knownDiscussionId: '1',
     showComments: true,
   });
+});
+// The picker sits below the discussion body, directly above the comments.
+it('renders the forum picker inside the detail, above the comments', () => {
+  setupQueries(createQueryMock(listResult([makeDiscussion('1')])));
+  const wrapper = mountList({ query: { selectedDiscussionId: '1' } });
+  expect(
+    wrapper
+      .find('.detail-stub [data-testid="forum-conversation-picker"]')
+      .exists()
+  ).toBe(true);
 });
 it('falls back to an available forum for a stale forum selection', () => {
   setupQueries(createQueryMock(listResult([makeDiscussion('1')])));

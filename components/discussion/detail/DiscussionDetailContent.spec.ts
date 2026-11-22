@@ -211,7 +211,11 @@ const setup = (
     discussionChannelOverrides?: Record<string, unknown>;
     issueResult?: Record<string, unknown>;
     commentIssueResult?: Record<string, unknown>;
-    componentProps?: { downloadMode?: boolean; showComments?: boolean };
+    componentProps?: {
+      downloadMode?: boolean;
+      showComments?: boolean;
+      knownDiscussionId?: string;
+    };
   } = {}
 ) => {
   const {
@@ -649,6 +653,45 @@ describe('DiscussionDetailContent', () => {
     await wrapper.vm.$nextTick();
 
     expect(wrapper.find('[aria-busy="true"]').exists()).toBe(false);
+  });
+
+  // Each forum's detail response overwrites the cached
+  // Discussion.DiscussionChannels, so a cache hit for this forum can carry a
+  // different forum's channel. The body must still render.
+  it('renders the body when the cached result lists only another forum', () => {
+    const { wrapper } = setup({
+      discussions: [
+        makeDiscussion({
+          DiscussionChannels: [
+            {
+              ...makeDiscussion().DiscussionChannels[0],
+              id: 'dc-dogs',
+              channelUniqueName: 'dogs',
+              discussionNumber: 3,
+            },
+          ],
+        }),
+      ],
+    });
+    expect(wrapper.find('.discussion-header-stub').exists()).toBe(true);
+  });
+
+  it('keeps the body while a known discussion switches forums', async () => {
+    const { wrapper, discussionQuery } = setup({
+      componentProps: { knownDiscussionId: makeDiscussion().id },
+    });
+    discussionQuery.loading.value = true;
+    await wrapper.setProps({ channelId: 'dogs', discussionNumber: 3 });
+
+    expect(wrapper.find('.discussion-header-stub').exists()).toBe(true);
+  });
+
+  it('shows the skeleton when an unknown discussion switches forums', async () => {
+    const { wrapper, discussionQuery } = setup();
+    discussionQuery.loading.value = true;
+    await wrapper.setProps({ channelId: 'dogs', discussionNumber: 3 });
+
+    expect(wrapper.find('[aria-busy="true"]').exists()).toBe(true);
   });
 
   // Guarded by the existing discussionNumber watch that clears the saved section.

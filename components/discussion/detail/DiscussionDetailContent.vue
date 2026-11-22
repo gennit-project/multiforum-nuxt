@@ -89,6 +89,12 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  // Optional global id, when the caller already knows it (list selection).
+  // Lets the body stay on screen while the same discussion switches forums.
+  knownDiscussionId: {
+    type: String,
+    default: '',
+  },
   compactMode: {
     type: Boolean,
     default: false,
@@ -122,7 +128,11 @@ const isDownloadChecksRoute = computed(
     route.name.includes('pipelines')
 );
 const loggedInUserModName = computed(() => modProfileNameVar.value);
-const lastValidDiscussion = ref<DetailDiscussion | null>(null);
+const lastValidDiscussion = ref<{
+  item: DetailDiscussion;
+  discussionNumber: number;
+  channelId: string;
+} | null>(null);
 const additionalAnswers = ref<AnswerSummary[]>([]);
 const additionalFiles = ref<DownloadableFile[]>([]);
 const additionalImages = ref<Image[]>([]);
@@ -170,21 +180,45 @@ const hasSelectedNumber = (item: DetailDiscussion | null | undefined) =>
       discussionChannel.channelUniqueName === channelId.value
   );
 
+const isRequestedDiscussion = (item: DetailDiscussion | null | undefined) =>
+  (!!props.knownDiscussionId && item?.id === props.knownDiscussionId) ||
+  hasSelectedNumber(item);
+
 // Apollo can keep the previous discussion's result while the number changes
-// (list selection), so only accept the item that matches the selected number.
+// (list selection), so a result still loading must match the selection.
+//
+// A settled result is trusted as-is: the detail query returns only the
+// requested forum's DiscussionChannel, and each forum's response overwrites
+// the cached Discussion.DiscussionChannels. A cache hit for one forum can
+// therefore carry another forum's channel and must not be discarded for it.
+const pickRequestedDiscussion = (
+  items: readonly DetailDiscussion[] | null | undefined,
+  settled: boolean
+) => items?.find(isRequestedDiscussion) || (settled ? items?.[0] : undefined);
+
 const currentDiscussionDetail = computed(() =>
-  getDiscussionResult.value?.discussions?.find(hasSelectedNumber)
+  pickRequestedDiscussion(
+    getDiscussionResult.value?.discussions,
+    !getDiscussionLoading.value && !getDiscussionError.value
+  )
 );
+// The last loaded discussion, if it still is the one being shown.
+const lastValidForSelection = computed(() => {
+  const saved = lastValidDiscussion.value;
+  if (!saved) return null;
+  const sameSelection =
+    saved.discussionNumber === props.discussionNumber &&
+    saved.channelId === channelId.value;
+  return sameSelection || isRequestedDiscussion(saved.item)
+    ? saved.item
+    : null;
+});
 // The global discussion id, taken from the loaded discussion. Everything keyed
 // by id (activity, answers/media pages, votes, mutations, cache updates) waits
 // for it; the detail and comment queries take the number directly instead.
 const discussionId = computed(
   () =>
-    currentDiscussionDetail.value?.id ||
-    (hasSelectedNumber(lastValidDiscussion.value)
-      ? lastValidDiscussion.value?.id
-      : '') ||
-    ''
+    currentDiscussionDetail.value?.id || lastValidForSelection.value?.id || ''
 );
 
 // Revision history is useful but noncritical to first paint. Fetching it in the
@@ -201,9 +235,16 @@ const { result: getDiscussionActivityResult } = useQuery(
 );
 
 onGetDiscussionResult((newResult) => {
-  const item = newResult?.data?.discussions?.find(hasSelectedNumber);
+  const item = pickRequestedDiscussion(
+    newResult?.data?.discussions,
+    !newResult.loading && !newResult.error
+  );
   if (item) {
-    lastValidDiscussion.value = item;
+    lastValidDiscussion.value = {
+      item,
+      discussionNumber: props.discussionNumber,
+      channelId: channelId.value,
+    };
   }
 });
 
@@ -253,10 +294,7 @@ const baseDiscussion = computed(() => {
   // Keep showing the last result only while the same discussion refetches.
   // After switching discussions (e.g. clicking another item in the list),
   // fall through to the loading skeleton instead of the previous body.
-  const lastValid = hasSelectedNumber(lastValidDiscussion.value)
-    ? lastValidDiscussion.value
-    : null;
-  return currentWithActivity || lastValid;
+  return currentWithActivity || lastValidForSelection.value;
 });
 
 const discussion = computed(() => {
