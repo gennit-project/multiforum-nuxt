@@ -8,7 +8,7 @@ const mountItem = (image: Partial<Image>) =>
     props: { image: image as Image, username: 'alice' },
     global: {
       stubs: {
-        NuxtLink: { template: '<a><slot /></a>' },
+        NuxtLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
         ClientOnly: { template: '<div><slot /></div>' },
         AddToImageFavorites: { template: '<div class="fav" />' },
       },
@@ -68,12 +68,27 @@ describe('ImageListItem', () => {
       },
       global: {
         stubs: {
-          NuxtLink: { template: '<a><slot /></a>' },
+          NuxtLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
           ClientOnly: { template: '<div><slot /></div>' },
           AddToImageFavorites: { template: '<div class="fav" />' },
         },
       },
     });
     expect(wrapper.find('.fav').exists()).toBe(false);
+  });
+
+  it('links to the image by number under the uploader profile', () => {
+    const wrapper = mountItem({
+      id: 'i1',
+      imageNumber: 9,
+      url: 'a.png',
+      Uploader: { username: 'bob' } as Image['Uploader'],
+    });
+    expect(wrapper.get('a').attributes('href')).toBe('/u/bob/images/9');
+  });
+
+  it('falls back to the profile username when the uploader is unknown', () => {
+    const wrapper = mountItem({ id: 'i1', imageNumber: 9, url: 'a.png' });
+    expect(wrapper.get('a').attributes('href')).toBe('/u/alice/images/9');
   });
 });

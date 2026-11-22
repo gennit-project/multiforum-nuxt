@@ -1,6 +1,6 @@
 import type {
   AuthorFieldsFragment,
-  GetEventsSourcef3f666cbeeQuery,
+  GetEventsSource0ffac39832Query,
   GetEventQuery,
   GetEventCommentsQuery,
 } from '@/__generated__/operations';
@@ -36,5 +36,5 @@ export type EventRevision = NonNullable<
   EventPresentation['PastDescriptionVersions']
 >[number];
 
-export type EventListSelection = GetEventsSourcef3f666cbeeQuery['events'][number];
+export type EventListSelection = GetEventsSource0ffac39832Query['events'][number];
 export type EventListPresentation = NullableSelection<EventListSelection>;

@@ -79,8 +79,10 @@ const mergeById = <T extends { id: string }>(base: T[], additions: T[]) => {
 };
 
 const props = defineProps({
-  discussionId: {
-    type: String,
+  // The per-forum discussion number parsed from the route (or list selection).
+  // The global discussion id comes from the loaded discussion, see `discussionId`.
+  discussionNumber: {
+    type: Number,
     required: true,
   },
   channelId: {
@@ -149,7 +151,7 @@ const {
   props.downloadMode ? GET_DOWNLOAD_DETAIL : GET_DISCUSSION_DETAIL,
   () =>
     buildDetailQueryVariables({
-      discussionId: props.discussionId,
+      discussionNumber: props.discussionNumber,
       downloadMode: props.downloadMode,
       modProfileName: loggedInUserModName.value,
       username: usernameVar.value,
@@ -160,23 +162,46 @@ const {
   }
 );
 
+// Whether a loaded discussion is the one this component was asked to show.
+const hasSelectedNumber = (item: DetailDiscussion | null | undefined) =>
+  !!item?.DiscussionChannels?.some(
+    (discussionChannel) =>
+      discussionChannel.discussionNumber === props.discussionNumber &&
+      discussionChannel.channelUniqueName === channelId.value
+  );
+
+// Apollo can keep the previous discussion's result while the number changes
+// (list selection), so only accept the item that matches the selected number.
+const currentDiscussionDetail = computed(() =>
+  getDiscussionResult.value?.discussions?.find(hasSelectedNumber)
+);
+// The global discussion id, taken from the loaded discussion. Everything keyed
+// by id (activity, answers/media pages, votes, mutations, cache updates) waits
+// for it; the detail and comment queries take the number directly instead.
+const discussionId = computed(
+  () =>
+    currentDiscussionDetail.value?.id ||
+    (hasSelectedNumber(lastValidDiscussion.value)
+      ? lastValidDiscussion.value?.id
+      : '') ||
+    ''
+);
+
 // Revision history is useful but noncritical to first paint. Fetching it in the
 // browser keeps potentially unbounded version lists out of the SSR response and
 // lets the discussion body, channel state, and comments render first.
 const { result: getDiscussionActivityResult } = useQuery(
   GET_DISCUSSION_ACTIVITY,
-  () => ({ id: props.discussionId }),
+  () => ({ id: discussionId.value }),
   {
     fetchPolicy: 'cache-first',
-    enabled: computed(() => !props.downloadMode && !!props.discussionId),
+    enabled: computed(() => !props.downloadMode && !!discussionId.value),
     prefetch: false,
   }
 );
 
 onGetDiscussionResult((newResult) => {
-  const item = newResult?.data?.discussions?.find(
-    (item) => item.id === props.discussionId
-  );
+  const item = newResult?.data?.discussions?.find(hasSelectedNumber);
   if (item) {
     lastValidDiscussion.value = item;
   }
@@ -196,7 +221,7 @@ const {
 } = useQuery(
   GET_DISCUSSION_COMMENTS,
   () => ({
-    discussionId: props.discussionId,
+    discussionNumber: props.discussionNumber,
     channelUniqueName: channelId.value,
     modName: loggedInUserModName.value,
     offset: offset.value,
@@ -217,11 +242,9 @@ const albumEditMode = ref(false);
 const feedbackModalManager = ref();
 
 const baseDiscussion = computed(() => {
-  const currentDiscussion = getDiscussionResult.value?.discussions?.find(
-    (item) => item.id === props.discussionId
-  );
+  const currentDiscussion = currentDiscussionDetail.value;
   const activity = getDiscussionActivityResult.value?.discussions?.find(
-    (item) => item.id === props.discussionId
+    (item) => item.id === currentDiscussion?.id
   );
   const currentWithActivity = currentDiscussion
     ? { ...currentDiscussion, ...(activity || {}) }
@@ -230,10 +253,9 @@ const baseDiscussion = computed(() => {
   // Keep showing the last result only while the same discussion refetches.
   // After switching discussions (e.g. clicking another item in the list),
   // fall through to the loading skeleton instead of the previous body.
-  const lastValid =
-    lastValidDiscussion.value?.id === props.discussionId
-      ? lastValidDiscussion.value
-      : null;
+  const lastValid = hasSelectedNumber(lastValidDiscussion.value)
+    ? lastValidDiscussion.value
+    : null;
   return currentWithActivity || lastValid;
 });
 
@@ -277,7 +299,8 @@ watch(
 const matchesSelectedConversation = (
   section: RootCommentSection | null | undefined
 ) =>
-  section?.DiscussionChannel?.discussionId === props.discussionId &&
+  !!section?.DiscussionChannel &&
+  section.DiscussionChannel.discussionNumber === props.discussionNumber &&
   section.DiscussionChannel.channelUniqueName === channelId.value;
 
 const currentCommentSection = computed(() => {
@@ -322,7 +345,7 @@ onGetDiscussionChannelResult((newResult) => {
   }
 });
 
-watch([() => props.discussionId, channelId], () => {
+watch([() => props.discussionNumber, channelId], () => {
   collectionGeneration.value += 1;
   setLastValidCommentSection(null);
   additionalAnswers.value = [];
@@ -405,7 +428,7 @@ const loadMoreAnswers = async () => {
     const { data } = await client.query({
       query: GET_DISCUSSION_DETAIL_ANSWERS_PAGE,
       variables: {
-        discussionId: props.discussionId,
+        discussionId: discussionId.value,
         channelUniqueName: channelId.value,
         after: pageInfo.endCursor,
       },
@@ -448,7 +471,7 @@ const loadMoreMedia = async () => {
           .query({
             query: GET_DISCUSSION_DETAIL_IMAGES_PAGE,
             variables: {
-              discussionId: props.discussionId,
+              discussionId: discussionId.value,
               channelUniqueName: channelId.value,
               after: currentImagePageInfo.value.endCursor,
             },
@@ -475,7 +498,7 @@ const loadMoreMedia = async () => {
           .query({
             query: GET_DISCUSSION_DETAIL_FILES_PAGE,
             variables: {
-              discussionId: props.discussionId,
+              discussionId: discussionId.value,
               channelUniqueName: channelId.value,
               after: currentFilePageInfo.value.endCursor,
             },
@@ -553,18 +576,17 @@ const loadedRootCommentCount = computed(() => {
 });
 
 // Issue-existence checks are hoisted to this always-mounted parent so they fire
-// on mount (keyed off the route's discussionId + channelId) in parallel with
-// GET_DISCUSSION, rather than waiting for the discussion to load and the gated
+// once the discussion id is known, rather than waiting for the gated
 // DiscussionHeader to mount. The resolved link is passed down to the header.
 const { result: getDiscussionIssueResult } = useQuery(
   CHECK_DISCUSSION_ISSUE_EXISTENCE,
   () => ({
-    discussionId: props.discussionId,
+    discussionId: discussionId.value,
     channelUniqueName: channelId.value,
   }),
   {
     fetchPolicy: 'cache-first',
-    enabled: computed(() => !!props.discussionId && !!channelId.value),
+    enabled: computed(() => !!discussionId.value && !!channelId.value),
     prefetch: false,
   }
 );
@@ -572,12 +594,12 @@ const { result: getDiscussionIssueResult } = useQuery(
 const { result: getDiscussionCommentIssueResult } = useQuery(
   CHECK_DISCUSSION_COMMENT_ISSUE_EXISTENCE,
   () => ({
-    discussionId: props.discussionId,
+    discussionId: discussionId.value,
     channelUniqueName: channelId.value,
   }),
   {
     fetchPolicy: 'cache-first',
-    enabled: computed(() => !!props.discussionId && !!channelId.value),
+    enabled: computed(() => !!discussionId.value && !!channelId.value),
     prefetch: false,
   }
 );
@@ -666,7 +688,7 @@ const aggregateRootCommentCount = computed(() => {
 
 const loadMore = () => {
   const requestScope = [
-    props.discussionId,
+    props.discussionNumber,
     channelId.value,
     commentSort.value,
     loggedInUserModName.value,
@@ -681,7 +703,7 @@ const loadMore = () => {
       if (
         requestScope !==
           [
-            props.discussionId,
+            props.discussionNumber,
             channelId.value,
             commentSort.value,
             loggedInUserModName.value,
@@ -840,7 +862,8 @@ const handleEditAlbum = () => {
       v-else-if="
         !discussion && !activeDiscussionChannel && !getDiscussionLoading
       "
-      :discussion-id="discussionId"
+      :discussion-number="discussionNumber"
+      :channel-unique-name="channelId"
     >
       <PageNotFound />
     </AgeGatedDiscussionNotice>
@@ -1005,6 +1028,7 @@ const handleEditAlbum = () => {
             v-if="discussion && discussion.DiscussionChannels"
             :channel-id="activeDiscussionChannel?.channelUniqueName || ''"
             :discussion-channels="discussion.DiscussionChannels"
+            :discussion-title="discussion.title"
           />
         </div>
       </div>

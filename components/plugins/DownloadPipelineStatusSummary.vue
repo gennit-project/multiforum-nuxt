@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, toRef } from 'vue';
+import { getDownloadTabRoute } from '@/utils/discussionLinks';
 import {
   getApplicablePipelineStatus,
   attemptDisplayStatus,
@@ -10,6 +11,9 @@ import {
 const props = defineProps<{
   fileId: string;
   discussionId: string;
+  /** Per-forum number and title of the download, for the checks link. */
+  discussionNumber?: number | null;
+  discussionTitle?: string | null;
   channelName: string;
 }>();
 
@@ -31,6 +35,18 @@ const {
   toRef(props, 'discussionId'),
   toRef(props, 'channelName'),
   { pollWhileActive: false }
+);
+
+const checksRoute = computed(() =>
+  getDownloadTabRoute({
+    target: {
+      forumId: props.channelName,
+      discussionNumber: props.discussionNumber,
+      title: props.discussionTitle,
+      discussionId: props.discussionId,
+    },
+    tab: 'pipelines',
+  })
 );
 
 const displayStatus = computed<PublicPipelineDisplayStatus>(() => {
@@ -82,13 +98,7 @@ const labels: Record<PublicPipelineDisplayStatus, string> = {
     </span>
     <NuxtLink
       v-if="hasPipelineContent"
-      :to="{
-        name: 'forums-forumId-downloads-discussionId-pipelines',
-        params: {
-          forumId: channelName,
-          discussionId,
-        },
-      }"
+      :to="checksRoute"
       class="text-brand-700 dark:text-brand-300 font-medium underline"
     >
       View checks

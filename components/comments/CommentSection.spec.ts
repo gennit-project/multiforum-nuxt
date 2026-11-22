@@ -193,6 +193,7 @@ const stubs = {
 
 const makeComment = (id: string, text = `text-${id}`) => ({
   id,
+  shortId: `short-${id}`,
   text,
   CommentAuthor: { __typename: 'User', username: 'bob' },
   Channel: { uniqueName: 'cats' },
@@ -353,11 +354,23 @@ describe('CommentSection', () => {
     expect(wrapper.emitted('updateCreateReplyCommentInput')).toBeTruthy();
   });
 
-  it('excludes the permalinked comment from the inline list', () => {
-    routeRef.value = { params: { commentId: 'c1' }, query: {} };
+  it('excludes the permalinked comment (route commentId is its shortId) from the inline list', () => {
+    routeRef.value = { params: { commentId: 'short-c1' }, query: {} };
     const wrapper = mountSection();
     // c1 is permalinked, so only c2 renders inline.
     expect(wrapper.findAllComponents(CommentStub)).toHaveLength(1);
+  });
+
+  it('still excludes the permalinked comment when the link carries a raw id', () => {
+    routeRef.value = { params: { commentId: 'c1' }, query: {} };
+    const wrapper = mountSection();
+    expect(wrapper.findAllComponents(CommentStub)).toHaveLength(1);
+  });
+
+  it('keeps every comment inline when the route points at another comment', () => {
+    routeRef.value = { params: { commentId: 'short-other' }, query: {} };
+    const wrapper = mountSection();
+    expect(wrapper.findAllComponents(CommentStub)).toHaveLength(2);
   });
 
   it('navigates to the comment-feedback route when viewing feedback', async () => {
@@ -373,6 +386,22 @@ describe('CommentSection', () => {
       expect.objectContaining({
         name: 'forums-forumId-discussions-commentFeedback-discussionId-commentId',
         params: expect.objectContaining({ commentId: 'c1' }),
+      })
+    );
+  });
+
+  it('reuses the route discussion segment for the comment-feedback route', async () => {
+    routeRef.value = {
+      params: { forumId: 'cats', discussionId: '42-trail-conditions' },
+      query: {},
+    };
+    const wrapper = mountSection();
+    await wrapper
+      .findAllComponents(CommentStub)[0]
+      .vm.$emit('handle-view-feedback', 'c1');
+    expect(routerPush).toHaveBeenCalledWith(
+      expect.objectContaining({
+        params: expect.objectContaining({ discussionId: '42-trail-conditions' }),
       })
     );
   });

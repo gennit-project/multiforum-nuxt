@@ -10,6 +10,8 @@ import { expectNoAxeViolations } from '../../helpers/axe';
 
 const channel = 'downloads-forum';
 const discussionId = 'download-scan-history';
+// The route carries the per-forum number (the fixtures default to 1) and a slug.
+const downloadSegment = '1-scanned-download';
 const fileId = 'scan-file';
 
 const attempt = (
@@ -197,7 +199,7 @@ test('bounded checks retain status, retry history pages, load stages, and resolv
     },
   });
 
-  await page.goto(`/forums/${channel}/downloads/${discussionId}/pipelines`);
+  await page.goto(`/forums/${channel}/downloads/${downloadSegment}/pipelines`);
   const history = page.getByRole('region', { name: 'Attempt history' });
   await expect(history.getByRole('heading', { level: 4 })).toHaveText([
     'Server pipeline · Attempt 2',
@@ -225,7 +227,7 @@ test('bounded checks retain status, retry history pages, load stages, and resolv
   ).toHaveAttribute('href', /attempt=run-creation-2/);
   await expectNoAxeViolations(page);
   await page.goto(
-    `/forums/${channel}/downloads/${discussionId}/pipelines?attempt=run-creation-1#attempt-creation-1`
+    `/forums/${channel}/downloads/${downloadSegment}/pipelines?attempt=run-creation-1#attempt-creation-1`
   );
   await expect(
     page.getByRole('heading', {
@@ -234,7 +236,7 @@ test('bounded checks retain status, retry history pages, load stages, and resolv
     })
   ).toBeVisible();
   await page.goto(
-    `/forums/${channel}/downloads/${discussionId}/pipelines?attempt=creation-1#attempt-creation-1`
+    `/forums/${channel}/downloads/${downloadSegment}/pipelines?attempt=creation-1#attempt-creation-1`
   );
   await expect(page.locator('#attempt-creation-1')).toBeVisible();
   await expect(

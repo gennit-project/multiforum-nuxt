@@ -6,11 +6,19 @@ vi.mock('nuxt/app', () => ({
 }));
 const submissions = Array.from({ length: 7 }, (_, i) => ({
   channelUniqueName: `forum-${i}`,
+  discussionNumber: i + 10,
+  eventNumber: i + 20,
   CommentsConnection: { aggregate: { count: { nodes: i } } },
 }));
 const mountForums = (props = {}) =>
   mount(ForumSubmissions, {
-    props: { submissions, contentId: 'topic', kind: 'discussion', ...props },
+    props: {
+      submissions,
+      contentId: 'topic',
+      contentTitle: 'Topic title',
+      kind: 'discussion',
+      ...props,
+    },
     global: {
       stubs: {
         NuxtLink: {
@@ -72,7 +80,7 @@ describe('ForumSubmissions', () => {
       mountForums({ preview: true })
         .findComponent({ name: 'NuxtLink' })
         .props('to')
-    ).toBe('/forums/forum-0/discussions/topic');
+    ).toBe('/forums/forum-0/discussions/10-topic-title');
   });
   it('shows event forum names without comment counts', () => {
     const wrapper = mountForums({ kind: 'event' });
@@ -83,7 +91,7 @@ describe('ForumSubmissions', () => {
     }).toEqual({
       counts: 0,
       label: 'View event in forum-0',
-      link: '/forums/forum-0/events/topic',
+      link: '/forums/forum-0/events/20-topic-title',
     });
   });
   it('omits the forum section when there are no submissions', () => {

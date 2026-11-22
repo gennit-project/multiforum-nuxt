@@ -41,12 +41,12 @@ interface AlbumFormData {
   };
 }
 
-// Get the discussion ID from the route params
+// Whether we're on a discussion route (the param carries `{number}-{slug}`,
+// not the global id, so the id itself always comes from `props.discussion`).
 const route = useRoute();
-const discussionIdInParams = computed(() => {
-  // If the discussion ID is provided in the route params, use it
-  return typeof route.params.discussionId === 'string' ? route.params.discussionId : '';
-});
+const isOnDiscussionRoute = computed(
+  () => typeof route.params.discussionId === 'string' && !!route.params.discussionId
+);
 
 const props = defineProps({
   discussion: {
@@ -85,7 +85,7 @@ const isCreateMode = computed(() => {
   }
 
   // If discussion has a real ID (not temp-id), we're in edit mode
-  if (props.discussion.id !== 'temp-id' && !discussionIdInParams.value) {
+  if (props.discussion.id !== 'temp-id' && !isOnDiscussionRoute.value) {
     return false;
   }
 
@@ -124,14 +124,14 @@ onMounted(() => {
   formValues.value.album.imageOrder = [...initialImageOrder.value];
 });
 
-watch(() => [props.discussion?.id, discussionIdInParams.value], () => {
+watch(() => [props.discussion?.id, isOnDiscussionRoute.value], () => {
   formValues.value.album = { images: [...images.value], imageOrder: [...initialImageOrder.value] };
   savedSuccessfully.value = false;
 });
-let submittedId = props.discussion?.id || discussionIdInParams.value;
+let submittedId = props.discussion?.id || '';
 
 const buildAlbumVariables = () => ({
-  where: { id: { eq: props.discussion?.id || discussionIdInParams.value } },
+  where: { id: { eq: props.discussion?.id || '' } },
   updateDiscussionInput: {},
   album: buildAlbumUpdateInput({
     albumData: formValues.value.album,
@@ -147,7 +147,7 @@ const {
 } = useMutation(UpdateDiscussionWithChannelConnectionsDocument, () => ({ variables: buildAlbumVariables() }));
 
 onDone(() => {
-  if (submittedId !== (props.discussion?.id || discussionIdInParams.value)) return;
+  if (submittedId !== (props.discussion?.id || '')) return;
   emit('closeEditor');
 });
 
@@ -203,7 +203,7 @@ function handleUpdateAlbum(newVals: AlbumFormData) {
         :form-values="formValues"
         :allow-image-upload="allowImageUpload"
         :auto-save="showCloseButton"
-        :discussion-id="discussionIdInParams"
+        :discussion-id="isOnDiscussionRoute ? props.discussion?.id || '' : ''"
         :existing-album="props.discussion?.Album || undefined"
         @update-form-values="handleUpdateAlbum"
       />

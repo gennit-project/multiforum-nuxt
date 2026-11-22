@@ -7,6 +7,11 @@ import {
 } from '@/__generated__/operations';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import { useRoute } from 'nuxt/app';
+import { useResolvedCommentId } from '@/composables/useRouteContentIds';
+import {
+  getPermalinkToDiscussionComment,
+  getPermalinkToEventComment,
+} from '@/utils/routerUtils';
 
 defineSlots<{
   comment(props: {
@@ -18,15 +23,33 @@ const route = useRoute();
 // A permalink has exactly one nonempty ID. Arrays are invalid, not coerced.
 const scalarId = (value: string | string[] | undefined) =>
   typeof value === 'string' && value.trim() ? value : '';
-const commentId = computed(() => scalarId(route.params.commentId));
+// The route's commentId is the comment's shortId. Resolve it to the global id
+// the comment query is keyed by. When the lookup finds nothing, try the param
+// itself as a raw id so links built from data that lacks a shortId still work.
+const routeCommentId = computed(() => scalarId(route.params.commentId));
+const {
+  id: resolvedCommentId,
+  loading: resolvingCommentId,
+  notFound: commentIdNotFound,
+} = useResolvedCommentId();
+const commentId = computed(
+  () =>
+    resolvedCommentId.value ||
+    (commentIdNotFound.value ? routeCommentId.value : '')
+);
 const {
   result: commentResult,
   error: commentError,
-  loading: commentLoading,
+  loading: commentQueryLoading,
 } = useQuery(
   GetPermalinkedCommentDocument,
   () => ({ id: commentId.value }),
   () => ({ enabled: !!commentId.value, keepPreviousResult: false })
+);
+const commentLoading = computed(
+  () =>
+    !!routeCommentId.value &&
+    (resolvingCommentId.value || commentQueryLoading.value)
 );
 
 const comment = computed(() => {
@@ -34,44 +57,45 @@ const comment = computed(() => {
     return undefined;
   // Apollo may briefly retain the previous result when route variables change.
   return commentResult.value?.comments?.find(
-    (item) => item?.id === commentId.value
+    (item) =>
+      item?.id === commentId.value &&
+      (item.shortId === routeCommentId.value ||
+        item.id === routeCommentId.value)
   );
 });
 
-const parentCommentId = computed(() => {
-  return comment.value?.ParentComment?.id || '';
-});
+const parentComment = computed(() => comment.value?.ParentComment ?? null);
 
-const discussionId = computed(() => {
+const discussionSegment = computed(() => {
   return scalarId(route.params.discussionId);
 });
 
-const eventId = computed(() => {
+const eventSegment = computed(() => {
   return scalarId(route.params.eventId);
 });
 
+// The route's discussionId / eventId params already carry the short-URL
+// segment, so the context link reuses it verbatim.
 const parentCommentPermalink = computed(() => {
-  if (parentCommentId.value && scalarId(route.params.forumId)) {
-    if (discussionId.value) {
-      return {
-        name: 'forums-forumId-discussions-discussionId-comments-commentId',
-        params: {
-          forumId: scalarId(route.params.forumId),
-          discussionId: discussionId.value,
-          commentId: parentCommentId.value,
-        },
-      };
+  const forumId = scalarId(route.params.forumId);
+  const parent = parentComment.value;
+  if (parent?.id && forumId) {
+    if (discussionSegment.value) {
+      return getPermalinkToDiscussionComment({
+        forumId,
+        discussionId: discussionSegment.value,
+        shortId: parent.shortId,
+        commentId: parent.id,
+      });
     }
 
-    if (eventId.value) {
-      return {
-        name: 'forums-forumId-events-eventId-comments-commentId',
-        params: {
-          forumId: scalarId(route.params.forumId),
-          eventId: eventId.value,
-          commentId: parentCommentId.value,
-        },
-      };
+    if (eventSegment.value) {
+      return getPermalinkToEventComment({
+        forumId,
+        eventId: eventSegment.value,
+        shortId: parent.shortId,
+        commentId: parent.id,
+      });
     }
   }
   return null;
@@ -80,14 +104,14 @@ const parentCommentPermalink = computed(() => {
 
 <template>
   <div data-testid="permalinked-comment">
-    <div v-if="commentId && commentLoading" role="status">Loading...</div>
+    <div v-if="commentLoading" role="status">Loading...</div>
     <ErrorBanner
-      v-else-if="commentId && commentError"
+      v-else-if="routeCommentId && commentError"
       :text="commentError.message"
     />
     <div v-else-if="comment">
       <nuxt-link
-        v-if="parentCommentId && parentCommentPermalink"
+        v-if="parentComment?.id && parentCommentPermalink"
         class="px-2 py-1 text-xs underline dark:text-white"
         :to="parentCommentPermalink"
       >

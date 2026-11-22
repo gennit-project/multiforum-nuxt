@@ -6,6 +6,8 @@ import type { Collection } from '@/__generated__/graphql';
 const collection = (overrides: Record<string, unknown> = {}) =>
   ({
     id: 'col-1',
+    collectionNumber: 5,
+    ownerUsername: 'alice',
     name: 'Sims 4 builds',
     description: 'My favorite lots.',
     collectionType: 'DOWNLOADS',
@@ -37,7 +39,9 @@ describe('SharedCollectionEmbed', () => {
     const wrapper = mountEmbed();
 
     expect(wrapper.find('a').text()).toContain('Sims 4 builds');
-    expect(wrapper.find('a').attributes('data-to')).toBe('/collections/col-1');
+    expect(wrapper.find('a').attributes('data-to')).toBe(
+      '/u/alice/collections/5-sims-4-builds'
+    );
   });
 
   it('shows owner, type, item count, and description', () => {

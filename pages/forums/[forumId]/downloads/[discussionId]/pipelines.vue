@@ -3,14 +3,25 @@ import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import type { Discussion } from '@/__generated__/graphql';
 import PublicDownloadPipelines from '@/components/plugins/PublicDownloadPipelines.vue';
+import { useRouteDiscussionNumber } from '@/composables/useRouteContentIds';
+import { getDownloadRoute } from '@/utils/contentUrls';
 
 const props = defineProps<{
   discussion?: Discussion;
 }>();
 
 const route = useRoute();
-const discussionId = computed(() =>
-  typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
+// The route param is `{number}-{slug}`; the global id comes from the discussion
+// the parent download page already loaded and passes in.
+const discussionId = computed(() => props.discussion?.id ?? '');
+const discussionNumber = useRouteDiscussionNumber();
+const backToDownloadRoute = computed(() =>
+  getDownloadRoute({
+    forumId: channelName.value,
+    discussionNumber: discussionNumber.value,
+    title: props.discussion?.title,
+    discussionId: discussionId.value,
+  })
 );
 const channelName = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
@@ -35,10 +46,7 @@ const fileName = computed(
   <div class="px-2 py-4">
     <nav aria-label="Breadcrumb">
       <NuxtLink
-        :to="{
-          name: 'forums-forumId-downloads-discussionId',
-          params: { forumId: channelName, discussionId },
-        }"
+        :to="backToDownloadRoute"
         class="text-brand-700 dark:text-brand-300 inline-flex items-center gap-2 text-sm font-medium hover:underline"
       >
         <span aria-hidden="true">&larr;</span>
@@ -60,6 +68,8 @@ const fileName = computed(
       :file-id="fileId"
       event-type="downloadableFile.created"
       :discussion-id="discussionId"
+      :discussion-number="discussionNumber"
+      :discussion-title="discussion?.title"
       :channel-name="channelName"
       :owner-username="discussion?.Author?.username || ''"
       :uploader-username="uploaderUsername"

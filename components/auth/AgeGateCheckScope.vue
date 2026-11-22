@@ -11,11 +11,17 @@ already rendered). The slot is empty until the check resolves, so nothing
 flashes "deleted" before it's known.
 */
 const props = defineProps<{
-  discussionId: string;
+  /** The global id, when known (edit pages); otherwise pass the number. */
+  discussionId?: string;
+  /** Per-forum discussion number from the route, resolved to an id here. */
+  discussionNumber?: number | null;
+  channelUniqueName?: string;
 }>();
 
 const { requiresAgeCheck, loading } = useDiscussionAgeGateCheck({
-  discussionId: computed(() => props.discussionId),
+  discussionId: computed(() => props.discussionId ?? ''),
+  discussionNumber: computed(() => props.discussionNumber ?? null),
+  channelUniqueName: computed(() => props.channelUniqueName ?? ''),
   enabled: true,
 });
 </script>

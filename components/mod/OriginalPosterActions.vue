@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, type PropType } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type { IssueView as Issue } from '@/types/Issue';
 import EyeIcon from '../icons/EyeIcon.vue';
@@ -7,6 +7,11 @@ import TrashIcon from '../icons/TrashIcon.vue';
 import ArrowUpRightIcon from '@/components/icons/ArrowUpRightIcon.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import { useRouter } from 'nuxt/app';
+import {
+  getCommentSegment,
+  getDiscussionSegment,
+  getEventSegment,
+} from '@/utils/contentUrls';
 
 const props = defineProps({
   issue: {
@@ -18,12 +23,37 @@ const props = defineProps({
     required: false,
     default: '',
   },
+  discussionNumber: {
+    type: Number as PropType<number | null>,
+    required: false,
+    default: null,
+  },
+  discussionTitle: {
+    type: String,
+    required: false,
+    default: '',
+  },
   eventId: {
     type: String,
     required: false,
     default: '',
   },
+  eventNumber: {
+    type: Number as PropType<number | null>,
+    required: false,
+    default: null,
+  },
+  eventTitle: {
+    type: String,
+    required: false,
+    default: '',
+  },
   commentId: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  commentShortId: {
     type: String,
     required: false,
     default: '',
@@ -100,13 +130,27 @@ const editRoute = computed(() => {
   if (props.discussionId) {
     return {
       name: 'forums-forumId-discussions-edit-discussionId',
-      params: { forumId, discussionId: props.discussionId },
+      params: {
+        forumId,
+        discussionId: getDiscussionSegment({
+          discussionNumber: props.discussionNumber,
+          title: props.discussionTitle,
+          discussionId: props.discussionId,
+        }),
+      },
     };
   }
   if (props.eventId) {
     return {
       name: 'forums-forumId-events-edit-eventId',
-      params: { forumId, eventId: props.eventId },
+      params: {
+        forumId,
+        eventId: getEventSegment({
+          eventNumber: props.eventNumber,
+          title: props.eventTitle,
+          eventId: props.eventId,
+        }),
+      },
     };
   }
   if (props.commentId) {
@@ -116,7 +160,10 @@ const editRoute = computed(() => {
       params: {
         forumId,
         issueNumber: props.issue.issueNumber,
-        commentId: props.commentId,
+        commentId: getCommentSegment({
+          shortId: props.commentShortId,
+          commentId: props.commentId,
+        }),
       },
     };
   }

@@ -45,7 +45,7 @@ const mountPanel = (props: Record<string, unknown> = {}) =>
           props: ['text'],
           template: '<div>{{ text }}</div>',
         },
-        NuxtLink: { props: ['to'], template: '<a><slot /></a>' },
+        NuxtLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
         'nuxt-link': { props: ['to'], template: '<a><slot /></a>' },
       },
     },
@@ -64,6 +64,12 @@ describe('LightboxInfoPanel display', () => {
     const wrapper = mountPanel();
 
     expect(wrapper.text()).toContain('More Details');
+  });
+
+  it('links More Details to the image by number under the uploader', () => {
+    const wrapper = mountPanel({ currentImage: image({ imageNumber: 12 }) });
+
+    expect(wrapper.get('a').attributes('href')).toBe('/u/alice/images/12');
   });
 
   it('emits close-panel from the close button', async () => {

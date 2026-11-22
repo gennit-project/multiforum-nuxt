@@ -97,6 +97,23 @@ describe('User albums page', () => {
     expect(wrapper.findAll('a').length).toBe(2);
   });
 
+  it('links each album to its owner by album number', () => {
+    withAlbums([
+      album({ id: 'mine', albumNumber: 1, ownerUsername: 'alice' }),
+      album({
+        id: 'theirs',
+        albumNumber: 4,
+        ownerUsername: 'bob',
+        Owner: { username: 'bob' },
+      }),
+    ]);
+    expect(
+      mountAlbums()
+        .findAll('a')
+        .map((link) => link.attributes('href'))
+    ).toEqual(['/u/alice/albums/1', '/u/bob/albums/4']);
+  });
+
   it('shows a "No images" placeholder for an album with no images', () => {
     withAlbums([album({ id: 'al1', Images: [], imageOrder: [] })]);
     const wrapper = mountAlbums();

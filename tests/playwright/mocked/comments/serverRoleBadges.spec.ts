@@ -149,7 +149,7 @@ test('shows a Server Admin badge only on the server admin comment', async ({
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/discussions/1-example-topic`);
 
   // Both comments render. Generous timeout for a possible cold compile.
   await expect(page.getByText(ADMIN_COMMENT_TEXT)).toBeVisible({
@@ -286,7 +286,7 @@ test('shows a Server Mod badge on a comment authored with a mod profile', async 
     },
   });
 
-  await page.goto(`/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${TEST_CHANNEL}/discussions/1-example-topic`);
 
   await expect(page.getByText(MOD_COMMENT_TEXT)).toBeVisible({
     timeout: 60_000,

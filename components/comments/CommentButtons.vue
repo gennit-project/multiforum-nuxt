@@ -18,6 +18,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import SuspensionNotice from '@/components/SuspensionNotice.vue';
 import { useUsername, useModProfileName } from '@/composables/useAuthState';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
+import { getPermalinkToDiscussionComment } from '@/utils/routerUtils';
 
 const usernameVar = useUsername();
 const modProfileNameVar = useModProfileName();
@@ -140,6 +141,19 @@ const emit = defineEmits([
 ]);
 
 const router = useRouter();
+
+const discussionCommentPermalink = computed(() =>
+  getPermalinkToDiscussionComment({
+    forumId:
+      props.commentData.DiscussionChannel?.channelUniqueName ||
+      props.commentData.Channel?.uniqueName ||
+      '',
+    discussionNumber: props.commentData.DiscussionChannel?.discussionNumber,
+    discussionId: props.commentData.DiscussionChannel?.discussionId,
+    shortId: props.commentData.shortId,
+    commentId: props.commentData.id,
+  })
+);
 
 const loggedInUserIsAuthor = computed(() => {
   if (!props.commentData) {
@@ -284,18 +298,7 @@ function handleBlockedReaction() {
         v-if="commentData.DiscussionChannel"
         type="button"
         class="cursor-pointer border-0 bg-transparent p-0 text-xs underline hover:text-black dark:text-gray-100 dark:hover:text-white"
-        @click="
-          router.push({
-            name: 'forums-forumId-discussions-discussionId-comments-commentId',
-            params: {
-              forumId:
-                commentData.DiscussionChannel?.channelUniqueName ||
-                commentData.Channel?.uniqueName,
-              discussionId: commentData.DiscussionChannel?.discussionId,
-              commentId: commentData.id,
-            },
-          })
-        "
+        @click="router.push(discussionCommentPermalink)"
       >
         Permalink
       </button>

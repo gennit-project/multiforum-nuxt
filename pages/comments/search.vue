@@ -19,6 +19,7 @@ import {
   getCommentForumId,
   getCommentPermalinkRoute,
 } from '@/utils/commentPermalink';
+import { getDiscussionRoute, getEventRoute } from '@/utils/contentUrls';
 import {
   getChannelsFromQuery,
   buildCommentSearchWhere,
@@ -182,26 +183,25 @@ const openCommentPermalink = (comment: Comment) => {
 // Get the context link for the comment (where it was posted)
 const getContextLink = (comment: Comment) => {
   if (comment.DiscussionChannel) {
-    return {
-      name: 'forums-forumId-discussions-discussionId',
-      params: {
-        forumId: comment.DiscussionChannel.channelUniqueName,
-        discussionId: comment.DiscussionChannel.discussionId,
-      },
-    };
+    return getDiscussionRoute({
+      forumId: comment.DiscussionChannel.channelUniqueName,
+      discussionNumber: comment.DiscussionChannel.discussionNumber,
+      title: comment.DiscussionChannel.Discussion?.title,
+      discussionId: comment.DiscussionChannel.discussionId,
+    });
   }
   if (comment.Event) {
     const forumId = getCommentForumId(comment);
     if (!forumId) {
       return null;
     }
-    return {
-      name: 'forums-forumId-events-eventId',
-      params: {
-        forumId,
-        eventId: comment.Event.id,
-      },
-    };
+    const eventChannel = comment.Event.EventChannels?.[0];
+    return getEventRoute({
+      forumId,
+      eventNumber: eventChannel?.eventNumber,
+      title: comment.Event.title,
+      eventId: comment.Event.id,
+    });
   }
   return null;
 };

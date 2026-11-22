@@ -13,8 +13,10 @@ export const CREATE_ISSUE = gql`
       createdAt
       updatedAt
       relatedCommentId
+      relatedCommentShortId
       relatedDiscussionId
       relatedEventId
+      relatedEventNumber
       channelUniqueName
       Channel {
         uniqueName

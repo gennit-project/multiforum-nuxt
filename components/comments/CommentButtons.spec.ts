@@ -305,5 +305,29 @@ describe('CommentButtons', () => {
         })
       );
     });
+
+    it('builds the permalink from the discussion number and comment shortId', async () => {
+      routerPush.mockClear();
+      const wrapper = mountButtons({
+        commentData: {
+          ...sharedBaseProps.commentData,
+          shortId: 'a1b2c3d4e5f6',
+          DiscussionChannel: {
+            discussionId: 'discussion-1',
+            discussionNumber: 42,
+            channelUniqueName: 'cats',
+          },
+        },
+      });
+      await action(wrapper, 'Permalink')!.trigger('click');
+      expect(routerPush).toHaveBeenCalledWith({
+        name: 'forums-forumId-discussions-discussionId-comments-commentId',
+        params: {
+          forumId: 'cats',
+          discussionId: '42',
+          commentId: 'a1b2c3d4e5f6',
+        },
+      });
+    });
   });
 });

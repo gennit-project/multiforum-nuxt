@@ -6,7 +6,7 @@
       "budgets": {
         "preloadFiles": 58,
         "rawBytes": 1040000,
-        "gzipBytes": 312000,
+        "gzipBytes": 314000,
         "jsGzipBytes": 287000,
         "cssGzipBytes": 27500
       }

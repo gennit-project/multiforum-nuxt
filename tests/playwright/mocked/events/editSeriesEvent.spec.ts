@@ -53,10 +53,10 @@ const buildSeriesEvent = (overrides: Partial<{
       endDate: null,
     },
     Occurrences: [
-      { id: 'event-1', startTime: '2030-01-01T18:00:00.000Z', endTime: '2030-01-01T20:00:00.000Z', canceled: false },
-      { id: 'event-2', startTime: '2030-01-08T18:00:00.000Z', endTime: '2030-01-08T20:00:00.000Z', canceled: false },
-      { id: 'event-3', startTime: '2030-01-15T18:00:00.000Z', endTime: '2030-01-15T20:00:00.000Z', canceled: false },
-      { id: 'event-4', startTime: '2030-01-22T18:00:00.000Z', endTime: '2030-01-22T20:00:00.000Z', canceled: false },
+      { id: 'event-1', title: 'Weekly Meetup', startTime: '2030-01-01T18:00:00.000Z', endTime: '2030-01-01T20:00:00.000Z', canceled: false, EventChannels: [{ channelUniqueName: TEST_CHANNEL, eventNumber: 1 }] },
+      { id: 'event-2', title: 'Weekly Meetup', startTime: '2030-01-08T18:00:00.000Z', endTime: '2030-01-08T20:00:00.000Z', canceled: false, EventChannels: [{ channelUniqueName: TEST_CHANNEL, eventNumber: 2 }] },
+      { id: 'event-3', title: 'Weekly Meetup', startTime: '2030-01-15T18:00:00.000Z', endTime: '2030-01-15T20:00:00.000Z', canceled: false, EventChannels: [{ channelUniqueName: TEST_CHANNEL, eventNumber: 3 }] },
+      { id: 'event-4', title: 'Weekly Meetup', startTime: '2030-01-22T18:00:00.000Z', endTime: '2030-01-22T20:00:00.000Z', canceled: false, EventChannels: [{ channelUniqueName: TEST_CHANNEL, eventNumber: 4 }] },
     ],
   },
   Tags: [],
@@ -65,6 +65,7 @@ const buildSeriesEvent = (overrides: Partial<{
     {
       id: 'event-channel-1',
       eventId: overrides.id || TEST_EVENT_ID,
+      eventNumber: 1,
       channelUniqueName: TEST_CHANNEL,
       archived: false,
       Channel: {
@@ -82,6 +83,10 @@ const buildSeriesEvent = (overrides: Partial<{
 });
 
 const getCommonMocks = (username: string) => ({
+  // Event routes carry `{eventNumber}-{slug}`; the event here is number 1.
+  getEventIdByNumber: () => ({
+    data: { getEventIdByNumber: TEST_EVENT_ID },
+  }),
   getBasicUserInfo: () => ({
     data: {
       users: [buildBasicUser({ username, displayName: username })],
@@ -187,7 +192,7 @@ test.describe('Edit Series Event', () => {
     });
 
     // Navigate to edit page
-    await page.goto(`/forums/${TEST_CHANNEL}/events/edit/${TEST_EVENT_ID}`);
+    await page.goto(`/forums/${TEST_CHANNEL}/events/edit/1-weekly-meetup`);
     await expect(page.getByTestId('event-form')).toBeVisible();
 
     // Change the title (a series-level field)
@@ -244,7 +249,7 @@ test.describe('Edit Series Event', () => {
       },
     });
 
-    await page.goto(`/forums/${TEST_CHANNEL}/events/edit/${TEST_EVENT_ID}`);
+    await page.goto(`/forums/${TEST_CHANNEL}/events/edit/1-weekly-meetup`);
     await expect(page.getByTestId('event-form')).toBeVisible();
 
     // Change the title
@@ -310,7 +315,7 @@ test.describe('Edit Series Event', () => {
       },
     });
 
-    await page.goto(`/forums/${TEST_CHANNEL}/events/edit/${TEST_EVENT_ID}`);
+    await page.goto(`/forums/${TEST_CHANNEL}/events/edit/1-weekly-meetup`);
     await expect(page.getByTestId('event-form')).toBeVisible();
 
     // Change the title

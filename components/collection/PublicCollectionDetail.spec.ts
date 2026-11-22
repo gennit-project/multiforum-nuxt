@@ -1,50 +1,33 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
-import { defineComponent, h, ref } from 'vue';
+import { ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import ErrorBanner from '@/components/ErrorBanner.vue';
+import PublicCollectionDetail from './PublicCollectionDetail.vue';
 
-const routeState = vi.hoisted(() => ({
-  route: { params: { collectionId: 'col-1' } } as {
-    params: { collectionId: string | string[] | undefined };
-  },
-}));
-vi.mock('nuxt/app', async () => {
-  const { reactive } = await import('vue');
-  routeState.route = reactive({ params: { collectionId: 'col-1' } });
-  return { useRoute: () => routeState.route, useHead: vi.fn() };
-});
-beforeEach(() => {
-  routeState.route.params.collectionId = 'col-1';
-});
+vi.mock('nuxt/app', () => ({ useHead: vi.fn() }));
 
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: vi.fn(),
 }));
 
-const NuxtLayoutStub = defineComponent({
-  setup(_props, { slots }) {
-    return () => h('div', slots.default?.());
-  },
-});
-
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountWith = async (state: {
-  result?: unknown;
-  loading?: boolean;
-  error?: unknown;
-}) => {
+const mountWith = async (
+  state: {
+    result?: unknown;
+    loading?: boolean;
+    error?: unknown;
+  },
+  collectionId = 'col-1'
+) => {
   mockedUseQuery.mockReturnValue({
     result: ref(state.result ?? null),
     loading: ref(state.loading ?? false),
     error: ref(state.error ?? null),
     fetchMore: vi.fn(),
   });
-  const Page = (await import('./[collectionId].vue')).default;
-  return shallowMount(Page, {
-    global: { stubs: { NuxtLayout: NuxtLayoutStub } },
-  });
+  return shallowMount(PublicCollectionDetail, { props: { collectionId } });
 };
 
 describe('public collection detail page', () => {
@@ -78,29 +61,24 @@ describe('public collection detail page', () => {
 });
 
 describe('public collection query navigation', () => {
-  it.each([undefined, ['col-1', 'col-2']])(
-    'disables invalid collection IDs',
-    async (id) => {
-      routeState.route.params.collectionId = id;
-      await mountWith({});
-      const [, variables, options] = mockedUseQuery.mock.calls.at(-1)!;
-      expect({
-        variables: variables(),
-        enabled: options.enabled.value,
-      }).toEqual({
-        variables: { collectionId: '', downloadLimit: 20, downloadOffset: 0 },
-        enabled: false,
-      });
-    }
-  );
+  it('disables the query until the collection id is resolved', async () => {
+    await mountWith({}, '');
+    const [, variables, options] = mockedUseQuery.mock.calls.at(-1)!;
+    expect({
+      variables: variables(),
+      enabled: options.enabled.value,
+    }).toEqual({
+      variables: { collectionId: '', downloadLimit: 20, downloadOffset: 0 },
+      enabled: false,
+    });
+  });
   it('hides the old collection when navigating to another collection', async () => {
     const wrapper = await mountWith({
       result: {
         collections: [{ id: 'col-1', name: 'Old collection', Downloads: [] }],
       },
     });
-    routeState.route.params.collectionId = 'col-2';
-    await wrapper.vm.$nextTick();
+    await wrapper.setProps({ collectionId: 'col-2' });
     expect(wrapper.text()).not.toContain('Old collection');
   });
 });
@@ -137,8 +115,7 @@ describe('public collection pagination', () => {
     await wrapper.find('button').trigger('click');
     const { updateQuery } =
       mockedUseQuery.mock.results.at(-1)!.value.fetchMore.mock.calls[0][0];
-    routeState.route.params.collectionId = 'col-2';
-    await wrapper.vm.$nextTick();
+    await wrapper.setProps({ collectionId: 'col-2' });
     expect(updateQuery(previous, { fetchMoreResult: previous })).toBe(previous);
   });
   it('retains existing data when a page has no matching collection', async () => {

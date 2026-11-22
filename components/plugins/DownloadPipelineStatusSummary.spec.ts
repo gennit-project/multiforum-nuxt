@@ -41,6 +41,8 @@ const mountSummary = async () => {
     props: {
       fileId: 'file-1',
       discussionId: 'discussion-1',
+      discussionNumber: 9,
+      discussionTitle: 'Desert Bloom',
       channelName: 'cats',
     },
     global: { stubs: { NuxtLink: NuxtLinkStub } },
@@ -74,7 +76,7 @@ describe('DownloadPipelineStatusSummary', () => {
         name: 'forums-forumId-downloads-discussionId-pipelines',
         params: {
           forumId: 'cats',
-          discussionId: 'discussion-1',
+          discussionId: '9-desert-bloom',
         },
       },
     });

@@ -13,6 +13,8 @@ import {
   GetFeedbackOnCommentDocument as GET_FEEDBACK_ON_COMMENT,
 } from '@/__generated__/operations';
 import { useModProfileName } from '@/composables/useAuthState';
+import { useResolvedDiscussionId } from '@/composables/useRouteContentIds';
+import { getDiscussionUrl } from '@/utils/contentUrls';
 import { useRoute } from 'nuxt/app';
 import { buildFeedbackContextLink } from '@/utils/feedbackContextLink';
 import type { FeedbackCommentView as Comment } from '@/types/Comment';
@@ -33,8 +35,20 @@ const contextLink = ref('');
 const channelId = ref(
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
-const discussionId = ref(
-  typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
+// The route carries `{number}-{slug}`; feedback is keyed by the global id.
+const {
+  id: discussionId,
+  discussionNumber,
+  loading: discussionIdLoading,
+  notFound: discussionNotFound,
+} = useResolvedDiscussionId();
+const discussionBackLink = computed(() =>
+  getDiscussionUrl({
+    forumId: channelId.value,
+    discussionNumber: discussionNumber.value,
+    title: discussion.value?.title,
+    discussionId: discussionId.value,
+  })
 );
 const commentId = ref(
   typeof route.params.commentId === 'string' ? route.params.commentId : ''
@@ -203,10 +217,6 @@ onAddFeedbackCommentToCommentDone(() => {
 const updateParams = () => {
   channelId.value =
     typeof route.params.forumId === 'string' ? route.params.forumId : '';
-  discussionId.value =
-    typeof route.params.discussionId === 'string'
-      ? route.params.discussionId
-      : '';
   commentId.value =
     typeof route.params.commentId === 'string' ? route.params.commentId : '';
   feedbackId.value =
@@ -223,20 +233,24 @@ watch(() => route.params, updateParams, { immediate: true });
   >
     <div class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5">
       <BackLink
-        :link="`/forums/${channelId}/discussions/${discussionId}`"
+        :link="discussionBackLink"
         :data-testid="'discussion-detail-back-link'"
       />
     </div>
     <h1 class="text-center text-2xl font-bold text-wrap dark:text-gray-200">
       Feedback
     </h1>
-    <div v-if="getDiscussionLoading || getCommentLoading">Loading...</div>
+    <div v-if="discussionIdLoading || getDiscussionLoading || getCommentLoading">
+      Loading...
+    </div>
     <ErrorBanner
       v-else-if="getDiscussionError"
       class="mt-2 px-4"
       :text="getDiscussionError.message"
     />
-    <PageNotFound v-else-if="getDiscussionResult && !discussion" />
+    <PageNotFound
+      v-else-if="discussionNotFound || (getDiscussionResult && !discussion)"
+    />
     <div v-else-if="discussion">
       <p class="mb-4 px-2">This page collects feedback on this discussion:</p>
       <div class="ml-2 flex flex-col gap-2 border-l pl-4">

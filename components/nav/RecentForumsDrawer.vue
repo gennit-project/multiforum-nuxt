@@ -58,120 +58,126 @@ const goToForum = (uniqueName: string) => {
 
 <template>
   <ClientOnly>
-    <!-- Backdrop. Offset below the fixed top nav (h-14) so the nav bar stays
+    <!-- Teleported to <body>: the vertical icon nav is `fixed z-18`, which forms
+         its own stacking context, so anything rendered inside it can never
+         outrank page content with a higher z-index (e.g. expanded discussion
+         albums at z-40). -->
+    <Teleport to="body">
+      <!-- Backdrop. Offset below the fixed top nav (h-14) so the nav bar stays
          fully visible and on top while the drawer is open, rather than being
          covered or dimmed. -->
-    <div
-      v-if="isOpen"
-      class="fixed inset-x-0 top-14 bottom-0 z-30 bg-black/50"
-      @click="closeDrawer"
-    />
-
-    <!-- Drawer -->
-    <Transition
-      enter-active-class="transform transition duration-300 ease-out"
-      enter-from-class="-translate-x-full"
-      enter-to-class="translate-x-0"
-      leave-active-class="transform transition duration-300 ease-in"
-      leave-from-class="translate-x-0"
-      leave-to-class="-translate-x-full"
-    >
       <div
         v-if="isOpen"
-        ref="panelRef"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="recent-forums-drawer-title"
-        class="fixed top-14 bottom-0 left-0 z-40 w-80 overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
+        class="fixed inset-x-0 top-14 bottom-0 z-45 bg-black/50"
+        @click="closeDrawer"
+      />
+
+      <!-- Drawer -->
+      <Transition
+        enter-active-class="transform transition duration-300 ease-out"
+        enter-from-class="-translate-x-full"
+        enter-to-class="translate-x-0"
+        leave-active-class="transform transition duration-300 ease-in"
+        leave-from-class="translate-x-0"
+        leave-to-class="-translate-x-full"
       >
-        <!-- Header -->
         <div
-          class="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-600"
+          v-if="isOpen"
+          ref="panelRef"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="recent-forums-drawer-title"
+          class="fixed top-14 bottom-0 left-0 z-50 w-80 overflow-y-auto border-r border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-900"
         >
-          <h3
-            id="recent-forums-drawer-title"
-            class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+          <!-- Header -->
+          <div
+            class="flex items-center justify-between border-b border-gray-200 p-4 dark:border-gray-600"
           >
-            Recent Forums
-          </h3>
-          <button
-            type="button"
-            class="focus:ring-brand-500 rounded-full p-1 text-gray-400 hover:text-gray-500 focus:ring-2 focus:outline-none dark:text-gray-200"
-            @click="closeDrawer"
-          >
-            <span class="sr-only">Close</span>
-            <svg
-              class="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            <h3
+              id="recent-forums-drawer-title"
+              class="text-lg font-semibold text-gray-900 dark:text-gray-100"
             >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <!-- Forums List -->
-        <div class="p-4">
-          <!-- Find Forum search -->
-          <div v-if="isFindingForum" class="mb-2">
-            <div class="mb-2 flex items-center justify-between">
-              <span
-                class="text-sm font-semibold text-gray-700 dark:text-gray-300"
-              >
-                Find a forum
-              </span>
-              <button
-                type="button"
-                class="focus-visible:ring-brand-500 rounded text-xs text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-200"
-                @click="isFindingForum = false"
-              >
-                Cancel
-              </button>
-            </div>
-            <ForumFinder @select="goToForum" />
-          </div>
-
-          <!-- Recent forums view -->
-          <template v-else>
-            <!-- Find Forum Button -->
+              Recent Forums
+            </h3>
             <button
               type="button"
-              data-testid="find-forum-button"
-              class="group mb-2 flex w-full items-center gap-x-3 rounded-md px-2 py-2 text-sm leading-6 font-semibold text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
-              @click="isFindingForum = true"
+              class="focus:ring-brand-500 rounded-full p-1 text-gray-400 hover:text-gray-500 focus:ring-2 focus:outline-none dark:text-gray-200"
+              @click="closeDrawer"
             >
-              <SearchIcon class="text-gray-500 dark:text-gray-400" />
-              Find Forum
+              <span class="sr-only">Close</span>
+              <svg
+                class="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
+          </div>
 
-            <!-- Divider -->
-            <div
-              v-if="forums.length > 0"
-              class="mb-4 border-t border-gray-200 dark:border-gray-600"
-            />
-
-            <RecentForumsList
-              :forums="forums"
-              :show-header="false"
-              :on-navigate="closeDrawer"
-              link-classes="font-semibold group flex items-center gap-x-3 rounded-md py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700 px-2"
-            />
-
-            <div
-              v-if="forums.length === 0"
-              class="py-8 text-center text-gray-500 dark:text-gray-400"
-            >
-              No recent forums yet
+          <!-- Forums List -->
+          <div class="p-4">
+            <!-- Find Forum search -->
+            <div v-if="isFindingForum" class="mb-2">
+              <div class="mb-2 flex items-center justify-between">
+                <span
+                  class="text-sm font-semibold text-gray-700 dark:text-gray-300"
+                >
+                  Find a forum
+                </span>
+                <button
+                  type="button"
+                  class="focus-visible:ring-brand-500 rounded text-xs text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 dark:text-gray-400 dark:hover:text-gray-200"
+                  @click="isFindingForum = false"
+                >
+                  Cancel
+                </button>
+              </div>
+              <ForumFinder @select="goToForum" />
             </div>
-          </template>
+
+            <!-- Recent forums view -->
+            <template v-else>
+              <!-- Find Forum Button -->
+              <button
+                type="button"
+                data-testid="find-forum-button"
+                class="group mb-2 flex w-full items-center gap-x-3 rounded-md px-2 py-2 text-sm leading-6 font-semibold text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+                @click="isFindingForum = true"
+              >
+                <SearchIcon class="text-gray-500 dark:text-gray-400" />
+                Find Forum
+              </button>
+
+              <!-- Divider -->
+              <div
+                v-if="forums.length > 0"
+                class="mb-4 border-t border-gray-200 dark:border-gray-600"
+              />
+
+              <RecentForumsList
+                :forums="forums"
+                :show-header="false"
+                :on-navigate="closeDrawer"
+                link-classes="font-semibold group flex items-center gap-x-3 rounded-md py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700 px-2"
+              />
+
+              <div
+                v-if="forums.length === 0"
+                class="py-8 text-center text-gray-500 dark:text-gray-400"
+              >
+                No recent forums yet
+              </div>
+            </template>
+          </div>
         </div>
-      </div>
-    </Transition>
+      </Transition>
+    </Teleport>
   </ClientOnly>
 </template>

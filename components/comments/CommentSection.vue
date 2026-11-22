@@ -36,6 +36,8 @@ import {
   buildReplyCommentInput,
 } from '@/utils/commentSection';
 import type { ModSuggestion } from '@/utils/modMentions';
+import { getDiscussionSegment } from '@/utils/contentUrls';
+import { isPermalinkedComment } from '@/utils/commentPermalink';
 
 // Import new composables
 import { useCommentSectionNotifications } from '@/composables/useCommentSectionNotifications';
@@ -48,6 +50,7 @@ const modProfileNameVar = useModProfileName();
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
+  discussionNumber?: number | null;
   eventId?: string;
   channelUniqueName?: string;
   limit: number;
@@ -464,7 +467,15 @@ function handleViewFeedback(commentId: string) {
     name: 'forums-forumId-discussions-commentFeedback-discussionId-commentId',
     params: {
       forumId: channelId.value,
-      discussionId,
+      // The route's discussionId param already holds the `{number}-{slug}`
+      // segment; it only falls back to the raw id off a discussion route.
+      discussionId: getDiscussionSegment({
+        discussionNumber: props.commentSectionQueryVariables.discussionNumber,
+        discussionId:
+          typeof route.params.discussionId === 'string'
+            ? route.params.discussionId
+            : discussionId,
+      }),
       commentId,
     },
   });
@@ -505,6 +516,7 @@ const commentPassThroughProps = computed(() => ({
   lengthOfCommentInProgress: lengthOfCommentInProgress.value,
   answers: props.answers,
   botUsernames: props.botUsernames,
+  discussionId: props.commentSectionQueryVariables.discussionId,
 }));
 </script>
 
@@ -772,7 +784,12 @@ const commentPassThroughProps = computed(() => ({
             :key="comment?.id || index"
           >
             <Comment
-              v-if="comment?.id !== permalinkedCommentId"
+              v-if="
+                !isPermalinkedComment({
+                  routeCommentId: permalinkedCommentId,
+                  comment,
+                })
+              "
               :aggregate-comment-count="aggregateCommentCount"
               :compact="true"
               :comment-data="comment"

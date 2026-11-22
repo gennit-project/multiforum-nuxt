@@ -3,7 +3,6 @@ import {
   GetCommentSectionDocument as GET_DISCUSSION_COMMENTS,
   GetDiscussionChannelCommentAggregateDocument as GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
   GetDiscussionChannelRootCommentAggregateDocument as GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-  GetDiscussionDocument as GET_DISCUSSION,
 } from '@/__generated__/operations';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'nuxt/app';
@@ -17,6 +16,7 @@ import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
 import type { DiscussionPresentation as Discussion } from '@/types/DiscussionPresentation';
 import { getSortFromQuery } from '@/utils/getSortFromQuery';
+import { useRouteDiscussionNumber } from '@/composables/useRouteContentIds';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -24,18 +24,17 @@ const usernameVar = useUsername();
 const COMMENT_LIMIT = 50;
 
 // The parent download page passes the already-loaded discussion via <NuxtPage>,
-// so skip the redundant GET_DISCUSSION fetch when switching to this tab.
+// so there is no separate discussion fetch when switching to this tab, and the
+// global discussion id comes from it.
 const props = defineProps<{
   discussion?: Discussion;
 }>();
 
 const route = useRoute();
 
-const discussionId = computed(() => {
-  return typeof route.params.discussionId === 'string'
-    ? route.params.discussionId
-    : '';
-});
+// The route param is `{number}-{slug}`; getCommentSection takes the number.
+const discussionNumber = useRouteDiscussionNumber();
+const discussionId = computed(() => props.discussion?.id ?? '');
 
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
@@ -43,28 +42,7 @@ const channelId = computed(() => {
 
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 
-const { result: getDiscussionResult } = useQuery(
-  GET_DISCUSSION,
-  () => ({
-    id: discussionId.value,
-    loggedInModName: loggedInUserModName.value,
-    channelUniqueName: channelId.value,
-  }),
-  {
-    enabled: computed(
-      () => !!discussionId.value && props.discussion?.id !== discussionId.value
-    ),
-  }
-);
-
-const discussion = computed(
-  () =>
-    (props.discussion?.id === discussionId.value ? props.discussion : null) ||
-    getDiscussionResult.value?.discussions?.find(
-      (item) => item.id === discussionId.value
-    ) ||
-    null
-);
+const discussion = computed(() => props.discussion ?? null);
 const activeDiscussionChannel = computed(() => {
   return discussion.value?.DiscussionChannels?.find(
     (dc) => dc.channelUniqueName === channelId.value
@@ -80,7 +58,7 @@ const {
 } = useQuery(
   GET_DISCUSSION_COMMENTS,
   () => ({
-    discussionId: discussionId.value,
+    discussionNumber: discussionNumber.value,
     channelUniqueName: channelId.value,
     modName: loggedInUserModName.value,
     offset: 0,
@@ -114,6 +92,7 @@ const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
   }),
   {
     fetchPolicy: 'cache-first',
+    enabled: computed(() => !!discussionId.value),
   }
 );
 
@@ -125,6 +104,7 @@ const { result: getDiscussionChannelRootCommentAggregateResult } = useQuery(
   }),
   {
     fetchPolicy: 'cache-first',
+    enabled: computed(() => !!discussionId.value),
   }
 );
 
@@ -146,7 +126,7 @@ const comments = computed(() =>
   getDiscussionChannelError.value || getDiscussionChannelLoading.value
     ? []
     : getDiscussionChannelResult.value?.getCommentSection?.DiscussionChannel
-          ?.discussionId === discussionId.value &&
+          ?.discussionNumber === discussionNumber.value &&
         getDiscussionChannelResult.value.getCommentSection.DiscussionChannel
           .channelUniqueName === channelId.value
       ? getDiscussionChannelResult.value.getCommentSection.Comments.filter(
@@ -186,7 +166,7 @@ const aggregateRootCommentCount = computed(() => {
 
 const loadMore = () => {
   const requestScope = [
-    discussionId.value,
+    discussionNumber.value,
     channelId.value,
     getSortFromQuery(route.query),
     loggedInUserModName.value,
@@ -201,15 +181,15 @@ const loadMore = () => {
       if (
         requestScope !==
           [
-            discussionId.value,
+            discussionNumber.value,
             channelId.value,
             getSortFromQuery(route.query),
             loggedInUserModName.value,
           ].join('\0') ||
         !previousResult.getCommentSection ||
         !fetchMoreResult?.getCommentSection ||
-        fetchMoreResult.getCommentSection.DiscussionChannel?.discussionId !==
-          discussionId.value ||
+        fetchMoreResult.getCommentSection.DiscussionChannel?.discussionNumber !==
+          discussionNumber.value ||
         fetchMoreResult.getCommentSection.DiscussionChannel
           .channelUniqueName !== channelId.value
       )

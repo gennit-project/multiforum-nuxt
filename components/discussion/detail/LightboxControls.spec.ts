@@ -51,6 +51,15 @@ describe('LightboxControls', () => {
     expect(wrapper.emitted('toggle-panel-position')).toHaveLength(1);
   });
 
+  it('links More Details to the image by number under the uploader', () => {
+    const wrapper = mountControls({
+      panelOnSide: false,
+      currentImageUploader: 'alice',
+      currentImageNumber: 12,
+    });
+    expect(wrapper.get('a').attributes('href')).toBe('/u/alice/images/12');
+  });
+
   // The report button lives in RequireAuth's #has-auth slot, which the default
   // test stub renders; currentImageId/isStlFile then govern visibility.
   it('emits report-image from the report button', async () => {

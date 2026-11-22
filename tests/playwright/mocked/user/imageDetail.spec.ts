@@ -11,6 +11,7 @@ import {
 
 const TEST_USER = 'alice';
 const IMAGE_ID = 'image-1';
+const IMAGE_NUMBER = 1;
 
 const buildAlbum = (overrides = {}) => ({
   id: 'album-1',
@@ -26,6 +27,7 @@ const buildAlbum = (overrides = {}) => ({
 
 const buildImage = (overrides = {}) => ({
   id: IMAGE_ID,
+  imageNumber: IMAGE_NUMBER,
   url: 'https://img.test/photo.png',
   alt: 'A scenic photo',
   caption: 'Sunset over the hills',
@@ -74,6 +76,8 @@ const getBaseMocks = (username: string) => ({
   getServerConfig: () => ({
     data: { serverConfigs: [buildServerConfig({ serverName: 'Listical' })] },
   }),
+  // The route carries the image number; the page resolves it to the global id.
+  getImageIdByNumber: () => ({ data: { getImageIdByNumber: IMAGE_ID } }),
   GetImageDetails: () => ({ data: { images: [buildImage()] } }),
   GetUserAlbumsForImageSave: () => ({ data: { albums: [] } }),
   GetUserCollectionsImages: () => ({
@@ -108,7 +112,7 @@ test.describe('User image detail', () => {
     );
 
     try {
-      await page.goto(`/u/${TEST_USER}/images/${IMAGE_ID}`);
+      await page.goto(`/u/${TEST_USER}/images/${IMAGE_NUMBER}`);
 
       await expect(page.getByText('Image uploaded by Alice')).toBeVisible();
       await expect(
@@ -155,7 +159,7 @@ test.describe('User image detail', () => {
 
     try {
       // Route says /u/alice but the image was uploaded by bob.
-      await page.goto(`/u/${TEST_USER}/images/${IMAGE_ID}`);
+      await page.goto(`/u/${TEST_USER}/images/${IMAGE_NUMBER}`);
 
       await expect(page.getByText(/uploaded by bob, not/i)).toBeVisible();
     } finally {
@@ -217,7 +221,7 @@ test.describe('User image detail', () => {
     });
 
     try {
-      await page.goto('/u/bob/images/image-1');
+      await page.goto(`/u/bob/images/${IMAGE_NUMBER}`);
 
       await page.getByRole('button', { name: 'Save to album' }).click();
       await expect(
@@ -257,7 +261,7 @@ test.describe('User image detail', () => {
     );
 
     try {
-      await page.goto(`/u/${TEST_USER}/images/${IMAGE_ID}`);
+      await page.goto(`/u/${TEST_USER}/images/${IMAGE_NUMBER}`);
 
       await page.getByRole('button', { name: 'Save to collection' }).click();
       await expect(

@@ -31,10 +31,14 @@ vi.mock('@/composables/useTheme', () => ({
   useAppTheme: () => ({ theme: ref('light') }),
 }));
 
-const discussionChannel = (id: string, title: string) => ({
+const discussionChannel = (id: string, title: string, number = 1) => ({
   id: `dc-${id}`,
   discussionId: id,
-  Discussion: { id, title },
+  Discussion: {
+    id,
+    title,
+    DiscussionChannels: [{ discussionId: id, discussionNumber: number }],
+  },
 });
 
 const resultWith = (channels: unknown[], aggregate = channels.length) => ({
@@ -46,7 +50,7 @@ const resultWith = (channels: unknown[], aggregate = channels.length) => ({
 
 const itemStub = {
   name: 'ChannelDiscussionListItem',
-  props: ['discussion', 'discussionChannel', 'selectedDiscussionId'],
+  props: ['discussion', 'discussionChannel', 'selectedDiscussionNumber'],
   emits: ['filter-by-tag', 'filter-by-channel', 'open-mod-profile'],
   template: '<li />',
 };
@@ -179,14 +183,14 @@ describe('ChannelDiscussionList selected discussion sync', () => {
   it('records the selected discussion in the UI store', () => {
     h.route = {
       params: { forumId: 'cats' },
-      query: { selectedDiscussionId: 'd1' },
+      query: { selectedDiscussionId: '1' },
     };
     h.result = ref(resultWith([discussionChannel('d1', 'First')]));
     mountList();
     const store = useUIStore(pinia);
 
     expect(store.setSelectedChannelDiscussionSelection).toHaveBeenCalledWith({
-      discussionId: 'd1',
+      discussionNumber: 1,
       title: 'First',
     });
   });

@@ -1,18 +1,36 @@
 <script setup lang="ts">
+import { computed } from 'vue';
+import { getDiscussionRoute } from '@/utils/contentUrls';
+
 interface Props {
   channelDisplayName?: string;
   channelIcon?: string;
   discussionId: string;
+  /** Per-forum number of the discussion in `channelId`. */
+  discussionNumber?: number | null;
+  /** Discussion title, for the decorative slug in the link. */
+  discussionTitle?: string | null;
   channelId: string;
   commentCount: number;
   upvoteCount?: number;
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   channelDisplayName: '',
   channelIcon: '',
+  discussionNumber: null,
+  discussionTitle: null,
   upvoteCount: 0,
 });
+
+const discussionLink = computed(() =>
+  getDiscussionRoute({
+    forumId: props.channelId,
+    discussionNumber: props.discussionNumber,
+    title: props.discussionTitle,
+    discussionId: props.discussionId,
+  })
+);
 </script>
 <template>
   <li>
@@ -20,10 +38,7 @@ withDefaults(defineProps<Props>(), {
       <nuxt-link
         :data-testid="`comments-in-${channelId}`"
         class="underline"
-        :to="{
-          name: 'forums-forumId-discussions-discussionId',
-          params: { discussionId, forumId: channelId },
-        }"
+        :to="discussionLink"
       >
         {{ `${commentCount} comments` }}
       </nuxt-link>
@@ -32,10 +47,7 @@ withDefaults(defineProps<Props>(), {
         {{ upvoteCount === 1 ? 'upvote' : 'upvotes' }} in</span
       >
       <nuxt-link
-        :to="{
-          name: 'forums-forumId-discussions-discussionId',
-          params: { discussionId, forumId: channelId },
-        }"
+        :to="discussionLink"
       >
         <div
           class="inline-flex items-center gap-2 rounded-md bg-gray-100 px-2 py-1 dark:bg-gray-700"

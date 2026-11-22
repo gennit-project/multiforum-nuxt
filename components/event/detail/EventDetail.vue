@@ -34,6 +34,8 @@ import { provideForumRoleMembership } from '@/composables/useForumRoleMembership
 import AddToCalendarButton from '../AddToCalendarButton.vue';
 import ArchivedEventInfoBanner from './ArchivedEventInfoBanner.vue';
 import { getOriginalPoster } from '@/utils/originalPoster';
+import { useResolvedEventId } from '@/composables/useRouteContentIds';
+import { getEventLinkRoute } from '@/utils/eventLinks';
 
 const modProfileNameVar = useModProfileName();
 const usernameVar = useUsername();
@@ -103,18 +105,26 @@ const props = defineProps({
 const emit = defineEmits(['fetchedOriginalPosterUsername']);
 
 const route = useRoute();
-const eventId = computed(
-  () =>
-    props.eventId ||
-    props.issueEventId ||
-    (typeof route.params.eventId === 'string' ? route.params.eventId : '')
+
+// A global id supplied by props (the issue page, the search side panel) is used
+// directly. Otherwise the route's `{eventNumber}-{slug}` is resolved to the
+// global id with a lookup query.
+const suppliedEventId = computed(() => props.eventId || props.issueEventId);
+const { id: resolvedEventId, loading: resolvingEventId } = useResolvedEventId({
+  enabled: computed(() => !suppliedEventId.value),
+});
+const activeEventId = computed(() => suppliedEventId.value || resolvedEventId.value);
+const eventIdIsResolving = computed(
+  () => !suppliedEventId.value && resolvingEventId.value
 );
 
 const channelId = computed(() => {
   if (props.channelUniqueName) {
     return props.channelUniqueName;
   }
-  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
+  if (typeof route.params.forumId === 'string') return route.params.forumId;
+  // Forum-less search routes carry the forum as a query param.
+  return typeof route.query.forum === 'string' ? route.query.forum : '';
 });
 
 // Provide this channel's owner/moderator lists so the event header/footer can
@@ -131,20 +141,20 @@ const {
 } = useQuery(
   GET_EVENT,
   () => ({
-    id: eventId.value,
+    id: activeEventId.value,
     channelUniqueName: channelId.value,
     loggedInModName: loggedInUserModName.value,
   }),
   {
     fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first',
-    enabled: computed(() => !!eventId.value),
+    enabled: computed(() => !!activeEventId.value),
     keepPreviousResult: false,
   }
 );
 
 onEventResult(({ data, loading }) => {
-  const current = data?.events?.find((item) => item.id === eventId.value);
+  const current = data?.events?.find((item) => item.id === activeEventId.value);
   if (!loading && current) {
     const author = getOriginalPoster({ Event: current });
     if (author.username) {
@@ -155,10 +165,10 @@ onEventResult(({ data, loading }) => {
 
 const event = computed<EventPresentation | null>(() => {
   const loadedEvent = !eventLoading.value
-    ? eventResult.value?.events?.find((item) => item.id === eventId.value)
+    ? eventResult.value?.events?.find((item) => item.id === activeEventId.value)
     : null;
   const fallback = getEventCommentsResult.value?.getEventComments?.Event;
-  return loadedEvent || (fallback?.id === eventId.value ? fallback : null);
+  return loadedEvent || (fallback?.id === activeEventId.value ? fallback : null);
 });
 
 const commentSort = computed(() => getSortFromQuery(route.query));
@@ -172,13 +182,13 @@ const {
 } = useQuery(
   GET_EVENT_COMMENTS,
   () => ({
-    eventId: eventId.value,
+    eventId: activeEventId.value,
     offset: 0,
     limit: COMMENT_LIMIT,
     sort: commentSort.value,
   }),
   {
-    enabled: computed(() => !!eventId.value),
+    enabled: computed(() => !!activeEventId.value),
     keepPreviousResult: false,
   }
 );
@@ -193,7 +203,7 @@ watch(
 
 const comments = computed<EventRootComment[]>(() => {
   const section = getEventCommentsResult.value?.getEventComments;
-  if (getEventCommentsLoading.value || section?.Event?.id !== eventId.value)
+  if (getEventCommentsLoading.value || section?.Event?.id !== activeEventId.value)
     return [];
   return section.Comments.filter((item) => item?.id);
 });
@@ -205,9 +215,9 @@ const {
   refetch: refetchEventChannel,
 } = useQuery(
   GET_EVENT_CHANNEL,
-  () => ({ eventId: eventId.value, channelUniqueName: channelId.value }),
+  () => ({ eventId: activeEventId.value, channelUniqueName: channelId.value }),
   {
-    enabled: computed(() => !!eventId.value && !!channelId.value),
+    enabled: computed(() => !!activeEventId.value && !!channelId.value),
     keepPreviousResult: false,
   }
 );
@@ -240,8 +250,8 @@ const {
   loading: getEventRootCommentAggregateLoading,
 } = useQuery(
   GET_EVENT_ROOT_COMMENT_AGGREGATE,
-  () => ({ eventId: eventId.value }),
-  { enabled: computed(() => !!eventId.value), keepPreviousResult: false }
+  () => ({ eventId: activeEventId.value }),
+  { enabled: computed(() => !!activeEventId.value), keepPreviousResult: false }
 );
 
 // Prefetch channel + server config in this first query wave. EventHeader issues
@@ -283,18 +293,18 @@ const aggregateRootCommentCount = computed(() => {
     return 0;
   const events = getEventRootCommentAggregateResult.value?.events || [];
   return (
-    events.find((item) => item.id === eventId.value)?.CommentsConnection
+    events.find((item) => item.id === activeEventId.value)?.CommentsConnection
       ?.aggregate?.count?.nodes || 0
   );
 });
 const previousOffset = 0;
 const paginationScope = computed(() =>
-  JSON.stringify([eventId.value, channelId.value, commentSort.value])
+  JSON.stringify([activeEventId.value, channelId.value, commentSort.value])
 );
 const loadMore = () => {
-  if (getEventCommentsLoading.value || !eventId.value) return;
+  if (getEventCommentsLoading.value || !activeEventId.value) return;
   const scope = paginationScope.value;
-  const id = eventId.value;
+  const id = activeEventId.value;
   return fetchMoreComments({
     variables: {
       eventId: id,
@@ -358,7 +368,7 @@ const editedAt = computed(() => {
 });
 
 const eventDescriptionEditMode = ref(false);
-watch([eventId, channelId], () => {
+watch([activeEventId, channelId], () => {
   eventDescriptionEditMode.value = false;
 });
 
@@ -390,7 +400,12 @@ useHead(
     >
       <div class="w-full">
         <div class="w-full">
-          <p v-if="eventLoading && !event" class="px-4 lg:px-10">Loading...</p>
+          <p
+            v-if="(eventLoading && !event) || eventIdIsResolving"
+            class="px-4 lg:px-10"
+          >
+            Loading...
+          </p>
           <ErrorBanner
             v-else-if="eventError"
             class="px-4 lg:px-10"
@@ -486,13 +501,7 @@ useHead(
                 >
                   <template v-if="props.issueEventId && channelId && event">
                     <nuxt-link
-                      :to="{
-                        name: 'forums-forumId-events-eventId',
-                        params: {
-                          forumId: channelId,
-                          eventId: event.id,
-                        },
-                      }"
+                      :to="getEventLinkRoute({ event, forumId: channelId })"
                       class="text-brand-500 dark:text-brand-400"
                       rel="noopener noreferrer"
                     >
@@ -501,13 +510,7 @@ useHead(
                   </template>
                   <template v-else-if="linkTitle && channelId && event">
                     <nuxt-link
-                      :to="{
-                        name: 'forums-forumId-events-eventId',
-                        params: {
-                          forumId: channelId,
-                          eventId: event.id,
-                        },
-                      }"
+                      :to="getEventLinkRoute({ event, forumId: channelId })"
                       class="decoration-gray-400 underline-offset-4 hover:underline focus-visible:underline dark:decoration-gray-500"
                     >
                       {{ event.title }}
@@ -565,7 +568,7 @@ useHead(
                   v-for="tag in event.Tags"
                   :key="tag.text"
                   :tag="tag.text"
-                  :event-id="eventId"
+                  :event-id="activeEventId"
                 />
               </div>
             </div>
@@ -586,6 +589,7 @@ useHead(
               <ForumSubmissions
                 :submissions="event.EventChannels"
                 :content-id="event.id"
+                :content-title="event.title"
                 kind="event"
               />
             </div>
@@ -596,7 +600,7 @@ useHead(
               />
               <div class="my-6 mb-2 rounded-lg">
                 <EventCommentsWrapper
-                  :key="`${eventId}:${channelId}`"
+                  :key="`${activeEventId}:${channelId}`"
                   :loading="getEventCommentsLoading"
                   :event="event"
                   :comments="comments"
@@ -608,7 +612,7 @@ useHead(
                 >
                   <EventRootCommentFormWrapper
                     v-if="event && !isArchived"
-                    :key="`${eventId}:${channelId}`"
+                    :key="`${activeEventId}:${channelId}`"
                     :event="event"
                     :previous-offset="previousOffset"
                   />
@@ -619,6 +623,7 @@ useHead(
               v-if="!discoveryMode && event && event.EventChannels"
               class="my-4"
               :event-channels="event.EventChannels"
+              :event-title="event.title"
               :channel-id="channelId"
             />
           </div>

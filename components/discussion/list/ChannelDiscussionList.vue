@@ -17,6 +17,8 @@ import {
   getTimeFrameFromQuery,
 } from '@/utils/getSortFromQuery';
 import { mergeUniqueById } from '@/utils/mergeUniqueById';
+import { getChannelListDiscussionNumber } from '@/utils/discussionListUtils';
+import { parseSlugSegmentNumber } from '@/utils/slugify';
 
 const usernameVar = useUsername();
 
@@ -63,11 +65,14 @@ const selectedChannels = computed(() => {
   return filterValues.value.channels;
 });
 
-const selectedDiscussionId = computed(() => {
-  return typeof route.query.selectedDiscussionId === 'string'
-    ? route.query.selectedDiscussionId
-    : '';
-});
+// `selectedDiscussionId` in the query carries the per-forum discussion number.
+const selectedDiscussionNumber = computed(() =>
+  parseSlugSegmentNumber(
+    typeof route.query.selectedDiscussionId === 'string'
+      ? route.query.selectedDiscussionId
+      : ''
+  )
+);
 
 const showArchived = computed(() => {
   return filterValues.value.showArchived;
@@ -198,9 +203,9 @@ const reachedEndOfResults = computed(() => {
 });
 
 watch(
-  [selectedDiscussionId, discussionChannelResult],
-  ([newSelectedDiscussionId, newDiscussionChannelResult]) => {
-    if (!newSelectedDiscussionId) {
+  [selectedDiscussionNumber, discussionChannelResult],
+  ([newSelectedDiscussionNumber, newDiscussionChannelResult]) => {
+    if (newSelectedDiscussionNumber == null) {
       uiStore.clearSelectedChannelDiscussion();
       return;
     }
@@ -208,7 +213,8 @@ watch(
     const selectedDiscussionChannel =
       newDiscussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.find(
         (discussionChannel) =>
-          discussionChannel.discussionId === newSelectedDiscussionId
+          getChannelListDiscussionNumber(discussionChannel) ===
+          newSelectedDiscussionNumber
       );
 
     if (!selectedDiscussionChannel?.Discussion?.title) {
@@ -216,7 +222,7 @@ watch(
     }
 
     uiStore.setSelectedChannelDiscussionSelection({
-      discussionId: newSelectedDiscussionId,
+      discussionNumber: newSelectedDiscussionNumber,
       title: selectedDiscussionChannel.Discussion.title,
     });
   },
@@ -296,7 +302,7 @@ watch(
             :selected-channels="selectedChannels || []"
             :default-expanded="expandChannelDiscussions"
             :is-selectable="true"
-            :selected-discussion-id="selectedDiscussionId"
+            :selected-discussion-number="selectedDiscussionNumber"
             @open-mod-profile="showModProfileModal = true"
             @filter-by-tag="filterByTag"
             @filter-by-channel="filterByChannel"

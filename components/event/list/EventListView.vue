@@ -6,7 +6,7 @@ import EventList from './EventList.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import 'md-editor-v3/lib/style.css';
-import { GetEventsSourcef3f666cbeeDocument as GET_EVENTS } from '@/__generated__/operations';
+import { GetEventsSource0ffac39832Document as GET_EVENTS } from '@/__generated__/operations';
 import getEventWhere from '@/utils/getEventWhere';
 import EventDetail from '@/components/event/detail/EventDetail.vue';
 import type { SearchEventValues } from '@/types/Event';
@@ -28,6 +28,13 @@ import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import type { EventListPresentation as Event } from '@/types/EventPresentation';
 import { isEventSearchRoute as getIsEventSearchRoute } from '@/utils/isEventSearchRoute';
+import { useRouteEventNumber } from '@/composables/useRouteContentIds';
+import { getEventSegment } from '@/utils/contentUrls';
+import {
+  EVENT_SEARCH_FORUM_QUERY_KEY,
+  getEventLinkTarget,
+  getEventNumberForForum,
+} from '@/utils/eventLinks';
 
 const route = useRoute();
 const router = useRouter();
@@ -39,8 +46,12 @@ const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
-const routeSearchEventId = computed(() => {
-  return typeof route.params.eventId === 'string' ? route.params.eventId : '';
+// The search route carries `{eventNumber}-{slug}` plus a `forum` query param.
+// The number is only unique per forum, so match both against the loaded list.
+const routeEventNumber = useRouteEventNumber();
+const routeSearchForum = computed(() => {
+  const forum = route.query[EVENT_SEARCH_FORUM_QUERY_KEY];
+  return typeof forum === 'string' ? forum : '';
 });
 
 const isSearchListRoute = computed(() => getIsEventSearchRoute(route));
@@ -145,8 +156,26 @@ const selectedSearchEvent = computed(() => {
   );
 });
 
+const routeSearchEventId = computed(() => {
+  if (routeEventNumber.value == null) return '';
+  return (
+    eventResult.value?.events?.find((event: Event) =>
+      event.EventChannels?.some(
+        (eventChannel) =>
+          eventChannel.eventNumber === routeEventNumber.value &&
+          (!routeSearchForum.value ||
+            eventChannel.channelUniqueName === routeSearchForum.value)
+      )
+    )?.id || ''
+  );
+});
+
 const selectedSearchEventChannelId = computed(() => {
-  return selectedSearchEvent.value?.EventChannels?.[0]?.channelUniqueName || '';
+  return (
+    routeSearchForum.value ||
+    selectedSearchEvent.value?.EventChannels?.[0]?.channelUniqueName ||
+    ''
+  );
 });
 
 const effectiveSelectedEventId = computed(() => {
@@ -220,16 +249,27 @@ const toggleShowMainFilters = () => {
 
 const handleSelectEvent = (payload: { eventId: string; title: string }) => {
   if (isSearchListRoute.value) {
+    const selectedEvent = eventResult.value?.events?.find(
+      (event: Event) => event.id === payload.eventId
+    );
+    if (!selectedEvent) return;
+    const target = getEventLinkTarget({ event: selectedEvent });
     selectedSearchEventId.value = payload.eventId;
     router.push({
-      path: `/events/list/search/${payload.eventId}`,
-      query: route.query,
+      path: `/events/list/search/${getEventSegment(target)}`,
+      query: { ...route.query, [EVENT_SEARCH_FORUM_QUERY_KEY]: target.forumId },
     });
     return;
   }
   if (!channelId.value) return;
+  const selectedEvent = eventResult.value?.events?.find(
+    (event: Event) => event.id === payload.eventId
+  );
   uiStore.setSelectedChannelEventSelection({
     eventId: payload.eventId,
+    eventNumber: selectedEvent
+      ? getEventNumberForForum({ event: selectedEvent, forumId: channelId.value })
+      : null,
     title: payload.title,
   });
 };

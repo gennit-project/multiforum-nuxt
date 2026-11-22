@@ -60,7 +60,7 @@ test('super upvote goes active even when the mutation returns a stale list', asy
   };
 
   await setupMockedPage({ username: 'cluse', handlers });
-  await page.goto(`/forums/${CHANNEL}/discussions/${DISCUSSION_ID}`);
+  await page.goto(`/forums/${CHANNEL}/discussions/1`);
 
   const superUpvoteButton = page
     .getByTestId('super-upvote-discussion-button')

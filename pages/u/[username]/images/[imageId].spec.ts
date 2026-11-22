@@ -18,16 +18,30 @@ const h = vi.hoisted(() => ({
   username: null as unknown as { value: string },
   updateImage: vi.fn(),
   useHead: vi.fn(),
-  routeParams: { username: 'alice', imageId: 'img1' },
+  routeParams: { username: 'alice', imageId: '7' },
   isLightboxOpen: null as unknown as { value: boolean },
   closeLightbox: vi.fn(),
   addImageToAlbum: vi.fn(),
   refetchUserAlbums: vi.fn(),
   updateDone: null as null | (() => void),
+  resolvedImageId: null as unknown as { value: string },
+  resolvedLoading: null as unknown as { value: boolean },
+  resolvedNotFound: null as unknown as { value: boolean },
 }));
 
 h.username = ref('alice');
 h.isLightboxOpen = ref(false);
+h.resolvedImageId = ref('img1');
+h.resolvedLoading = ref(false);
+h.resolvedNotFound = ref(false);
+
+vi.mock('@/composables/useRouteContentIds', () => ({
+  useResolvedImageId: () => ({
+    id: h.resolvedImageId,
+    loading: h.resolvedLoading,
+    notFound: h.resolvedNotFound,
+  }),
+}));
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({ params: h.routeParams }),
@@ -80,6 +94,7 @@ const mockedUseMutation = useMutation as unknown as ReturnType<typeof vi.fn>;
 
 const baseImage = {
   id: 'img1',
+  imageNumber: 7,
   url: 'https://img.test/photo.jpg',
   caption: 'A photo',
   Uploader: { username: 'alice' },
@@ -126,7 +141,10 @@ beforeEach(() => {
   setActivePinia(createPinia());
   vi.clearAllMocks();
   h.username.value = 'alice';
-  h.routeParams = { username: 'alice', imageId: 'img1' };
+  h.routeParams = { username: 'alice', imageId: '7' };
+  h.resolvedImageId.value = 'img1';
+  h.resolvedLoading.value = false;
+  h.resolvedNotFound.value = false;
   h.isLightboxOpen = ref(false);
   h.updateDone = null;
   h.updateImage.mockResolvedValue(undefined);
@@ -141,6 +159,16 @@ describe('user image detail page', () => {
     );
   });
 
+  it('shows the loading state while the image number is being resolved', async () => {
+    h.resolvedLoading.value = true;
+    expect((await mountWith(null)).text()).toContain('Loading image...');
+  });
+
+  it('shows the not-found state when the image number matches nothing', async () => {
+    h.resolvedNotFound.value = true;
+    expect((await mountWith(null)).text()).toContain('Image Not Found');
+  });
+
   it('shows the not-found state when the image query fails', async () => {
     expect(
       (await mountWith(null, { error: { message: 'boom' } })).text()
@@ -150,6 +178,7 @@ describe('user image detail page', () => {
   it('shows the invalid-url state when the image belongs to another uploader', async () => {
     const wrapper = await mountWith({
       id: 'img1',
+      imageNumber: 7,
       url: 'https://img.test/photo.jpg',
       Uploader: { username: 'bob' },
       Album: { Images: [], imageOrder: [] },
@@ -157,6 +186,19 @@ describe('user image detail page', () => {
     expect(wrapper.text()).toContain(
       'This image was uploaded by bob, not alice.'
     );
+  });
+
+  it('links to the uploader profile copy of the image by number', async () => {
+    const wrapper = await mountWith({
+      ...baseImage,
+      Uploader: { username: 'bob' },
+    });
+    expect(
+      wrapper
+        .findAll('nuxtlink')
+        .find((node) => node.text().includes('View on Correct Profile'))
+        ?.attributes('to')
+    ).toBe('/u/bob/images/7');
   });
 
   it('renders the image with its url', async () => {

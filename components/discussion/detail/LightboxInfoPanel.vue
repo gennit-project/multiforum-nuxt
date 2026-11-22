@@ -6,9 +6,11 @@ import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
 import CancelButton from '@/components/CancelButton.vue';
 import ImageCaption from '@/components/image/ImageCaption.vue';
+import { getImageUrl } from '@/utils/contentUrls';
 // Simplified image type for lightbox display
 interface LightboxImage {
   id: string;
+  imageNumber?: number | null;
   url?: string | null;
   alt?: string | null;
   caption?: string | null;
@@ -123,7 +125,13 @@ const emit = defineEmits([
       <!-- More Details button -->
       <div v-if="currentImage?.Uploader?.username" class="mt-3">
         <NuxtLink
-          :to="`/u/${currentImage.Uploader.username}/images/${currentImage.id}`"
+          :to="
+            getImageUrl({
+              username: currentImage.Uploader.username,
+              imageNumber: currentImage.imageNumber,
+              imageId: currentImage.id,
+            })
+          "
           class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           More Details
@@ -148,7 +156,13 @@ const emit = defineEmits([
       <!-- More Details button for images without captions -->
       <div v-if="currentImage?.Uploader?.username" class="mt-3">
         <NuxtLink
-          :to="`/u/${currentImage.Uploader.username}/images/${currentImage.id}`"
+          :to="
+            getImageUrl({
+              username: currentImage.Uploader.username,
+              imageNumber: currentImage.imageNumber,
+              imageId: currentImage.id,
+            })
+          "
           class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
           More Details

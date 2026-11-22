@@ -5,6 +5,7 @@
  */
 
 import type { Discussion, DiscussionChannel } from '@/__generated__/graphql';
+import { getDiscussionUrl, getDownloadUrl } from '@/utils/contentUrls';
 
 /**
  * Calculate total comment count across all discussion channels.
@@ -42,7 +43,12 @@ export function getDiscussionDetailOptions(
 
   return discussion.DiscussionChannels.map((dc) => {
     const commentCount = dc.CommentsConnection?.aggregate?.count?.nodes || 0;
-    const discussionDetailLink = `/forums/${dc.channelUniqueName}/discussions/${discussion.id}`;
+    const discussionDetailLink = getDiscussionUrl({
+      forumId: dc.channelUniqueName ?? '',
+      discussionNumber: dc.discussionNumber,
+      title: discussion.title,
+      discussionId: discussion.id,
+    });
     return {
       label: `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
       value: discussionDetailLink,
@@ -62,7 +68,12 @@ export function getDownloadDetailOptions(
     const commentCount = dc.CommentsConnection?.aggregate?.count?.nodes || 0;
     return {
       label: `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
-      value: `/forums/${dc.channelUniqueName}/downloads/${discussion.id}`,
+      value: getDownloadUrl({
+        forumId: dc.channelUniqueName ?? '',
+        discussionNumber: dc.discussionNumber,
+        title: discussion.title,
+        discussionId: discussion.id,
+      }),
     };
   });
 }
@@ -147,4 +158,23 @@ export function buildFilteredQuery(
     }
   }
   return result;
+}
+
+type ChannelListItemWithNumber = {
+  Discussion?: {
+    DiscussionChannels?: ReadonlyArray<{
+      discussionNumber?: number | null;
+    }> | null;
+  } | null;
+} | null;
+
+/**
+ * The per-forum discussion number of a channel-list item. The list item type
+ * (DiscussionChannelListItem) has no `discussionNumber`, so the list query
+ * selects it through `Discussion.DiscussionChannels` for the listed forum.
+ */
+export function getChannelListDiscussionNumber(
+  item: ChannelListItemWithNumber | undefined
+): number | null {
+  return item?.Discussion?.DiscussionChannels?.[0]?.discussionNumber ?? null;
 }

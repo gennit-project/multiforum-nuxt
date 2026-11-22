@@ -3,7 +3,7 @@ import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import { useHead } from 'nuxt/app';
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import Breadcrumbs from '@/components/nav/Breadcrumbs.vue';
 import LibraryListSkeleton from '@/components/library/LibraryListSkeleton.vue';
@@ -43,6 +43,7 @@ import {
   getCommentContextType,
 } from '@/utils/commentUtils';
 import { isAutoSavedDownloadsCollection } from '@/utils/downloadLibraryCollection';
+import { getDiscussionUrl } from '@/utils/contentUrls';
 type SelectedCollection = GetCollectionItemsQuery['collections'][number];
 type Discussion = SelectedCollection['Discussions'][number];
 type Comment = SelectedCollection['Comments'][number];
@@ -59,10 +60,10 @@ const ForumPicker = defineAsyncComponent(
 
 const usernameVar = useUsername();
 
-const route = useRoute();
-const collectionId = computed(() =>
-  typeof route.params.collectionId === 'string' ? route.params.collectionId : ''
-);
+// The global collection id, already resolved from the route's short number by
+// pages/u/[username]/collections/[collectionId].vue.
+const props = defineProps<{ collectionId: string }>();
+const collectionId = computed(() => props.collectionId);
 const { serverAdminUsernames } = useServerRoleMembership();
 
 const {
@@ -299,13 +300,19 @@ const handleShareCollection = async () => {
     if (id !== collectionId.value) return;
     const sharedDiscussion = result?.data?.shareCollectionAsDiscussion;
     const discussionId = sharedDiscussion?.id;
-    const forumId =
-      sharedDiscussion?.DiscussionChannels?.[0]?.channelUniqueName ||
-      targetForum;
+    const sharedChannel = sharedDiscussion?.DiscussionChannels?.[0];
+    const forumId = sharedChannel?.channelUniqueName || targetForum;
 
     showShareModal.value = false;
     if (discussionId) {
-      router.push(`/forums/${forumId}/discussions/${discussionId}`);
+      router.push(
+        getDiscussionUrl({
+          forumId,
+          discussionNumber: sharedChannel?.discussionNumber,
+          title: sharedDiscussion?.title,
+          discussionId,
+        })
+      );
     }
   } catch (err: unknown) {
     if (id !== collectionId.value) return;

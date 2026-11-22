@@ -286,7 +286,7 @@ test.describe('Unsubscribe flow', () => {
 
       // Navigate with unsubscribe action parameter
       await page.goto(
-        `/forums/${TEST_CHANNEL}/discussions/${DISCUSSION_ID}?action=unsubscribe`
+        `/forums/${TEST_CHANNEL}/discussions/1-example-topic?action=unsubscribe`
       );
 
       // Wait for page to load

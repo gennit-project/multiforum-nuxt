@@ -21,6 +21,8 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import DownloadQuarantineBadge from '@/components/download/DownloadQuarantineBadge.vue';
 import AppImage from '@/components/image/AppImage.vue';
 import { getPreferredImageUrl } from '@/utils/imageVariants';
+import { getDownloadRoute } from '@/utils/contentUrls';
+import { getChannelListDiscussionNumber } from '@/utils/discussionListUtils';
 type Tag = Discussion['Tags'][number];
 
 // Define props
@@ -89,6 +91,16 @@ const authorProfilePicURL = computed(
   () => props.discussion?.Author?.profilePicURL || ''
 );
 const title = computed(() => props.discussion?.title || '[Deleted]');
+const downloadLink = computed(() =>
+  getDownloadRoute({
+    forumId: defaultUniqueName.value,
+    discussionNumber: getChannelListDiscussionNumber({
+      Discussion: props.discussion,
+    }),
+    title: props.discussion?.title,
+    discussionId: props.discussionChannel?.discussionId || props.discussion?.id,
+  })
+);
 const relativeTimeAgo = computed(() =>
   relativeTime(props.discussionChannel.createdAt)
 );
@@ -141,14 +153,7 @@ const filteredQuery = computed(() => {
         <div class="relative">
           <nuxt-link
             class="block"
-            :to="{
-              name: 'forums-forumId-downloads-discussionId',
-              params: {
-                forumId: defaultUniqueName,
-                discussionId: discussionChannel.discussionId,
-              },
-              query: filteredQuery,
-            }"
+            :to="{ ...downloadLink, query: filteredQuery }"
           >
             <div
               class="aspect-square w-full overflow-hidden bg-gray-100 dark:bg-gray-700"
@@ -180,14 +185,7 @@ const filteredQuery = computed(() => {
             <div class="flex items-start gap-2">
               <nuxt-link
                 class="pointer-events-auto line-clamp-2 text-sm leading-tight font-bold text-white drop-shadow-md hover:text-gray-200"
-                :to="{
-                  name: 'forums-forumId-downloads-discussionId',
-                  params: {
-                    forumId: defaultUniqueName,
-                    discussionId: discussionChannel.discussionId,
-                  },
-                  query: filteredQuery,
-                }"
+                :to="{ ...downloadLink, query: filteredQuery }"
               >
                 <HighlightedSearchTerms
                   :search-input="searchInput"
@@ -290,14 +288,7 @@ const filteredQuery = computed(() => {
 
             <nuxt-link
               class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-              :to="{
-                name: 'forums-forumId-downloads-discussionId',
-                params: {
-                  forumId: defaultUniqueName,
-                  discussionId: discussionChannel.discussionId,
-                },
-                query: filteredQuery,
-              }"
+              :to="{ ...downloadLink, query: filteredQuery }"
             >
               <CommentIcon class="h-3 w-3" aria-hidden="true" />
               <span class="text-sm">{{ commentCount }}</span>

@@ -202,13 +202,19 @@ describe('CreateEvent', () => {
     });
     onDoneCallbacks[0]({
       data: {
-        createEventWithChannelConnections: [{ id: 'event-1' }],
+        createEventWithChannelConnections: [
+          {
+            id: 'event-1',
+            title: 'Game Night',
+            EventChannels: [{ channelUniqueName: 'cats', eventNumber: 5 }],
+          },
+        ],
       },
     });
     await wrapper.vm.$nextTick();
     expect(mockPush).toHaveBeenCalledWith({
       name: 'forums-forumId-events-eventId',
-      params: { forumId: 'cats', eventId: 'event-1' },
+      params: { forumId: 'cats', eventId: '5-game-night' },
     });
   });
 
@@ -384,13 +390,19 @@ describe('CreateEvent', () => {
     onDoneCallbacks[1]({
       data: {
         createEventSeriesWithChannelConnections: {
-          Occurrences: [{ id: 'occurrence-1' }],
+          Occurrences: [
+            {
+              id: 'occurrence-1',
+              title: 'Game Night',
+              EventChannels: [{ channelUniqueName: 'cats', eventNumber: 8 }],
+            },
+          ],
         },
       },
     } as CreateEventResult);
     expect(mockPush).toHaveBeenCalledWith({
       name: 'forums-forumId-events-eventId',
-      params: { forumId: 'cats', eventId: 'occurrence-1' },
+      params: { forumId: 'cats', eventId: '8-game-night' },
     });
   });
 

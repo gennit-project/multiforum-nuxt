@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import type { DiscussionPresentation } from '@/types/DiscussionPresentation';
 import { getCollectionTypeLabel } from '@/utils/collectionItemUtils';
+import { getCollectionUrl } from '@/utils/contentUrls';
 
 const props = defineProps<{
   collection: DiscussionPresentation['SharedCollection'];
@@ -10,7 +11,13 @@ const props = defineProps<{
 
 const collectionLink = computed(() => {
   if (!props.collection?.id) return null;
-  return `/collections/${props.collection.id}`;
+  return getCollectionUrl({
+    username:
+      props.collection.ownerUsername || props.collection.CreatedBy?.username || '',
+    collectionNumber: props.collection.collectionNumber,
+    name: props.collection.name,
+    collectionId: props.collection.id,
+  });
 });
 
 const ownerName = computed(() => {

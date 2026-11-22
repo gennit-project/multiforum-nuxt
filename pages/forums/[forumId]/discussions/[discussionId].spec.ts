@@ -8,7 +8,7 @@ import { GetDiscussionDetailDocument as GET_DISCUSSION_DETAIL } from '@/__genera
 
 const useHead = vi.fn();
 const routeParams: { discussionId?: string; forumId?: string } = {
-  discussionId: 'd1',
+  discussionId: '42-my-post',
   forumId: 'cats',
 };
 
@@ -47,16 +47,16 @@ describe('discussion detail page', () => {
     expect(mockedUseQuery.mock.calls[0]?.[0]).toBe(GET_DISCUSSION_DETAIL);
   });
 
-  it('renders the discussion detail content when an id is present', async () => {
-    routeParams.discussionId = 'd1';
+  it('renders the discussion detail content when a discussion number is present', async () => {
+    routeParams.discussionId = '42-my-post';
     const wrapper = await mountPage();
     expect(
-      wrapper.findComponent(DiscussionDetailContent).props('discussionId')
-    ).toBe('d1');
+      wrapper.findComponent(DiscussionDetailContent).props('discussionNumber')
+    ).toBe(42);
   });
 
-  it('shows an error banner when there is no discussion id', async () => {
-    routeParams.discussionId = '';
+  it('shows an error banner when the route has no discussion number', async () => {
+    routeParams.discussionId = 'not-a-number';
     const wrapper = await mountPage();
     expect(wrapper.findComponent(ErrorBanner).exists()).toBe(true);
   });

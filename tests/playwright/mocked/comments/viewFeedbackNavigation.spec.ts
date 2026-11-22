@@ -119,8 +119,10 @@ test('opens comment feedback from a discussion selected in list query state', as
     },
   });
 
+  // In a forum's split view `selectedDiscussionId` carries the discussion's
+  // per-forum number (the mocked discussion channel defaults to 1).
   await page.goto(
-    `/forums/${TEST_CHANNEL}/discussions?selectedDiscussionId=${DISCUSSION_ID}`
+    `/forums/${TEST_CHANNEL}/discussions?selectedDiscussionId=1`
   );
 
   const renderedComment = page
@@ -134,8 +136,12 @@ test('opens comment feedback from a discussion selected in list query state', as
     .click();
   await page.getByText('View Feedback', { exact: true }).click();
 
+  // The discussion segment is the per-forum number (or the raw id when the
+  // mocked channel carries no discussionNumber); the comment stays a raw id.
   await expect(page).toHaveURL(
-    `/forums/${TEST_CHANNEL}/discussions/commentFeedback/${DISCUSSION_ID}/${COMMENT_ID}`
+    new RegExp(
+      `/forums/${TEST_CHANNEL}/discussions/commentFeedback/[^/]+/${COMMENT_ID}$`
+    )
   );
   await expect(
     page.getByRole('heading', { name: 'Feedback', exact: true })

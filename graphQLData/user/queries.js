@@ -210,6 +210,7 @@ export const GET_USER_COMMENTS = gql`
         sort: { createdAt: DESC }
       ) {
         id
+        shortId
         text
         createdAt
         updatedAt
@@ -218,6 +219,7 @@ export const GET_USER_COMMENTS = gql`
         weightedVotesCount
         ParentComment {
           id
+          shortId
         }
         CommentAuthor {
           ... on User {
@@ -234,6 +236,7 @@ export const GET_USER_COMMENTS = gql`
             uniqueName
           }
           discussionId
+          discussionNumber
           channelUniqueName
         }
         Event {
@@ -241,6 +244,7 @@ export const GET_USER_COMMENTS = gql`
           title
           EventChannels {
             channelUniqueName
+            eventNumber
           }
         }
         Channel {
@@ -290,6 +294,7 @@ export const GET_USER_DISCUSSIONS = gql`
           weightedVotesCount
           id
           discussionId
+          discussionNumber
           channelUniqueName
         }
         Tags {
@@ -339,6 +344,7 @@ export const GET_USER_DOWNLOADS = gql`
           weightedVotesCount
           id
           discussionId
+          discussionNumber
           channelUniqueName
         }
         Tags {
@@ -383,6 +389,7 @@ export const GET_USER_OWNED_DOWNLOADS = gql`
         }
         DiscussionChannels {
           id
+          discussionNumber
           channelUniqueName
           archived
           answered
@@ -442,6 +449,10 @@ export const GET_UPLOADED_DOWNLOADABLE_FILES = gql`
         createdAt
         updatedAt
         channelUniqueNames
+        channels {
+          channelUniqueName
+          discussionNumber
+        }
       }
       files {
         id
@@ -483,6 +494,7 @@ export const GET_USER_EVENTS = gql`
         updatedAt
         deleted
         EventChannels {
+          eventNumber
           channelUniqueName
           Channel {
             uniqueName
@@ -635,6 +647,7 @@ export const GET_USER_CONTRIBUTIONS = gql`
         type
         Comments {
           id
+          shortId
           text
           createdAt
           CommentAuthor {
@@ -649,6 +662,7 @@ export const GET_USER_CONTRIBUTIONS = gql`
           DiscussionChannel {
             id
             discussionId
+            discussionNumber
             channelUniqueName
           }
           Event {
@@ -667,6 +681,7 @@ export const GET_USER_CONTRIBUTIONS = gql`
             id
             channelUniqueName
             discussionId
+            discussionNumber
           }
         }
         Events {
@@ -680,6 +695,7 @@ export const GET_USER_CONTRIBUTIONS = gql`
             id
             channelUniqueName
             eventId
+            eventNumber
           }
         }
         WikiEdits {

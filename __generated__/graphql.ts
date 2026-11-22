@@ -46,6 +46,35 @@ export type Query = {
   getSiteWideWikiList?: Maybe<SiteWideWikiListFormat>;
   getCommentSection?: Maybe<CommentSectionFormat>;
   getEventComments?: Maybe<EventCommentsFormat>;
+  /**
+   * Translate a per-forum event number (the short URL id) into the global Event
+   * id, for routes like /forums/cats/events/7-saturday-cleanup. Returns null when
+   * no event carries that number in the channel.
+   */
+  getEventIdByNumber?: Maybe<Scalars['ID']['output']>;
+  /**
+   * Translate a comment shortId (the public URL handle) into the global Comment
+   * id, for permalinks like /forums/cats/discussions/42-.../comments/4f3a9b2e1c7d.
+   * Returns null when no comment carries that shortId.
+   */
+  getCommentIdByShortId?: Maybe<Scalars['ID']['output']>;
+  /**
+   * Translate a per-user image number (the short URL id) into the global Image
+   * id, for routes like /u/alice/images/12. Returns null when no image carries
+   * that number for the user.
+   */
+  getImageIdByNumber?: Maybe<Scalars['ID']['output']>;
+  /**
+   * Translate a per-user album number (the short URL id) into the global Album
+   * id, for routes like /u/alice/albums/3. Null when none matches for the user.
+   */
+  getAlbumIdByNumber?: Maybe<Scalars['ID']['output']>;
+  /**
+   * Translate a per-user collection number (the short URL id) into the global
+   * Collection id, for routes like /u/alice/collections/5-nature. Null when none
+   * matches for the user.
+   */
+  getCollectionIdByNumber?: Maybe<Scalars['ID']['output']>;
   getCommentReplies?: Maybe<CommentRepliesFormat>;
   /**
    * Return the authenticated caller's own account summary, keyed off the
@@ -224,7 +253,8 @@ export type QueryGetDiscussionsInChannelArgs = {
 
 
 export type QueryGetDiscussionDetailArgs = {
-  discussionId: Scalars['ID']['input'];
+  discussionId?: InputMaybe<Scalars['ID']['input']>;
+  discussionNumber?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName: Scalars['String']['input'];
 };
 
@@ -298,7 +328,8 @@ export type QueryGetSiteWideWikiListArgs = {
 
 export type QueryGetCommentSectionArgs = {
   channelUniqueName: Scalars['String']['input'];
-  discussionId: Scalars['ID']['input'];
+  discussionId?: InputMaybe<Scalars['ID']['input']>;
+  discussionNumber?: InputMaybe<Scalars['Int']['input']>;
   modName?: InputMaybe<Scalars['String']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -311,6 +342,35 @@ export type QueryGetEventCommentsArgs = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<SortType>;
+};
+
+
+export type QueryGetEventIdByNumberArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  eventNumber: Scalars['Int']['input'];
+};
+
+
+export type QueryGetCommentIdByShortIdArgs = {
+  shortId: Scalars['String']['input'];
+};
+
+
+export type QueryGetImageIdByNumberArgs = {
+  username: Scalars['String']['input'];
+  imageNumber: Scalars['Int']['input'];
+};
+
+
+export type QueryGetAlbumIdByNumberArgs = {
+  username: Scalars['String']['input'];
+  albumNumber: Scalars['Int']['input'];
+};
+
+
+export type QueryGetCollectionIdByNumberArgs = {
+  username: Scalars['String']['input'];
+  collectionNumber: Scalars['Int']['input'];
 };
 
 
@@ -3385,6 +3445,8 @@ export type AgePolicy = {
 export type Album = {
   __typename?: 'Album';
   id: Scalars['ID']['output'];
+  ownerUsername?: Maybe<Scalars['String']['output']>;
+  albumNumber?: Maybe<Scalars['Int']['output']>;
   imageOrder?: Maybe<Array<Scalars['ID']['output']>>;
   detailImagesPageInfo: DetailCollectionPageInfo;
   Owner?: Maybe<User>;
@@ -3430,6 +3492,13 @@ export type AlbumDiscussionsConnectionArgs = {
 export type AlbumAggregate = {
   __typename?: 'AlbumAggregate';
   count: Count;
+  node: AlbumAggregateNode;
+};
+
+export type AlbumAggregateNode = {
+  __typename?: 'AlbumAggregateNode';
+  ownerUsername: StringAggregateSelection;
+  albumNumber: IntAggregateSelection;
 };
 
 export type AlbumDiscussionDiscussionsAggregateSelection = {
@@ -3489,6 +3558,7 @@ export type AlbumImageImagesNodeAggregateSelection = {
   storageUrl: StringAggregateSelection;
   uploadedAt: DateTimeAggregateSelection;
   uploadedByUsername: StringAggregateSelection;
+  imageNumber: IntAggregateSelection;
   uploadedByIp: StringAggregateSelection;
   alt: StringAggregateSelection;
   caption: StringAggregateSelection;
@@ -4059,6 +4129,8 @@ export type ChannelCollectionInCollectionsAggregateSelection = {
 export type ChannelCollectionInCollectionsNodeAggregateSelection = {
   __typename?: 'ChannelCollectionInCollectionsNodeAggregateSelection';
   name: StringAggregateSelection;
+  ownerUsername: StringAggregateSelection;
+  collectionNumber: IntAggregateSelection;
   description: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
@@ -4072,6 +4144,7 @@ export type ChannelCommentCommentsAggregateSelection = {
 
 export type ChannelCommentCommentsNodeAggregateSelection = {
   __typename?: 'ChannelCommentCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -4132,6 +4205,7 @@ export type ChannelDiscussionChannelDiscussionChannelsAggregateSelection = {
 export type ChannelDiscussionChannelDiscussionChannelsNodeAggregateSelection = {
   __typename?: 'ChannelDiscussionChannelDiscussionChannelsNodeAggregateSelection';
   channelUniqueName: StringAggregateSelection;
+  discussionNumber: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   weightedVotesCount: FloatAggregateSelection;
   botMentions: StringAggregateSelection;
@@ -4146,6 +4220,7 @@ export type ChannelDiscussionChannelPinnedDiscussionChannelsAggregateSelection =
 export type ChannelDiscussionChannelPinnedDiscussionChannelsNodeAggregateSelection = {
   __typename?: 'ChannelDiscussionChannelPinnedDiscussionChannelsNodeAggregateSelection';
   channelUniqueName: StringAggregateSelection;
+  discussionNumber: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   weightedVotesCount: FloatAggregateSelection;
   botMentions: StringAggregateSelection;
@@ -4255,6 +4330,7 @@ export type ChannelEventChannelEventChannelsAggregateSelection = {
 export type ChannelEventChannelEventChannelsNodeAggregateSelection = {
   __typename?: 'ChannelEventChannelEventChannelsNodeAggregateSelection';
   channelUniqueName: StringAggregateSelection;
+  eventNumber: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
 };
 
@@ -4934,6 +5010,8 @@ export type Collection = {
   __typename?: 'Collection';
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  ownerUsername?: Maybe<Scalars['String']['output']>;
+  collectionNumber?: Maybe<Scalars['Int']['output']>;
   description?: Maybe<Scalars['String']['output']>;
   visibility: CollectionVisibility;
   collectionType: CollectionType;
@@ -5063,6 +5141,8 @@ export type CollectionAggregate = {
 export type CollectionAggregateNode = {
   __typename?: 'CollectionAggregateNode';
   name: StringAggregateSelection;
+  ownerUsername: StringAggregateSelection;
+  collectionNumber: IntAggregateSelection;
   description: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
@@ -5115,6 +5195,7 @@ export type CollectionCommentCommentsAggregateSelection = {
 
 export type CollectionCommentCommentsNodeAggregateSelection = {
   __typename?: 'CollectionCommentCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -5254,6 +5335,7 @@ export type CollectionImageImagesNodeAggregateSelection = {
   storageUrl: StringAggregateSelection;
   uploadedAt: DateTimeAggregateSelection;
   uploadedByUsername: StringAggregateSelection;
+  imageNumber: IntAggregateSelection;
   uploadedByIp: StringAggregateSelection;
   alt: StringAggregateSelection;
   caption: StringAggregateSelection;
@@ -5305,6 +5387,7 @@ export type CollectionSharedInDiscussionsRelationship = {
 export type Comment = {
   __typename?: 'Comment';
   id: Scalars['ID']['output'];
+  shortId?: Maybe<Scalars['String']['output']>;
   text?: Maybe<Scalars['String']['output']>;
   editReason?: Maybe<Scalars['String']['output']>;
   isRootComment: Scalars['Boolean']['output'];
@@ -5529,6 +5612,7 @@ export type CommentAggregate = {
 
 export type CommentAggregateNode = {
   __typename?: 'CommentAggregateNode';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -5581,6 +5665,8 @@ export type CommentCollectionInCollectionsAggregateSelection = {
 export type CommentCollectionInCollectionsNodeAggregateSelection = {
   __typename?: 'CommentCollectionInCollectionsNodeAggregateSelection';
   name: StringAggregateSelection;
+  ownerUsername: StringAggregateSelection;
+  collectionNumber: IntAggregateSelection;
   description: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
@@ -5607,6 +5693,7 @@ export type CommentCommentChildCommentsAggregateSelection = {
 
 export type CommentCommentChildCommentsNodeAggregateSelection = {
   __typename?: 'CommentCommentChildCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -5626,6 +5713,7 @@ export type CommentCommentFeedbackCommentsAggregateSelection = {
 
 export type CommentCommentFeedbackCommentsNodeAggregateSelection = {
   __typename?: 'CommentCommentFeedbackCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -5739,6 +5827,7 @@ export type CommentInCollectionsRelationship = {
 export type CommentInfo = {
   __typename?: 'CommentInfo';
   id: Scalars['ID']['output'];
+  shortId?: Maybe<Scalars['String']['output']>;
   text?: Maybe<Scalars['String']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   Channel?: Maybe<ChannelInfo>;
@@ -6698,6 +6787,7 @@ export type DiscussionChannel = {
   locked?: Maybe<Scalars['Boolean']['output']>;
   discussionId: Scalars['ID']['output'];
   channelUniqueName: Scalars['String']['output'];
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
   createdAt: Scalars['DateTime']['output'];
   weightedVotesCount?: Maybe<Scalars['Float']['output']>;
   emoji?: Maybe<Scalars['JSON']['output']>;
@@ -6882,6 +6972,7 @@ export type DiscussionChannelAggregate = {
 export type DiscussionChannelAggregateNode = {
   __typename?: 'DiscussionChannelAggregateNode';
   channelUniqueName: StringAggregateSelection;
+  discussionNumber: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   weightedVotesCount: FloatAggregateSelection;
   botMentions: StringAggregateSelection;
@@ -6922,6 +7013,7 @@ export type DiscussionChannelCommentAnswersAggregateSelection = {
 
 export type DiscussionChannelCommentAnswersNodeAggregateSelection = {
   __typename?: 'DiscussionChannelCommentAnswersNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -6941,6 +7033,7 @@ export type DiscussionChannelCommentCommentsAggregateSelection = {
 
 export type DiscussionChannelCommentCommentsNodeAggregateSelection = {
   __typename?: 'DiscussionChannelCommentCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -7029,6 +7122,7 @@ export type DiscussionChannelInfo = {
   __typename?: 'DiscussionChannelInfo';
   id?: Maybe<Scalars['ID']['output']>;
   discussionId?: Maybe<Scalars['String']['output']>;
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   Channel?: Maybe<ChannelInfo>;
 };
@@ -7292,6 +7386,8 @@ export type DiscussionCollectionInCollectionsAggregateSelection = {
 export type DiscussionCollectionInCollectionsNodeAggregateSelection = {
   __typename?: 'DiscussionCollectionInCollectionsNodeAggregateSelection';
   name: StringAggregateSelection;
+  ownerUsername: StringAggregateSelection;
+  collectionNumber: IntAggregateSelection;
   description: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
@@ -7305,6 +7401,7 @@ export type DiscussionCommentFeedbackCommentsAggregateSelection = {
 
 export type DiscussionCommentFeedbackCommentsNodeAggregateSelection = {
   __typename?: 'DiscussionCommentFeedbackCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -7338,6 +7435,7 @@ export type DiscussionDiscussionChannelDiscussionChannelsAggregateSelection = {
 export type DiscussionDiscussionChannelDiscussionChannelsNodeAggregateSelection = {
   __typename?: 'DiscussionDiscussionChannelDiscussionChannelsNodeAggregateSelection';
   channelUniqueName: StringAggregateSelection;
+  discussionNumber: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   weightedVotesCount: FloatAggregateSelection;
   botMentions: StringAggregateSelection;
@@ -7504,6 +7602,7 @@ export type DiscussionFlairDiscussionChannelDiscussionChannelsAggregateSelection
 export type DiscussionFlairDiscussionChannelDiscussionChannelsNodeAggregateSelection = {
   __typename?: 'DiscussionFlairDiscussionChannelDiscussionChannelsNodeAggregateSelection';
   channelUniqueName: StringAggregateSelection;
+  discussionNumber: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   weightedVotesCount: FloatAggregateSelection;
   botMentions: StringAggregateSelection;
@@ -7940,6 +8039,7 @@ export type DownloadScanReviewItem = {
   reviewRequestReason?: Maybe<Scalars['String']['output']>;
   uploaderUsername?: Maybe<Scalars['String']['output']>;
   discussionId: Scalars['ID']['output'];
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
   discussionTitle?: Maybe<Scalars['String']['output']>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
 };
@@ -8291,6 +8391,7 @@ export type EventChannel = {
   locked?: Maybe<Scalars['Boolean']['output']>;
   eventId: Scalars['ID']['output'];
   channelUniqueName: Scalars['String']['output'];
+  eventNumber?: Maybe<Scalars['Int']['output']>;
   createdAt: Scalars['DateTime']['output'];
   archived?: Maybe<Scalars['Boolean']['output']>;
   Event?: Maybe<Event>;
@@ -8344,6 +8445,7 @@ export type EventChannelAggregate = {
 export type EventChannelAggregateNode = {
   __typename?: 'EventChannelAggregateNode';
   channelUniqueName: StringAggregateSelection;
+  eventNumber: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
 };
 
@@ -8368,6 +8470,7 @@ export type EventChannelCommentCommentsAggregateSelection = {
 
 export type EventChannelCommentCommentsNodeAggregateSelection = {
   __typename?: 'EventChannelCommentCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -8416,6 +8519,7 @@ export type EventChannelInfo = {
   __typename?: 'EventChannelInfo';
   id?: Maybe<Scalars['ID']['output']>;
   eventId?: Maybe<Scalars['String']['output']>;
+  eventNumber?: Maybe<Scalars['Int']['output']>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   Channel?: Maybe<ChannelInfo>;
 };
@@ -8478,6 +8582,7 @@ export type EventCommentCommentsAggregateSelection = {
 
 export type EventCommentCommentsNodeAggregateSelection = {
   __typename?: 'EventCommentCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -8497,6 +8602,7 @@ export type EventCommentFeedbackCommentsAggregateSelection = {
 
 export type EventCommentFeedbackCommentsNodeAggregateSelection = {
   __typename?: 'EventCommentFeedbackCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -8556,6 +8662,7 @@ export type EventEventChannelEventChannelsAggregateSelection = {
 export type EventEventChannelEventChannelsNodeAggregateSelection = {
   __typename?: 'EventEventChannelEventChannelsNodeAggregateSelection';
   channelUniqueName: StringAggregateSelection;
+  eventNumber: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
 };
 
@@ -8836,6 +8943,7 @@ export type EventSeriesEventChannelEventChannelsAggregateSelection = {
 export type EventSeriesEventChannelEventChannelsNodeAggregateSelection = {
   __typename?: 'EventSeriesEventChannelEventChannelsNodeAggregateSelection';
   channelUniqueName: StringAggregateSelection;
+  eventNumber: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
 };
 
@@ -9419,6 +9527,7 @@ export type Image = {
   storageUrl?: Maybe<Scalars['String']['output']>;
   uploadedAt?: Maybe<Scalars['DateTime']['output']>;
   uploadedByUsername?: Maybe<Scalars['String']['output']>;
+  imageNumber?: Maybe<Scalars['Int']['output']>;
   uploadedByIp?: Maybe<Scalars['String']['output']>;
   alt?: Maybe<Scalars['String']['output']>;
   caption?: Maybe<Scalars['String']['output']>;
@@ -9524,6 +9633,7 @@ export type ImageAggregateNode = {
   storageUrl: StringAggregateSelection;
   uploadedAt: DateTimeAggregateSelection;
   uploadedByUsername: StringAggregateSelection;
+  imageNumber: IntAggregateSelection;
   uploadedByIp: StringAggregateSelection;
   alt: StringAggregateSelection;
   caption: StringAggregateSelection;
@@ -9539,6 +9649,13 @@ export type ImageAggregateNode = {
 export type ImageAlbumAlbumsAggregateSelection = {
   __typename?: 'ImageAlbumAlbumsAggregateSelection';
   count: CountConnection;
+  node?: Maybe<ImageAlbumAlbumsNodeAggregateSelection>;
+};
+
+export type ImageAlbumAlbumsNodeAggregateSelection = {
+  __typename?: 'ImageAlbumAlbumsNodeAggregateSelection';
+  ownerUsername: StringAggregateSelection;
+  albumNumber: IntAggregateSelection;
 };
 
 export type ImageAlbumsConnection = {
@@ -9572,6 +9689,8 @@ export type ImageCollectionInCollectionsAggregateSelection = {
 export type ImageCollectionInCollectionsNodeAggregateSelection = {
   __typename?: 'ImageCollectionInCollectionsNodeAggregateSelection';
   name: StringAggregateSelection;
+  ownerUsername: StringAggregateSelection;
+  collectionNumber: IntAggregateSelection;
   description: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
@@ -9767,6 +9886,8 @@ export type Issue = {
   relatedDiscussionId?: Maybe<Scalars['ID']['output']>;
   relatedCommentId?: Maybe<Scalars['ID']['output']>;
   relatedEventId?: Maybe<Scalars['ID']['output']>;
+  relatedEventNumber?: Maybe<Scalars['Int']['output']>;
+  relatedCommentShortId?: Maybe<Scalars['String']['output']>;
   relatedWikiPageId?: Maybe<Scalars['ID']['output']>;
   relatedWikiRevisionId?: Maybe<Scalars['ID']['output']>;
   relatedUsername?: Maybe<Scalars['String']['output']>;
@@ -10740,6 +10861,7 @@ export type ModerationProfileCommentAuthoredCommentsAggregateSelection = {
 
 export type ModerationProfileCommentAuthoredCommentsNodeAggregateSelection = {
   __typename?: 'ModerationProfileCommentAuthoredCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -11241,6 +11363,7 @@ export type PluginPipelineCampaignFailure = {
   pipelineId: Scalars['ID']['output'];
   targetId: Scalars['ID']['output'];
   discussionId: Scalars['ID']['output'];
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
   channelId: Scalars['String']['output'];
   status: PluginPipelineRunStatus;
   attemptNumber: Scalars['Int']['output'];
@@ -11898,6 +12021,8 @@ export type ScratchpadEntry = {
   sourceId: Scalars['String']['output'];
   sourceChannelUniqueName?: Maybe<Scalars['String']['output']>;
   discussionId?: Maybe<Scalars['String']['output']>;
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
+  sourceCommentShortId?: Maybe<Scalars['String']['output']>;
   superUpvotedByUsers?: Maybe<Array<User>>;
   Author?: Maybe<User>;
   AuthorConnection: ScratchpadEntryAuthorConnection;
@@ -13084,6 +13209,7 @@ export type TagCommentCommentsAggregateSelection = {
 
 export type TagCommentCommentsNodeAggregateSelection = {
   __typename?: 'TagCommentCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -13532,6 +13658,12 @@ export type UpdateWikiPagesMutationResponse = {
   wikiPages: Array<WikiPage>;
 };
 
+export type UploadedDownloadableFileChannel = {
+  __typename?: 'UploadedDownloadableFileChannel';
+  channelUniqueName: Scalars['String']['output'];
+  discussionNumber?: Maybe<Scalars['Int']['output']>;
+};
+
 export type UploadedDownloadableFileDiscussion = {
   __typename?: 'UploadedDownloadableFileDiscussion';
   id: Scalars['ID']['output'];
@@ -13539,6 +13671,7 @@ export type UploadedDownloadableFileDiscussion = {
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   channelUniqueNames: Array<Scalars['String']['output']>;
+  channels: Array<UploadedDownloadableFileChannel>;
 };
 
 export type UploadedDownloadableFileGroup = {
@@ -14286,6 +14419,13 @@ export type UserAggregateResult = {
 export type UserAlbumAlbumsAggregateSelection = {
   __typename?: 'UserAlbumAlbumsAggregateSelection';
   count: CountConnection;
+  node?: Maybe<UserAlbumAlbumsNodeAggregateSelection>;
+};
+
+export type UserAlbumAlbumsNodeAggregateSelection = {
+  __typename?: 'UserAlbumAlbumsNodeAggregateSelection';
+  ownerUsername: StringAggregateSelection;
+  albumNumber: IntAggregateSelection;
 };
 
 export type UserAlbumsConnection = {
@@ -14516,6 +14656,8 @@ export type UserCollectionCollectionsAggregateSelection = {
 export type UserCollectionCollectionsNodeAggregateSelection = {
   __typename?: 'UserCollectionCollectionsNodeAggregateSelection';
   name: StringAggregateSelection;
+  ownerUsername: StringAggregateSelection;
+  collectionNumber: IntAggregateSelection;
   description: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   updatedAt: DateTimeAggregateSelection;
@@ -14543,6 +14685,7 @@ export type UserCommentCommentsAggregateSelection = {
 
 export type UserCommentCommentsNodeAggregateSelection = {
   __typename?: 'UserCommentCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -14562,6 +14705,7 @@ export type UserCommentFavoriteCommentsAggregateSelection = {
 
 export type UserCommentFavoriteCommentsNodeAggregateSelection = {
   __typename?: 'UserCommentFavoriteCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -14595,6 +14739,7 @@ export type UserCommentUpvotedCommentsAggregateSelection = {
 
 export type UserCommentUpvotedCommentsNodeAggregateSelection = {
   __typename?: 'UserCommentUpvotedCommentsNodeAggregateSelection';
+  shortId: StringAggregateSelection;
   text: StringAggregateSelection;
   editReason: StringAggregateSelection;
   stickyAt: DateTimeAggregateSelection;
@@ -14637,6 +14782,7 @@ export type UserDiscussionChannelUpvotedDiscussionChannelsAggregateSelection = {
 export type UserDiscussionChannelUpvotedDiscussionChannelsNodeAggregateSelection = {
   __typename?: 'UserDiscussionChannelUpvotedDiscussionChannelsNodeAggregateSelection';
   channelUniqueName: StringAggregateSelection;
+  discussionNumber: IntAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   weightedVotesCount: FloatAggregateSelection;
   botMentions: StringAggregateSelection;
@@ -14907,6 +15053,7 @@ export type UserImageFavoriteImagesNodeAggregateSelection = {
   storageUrl: StringAggregateSelection;
   uploadedAt: DateTimeAggregateSelection;
   uploadedByUsername: StringAggregateSelection;
+  imageNumber: IntAggregateSelection;
   uploadedByIp: StringAggregateSelection;
   alt: StringAggregateSelection;
   caption: StringAggregateSelection;
@@ -14941,6 +15088,7 @@ export type UserImageImagesNodeAggregateSelection = {
   storageUrl: StringAggregateSelection;
   uploadedAt: DateTimeAggregateSelection;
   uploadedByUsername: StringAggregateSelection;
+  imageNumber: IntAggregateSelection;
   uploadedByIp: StringAggregateSelection;
   alt: StringAggregateSelection;
   caption: StringAggregateSelection;
@@ -16553,6 +16701,47 @@ export type AlbumImagesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'uploadedByUsername: { shortestLength: { lte: ... } } }' instead. */
   uploadedByUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   uploadedByUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { eq: ... } } }' instead. */
+  imageNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { eq: ... } } }' instead. */
+  imageNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { eq: ... } } }' instead. */
+  imageNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { eq: ... } } }' instead. */
+  imageNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { gt: ... } } }' instead. */
+  imageNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { gt: ... } } }' instead. */
+  imageNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { gt: ... } } }' instead. */
+  imageNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { gt: ... } } }' instead. */
+  imageNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { gte: ... } } }' instead. */
+  imageNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { gte: ... } } }' instead. */
+  imageNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { gte: ... } } }' instead. */
+  imageNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { gte: ... } } }' instead. */
+  imageNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { lt: ... } } }' instead. */
+  imageNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { lt: ... } } }' instead. */
+  imageNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { lt: ... } } }' instead. */
+  imageNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { lt: ... } } }' instead. */
+  imageNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { lte: ... } } }' instead. */
+  imageNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { lte: ... } } }' instead. */
+  imageNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { lte: ... } } }' instead. */
+  imageNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { lte: ... } } }' instead. */
+  imageNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'uploadedByIp: { averageLength: { eq: ... } } }' instead. */
   uploadedByIp_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'uploadedByIp: { longestLength: { eq: ... } } }' instead. */
@@ -16882,6 +17071,8 @@ export type AlbumRelationshipFilters = {
 /** Fields to sort Albums by. The order in which sorts are applied is not guaranteed when specifying many fields in one AlbumSort object. */
 export type AlbumSort = {
   id?: InputMaybe<SortDirection>;
+  ownerUsername?: InputMaybe<SortDirection>;
+  albumNumber?: InputMaybe<SortDirection>;
 };
 
 export type AlbumUpdateInput = {
@@ -16908,6 +17099,32 @@ export type AlbumWhere = {
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
   /** @deprecated Please use the relevant generic filter id: { endsWith: ... } */
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  ownerUsername?: InputMaybe<StringScalarFilters>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { eq: ... } */
+  ownerUsername_EQ?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { in: ... } */
+  ownerUsername_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { contains: ... } */
+  ownerUsername_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { startsWith: ... } */
+  ownerUsername_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { endsWith: ... } */
+  ownerUsername_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { matches: ... } */
+  ownerUsername_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  albumNumber?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter albumNumber: { eq: ... } */
+  albumNumber_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter albumNumber: { in: ... } */
+  albumNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter albumNumber: { lt: ... } */
+  albumNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter albumNumber: { lte: ... } */
+  albumNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter albumNumber: { gt: ... } */
+  albumNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter albumNumber: { gte: ... } */
+  albumNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
   imageOrder?: InputMaybe<IdListFilters>;
   /** @deprecated Please use the relevant generic filter imageOrder: { eq: ... } */
   imageOrder_EQ?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -18542,6 +18759,37 @@ export type ChannelCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ChannelCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<ChannelCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ChannelCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -19095,6 +19343,47 @@ export type ChannelDiscussionChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead. */
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { eq: ... } } }' instead. */
+  discussionNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { eq: ... } } }' instead. */
+  discussionNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { eq: ... } } }' instead. */
+  discussionNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { eq: ... } } }' instead. */
+  discussionNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { gt: ... } } }' instead. */
+  discussionNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { gt: ... } } }' instead. */
+  discussionNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { gt: ... } } }' instead. */
+  discussionNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { gt: ... } } }' instead. */
+  discussionNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { gte: ... } } }' instead. */
+  discussionNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { gte: ... } } }' instead. */
+  discussionNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { gte: ... } } }' instead. */
+  discussionNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { gte: ... } } }' instead. */
+  discussionNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { lt: ... } } }' instead. */
+  discussionNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { lt: ... } } }' instead. */
+  discussionNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { lt: ... } } }' instead. */
+  discussionNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { lt: ... } } }' instead. */
+  discussionNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { lte: ... } } }' instead. */
+  discussionNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { lte: ... } } }' instead. */
+  discussionNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { lte: ... } } }' instead. */
+  discussionNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { lte: ... } } }' instead. */
+  discussionNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead. */
   createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead. */
@@ -20025,6 +20314,47 @@ export type ChannelEventChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead. */
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { eq: ... } } }' instead. */
+  eventNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { eq: ... } } }' instead. */
+  eventNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { eq: ... } } }' instead. */
+  eventNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { eq: ... } } }' instead. */
+  eventNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { gt: ... } } }' instead. */
+  eventNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { gt: ... } } }' instead. */
+  eventNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { gt: ... } } }' instead. */
+  eventNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { gt: ... } } }' instead. */
+  eventNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { gte: ... } } }' instead. */
+  eventNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { gte: ... } } }' instead. */
+  eventNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { gte: ... } } }' instead. */
+  eventNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { gte: ... } } }' instead. */
+  eventNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { lt: ... } } }' instead. */
+  eventNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { lt: ... } } }' instead. */
+  eventNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { lt: ... } } }' instead. */
+  eventNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { lt: ... } } }' instead. */
+  eventNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { lte: ... } } }' instead. */
+  eventNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { lte: ... } } }' instead. */
+  eventNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { lte: ... } } }' instead. */
+  eventNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { lte: ... } } }' instead. */
+  eventNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  eventNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead. */
   createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead. */
@@ -20366,6 +20696,78 @@ export type ChannelInCollectionsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'name: { shortestLength: { lte: ... } } }' instead. */
   name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  ownerUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { eq: ... } } }' instead. */
+  collectionNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { eq: ... } } }' instead. */
+  collectionNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { eq: ... } } }' instead. */
+  collectionNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { eq: ... } } }' instead. */
+  collectionNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { gt: ... } } }' instead. */
+  collectionNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { gt: ... } } }' instead. */
+  collectionNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { gt: ... } } }' instead. */
+  collectionNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { gt: ... } } }' instead. */
+  collectionNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { gte: ... } } }' instead. */
+  collectionNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { gte: ... } } }' instead. */
+  collectionNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { gte: ... } } }' instead. */
+  collectionNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { gte: ... } } }' instead. */
+  collectionNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { lt: ... } } }' instead. */
+  collectionNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { lt: ... } } }' instead. */
+  collectionNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { lt: ... } } }' instead. */
+  collectionNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { lt: ... } } }' instead. */
+  collectionNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { lte: ... } } }' instead. */
+  collectionNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { lte: ... } } }' instead. */
+  collectionNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { lte: ... } } }' instead. */
+  collectionNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { lte: ... } } }' instead. */
+  collectionNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  collectionNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'description: { averageLength: { eq: ... } } }' instead. */
   description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'description: { longestLength: { eq: ... } } }' instead. */
@@ -22693,6 +23095,47 @@ export type ChannelPinnedDiscussionChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead. */
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { eq: ... } } }' instead. */
+  discussionNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { eq: ... } } }' instead. */
+  discussionNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { eq: ... } } }' instead. */
+  discussionNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { eq: ... } } }' instead. */
+  discussionNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { gt: ... } } }' instead. */
+  discussionNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { gt: ... } } }' instead. */
+  discussionNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { gt: ... } } }' instead. */
+  discussionNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { gt: ... } } }' instead. */
+  discussionNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { gte: ... } } }' instead. */
+  discussionNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { gte: ... } } }' instead. */
+  discussionNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { gte: ... } } }' instead. */
+  discussionNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { gte: ... } } }' instead. */
+  discussionNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { lt: ... } } }' instead. */
+  discussionNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { lt: ... } } }' instead. */
+  discussionNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { lt: ... } } }' instead. */
+  discussionNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { lt: ... } } }' instead. */
+  discussionNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { lte: ... } } }' instead. */
+  discussionNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { lte: ... } } }' instead. */
+  discussionNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { lte: ... } } }' instead. */
+  discussionNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { lte: ... } } }' instead. */
+  discussionNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead. */
   createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead. */
@@ -26954,6 +27397,37 @@ export type CollectionCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<CollectionCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<CollectionCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<CollectionCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -28264,6 +28738,47 @@ export type CollectionImagesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'uploadedByUsername: { shortestLength: { lte: ... } } }' instead. */
   uploadedByUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   uploadedByUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { eq: ... } } }' instead. */
+  imageNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { eq: ... } } }' instead. */
+  imageNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { eq: ... } } }' instead. */
+  imageNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { eq: ... } } }' instead. */
+  imageNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { gt: ... } } }' instead. */
+  imageNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { gt: ... } } }' instead. */
+  imageNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { gt: ... } } }' instead. */
+  imageNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { gt: ... } } }' instead. */
+  imageNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { gte: ... } } }' instead. */
+  imageNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { gte: ... } } }' instead. */
+  imageNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { gte: ... } } }' instead. */
+  imageNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { gte: ... } } }' instead. */
+  imageNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { lt: ... } } }' instead. */
+  imageNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { lt: ... } } }' instead. */
+  imageNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { lt: ... } } }' instead. */
+  imageNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { lt: ... } } }' instead. */
+  imageNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { lte: ... } } }' instead. */
+  imageNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { lte: ... } } }' instead. */
+  imageNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { lte: ... } } }' instead. */
+  imageNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { lte: ... } } }' instead. */
+  imageNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'uploadedByIp: { averageLength: { eq: ... } } }' instead. */
   uploadedByIp_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'uploadedByIp: { longestLength: { eq: ... } } }' instead. */
@@ -28802,6 +29317,8 @@ export type CollectionSharedInDiscussionsUpdateFieldInput = {
 export type CollectionSort = {
   id?: InputMaybe<SortDirection>;
   name?: InputMaybe<SortDirection>;
+  ownerUsername?: InputMaybe<SortDirection>;
+  collectionNumber?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
   visibility?: InputMaybe<SortDirection>;
   collectionType?: InputMaybe<SortDirection>;
@@ -28889,6 +29406,32 @@ export type CollectionWhere = {
   name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   /** @deprecated Please use the relevant generic filter name: { matches: ... } */
   name_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  ownerUsername?: InputMaybe<StringScalarFilters>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { eq: ... } */
+  ownerUsername_EQ?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { in: ... } */
+  ownerUsername_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { contains: ... } */
+  ownerUsername_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { startsWith: ... } */
+  ownerUsername_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { endsWith: ... } */
+  ownerUsername_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter ownerUsername: { matches: ... } */
+  ownerUsername_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  collectionNumber?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter collectionNumber: { eq: ... } */
+  collectionNumber_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter collectionNumber: { in: ... } */
+  collectionNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter collectionNumber: { lt: ... } */
+  collectionNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter collectionNumber: { lte: ... } */
+  collectionNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter collectionNumber: { gt: ... } */
+  collectionNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter collectionNumber: { gte: ... } */
+  collectionNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
   description?: InputMaybe<StringScalarFilters>;
   /** @deprecated Please use the relevant generic filter description: { eq: ... } */
   description_EQ?: InputMaybe<Scalars['String']['input']>;
@@ -29343,6 +29886,37 @@ export type CommentChildCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<CommentChildCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<CommentChildCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<CommentChildCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -29869,6 +30443,37 @@ export type CommentFeedbackCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<CommentFeedbackCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<CommentFeedbackCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<CommentFeedbackCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -30302,6 +30907,78 @@ export type CommentInCollectionsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'name: { shortestLength: { lte: ... } } }' instead. */
   name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  ownerUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { eq: ... } } }' instead. */
+  collectionNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { eq: ... } } }' instead. */
+  collectionNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { eq: ... } } }' instead. */
+  collectionNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { eq: ... } } }' instead. */
+  collectionNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { gt: ... } } }' instead. */
+  collectionNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { gt: ... } } }' instead. */
+  collectionNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { gt: ... } } }' instead. */
+  collectionNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { gt: ... } } }' instead. */
+  collectionNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { gte: ... } } }' instead. */
+  collectionNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { gte: ... } } }' instead. */
+  collectionNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { gte: ... } } }' instead. */
+  collectionNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { gte: ... } } }' instead. */
+  collectionNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { lt: ... } } }' instead. */
+  collectionNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { lt: ... } } }' instead. */
+  collectionNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { lt: ... } } }' instead. */
+  collectionNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { lt: ... } } }' instead. */
+  collectionNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { lte: ... } } }' instead. */
+  collectionNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { lte: ... } } }' instead. */
+  collectionNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { lte: ... } } }' instead. */
+  collectionNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { lte: ... } } }' instead. */
+  collectionNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  collectionNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'description: { averageLength: { eq: ... } } }' instead. */
   description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'description: { longestLength: { eq: ... } } }' instead. */
@@ -31423,6 +32100,7 @@ export type CommentRelationshipFilters = {
 /** Fields to sort Comments by. The order in which sorts are applied is not guaranteed when specifying many fields in one CommentSort object. */
 export type CommentSort = {
   id?: InputMaybe<SortDirection>;
+  shortId?: InputMaybe<SortDirection>;
   ageGateTouchedAt?: InputMaybe<SortDirection>;
   ageGateSensitive?: InputMaybe<SortDirection>;
   ageGateRestricted?: InputMaybe<SortDirection>;
@@ -33815,6 +34493,19 @@ export type CommentWhere = {
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
   /** @deprecated Please use the relevant generic filter id: { endsWith: ... } */
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  shortId?: InputMaybe<StringScalarFilters>;
+  /** @deprecated Please use the relevant generic filter shortId: { eq: ... } */
+  shortId_EQ?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter shortId: { in: ... } */
+  shortId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** @deprecated Please use the relevant generic filter shortId: { contains: ... } */
+  shortId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter shortId: { startsWith: ... } */
+  shortId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter shortId: { endsWith: ... } */
+  shortId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter shortId: { matches: ... } */
+  shortId_MATCHES?: InputMaybe<Scalars['String']['input']>;
   ageGateSensitive?: InputMaybe<BooleanScalarFilters>;
   /** @deprecated Please use the relevant generic filter ageGateSensitive: { eq: ... } */
   ageGateSensitive_EQ?: InputMaybe<Scalars['Boolean']['input']>;
@@ -34985,6 +35676,37 @@ export type DiscussionChannelAnswersNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<DiscussionChannelAnswersNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<DiscussionChannelAnswersNodeAggregationWhereInput>>;
   NOT?: InputMaybe<DiscussionChannelAnswersNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -35347,6 +36069,37 @@ export type DiscussionChannelCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<DiscussionChannelCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<DiscussionChannelCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<DiscussionChannelCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -36803,6 +37556,7 @@ export type DiscussionChannelSort = {
   locked?: InputMaybe<SortDirection>;
   discussionId?: InputMaybe<SortDirection>;
   channelUniqueName?: InputMaybe<SortDirection>;
+  discussionNumber?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   weightedVotesCount?: InputMaybe<SortDirection>;
   emoji?: InputMaybe<SortDirection>;
@@ -39062,6 +39816,19 @@ export type DiscussionChannelWhere = {
   channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   /** @deprecated Please use the relevant generic filter channelUniqueName: { matches: ... } */
   channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  discussionNumber?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { eq: ... } */
+  discussionNumber_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { in: ... } */
+  discussionNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { lt: ... } */
+  discussionNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { lte: ... } */
+  discussionNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { gt: ... } */
+  discussionNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { gte: ... } */
+  discussionNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   /** @deprecated Please use the relevant generic filter createdAt: { eq: ... } */
   createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
@@ -39715,6 +40482,47 @@ export type DiscussionDiscussionChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead. */
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { eq: ... } } }' instead. */
+  discussionNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { eq: ... } } }' instead. */
+  discussionNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { eq: ... } } }' instead. */
+  discussionNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { eq: ... } } }' instead. */
+  discussionNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { gt: ... } } }' instead. */
+  discussionNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { gt: ... } } }' instead. */
+  discussionNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { gt: ... } } }' instead. */
+  discussionNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { gt: ... } } }' instead. */
+  discussionNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { gte: ... } } }' instead. */
+  discussionNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { gte: ... } } }' instead. */
+  discussionNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { gte: ... } } }' instead. */
+  discussionNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { gte: ... } } }' instead. */
+  discussionNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { lt: ... } } }' instead. */
+  discussionNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { lt: ... } } }' instead. */
+  discussionNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { lt: ... } } }' instead. */
+  discussionNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { lt: ... } } }' instead. */
+  discussionNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { lte: ... } } }' instead. */
+  discussionNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { lte: ... } } }' instead. */
+  discussionNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { lte: ... } } }' instead. */
+  discussionNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { lte: ... } } }' instead. */
+  discussionNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead. */
   createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead. */
@@ -40904,6 +41712,37 @@ export type DiscussionFeedbackCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<DiscussionFeedbackCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<DiscussionFeedbackCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<DiscussionFeedbackCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -41309,6 +42148,47 @@ export type DiscussionFlairDiscussionChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead. */
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { eq: ... } } }' instead. */
+  discussionNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { eq: ... } } }' instead. */
+  discussionNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { eq: ... } } }' instead. */
+  discussionNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { eq: ... } } }' instead. */
+  discussionNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { gt: ... } } }' instead. */
+  discussionNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { gt: ... } } }' instead. */
+  discussionNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { gt: ... } } }' instead. */
+  discussionNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { gt: ... } } }' instead. */
+  discussionNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { gte: ... } } }' instead. */
+  discussionNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { gte: ... } } }' instead. */
+  discussionNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { gte: ... } } }' instead. */
+  discussionNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { gte: ... } } }' instead. */
+  discussionNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { lt: ... } } }' instead. */
+  discussionNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { lt: ... } } }' instead. */
+  discussionNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { lt: ... } } }' instead. */
+  discussionNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { lt: ... } } }' instead. */
+  discussionNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { lte: ... } } }' instead. */
+  discussionNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { lte: ... } } }' instead. */
+  discussionNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { lte: ... } } }' instead. */
+  discussionNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { lte: ... } } }' instead. */
+  discussionNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead. */
   createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead. */
@@ -41638,6 +42518,78 @@ export type DiscussionInCollectionsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'name: { shortestLength: { lte: ... } } }' instead. */
   name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  ownerUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { eq: ... } } }' instead. */
+  collectionNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { eq: ... } } }' instead. */
+  collectionNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { eq: ... } } }' instead. */
+  collectionNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { eq: ... } } }' instead. */
+  collectionNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { gt: ... } } }' instead. */
+  collectionNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { gt: ... } } }' instead. */
+  collectionNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { gt: ... } } }' instead. */
+  collectionNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { gt: ... } } }' instead. */
+  collectionNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { gte: ... } } }' instead. */
+  collectionNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { gte: ... } } }' instead. */
+  collectionNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { gte: ... } } }' instead. */
+  collectionNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { gte: ... } } }' instead. */
+  collectionNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { lt: ... } } }' instead. */
+  collectionNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { lt: ... } } }' instead. */
+  collectionNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { lt: ... } } }' instead. */
+  collectionNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { lt: ... } } }' instead. */
+  collectionNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { lte: ... } } }' instead. */
+  collectionNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { lte: ... } } }' instead. */
+  collectionNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { lte: ... } } }' instead. */
+  collectionNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { lte: ... } } }' instead. */
+  collectionNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  collectionNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'description: { averageLength: { eq: ... } } }' instead. */
   description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'description: { longestLength: { eq: ... } } }' instead. */
@@ -44306,6 +45258,37 @@ export type EventChannelCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<EventChannelCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<EventChannelCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<EventChannelCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -45146,6 +46129,7 @@ export type EventChannelSort = {
   locked?: InputMaybe<SortDirection>;
   eventId?: InputMaybe<SortDirection>;
   channelUniqueName?: InputMaybe<SortDirection>;
+  eventNumber?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   archived?: InputMaybe<SortDirection>;
 };
@@ -45200,6 +46184,19 @@ export type EventChannelWhere = {
   channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   /** @deprecated Please use the relevant generic filter channelUniqueName: { matches: ... } */
   channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  eventNumber?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter eventNumber: { eq: ... } */
+  eventNumber_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter eventNumber: { in: ... } */
+  eventNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter eventNumber: { lt: ... } */
+  eventNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter eventNumber: { lte: ... } */
+  eventNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter eventNumber: { gt: ... } */
+  eventNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter eventNumber: { gte: ... } */
+  eventNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
   createdAt?: InputMaybe<DateTimeScalarFilters>;
   /** @deprecated Please use the relevant generic filter createdAt: { eq: ... } */
   createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
@@ -45391,6 +46388,37 @@ export type EventCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<EventCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<EventCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<EventCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -45877,6 +46905,47 @@ export type EventEventChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead. */
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { eq: ... } } }' instead. */
+  eventNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { eq: ... } } }' instead. */
+  eventNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { eq: ... } } }' instead. */
+  eventNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { eq: ... } } }' instead. */
+  eventNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { gt: ... } } }' instead. */
+  eventNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { gt: ... } } }' instead. */
+  eventNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { gt: ... } } }' instead. */
+  eventNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { gt: ... } } }' instead. */
+  eventNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { gte: ... } } }' instead. */
+  eventNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { gte: ... } } }' instead. */
+  eventNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { gte: ... } } }' instead. */
+  eventNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { gte: ... } } }' instead. */
+  eventNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { lt: ... } } }' instead. */
+  eventNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { lt: ... } } }' instead. */
+  eventNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { lt: ... } } }' instead. */
+  eventNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { lt: ... } } }' instead. */
+  eventNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { lte: ... } } }' instead. */
+  eventNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { lte: ... } } }' instead. */
+  eventNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { lte: ... } } }' instead. */
+  eventNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { lte: ... } } }' instead. */
+  eventNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  eventNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead. */
   createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead. */
@@ -46011,6 +47080,37 @@ export type EventFeedbackCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<EventFeedbackCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<EventFeedbackCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<EventFeedbackCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -47373,6 +48473,47 @@ export type EventSeriesEventChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead. */
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { eq: ... } } }' instead. */
+  eventNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { eq: ... } } }' instead. */
+  eventNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { eq: ... } } }' instead. */
+  eventNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { eq: ... } } }' instead. */
+  eventNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { gt: ... } } }' instead. */
+  eventNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { gt: ... } } }' instead. */
+  eventNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { gt: ... } } }' instead. */
+  eventNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { gt: ... } } }' instead. */
+  eventNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { gte: ... } } }' instead. */
+  eventNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { gte: ... } } }' instead. */
+  eventNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { gte: ... } } }' instead. */
+  eventNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { gte: ... } } }' instead. */
+  eventNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { lt: ... } } }' instead. */
+  eventNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { lt: ... } } }' instead. */
+  eventNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { lt: ... } } }' instead. */
+  eventNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { lt: ... } } }' instead. */
+  eventNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { min: { lte: ... } } }' instead. */
+  eventNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { max: { lte: ... } } }' instead. */
+  eventNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { sum: { lte: ... } } }' instead. */
+  eventNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'eventNumber: { average: { lte: ... } } }' instead. */
+  eventNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  eventNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead. */
   createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead. */
@@ -52017,6 +53158,7 @@ export type ImageAlbumsAggregateInput = {
   AND?: InputMaybe<Array<ImageAlbumsAggregateInput>>;
   OR?: InputMaybe<Array<ImageAlbumsAggregateInput>>;
   NOT?: InputMaybe<ImageAlbumsAggregateInput>;
+  node?: InputMaybe<ImageAlbumsNodeAggregationWhereInput>;
 };
 
 export type ImageAlbumsConnectFieldInput = {
@@ -52029,6 +53171,7 @@ export type ImageAlbumsConnectionAggregateInput = {
   AND?: InputMaybe<Array<ImageAlbumsConnectionAggregateInput>>;
   OR?: InputMaybe<Array<ImageAlbumsConnectionAggregateInput>>;
   NOT?: InputMaybe<ImageAlbumsConnectionAggregateInput>;
+  node?: InputMaybe<ImageAlbumsNodeAggregationWhereInput>;
 };
 
 export type ImageAlbumsConnectionFilters = {
@@ -52072,6 +53215,84 @@ export type ImageAlbumsDisconnectFieldInput = {
 export type ImageAlbumsFieldInput = {
   connect?: InputMaybe<Array<ImageAlbumsConnectFieldInput>>;
   create?: InputMaybe<Array<ImageAlbumsCreateFieldInput>>;
+};
+
+export type ImageAlbumsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ImageAlbumsNodeAggregationWhereInput>>;
+  OR?: InputMaybe<Array<ImageAlbumsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ImageAlbumsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  ownerUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { min: { eq: ... } } }' instead. */
+  albumNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { max: { eq: ... } } }' instead. */
+  albumNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { sum: { eq: ... } } }' instead. */
+  albumNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { average: { eq: ... } } }' instead. */
+  albumNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { min: { gt: ... } } }' instead. */
+  albumNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { max: { gt: ... } } }' instead. */
+  albumNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { sum: { gt: ... } } }' instead. */
+  albumNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { average: { gt: ... } } }' instead. */
+  albumNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { min: { gte: ... } } }' instead. */
+  albumNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { max: { gte: ... } } }' instead. */
+  albumNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { sum: { gte: ... } } }' instead. */
+  albumNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { average: { gte: ... } } }' instead. */
+  albumNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { min: { lt: ... } } }' instead. */
+  albumNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { max: { lt: ... } } }' instead. */
+  albumNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { sum: { lt: ... } } }' instead. */
+  albumNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { average: { lt: ... } } }' instead. */
+  albumNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { min: { lte: ... } } }' instead. */
+  albumNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { max: { lte: ... } } }' instead. */
+  albumNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { sum: { lte: ... } } }' instead. */
+  albumNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { average: { lte: ... } } }' instead. */
+  albumNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  albumNumber?: InputMaybe<IntScalarAggregationFilters>;
 };
 
 export type ImageAlbumsUpdateConnectionInput = {
@@ -52259,6 +53480,78 @@ export type ImageInCollectionsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'name: { shortestLength: { lte: ... } } }' instead. */
   name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  ownerUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { eq: ... } } }' instead. */
+  collectionNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { eq: ... } } }' instead. */
+  collectionNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { eq: ... } } }' instead. */
+  collectionNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { eq: ... } } }' instead. */
+  collectionNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { gt: ... } } }' instead. */
+  collectionNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { gt: ... } } }' instead. */
+  collectionNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { gt: ... } } }' instead. */
+  collectionNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { gt: ... } } }' instead. */
+  collectionNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { gte: ... } } }' instead. */
+  collectionNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { gte: ... } } }' instead. */
+  collectionNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { gte: ... } } }' instead. */
+  collectionNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { gte: ... } } }' instead. */
+  collectionNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { lt: ... } } }' instead. */
+  collectionNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { lt: ... } } }' instead. */
+  collectionNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { lt: ... } } }' instead. */
+  collectionNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { lt: ... } } }' instead. */
+  collectionNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { lte: ... } } }' instead. */
+  collectionNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { lte: ... } } }' instead. */
+  collectionNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { lte: ... } } }' instead. */
+  collectionNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { lte: ... } } }' instead. */
+  collectionNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  collectionNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'description: { averageLength: { eq: ... } } }' instead. */
   description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'description: { longestLength: { eq: ... } } }' instead. */
@@ -52924,6 +54217,7 @@ export type ImageSort = {
   storageUrl?: InputMaybe<SortDirection>;
   uploadedAt?: InputMaybe<SortDirection>;
   uploadedByUsername?: InputMaybe<SortDirection>;
+  imageNumber?: InputMaybe<SortDirection>;
   uploadedByIp?: InputMaybe<SortDirection>;
   alt?: InputMaybe<SortDirection>;
   caption?: InputMaybe<SortDirection>;
@@ -53266,6 +54560,19 @@ export type ImageWhere = {
   uploadedByUsername_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   /** @deprecated Please use the relevant generic filter uploadedByUsername: { matches: ... } */
   uploadedByUsername_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  imageNumber?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter imageNumber: { eq: ... } */
+  imageNumber_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageNumber: { in: ... } */
+  imageNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter imageNumber: { lt: ... } */
+  imageNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageNumber: { lte: ... } */
+  imageNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageNumber: { gt: ... } */
+  imageNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter imageNumber: { gte: ... } */
+  imageNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
   uploadedByIp?: InputMaybe<StringScalarFilters>;
   /** @deprecated Please use the relevant generic filter uploadedByIp: { eq: ... } */
   uploadedByIp_EQ?: InputMaybe<Scalars['String']['input']>;
@@ -54050,6 +55357,8 @@ export type IssueSort = {
   relatedDiscussionId?: InputMaybe<SortDirection>;
   relatedCommentId?: InputMaybe<SortDirection>;
   relatedEventId?: InputMaybe<SortDirection>;
+  relatedEventNumber?: InputMaybe<SortDirection>;
+  relatedCommentShortId?: InputMaybe<SortDirection>;
   relatedWikiPageId?: InputMaybe<SortDirection>;
   relatedWikiRevisionId?: InputMaybe<SortDirection>;
   relatedUsername?: InputMaybe<SortDirection>;
@@ -55016,6 +56325,32 @@ export type IssueWhere = {
   relatedEventId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
   /** @deprecated Please use the relevant generic filter relatedEventId: { endsWith: ... } */
   relatedEventId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventNumber?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { eq: ... } */
+  relatedEventNumber_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { in: ... } */
+  relatedEventNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { lt: ... } */
+  relatedEventNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { lte: ... } */
+  relatedEventNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { gt: ... } */
+  relatedEventNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedEventNumber: { gte: ... } */
+  relatedEventNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
+  relatedCommentShortId?: InputMaybe<StringScalarFilters>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { eq: ... } */
+  relatedCommentShortId_EQ?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { in: ... } */
+  relatedCommentShortId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { contains: ... } */
+  relatedCommentShortId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { startsWith: ... } */
+  relatedCommentShortId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { endsWith: ... } */
+  relatedCommentShortId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter relatedCommentShortId: { matches: ... } */
+  relatedCommentShortId_MATCHES?: InputMaybe<Scalars['String']['input']>;
   relatedWikiPageId?: InputMaybe<IdScalarFilters>;
   /** @deprecated Please use the relevant generic filter relatedWikiPageId: { eq: ... } */
   relatedWikiPageId_EQ?: InputMaybe<Scalars['ID']['input']>;
@@ -56587,6 +57922,37 @@ export type ModerationProfileAuthoredCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ModerationProfileAuthoredCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<ModerationProfileAuthoredCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ModerationProfileAuthoredCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -63224,6 +64590,8 @@ export type ScratchpadEntrySort = {
   sourceId?: InputMaybe<SortDirection>;
   sourceChannelUniqueName?: InputMaybe<SortDirection>;
   discussionId?: InputMaybe<SortDirection>;
+  discussionNumber?: InputMaybe<SortDirection>;
+  sourceCommentShortId?: InputMaybe<SortDirection>;
 };
 
 export type ScratchpadEntryUpdateInput = {
@@ -63343,6 +64711,32 @@ export type ScratchpadEntryWhere = {
   discussionId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   /** @deprecated Please use the relevant generic filter discussionId: { matches: ... } */
   discussionId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  discussionNumber?: InputMaybe<IntScalarFilters>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { eq: ... } */
+  discussionNumber_EQ?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { in: ... } */
+  discussionNumber_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { lt: ... } */
+  discussionNumber_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { lte: ... } */
+  discussionNumber_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { gt: ... } */
+  discussionNumber_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter discussionNumber: { gte: ... } */
+  discussionNumber_GTE?: InputMaybe<Scalars['Int']['input']>;
+  sourceCommentShortId?: InputMaybe<StringScalarFilters>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { eq: ... } */
+  sourceCommentShortId_EQ?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { in: ... } */
+  sourceCommentShortId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { contains: ... } */
+  sourceCommentShortId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { startsWith: ... } */
+  sourceCommentShortId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { endsWith: ... } */
+  sourceCommentShortId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Please use the relevant generic filter sourceCommentShortId: { matches: ... } */
+  sourceCommentShortId_MATCHES?: InputMaybe<Scalars['String']['input']>;
   OR?: InputMaybe<Array<ScratchpadEntryWhere>>;
   AND?: InputMaybe<Array<ScratchpadEntryWhere>>;
   NOT?: InputMaybe<ScratchpadEntryWhere>;
@@ -70082,6 +71476,37 @@ export type TagCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<TagCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<TagCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<TagCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -72839,6 +74264,7 @@ export type UserAlbumsAggregateInput = {
   AND?: InputMaybe<Array<UserAlbumsAggregateInput>>;
   OR?: InputMaybe<Array<UserAlbumsAggregateInput>>;
   NOT?: InputMaybe<UserAlbumsAggregateInput>;
+  node?: InputMaybe<UserAlbumsNodeAggregationWhereInput>;
 };
 
 export type UserAlbumsConnectFieldInput = {
@@ -72851,6 +74277,7 @@ export type UserAlbumsConnectionAggregateInput = {
   AND?: InputMaybe<Array<UserAlbumsConnectionAggregateInput>>;
   OR?: InputMaybe<Array<UserAlbumsConnectionAggregateInput>>;
   NOT?: InputMaybe<UserAlbumsConnectionAggregateInput>;
+  node?: InputMaybe<UserAlbumsNodeAggregationWhereInput>;
 };
 
 export type UserAlbumsConnectionFilters = {
@@ -72894,6 +74321,84 @@ export type UserAlbumsDisconnectFieldInput = {
 export type UserAlbumsFieldInput = {
   connect?: InputMaybe<Array<UserAlbumsConnectFieldInput>>;
   create?: InputMaybe<Array<UserAlbumsCreateFieldInput>>;
+};
+
+export type UserAlbumsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserAlbumsNodeAggregationWhereInput>>;
+  OR?: InputMaybe<Array<UserAlbumsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserAlbumsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  ownerUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { min: { eq: ... } } }' instead. */
+  albumNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { max: { eq: ... } } }' instead. */
+  albumNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { sum: { eq: ... } } }' instead. */
+  albumNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { average: { eq: ... } } }' instead. */
+  albumNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { min: { gt: ... } } }' instead. */
+  albumNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { max: { gt: ... } } }' instead. */
+  albumNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { sum: { gt: ... } } }' instead. */
+  albumNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { average: { gt: ... } } }' instead. */
+  albumNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { min: { gte: ... } } }' instead. */
+  albumNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { max: { gte: ... } } }' instead. */
+  albumNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { sum: { gte: ... } } }' instead. */
+  albumNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { average: { gte: ... } } }' instead. */
+  albumNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { min: { lt: ... } } }' instead. */
+  albumNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { max: { lt: ... } } }' instead. */
+  albumNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { sum: { lt: ... } } }' instead. */
+  albumNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { average: { lt: ... } } }' instead. */
+  albumNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { min: { lte: ... } } }' instead. */
+  albumNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { max: { lte: ... } } }' instead. */
+  albumNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { sum: { lte: ... } } }' instead. */
+  albumNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'albumNumber: { average: { lte: ... } } }' instead. */
+  albumNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  albumNumber?: InputMaybe<IntScalarAggregationFilters>;
 };
 
 export type UserAlbumsUpdateConnectionInput = {
@@ -73748,6 +75253,78 @@ export type UserCollectionsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'name: { shortestLength: { lte: ... } } }' instead. */
   name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { eq: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { eq: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { eq: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { gte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { gte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { gte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lt: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lt: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lt: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { averageLength: { lte: ... } } }' instead. */
+  ownerUsername_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { longestLength: { lte: ... } } }' instead. */
+  ownerUsername_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'ownerUsername: { shortestLength: { lte: ... } } }' instead. */
+  ownerUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  ownerUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { eq: ... } } }' instead. */
+  collectionNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { eq: ... } } }' instead. */
+  collectionNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { eq: ... } } }' instead. */
+  collectionNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { eq: ... } } }' instead. */
+  collectionNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { gt: ... } } }' instead. */
+  collectionNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { gt: ... } } }' instead. */
+  collectionNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { gt: ... } } }' instead. */
+  collectionNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { gt: ... } } }' instead. */
+  collectionNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { gte: ... } } }' instead. */
+  collectionNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { gte: ... } } }' instead. */
+  collectionNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { gte: ... } } }' instead. */
+  collectionNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { gte: ... } } }' instead. */
+  collectionNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { lt: ... } } }' instead. */
+  collectionNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { lt: ... } } }' instead. */
+  collectionNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { lt: ... } } }' instead. */
+  collectionNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { lt: ... } } }' instead. */
+  collectionNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { min: { lte: ... } } }' instead. */
+  collectionNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { max: { lte: ... } } }' instead. */
+  collectionNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { sum: { lte: ... } } }' instead. */
+  collectionNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'collectionNumber: { average: { lte: ... } } }' instead. */
+  collectionNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  collectionNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'description: { averageLength: { eq: ... } } }' instead. */
   description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'description: { longestLength: { eq: ... } } }' instead. */
@@ -73914,6 +75491,37 @@ export type UserCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<UserCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<UserCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<UserCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -75853,6 +77461,37 @@ export type UserFavoriteCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<UserFavoriteCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<UserFavoriteCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<UserFavoriteCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -77095,6 +78734,47 @@ export type UserFavoriteImagesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'uploadedByUsername: { shortestLength: { lte: ... } } }' instead. */
   uploadedByUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   uploadedByUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { eq: ... } } }' instead. */
+  imageNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { eq: ... } } }' instead. */
+  imageNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { eq: ... } } }' instead. */
+  imageNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { eq: ... } } }' instead. */
+  imageNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { gt: ... } } }' instead. */
+  imageNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { gt: ... } } }' instead. */
+  imageNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { gt: ... } } }' instead. */
+  imageNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { gt: ... } } }' instead. */
+  imageNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { gte: ... } } }' instead. */
+  imageNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { gte: ... } } }' instead. */
+  imageNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { gte: ... } } }' instead. */
+  imageNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { gte: ... } } }' instead. */
+  imageNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { lt: ... } } }' instead. */
+  imageNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { lt: ... } } }' instead. */
+  imageNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { lt: ... } } }' instead. */
+  imageNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { lt: ... } } }' instead. */
+  imageNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { lte: ... } } }' instead. */
+  imageNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { lte: ... } } }' instead. */
+  imageNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { lte: ... } } }' instead. */
+  imageNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { lte: ... } } }' instead. */
+  imageNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'uploadedByIp: { averageLength: { eq: ... } } }' instead. */
   uploadedByIp_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'uploadedByIp: { longestLength: { eq: ... } } }' instead. */
@@ -77912,6 +79592,47 @@ export type UserImagesNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'uploadedByUsername: { shortestLength: { lte: ... } } }' instead. */
   uploadedByUsername_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   uploadedByUsername?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { eq: ... } } }' instead. */
+  imageNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { eq: ... } } }' instead. */
+  imageNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { eq: ... } } }' instead. */
+  imageNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { eq: ... } } }' instead. */
+  imageNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { gt: ... } } }' instead. */
+  imageNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { gt: ... } } }' instead. */
+  imageNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { gt: ... } } }' instead. */
+  imageNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { gt: ... } } }' instead. */
+  imageNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { gte: ... } } }' instead. */
+  imageNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { gte: ... } } }' instead. */
+  imageNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { gte: ... } } }' instead. */
+  imageNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { gte: ... } } }' instead. */
+  imageNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { lt: ... } } }' instead. */
+  imageNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { lt: ... } } }' instead. */
+  imageNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { lt: ... } } }' instead. */
+  imageNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { lt: ... } } }' instead. */
+  imageNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { min: { lte: ... } } }' instead. */
+  imageNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { max: { lte: ... } } }' instead. */
+  imageNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { sum: { lte: ... } } }' instead. */
+  imageNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'imageNumber: { average: { lte: ... } } }' instead. */
+  imageNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  imageNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'uploadedByIp: { averageLength: { eq: ... } } }' instead. */
   uploadedByIp_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'uploadedByIp: { longestLength: { eq: ... } } }' instead. */
@@ -85175,6 +86896,37 @@ export type UserUpvotedCommentsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<UserUpvotedCommentsNodeAggregationWhereInput>>;
   OR?: InputMaybe<Array<UserUpvotedCommentsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<UserUpvotedCommentsNodeAggregationWhereInput>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { eq: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { eq: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { eq: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { gte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { gte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { gte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lt: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lt: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lt: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { averageLength: { lte: ... } } }' instead. */
+  shortId_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { longestLength: { lte: ... } } }' instead. */
+  shortId_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'shortId: { shortestLength: { lte: ... } } }' instead. */
+  shortId_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  shortId?: InputMaybe<StringScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'text: { averageLength: { eq: ... } } }' instead. */
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   /** @deprecated Please use the relevant generic filter 'text: { longestLength: { eq: ... } } }' instead. */
@@ -85548,6 +87300,47 @@ export type UserUpvotedDiscussionChannelsNodeAggregationWhereInput = {
   /** @deprecated Please use the relevant generic filter 'channelUniqueName: { shortestLength: { lte: ... } } }' instead. */
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName?: InputMaybe<StringScalarAggregationFilters>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { eq: ... } } }' instead. */
+  discussionNumber_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { eq: ... } } }' instead. */
+  discussionNumber_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { eq: ... } } }' instead. */
+  discussionNumber_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { eq: ... } } }' instead. */
+  discussionNumber_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { gt: ... } } }' instead. */
+  discussionNumber_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { gt: ... } } }' instead. */
+  discussionNumber_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { gt: ... } } }' instead. */
+  discussionNumber_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { gt: ... } } }' instead. */
+  discussionNumber_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { gte: ... } } }' instead. */
+  discussionNumber_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { gte: ... } } }' instead. */
+  discussionNumber_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { gte: ... } } }' instead. */
+  discussionNumber_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { gte: ... } } }' instead. */
+  discussionNumber_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { lt: ... } } }' instead. */
+  discussionNumber_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { lt: ... } } }' instead. */
+  discussionNumber_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { lt: ... } } }' instead. */
+  discussionNumber_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { lt: ... } } }' instead. */
+  discussionNumber_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { min: { lte: ... } } }' instead. */
+  discussionNumber_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { max: { lte: ... } } }' instead. */
+  discussionNumber_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { sum: { lte: ... } } }' instead. */
+  discussionNumber_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  /** @deprecated Please use the relevant generic filter 'discussionNumber: { average: { lte: ... } } }' instead. */
+  discussionNumber_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionNumber?: InputMaybe<IntScalarAggregationFilters>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { min: { eq: ... } } }' instead. */
   createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   /** @deprecated Please use the relevant generic filter 'createdAt: { max: { eq: ... } } }' instead. */

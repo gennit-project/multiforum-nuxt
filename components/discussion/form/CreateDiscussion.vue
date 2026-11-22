@@ -17,6 +17,7 @@ import { useRouter, useRoute } from 'nuxt/app';
 import { useChannelSuspensionNotice } from '@/composables/useSuspensionNotice';
 import { useForumLock } from '@/composables/useForumLock';
 import { useUsername } from '@/composables/useAuthState';
+import { getDiscussionRoute } from '@/utils/contentUrls';
 import {
   useChannelDiscussionFlairConfigs,
   type ChannelDiscussionFlairConfig,
@@ -250,7 +251,14 @@ onDone((response) => {
   if (routeGeneration !== submittedGeneration || channelId.value !== submittedRoute) return;
   const newDiscussionArray =
     response.data?.createDiscussionWithChannelConnections;
-  const newDiscussion = newDiscussionArray?.[0]?.DiscussionChannels?.[0];
+  const createdDiscussion = newDiscussionArray?.[0];
+  // The number is per forum, so use the DiscussionChannel for the forum we
+  // are redirecting into (a crosspost creates one per selected forum).
+  const newDiscussion =
+    createdDiscussion?.DiscussionChannels?.find(
+      (discussionChannel) =>
+        discussionChannel.channelUniqueName === submittedChannel
+    ) ?? createdDiscussion?.DiscussionChannels?.[0];
   const newDiscussionId = newDiscussion?.Discussion?.id;
 
   if (!newDiscussionId) {
@@ -261,13 +269,14 @@ onDone((response) => {
 
   if (completedDiscussionIds.has(newDiscussionId)) return;
   completedDiscussionIds.add(newDiscussionId);
-  router.push({
-    name: 'forums-forumId-discussions-discussionId',
-    params: {
+  router.push(
+    getDiscussionRoute({
       forumId: submittedChannel,
+      discussionNumber: newDiscussion?.discussionNumber,
+      title: createdDiscussion?.title,
       discussionId: newDiscussionId,
-    },
-  });
+    })
+  );
 });
 
 function submit() {

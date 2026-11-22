@@ -6,6 +6,7 @@ export const UPDATED_ANSWERS_FRAGMENT = gql`
     answered
     Answers {
       id
+      shortId
       text
       CommentAuthor {
         ... on User {

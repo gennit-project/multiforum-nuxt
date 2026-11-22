@@ -6,6 +6,10 @@ const h = vi.hoisted(() => ({
   result: undefined as unknown,
   variables: undefined as undefined | (() => unknown),
   options: undefined as undefined | (() => { enabled: boolean }),
+  calls: [] as Array<{
+    variables: () => unknown;
+    options: () => { enabled: boolean };
+  }>,
 }));
 
 vi.mock('@vue/apollo-composable', () => ({
@@ -16,6 +20,7 @@ vi.mock('@vue/apollo-composable', () => ({
   ) => {
     h.variables = variables;
     h.options = options;
+    h.calls.push({ variables, options });
     return { result: h.result, loading: ref(false) };
   },
 }));
@@ -25,6 +30,7 @@ vi.mock('@/graphQLData/age/queries', () => ({
 
 beforeEach(() => {
   h.result = ref(undefined);
+  h.calls = [];
 });
 
 describe('useDiscussionAgeGateCheck', () => {
@@ -61,3 +67,47 @@ describe('useDiscussionAgeGateCheck', () => {
     expect(requiresAgeCheck.value).toBe(expected);
   });
 });
+
+describe('useDiscussionAgeGateCheck without a known id', () => {
+  const lookupByNumber = () =>
+    useDiscussionAgeGateCheck({
+      discussionNumber: ref(7),
+      channelUniqueName: ref('cats'),
+      enabled: ref(true),
+    });
+
+  it('looks the id up from the forum and discussion number', () => {
+    lookupByNumber();
+    expect(h.calls[0]?.variables()).toEqual({
+      channelUniqueName: 'cats',
+      discussionNumber: 7,
+    });
+  });
+
+  it('runs the id lookup when only the number is known', () => {
+    lookupByNumber();
+    expect(h.calls[0]?.options().enabled).toBe(true);
+  });
+
+  it('waits for the id before running the age check', () => {
+    lookupByNumber();
+    expect(h.calls[1]?.options().enabled).toBe(false);
+  });
+
+  it('asks about the looked-up discussion id', () => {
+    h.result = ref({ discussionChannels: [{ discussionId: 'looked-up' }] });
+    lookupByNumber();
+    expect(h.calls[1]?.variables()).toEqual({ discussionId: 'looked-up' });
+  });
+
+  it('skips the lookup when the id is already known', () => {
+    useDiscussionAgeGateCheck({
+      discussionId: ref('d1'),
+      discussionNumber: ref(7),
+      channelUniqueName: ref('cats'),
+      enabled: ref(true),
+    });
+    expect(h.calls[0]?.options().enabled).toBe(false);
+  });
+});
+

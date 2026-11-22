@@ -73,7 +73,7 @@ const IssueTitleEditFormStub = defineComponent({
 
 const DiscussionDetailContentStub = defineComponent({
   name: 'DiscussionDetailContent',
-  props: { discussionId: String },
+  props: { discussionNumber: Number },
   template: '<div class="discussion-detail-content-stub" />',
 });
 
@@ -461,9 +461,9 @@ describe('forum shell page', () => {
 
   it('renders a selected discussion in the split panel', async () => {
     mockState.route.name = 'forums-forumId-discussions';
-    mockState.route.query = { selectedDiscussionId: 'discussion-1' };
+    mockState.route.query = { selectedDiscussionId: '12' };
     useUIStore().setSelectedChannelDiscussionSelection({
-      discussionId: 'discussion-1',
+      discussionNumber: 12,
       title: 'A discussion',
     });
     const wrapper = await mountWith([
@@ -474,17 +474,17 @@ describe('forum shell page', () => {
       title: wrapper.text().includes('A discussion'),
       id: wrapper
         .findComponent(DiscussionDetailContentStub)
-        .props('discussionId'),
+        .props('discussionNumber'),
       link: wrapper
         .getComponent('[data-testid="channel-discussion-detail-link"]')
         .props('to'),
       hasOpenInNewTab: wrapper.text().includes('Open in new tab'),
     }).toEqual({
       title: true,
-      id: 'discussion-1',
+      id: 12,
       link: {
         name: 'forums-forumId-discussions-discussionId',
-        params: { forumId: 'cats', discussionId: 'discussion-1' },
+        params: { forumId: 'cats', discussionId: '12-a-discussion' },
       },
       hasOpenInNewTab: false,
     });

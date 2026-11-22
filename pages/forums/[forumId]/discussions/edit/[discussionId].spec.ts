@@ -21,7 +21,9 @@ const hState = vi.hoisted(() => ({
 }));
 
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { forumId: 'cats', discussionId: 'd1' } }),
+  useRoute: () => ({
+    params: { forumId: 'cats', discussionId: '42-hello' },
+  }),
   useRouter: () => ({ push: hState.push }),
   useHead: hState.useHead,
 }));
@@ -36,6 +38,16 @@ vi.mock('@vue/apollo-composable', () => ({
 
 vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => ref('mod-1'),
+}));
+
+// The page resolves the route's `{number}-{slug}` to the global id.
+vi.mock('@/composables/useRouteContentIds', () => ({
+  useResolvedDiscussionId: () => ({
+    id: ref('d1'),
+    discussionNumber: ref(42),
+    loading: ref(false),
+    notFound: ref(false),
+  }),
 }));
 
 const RequireAuthStub = defineComponent({
@@ -299,6 +311,40 @@ describe('discussion edit page', () => {
         forumId: 'science',
         discussionId: 'd1',
       },
+    });
+  });
+
+  it('navigates back to the number-and-slug url when staying in the same forum', async () => {
+    const wrapper = await mountPage();
+    hState.onResultCb({
+      loading: false,
+      data: {
+        discussions: [
+          {
+            id: 'd1',
+            title: 'Hello',
+            body: '',
+            Tags: [],
+            DiscussionChannels: [
+              {
+                channelUniqueName: 'cats',
+                discussionNumber: 42,
+                Channel: { uniqueName: 'cats' },
+              },
+            ],
+            Author: { username: 'alice' },
+            Album: { Images: [], imageOrder: [] },
+          },
+        ],
+      },
+    });
+    await nextTick();
+
+    await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('cancel');
+
+    expect(hState.push).toHaveBeenCalledWith({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { forumId: 'cats', discussionId: '42-hello' },
     });
   });
 

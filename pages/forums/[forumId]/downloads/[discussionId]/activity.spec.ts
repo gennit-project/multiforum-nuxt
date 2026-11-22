@@ -11,7 +11,7 @@ const mockUseQuery = vi.hoisted(() => vi.fn());
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
-    params: { forumId: 'cats', discussionId: 'discussion-1' },
+    params: { forumId: 'cats', discussionId: '7-cool-model' },
   }),
 }));
 
@@ -70,8 +70,8 @@ describe('download activity', () => {
     expect(wrapper.text()).toContain('Pipeline activity');
     expect(wrapper.text()).toContain('timed out');
     expect(wrapper.text()).not.toContain('pipeline-active');
-    expect(wrapper.get('a').attributes('href')).toContain(
-      '?attempt=attempt-1#attempt-pipeline-1'
+    expect(wrapper.get('a').attributes('href')).toBe(
+      '/forums/cats/downloads/7/pipelines?attempt=attempt-1#attempt-pipeline-1'
     );
   });
 

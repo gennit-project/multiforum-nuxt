@@ -6,10 +6,13 @@ import DiscussionChannelLink from './DiscussionChannelLink.vue';
 interface Props {
   channelId?: string;
   discussionChannels: DiscussionChannel[];
+  /** Discussion title, for the decorative slug in the links. */
+  discussionTitle?: string | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   channelId: '',
+  discussionTitle: null,
 });
 
 const channelsExceptActive = computed(() => {
@@ -39,6 +42,8 @@ const channelsExceptActive = computed(() => {
               ?.nodes || 0
           "
           :discussion-id="discussionChannel.discussionId"
+          :discussion-number="discussionChannel.discussionNumber"
+          :discussion-title="discussionTitle"
         />
       </ul>
     </div>
@@ -58,6 +63,8 @@ const channelsExceptActive = computed(() => {
               dc.UpvotedByUsersConnection?.aggregate?.count?.nodes || 0
             "
             :discussion-id="dc.discussionId"
+            :discussion-number="dc.discussionNumber"
+            :discussion-title="discussionTitle"
           />
         </ul>
         <p v-if="channelsExceptActive.length === 0" class="text-sm">

@@ -9,12 +9,16 @@ const replace = vi.fn();
 const fetchMoreMock = vi.fn();
 const clearSelectedChannelEventSelection = vi.fn();
 const setSelectedChannelEventSelection = vi.fn();
-const mockRoute = {
-  path: '/events/list/search/event-1',
+const mockRoute: {
+  path: string;
+  params: Record<string, string>;
+  query: Record<string, string>;
+} = {
+  path: '/events/list/search/1-event-one',
   params: {
-    eventId: 'event-1',
+    eventId: '1-event-one',
   },
-  query: {},
+  query: { forum: 'forum-1' },
 };
 
 vi.mock('@/components/auth/RequireAuth.vue', () => ({
@@ -73,9 +77,9 @@ const EventDetailStub = defineComponent({
 describe('EventListView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockRoute.path = '/events/list/search/event-1';
-    mockRoute.params = { eventId: 'event-1' };
-    mockRoute.query = {};
+    mockRoute.path = '/events/list/search/1-event-one';
+    mockRoute.params = { eventId: '1-event-one' };
+    mockRoute.query = { forum: 'forum-1' };
 
     (useQuery as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       error: ref(null),
@@ -84,12 +88,15 @@ describe('EventListView', () => {
           {
             id: 'event-1',
             title: 'Event One',
-            EventChannels: [{ channelUniqueName: 'forum-1' }],
+            EventChannels: [
+              { channelUniqueName: 'forum-1', eventNumber: 1 },
+              { channelUniqueName: 'forum-2', eventNumber: 1 },
+            ],
           },
           {
             id: 'event-2',
             title: 'Event Two',
-            EventChannels: [{ channelUniqueName: 'forum-2' }],
+            EventChannels: [{ channelUniqueName: 'forum-2', eventNumber: 2 }],
           },
         ],
         eventsConnection: { aggregate: { count: { nodes: 2 } } },
@@ -98,7 +105,7 @@ describe('EventListView', () => {
     });
   });
 
-  it('uses the route event id as the selected search event and pushes a new search detail route on selection', async () => {
+  it('resolves the selected search event from the route number and forum, and pushes a new search detail route on selection', async () => {
     const wrapper = mount(EventListView, {
       global: {
         stubs: {
@@ -119,8 +126,8 @@ describe('EventListView', () => {
     await wrapper.vm.$nextTick();
 
     expect(push).toHaveBeenCalledWith({
-      path: '/events/list/search/event-2',
-      query: {},
+      path: '/events/list/search/2-event-two',
+      query: { forum: 'forum-2' },
     });
     expect(wrapper.get('[data-testid="event-detail"]').text()).toBe('event-2');
   });

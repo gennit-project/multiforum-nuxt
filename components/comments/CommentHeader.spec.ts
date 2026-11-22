@@ -238,3 +238,121 @@ describe('CommentHeader context link', () => {
     expect(wrapper.text()).toContain('View Context');
   });
 });
+
+describe('CommentHeader context link target', () => {
+  const contextLinkTarget = (commentData: Comment) =>
+    mount(CommentHeader, {
+      props: { commentData, parentCommentId: 'p1' },
+      global: {
+        stubs: {
+          AvatarComponent: true,
+          CommentEditsDropdown: { template: '<div />' },
+          NuxtLink: {
+            name: 'NuxtLink',
+            props: ['to'],
+            template: '<a><slot /></a>',
+          },
+        },
+      },
+    })
+      .findAllComponents({ name: 'NuxtLink' })
+      .find((link) => link.text() === 'View Context')
+      ?.props('to');
+
+  const discussionContext = {
+    channelUniqueName: 'cats',
+    discussionId: 'd1',
+    discussionNumber: 42,
+  };
+
+  it('links to the parent comment by discussion number and parent shortId', () => {
+    expect(
+      contextLinkTarget(
+        makeComment({
+          DiscussionChannel: discussionContext,
+          Channel: { uniqueName: 'cats' },
+          ParentComment: { id: 'parent1', shortId: 'parentshort1' },
+        })
+      )
+    ).toEqual({
+      name: 'forums-forumId-discussions-discussionId-comments-commentId',
+      params: {
+        forumId: 'cats',
+        discussionId: '42',
+        commentId: 'parentshort1',
+      },
+    });
+  });
+
+  it('links to the comment itself by shortId when it has no parent', () => {
+    expect(
+      contextLinkTarget(
+        makeComment({
+          shortId: 'ownshort0001',
+          DiscussionChannel: discussionContext,
+          Channel: { uniqueName: 'cats' },
+        })
+      )
+    ).toMatchObject({ params: { commentId: 'ownshort0001' } });
+  });
+
+  it('links to the commented-on comment for feedback on a comment', () => {
+    expect(
+      contextLinkTarget(
+        makeComment({
+          DiscussionChannel: discussionContext,
+          Channel: { uniqueName: 'cats' },
+          GivesFeedbackOnComment: {
+            id: 'target1',
+            shortId: 'targetshort1',
+            DiscussionChannel: { discussionId: 'd7', discussionNumber: 7 },
+          },
+        })
+      )
+    ).toEqual({
+      name: 'forums-forumId-discussions-discussionId-comments-commentId',
+      params: {
+        forumId: 'cats',
+        discussionId: '7',
+        commentId: 'targetshort1',
+      },
+    });
+  });
+
+  it('links feedback on a discussion by the discussion number and title', () => {
+    expect(
+      contextLinkTarget(
+        makeComment({
+          DiscussionChannel: discussionContext,
+          Channel: { uniqueName: 'cats' },
+          GivesFeedbackOnDiscussion: {
+            id: 'd9',
+            title: 'Trail conditions',
+            DiscussionChannels: [
+              { channelUniqueName: 'dogs', discussionNumber: 3 },
+              { channelUniqueName: 'cats', discussionNumber: 42 },
+            ],
+          },
+        })
+      )
+    ).toEqual({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { forumId: 'cats', discussionId: '42-trail-conditions' },
+    });
+  });
+
+  it('falls back to the raw discussion id for feedback on a discussion', () => {
+    expect(
+      contextLinkTarget(
+        makeComment({
+          DiscussionChannel: discussionContext,
+          Channel: { uniqueName: 'cats' },
+          GivesFeedbackOnDiscussion: { id: 'd9' },
+        })
+      )
+    ).toEqual({
+      name: 'forums-forumId-discussions-discussionId',
+      params: { forumId: 'cats', discussionId: 'd9' },
+    });
+  });
+});

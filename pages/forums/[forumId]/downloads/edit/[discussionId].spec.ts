@@ -10,7 +10,9 @@ import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditD
 const routeHarness = vi.hoisted(() => ({ routerPush: vi.fn() }));
 
 vi.mock('nuxt/app', () => ({
-  useRoute: () => ({ params: { forumId: 'cats', discussionId: 'd1' } }),
+  useRoute: () => ({
+    params: { forumId: 'cats', discussionId: '42-cool-model' },
+  }),
   useRouter: () => ({ push: routeHarness.routerPush }),
   useHead: vi.fn(),
 }));
@@ -47,6 +49,16 @@ vi.mock('@vue/apollo-composable', async () => {
 
 vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => ref('mod-1'),
+}));
+
+// The page resolves the route's `{number}-{slug}` to the global id.
+vi.mock('@/composables/useRouteContentIds', () => ({
+  useResolvedDiscussionId: () => ({
+    id: ref('d1'),
+    discussionNumber: ref(42),
+    loading: ref(false),
+    notFound: ref(false),
+  }),
 }));
 
 const RequireAuthStub = defineComponent({
@@ -371,7 +383,7 @@ describe('download edit page', () => {
     await wrapper.findComponent(CreateEditDiscussionFields).vm.$emit('cancel');
     expect(routeHarness.routerPush).toHaveBeenCalledWith({
       name: 'forums-forumId-downloads-discussionId',
-      params: { forumId: 'cats', discussionId: 'd1' },
+      params: { forumId: 'cats', discussionId: '42-cool-model' },
     });
   });
 
