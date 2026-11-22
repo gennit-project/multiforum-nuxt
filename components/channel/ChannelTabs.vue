@@ -1,5 +1,13 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, watch, type Component } from 'vue';
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+  type Component,
+} from 'vue';
 import TabButton from '@/components/channel/TabButton.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
@@ -20,6 +28,7 @@ import { useDisplay } from '@/composables/useDisplay';
 import { useQuery } from '@vue/apollo-composable';
 import { GetServerConfigDocument as GET_SERVER_CONFIG } from '@/__generated__/operations';
 import { config } from '@/config';
+import { computeVisibleTabCount } from '@/utils/tabOverflow';
 // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
 import { defineAsyncComponent } from 'vue';
 const Popper = defineAsyncComponent(() => import('vue3-popper'));
@@ -33,7 +42,12 @@ type Tab = {
   routeSuffix: string;
   label: string;
   icon: Component;
-  countProperty: 'DiscussionChannelsConnection' | 'EventChannelsConnection' | 'IssuesConnection' | '__DOWNLOAD_COUNT__' | null;
+  countProperty:
+    | 'DiscussionChannelsConnection'
+    | 'EventChannelsConnection'
+    | 'IssuesConnection'
+    | '__DOWNLOAD_COUNT__'
+    | null;
 };
 
 type TabRoutes = {
@@ -287,31 +301,118 @@ onMounted(() => {
 });
 
 watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
+
+const tabCount = (tab: Tab): number | null | undefined => {
+  if (!tab.countProperty) {
+    return null;
+  }
+  return tab.countProperty === '__DOWNLOAD_COUNT__'
+    ? props.downloadCount
+    : props.channel[tab.countProperty]?.aggregate?.count?.nodes;
+};
+
+// --- Overflow ("More") menu for the horizontal tab bar ---------------------
+// Every tab is rendered first so its natural width can be measured and cached.
+// Tabs that do not fit beside the "More" button move into its dropdown.
+const TAB_GAP_PX = 8;
+const navRef = ref<HTMLElement | null>(null);
+const moreRef = ref<HTMLElement | null>(null);
+const tabWidths = ref<number[] | null>(null);
+const visibleCount = ref(Number.POSITIVE_INFINITY);
+let resizeObserver: ResizeObserver | null = null;
+let measureFrame = 0;
+
+const visibleTabs = computed(() => tabs.value.slice(0, visibleCount.value));
+const overflowTabs = computed(() => tabs.value.slice(visibleCount.value));
+const isMoreActive = computed(() =>
+  overflowTabs.value.some((tab) => isTabActive(tab))
+);
+
+const measureOverflow = () => {
+  const nav = navRef.value;
+  if (!nav) {
+    return;
+  }
+  if (!tabWidths.value) {
+    const items = nav.querySelectorAll<HTMLElement>('[data-tab-item]');
+    if (items.length !== tabs.value.length) {
+      return;
+    }
+    tabWidths.value = Array.from(
+      items,
+      (item) => item.offsetWidth + TAB_GAP_PX
+    );
+  }
+  visibleCount.value = computeVisibleTabCount({
+    tabWidths: tabWidths.value,
+    moreWidth: (moreRef.value?.offsetWidth ?? 0) + TAB_GAP_PX,
+    containerWidth: nav.clientWidth,
+  });
+};
+
+// Widths are stale whenever the tab list or a badge value changes: render
+// everything again, then re-measure.
+const remeasureOverflow = () => {
+  tabWidths.value = null;
+  visibleCount.value = Number.POSITIVE_INFINITY;
+  void nextTick(measureOverflow);
+};
+
+const overflowKey = computed(() =>
+  tabs.value
+    .map((tab) => `${tab.name}:${props.showCounts ? tabCount(tab) : ''}`)
+    .join('|')
+);
+
+watch(overflowKey, remeasureOverflow);
+
+watch(
+  navRef,
+  (nav) => {
+    resizeObserver?.disconnect();
+    if (nav && resizeObserver) {
+      resizeObserver.observe(nav);
+      remeasureOverflow();
+    }
+  },
+  { flush: 'post' }
+);
+
+onMounted(() => {
+  if (typeof ResizeObserver === 'undefined') {
+    return;
+  }
+  // Defer to the next frame: changing the visible tabs inside the observer
+  // callback would otherwise trigger "ResizeObserver loop" errors.
+  resizeObserver = new ResizeObserver(() => {
+    cancelAnimationFrame(measureFrame);
+    measureFrame = requestAnimationFrame(measureOverflow);
+  });
+  if (navRef.value) {
+    resizeObserver.observe(navRef.value);
+    remeasureOverflow();
+  }
+});
+
+onBeforeUnmount(() => {
+  cancelAnimationFrame(measureFrame);
+  resizeObserver?.disconnect();
+});
 </script>
 
 <template>
   <div>
     <ClientOnly>
-      <!-- Desktop/Tablet Tabs (md and up) -->
+      <!-- Vertical sidebar tabs (md and up) -->
       <nav
-        v-if="mdAndUp"
+        v-if="mdAndUp && vertical"
         aria-label="Tabs"
-        :class="
-          vertical
-            ? 'text-md flex flex-col'
-            : 'space-x-2 overflow-x-auto text-sm'
-        "
+        class="text-md flex flex-col"
       >
         <TabButton
           v-for="tab in tabs"
           :key="tab.name"
-          :count="
-            tab.countProperty === '__DOWNLOAD_COUNT__'
-              ? downloadCount
-              : tab.countProperty
-                ? channel[tab.countProperty]?.aggregate?.count?.nodes
-                : 0
-          "
+          :count="tabCount(tab) ?? 0"
           :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
           :is-active="isTabActive(tab)"
           :label="tab.label"
@@ -321,6 +422,97 @@ watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
         >
           <component :is="tab.icon" :class="iconSize" />
         </TabButton>
+      </nav>
+
+      <!-- Horizontal tabs (md and up); tabs that do not fit go in "More" -->
+      <nav
+        v-else-if="mdAndUp"
+        ref="navRef"
+        aria-label="Tabs"
+        class="flex w-full items-start space-x-2 overflow-hidden text-sm whitespace-nowrap"
+        data-testid="channel-tabs-horizontal"
+      >
+        <TabButton
+          v-for="tab in visibleTabs"
+          :key="tab.name"
+          class="shrink-0"
+          data-tab-item
+          :count="tabCount(tab) ?? 0"
+          :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
+          :is-active="isTabActive(tab)"
+          :label="tab.label"
+          :show-count="showCounts && !!tab.countProperty"
+          :to="tabRoutes[tab.name] || ''"
+          :vertical="vertical"
+        >
+          <component :is="tab.icon" :class="iconSize" />
+        </TabButton>
+        <div
+          ref="moreRef"
+          class="shrink-0"
+          :class="overflowTabs.length ? '' : 'invisible absolute'"
+          data-testid="channel-tabs-more-container"
+        >
+          <Popper placement="bottom-end">
+            <template #default>
+              <button
+                type="button"
+                class="inline-flex items-center pt-2 text-xs font-medium"
+                :class="
+                  isMoreActive
+                    ? 'border-brand-500 border-b-2 text-gray-900 dark:text-gray-100'
+                    : 'border-b-2 border-transparent text-gray-500 dark:text-gray-400'
+                "
+                aria-haspopup="menu"
+                data-testid="channel-tabs-more"
+              >
+                <span
+                  class="flex h-6 items-center space-x-2 rounded-lg px-2 py-4 hover:bg-gray-100 sm:my-1 dark:hover:bg-gray-700"
+                >
+                  <span class="text-gray-700 dark:text-white">More</span>
+                  <i
+                    class="fa-solid fa-chevron-down h-3 w-3"
+                    aria-hidden="true"
+                  />
+                </span>
+              </button>
+            </template>
+
+            <template #content="{ close }">
+              <div
+                class="mt-1 w-56 rounded-md bg-white shadow-lg ring-1 ring-black/5 dark:bg-gray-800 dark:ring-gray-600"
+              >
+                <div class="py-1">
+                  <nuxt-link
+                    v-for="tab in overflowTabs"
+                    :key="tab.name"
+                    :to="tabRoutes[tab.name] || ''"
+                    :data-testid="`more-dropdown-${tab.name}`"
+                    :aria-current="isTabActive(tab) ? 'page' : undefined"
+                    class="flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700"
+                    :class="[
+                      isTabActive(tab)
+                        ? 'bg-brand-50 text-brand-700 dark:bg-brand-900/20 dark:text-brand-300'
+                        : 'text-gray-700 dark:text-gray-200',
+                    ]"
+                    @click="close"
+                  >
+                    <div class="flex items-center space-x-2">
+                      <component :is="tab.icon" class="h-5 w-5 shrink-0" />
+                      <span>{{ tab.label }}</span>
+                    </div>
+                    <span
+                      v-if="showCounts && tab.countProperty && tabCount(tab)"
+                      class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
+                    >
+                      {{ tabCount(tab) }}
+                    </span>
+                  </nuxt-link>
+                </div>
+              </div>
+            </template>
+          </Popper>
+        </div>
       </nav>
 
       <!-- Mobile Dropdown (sm and down) -->
@@ -344,14 +536,16 @@ watch([mdAndUp, tabs, tabRoutes], preloadMobileTabRoutes);
                     activeTab?.countProperty &&
                     (activeTab?.countProperty === '__DOWNLOAD_COUNT__'
                       ? downloadCount
-                      : channel[activeTab?.countProperty]?.aggregate?.count?.nodes)
+                      : channel[activeTab?.countProperty]?.aggregate?.count
+                          ?.nodes)
                   "
                   class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
                 >
                   {{
                     activeTab?.countProperty === '__DOWNLOAD_COUNT__'
                       ? downloadCount
-                      : channel[activeTab?.countProperty]?.aggregate?.count?.nodes
+                      : channel[activeTab?.countProperty]?.aggregate?.count
+                          ?.nodes
                   }}
                 </span>
               </div>
