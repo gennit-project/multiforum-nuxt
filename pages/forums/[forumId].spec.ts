@@ -445,6 +445,57 @@ describe('forum shell page', () => {
     ).toEqual(expect.arrayContaining(['mx-auto', 'xl:max-w-6xl']));
   });
 
+  it.each([
+    'forums-forumId-discussions',
+    'forums-forumId-events',
+    'forums-forumId-issues',
+  ])(
+    'lets the list scroll with the page in split view on %s',
+    async (routeName) => {
+      mockState.route.name = routeName;
+      const wrapper = await mountWith([
+        { uniqueName: 'cats', displayName: 'Cats' },
+      ]);
+
+      expect(
+        wrapper.get('[data-testid="forum-list-column"]').classes()
+      ).not.toContain('lg:overflow-y-auto');
+    }
+  );
+
+  it.each([
+    'forums-forumId-discussions',
+    'forums-forumId-events',
+    'forums-forumId-issues',
+  ])('pins the detail pane to the viewport on %s', async (routeName) => {
+    mockState.route.name = routeName;
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect(
+      wrapper.get('[data-testid="forum-detail-pane"]').classes()
+    ).toEqual(
+      expect.arrayContaining([
+        'lg:sticky',
+        'lg:top-0',
+        'h-screen',
+        'lg:overflow-y-auto',
+      ])
+    );
+  });
+
+  it('pins the channel tabs while the split-view list scrolls', async () => {
+    mockState.route.name = 'forums-forumId-discussions';
+    const wrapper = await mountWith([
+      { uniqueName: 'cats', displayName: 'Cats' },
+    ]);
+
+    expect(wrapper.get('[data-testid="forum-tabs-row"]').classes()).toEqual(
+      expect.arrayContaining(['lg:sticky', 'lg:top-0'])
+    );
+  });
+
   it('aligns the download title bar with the centered detail content', async () => {
     mockState.route.name = 'forums-forumId-downloads-discussionId';
     const wrapper = await mountWith([
