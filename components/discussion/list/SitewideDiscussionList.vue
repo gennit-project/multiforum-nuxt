@@ -466,39 +466,41 @@ const filterByChannel = (channel: string) => {
                   {{ selectedDiscussionTitle }}
                 </span>
               </h2>
-              <div
-                v-if="selectedDiscussionChannels.length"
-                class="mb-5 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900"
-              >
-                <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">
-                  Each forum has its own conversation.
-                </p>
-                <ForumSubmissions
-                  :key="selectedDiscussionId"
-                  :submissions="selectedDiscussionChannels"
-                  :content-id="selectedDiscussionId"
-                  :content-title="selectedDiscussionTitle"
-                  kind="discussion"
-                  :preview="true"
-                  :selected-forum="selectedChannelId"
-                />
-              </div>
+              <!-- Keyed by discussion only: switching forums keeps the body
+                   mounted and swaps just the conversation below it. -->
               <DiscussionDetailContent
                 v-if="selectedChannelId && selectedDiscussionNumber != null"
-                :key="`${selectedDiscussionId}:${selectedChannelId}`"
+                :key="selectedDiscussionId"
                 :discussion-number="selectedDiscussionNumber"
                 :channel-id="selectedChannelId"
+                :known-discussion-id="selectedDiscussionId"
                 :horizontal-album-thumbnails="true"
                 :show-comments="true"
                 class="w-full max-w-full min-w-0"
               >
                 <template #before-comments>
-                  <h3
-                    class="mt-6 border-t border-gray-200 pt-5 text-base font-semibold dark:border-gray-800"
+                  <div
+                    v-if="selectedDiscussionChannels.length"
+                    class="mx-2 mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-gray-900"
+                    data-testid="forum-conversation-picker"
                   >
+                    <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">
+                      Each forum has its own conversation.
+                    </p>
+                    <ForumSubmissions
+                      :key="selectedDiscussionId"
+                      :submissions="selectedDiscussionChannels"
+                      :content-id="selectedDiscussionId"
+                      :content-title="selectedDiscussionTitle"
+                      kind="discussion"
+                      :preview="true"
+                      :selected-forum="selectedChannelId"
+                    />
+                  </div>
+                  <h3 class="mx-2 mt-5 text-base font-semibold">
                     Conversation in {{ selectedChannelId }}
                   </h3>
-                  <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                  <p class="mx-2 mt-1 text-sm text-gray-600 dark:text-gray-400">
                     Replies here are visible in this forum’s conversation.
                   </p>
                 </template>
