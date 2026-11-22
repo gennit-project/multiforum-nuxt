@@ -104,6 +104,17 @@ const showChannelIssuePanel = computed(
   () => shellVisibility.value.showChannelIssuePanel
 );
 
+const enableSplitScroll = computed(
+  () =>
+    enableDiscussionSplitScroll.value ||
+    enableEventSplitScroll.value ||
+    enableIssueSplitScroll.value
+);
+// Split view: the list column scrolls with the page, so the channel banner
+// scrolls away like normal content. Only the detail pane is its own scroll
+// area, pinned to the viewport while the list moves underneath it.
+const detailPaneStickyClasses = 'lg:sticky lg:top-0 lg:h-screen lg:self-start';
+
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
@@ -419,15 +430,20 @@ definePageMeta({
             >
               <div
                 class="min-w-0 flex-1 overflow-x-clip px-4"
-                :class="
-                  enableDiscussionSplitScroll ||
-                  enableEventSplitScroll ||
-                  enableIssueSplitScroll
-                    ? 'lg:h-[calc(100vh-3.5rem)] lg:w-1/2 lg:overflow-y-auto'
-                    : ''
-                "
+                :class="enableSplitScroll ? 'lg:w-1/2' : ''"
+                data-testid="forum-list-column"
               >
-                <div class="flex items-center justify-between">
+                <!-- In split view the list scrolls with the page (so the
+                     banner scrolls away) and the tabs pin to the top. -->
+                <div
+                  class="flex items-center justify-between"
+                  :class="
+                    enableSplitScroll
+                      ? 'lg:sticky lg:top-0 lg:z-10 lg:bg-white lg:dark:bg-black'
+                      : ''
+                  "
+                  data-testid="forum-tabs-row"
+                >
                   <ChannelTabs
                     v-if="showChannelTabs && channel"
                     :admin-list="adminList"
@@ -445,9 +461,8 @@ definePageMeta({
               <div
                 v-if="showChannelDiscussionPanel"
                 class="hidden lg:flex lg:w-1/2 lg:flex-col lg:overflow-y-auto"
-                :class="
-                  enableDiscussionSplitScroll ? 'lg:h-[calc(100vh-3.5rem)]' : ''
-                "
+                :class="enableDiscussionSplitScroll ? detailPaneStickyClasses : ''"
+                data-testid="forum-detail-pane"
               >
                 <div
                   v-if="selectedChannelDiscussionNumber != null"
@@ -485,9 +500,8 @@ definePageMeta({
               <div
                 v-if="showChannelEventPanel"
                 class="hidden lg:flex lg:w-1/2 lg:flex-col lg:overflow-y-auto"
-                :class="
-                  enableEventSplitScroll ? 'lg:h-[calc(100vh-3.5rem)]' : ''
-                "
+                :class="enableEventSplitScroll ? detailPaneStickyClasses : ''"
+                data-testid="forum-detail-pane"
               >
                 <div
                   v-if="selectedChannelEventId"
@@ -533,9 +547,8 @@ definePageMeta({
               <div
                 v-if="showChannelIssuePanel"
                 class="hidden lg:flex lg:w-1/2 lg:flex-col lg:overflow-y-auto"
-                :class="
-                  enableIssueSplitScroll ? 'lg:h-[calc(100vh-3.5rem)]' : ''
-                "
+                :class="enableIssueSplitScroll ? detailPaneStickyClasses : ''"
+                data-testid="forum-detail-pane"
               >
                 <div
                   v-if="selectedIssueNumber && selectedIssueChannelId"
