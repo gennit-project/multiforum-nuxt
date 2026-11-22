@@ -479,7 +479,7 @@ describe('forum shell page', () => {
       expect.arrayContaining([
         'lg:sticky',
         'lg:top-0',
-        'lg:h-screen',
+        'h-screen',
         'lg:overflow-y-auto',
       ])
     );

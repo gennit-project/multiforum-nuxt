@@ -113,7 +113,9 @@ const enableSplitScroll = computed(
 // Split view: the list column scrolls with the page, so the channel banner
 // scrolls away like normal content. Only the detail pane is its own scroll
 // area, pinned to the viewport while the list moves underneath it.
-const detailPaneStickyClasses = 'lg:sticky lg:top-0 lg:h-screen lg:self-start';
+// The pane is `hidden` below lg, so the unprefixed height is inert there;
+// reusing existing utilities keeps the route CSS inside its budget.
+const detailPaneStickyClasses = 'h-screen lg:sticky lg:top-0';
 
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
@@ -439,7 +441,7 @@ definePageMeta({
                   class="flex items-center justify-between"
                   :class="
                     enableSplitScroll
-                      ? 'lg:sticky lg:top-0 lg:z-10 lg:bg-white lg:dark:bg-black'
+                      ? 'z-10 bg-white lg:sticky lg:top-0 dark:bg-black'
                       : ''
                   "
                   data-testid="forum-tabs-row"
