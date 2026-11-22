@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ref, reactive, nextTick } from 'vue';
 import { mount } from '@vue/test-utils';
 import type { Channel } from '@/__generated__/graphql';
@@ -21,7 +21,9 @@ vi.mock('@/composables/useAuthState', () => ({
   useModProfileName: () => h.modName,
   useIsAuthenticated: () => h.isAuth,
 }));
-vi.mock('@/composables/useDisplay', () => ({ useDisplay: () => ({ mdAndUp: h.mdAndUp }) }));
+vi.mock('@/composables/useDisplay', () => ({
+  useDisplay: () => ({ mdAndUp: h.mdAndUp }),
+}));
 vi.mock('@vue/apollo-composable', () => ({
   useQuery: () => ({ result: h.serverConfig }),
 }));
@@ -49,8 +51,7 @@ const mountTabs = (props: Record<string, unknown> = {}) =>
         ClientOnly: { template: '<div><slot /></div>' },
         Popper: {
           setup: () => ({ close: h.closePopper }),
-          template:
-            '<div><slot /><slot name="content" :close="close" /></div>',
+          template: '<div><slot /><slot name="content" :close="close" /></div>',
         },
         TabButton: {
           name: 'TabButton',
@@ -112,7 +113,9 @@ describe('ChannelTabs base tabs', () => {
   });
 
   it('adds the Calendar tab when events are enabled', () => {
-    const wrapper = mountTabs({ channel: makeChannel({ eventsEnabled: true }) });
+    const wrapper = mountTabs({
+      channel: makeChannel({ eventsEnabled: true }),
+    });
 
     expect(labels(wrapper)).toContain('Calendar');
   });
@@ -132,7 +135,9 @@ describe('ChannelTabs auth-dependent tabs', () => {
       channel: makeChannel({ Admins: [{ username: 'alice' }] as never }),
     });
 
-    expect(labels(wrapper)).toEqual(expect.arrayContaining(['Settings', 'Issues']));
+    expect(labels(wrapper)).toEqual(
+      expect.arrayContaining(['Settings', 'Issues'])
+    );
   });
 
   it('shows Issues but not Settings for a moderator', () => {
@@ -261,5 +266,90 @@ describe('ChannelTabs mobile layout', () => {
     await nextTick();
 
     expect(h.preloadRouteComponents).not.toHaveBeenCalled();
+  });
+});
+
+describe('ChannelTabs overflow "More" menu', () => {
+  const originalResizeObserver = globalThis.ResizeObserver;
+
+  const mockLayout = ({ containerWidth }: { containerWidth: number }) => {
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        observe() {}
+        disconnect() {}
+      }
+    );
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(100);
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(
+      containerWidth
+    );
+  };
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.stubGlobal('ResizeObserver', originalResizeObserver);
+  });
+
+  const mountOverflowing = async (props: Record<string, unknown> = {}) => {
+    mockLayout({ containerWidth: 250 });
+    const wrapper = mountTabs({
+      channel: makeChannel({ downloadsEnabled: true, eventsEnabled: true }),
+      ...props,
+    });
+    await nextTick();
+    await nextTick();
+    return wrapper;
+  };
+
+  it('keeps only the tabs that fit beside the More button visible', async () => {
+    const wrapper = await mountOverflowing();
+
+    expect(labels(wrapper)).toEqual(['Discussions']);
+  });
+
+  it('moves the remaining tabs into the More dropdown in order', async () => {
+    const wrapper = await mountOverflowing();
+
+    expect(
+      wrapper
+        .findAll('[data-testid^="more-dropdown-"]')
+        .map((link) => link.attributes('data-testid'))
+    ).toEqual([
+      'more-dropdown-downloads',
+      'more-dropdown-events',
+      'more-dropdown-contributors',
+      'more-dropdown-about',
+    ]);
+  });
+
+  it('shows count badges on tabs inside the More dropdown', async () => {
+    const wrapper = await mountOverflowing({
+      showCounts: true,
+      downloadCount: 7,
+    });
+
+    expect(
+      wrapper.get('[data-testid="more-dropdown-downloads"]').text()
+    ).toContain('7');
+  });
+
+  it('closes the More dropdown when an item is clicked', async () => {
+    const wrapper = await mountOverflowing();
+
+    await wrapper.get('[data-testid="more-dropdown-about"]').trigger('click');
+
+    expect(h.closePopper).toHaveBeenCalledOnce();
+  });
+
+  it('hides the More container when every tab fits', async () => {
+    mockLayout({ containerWidth: 2000 });
+    const wrapper = mountTabs();
+    await nextTick();
+    await nextTick();
+
+    expect(
+      wrapper.get('[data-testid="channel-tabs-more-container"]').classes()
+    ).toContain('invisible');
   });
 });
