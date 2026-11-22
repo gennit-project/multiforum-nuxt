@@ -74,7 +74,7 @@ useHead(
           :route="route"
         />
       </div>
-      <ErrorBanner v-if="error" :error="error" />
+      <ErrorBanner v-if="error" :text="error.message" />
       <NuxtPage />
     </div>
   </NuxtLayout>

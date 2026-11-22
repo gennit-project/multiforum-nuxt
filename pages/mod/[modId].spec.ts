@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { shallowMount } from '@vue/test-utils';
 import { ref, unref, defineComponent, h } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 
 vi.stubGlobal('definePageMeta', vi.fn());
 
@@ -61,14 +62,15 @@ const SlotStub = defineComponent({
 
 const mockedUseQuery = useQuery as unknown as ReturnType<typeof vi.fn>;
 
-const mountPage = async (mod: unknown) => {
+const mountPage = async (mod: unknown, error: Error | null = null) => {
   mockedUseQuery.mockReturnValue({
     result: ref(mod ? { moderationProfiles: [mod] } : { moderationProfiles: [] }),
-    error: ref(null),
+    error: ref(error),
   });
   const Page = (await import('./[modId].vue')).default;
   return shallowMount(Page, {
     global: {
+      components: { ErrorBanner },
       stubs: { NuxtLayout: SlotStub, ClientOnly: SlotStub, NuxtPage: true },
     },
   });
@@ -98,5 +100,12 @@ describe('mod profile layout page', () => {
   it('hides the tabs when no mod is found', async () => {
     const wrapper = await mountPage(null);
     expect(wrapper.findComponent(ModProfileTabsStub).exists()).toBe(false);
+  });
+
+  it('shows the query error message in the error banner', async () => {
+    const wrapper = await mountPage(null, new Error('Not Authorised!'));
+    expect(wrapper.findComponent(ErrorBanner).props('text')).toBe(
+      'Not Authorised!'
+    );
   });
 });

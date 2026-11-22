@@ -118,13 +118,9 @@ const handleClickReport = (comment: CommentType) => {
 
 <template>
   <div class="py-3 dark:text-white">
-    <ErrorBanner v-if="error">
-      {{ error.message }}
-    </ErrorBanner>
-    <ErrorBanner v-if="getModError">
-      {{ getModError.message }}
-    </ErrorBanner>
-    <div v-else-if="commentCount === 0">No comments yet</div>
+    <ErrorBanner v-if="error" :text="error.message" />
+    <ErrorBanner v-if="getModError" :text="getModError.message" />
+    <div v-else-if="commentCount === 0 && !error">No comments yet</div>
     <HydratedProfileComment v-for="comment in comments" :key="comment.id" :comment="comment">
       <template #default="{ commentData }">
       <Comment
