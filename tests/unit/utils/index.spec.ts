@@ -581,97 +581,34 @@ describe('uploadAndGetEmbeddedLink', () => {
     ).rejects.toThrow('Network error');
   });
 
-  it('uses file extension to determine content type for jpg', async () => {
+  it.each([
+    ['photo.webp', '', 'image/webp'],
+    ['photo.PNG', '', 'image/png'],
+    ['model.stl', '', 'model/stl'],
+    ['model.glb', '', 'model/gltf-binary'],
+    ['photo.jpg', 'application/octet-stream', 'image/jpeg'],
+    ['data.xyz', '', 'application/octet-stream'],
+  ])('replays the signed MIME type for %s (browser MIME: %s)', async (filename, browserType, fileType) => {
     mockFetch.mockResolvedValueOnce({ ok: true });
+    const file = new File(['content'], filename, { type: browserType });
 
-    const file = new File(['content'], 'photo.jpg');
     await uploadAndGetEmbeddedLink({
       signedStorageURL: 'https://storage.example.com/upload',
-      filename: 'photo.jpg',
+      filename,
       file,
-      fileType: '',
+      fileType,
+      contentLengthRange: '0,10485760',
     });
 
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.any(String),
+      'https://storage.example.com/upload',
       expect.objectContaining({
-        headers: { 'Content-Type': 'image/jpeg' },
-      })
-    );
-  });
-
-  it('uses file extension to determine content type for jpeg', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true });
-
-    const file = new File(['content'], 'photo.jpeg');
-    await uploadAndGetEmbeddedLink({
-      signedStorageURL: 'https://storage.example.com/upload',
-      filename: 'photo.jpeg',
-      file,
-      fileType: '',
-    });
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        headers: { 'Content-Type': 'image/jpeg' },
-      })
-    );
-  });
-
-  it('uses file extension to determine content type for png', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true });
-
-    const file = new File(['content'], 'image.png');
-    await uploadAndGetEmbeddedLink({
-      signedStorageURL: 'https://storage.example.com/upload',
-      filename: 'image.png',
-      file,
-      fileType: '',
-    });
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        headers: { 'Content-Type': 'image/png' },
-      })
-    );
-  });
-
-  it('uses file extension to determine content type for gif', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true });
-
-    const file = new File(['content'], 'anim.gif');
-    await uploadAndGetEmbeddedLink({
-      signedStorageURL: 'https://storage.example.com/upload',
-      filename: 'anim.gif',
-      file,
-      fileType: '',
-    });
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        headers: { 'Content-Type': 'image/gif' },
-      })
-    );
-  });
-
-  it('uses octet-stream for unknown file types', async () => {
-    mockFetch.mockResolvedValueOnce({ ok: true });
-
-    const file = new File(['content'], 'data.xyz');
-    await uploadAndGetEmbeddedLink({
-      signedStorageURL: 'https://storage.example.com/upload',
-      filename: 'data.xyz',
-      file,
-      fileType: '',
-    });
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({
-        headers: { 'Content-Type': 'application/octet-stream' },
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': fileType,
+          'x-goog-content-length-range': '0,10485760',
+        },
       })
     );
   });
