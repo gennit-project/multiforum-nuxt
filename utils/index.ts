@@ -291,7 +291,7 @@ function describeSizeLimitHint(input: SizeLimitHintInput) {
 }
 
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
-  const { signedStorageURL, storageUrl, contentLengthRange, filename, file } =
+  const { signedStorageURL, storageUrl, contentLengthRange, filename, file, fileType } =
     input;
 
   if (!signedStorageURL) {
@@ -305,24 +305,10 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
     `https://storage.googleapis.com/${googleCloudStorageBucket}/${encodedFilename}`
   );
 
-  // Set the content type based on the file type or extension
-  const contentType =
-    file.type ||
-    (() => {
-      if (file.name.endsWith('.jpg') || file.name.endsWith('.jpeg')) {
-        return 'image/jpeg';
-      } else if (file.name.endsWith('.png')) {
-        return 'image/png';
-      } else if (file.name.endsWith('.gif')) {
-        return 'image/gif';
-      } else {
-        return 'application/octet-stream';
-      }
-    })();
-
+  // Replay the exact MIME type used to sign the URL.
   try {
     const headers: Record<string, string> = {
-      'Content-Type': contentType,
+      'Content-Type': fileType,
     };
     if (contentLengthRange) {
       headers['x-goog-content-length-range'] = contentLengthRange;
