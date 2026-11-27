@@ -1,4 +1,5 @@
 import { PermanentlyDeleteProfileImageDocument } from '@/__generated__/operations';
+import { stubSignedUpload } from '@/tests/unit/helpers/signedUpload';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ref } from 'vue';
 import { mount, flushPromises } from '@vue/test-utils';
@@ -171,6 +172,17 @@ describe('EditAccountSettingsFields profile picture upload', () => {
     expect(wrapper.emitted('updateFormValues')?.at(-1)?.[0]).toEqual({
       profilePicURL: 'https://cdn.example.com/pic.png',
     });
+  });
+
+  it('signs and PUTs the same MIME type for an avatar with no browser MIME', async () => {
+    const file = new File(['content'], 'avatar.PNG');
+    const { recordedRequest, expectedRequest } = await stubSignedUpload(
+      h.createSignedStorageUrl,
+      h.uploadLink
+    );
+    await changeProfilePic(mountFields(), file);
+
+    expect(recordedRequest()).toEqual(expectedRequest(file, 'image/png'));
   });
 
   it('emits submit after a successful upload', async () => {

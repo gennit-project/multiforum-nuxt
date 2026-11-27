@@ -14,6 +14,7 @@ import {
   uploadAndGetEmbeddedLink,
   type SignedStorageUrlPayload,
 } from '@/utils';
+import { resolveImageUploadContentType } from '@/utils/imageUploadContentType';
 import { useUsername } from '@/composables/useAuthState';
 import { ref, nextTick, computed } from 'vue';
 import { CreateSignedUrlDocument as CREATE_SIGNED_STORAGE_URL, PermanentlyDeleteChannelBannerDocument as PERMANENTLY_DELETE_CHANNEL_BANNER, SetChannelIconDocument as SET_CHANNEL_ICON , RemoveForumOwnerDocument as REMOVE_FORUM_OWNER  } from '@/__generated__/operations';
@@ -129,9 +130,10 @@ const upload = async (file: File) => {
       file,
     });
 
+    const contentType = resolveImageUploadContentType(file);
     const getSignedStorageURLInput = {
       filename,
-      contentType: file.type,
+      contentType,
     };
 
     const signedUrlResult = await createSignedStorageUrl(
@@ -141,16 +143,14 @@ const upload = async (file: File) => {
       ?.createSignedStorageURL as SignedStorageUrlPayload | undefined;
     const signedStorageURL = signedUpload?.url || '';
 
-    const embeddedLink = uploadAndGetEmbeddedLink({
+    return await uploadAndGetEmbeddedLink({
       file,
       filename,
       signedStorageURL,
-      fileType: file.type,
+      fileType: contentType,
       storageUrl: signedUpload?.storageUrl,
       contentLengthRange: signedUpload?.contentLengthRange,
     });
-
-    return embeddedLink;
   } catch (error) {
     console.error('Error uploading file:', error);
   }

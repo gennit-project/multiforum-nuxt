@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { stubSignedUpload } from '@/tests/unit/helpers/signedUpload';
 import { flushPromises, shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
 import EventCoverImageField from './EventCoverImageField.vue';
@@ -94,6 +95,22 @@ describe('EventCoverImageField', () => {
       },
       emitted: ['https://cdn.test/cover.png'],
     });
+  });
+
+  it('signs and PUTs the same MIME type for a cover with no browser MIME', async () => {
+    const file = new File(['content'], 'cover.WEBP');
+    const { recordedRequest, expectedRequest } = await stubSignedUpload(
+      createSignedStorageUrlMock,
+      uploadAndGetEmbeddedLinkMock
+    );
+    const wrapper = mountField('');
+    await wrapper.findComponent({ name: 'AddImage' }).vm.$emit('file-change', {
+      fieldName: 'coverImageURL',
+      event: { target: { files: [file] } },
+    });
+    await flushPromises();
+
+    expect(recordedRequest()).toEqual(expectedRequest(file, 'image/webp'));
   });
 
   it('ignores file changes for other fields', async () => {

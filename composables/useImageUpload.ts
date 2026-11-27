@@ -5,6 +5,7 @@ import {
   uploadAndGetEmbeddedLink,
   getUploadFileName,
 } from '@/utils';
+import { resolveImageUploadContentType } from '@/utils/imageUploadContentType';
 import { useUsername } from '@/composables/useAuthState';
 
 type UploadResult = {
@@ -15,28 +16,6 @@ type UploadResult = {
 
 type UseImageUploadOptions = {
   getChannelConnections?: () => string[];
-};
-
-/**
- * Get MIME type from filename extension when browser doesn't provide it
- */
-const getFileTypeFromName = (filename: string): string | null => {
-  if (!filename) return null;
-
-  const extension = filename.toLowerCase().split('.').pop();
-  if (!extension) return null;
-
-  const mimeTypes: Record<string, string> = {
-    jpg: 'image/jpeg',
-    jpeg: 'image/jpeg',
-    png: 'image/png',
-    gif: 'image/gif',
-    webp: 'image/webp',
-    svg: 'image/svg+xml',
-    bmp: 'image/bmp',
-  };
-
-  return mimeTypes[extension] || null;
 };
 
 /**
@@ -64,9 +43,7 @@ export function useImageUpload(options: UseImageUploadOptions = {}) {
     try {
       isUploading.value = true;
 
-      // For mobile devices, ensure the file type is correct even when it's sometimes missing
-      const fileType =
-        file.type || getFileTypeFromName(file.name) || 'image/jpeg';
+      const fileType = resolveImageUploadContentType(file, 'image/jpeg');
 
       const filename = getUploadFileName({ username: usernameVar.value, file });
       const signedStorageURLInput = {
