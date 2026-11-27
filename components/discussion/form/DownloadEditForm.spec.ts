@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { stubSignedUpload } from '@/tests/unit/helpers/signedUpload';
 import { ref } from 'vue';
 import { mount, flushPromises } from '@vue/test-utils';
 import type { Discussion } from '@/__generated__/graphql';
@@ -7,12 +8,12 @@ import DownloadEditForm from '@/components/discussion/form/DownloadEditForm.vue'
 
 const h = vi.hoisted(() => ({
   username: { value: 'alice' as string | null },
-  createSignedStorageUrl: undefined as unknown,
+  createSignedStorageUrl: vi.fn(),
   createDownloadableFile: undefined as unknown,
   permanentlyDeleteDownloadableFile: undefined as unknown,
   updateMutate: undefined as unknown,
   updateOptions: undefined as unknown,
-  uploadLink: undefined as unknown,
+  uploadLink: vi.fn(),
   onDoneCb: { fn: undefined as undefined | (() => void) },
 }));
 
@@ -363,6 +364,18 @@ describe('DownloadEditForm upload', () => {
     expect(h.createSignedStorageUrl).toHaveBeenCalledWith(
       expect.objectContaining({ uploadTarget: 'PRIVATE_DOWNLOAD' })
     );
+  });
+
+  it('signs and PUTs the same MIME type for a download with no browser MIME', async () => {
+    const file = new File(['content'], 'new.stl');
+    const { recordedRequest, expectedRequest } = await stubSignedUpload(
+      h.createSignedStorageUrl,
+      h.uploadLink
+    );
+    const wrapper = mountForm();
+    await setFiles(wrapper, '#downloadable-file-input', [file]);
+
+    expect(recordedRequest()).toEqual(expectedRequest(file, 'application/octet-stream'));
   });
 
   it('uploads a file and adds it to the form values', async () => {

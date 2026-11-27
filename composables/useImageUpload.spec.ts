@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { stubSignedUpload } from '@/tests/unit/helpers/signedUpload';
 import { useMutation } from '@vue/apollo-composable';
 import { useImageUpload } from './useImageUpload';
 
@@ -87,17 +88,16 @@ describe('useImageUpload.uploadFile', () => {
     expect(isUploading.value).toBe(false);
   });
 
-  it('derives a content type from the filename when file.type is missing', async () => {
-    mockMutate.mockResolvedValue({
-      data: { createSignedStorageURL: { url: 'https://signed' } },
-    });
-    uploadAndGetEmbeddedLink.mockResolvedValue('https://cdn/x.webp');
-    const { uploadFile } = useImageUpload();
-
-    await uploadFile(makeFile('x.webp', '')); // no MIME type
-    expect(mockMutate).toHaveBeenCalledWith(
-      expect.objectContaining({ contentType: 'image/webp' })
+  it('signs and PUTs the same MIME type for a WebP with no browser MIME', async () => {
+    const file = new File(['content'], 'x.webp');
+    const { recordedRequest, expectedRequest } = await stubSignedUpload(
+      mockMutate,
+      uploadAndGetEmbeddedLink
     );
+    const { uploadFile } = useImageUpload();
+    await uploadFile(file);
+
+    expect(recordedRequest()).toEqual(expectedRequest(file, 'image/webp'));
   });
 
   it('passes channel connections from the option callback', async () => {

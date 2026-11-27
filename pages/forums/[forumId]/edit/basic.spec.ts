@@ -1,4 +1,5 @@
 import { PermanentlyDeleteChannelBannerDocument, SetChannelIconDocument, RemoveForumOwnerDocument } from '@/__generated__/operations';
+import { stubSignedUpload } from '@/tests/unit/helpers/signedUpload';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { flushPromises, shallowMount } from '@vue/test-utils';
 import { ref } from 'vue';
@@ -148,11 +149,12 @@ const buildWrapper = async (formValues: Record<string, unknown>) => {
 
 const emitImage = (
   wrapper: Awaited<ReturnType<typeof buildWrapper>>,
-  file: File
+  file: File,
+  fieldName = 'channelIconURL'
 ) =>
   wrapper.findComponent(AddImageStub).vm.$emit('file-change', {
     event: { target: { files: [file] } },
-    fieldName: 'channelIconURL',
+    fieldName,
   });
 
 beforeEach(() => {
@@ -228,6 +230,19 @@ describe('forum basic settings page', () => {
       ],
     });
     expect(wrapper.emitted('submit')).toBeUndefined();
+  });
+
+  it('signs and PUTs the same MIME type for a banner with no browser MIME', async () => {
+    const file = new File(['content'], 'banner.webp');
+    const { recordedRequest, expectedRequest } = await stubSignedUpload(
+      h.createSignedStorageUrl,
+      h.uploadAndGetEmbeddedLink
+    );
+    const wrapper = await buildWrapper({});
+    emitImage(wrapper, file, 'channelBannerURL');
+    await flushPromises();
+
+    expect(recordedRequest()).toEqual(expectedRequest(file, 'image/webp'));
   });
 
   it('does not upload when no user is signed in', async () => {

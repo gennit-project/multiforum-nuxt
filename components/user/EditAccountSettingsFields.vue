@@ -12,6 +12,7 @@ import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
 } from '@/utils';
+import { resolveImageUploadContentType } from '@/utils/imageUploadContentType';
 import { useUsername } from '@/composables/useAuthState';
 import type { EditAccountSettingsFormValues } from '@/types/User';
 import FormComponent from '../FormComponent.vue';
@@ -80,9 +81,10 @@ const upload = async (file: File) => {
 
   try {
     const filename = getUploadFileName({ username: usernameVar.value, file });
+    const contentType = resolveImageUploadContentType(file);
     const signedUrlResult = await createSignedStorageUrl({
       filename,
-      contentType: file.type,
+      contentType,
     });
 
     const signedUpload = signedUrlResult?.data
@@ -92,7 +94,7 @@ const upload = async (file: File) => {
     const embeddedLink = await uploadAndGetEmbeddedLink({
       file,
       filename,
-      fileType: file.type,
+      fileType: contentType,
       signedStorageURL,
       storageUrl: signedUpload?.storageUrl,
       contentLengthRange: signedUpload?.contentLengthRange,

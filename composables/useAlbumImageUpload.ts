@@ -6,6 +6,7 @@ import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
 } from '@/utils';
+import { resolveImageUploadContentType } from '@/utils/imageUploadContentType';
 
 export type AlbumImageInput = {
   id?: string;
@@ -62,7 +63,7 @@ export function useAlbumImageUpload(params: UseAlbumImageUploadParams) {
     try {
       // Generate a unique filename
       const filename = getUploadFileName({ username: usernameVar.value, file });
-      const contentType = file.type;
+      const contentType = resolveImageUploadContentType(file);
       const signedStorageURLInput = { filename, contentType };
 
       // Ask the server for a signed storage URL

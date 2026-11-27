@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { stubSignedUpload } from '@/tests/unit/helpers/signedUpload';
 import { CreateSignedUrlDocument } from '@/__generated__/operations';
 import { flushPromises } from '@vue/test-utils';
 import { useAlbumImageUpload } from '@/composables/useAlbumImageUpload';
@@ -333,6 +334,30 @@ describe('useAlbumImageUpload', () => {
 
       alertMock.mockRestore();
     });
+  });
+
+  it('signs and PUTs the same MIME type for an album image with no browser MIME', async () => {
+    const file = new File(['content'], 'photo.webp');
+    const { recordedRequest, expectedRequest } = await stubSignedUpload(
+      mockCreateSignedStorageUrl,
+      mockUploadAndGetEmbeddedLink
+    );
+    mockCreateImage.mockResolvedValue({
+      data: {
+        createImageWithUploader: {
+          id: 'new-image',
+          url: 'https://storage.test/uploaded-file',
+        },
+      },
+    });
+    const { uploadFile } = useAlbumImageUpload({
+      maxImages: 25,
+      currentImageCount,
+      onImageUploaded,
+    });
+    await uploadFile(file);
+
+    expect(recordedRequest()).toEqual(expectedRequest(file, 'image/webp'));
   });
 
   describe('uploadFile failures', () => {

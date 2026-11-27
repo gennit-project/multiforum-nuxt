@@ -6,6 +6,7 @@ import {
   uploadAndGetEmbeddedLink,
   type SignedStorageUrlPayload,
 } from '@/utils';
+import { resolveImageUploadContentType } from '@/utils/imageUploadContentType';
 import { useUsername } from '@/composables/useAuthState';
 import { CreateSignedUrlDocument as CREATE_SIGNED_STORAGE_URL } from '@/__generated__/operations';
 import AddImage from '@/components/AddImage.vue';
@@ -40,24 +41,23 @@ const upload = async (file: File) => {
   }
   try {
     const filename = getUploadFileName({ username: usernameVar.value, file });
+    const contentType = resolveImageUploadContentType(file);
     const signedUrlResult = await createSignedStorageUrl({
       filename,
-      contentType: file.type,
+      contentType,
     });
 
     const signedUpload = signedUrlResult?.data?.createSignedStorageURL as
       SignedStorageUrlPayload | undefined;
     const signedStorageURL = signedUpload?.url || '';
-    const embeddedLink = uploadAndGetEmbeddedLink({
+    return await uploadAndGetEmbeddedLink({
       file,
       filename,
-      fileType: file.type,
+      fileType: contentType,
       signedStorageURL,
       storageUrl: signedUpload?.storageUrl,
       contentLengthRange: signedUpload?.contentLengthRange,
     });
-
-    return embeddedLink;
   } catch (error) {
     console.error('Error uploading file:', error);
   }
